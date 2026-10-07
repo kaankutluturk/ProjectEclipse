@@ -20,9 +20,9 @@ public sealed class KeyValuePair
 		}
 	}
 
-	public KeyValuePair(string KGBGENDIMBC)
+	public KeyValuePair(string keyName)
 	{
-		set_Key(KGBGENDIMBC);
+		set_Key(keyName);
 	}
 
 	public string GetKey()

@@ -8,13 +8,13 @@ public class RewardStruct
 
 	public Reward EclipseModeReward;
 
-	public RewardStruct(XmlNode node, ushort CDCJKJNGPOE, ushort MCDAHGPLLDO)
+	public RewardStruct(XmlNode node, ushort moneyExponent, ushort prizeBaseExponent)
 	{
-		CommonReward = new Reward(node, CDCJKJNGPOE, MCDAHGPLLDO);
+		CommonReward = new Reward(node, moneyExponent, prizeBaseExponent);
 		XmlNode xmlNode = node["NormalModeReward"];
 		if (xmlNode != null)
 		{
-			NormalModeReward = new Reward(xmlNode, CDCJKJNGPOE, MCDAHGPLLDO);
+			NormalModeReward = new Reward(xmlNode, moneyExponent, prizeBaseExponent);
 		}
 		else
 		{
@@ -23,7 +23,7 @@ public class RewardStruct
 		XmlNode xmlNode2 = node["EclipseModeReward"];
 		if (xmlNode2 != null)
 		{
-			EclipseModeReward = new Reward(xmlNode2, CDCJKJNGPOE, MCDAHGPLLDO);
+			EclipseModeReward = new Reward(xmlNode2, moneyExponent, prizeBaseExponent);
 		}
 		else
 		{
@@ -47,21 +47,21 @@ public class RewardStruct
 		}
 	}
 
-	public RewardPrize GetPrizeForLevel(int GNLOCMLBNHF)
+	public RewardPrize GetPrizeForLevel(int level)
 	{
-		RewardPrize cMHHEHILIIH = new RewardPrize();
+		RewardPrize prize = new RewardPrize();
 		if (CommonReward != null)
 		{
-			cMHHEHILIIH = CommonReward.GetPrizeForLevel(GNLOCMLBNHF);
-			cMHHEHILIIH.IsCloned = true;
+			prize = CommonReward.GetPrizeForLevel(level);
+			prize.IsCloned = true;
 		}
-		Reward lOELDGJGPIF = ((!ListSF.GetRoster().IsEclipseMode()) ? NormalModeReward : EclipseModeReward);
-		if (lOELDGJGPIF != null)
+		Reward modeReward = ((!ListSF.GetRoster().IsEclipseMode()) ? NormalModeReward : EclipseModeReward);
+		if (modeReward != null)
 		{
-			RewardPrize cMHHEHILIIH2 = lOELDGJGPIF.GetPrizeForLevel(GNLOCMLBNHF);
+			RewardPrize cMHHEHILIIH2 = modeReward.GetPrizeForLevel(level);
 			cMHHEHILIIH2.IsCloned = true;
-			cMHHEHILIIH.Merge(cMHHEHILIIH2);
+			prize.Merge(cMHHEHILIIH2);
 		}
-		return cMHHEHILIIH;
+		return prize;
 	}
 }

@@ -4,9 +4,9 @@ public class PerkData
 
 	public bool Enabled = true;
 
-	public PerkData(PerkInfoItem AEFFHJGMNFI, bool EMMAFNNIBFJ = true)
+	public PerkData(PerkInfoItem perkInfo, bool enabled = true)
 	{
-		PerkInfo = AEFFHJGMNFI;
-		Enabled = EMMAFNNIBFJ;
+		PerkInfo = perkInfo;
+		Enabled = enabled;
 	}
 }

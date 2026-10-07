@@ -134,20 +134,20 @@ namespace Nekki.SF2.GUI.Fight
 			return ScreenFightType.TYPE_INFO_NONE;
 		}
 
-		public void Init(FightList KGKDKENMAOA)
+		public void Init(FightList list)
 		{
-			this.fightList = KGKDKENMAOA;
+			this.fightList = list;
 			InitPreFight();
 		}
 
-		public void InitPreFight(ComboStatistic AIOMDIAFHGB = null, ComboStatistic MOJHPBGGNAH = null)
+		public void InitPreFight(ComboStatistic leftCombo = null, ComboStatistic rightCombo = null)
 		{
 			if (viewerFight == null)
 			{
 				viewerFight = Object.Instantiate(viewerFightPrefab).GetComponent<ViewerFight>();
 				viewerFight.transform.SetParent(base.transform, false);
 				viewerFight.AddEventListener(0, OnButtonClicked);
-				viewerFight.PreInit(AIOMDIAFHGB, MOJHPBGGNAH);
+				viewerFight.PreInit(leftCombo, rightCombo);
 			}
 			if (screenFight == null)
 			{
@@ -185,7 +185,7 @@ namespace Nekki.SF2.GUI.Fight
 			}
 		}
 
-		public void OpenEndFightScreen(FightResult DCJLKCFKCOM)
+		public void OpenEndFightScreen(FightResult result)
 		{
 			if (endFightScreenPrefab != null)
 			{
@@ -194,7 +194,7 @@ namespace Nekki.SF2.GUI.Fight
 				Transform parent = ((!(base.transform.parent != null)) ? base.transform : base.transform.parent);
 				endFightScreen.transform.SetParent(parent, false);
 				endFightScreen.transform.SetAsLastSibling();
-				endFightScreen.Init(DCJLKCFKCOM);
+				endFightScreen.Init(result);
 			}
 		}
 
@@ -214,11 +214,11 @@ namespace Nekki.SF2.GUI.Fight
 			}
 		}
 
-		public void ViewerInit(Round round, ModelParameters GKCDEPEKKEL, ModelParameters GJMOIENEDPB, bool ENCAKAAMEPN = true)
+		public void ViewerInit(Round round, ModelParameters leftParameters, ModelParameters rightParameters, bool showRounds = true)
 		{
 			if (viewerFight != null)
 			{
-				viewerFight.Init(round, GKCDEPEKKEL, GJMOIENEDPB, ENCAKAAMEPN);
+				viewerFight.Init(round, leftParameters, rightParameters, showRounds);
 			}
 		}
 
@@ -230,11 +230,11 @@ namespace Nekki.SF2.GUI.Fight
 			}
 		}
 
-		public void ViewerStrike(InfoAnimation IFPDGKDKJOD, float CKKFKEIELCP, int LBIOCDCPAGO, bool isFirstStrike, bool FABADFPDLPG, bool OOGIBOBMGJA, bool OOCLHFGEPML, bool EPKEEMFHHFM)
+		public void ViewerStrike(InfoAnimation animation, float damage, int attackerIndex, bool isFirstStrike, bool isHeadStrike, bool isCritical, bool isBlocked, bool isShock)
 		{
 			if (viewerFight != null)
 			{
-				viewerFight.Strike(IFPDGKDKJOD, CKKFKEIELCP, LBIOCDCPAGO, isFirstStrike, FABADFPDLPG, OOGIBOBMGJA, OOCLHFGEPML, EPKEEMFHHFM);
+				viewerFight.Strike(animation, damage, attackerIndex, isFirstStrike, isHeadStrike, isCritical, isBlocked, isShock);
 			}
 		}
 
@@ -246,11 +246,11 @@ namespace Nekki.SF2.GUI.Fight
 			}
 		}
 
-		public void ViewerUpdateHotGroundTimer(int time, RuleAppliance EJPOJJKKICO)
+		public void ViewerUpdateHotGroundTimer(int time, RuleAppliance appliance)
 		{
 			if (viewerFight != null)
 			{
-				viewerFight.UpdateHotGroundTimer(time, EJPOJJKKICO);
+				viewerFight.UpdateHotGroundTimer(time, appliance);
 			}
 		}
 
@@ -286,19 +286,19 @@ namespace Nekki.SF2.GUI.Fight
 			pauseScreen = null;
 		}
 
-		public void CreateVS(ModelParameters JCICKLIMBEF, List<ModelParameters> IDAAONBIBJM, int OBLEMIHLFII, bool BBBNBKIMHJC, bool GDLJMEJBGPO, bool IFMCDDIGOLD)
+		public void CreateVS(ModelParameters playerParameters, List<ModelParameters> enemies, int enemyIndex, bool enemiesFlag, bool showEnemies, bool startVsImmediately)
 		{
 			if (screenFight != null)
 			{
-				screenFight.CreateVS(JCICKLIMBEF, IDAAONBIBJM, OBLEMIHLFII, BBBNBKIMHJC, GDLJMEJBGPO, IFMCDDIGOLD);
+				screenFight.CreateVS(playerParameters, enemies, enemyIndex, enemiesFlag, showEnemies, startVsImmediately);
 			}
 		}
 
-		public void CreateRound(int value, bool JMBAAPAPMGB)
+		public void CreateRound(int value, bool useMaxRounds)
 		{
 			if (screenFight != null)
 			{
-				screenFight.CreateRound(value, JMBAAPAPMGB);
+				screenFight.CreateRound(value, useMaxRounds);
 			}
 			if (viewerFight != null)
 			{
@@ -334,13 +334,13 @@ namespace Nekki.SF2.GUI.Fight
 			}
 		}
 
-		public void CreateWinner(bool MBDILDFLMBL)
+		public void CreateWinner(bool isPerfect)
 		{
 			if (screenFight != null)
 			{
-				screenFight.CreateWinner(MBDILDFLMBL);
+				screenFight.CreateWinner(isPerfect);
 			}
-			if (MBDILDFLMBL && viewerFight != null)
+			if (isPerfect && viewerFight != null)
 			{
 				viewerFight.GetScreenModel(0).AddPerfect();
 			}
@@ -378,7 +378,7 @@ namespace Nekki.SF2.GUI.Fight
 			}
 		}
 
-		public void ShowAchievementMessage(Achievement NCCHENOEPNF)
+		public void ShowAchievementMessage(Achievement achievement)
 		{
 			if (achievementMessagePrefab == null)
 			{
@@ -390,7 +390,7 @@ namespace Nekki.SF2.GUI.Fight
 				achievementMessage.gameObject.SetActive(true);
 				achievementMessage.transform.SetParent(base.transform, false);
 				achievementMessage.OnHide.AddListener(OnAchievementMessageAnimationEnd);
-				achievementMessage.Init(NCCHENOEPNF);
+				achievementMessage.Init(achievement);
 				achievementMessage.StartAnimation();
 			}
 		}
@@ -406,13 +406,13 @@ namespace Nekki.SF2.GUI.Fight
 			OnAchievementMessageHide.Invoke();
 		}
 
-		public void OnScreenStop(ScreenFightType LFLGCDNKNJI)
+		public void OnScreenStop(ScreenFightType screenType)
 		{
 			if (screenFight != null)
 			{
 				screenFight.Clear();
 			}
-			OnStopScreen.Invoke(LFLGCDNKNJI);
+			OnStopScreen.Invoke(screenType);
 		}
 
 		public void OnFightPause(bool value)
@@ -423,11 +423,11 @@ namespace Nekki.SF2.GUI.Fight
 			}
 		}
 
-		public void SetHealthBarVisible(RuleAppliance EJPOJJKKICO, bool value)
+		public void SetHealthBarVisible(RuleAppliance appliance, bool value)
 		{
 			if (viewerFight != null)
 			{
-				viewerFight.SetHealthBarVisible(EJPOJJKKICO, value);
+				viewerFight.SetHealthBarVisible(appliance, value);
 			}
 		}
 
@@ -473,19 +473,19 @@ namespace Nekki.SF2.GUI.Fight
 			}
 		}
 
-		public void CreatePointsTable(float FNDOOJNDJDC, float GBCONNBABLL, int CFMPJLLNCFF, PointsTableType NOPJGLHKJPG, int LOMKKEAMMIG)
+		public void CreatePointsTable(float x, float y, int width, PointsTableType tableType, int maxPoints)
 		{
 			if (viewerFight != null)
 			{
-				viewerFight.CreatePointsTable(FNDOOJNDJDC, GBCONNBABLL, CFMPJLLNCFF, NOPJGLHKJPG, LOMKKEAMMIG);
+				viewerFight.CreatePointsTable(x, y, width, tableType, maxPoints);
 			}
 		}
 
-		public void UpdatePointsTable(int BBNOPLBAOCF, int HBIKJBGFFBM)
+		public void UpdatePointsTable(int leftScore, int rightScore)
 		{
 			if (viewerFight != null)
 			{
-				viewerFight.UpdatePointsTable(BBNOPLBAOCF, HBIKJBGFFBM);
+				viewerFight.UpdatePointsTable(leftScore, rightScore);
 			}
 		}
 

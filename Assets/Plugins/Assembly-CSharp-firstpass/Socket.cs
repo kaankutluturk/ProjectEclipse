@@ -58,10 +58,10 @@ public sealed class Socket : ISocket
 		}
 	}
 
-	internal Socket(string JBALIKEKHGL, SocketManager BJGMPDIKEJC)
+	internal Socket(string namespaceName, SocketManager socketManager)
 	{
-		set_Namespace(JBALIKEKHGL);
-		SetManager(BJGMPDIKEJC);
+		set_Namespace(namespaceName);
+		SetManager(socketManager);
 		SetIsOpen(false);
 		SetAutoDecodePayload(true);
 		eventCallbacks = new EventTable(this);
@@ -127,46 +127,46 @@ public sealed class Socket : ISocket
 		((ISocket)this).Disconnect(true);
 	}
 
-	void ISocket.Disconnect(bool GGONLJPAABO)
+	void ISocket.Disconnect(bool removeFromManager)
 	{
 		if (GetIsOpen())
 		{
-			Packet nPKADBPBKIG = new Packet(TransportEventTypes.Message, SocketIOEventType.Disconnect, GetNamespace(), string.Empty);
-			((IManager)GetManager()).SendPacket(nPKADBPBKIG);
+			Packet packet = new Packet(TransportEventTypes.Message, SocketIOEventType.Disconnect, GetNamespace(), string.Empty);
+			((IManager)GetManager()).SendPacket(packet);
 			SetIsOpen(false);
-			((ISocket)this).OnPacket(nPKADBPBKIG);
+			((ISocket)this).OnPacket(packet);
 		}
 		if (ackCallbacks != null)
 		{
 			ackCallbacks.Clear();
 		}
-		if (GGONLJPAABO)
+		if (removeFromManager)
 		{
 			eventCallbacks.Clear();
 			((IManager)GetManager()).Remove(this);
 		}
 	}
 
-	public Socket Emit(string DOPHKKGNAEF, params object[] LKIOKGCNKHE)
+	public Socket Emit(string eventName, params object[] args)
 	{
-		return Emit(DOPHKKGNAEF, null, LKIOKGCNKHE);
+		return Emit(eventName, null, args);
 	}
 
-	public Socket Emit(string DOPHKKGNAEF, SocketIOAckCallback callback, params object[] LKIOKGCNKHE)
+	public Socket Emit(string eventName, SocketIOAckCallback callback, params object[] args)
 	{
-		if (EventNames.IsBlacklisted(DOPHKKGNAEF))
+		if (EventNames.IsBlacklisted(eventName))
 		{
-			throw new ArgumentException("Blacklisted event: " + DOPHKKGNAEF);
+			throw new ArgumentException("Blacklisted event: " + eventName);
 		}
 		arguments.Clear();
-		arguments.Add(DOPHKKGNAEF);
+		arguments.Add(eventName);
 		List<byte[]> list = null;
-		if (LKIOKGCNKHE != null && LKIOKGCNKHE.Length > 0)
+		if (args != null && args.Length > 0)
 		{
 			int num = 0;
-			for (int i = 0; i < LKIOKGCNKHE.Length; i++)
+			for (int i = 0; i < args.Length; i++)
 			{
-				byte[] array = LKIOKGCNKHE[i] as byte[];
+				byte[] array = args[i] as byte[];
 				if (array != null)
 				{
 					if (list == null)
@@ -178,7 +178,7 @@ public sealed class Socket : ISocket
 				}
 				else
 				{
-					arguments.Add(LKIOKGCNKHE[i]);
+					arguments.Add(args[i]);
 				}
 			}
 		}
@@ -207,29 +207,29 @@ public sealed class Socket : ISocket
 			}
 			ackCallbacks[num2] = callback;
 		}
-		Packet cMPKPLIGKLC = new Packet(TransportEventTypes.Message, (list != null) ? SocketIOEventType.BinaryEvent : SocketIOEventType.Event, GetNamespace(), text, 0, num2);
+		Packet packet = new Packet(TransportEventTypes.Message, (list != null) ? SocketIOEventType.BinaryEvent : SocketIOEventType.Event, GetNamespace(), text, 0, num2);
 		if (list != null)
 		{
-			cMPKPLIGKLC.set_Attachments(list);
+			packet.set_Attachments(list);
 		}
-		((IManager)GetManager()).SendPacket(cMPKPLIGKLC);
+		((IManager)GetManager()).SendPacket(packet);
 		return this;
 	}
 
-	public Socket EmitAck(Packet FMAMCLDBKFM, params object[] LKIOKGCNKHE)
+	public Socket EmitAck(Packet originalPacket, params object[] args)
 	{
-		if (FMAMCLDBKFM == null)
+		if (originalPacket == null)
 		{
 			throw new ArgumentNullException("originalPacket == null!");
 		}
-		if (FMAMCLDBKFM.GetSocketIOEvent() != SocketIOEventType.Event && FMAMCLDBKFM.GetSocketIOEvent() != SocketIOEventType.BinaryEvent)
+		if (originalPacket.GetSocketIOEvent() != SocketIOEventType.Event && originalPacket.GetSocketIOEvent() != SocketIOEventType.BinaryEvent)
 		{
 			throw new ArgumentException("Wrong packet - you can't send an Ack for a packet with id == 0 and SocketIOEvent != Event or SocketIOEvent != BinaryEvent!");
 		}
 		arguments.Clear();
-		if (LKIOKGCNKHE != null && LKIOKGCNKHE.Length > 0)
+		if (args != null && args.Length > 0)
 		{
-			arguments.AddRange(LKIOKGCNKHE);
+			arguments.AddRange(args);
 		}
 		string text = null;
 		try
@@ -245,51 +245,51 @@ public sealed class Socket : ISocket
 		{
 			throw new ArgumentException("Encoding the arguments to JSON failed!");
 		}
-		Packet nPKADBPBKIG = new Packet(TransportEventTypes.Message, (FMAMCLDBKFM.GetSocketIOEvent() != SocketIOEventType.Event) ? SocketIOEventType.BinaryAck : SocketIOEventType.Ack, GetNamespace(), text, 0, FMAMCLDBKFM.GetPacketId());
-		((IManager)GetManager()).SendPacket(nPKADBPBKIG);
+		Packet packet = new Packet(TransportEventTypes.Message, (originalPacket.GetSocketIOEvent() != SocketIOEventType.Event) ? SocketIOEventType.BinaryAck : SocketIOEventType.Ack, GetNamespace(), text, 0, originalPacket.GetPacketId());
+		((IManager)GetManager()).SendPacket(packet);
 		return this;
 	}
 
-	public void On(string DOPHKKGNAEF, SocketIOCallback callback)
+	public void On(string eventName, SocketIOCallback callback)
 	{
-		eventCallbacks.Register(DOPHKKGNAEF, callback, false, GetAutoDecodePayload());
+		eventCallbacks.Register(eventName, callback, false, GetAutoDecodePayload());
 	}
 
-	public void On(SocketIOEventType LFLGCDNKNJI, SocketIOCallback callback)
+	public void On(SocketIOEventType eventType, SocketIOCallback callback)
 	{
-		string dOPHKKGNAEF = EventNames.GetNameFor(LFLGCDNKNJI);
-		eventCallbacks.Register(dOPHKKGNAEF, callback, false, GetAutoDecodePayload());
+		string eventName = EventNames.GetNameFor(eventType);
+		eventCallbacks.Register(eventName, callback, false, GetAutoDecodePayload());
 	}
 
-	public void On(string DOPHKKGNAEF, SocketIOCallback callback, bool EJDLINOJJIF)
+	public void On(string eventName, SocketIOCallback callback, bool autoDecodePayload)
 	{
-		eventCallbacks.Register(DOPHKKGNAEF, callback, false, EJDLINOJJIF);
+		eventCallbacks.Register(eventName, callback, false, autoDecodePayload);
 	}
 
-	public void On(SocketIOEventType LFLGCDNKNJI, SocketIOCallback callback, bool EJDLINOJJIF)
+	public void On(SocketIOEventType eventType, SocketIOCallback callback, bool autoDecodePayload)
 	{
-		string dOPHKKGNAEF = EventNames.GetNameFor(LFLGCDNKNJI);
-		eventCallbacks.Register(dOPHKKGNAEF, callback, false, EJDLINOJJIF);
+		string eventName = EventNames.GetNameFor(eventType);
+		eventCallbacks.Register(eventName, callback, false, autoDecodePayload);
 	}
 
-	public void Once(string DOPHKKGNAEF, SocketIOCallback callback)
+	public void Once(string eventName, SocketIOCallback callback)
 	{
-		eventCallbacks.Register(DOPHKKGNAEF, callback, true, GetAutoDecodePayload());
+		eventCallbacks.Register(eventName, callback, true, GetAutoDecodePayload());
 	}
 
-	public void Once(SocketIOEventType LFLGCDNKNJI, SocketIOCallback callback)
+	public void Once(SocketIOEventType eventType, SocketIOCallback callback)
 	{
-		eventCallbacks.Register(EventNames.GetNameFor(LFLGCDNKNJI), callback, true, GetAutoDecodePayload());
+		eventCallbacks.Register(EventNames.GetNameFor(eventType), callback, true, GetAutoDecodePayload());
 	}
 
-	public void Once(string DOPHKKGNAEF, SocketIOCallback callback, bool EJDLINOJJIF)
+	public void Once(string eventName, SocketIOCallback callback, bool autoDecodePayload)
 	{
-		eventCallbacks.Register(DOPHKKGNAEF, callback, true, EJDLINOJJIF);
+		eventCallbacks.Register(eventName, callback, true, autoDecodePayload);
 	}
 
-	public void Once(SocketIOEventType LFLGCDNKNJI, SocketIOCallback callback, bool EJDLINOJJIF)
+	public void Once(SocketIOEventType eventType, SocketIOCallback callback, bool autoDecodePayload)
 	{
-		eventCallbacks.Register(EventNames.GetNameFor(LFLGCDNKNJI), callback, true, EJDLINOJJIF);
+		eventCallbacks.Register(EventNames.GetNameFor(eventType), callback, true, autoDecodePayload);
 	}
 
 	public void Off()
@@ -297,29 +297,29 @@ public sealed class Socket : ISocket
 		eventCallbacks.Clear();
 	}
 
-	public void Off(string DOPHKKGNAEF)
+	public void Off(string eventName)
 	{
-		eventCallbacks.Unregister(DOPHKKGNAEF);
+		eventCallbacks.Unregister(eventName);
 	}
 
-	public void Off(SocketIOEventType LFLGCDNKNJI)
+	public void Off(SocketIOEventType eventType)
 	{
-		Off(EventNames.GetNameFor(LFLGCDNKNJI));
+		Off(EventNames.GetNameFor(eventType));
 	}
 
-	public void Off(string DOPHKKGNAEF, SocketIOCallback callback)
+	public void Off(string eventName, SocketIOCallback callback)
 	{
-		eventCallbacks.Unregister(DOPHKKGNAEF, callback);
+		eventCallbacks.Unregister(eventName, callback);
 	}
 
-	public void Off(SocketIOEventType LFLGCDNKNJI, SocketIOCallback callback)
+	public void Off(SocketIOEventType eventType, SocketIOCallback callback)
 	{
-		eventCallbacks.Unregister(EventNames.GetNameFor(LFLGCDNKNJI), callback);
+		eventCallbacks.Unregister(EventNames.GetNameFor(eventType), callback);
 	}
 
-	void ISocket.OnPacket(Packet NPKADBPBKIG)
+	void ISocket.OnPacket(Packet packet)
 	{
-		switch (NPKADBPBKIG.GetSocketIOEvent())
+		switch (packet.GetSocketIOEvent())
 		{
 		case SocketIOEventType.Disconnect:
 			if (GetIsOpen())
@@ -330,59 +330,59 @@ public sealed class Socket : ISocket
 			break;
 		case SocketIOEventType.Error:
 		{
-			bool IBFAPIMOMBA = false;
-			Dictionary<string, object> dictionary = Json.Decode(NPKADBPBKIG.GetPayload(), ref IBFAPIMOMBA) as Dictionary<string, object>;
-			if (IBFAPIMOMBA)
+			bool isValidJson = false;
+			Dictionary<string, object> dictionary = Json.Decode(packet.GetPayload(), ref isValidJson) as Dictionary<string, object>;
+			if (isValidJson)
 			{
-				Error eOFKDCNBPHO = new Error((SocketIOErrors)Convert.ToInt32(dictionary["code"]), dictionary["message"] as string);
-				eventCallbacks.Call(EventNames.GetNameFor(SocketIOEventType.Error), NPKADBPBKIG, eOFKDCNBPHO);
+				Error error = new Error((SocketIOErrors)Convert.ToInt32(dictionary["code"]), dictionary["message"] as string);
+				eventCallbacks.Call(EventNames.GetNameFor(SocketIOEventType.Error), packet, error);
 				return;
 			}
 			break;
 		}
 		}
-		eventCallbacks.Call(NPKADBPBKIG);
-		if ((NPKADBPBKIG.GetSocketIOEvent() != SocketIOEventType.Ack && NPKADBPBKIG.GetSocketIOEvent() != SocketIOEventType.BinaryAck) || ackCallbacks == null)
+		eventCallbacks.Call(packet);
+		if ((packet.GetSocketIOEvent() != SocketIOEventType.Ack && packet.GetSocketIOEvent() != SocketIOEventType.BinaryAck) || ackCallbacks == null)
 		{
 			return;
 		}
 		SocketIOAckCallback value = null;
-		if (ackCallbacks.TryGetValue(NPKADBPBKIG.GetPacketId(), out value) && value != null)
+		if (ackCallbacks.TryGetValue(packet.GetPacketId(), out value) && value != null)
 		{
 			try
 			{
-				value(this, NPKADBPBKIG, NPKADBPBKIG.Decode(GetManager().GetEncoder()));
+				value(this, packet, packet.Decode(GetManager().GetEncoder()));
 			}
-			catch (Exception mPFFFAOGBJE)
+			catch (Exception exception)
 			{
-				HTTPManager.GetLogger().Exception("Socket", "ackCallback", mPFFFAOGBJE);
+				HTTPManager.GetLogger().Exception("Socket", "ackCallback", exception);
 			}
 		}
-		ackCallbacks.Remove(NPKADBPBKIG.GetPacketId());
+		ackCallbacks.Remove(packet.GetPacketId());
 	}
 
-	void ISocket.EmitEvent(SocketIOEventType LFLGCDNKNJI, params object[] LKIOKGCNKHE)
+	void ISocket.EmitEvent(SocketIOEventType eventType, params object[] args)
 	{
-		((ISocket)this).EmitEvent(EventNames.GetNameFor(LFLGCDNKNJI), LKIOKGCNKHE);
+		((ISocket)this).EmitEvent(EventNames.GetNameFor(eventType), args);
 	}
 
-	void ISocket.EmitEvent(string DOPHKKGNAEF, params object[] LKIOKGCNKHE)
+	void ISocket.EmitEvent(string eventName, params object[] args)
 	{
-		if (!string.IsNullOrEmpty(DOPHKKGNAEF))
+		if (!string.IsNullOrEmpty(eventName))
 		{
-			eventCallbacks.Call(DOPHKKGNAEF, null, LKIOKGCNKHE);
+			eventCallbacks.Call(eventName, null, args);
 		}
 	}
 
-	void ISocket.EmitError(SocketIOErrors GNKCGOGKAEK, string CKEHOEGLMBM)
+	void ISocket.EmitError(SocketIOErrors errorType, string errorMessage)
 	{
 		((ISocket)this).EmitEvent(SocketIOEventType.Error, new object[1]
 		{
-			new Error(GNKCGOGKAEK, CKEHOEGLMBM)
+			new Error(errorType, errorMessage)
 		});
 	}
 
-	private void OnTransportOpen(Socket JLEACANCMJF, Packet NPKADBPBKIG, params object[] LKIOKGCNKHE)
+	private void OnTransportOpen(Socket socket, Packet packet, params object[] args)
 	{
 		if (GetNamespace() != "/")
 		{

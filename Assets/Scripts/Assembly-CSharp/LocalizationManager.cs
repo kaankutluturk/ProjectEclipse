@@ -48,27 +48,27 @@ public class Language
 
 		public float CustomLineSpacingScale = 1f;
 
-		public Language(XmlNode MEEAKLDGLDF, int DCHCFFFFLLK)
+		public Language(XmlNode node, int languageIndex)
 		{
-			name = MEEAKLDGLDF.Attributes["Name"].GetStringOrDefault("Name");
-			Locale = MEEAKLDGLDF.Attributes["Locale"].GetStringOrDefault("Locale");
+			name = node.Attributes["Name"].GetStringOrDefault("Name");
+			Locale = node.Attributes["Locale"].GetStringOrDefault("Locale");
 			FilePath = SF2Paths.GetLocalizationsPath() + "/" + name + ".xml";
-			IconSprite = "SettingsButtons." + MEEAKLDGLDF.Attributes["FileIcon"].GetStringOrDefault("FileIcon");
-			if (!MEEAKLDGLDF.Attributes["FileIconSelected"].Empty())
+			IconSprite = "SettingsButtons." + node.Attributes["FileIcon"].GetStringOrDefault("FileIcon");
+			if (!node.Attributes["FileIconSelected"].Empty())
 			{
-				SelectedIconSprite = "SettingsButtons." + MEEAKLDGLDF.Attributes["FileIconSelected"].GetStringOrDefault(string.Empty);
+				SelectedIconSprite = "SettingsButtons." + node.Attributes["FileIconSelected"].GetStringOrDefault(string.Empty);
 			}
-			index = DCHCFFFFLLK;
-			Alias = MEEAKLDGLDF.Attributes["Alias"].GetStringOrDefault("Alias");
-			LoaderImage = MEEAKLDGLDF.Attributes["LoaderImage"].GetStringOrDefault("logo");
-			PreloaderImage = MEEAKLDGLDF.Attributes["PreloaderImage"].GetStringOrDefault();
-			IsAsian = MEEAKLDGLDF.Attributes["IsAsian"].ParseBool();
-			if (MEEAKLDGLDF["Fonts"] != null)
+			index = languageIndex;
+			Alias = node.Attributes["Alias"].GetStringOrDefault("Alias");
+			LoaderImage = node.Attributes["LoaderImage"].GetStringOrDefault("logo");
+			PreloaderImage = node.Attributes["PreloaderImage"].GetStringOrDefault();
+			IsAsian = node.Attributes["IsAsian"].ParseBool();
+			if (node["Fonts"] != null)
 			{
-				LoadFonts(MEEAKLDGLDF["Fonts"], ref ContentFontName, ref TitleFontName, ref ButtonFontName, ref ContentFont, ref TitleFont, ref ButtonFont);
-				FontSizeScale = MEEAKLDGLDF["Fonts"].Attributes["FontSizeScale"].ParseFloat(1f);
-				LineSpacing = MEEAKLDGLDF["Fonts"].Attributes["LineSpacing"].ParseFloat(1f);
-				CustomLineSpacingScale = MEEAKLDGLDF["Fonts"].Attributes["CustomLineSpacingScale"].ParseFloat(1f);
+				LoadFonts(node["Fonts"], ref ContentFontName, ref TitleFontName, ref ButtonFontName, ref ContentFont, ref TitleFont, ref ButtonFont);
+				FontSizeScale = node["Fonts"].Attributes["FontSizeScale"].ParseFloat(1f);
+				LineSpacing = node["Fonts"].Attributes["LineSpacing"].ParseFloat(1f);
+				CustomLineSpacingScale = node["Fonts"].Attributes["CustomLineSpacingScale"].ParseFloat(1f);
 			}
 		}
 
@@ -365,27 +365,27 @@ public class Language
 		}
 	}
 
-	private static void LoadFonts(XmlNode HPGOCHNDPOO, ref string LICDEKGKFOG, ref string PGFDIINNPIP, ref string KIAADBBGNOI, ref Font CCJIANGGFEF, ref Font DHOMOPOLLGH, ref Font PDENGPGFJOB)
+	private static void LoadFonts(XmlNode node, ref string contentFontName, ref string titleFontName, ref string buttonFontName, ref Font contentFont, ref Font titleFont, ref Font buttonFont)
 	{
-		LICDEKGKFOG = HPGOCHNDPOO.Attributes["ContentFont"].GetStringOrDefault(string.Empty);
-		PGFDIINNPIP = HPGOCHNDPOO.Attributes["TitleFont"].GetStringOrDefault(string.Empty);
-		KIAADBBGNOI = HPGOCHNDPOO.Attributes["ButtonFont"].GetStringOrDefault(string.Empty);
-		LoadFonts(LICDEKGKFOG, PGFDIINNPIP, KIAADBBGNOI, ref CCJIANGGFEF, ref DHOMOPOLLGH, ref PDENGPGFJOB);
+		contentFontName = node.Attributes["ContentFont"].GetStringOrDefault(string.Empty);
+		titleFontName = node.Attributes["TitleFont"].GetStringOrDefault(string.Empty);
+		buttonFontName = node.Attributes["ButtonFont"].GetStringOrDefault(string.Empty);
+		LoadFonts(contentFontName, titleFontName, buttonFontName, ref contentFont, ref titleFont, ref buttonFont);
 	}
 
-	private static void LoadFonts(string LICDEKGKFOG, string PGFDIINNPIP, string KIAADBBGNOI, ref Font CCJIANGGFEF, ref Font DHOMOPOLLGH, ref Font PDENGPGFJOB)
+	private static void LoadFonts(string contentFontName, string titleFontName, string buttonFontName, ref Font contentFont, ref Font titleFont, ref Font buttonFont)
 	{
-		CCJIANGGFEF = ResourcesAndBundles.Load<Font>("UI/Fonts/" + LICDEKGKFOG);
-		DHOMOPOLLGH = ResourcesAndBundles.Load<Font>("UI/Fonts/" + PGFDIINNPIP);
-		PDENGPGFJOB = ResourcesAndBundles.Load<Font>("UI/Fonts/" + KIAADBBGNOI);
+		contentFont = ResourcesAndBundles.Load<Font>("UI/Fonts/" + contentFontName);
+		titleFont = ResourcesAndBundles.Load<Font>("UI/Fonts/" + titleFontName);
+		buttonFont = ResourcesAndBundles.Load<Font>("UI/Fonts/" + buttonFontName);
 	}
 
-	private static void ParseLanguages(XmlNode DAENMBIHKEB)
+	private static void ParseLanguages(XmlNode node)
 	{
-		DefaultLanguageName = DAENMBIHKEB.Attributes["Default"].GetStringOrDefault(string.Empty);
+		DefaultLanguageName = node.Attributes["Default"].GetStringOrDefault(string.Empty);
 		Languages.Clear();
 		int num = 0;
-		foreach (XmlNode childNode in DAENMBIHKEB.ChildNodes)
+		foreach (XmlNode childNode in node.ChildNodes)
 		{
 			Language item = new Language(childNode, num);
 			Languages.Add(item);
@@ -402,16 +402,16 @@ public class Language
 		return GetString(key, arguments);
 	}
 
-	public static string GetString(string PEMOECLNECD, params string[] JCICKLIMBEF)
+	public static string GetString(string stringKey, params string[] args)
 	{
-		if (PEMOECLNECD == null || CurrentLanguage == null)
+		if (stringKey == null || CurrentLanguage == null)
 		{
 			return string.Empty;
 		}
-		List<string> list = new List<string>(JCICKLIMBEF);
-		string key = PEMOECLNECD;
+		List<string> list = new List<string>(args);
+		string key = stringKey;
 		bool flag = false;
-		int num = PEMOECLNECD.IndexOf("{");
+		int num = stringKey.IndexOf("{");
 		if (num != -1)
 		{
 			flag = true;
@@ -419,14 +419,14 @@ public class Language
 			// separating space is presentation syntax, not part of the localization
 			// key.  Keeping it made valid entries such as "replays {999}" look up
 			// "replays " and spam a false missing-localization error.
-			key = PEMOECLNECD.Substring(0, num).TrimEnd();
+			key = stringKey.Substring(0, num).TrimEnd();
 		}
 			string text;
 			if (!EclipseExternalStrings.TryGetValue(key, out text) && !words.TryGetValue(key, out text))
 			{
-				if (PEMOECLNECD != string.Empty)
+				if (stringKey != string.Empty)
 				{
-					GameLog.Error(string.Format("ERROR: localization does not contain title \"{0}\"", PEMOECLNECD));
+					GameLog.Error(string.Format("ERROR: localization does not contain title \"{0}\"", stringKey));
 				}
 				return "%%ERROR%%";
 			}
@@ -439,19 +439,19 @@ public class Language
 		{
 			if (list.Count != 0)
 			{
-				GameLog.Error(string.Format("ERROR: GetString - parameters passed both through arguments and title in \"{0}\"", PEMOECLNECD));
+				GameLog.Error(string.Format("ERROR: GetString - parameters passed both through arguments and title in \"{0}\"", stringKey));
 			}
-			for (int num2 = num; num2 != -1; num2 = PEMOECLNECD.IndexOf('{', num2 + 1))
+			for (int num2 = num; num2 != -1; num2 = stringKey.IndexOf('{', num2 + 1))
 			{
-				int num3 = PEMOECLNECD.IndexOf('}', num2 + 1);
-				if ((num3 > PEMOECLNECD.IndexOf('{', num2 + 1) && PEMOECLNECD.IndexOf('{', num2 + 1) != -1) || num3 == -1)
+				int num3 = stringKey.IndexOf('}', num2 + 1);
+				if ((num3 > stringKey.IndexOf('{', num2 + 1) && stringKey.IndexOf('{', num2 + 1) != -1) || num3 == -1)
 				{
-					GameLog.Error(string.Format("ERROR: GetString - parameters brackets broken in title \"{0}\"", PEMOECLNECD));
+					GameLog.Error(string.Format("ERROR: GetString - parameters brackets broken in title \"{0}\"", stringKey));
 					break;
 				}
-				string bFFNFGKHBJA = PEMOECLNECD.Substring(num2 + 1, num3 - num2 - 1);
-				bFFNFGKHBJA = ResolveEmbeddedKeys(bFFNFGKHBJA);
-				list.Add(bFFNFGKHBJA);
+				string argument = stringKey.Substring(num2 + 1, num3 - num2 - 1);
+				argument = ResolveEmbeddedKeys(argument);
+				list.Add(argument);
 			}
 		}
 		if (list.Count != 0)
@@ -461,7 +461,7 @@ public class Language
 				int num5 = text.IndexOf('}', num4 + 1);
 				if ((num5 > text.IndexOf('{', num4 + 1) && text.IndexOf('{', num4 + 1) != -1) || num5 == -1)
 				{
-					GameLog.Error(string.Format("ERROR: GetString - parameters brackets broken in content of title \"{0}\"", PEMOECLNECD));
+					GameLog.Error(string.Format("ERROR: GetString - parameters brackets broken in content of title \"{0}\"", stringKey));
 					break;
 				}
 				string text2 = text.Substring(num4 + 1, num5 - num4 - 1);
@@ -482,15 +482,15 @@ public class Language
 		return ResolveEmbeddedKeys(text);
 	}
 
-	public static string DateString(long NNBJNDAFEDH)
+	public static string DateString(long unixSeconds)
 	{
-		DateTime dateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc).AddSeconds(NNBJNDAFEDH);
+		DateTime dateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc).AddSeconds(unixSeconds);
 		return string.Format("{0}.{1}.{2}", dateTime.Day, dateTime.Month, dateTime.Year);
 	}
 
-	private static string ResolveEmbeddedKeys(string BFFNFGKHBJA)
+	private static string ResolveEmbeddedKeys(string source)
 	{
-		string text = BFFNFGKHBJA;
+		string text = source;
 		for (int num = text.IndexOf('%'); num != -1; num = text.IndexOf('%', num + 1))
 		{
 			if (num + 1 >= text.Length || char.IsWhiteSpace(text[num + 1])) continue;
@@ -510,47 +510,47 @@ public class Language
 		return text;
 	}
 
-	private static int GetWordEndSymbol(string BFFNFGKHBJA, int IOOFDAIOCEL)
+	private static int GetWordEndSymbol(string source, int startIndex)
 	{
-		int num = BFFNFGKHBJA.IndexOf(' ', IOOFDAIOCEL);
-		int num2 = BFFNFGKHBJA.IndexOf('\n', IOOFDAIOCEL);
+		int num = source.IndexOf(' ', startIndex);
+		int num2 = source.IndexOf('\n', startIndex);
 		if ((num2 < num && num2 != -1) || num == -1)
 		{
 			num = num2;
 		}
 		if (num == -1)
 		{
-			num = BFFNFGKHBJA.Length;
+			num = source.Length;
 		}
 		return num;
 	}
 
-	public static Language GetNextLanguage(Language DLKMOGEJJCO = null)
+	public static Language GetNextLanguage(Language language = null)
 	{
-		if (DLKMOGEJJCO == null)
+		if (language == null)
 		{
-			DLKMOGEJJCO = CurrentLanguage;
+			language = CurrentLanguage;
 		}
-		int iHPMGHJPLBP = DLKMOGEJJCO.index;
+		int nextIndex = language.index;
 		int count = Languages.Count;
-		iHPMGHJPLBP = (iHPMGHJPLBP + 1) % count;
-		return Languages[iHPMGHJPLBP];
+		nextIndex = (nextIndex + 1) % count;
+		return Languages[nextIndex];
 	}
 
-	public static Language FindLanguageByName(string KEEACJILEEK)
+	public static Language FindLanguageByName(string languageName)
 	{
-		return Languages.Find((Language DHDMNHCIPEH) => DHDMNHCIPEH.name.Equals(KEEACJILEEK));
+		return Languages.Find((Language candidate) => candidate.name.Equals(languageName));
 	}
 
-	public static Language FindLanguageByLocale(string EOMNCDDELLB)
+	public static Language FindLanguageByLocale(string locale)
 	{
-		return Languages.Find((Language DHDMNHCIPEH) => DHDMNHCIPEH.Locale.Equals(EOMNCDDELLB));
+		return Languages.Find((Language candidate) => candidate.Locale.Equals(locale));
 	}
 
-	private static void Load(string PMFEIPCHENB)
+	private static void Load(string fileName)
 	{
 		Clear();
-		XmlDocument xmlDocument = XmlUtils.OpenXMLDocument(PMFEIPCHENB, string.Empty);
+		XmlDocument xmlDocument = XmlUtils.OpenXMLDocument(fileName, string.Empty);
 		if (xmlDocument != null)
 		{
 			ParseWords(xmlDocument["Localization"]["Words"]);
@@ -558,13 +558,13 @@ public class Language
 		}
 		else
 		{
-			GameLog.Error(string.Format("ERROR: load - file \"{0}\" doesn't exist", PMFEIPCHENB));
+			GameLog.Error(string.Format("ERROR: load - file \"{0}\" doesn't exist", fileName));
 		}
 	}
 
-	private static void ParseWords(XmlNode FOKEBDFAEEA)
+	private static void ParseWords(XmlNode node)
 	{
-		foreach (XmlNode childNode in FOKEBDFAEEA.ChildNodes)
+		foreach (XmlNode childNode in node.ChildNodes)
 		{
 			if (childNode.NodeType == XmlNodeType.Element)
 			{
@@ -573,25 +573,25 @@ public class Language
 		}
 	}
 
-	private static void ApplyLanguage(Language DLKMOGEJJCO = null, bool DANDCEBFMHM = true)
+	private static void ApplyLanguage(Language language = null, bool saveToRoster = true)
 	{
-		if (DLKMOGEJJCO == null)
+		if (language == null)
 		{
-			DLKMOGEJJCO = CurrentLanguage;
+			language = CurrentLanguage;
 		}
-		if (!HasAllFonts(DLKMOGEJJCO))
+		if (!HasAllFonts(language))
 		{
-			GameLog.Error(string.Format("ERROR: Language \"{0}\" doesn't have fonts", DLKMOGEJJCO.name));
+			GameLog.Error(string.Format("ERROR: Language \"{0}\" doesn't have fonts", language.name));
 		}
-		Load(DLKMOGEJJCO.FilePath);
-		CurrentLanguage = DLKMOGEJJCO;
+		Load(language.FilePath);
+		CurrentLanguage = language;
 		if (CurrentLanguage != null)
 		{
 			CurrentLanguage.LoadMissingFonts();
 		}
-		if (DANDCEBFMHM)
+		if (saveToRoster)
 		{
-			ListSF.GetRoster().SetLanguage(DLKMOGEJJCO.name);
+			ListSF.GetRoster().SetLanguage(language.name);
 			ListSF.GetRoster().RequestSave();
 		}
 	}
@@ -603,19 +603,19 @@ public class Language
 		IsLoaded = false;
 	}
 
-	public static bool HasAllFonts(Language HBGOBBALPBP)
+	public static bool HasAllFonts(Language language)
 	{
-		if (HBGOBBALPBP != null)
+		if (language != null)
 		{
-			if (HBGOBBALPBP.ButtonFont == null)
+			if (language.ButtonFont == null)
 			{
 				return false;
 			}
-			if (HBGOBBALPBP.ContentFont == null)
+			if (language.ContentFont == null)
 			{
 				return false;
 			}
-			if (HBGOBBALPBP.TitleFont == null)
+			if (language.TitleFont == null)
 			{
 				return false;
 			}
@@ -624,11 +624,11 @@ public class Language
 		return false;
 	}
 
-	public static void ChangeLanguage(Language HBGOBBALPBP = null)
+	public static void ChangeLanguage(Language language = null)
 	{
-		if (HBGOBBALPBP != null)
+		if (language != null)
 		{
-			ApplyLanguage(HBGOBBALPBP);
+			ApplyLanguage(language);
 		}
 		else
 		{

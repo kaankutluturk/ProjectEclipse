@@ -3,9 +3,9 @@ using System.Xml;
 
 public class TacticsCompiler
 {
-	public static void CompileTacticsSettings(XmlDocument EELFNMOHGJL)
+	public static void CompileTacticsSettings(XmlDocument document)
 	{
-		XmlNode xmlNode = EELFNMOHGJL["TacticsSettings"]["Tactics"];
+		XmlNode xmlNode = document["TacticsSettings"]["Tactics"];
 		if (xmlNode == null)
 		{
 			return;
@@ -29,8 +29,8 @@ public class TacticsCompiler
 			RemoveDuplicateTeplates(list);
 			if (0 < num)
 			{
-				int iHPMGHJPLBP = 0;
-				ApplyTemplates(xmlNode, childNode, list, iHPMGHJPLBP);
+				int templateIndex = 0;
+				ApplyTemplates(xmlNode, childNode, list, templateIndex);
 			}
 			if (list.Count == 0)
 			{
@@ -49,18 +49,18 @@ public class TacticsCompiler
 		}
 	}
 
-	private static void ApplyTemplates(XmlNode AFHNINCKJEE, XmlNode OEMALIFPGPO, List<string> JIGEFEPNCIN, int index)
+	private static void ApplyTemplates(XmlNode templatesNode, XmlNode targetNode, List<string> templateNames, int index)
 	{
-		if (JIGEFEPNCIN.Count <= index)
+		if (templateNames.Count <= index)
 		{
 			return;
 		}
-		string pAGGPPPLPGC = JIGEFEPNCIN[index];
-		XmlNode xmlNode = GetTemplateNode(AFHNINCKJEE, pAGGPPPLPGC);
+		string templateName = templateNames[index];
+		XmlNode xmlNode = GetTemplateNode(templatesNode, templateName);
 		if (xmlNode != null)
 		{
-			MergeAttributes(OEMALIFPGPO, xmlNode);
-			MergeChildNodes(OEMALIFPGPO, xmlNode);
+			MergeAttributes(targetNode, xmlNode);
+			MergeChildNodes(targetNode, xmlNode);
 			XmlAttribute xmlAttribute = xmlNode.Attributes["Template"];
 			if (xmlAttribute != null)
 			{
@@ -68,63 +68,63 @@ public class TacticsCompiler
 				List<string> list = new List<string>();
 				string[] collection = text.Split('|');
 				list.AddRange(collection);
-				JIGEFEPNCIN.AddIfNotExist(list);
+				templateNames.AddIfNotExist(list);
 			}
 		}
-		ApplyTemplates(AFHNINCKJEE, OEMALIFPGPO, JIGEFEPNCIN, index + 1);
+		ApplyTemplates(templatesNode, targetNode, templateNames, index + 1);
 	}
 
-	private static XmlNode GetTemplateNode(XmlNode AFHNINCKJEE, string PAGGPPPLPGC)
+	private static XmlNode GetTemplateNode(XmlNode templatesNode, string templateName)
 	{
-		foreach (XmlNode childNode in AFHNINCKJEE.ChildNodes)
+		foreach (XmlNode childNode in templatesNode.ChildNodes)
 		{
 			if (childNode.Name == "Tactic")
 			{
 				string text = childNode.Attributes["Name"].GetStringOrDefault(string.Empty);
-				if (PAGGPPPLPGC == text)
+				if (templateName == text)
 				{
 					return childNode;
 				}
 			}
 		}
-		GameLog.Error("TacticsSettings: tactics template " + PAGGPPPLPGC + " not found");
+		GameLog.Error("TacticsSettings: tactics template " + templateName + " not found");
 		return null;
 	}
 
-	public static void MergeAttributes(XmlNode OEMALIFPGPO, XmlNode BBNKIBKPBLO, bool HPKBCMPEBJF = false)
+	public static void MergeAttributes(XmlNode targetNode, XmlNode sourceNode, bool overwrite = false)
 	{
-		foreach (XmlAttribute attribute in BBNKIBKPBLO.Attributes)
+		foreach (XmlAttribute attribute in sourceNode.Attributes)
 		{
 			string name = attribute.Name;
-			XmlAttribute xmlAttribute2 = OEMALIFPGPO.Attributes[name];
+			XmlAttribute xmlAttribute2 = targetNode.Attributes[name];
 			if (xmlAttribute2 == null)
 			{
-				OEMALIFPGPO.CopyAttribute(attribute);
+				targetNode.CopyAttribute(attribute);
 			}
-			else if (HPKBCMPEBJF)
+			else if (overwrite)
 			{
 				xmlAttribute2.Value = attribute.Value;
 			}
 		}
 	}
 
-	public static void MergeChildNodes(XmlNode OEMALIFPGPO, XmlNode BBNKIBKPBLO)
+	public static void MergeChildNodes(XmlNode targetNode, XmlNode sourceNode)
 	{
-		foreach (XmlNode childNode in BBNKIBKPBLO.ChildNodes)
+		foreach (XmlNode childNode in sourceNode.ChildNodes)
 		{
 			string name = childNode.Name;
-			XmlNode xmlNode2 = OEMALIFPGPO[name];
+			XmlNode xmlNode2 = targetNode[name];
 			if (xmlNode2 == null)
 			{
-				OEMALIFPGPO.AppendImportedClone(childNode);
+				targetNode.AppendImportedClone(childNode);
 			}
 		}
 	}
 
-	public static void MergeTactics(XmlNode OEMALIFPGPO, XmlNode BBNKIBKPBLO)
+	public static void MergeTactics(XmlNode targetSettings, XmlNode sourceSettings)
 	{
-		XmlNode mEEAKLDGLDF = OEMALIFPGPO["TacticsSettings"]["Tactics"];
-		XmlNode xmlNode = BBNKIBKPBLO["TacticsSettings"]["Tactics"];
+		XmlNode targetTactics = targetSettings["TacticsSettings"]["Tactics"];
+		XmlNode xmlNode = sourceSettings["TacticsSettings"]["Tactics"];
 		foreach (XmlNode childNode in xmlNode.ChildNodes)
 		{
 			string name = childNode.Name;
@@ -134,7 +134,7 @@ public class TacticsCompiler
 			}
 			string text = childNode.Attributes["Name"].GetStringOrDefault(string.Empty);
 			bool flag = false;
-			foreach (XmlNode childNode2 in OEMALIFPGPO.ChildNodes)
+			foreach (XmlNode childNode2 in targetSettings.ChildNodes)
 			{
 				if (!(name != "Tactic"))
 				{
@@ -148,20 +148,20 @@ public class TacticsCompiler
 			}
 			if (!flag)
 			{
-				mEEAKLDGLDF.AppendImportedClone(childNode);
+				targetTactics.AppendImportedClone(childNode);
 			}
 		}
 	}
 
-	private static void RemoveDuplicateTeplates(List<string> JIGEFEPNCIN)
+	private static void RemoveDuplicateTeplates(List<string> templateNames)
 	{
-		for (int i = 0; i < JIGEFEPNCIN.Count; i++)
+		for (int i = 0; i < templateNames.Count; i++)
 		{
-			for (int j = i + 1; j < JIGEFEPNCIN.Count; j++)
+			for (int j = i + 1; j < templateNames.Count; j++)
 			{
-				if (JIGEFEPNCIN[i] == JIGEFEPNCIN[j])
+				if (templateNames[i] == templateNames[j])
 				{
-					JIGEFEPNCIN.RemoveAt(j);
+					templateNames.RemoveAt(j);
 					j--;
 				}
 			}

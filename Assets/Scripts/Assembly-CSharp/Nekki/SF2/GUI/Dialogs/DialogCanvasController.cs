@@ -141,11 +141,11 @@ namespace Nekki.SF2.GUI.Dialogs
 			return component;
 		}
 
-		private GameObject GetPrefab(Type IGABHEMGKKE)
+		private GameObject GetPrefab(Type dialogType)
 		{
-			if (prefabsByType.ContainsKey(IGABHEMGKKE))
+			if (prefabsByType.ContainsKey(dialogType))
 			{
-				return prefabsByType[IGABHEMGKKE];
+				return prefabsByType[dialogType];
 			}
 			return null;
 		}

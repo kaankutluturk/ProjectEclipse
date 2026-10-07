@@ -22,52 +22,52 @@ namespace YamlDotNet.RepresentationModel
 		{
 		}
 
-		public YamlStream(params YamlDocument[] KODNOAMCEJE)
-			: this((IEnumerable<YamlDocument>)KODNOAMCEJE)
+		public YamlStream(params YamlDocument[] initialDocuments)
+			: this((IEnumerable<YamlDocument>)initialDocuments)
 		{
 		}
 
-		public YamlStream(IEnumerable<YamlDocument> KODNOAMCEJE)
+		public YamlStream(IEnumerable<YamlDocument> initialDocuments)
 		{
-			foreach (YamlDocument item in KODNOAMCEJE)
+			foreach (YamlDocument item in initialDocuments)
 			{
 				documents.Add(item);
 			}
 		}
 
-		public void Add(YamlDocument DPMKHPJABAF)
+		public void Add(YamlDocument document)
 		{
-			documents.Add(DPMKHPJABAF);
+			documents.Add(document);
 		}
 
-		public void Load(TextReader NILNDHEKNLJ)
+		public void Load(TextReader input)
 		{
 			documents.Clear();
-			YamlEventParser bPGMNGAJMKK = new YamlEventParser(NILNDHEKNLJ);
-			EventReader dCDJJJDPACI = new EventReader(bPGMNGAJMKK);
-			dCDJJJDPACI.Expect<StreamStart>();
-			while (!dCDJJJDPACI.Accept<StreamEndEvent>())
+			YamlEventParser parser = new YamlEventParser(input);
+			EventReader eventReader = new EventReader(parser);
+			eventReader.Expect<StreamStart>();
+			while (!eventReader.Accept<StreamEndEvent>())
 			{
-				YamlDocument item = new YamlDocument(dCDJJJDPACI);
+				YamlDocument item = new YamlDocument(eventReader);
 				documents.Add(item);
 			}
-			dCDJJJDPACI.Expect<StreamEndEvent>();
+			eventReader.Expect<StreamEndEvent>();
 		}
 
-		public void Save(TextWriter output, bool EENMGCCBIHF = true)
+		public void Save(TextWriter output, bool assignAnchors = true)
 		{
-			IEmitter nEKGJNOFOFN = new Emitter(output);
-			nEKGJNOFOFN.Emit(new StreamStart());
+			IEmitter emitter = new Emitter(output);
+			emitter.Emit(new StreamStart());
 			foreach (YamlDocument document in documents)
 			{
-				document.Save(nEKGJNOFOFN, EENMGCCBIHF);
+				document.Save(emitter, assignAnchors);
 			}
-			nEKGJNOFOFN.Emit(new StreamEndEvent());
+			emitter.Emit(new StreamEndEvent());
 		}
 
-		public void Accept(IYamlVisitor NKECMANOOEM)
+		public void Accept(IYamlVisitor visitor)
 		{
-			NKECMANOOEM.Visit(this);
+			visitor.Visit(this);
 		}
 
 		public IEnumerator<YamlDocument> GetEnumerator()

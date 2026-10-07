@@ -71,8 +71,8 @@ public sealed class WebSocketResponse : HTTPResponse, IHeartbeat, IProtocol
 		}
 	}
 
-	internal WebSocketResponse(HTTPRequest ONOCIELLAPL, Stream ABJIEFMMIEK, bool IBIIADCLKCH, bool PEAJIKCANHP)
-		: base(ONOCIELLAPL, ABJIEFMMIEK, IBIIADCLKCH, PEAJIKCANHP)
+	internal WebSocketResponse(HTTPRequest request, Stream stream, bool isStreamed, bool isFromCache)
+		: base(request, stream, isStreamed, isFromCache)
 	{
 		SetIsClosedManually(true);
 		closed = false;
@@ -115,13 +115,13 @@ public sealed class WebSocketResponse : HTTPResponse, IHeartbeat, IProtocol
 		}
 	}
 
-	public void Send(string LIOGIBJBHAH)
+	public void Send(string message)
 	{
-		if (LIOGIBJBHAH == null)
+		if (message == null)
 		{
 			throw new ArgumentNullException("message must not be null!");
 		}
-		Send(new WebSocketTextFrame(LIOGIBJBHAH));
+		Send(new WebSocketTextFrame(message));
 	}
 
 	public void Send(byte[] data)
@@ -147,13 +147,13 @@ public sealed class WebSocketResponse : HTTPResponse, IHeartbeat, IProtocol
 		Send(new WebSocketBinaryFrame(data));
 	}
 
-	public void Send(byte[] data, ulong IPCOBJBKNAO, ulong count)
+	public void Send(byte[] data, ulong offset, ulong count)
 	{
 		if (data == null)
 		{
 			throw new ArgumentNullException("data must not be null!");
 		}
-		if (IPCOBJBKNAO + count > (ulong)data.Length)
+		if (offset + count > (ulong)data.Length)
 		{
 			throw new ArgumentOutOfRangeException("offset + count >= data.Length");
 		}
@@ -161,9 +161,9 @@ public sealed class WebSocketResponse : HTTPResponse, IHeartbeat, IProtocol
 		{
 			lock (sendLock)
 			{
-				Send(new WebSocketBinaryFrame(data, IPCOBJBKNAO, GetMaxFragmentSize(), false));
+				Send(new WebSocketBinaryFrame(data, offset, GetMaxFragmentSize(), false));
 				ulong num2;
-				for (ulong num = IPCOBJBKNAO + GetMaxFragmentSize(); num < count; num += num2)
+				for (ulong num = offset + GetMaxFragmentSize(); num < count; num += num2)
 				{
 					num2 = Math.Min(GetMaxFragmentSize(), count - num);
 					Send(new WebSocketContinuationFrame(data, num, num2, num + num2 >= count));
@@ -171,7 +171,7 @@ public sealed class WebSocketResponse : HTTPResponse, IHeartbeat, IProtocol
 				return;
 			}
 		}
-		Send(new WebSocketBinaryFrame(data, IPCOBJBKNAO, count, true));
+		Send(new WebSocketBinaryFrame(data, offset, count, true));
 	}
 
 	public void Send(IWebSocketFrameWriter frame)
@@ -200,21 +200,21 @@ public sealed class WebSocketResponse : HTTPResponse, IHeartbeat, IProtocol
 		Close(1000, "Bye!");
 	}
 
-	public void Close(ushort KJPGKHJNOMC, string CKEHOEGLMBM)
+	public void Close(ushort code, string message)
 	{
 		if (!closed)
 		{
-			Send(new WebSocketClose(KJPGKHJNOMC, CKEHOEGLMBM));
+			Send(new WebSocketClose(code, message));
 		}
 	}
 
-	public void StartPinging(int ONDDDDCAPFG)
+	public void StartPinging(int frequency)
 	{
-		if (ONDDDDCAPFG < 100)
+		if (frequency < 100)
 		{
 			throw new ArgumentException("frequency must be at least 100 millisec!");
 		}
-		set_PingFrequnecy(TimeSpan.FromMilliseconds(ONDDDDCAPFG));
+		set_PingFrequnecy(TimeSpan.FromMilliseconds(frequency));
 		HTTPManager.GetHeartbeats().Subscribe(this);
 	}
 
@@ -226,55 +226,55 @@ public sealed class WebSocketResponse : HTTPResponse, IHeartbeat, IProtocol
 			{
 				try
 				{
-					WebSocketFrameReader hENOIJFGGOF = new WebSocketFrameReader();
-					hENOIJFGGOF.Read(Stream);
-					if (hENOIJFGGOF.GetHasMask())
+					WebSocketFrameReader frame = new WebSocketFrameReader();
+					frame.Read(Stream);
+					if (frame.GetHasMask())
 					{
 						Close(1002, "Protocol Error: masked frame received from server!");
 						continue;
 					}
-					if (!hENOIJFGGOF.GetIsFinal())
+					if (!frame.GetIsFinal())
 					{
 						if (OnIncompleteFrame == null)
 						{
-							incompleteFrames.Add(hENOIJFGGOF);
+							incompleteFrames.Add(frame);
 							continue;
 						}
 						lock (FrameLock)
 						{
-							completedFrames.Add(hENOIJFGGOF);
+							completedFrames.Add(frame);
 						}
 						continue;
 					}
-					switch (hENOIJFGGOF.get_Type())
+					switch (frame.get_Type())
 					{
 					case WebSocketFrameTypes.Continuation:
 						if (OnIncompleteFrame == null)
 						{
-							hENOIJFGGOF.Assemble(incompleteFrames);
+							frame.Assemble(incompleteFrames);
 							incompleteFrames.Clear();
 							goto case WebSocketFrameTypes.Text;
 						}
 						lock (FrameLock)
 						{
-							completedFrames.Add(hENOIJFGGOF);
+							completedFrames.Add(frame);
 						}
 						break;
 					case WebSocketFrameTypes.Text:
 					case WebSocketFrameTypes.Binary:
 						lock (FrameLock)
 						{
-							completedFrames.Add(hENOIJFGGOF);
+							completedFrames.Add(frame);
 						}
 						break;
 					case WebSocketFrameTypes.Ping:
 						if (!closeSent && !closed)
 						{
-							Send(new WebSocketPong(hENOIJFGGOF));
+							Send(new WebSocketPong(frame));
 						}
 						break;
 					case WebSocketFrameTypes.ConnectionClose:
-						closeFrame = hENOIJFGGOF;
+						closeFrame = frame;
 						if (!closeSent)
 						{
 							Send(new WebSocketClose());
@@ -289,9 +289,9 @@ public sealed class WebSocketResponse : HTTPResponse, IHeartbeat, IProtocol
 					BaseRequest.set_State(HTTPRequestStates.Aborted);
 					closed = true;
 				}
-				catch (Exception bAINMLLIKOL)
+				catch (Exception exception)
 				{
-					BaseRequest.set_Exception(bAINMLLIKOL);
+					BaseRequest.set_Exception(exception);
 					BaseRequest.set_State(HTTPRequestStates.Error);
 					closed = true;
 				}
@@ -309,50 +309,50 @@ public sealed class WebSocketResponse : HTTPResponse, IHeartbeat, IProtocol
 		{
 			for (int i = 0; i < completedFrames.Count; i++)
 			{
-				WebSocketFrameReader hENOIJFGGOF = completedFrames[i];
+				WebSocketFrameReader frame = completedFrames[i];
 				try
 				{
-					WebSocketFrameTypes bECKAHJIEGE = hENOIJFGGOF.get_Type();
-					if (bECKAHJIEGE == WebSocketFrameTypes.Continuation)
+					WebSocketFrameTypes frameType = frame.get_Type();
+					if (frameType == WebSocketFrameTypes.Continuation)
 					{
 						goto IL_0041;
 					}
-					if (bECKAHJIEGE != WebSocketFrameTypes.Text)
+					if (frameType != WebSocketFrameTypes.Text)
 					{
-						if (bECKAHJIEGE == WebSocketFrameTypes.Binary)
+						if (frameType == WebSocketFrameTypes.Binary)
 						{
-							if (!hENOIJFGGOF.GetIsFinal())
+							if (!frame.GetIsFinal())
 							{
 								goto IL_0041;
 							}
 							if (OnBinary != null)
 							{
-								OnBinary(this, hENOIJFGGOF.GetData());
+								OnBinary(this, frame.GetData());
 							}
 						}
 					}
 					else
 					{
-						if (!hENOIJFGGOF.GetIsFinal())
+						if (!frame.GetIsFinal())
 						{
 							goto IL_0041;
 						}
 						if (OnText != null)
 						{
-							OnText(this, Encoding.UTF8.GetString(hENOIJFGGOF.GetData(), 0, hENOIJFGGOF.GetData().Length));
+							OnText(this, Encoding.UTF8.GetString(frame.GetData(), 0, frame.GetData().Length));
 						}
 					}
 					goto end_IL_0021;
 					IL_0041:
 					if (OnIncompleteFrame != null)
 					{
-						OnIncompleteFrame(this, hENOIJFGGOF);
+						OnIncompleteFrame(this, frame);
 					}
 					end_IL_0021:;
 				}
-				catch (Exception mPFFFAOGBJE)
+				catch (Exception exception)
 				{
-					HTTPManager.GetLogger().Exception("WebSocketResponse", "HandleEvents", mPFFFAOGBJE);
+					HTTPManager.GetLogger().Exception("WebSocketResponse", "HandleEvents", exception);
 				}
 			}
 			completedFrames.Clear();
@@ -385,7 +385,7 @@ public sealed class WebSocketResponse : HTTPResponse, IHeartbeat, IProtocol
 		}
 	}
 
-	void IHeartbeat.OnHeartbeatUpdate(TimeSpan OJOKANCMPLG)
+	void IHeartbeat.OnHeartbeatUpdate(TimeSpan elapsed)
 	{
 		if (lastPing == DateTime.MinValue)
 		{

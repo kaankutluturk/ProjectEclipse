@@ -17,15 +17,15 @@ public class PerkConditionMagicCharge : PerkConditionMatchMinMax
 		_chargeType = node.Attributes["Type"].GetStringOrDefault(string.Empty);
 	}
 
-	public override bool IsEqual(Model ACENLMONNPA, List<string> NIKHAICFGNM)
+	public override bool IsEqual(Model model, List<string> args)
 	{
-		Model fGCODGKLHED = ResolveTargetModel(ACENLMONNPA);
-		if (ACENLMONNPA == null)
+		Model targetModel = ResolveTargetModel(model);
+		if (model == null)
 		{
 			return false;
 		}
 		minMax.EvaluateFunctions();
-		float num = fGCODGKLHED.GetMagicChargeFraction();
+		float num = targetModel.GetMagicChargeFraction();
 		if (!minMax.GetMinUnbounded() && minMax.GetMinValue() > num)
 		{
 			return false;

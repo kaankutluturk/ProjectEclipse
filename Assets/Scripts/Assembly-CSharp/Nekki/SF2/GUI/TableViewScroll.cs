@@ -61,9 +61,9 @@ namespace Nekki.SF2.GUI
 			CreateContent();
 		}
 
-		public void SetOrientation(TableViewOrientation LJHFAPHFGIC)
+		public void SetOrientation(TableViewOrientation orientation)
 		{
-			_orientation = LJHFAPHFGIC;
+			_orientation = orientation;
 			if (_orientation == TableViewOrientation.Horizontal)
 			{
 				get_content().anchorMin = new Vector2(0f, 0f);
@@ -108,15 +108,15 @@ namespace Nekki.SF2.GUI
             base.OnScroll(data);
         }
 
-        public override void OnBeginDrag(PointerEventData BHOLFGOGPCP)
+        public override void OnBeginDrag(PointerEventData eventData)
 		{
-			base.OnBeginDrag(BHOLFGOGPCP);
+			base.OnBeginDrag(eventData);
 			onDragBegin.Invoke();
 		}
 
-		public override void OnEndDrag(PointerEventData BHOLFGOGPCP)
+		public override void OnEndDrag(PointerEventData eventData)
 		{
-			base.OnEndDrag(BHOLFGOGPCP);
+			base.OnEndDrag(eventData);
 			onDragEnd.Invoke();
 		}
 	}

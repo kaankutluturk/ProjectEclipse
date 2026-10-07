@@ -4,17 +4,17 @@ public interface IObjectGraphVisitor
 {
 	bool Enter(IObjectDescriptor value);
 
-	bool EnterMapping(IObjectDescriptor KGBGENDIMBC, IObjectDescriptor value);
+	bool EnterMapping(IObjectDescriptor key, IObjectDescriptor value);
 
-	bool EnterMapping(IPropertyDescriptor KGBGENDIMBC, IObjectDescriptor value);
+	bool EnterMapping(IPropertyDescriptor key, IObjectDescriptor value);
 
-	void VisitScalar(IObjectDescriptor ADDIBOMFCNH);
+	void VisitScalar(IObjectDescriptor scalar);
 
-	void VisitMappingStart(IObjectDescriptor JPEFEBICPFI, Type FHNELPLPIPI, Type EJGJHBGMCDM);
+	void VisitMappingStart(IObjectDescriptor mapping, Type keyType, Type valueType);
 
-	void VisitMappingEnd(IObjectDescriptor JPEFEBICPFI);
+	void VisitMappingEnd(IObjectDescriptor mapping);
 
-	void VisitSequenceStart(IObjectDescriptor sequence, Type LKAAAFHOAGD);
+	void VisitSequenceStart(IObjectDescriptor sequence, Type elementType);
 
 	void VisitSequenceEnd(IObjectDescriptor sequence);
 }

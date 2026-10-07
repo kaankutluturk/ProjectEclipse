@@ -28,30 +28,30 @@ public abstract class NodeEvent : ParsingEvent
 
 	public abstract bool IsCanonical { get; }
 
-	protected NodeEvent(string KOLNNNLOCFE, string EDLADAAKMDF, Mark ILENLCMAMBH, Mark PCLFFOBJJFO)
-		: base(ILENLCMAMBH, PCLFFOBJJFO)
+	protected NodeEvent(string anchor, string tag, Mark start, Mark end)
+		: base(start, end)
 	{
-		if (KOLNNNLOCFE != null)
+		if (anchor != null)
 		{
-			if (KOLNNNLOCFE.Length == 0)
+			if (anchor.Length == 0)
 			{
 				throw new ArgumentException("Anchor value must not be empty.", "anchor");
 			}
-			if (!anchorValidator.IsMatch(KOLNNNLOCFE))
+			if (!anchorValidator.IsMatch(anchor))
 			{
 				throw new ArgumentException("Anchor value must contain alphanumerical characters only.", "anchor");
 			}
 		}
-		if (EDLADAAKMDF != null && EDLADAAKMDF.Length == 0)
+		if (tag != null && tag.Length == 0)
 		{
 			throw new ArgumentException("Tag value must not be empty.", "tag");
 		}
-		this.anchor = KOLNNNLOCFE;
-		this.tag = EDLADAAKMDF;
+		this.anchor = anchor;
+		this.tag = tag;
 	}
 
-	protected NodeEvent(string KOLNNNLOCFE, string EDLADAAKMDF)
-		: this(KOLNNNLOCFE, EDLADAAKMDF, Mark.Empty, Mark.Empty)
+	protected NodeEvent(string anchor, string tag)
+		: this(anchor, tag, Mark.Empty, Mark.Empty)
 	{
 	}
 

@@ -37,14 +37,14 @@ namespace YamlDotNet.RepresentationModel
 			}
 		}
 
-		internal YamlSequenceNode(EventReader DNBFFLFBDOB, DocumentLoadingState state)
+		internal YamlSequenceNode(EventReader reader, DocumentLoadingState state)
 		{
-			SequenceStart cAJDINOLOJH = DNBFFLFBDOB.Expect<SequenceStart>();
-			Load(cAJDINOLOJH, state);
+			SequenceStart sequenceStart = reader.Expect<SequenceStart>();
+			Load(sequenceStart, state);
 			bool flag = false;
-			while (!DNBFFLFBDOB.Accept<SequenceEnd>())
+			while (!reader.Accept<SequenceEnd>())
 			{
-				YamlNode yamlNode = YamlNode.ParseNode(DNBFFLFBDOB, state);
+				YamlNode yamlNode = YamlNode.ParseNode(reader, state);
 				children.Add(yamlNode);
 				flag |= yamlNode is YamlAliasNode;
 			}
@@ -52,41 +52,41 @@ namespace YamlDotNet.RepresentationModel
 			{
 				state.AddNodeWithUnresolvedAliases(this);
 			}
-			DNBFFLFBDOB.Expect<SequenceEnd>();
+			reader.Expect<SequenceEnd>();
 		}
 
 		public YamlSequenceNode()
 		{
 		}
 
-		public YamlSequenceNode(params YamlNode[] IPCFHFNBMIC)
-			: this((IEnumerable<YamlNode>)IPCFHFNBMIC)
+		public YamlSequenceNode(params YamlNode[] nodes)
+			: this((IEnumerable<YamlNode>)nodes)
 		{
 		}
 
-		public YamlSequenceNode(IEnumerable<YamlNode> IPCFHFNBMIC)
+		public YamlSequenceNode(IEnumerable<YamlNode> nodes)
 		{
-			foreach (YamlNode item in IPCFHFNBMIC)
+			foreach (YamlNode item in nodes)
 			{
 				children.Add(item);
 			}
 		}
 
-		public void Add(YamlNode BFEBLBKODLK)
+		public void Add(YamlNode child)
 		{
-			children.Add(BFEBLBKODLK);
+			children.Add(child);
 		}
 
-		public void Add(string BFEBLBKODLK)
+		public void Add(string child)
 		{
-			children.Add(new YamlScalarNode(BFEBLBKODLK));
+			children.Add(new YamlScalarNode(child));
 		}
 
-		public void Remove(YamlNode BFEBLBKODLK)
+		public void Remove(YamlNode node)
 		{
 			foreach (YamlNode child in children)
 			{
-				if (child == BFEBLBKODLK)
+				if (child == node)
 				{
 					children.Remove(child);
 					break;
@@ -94,25 +94,25 @@ namespace YamlDotNet.RepresentationModel
 			}
 		}
 
-		public void Replace(YamlNode LAAGOLBMEKP, Predicate<YamlNode> DFIECHGNEPK)
+		public void Replace(YamlNode replacement, Predicate<YamlNode> match)
 		{
 			for (int i = 0; i < children.Count; i++)
 			{
-				if (DFIECHGNEPK(children[i]))
+				if (match(children[i]))
 				{
-					children[i] = LAAGOLBMEKP;
+					children[i] = replacement;
 					break;
 				}
 			}
 		}
 
-		public void UpdateNode(YamlNode KLDACECBHOJ, YamlNode BFEBLBKODLK)
+		public void UpdateNode(YamlNode oldNode, YamlNode newNode)
 		{
 			for (int i = 0; i < children.Count; i++)
 			{
-				if (children[i] == KLDACECBHOJ)
+				if (children[i] == oldNode)
 				{
-					children[i] = BFEBLBKODLK;
+					children[i] = newNode;
 					break;
 				}
 			}
@@ -129,24 +129,24 @@ namespace YamlDotNet.RepresentationModel
 			}
 		}
 
-		internal override void Emit(IEmitter NPIDIMCLNEM, EmitterState state)
+		internal override void Emit(IEmitter emitter, EmitterState state)
 		{
-			NPIDIMCLNEM.Emit(new SequenceStart(base.Anchor, base.Tag, true, Style));
+			emitter.Emit(new SequenceStart(base.Anchor, base.Tag, true, Style));
 			foreach (YamlNode child in children)
 			{
-				child.Save(NPIDIMCLNEM, state);
+				child.Save(emitter, state);
 			}
-			NPIDIMCLNEM.Emit(new SequenceEnd());
+			emitter.Emit(new SequenceEnd());
 		}
 
-		public override void Accept(IYamlVisitor NKECMANOOEM)
+		public override void Accept(IYamlVisitor visitor)
 		{
-			NKECMANOOEM.Visit(this);
+			visitor.Visit(this);
 		}
 
-		public override bool Equals(object NOLFMPDGCOC)
+		public override bool Equals(object obj)
 		{
-			YamlSequenceNode yamlSequenceNode = NOLFMPDGCOC as YamlSequenceNode;
+			YamlSequenceNode yamlSequenceNode = obj as YamlSequenceNode;
 			if (yamlSequenceNode == null || !Equals(yamlSequenceNode) || children.Count != yamlSequenceNode.children.Count)
 			{
 				return false;

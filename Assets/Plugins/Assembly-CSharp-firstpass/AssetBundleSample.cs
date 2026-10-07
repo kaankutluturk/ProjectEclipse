@@ -39,31 +39,31 @@ public sealed class AssetBundleSample : MonoBehaviour
 	private IEnumerator DownloadAssetBundle()
 	{
 		downloading = true;
-		HTTPRequest iPLGNIDJDCF = new HTTPRequest(new Uri("http://besthttp.azurewebsites.net/Content/AssetBundle.html")).Send();
+		HTTPRequest request = new HTTPRequest(new Uri("http://besthttp.azurewebsites.net/Content/AssetBundle.html")).Send();
 		status = "Download started";
-		while (iPLGNIDJDCF.GetState() < HTTPRequestStates.Finished)
+		while (request.GetState() < HTTPRequestStates.Finished)
 		{
 			yield return new WaitForSeconds(0.1f);
 			status += ".";
 		}
-		switch (iPLGNIDJDCF.GetState())
+		switch (request.GetState())
 		{
 		case HTTPRequestStates.Finished:
-			if (iPLGNIDJDCF.GetResponse().GetIsSuccess())
+			if (request.GetResponse().GetIsSuccess())
 			{
-				status = string.Format("AssetBundle downloaded! Loaded from local cache: {0}", iPLGNIDJDCF.GetResponse().GetIsFromCache().ToString());
-				AssetBundleCreateRequest assetBundleCreateRequest = AssetBundle.LoadFromMemoryAsync(iPLGNIDJDCF.GetResponse().GetData());
+				status = string.Format("AssetBundle downloaded! Loaded from local cache: {0}", request.GetResponse().GetIsFromCache().ToString());
+				AssetBundleCreateRequest assetBundleCreateRequest = AssetBundle.LoadFromMemoryAsync(request.GetResponse().GetData());
 				yield return assetBundleCreateRequest;
 				yield return StartCoroutine(ProcessAssetBundle(assetBundleCreateRequest.assetBundle));
 			}
 			else
 			{
-				status = string.Format("Request finished Successfully, but the server sent an error. Status Code: {0}-{1} Message: {2}", iPLGNIDJDCF.GetResponse().GetStatusCode(), iPLGNIDJDCF.GetResponse().GetMessage(), iPLGNIDJDCF.GetResponse().GetDataAsText());
+				status = string.Format("Request finished Successfully, but the server sent an error. Status Code: {0}-{1} Message: {2}", request.GetResponse().GetStatusCode(), request.GetResponse().GetMessage(), request.GetResponse().GetDataAsText());
 				AdvLog.LogWarning(status);
 			}
 			break;
 		case HTTPRequestStates.Error:
-			status = "Request Finished with Error! " + ((iPLGNIDJDCF.GetException() == null) ? "No Exception" : (iPLGNIDJDCF.GetException().Message + "\n" + iPLGNIDJDCF.GetException().StackTrace));
+			status = "Request Finished with Error! " + ((request.GetException() == null) ? "No Exception" : (request.GetException().Message + "\n" + request.GetException().StackTrace));
 			AdvLog.LogError(status);
 			break;
 		case HTTPRequestStates.Aborted:

@@ -47,12 +47,12 @@ public static class MenuController
 		}
 	}
 
-	public static void SetNormalViewMode(bool DGNLFEPIANN)
+	public static void SetNormalViewMode(bool isNormalView)
 	{
 		MainMenu instance = MainMenu.get_Instance();
 		if (instance != null)
 		{
-			instance.SetNormalViewMode(DGNLFEPIANN);
+			instance.SetNormalViewMode(isNormalView);
 		}
 	}
 

@@ -1,12 +1,12 @@
 public class QuestActionResetPerks : QuestAction
 {
-	public override void Execute(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters parameters)
 	{
-		base.Execute(GFIHPBCEEOB);
-		Roster nKGLHEGIKKP = ListSF.GetRoster();
-		if (nKGLHEGIKKP != null)
+		base.Execute(parameters);
+		Roster roster = ListSF.GetRoster();
+		if (roster != null)
 		{
-			nKGLHEGIKKP.GetPerks().ResetPerks();
+			roster.GetPerks().ResetPerks();
 		}
 		FinishAction();
 	}

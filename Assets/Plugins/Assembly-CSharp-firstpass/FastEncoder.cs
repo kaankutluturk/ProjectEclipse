@@ -58,16 +58,16 @@ internal class FastEncoder
 		return lastCompressionRatio;
 	}
 
-	internal void GetBlock(DeflateInput NILNDHEKNLJ, OutputBuffer output, int OADBBDFBPOG)
+	internal void GetBlock(DeflateInput input, OutputBuffer output, int maxBytesToCopy)
 	{
 		WriteDeflatePreamble(output);
-		GetCompressedOutput(NILNDHEKNLJ, output, OADBBDFBPOG);
+		GetCompressedOutput(input, output, maxBytesToCopy);
 		WriteEndOfBlock(output);
 	}
 
-	internal void GetCompressedData(DeflateInput NILNDHEKNLJ, OutputBuffer output)
+	internal void GetCompressedData(DeflateInput input, OutputBuffer output)
 	{
-		GetCompressedOutput(NILNDHEKNLJ, output, -1);
+		GetCompressedOutput(input, output, -1);
 	}
 
 	internal void GetBlockHeader(OutputBuffer output)
@@ -80,30 +80,30 @@ internal class FastEncoder
 		WriteEndOfBlock(output);
 	}
 
-	private void GetCompressedOutput(DeflateInput NILNDHEKNLJ, OutputBuffer output, int OADBBDFBPOG)
+	private void GetCompressedOutput(DeflateInput input, OutputBuffer output, int maxBytesToCopy)
 	{
 		int num = output.GetBytesWritten();
 		int num2 = 0;
-		int num3 = GetBytesInHistory() + NILNDHEKNLJ.GetCount();
+		int num3 = GetBytesInHistory() + input.GetCount();
 		do
 		{
-			int num4 = ((NILNDHEKNLJ.GetCount() >= inputWindow.GetFreeWindowSpace()) ? inputWindow.GetFreeWindowSpace() : NILNDHEKNLJ.GetCount());
-			if (OADBBDFBPOG >= 1)
+			int num4 = ((input.GetCount() >= inputWindow.GetFreeWindowSpace()) ? inputWindow.GetFreeWindowSpace() : input.GetCount());
+			if (maxBytesToCopy >= 1)
 			{
-				num4 = Math.Min(num4, OADBBDFBPOG - num2);
+				num4 = Math.Min(num4, maxBytesToCopy - num2);
 			}
 			if (num4 > 0)
 			{
-				inputWindow.CopyBytes(NILNDHEKNLJ.GetBuffer(), NILNDHEKNLJ.GetStartIndex(), num4);
-				NILNDHEKNLJ.ConsumeBytes(num4);
+				inputWindow.CopyBytes(input.GetBuffer(), input.GetStartIndex(), num4);
+				input.ConsumeBytes(num4);
 				num2 += num4;
 			}
 			GetCompressedOutput(output);
 		}
-		while (SafeToWriteTo(output) && InputAvailable(NILNDHEKNLJ) && (OADBBDFBPOG < 1 || num2 < OADBBDFBPOG));
+		while (SafeToWriteTo(output) && InputAvailable(input) && (maxBytesToCopy < 1 || num2 < maxBytesToCopy));
 		int num5 = output.GetBytesWritten();
 		int num6 = num5 - num;
-		int num7 = GetBytesInHistory() + NILNDHEKNLJ.GetCount();
+		int num7 = GetBytesInHistory() + input.GetCount();
 		int num8 = num3 - num7;
 		if (num6 != 0)
 		{
@@ -131,9 +131,9 @@ internal class FastEncoder
 		}
 	}
 
-	private bool InputAvailable(DeflateInput NILNDHEKNLJ)
+	private bool InputAvailable(DeflateInput input)
 	{
-		return NILNDHEKNLJ.GetCount() > 0 || GetBytesInHistory() > 0;
+		return input.GetCount() > 0 || GetBytesInHistory() > 0;
 	}
 
 	private bool SafeToWriteTo(OutputBuffer output)
@@ -144,13 +144,13 @@ internal class FastEncoder
 	private void WriteEndOfBlock(OutputBuffer output)
 	{
 		uint num = FastEncoderStatics.FastEncoderLiteralCodeInfo[256];
-		int hDKKKCDKFEE = (int)(num & 0x1F);
-		output.WriteBits(hDKKKCDKFEE, num >> 5);
+		int codeLength = (int)(num & 0x1F);
+		output.WriteBits(codeLength, num >> 5);
 	}
 
-	internal static void WriteMatch(int EEPFDKNNGJB, int MIAOKJENHOF, OutputBuffer output)
+	internal static void WriteMatch(int length, int distance, OutputBuffer output)
 	{
-		uint num = FastEncoderStatics.FastEncoderLiteralCodeInfo[254 + EEPFDKNNGJB];
+		uint num = FastEncoderStatics.FastEncoderLiteralCodeInfo[254 + length];
 		int num2 = (int)(num & 0x1F);
 		if (num2 <= 16)
 		{
@@ -161,18 +161,18 @@ internal class FastEncoder
 			output.WriteBits(16, (num >> 5) & 0xFFFF);
 			output.WriteBits(num2 - 16, num >> 21);
 		}
-		num = FastEncoderStatics.FastEncoderDistanceCodeInfo[FastEncoderStatics.GetSlot(MIAOKJENHOF)];
+		num = FastEncoderStatics.FastEncoderDistanceCodeInfo[FastEncoderStatics.GetSlot(distance)];
 		output.WriteBits((int)(num & 0xF), num >> 8);
 		int num3 = (int)((num >> 4) & 0xF);
 		if (num3 != 0)
 		{
-			output.WriteBits(num3, (uint)MIAOKJENHOF & FastEncoderStatics.BitMask[num3]);
+			output.WriteBits(num3, (uint)distance & FastEncoderStatics.BitMask[num3]);
 		}
 	}
 
-	internal static void WriteChar(byte AAOIAEJJINO, OutputBuffer output)
+	internal static void WriteChar(byte symbol, OutputBuffer output)
 	{
-		uint num = FastEncoderStatics.FastEncoderLiteralCodeInfo[AAOIAEJJINO];
+		uint num = FastEncoderStatics.FastEncoderLiteralCodeInfo[symbol];
 		output.WriteBits((int)(num & 0x1F), num >> 5);
 	}
 

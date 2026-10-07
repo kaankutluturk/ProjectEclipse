@@ -121,32 +121,32 @@ public sealed class ConnectionAPISample : MonoBehaviour
 		signalRConnection.Close();
 	}
 
-	private void OnNonHubMessage(Connection BJGMPDIKEJC, object data)
+	private void OnNonHubMessage(Connection connection, object data)
 	{
 		string text = Json.Encode(data);
 		messages.Add("[Server Message] " + text);
 	}
 
-	private void OnStateChanged(Connection BJGMPDIKEJC, ConnectionStates JOBAGBFMMFP, ConnectionStates MPJEMGJIBBD)
+	private void OnStateChanged(Connection connection, ConnectionStates oldState, ConnectionStates newState)
 	{
-		messages.Add(string.Format("[State Change] {0} => {1}", JOBAGBFMMFP.ToString(), MPJEMGJIBBD.ToString()));
+		messages.Add(string.Format("[State Change] {0} => {1}", oldState.ToString(), newState.ToString()));
 	}
 
-	private void Broadcast(string HCPNFPMHFCM)
+	private void Broadcast(string message)
 	{
 		signalRConnection.Send(new
 		{
 			Type = MessageType.Broadcast,
-			Value = HCPNFPMHFCM
+			Value = message
 		});
 	}
 
-	private void BroadcastExceptMe(string HCPNFPMHFCM)
+	private void BroadcastExceptMe(string message)
 	{
 		signalRConnection.Send(new
 		{
 			Type = MessageType.BroadcastExceptMe,
-			Value = HCPNFPMHFCM
+			Value = message
 		});
 	}
 
@@ -159,48 +159,48 @@ public sealed class ConnectionAPISample : MonoBehaviour
 		});
 	}
 
-	private void JoinGroup(string LKLJOLILPCJ)
+	private void JoinGroup(string groupName)
 	{
 		signalRConnection.Send(new
 		{
 			Type = MessageType.AddToGroup,
-			Value = LKLJOLILPCJ
+			Value = groupName
 		});
 	}
 
-	private void LeaveGroup(string LKLJOLILPCJ)
+	private void LeaveGroup(string groupName)
 	{
 		signalRConnection.Send(new
 		{
 			Type = MessageType.RemoveFromGroup,
-			Value = LKLJOLILPCJ
+			Value = groupName
 		});
 	}
 
-	private void SendToMe(string HCPNFPMHFCM)
+	private void SendToMe(string message)
 	{
 		signalRConnection.Send(new
 		{
 			Type = MessageType.Send,
-			Value = HCPNFPMHFCM
+			Value = message
 		});
 	}
 
-	private void SendToUser(string HIMLMCMHHGJ, string HCPNFPMHFCM)
+	private void SendToUser(string userName, string message)
 	{
 		signalRConnection.Send(new
 		{
 			Type = MessageType.PrivateMessage,
-			Value = string.Format("{0}|{1}", HIMLMCMHHGJ, HCPNFPMHFCM)
+			Value = string.Format("{0}|{1}", userName, message)
 		});
 	}
 
-	private void SendToGroup(string HIMLMCMHHGJ, string HCPNFPMHFCM)
+	private void SendToGroup(string userName, string message)
 	{
 		signalRConnection.Send(new
 		{
 			Type = MessageType.SendToGroup,
-			Value = string.Format("{0}|{1}", HIMLMCMHHGJ, HCPNFPMHFCM)
+			Value = string.Format("{0}|{1}", userName, message)
 		});
 	}
 }

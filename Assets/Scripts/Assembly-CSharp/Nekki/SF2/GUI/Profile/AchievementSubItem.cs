@@ -34,22 +34,22 @@ namespace Nekki.SF2.GUI.Profile
 
 		protected Action<object> _dlg;
 
-		public void Init(string KHPKDMGDMAB, string HHAAFADDOJB, string HCPNFPMHFCM, float AKIOCHEKNPE, float NPILBMKDDGN, int OKNNNLIPODI, Achievement NCCHENOEPNF = null)
+		public void Init(string KHPKDMGDMAB, string title, string description, float AKIOCHEKNPE, float NPILBMKDDGN, int buttonId, Achievement achievementData = null)
 		{
-			Init(OKNNNLIPODI);
+			Init(buttonId);
 			targetValue = AKIOCHEKNPE;
 			currentValue = NPILBMKDDGN;
-			achievement = NCCHENOEPNF;
+			achievement = achievementData;
 			_texturePath = "UI/Achievements/";
 			spriteName = KHPKDMGDMAB;
 			iconMaxOpacity = ProfileGUI.PerkOpacity.Max;
 			iconMinOpacity = ProfileGUI.PerkOpacity.Min;
-			int mJBFFBPLAGC = ((NCCHENOEPNF != null) ? NCCHENOEPNF.MoneyPrize : 0);
-			int bDONIKLHFLJ = ((NCCHENOEPNF != null) ? NCCHENOEPNF.BonusPrize : 0);
-			bool bODCOGFGHAD = NCCHENOEPNF != null && !NCCHENOEPNF.RewardClaimed;
-			bool dPJOPMHPGKG = currentValue >= targetValue;
+			int moneyPrize = ((achievementData != null) ? achievementData.MoneyPrize : 0);
+			int bonusPrize = ((achievementData != null) ? achievementData.BonusPrize : 0);
+			bool canTakeReward = achievementData != null && !achievementData.RewardClaimed;
+			bool isCompleted = currentValue >= targetValue;
 			_dlg = OnTakeReward;
-			achievementInfo = new AchievementInfo(HHAAFADDOJB, HCPNFPMHFCM, mJBFFBPLAGC, bDONIKLHFLJ, _dlg, bODCOGFGHAD, dPJOPMHPGKG);
+			achievementInfo = new AchievementInfo(title, description, moneyPrize, bonusPrize, _dlg, canTakeReward, isCompleted);
 			Data = achievementInfo;
 			UpdateIcon();
 			SetActive(true);

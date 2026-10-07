@@ -34,12 +34,12 @@ namespace Nekki.SF2.GUI.Fight
 			return complete;
 		}
 
-		public void SetAvatar(string OEJJMOBGPLG)
+		public void SetAvatar(string spriteName)
 		{
 			if (avatar != null)
 			{
 				avatar.set_TexturePath(texturePath);
-				avatar.set_SpriteName(OEJJMOBGPLG);
+				avatar.set_SpriteName(spriteName);
 				avatar.SetNativeSize();
 			}
 		}
@@ -52,17 +52,17 @@ namespace Nekki.SF2.GUI.Fight
 			}
 		}
 
-		public void ScaleAvatar(Vector2 JPJGNKGEHPI)
+		public void ScaleAvatar(Vector2 scale)
 		{
 			if (avatar != null)
 			{
-				avatar.transform.localScale = JPJGNKGEHPI;
+				avatar.transform.localScale = scale;
 				RectTransform rectTransform = base.transform as RectTransform;
 				if (rectTransform != null && layoutElement != null)
 				{
 					Vector2 size = avatar.rectTransform.rect.size;
-					size.x *= JPJGNKGEHPI.x;
-					size.y *= JPJGNKGEHPI.y;
+					size.x *= scale.x;
+					size.y *= scale.y;
 					rectTransform.sizeDelta = size;
 					layoutElement.minWidth = size.x;
 					layoutElement.minHeight = size.y;
@@ -70,18 +70,18 @@ namespace Nekki.SF2.GUI.Fight
 			}
 			if (complete != null)
 			{
-				complete.transform.localScale = JPJGNKGEHPI;
+				complete.transform.localScale = scale;
 			}
 		}
 
-		public void SetSizeDelta(Vector2 MHLKKEPFMIF)
+		public void SetSizeDelta(Vector2 sizeDelta)
 		{
 			RectTransform rectTransform = base.transform as RectTransform;
 			if (rectTransform != null && layoutElement != null)
 			{
-				rectTransform.sizeDelta = MHLKKEPFMIF;
-				layoutElement.minWidth = MHLKKEPFMIF.x;
-				layoutElement.minHeight = MHLKKEPFMIF.y;
+				rectTransform.sizeDelta = sizeDelta;
+				layoutElement.minWidth = sizeDelta.x;
+				layoutElement.minHeight = sizeDelta.y;
 			}
 		}
 	}

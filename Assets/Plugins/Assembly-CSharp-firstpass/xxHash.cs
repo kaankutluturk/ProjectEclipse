@@ -10,32 +10,32 @@ internal class xxHash
 
 	private const uint Prime32Five = 374761393u;
 
-	public static uint CalculateHash(byte[] HLDLIFPJMOA, int JCAJDBOMGOM, uint OKGKLCLEDFN)
+	public static uint CalculateHash(byte[] data, int length, uint seed)
 	{
 		int i = 0;
 		uint num7;
-		if (JCAJDBOMGOM >= 16)
+		if (length >= 16)
 		{
-			int num = JCAJDBOMGOM - 16;
-			uint num2 = (uint)((int)OKGKLCLEDFN + -1640531535 + -2048144777);
-			uint num3 = OKGKLCLEDFN + 2246822519u;
-			uint num4 = OKGKLCLEDFN;
-			uint num5 = OKGKLCLEDFN - 2654435761u;
+			int num = length - 16;
+			uint num2 = (uint)((int)seed + -1640531535 + -2048144777);
+			uint num3 = seed + 2246822519u;
+			uint num4 = seed;
+			uint num5 = seed - 2654435761u;
 			do
 			{
-				uint num6 = (uint)(HLDLIFPJMOA[i++] | (HLDLIFPJMOA[i++] << 8) | (HLDLIFPJMOA[i++] << 16) | (HLDLIFPJMOA[i++] << 24));
+				uint num6 = (uint)(data[i++] | (data[i++] << 8) | (data[i++] << 16) | (data[i++] << 24));
 				num2 += (uint)((int)num6 * -2048144777);
 				num2 = (num2 << 13) | (num2 >> 19);
 				num2 *= 2654435761u;
-				num6 = (uint)(HLDLIFPJMOA[i++] | (HLDLIFPJMOA[i++] << 8) | (HLDLIFPJMOA[i++] << 16) | (HLDLIFPJMOA[i++] << 24));
+				num6 = (uint)(data[i++] | (data[i++] << 8) | (data[i++] << 16) | (data[i++] << 24));
 				num3 += (uint)((int)num6 * -2048144777);
 				num3 = (num3 << 13) | (num3 >> 19);
 				num3 *= 2654435761u;
-				num6 = (uint)(HLDLIFPJMOA[i++] | (HLDLIFPJMOA[i++] << 8) | (HLDLIFPJMOA[i++] << 16) | (HLDLIFPJMOA[i++] << 24));
+				num6 = (uint)(data[i++] | (data[i++] << 8) | (data[i++] << 16) | (data[i++] << 24));
 				num4 += (uint)((int)num6 * -2048144777);
 				num4 = (num4 << 13) | (num4 >> 19);
 				num4 *= 2654435761u;
-				num6 = (uint)(HLDLIFPJMOA[i++] | (HLDLIFPJMOA[i++] << 8) | (HLDLIFPJMOA[i++] << 16) | (HLDLIFPJMOA[i++] << 24));
+				num6 = (uint)(data[i++] | (data[i++] << 8) | (data[i++] << 16) | (data[i++] << 24));
 				num5 += (uint)((int)num6 * -2048144777);
 				num5 = (num5 << 13) | (num5 >> 19);
 				num5 *= 2654435761u;
@@ -45,17 +45,17 @@ internal class xxHash
 		}
 		else
 		{
-			num7 = OKGKLCLEDFN + 374761393;
+			num7 = seed + 374761393;
 		}
-		num7 += (uint)JCAJDBOMGOM;
-		while (i <= JCAJDBOMGOM - 4)
+		num7 += (uint)length;
+		while (i <= length - 4)
 		{
-			num7 += (uint)((HLDLIFPJMOA[i++] | (HLDLIFPJMOA[i++] << 8) | (HLDLIFPJMOA[i++] << 16) | (HLDLIFPJMOA[i++] << 24)) * -1028477379);
+			num7 += (uint)((data[i++] | (data[i++] << 8) | (data[i++] << 16) | (data[i++] << 24)) * -1028477379);
 			num7 = ((num7 << 17) | (num7 >> 15)) * 668265263;
 		}
-		for (; i < JCAJDBOMGOM; i++)
+		for (; i < length; i++)
 		{
-			num7 += (uint)(HLDLIFPJMOA[i] * 374761393);
+			num7 += (uint)(data[i] * 374761393);
 			num7 = ((num7 << 11) | (num7 >> 21)) * 2654435761u;
 		}
 		num7 ^= num7 >> 15;

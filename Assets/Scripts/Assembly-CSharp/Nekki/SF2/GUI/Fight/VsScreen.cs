@@ -90,28 +90,28 @@ namespace Nekki.SF2.GUI.Fight
 			}
 		}
 
-		public void Init(ModelParameters KEJDJHAGBMK, ModelParameters HFGPAELCNMF)
+		public void Init(ModelParameters leftParameters, ModelParameters rightParameters)
 		{
 			if (playerLeft != null)
 			{
 				playerLeft.set_TexturePath(texturePath);
-				playerLeft.set_SpriteName(KEJDJHAGBMK.Avatar);
+				playerLeft.set_SpriteName(leftParameters.Avatar);
 				playerLeft.SetNativeSize();
 			}
 			if (playerRight != null)
 			{
 				playerRight.set_TexturePath(texturePath);
-				playerRight.set_SpriteName(HFGPAELCNMF.Avatar);
+				playerRight.set_SpriteName(rightParameters.Avatar);
 				playerRight.SetNativeSize();
 			}
 			if (nameLeft != null)
 			{
-				nameLeft.set_Alias(KEJDJHAGBMK.FirstName);
+				nameLeft.set_Alias(leftParameters.FirstName);
 				AllowExplicitLineBreaks(nameLeft);
 			}
 			if (nameRight != null)
 			{
-				nameRight.set_Alias(HFGPAELCNMF.FirstName);
+				nameRight.set_Alias(rightParameters.FirstName);
 				AllowExplicitLineBreaks(nameRight);
 			}
 			if (playerLeft != null && playerRight != null && nameLeft != null && nameRight != null && vsImage != null && leftStripe != null && rightStripe != null)

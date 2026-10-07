@@ -80,13 +80,13 @@ public class ProfilePerk : global::EventDispatcher<object>
 		}
 	}
 
-	public ProfilePerk(PerkInfoItem AEFFHJGMNFI, int GNLOCMLBNHF, ProfilePerkState state = ProfilePerkState.PERK_AVAILABLE, ProfilePerkType LFLGCDNKNJI = ProfilePerkType.TYPE_NONE)
+	public ProfilePerk(PerkInfoItem info, int level, ProfilePerkState state = ProfilePerkState.PERK_AVAILABLE, ProfilePerkType perkType = ProfilePerkType.TYPE_NONE)
 	{
 		perkState = state;
-		_level = GNLOCMLBNHF;
-		perkInfo = AEFFHJGMNFI;
+		_level = level;
+		perkInfo = info;
 		IsNew = false;
-		_type = LFLGCDNKNJI;
+		_type = perkType;
 		_description = ((perkInfo == null) ? string.Empty : perkInfo.DescriptionKey);
 	}
 
@@ -138,9 +138,9 @@ public class ProfilePerk : global::EventDispatcher<object>
 		CallEvent(1, null);
 	}
 
-	public bool Islevel(int OMHDLKNHNMJ)
+	public bool Islevel(int level)
 	{
-		return OMHDLKNHNMJ < _level;
+		return level < _level;
 	}
 
 	public int GetUpgradeLevel()

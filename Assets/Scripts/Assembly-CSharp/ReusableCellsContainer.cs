@@ -10,10 +10,10 @@ public class ReusableCellsContainer
 		cells = new LinkedList<TableViewCell>();
 	}
 
-	public void RecycleCell(TableViewCell HJCPCBLCJJN)
+	public void RecycleCell(TableViewCell cell)
 	{
-		cells.AddLast(HJCPCBLCJJN);
-		HJCPCBLCJJN.gameObject.SetActive(false);
+		cells.AddLast(cell);
+		cell.gameObject.SetActive(false);
 	}
 
 	public TableViewCell TakeCell()

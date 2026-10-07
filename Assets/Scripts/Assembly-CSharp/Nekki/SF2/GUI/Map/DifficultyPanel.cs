@@ -33,12 +33,12 @@ namespace Nekki.SF2.GUI.Map
 			_difficultyBar.SetValueBorders(0f, 100f);
 			int num = 0;
 			int num2 = 0;
-			global::Pair<string, float> cCKLNOPEKHO = difficultyEvaluation[0];
+			global::Pair<string, float> bestRating = difficultyEvaluation[0];
 			foreach (global::Pair<string, float> item in difficultyEvaluation)
 			{
-				if (item.Second < ratio && cCKLNOPEKHO.Second < item.Second)
+				if (item.Second < ratio && bestRating.Second < item.Second)
 				{
-					cCKLNOPEKHO = item;
+					bestRating = item;
 					num2 = num;
 				}
 				num++;
@@ -46,7 +46,7 @@ namespace Nekki.SF2.GUI.Map
 			_difficultyBar.Stripe.set_SpriteName(Constants.DifficultyBarSprites[num2]);
 			RestoreTrimmedStripeLayout();
 			_difficultyBar.SetValue(100f);
-			_difficultyLabel.SetAlias(cCKLNOPEKHO.First);
+			_difficultyLabel.SetAlias(bestRating.First);
 		}
 
 		private void RestoreTrimmedStripeLayout()
@@ -74,10 +74,10 @@ namespace Nekki.SF2.GUI.Map
 			_difficultyBar.Stripe.type = Image.Type.Simple;
 		}
 
-		public static void DifficultyEvaluationParse(XmlNode AFHNINCKJEE)
+		public static void DifficultyEvaluationParse(XmlNode node)
 		{
 			difficultyEvaluation.Clear();
-			foreach (XmlNode childNode in AFHNINCKJEE.ChildNodes)
+			foreach (XmlNode childNode in node.ChildNodes)
 			{
 				difficultyEvaluation.Add(new global::Pair<string, float>(childNode.Attributes["Name"].GetStringOrDefault(string.Empty), childNode.Attributes["RatingRatioTreshold"].ParseFloat()));
 			}

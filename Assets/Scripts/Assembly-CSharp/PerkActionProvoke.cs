@@ -22,10 +22,10 @@ public class PerkActionProvoke : PerkAction
 	{
 	}
 
-	public PerkActionProvoke(PerkActionProvoke NOLFMPDGCOC)
-		: base(NOLFMPDGCOC)
+	public PerkActionProvoke(PerkActionProvoke source)
+		: base(source)
 	{
-		set_Trigger(NOLFMPDGCOC.GetProvokeTrigger());
+		set_Trigger(source.GetProvokeTrigger());
 	}
 
 	public string GetProvokeTrigger()

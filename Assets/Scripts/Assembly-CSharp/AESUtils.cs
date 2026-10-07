@@ -6,18 +6,18 @@ using UnityEngine;
 
 public class AESUtils
 {
-	public static void EncryptBytesToFile(byte[] GHDPPHAAPCA, byte[] BFADPFOIPLL, byte[] EJHBCOKHNNC, string BMDJOFHDOGF)
+	public static void EncryptBytesToFile(byte[] data, byte[] key, byte[] iv, string outputPath)
 	{
-		byte[] bytes = EncryptBytes(GHDPPHAAPCA, BFADPFOIPLL, EJHBCOKHNNC);
-		File.WriteAllBytes(BMDJOFHDOGF, bytes);
+		byte[] bytes = EncryptBytes(data, key, iv);
+		File.WriteAllBytes(outputPath, bytes);
 	}
 
-	public static byte[] DecryptFileToBytes(byte[] BFADPFOIPLL, byte[] EJHBCOKHNNC, string AMNCLCPADOO, bool GIEAPLJHHDK = false)
+	public static byte[] DecryptFileToBytes(byte[] key, byte[] iv, string path, bool readFromDisk = false)
 	{
 		try
 		{
-			byte[] gHDPPHAAPCA = ((!GIEAPLJHHDK) ? ResourceManager.GetBinary(AMNCLCPADOO) : File.ReadAllBytes(AMNCLCPADOO));
-			return DecryptBytes(gHDPPHAAPCA, BFADPFOIPLL, EJHBCOKHNNC);
+			byte[] fileBytes = ((!readFromDisk) ? ResourceManager.GetBinary(path) : File.ReadAllBytes(path));
+			return DecryptBytes(fileBytes, key, iv);
 		}
 		catch
 		{
@@ -25,32 +25,32 @@ public class AESUtils
 		}
 	}
 
-	public static void DecryptFileToFile(byte[] BFADPFOIPLL, byte[] EJHBCOKHNNC, string AMNCLCPADOO, string BMDJOFHDOGF = null, bool GIEAPLJHHDK = false)
+	public static void DecryptFileToFile(byte[] key, byte[] iv, string path, string outputPath = null, bool readFromDisk = false)
 	{
-		if (BMDJOFHDOGF == null)
+		if (outputPath == null)
 		{
-			BMDJOFHDOGF = AMNCLCPADOO;
+			outputPath = path;
 		}
-		byte[] gHDPPHAAPCA = ((!GIEAPLJHHDK) ? ResourceManager.GetBinary(AMNCLCPADOO) : File.ReadAllBytes(AMNCLCPADOO));
-		byte[] bytes = DecryptBytes(gHDPPHAAPCA, BFADPFOIPLL, EJHBCOKHNNC);
-		File.WriteAllBytes(BMDJOFHDOGF, bytes);
+		byte[] fileBytes = ((!readFromDisk) ? ResourceManager.GetBinary(path) : File.ReadAllBytes(path));
+		byte[] bytes = DecryptBytes(fileBytes, key, iv);
+		File.WriteAllBytes(outputPath, bytes);
 	}
 
-	public static void EncryptFileToFile(byte[] BFADPFOIPLL, byte[] EJHBCOKHNNC, string AMNCLCPADOO, string BMDJOFHDOGF = null, bool GIEAPLJHHDK = false)
+	public static void EncryptFileToFile(byte[] key, byte[] iv, string path, string outputPath = null, bool readFromDisk = false)
 	{
-		if (BMDJOFHDOGF == null)
+		if (outputPath == null)
 		{
-			BMDJOFHDOGF = AMNCLCPADOO;
+			outputPath = path;
 		}
-		byte[] gHDPPHAAPCA = ((!GIEAPLJHHDK) ? ResourceManager.GetBinary(AMNCLCPADOO) : File.ReadAllBytes(AMNCLCPADOO));
-		byte[] bytes = EncryptBytes(gHDPPHAAPCA, BFADPFOIPLL, EJHBCOKHNNC);
-		File.WriteAllBytes(BMDJOFHDOGF, bytes);
+		byte[] fileBytes = ((!readFromDisk) ? ResourceManager.GetBinary(path) : File.ReadAllBytes(path));
+		byte[] bytes = EncryptBytes(fileBytes, key, iv);
+		File.WriteAllBytes(outputPath, bytes);
 	}
 
-	public static string EncryptStringToBase64(string GHDPPHAAPCA, byte[] BFADPFOIPLL, byte[] EJHBCOKHNNC)
+	public static string EncryptStringToBase64(string text, byte[] key, byte[] iv)
 	{
-		byte[] bytes = Encoding.UTF8.GetBytes(GHDPPHAAPCA);
-		byte[] array = EncryptBytes(bytes, BFADPFOIPLL, EJHBCOKHNNC);
+		byte[] bytes = Encoding.UTF8.GetBytes(text);
+		byte[] array = EncryptBytes(bytes, key, iv);
 		if (array == null)
 		{
 			return string.Empty;
@@ -58,10 +58,10 @@ public class AESUtils
 		return Convert.ToBase64String(array);
 	}
 
-	public static string DecryptBase64ToString(string GHDPPHAAPCA, byte[] BFADPFOIPLL, byte[] EJHBCOKHNNC)
+	public static string DecryptBase64ToString(string base64Text, byte[] key, byte[] iv)
 	{
-		byte[] gHDPPHAAPCA = Convert.FromBase64String(GHDPPHAAPCA);
-		byte[] array = DecryptBytes(gHDPPHAAPCA, BFADPFOIPLL, EJHBCOKHNNC);
+		byte[] encryptedBytes = Convert.FromBase64String(base64Text);
+		byte[] array = DecryptBytes(encryptedBytes, key, iv);
 		if (array == null)
 		{
 			return string.Empty;
@@ -69,16 +69,16 @@ public class AESUtils
 		return Encoding.UTF8.GetString(array);
 	}
 
-	public static byte[] EncryptBytes(byte[] GHDPPHAAPCA, byte[] BFADPFOIPLL, byte[] EJHBCOKHNNC)
+	public static byte[] EncryptBytes(byte[] data, byte[] key, byte[] iv)
 	{
 		try
 		{
 			using (Aes aes = Aes.Create())
 			{
-				aes.Key = BFADPFOIPLL;
-				aes.IV = EJHBCOKHNNC;
-				ICryptoTransform pIDLNECOJBG = aes.CreateEncryptor(aes.Key, aes.IV);
-				return TransformBytes(GHDPPHAAPCA, pIDLNECOJBG);
+				aes.Key = key;
+				aes.IV = iv;
+				ICryptoTransform encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
+				return TransformBytes(data, encryptor);
 			}
 		}
 		catch (Exception exception)
@@ -88,16 +88,16 @@ public class AESUtils
 		return null;
 	}
 
-	public static byte[] DecryptBytes(byte[] GHDPPHAAPCA, byte[] BFADPFOIPLL, byte[] EJHBCOKHNNC)
+	public static byte[] DecryptBytes(byte[] data, byte[] key, byte[] iv)
 	{
 		try
 		{
 			using (Aes aes = Aes.Create())
 			{
-				aes.Key = BFADPFOIPLL;
-				aes.IV = EJHBCOKHNNC;
-				ICryptoTransform pIDLNECOJBG = aes.CreateDecryptor(aes.Key, aes.IV);
-				return TransformBytes(GHDPPHAAPCA, pIDLNECOJBG);
+				aes.Key = key;
+				aes.IV = iv;
+				ICryptoTransform decryptor = aes.CreateDecryptor(aes.Key, aes.IV);
+				return TransformBytes(data, decryptor);
 			}
 		}
 		catch (Exception exception)
@@ -107,13 +107,13 @@ public class AESUtils
 		return null;
 	}
 
-	private static byte[] TransformBytes(byte[] GHDPPHAAPCA, ICryptoTransform PIDLNECOJBG)
+	private static byte[] TransformBytes(byte[] data, ICryptoTransform transform)
 	{
 		using (MemoryStream memoryStream = new MemoryStream())
 		{
-			using (CryptoStream cryptoStream = new CryptoStream(memoryStream, PIDLNECOJBG, CryptoStreamMode.Write))
+			using (CryptoStream cryptoStream = new CryptoStream(memoryStream, transform, CryptoStreamMode.Write))
 			{
-				cryptoStream.Write(GHDPPHAAPCA, 0, GHDPPHAAPCA.Length);
+				cryptoStream.Write(data, 0, data.Length);
 				cryptoStream.FlushFinalBlock();
 				return memoryStream.ToArray();
 			}

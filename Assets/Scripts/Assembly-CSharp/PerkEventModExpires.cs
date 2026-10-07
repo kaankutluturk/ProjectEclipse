@@ -26,11 +26,11 @@ public class PerkEventModExpires : PerkEvent
 	{
 	}
 
-	public PerkEventModExpires(PerkEventModExpires NOLFMPDGCOC)
-		: base(NOLFMPDGCOC)
+	public PerkEventModExpires(PerkEventModExpires source)
+		: base(source)
 	{
-		set_ModName(NOLFMPDGCOC.GetModName());
-		set_Namespace(NOLFMPDGCOC.GetNamespace());
+		set_ModName(source.GetModName());
+		set_Namespace(source.GetNamespace());
 	}
 
 	public string GetModName()
@@ -60,25 +60,25 @@ public class PerkEventModExpires : PerkEvent
 		set_Namespace(node.Attributes["Namespace"].GetStringOrDefault(string.Empty));
 	}
 
-	public override bool IsEqual(EventStruct EJMEALJNNIL)
+	public override bool IsEqual(EventStruct eventData)
 	{
 		if (GetNamespace() == null || GetNamespace() == string.Empty)
 		{
-			if (!base.IsEqual(EJMEALJNNIL) || EJMEALJNNIL == null || EJMEALJNNIL.Info == null)
+			if (!base.IsEqual(eventData) || eventData == null || eventData.Info == null)
 			{
 				return false;
 			}
 		}
-		else if (GetNamespace().Equals(EJMEALJNNIL.Namespace))
+		else if (GetNamespace().Equals(eventData.Namespace))
 		{
 			return false;
 		}
-		Dictionary<string, object> dictionary = (Dictionary<string, object>)EJMEALJNNIL.Info;
+		Dictionary<string, object> dictionary = (Dictionary<string, object>)eventData.Info;
 		if (dictionary != null)
 		{
 			string value = ((!dictionary.ContainsKey("ModExpires")) ? null : ((string)dictionary["ModExpires"]));
-			PerkInfoItem aCONCDFDNJH = ((!dictionary.ContainsKey("ParentPerk")) ? null : ((PerkInfoItem)dictionary["ParentPerk"]));
-			if (aCONCDFDNJH == GetPerk() && (GetModName() == null || GetModName() == string.Empty || GetModName().Equals(value)))
+			PerkInfoItem eventPerk = ((!dictionary.ContainsKey("ParentPerk")) ? null : ((PerkInfoItem)dictionary["ParentPerk"]));
+			if (eventPerk == GetPerk() && (GetModName() == null || GetModName() == string.Empty || GetModName().Equals(value)))
 			{
 				return true;
 			}

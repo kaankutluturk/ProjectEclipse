@@ -2,13 +2,13 @@ using System.Collections.Generic;
 
 public sealed class SocketIODefaultJsonEncoder : ISocketJsonEncoder
 {
-	public List<object> Decode(string EMDHMHOKGFP)
+	public List<object> Decode(string json)
 	{
-		return Json.Decode(EMDHMHOKGFP) as List<object>;
+		return Json.Decode(json) as List<object>;
 	}
 
-	public string Encode(List<object> AOMLCBHAJJH)
+	public string Encode(List<object> arguments)
 	{
-		return Json.Encode(AOMLCBHAJJH);
+		return Json.Encode(arguments);
 	}
 }

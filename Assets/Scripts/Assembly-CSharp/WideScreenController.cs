@@ -49,9 +49,9 @@ public class WideScreenController : MonoBehaviour
         }
     }
 
-	private void PositionBorders(float DJFFDCFCNJM)
+	private void PositionBorders(float contentWidth)
 	{
-		float num = DJFFDCFCNJM / 2f;
+		float num = contentWidth / 2f;
 		Vector3 localPosition = _LeftBorder.transform.localPosition;
 		localPosition.x = 0f - num;
 		_LeftBorder.transform.localPosition = localPosition;

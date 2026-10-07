@@ -15,7 +15,7 @@ $parseEnchantments = [regex]::Match($userItemSource,
 $migrateKind = [regex]::Match($userItemSource,
     '(?ms)^\tprivate static void EnsureExternalEnchantmentKind\(XmlNode node, PerkInfoItem perk\).*?^\t\}').Value
 $applyEnchantments = [regex]::Match($userItemSource,
-    '(?ms)^\tpublic void ApplyEnchantments\(List<PerkStruct> HALHGEGADKA, int MPAGFAKIEJG, int MHNCENBCECJ\).*?^\t\}').Value
+    '(?ms)^\tpublic void ApplyEnchantments\(List<PerkStruct> perkStructs, int itemLevel, int playerLevel\).*?^\t\}').Value
 $removeSingle = [regex]::Match($userItemSource,
     '(?ms)^\tprivate void RemoveSingleEnchantments\(\).*?^\t\}').Value
 $removeCombo = [regex]::Match($userItemSource,

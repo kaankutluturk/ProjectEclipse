@@ -68,10 +68,10 @@ internal sealed class SocketIoWebSocketTransport : ITransport
 		}
 	}
 
-	public SocketIoWebSocketTransport(SocketManager BJGMPDIKEJC)
+	public SocketIoWebSocketTransport(SocketManager socketManager)
 	{
 		set_State(SocketIOTransportState.Closed);
-		SetManager(BJGMPDIKEJC);
+		SetManager(socketManager);
 	}
 
 	public SocketIOTransportState GetState()
@@ -118,8 +118,8 @@ internal sealed class SocketIoWebSocketTransport : ITransport
 	{
 		if (GetState() == SocketIOTransportState.Closed)
 		{
-			Uri kJHNCLAJMLO = new Uri(string.Format("{0}?transport=websocket&sid={1}{2}", new UriBuilder("ws", GetManager().GetUri().Host, GetManager().GetUri().Port, GetManager().GetUri().PathAndQuery).Uri.ToString(), GetManager().GetHandshake().GetSid(), GetManager().GetOptions().GetQueryParamsOnlyForHandshake() ? string.Empty : GetManager().GetOptions().BuildQueryParams()));
-			SetImplementation(new WebSocket(kJHNCLAJMLO));
+			Uri uri = new Uri(string.Format("{0}?transport=websocket&sid={1}{2}", new UriBuilder("ws", GetManager().GetUri().Host, GetManager().GetUri().Port, GetManager().GetUri().PathAndQuery).Uri.ToString(), GetManager().GetHandshake().GetSid(), GetManager().GetOptions().GetQueryParamsOnlyForHandshake() ? string.Empty : GetManager().GetOptions().BuildQueryParams()));
+			SetImplementation(new WebSocket(uri));
 			GetImplementation().OnOpen = OnOpen;
 			GetImplementation().OnMessage = OnMessage;
 			GetImplementation().OnBinary = OnBinary;
@@ -144,38 +144,38 @@ internal sealed class SocketIoWebSocketTransport : ITransport
 	{
 	}
 
-	private void OnOpen(WebSocket IIBIPJJLEGJ)
+	private void OnOpen(WebSocket webSocket)
 	{
 		HTTPManager.GetLogger().Information("WebSocketTransport", "OnOpen");
 		set_State(SocketIOTransportState.Opening);
 		Send(new Packet(TransportEventTypes.Ping, SocketIOEventType.Unknown, "/", "probe"));
 	}
 
-	private void OnMessage(WebSocket IIBIPJJLEGJ, string LIOGIBJBHAH)
+	private void OnMessage(WebSocket webSocket, string message)
 	{
 		if (HTTPManager.GetLogger().GetLevel() <= Loglevels.All)
 		{
-			HTTPManager.GetLogger().Verbose("WebSocketTransport", "OnMessage: " + LIOGIBJBHAH);
+			HTTPManager.GetLogger().Verbose("WebSocketTransport", "OnMessage: " + message);
 		}
 		try
 		{
-			Packet cMPKPLIGKLC = new Packet(LIOGIBJBHAH);
-			if (cMPKPLIGKLC.GetAttachmentCount() == 0)
+			Packet packet = new Packet(message);
+			if (packet.GetAttachmentCount() == 0)
 			{
-				OnPacket(cMPKPLIGKLC);
+				OnPacket(packet);
 			}
 			else
 			{
-				packetWithAttachment = cMPKPLIGKLC;
+				packetWithAttachment = packet;
 			}
 		}
-		catch (Exception mPFFFAOGBJE)
+		catch (Exception exception)
 		{
-			HTTPManager.GetLogger().Exception("WebSocketTransport", "OnMessage", mPFFFAOGBJE);
+			HTTPManager.GetLogger().Exception("WebSocketTransport", "OnMessage", exception);
 		}
 	}
 
-	private void OnBinary(WebSocket IIBIPJJLEGJ, byte[] data)
+	private void OnBinary(WebSocket webSocket, byte[] data)
 	{
 		if (HTTPManager.GetLogger().GetLevel() <= Loglevels.All)
 		{
@@ -194,9 +194,9 @@ internal sealed class SocketIoWebSocketTransport : ITransport
 		{
 			OnPacket(packetWithAttachment);
 		}
-		catch (Exception mPFFFAOGBJE)
+		catch (Exception exception)
 		{
-			HTTPManager.GetLogger().Exception("WebSocketTransport", "OnBinary", mPFFFAOGBJE);
+			HTTPManager.GetLogger().Exception("WebSocketTransport", "OnBinary", exception);
 		}
 		finally
 		{
@@ -204,23 +204,23 @@ internal sealed class SocketIoWebSocketTransport : ITransport
 		}
 	}
 
-	private void OnError(WebSocket IIBIPJJLEGJ, Exception MPFFFAOGBJE)
+	private void OnError(WebSocket webSocket, Exception exception)
 	{
 		string text = string.Empty;
-		if (MPFFFAOGBJE != null)
+		if (exception != null)
 		{
-			text = MPFFFAOGBJE.Message + " " + MPFFFAOGBJE.StackTrace;
+			text = exception.Message + " " + exception.StackTrace;
 		}
 		else
 		{
-			switch (IIBIPJJLEGJ.GetInternalRequest().GetState())
+			switch (webSocket.GetInternalRequest().GetState())
 			{
 			case HTTPRequestStates.Finished:
-				text = ((!IIBIPJJLEGJ.GetInternalRequest().GetResponse().GetIsSuccess() && IIBIPJJLEGJ.GetInternalRequest().GetResponse().GetStatusCode() != 101) ? string.Format("Request Finished Successfully, but the server sent an error. Status Code: {0}-{1} Message: {2}", IIBIPJJLEGJ.GetInternalRequest().GetResponse().GetStatusCode(), IIBIPJJLEGJ.GetInternalRequest().GetResponse().GetMessage(), IIBIPJJLEGJ.GetInternalRequest().GetResponse().GetDataAsText()) : string.Format("Request finished. Status Code: {0} Message: {1}", IIBIPJJLEGJ.GetInternalRequest().GetResponse().GetStatusCode()
-					.ToString(), IIBIPJJLEGJ.GetInternalRequest().GetResponse().GetMessage()));
+				text = ((!webSocket.GetInternalRequest().GetResponse().GetIsSuccess() && webSocket.GetInternalRequest().GetResponse().GetStatusCode() != 101) ? string.Format("Request Finished Successfully, but the server sent an error. Status Code: {0}-{1} Message: {2}", webSocket.GetInternalRequest().GetResponse().GetStatusCode(), webSocket.GetInternalRequest().GetResponse().GetMessage(), webSocket.GetInternalRequest().GetResponse().GetDataAsText()) : string.Format("Request finished. Status Code: {0} Message: {1}", webSocket.GetInternalRequest().GetResponse().GetStatusCode()
+					.ToString(), webSocket.GetInternalRequest().GetResponse().GetMessage()));
 				break;
 			case HTTPRequestStates.Error:
-				text = (("Request Finished with Error! : " + IIBIPJJLEGJ.GetInternalRequest().GetException() == null) ? string.Empty : (IIBIPJJLEGJ.GetInternalRequest().GetException().Message + " " + IIBIPJJLEGJ.GetInternalRequest().GetException().StackTrace));
+				text = (("Request Finished with Error! : " + webSocket.GetInternalRequest().GetException() == null) ? string.Empty : (webSocket.GetInternalRequest().GetException().Message + " " + webSocket.GetInternalRequest().GetException().StackTrace));
 				break;
 			case HTTPRequestStates.Aborted:
 				text = "Request Aborted!";
@@ -237,75 +237,75 @@ internal sealed class SocketIoWebSocketTransport : ITransport
 		((IManager)GetManager()).OnTransportError((ITransport)this, text);
 	}
 
-	private void OnClosed(WebSocket IIBIPJJLEGJ, ushort KJPGKHJNOMC, string LIOGIBJBHAH)
+	private void OnClosed(WebSocket webSocket, ushort code, string message)
 	{
 		HTTPManager.GetLogger().Information("WebSocketTransport", "OnClosed");
 		Close();
 		((IManager)GetManager()).TryToReconnect();
 	}
 
-	public void Send(Packet NPKADBPBKIG)
+	public void Send(Packet packet)
 	{
 		if (GetState() == SocketIOTransportState.Closed || GetState() == SocketIOTransportState.Paused)
 		{
 			return;
 		}
-		string text = NPKADBPBKIG.Encode();
+		string text = packet.Encode();
 		if (HTTPManager.GetLogger().GetLevel() <= Loglevels.All)
 		{
 			HTTPManager.GetLogger().Verbose("WebSocketTransport", "Send: " + text);
 		}
-		if (NPKADBPBKIG.GetAttachmentCount() != 0 || (NPKADBPBKIG.GetAttachments() != null && NPKADBPBKIG.GetAttachments().Count != 0))
+		if (packet.GetAttachmentCount() != 0 || (packet.GetAttachments() != null && packet.GetAttachments().Count != 0))
 		{
-			if (NPKADBPBKIG.GetAttachments() == null)
+			if (packet.GetAttachments() == null)
 			{
 				throw new ArgumentException("packet.Attachments are null!");
 			}
-			if (NPKADBPBKIG.GetAttachmentCount() != NPKADBPBKIG.GetAttachments().Count)
+			if (packet.GetAttachmentCount() != packet.GetAttachments().Count)
 			{
 				throw new ArgumentException("packet.AttachmentCount != packet.Attachments.Count. Use the packet.AddAttachment function to add data to a packet!");
 			}
 		}
 		GetImplementation().Send(text);
-		if (NPKADBPBKIG.GetAttachmentCount() == 0)
+		if (packet.GetAttachmentCount() == 0)
 		{
 			return;
 		}
-		int num = NPKADBPBKIG.GetAttachments()[0].Length + 1;
-		for (int i = 1; i < NPKADBPBKIG.GetAttachments().Count; i++)
+		int num = packet.GetAttachments()[0].Length + 1;
+		for (int i = 1; i < packet.GetAttachments().Count; i++)
 		{
-			if (NPKADBPBKIG.GetAttachments()[i].Length + 1 > num)
+			if (packet.GetAttachments()[i].Length + 1 > num)
 			{
-				num = NPKADBPBKIG.GetAttachments()[i].Length + 1;
+				num = packet.GetAttachments()[i].Length + 1;
 			}
 		}
 		if (Buffer == null || Buffer.Length < num)
 		{
 			Array.Resize(ref Buffer, num);
 		}
-		for (int j = 0; j < NPKADBPBKIG.GetAttachmentCount(); j++)
+		for (int j = 0; j < packet.GetAttachmentCount(); j++)
 		{
 			Buffer[0] = 4;
-			Array.Copy(NPKADBPBKIG.GetAttachments()[j], 0, Buffer, 1, NPKADBPBKIG.GetAttachments()[j].Length);
-			GetImplementation().Send(Buffer, 0uL, (ulong)NPKADBPBKIG.GetAttachments()[j].Length + 1uL);
+			Array.Copy(packet.GetAttachments()[j], 0, Buffer, 1, packet.GetAttachments()[j].Length);
+			GetImplementation().Send(Buffer, 0uL, (ulong)packet.GetAttachments()[j].Length + 1uL);
 		}
 	}
 
-	public void Send(List<Packet> DPGGBKDLDJE)
+	public void Send(List<Packet> packets)
 	{
-		for (int i = 0; i < DPGGBKDLDJE.Count; i++)
+		for (int i = 0; i < packets.Count; i++)
 		{
-			Send(DPGGBKDLDJE[i]);
+			Send(packets[i]);
 		}
-		DPGGBKDLDJE.Clear();
+		packets.Clear();
 	}
 
-	private void OnPacket(Packet NPKADBPBKIG)
+	private void OnPacket(Packet packet)
 	{
-		switch (NPKADBPBKIG.GetTransportEvent())
+		switch (packet.GetTransportEvent())
 		{
 		case TransportEventTypes.Message:
-			if (NPKADBPBKIG.GetSocketIOEvent() == SocketIOEventType.Connect && GetState() == SocketIOTransportState.Opening)
+			if (packet.GetSocketIOEvent() == SocketIOEventType.Connect && GetState() == SocketIOTransportState.Opening)
 			{
 				set_State(SocketIOTransportState.Open);
 				if (!((IManager)GetManager()).OnTransportConnected((ITransport)this))
@@ -315,13 +315,13 @@ internal sealed class SocketIoWebSocketTransport : ITransport
 			}
 			break;
 		case TransportEventTypes.Pong:
-			if (NPKADBPBKIG.GetPayload() == "probe")
+			if (packet.GetPayload() == "probe")
 			{
 				HTTPManager.GetLogger().Information("WebSocketTransport", "\"probe\" packet received, sending Upgrade packet");
 				Send(new Packet(TransportEventTypes.Upgrade, SocketIOEventType.Event, "/", string.Empty));
 			}
 			break;
 		}
-		((IManager)GetManager()).OnPacket(NPKADBPBKIG);
+		((IManager)GetManager()).OnPacket(packet);
 	}
 }

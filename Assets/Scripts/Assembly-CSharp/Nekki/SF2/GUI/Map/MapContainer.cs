@@ -64,9 +64,9 @@ namespace Nekki.SF2.GUI.Map
 			_moveableMapPanel.CloseRightNow();
 		}
 
-		public int GetZoneIndex(ZoneScrollItem JEOIJBLAMIO)
+		public int GetZoneIndex(ZoneScrollItem zoneItem)
 		{
-			return _mapPanel.GetZoneIndex(JEOIJBLAMIO);
+			return _mapPanel.GetZoneIndex(zoneItem);
 		}
 
 		public int GetZoneIndexByName(string name)
@@ -74,9 +74,9 @@ namespace Nekki.SF2.GUI.Map
 			return _mapPanel.GetZoneIndexByName(name);
 		}
 
-		public void SelectBattle(Battle DPOOIONCEOA, float _Duration)
+		public void SelectBattle(Battle battle, float _Duration)
 		{
-			_mapPanel.SelectBattle(DPOOIONCEOA, _Duration);
+			_mapPanel.SelectBattle(battle, _Duration);
 		}
 
 		private Color _backgroundMask = Color.white;
@@ -130,9 +130,9 @@ namespace Nekki.SF2.GUI.Map
 			return _mapPanel.GetZone(index);
 		}
 
-		public void SetCurrentZone(int index, string ABJMDKJHJCP)
+		public void SetCurrentZone(int index, string zoneAlias)
 		{
-			_lampsPanel.SetCurrentZone(index, ABJMDKJHJCP);
+			_lampsPanel.SetCurrentZone(index, zoneAlias);
 		}
 
 		public void ScrollToZone(int index, float _Duration)
@@ -160,19 +160,19 @@ namespace Nekki.SF2.GUI.Map
 			return _mapPanel.GetZones().Count;
 		}
 
-		public void SetLampsEnable(bool IJHFJPBBNEJ)
+		public void SetLampsEnable(bool isLampsEnabled)
 		{
-			_lampsPanel.gameObject.SetActive(IJHFJPBBNEJ);
+			_lampsPanel.gameObject.SetActive(isLampsEnabled);
 		}
 
-		public bool HasBattle(Battle DPOOIONCEOA)
+		public bool HasBattle(Battle battle)
 		{
-			return _mapPanel.HasBattle(DPOOIONCEOA);
+			return _mapPanel.HasBattle(battle);
 		}
 
-		public bool HasZone(ZoneScrollItem HLJKOKMKMLM)
+		public bool HasZone(ZoneScrollItem zoneItem)
 		{
-			return _mapPanel.HasZone(HLJKOKMKMLM);
+			return _mapPanel.HasZone(zoneItem);
 		}
 
 		public void FadeZonesBackgroundMask(Color color, float duration)
@@ -194,9 +194,9 @@ namespace Nekki.SF2.GUI.Map
 			}
 		}
 
-		public virtual void SetTouchEnabled(bool MINKNLEJMKF)
+		public virtual void SetTouchEnabled(bool isTouchEnabled)
 		{
-			_mapPanel.SetTouchEnabled(MINKNLEJMKF);
+			_mapPanel.SetTouchEnabled(isTouchEnabled);
 		}
 
 		public bool IsMoveNow()
@@ -228,12 +228,12 @@ namespace Nekki.SF2.GUI.Map
 		{
 			int num = (int)data;
 			int num2 = (int)Mathf.Min(LAMP_MAX_FRAMES, (float)Mathf.Abs(_lampsPanel.GetCurrentLamp() - num) * LAMP_FRAMES_PER_ZONE);
-			float dFNBHOEGAHO = (float)num2 / 60f;
+			float scrollDuration = (float)num2 / 60f;
 			int count = _mapPanel.GetZones().Count;
 			if (num >= 0 && num < count)
 			{
 				ZoneScrollItem zone = GetZone(num);
-				ScrollToZone(num, dFNBHOEGAHO);
+				ScrollToZone(num, scrollDuration);
 				Zone zone2 = zone.get_Zone();
 				if (zone2 != null && MapScene.IsZoneOpen(zone2) && MapScene.IsZoneHaveDontCompleteBattle(zone2))
 				{
@@ -242,31 +242,31 @@ namespace Nekki.SF2.GUI.Map
 			}
 		}
 
-		private void SelectFirstOpenBattle(Zone HLJKOKMKMLM, ZoneScrollItem ELOKNHJDCCD)
+		private void SelectFirstOpenBattle(Zone zone, ZoneScrollItem zoneItem)
 		{
-			List<string> gBDHOPBMLHK = MapGUI.ZoneSwitchFade.BattleTypeNames;
-			List<Battle> lGIIBNJFADA = HLJKOKMKMLM.Battles;
-			foreach (string item in gBDHOPBMLHK)
+			List<string> battleNames = MapGUI.ZoneSwitchFade.BattleTypeNames;
+			List<Battle> battles = zone.Battles;
+			foreach (string item in battleNames)
 			{
-				foreach (Battle item2 in lGIIBNJFADA)
+				foreach (Battle item2 in battles)
 				{
 					if (IsOpenUncompletedBattleNamed(item, item2))
 					{
-						ELOKNHJDCCD.SetLastBattle(item);
+						zoneItem.SetLastBattle(item);
 						return;
 					}
 				}
 			}
 		}
 
-		private static bool IsOpenUncompletedBattleNamed(string name, Battle DPOOIONCEOA)
+		private static bool IsOpenUncompletedBattleNamed(string name, Battle battle)
 		{
-			if (DPOOIONCEOA == null)
+			if (battle == null)
 			{
 				return false;
 			}
-			bool flag = name == DPOOIONCEOA.get_Name();
-			bool flag2 = DPOOIONCEOA.GetStatus() == ConditionStatus.StatusOpen && !DPOOIONCEOA.IsLocked();
+			bool flag = name == battle.get_Name();
+			bool flag2 = battle.GetStatus() == ConditionStatus.StatusOpen && !battle.IsLocked();
 			return flag && flag2;
 		}
 	}

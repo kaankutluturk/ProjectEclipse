@@ -2,8 +2,8 @@ using System.Xml;
 
 public class NoHealthBarRule : InFightRule
 {
-	public NoHealthBarRule(XmlNode node, RuleAppliance EJPOJJKKICO)
-		: base(RuleType.RuleNoHealthBar, EJPOJJKKICO, node)
+	public NoHealthBarRule(XmlNode node, RuleAppliance appliance)
+		: base(RuleType.RuleNoHealthBar, appliance, node)
 	{
 		Parse(node);
 	}
@@ -15,11 +15,11 @@ public class NoHealthBarRule : InFightRule
 
 	public override InFightRule Copy()
 	{
-		InFightRule aAJIFBJLJOA = null;
-		RuleAppliance eJPOJJKKICO = GetAppliance();
-		XmlNode hKPPBKPJOEO = GetXmlSource().GetNode();
-		aAJIFBJLJOA = new NoHealthBarRule(hKPPBKPJOEO, eJPOJJKKICO);
-		aAJIFBJLJOA.IsRandom = IsRandom;
-		return aAJIFBJLJOA;
+		InFightRule copy = null;
+		RuleAppliance appliance = GetAppliance();
+		XmlNode ruleNode = GetXmlSource().GetNode();
+		copy = new NoHealthBarRule(ruleNode, appliance);
+		copy.IsRandom = IsRandom;
+		return copy;
 	}
 }

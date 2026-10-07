@@ -4,7 +4,7 @@ namespace Nekki.SF2.GUI.Profile
 	{
 		public int HeaderFontSize = -1;
 
-		public virtual void SetUpBorder(float BGEEALIPKCC)
+		public virtual void SetUpBorder(float upBorder)
 		{
 		}
 	}

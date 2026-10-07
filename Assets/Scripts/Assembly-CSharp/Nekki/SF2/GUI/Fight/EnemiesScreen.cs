@@ -60,7 +60,7 @@ namespace Nekki.SF2.GUI.Fight
 			return animationTime;
 		}
 
-		public void Init(List<ModelParameters> IDAAONBIBJM, int index, bool PPIJJHJCGGB)
+		public void Init(List<ModelParameters> enemies, int index, bool enemiesFlag)
 		{
 			if (displayModelPrefab == null)
 			{
@@ -79,7 +79,7 @@ namespace Nekki.SF2.GUI.Fight
 			}
 			Vector2 sizeDelta = new Vector2(0f, 0f);
 			int num = 0;
-			foreach (ModelParameters item in IDAAONBIBJM)
+			foreach (ModelParameters item in enemies)
 			{
 				DisplayModel component = Object.Instantiate(displayModelPrefab).GetComponent<DisplayModel>();
 				component.transform.SetParent(enemiesPanel, false);
@@ -99,7 +99,7 @@ namespace Nekki.SF2.GUI.Fight
 					}
 				}
 				num++;
-				if (IDAAONBIBJM.Count == num && PPIJJHJCGGB)
+				if (enemies.Count == num && enemiesFlag)
 				{
 					component.ScaleAvatar(bossScale);
 					component.SetSizeDelta(bossSize);

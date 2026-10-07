@@ -42,14 +42,14 @@ public static class Saves
 		datapath = value;
 	}
 
-	public static void Save(string HIOFDADIEME, object DMNBDBJNKME)
+	public static void Save(string fileName, object data)
 	{
-		File.WriteAllText(string.Format("{0}\\{1}.json", GetDatapath(), HIOFDADIEME), JsonConvert.SerializeObject(DMNBDBJNKME));
+		File.WriteAllText(string.Format("{0}\\{1}.json", GetDatapath(), fileName), JsonConvert.SerializeObject(data));
 	}
 
-	public static T Load<T>(string HIOFDADIEME) where T : class
+	public static T Load<T>(string fileName) where T : class
 	{
-		string path = string.Format("{0}\\{1}.json", GetDatapath(), HIOFDADIEME);
+		string path = string.Format("{0}\\{1}.json", GetDatapath(), fileName);
 		if (File.Exists(path))
 		{
 			string value = File.ReadAllText(path);

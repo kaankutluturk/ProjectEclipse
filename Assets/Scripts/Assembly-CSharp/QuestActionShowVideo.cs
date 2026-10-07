@@ -10,15 +10,15 @@ public class QuestActionShowVideo : QuestAction
 
 	private string videoName;
 
-	public override void Parse(XmlNode EPKLCPOEELO)
+	public override void Parse(XmlNode node)
 	{
-		base.Parse(EPKLCPOEELO);
-		videoName = EPKLCPOEELO.Attributes["Name"].GetStringOrDefault(string.Empty);
+		base.Parse(node);
+		videoName = node.Attributes["Name"].GetStringOrDefault(string.Empty);
 	}
 
-	public override void Execute(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters parameters)
 	{
-		base.Execute(GFIHPBCEEOB);
+		base.Execute(parameters);
 		// The mobile intro is over 100 seconds long and the original player only
 		// accepted touch input.  In the Editor that presents as an unskippable
 		// black loader screen, so continue the first-launch quest immediately.

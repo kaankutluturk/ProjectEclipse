@@ -75,9 +75,9 @@ public class ModelStatistics
 			}
 		}
 
-		public AttackStatistics(InfoAnimation DBOLBEOCEME)
+		public AttackStatistics(InfoAnimation attackAnimation)
 		{
-			animation = DBOLBEOCEME;
+			animation = attackAnimation;
 			totalDamage = 0f;
 			pendingDamage = 0f;
 			_count = 0f;
@@ -86,14 +86,14 @@ public class ModelStatistics
 			_strikeIndex = 0;
 		}
 
-		public AttackStatistics(AttackStatistics NBMGOEMJJAF)
+		public AttackStatistics(AttackStatistics source)
 		{
-			animation = NBMGOEMJJAF.animation;
-			totalDamage = NBMGOEMJJAF.totalDamage;
-			pendingDamage = NBMGOEMJJAF.pendingDamage;
-			_count = NBMGOEMJJAF._count;
-			totalHitCount = NBMGOEMJJAF.totalHitCount;
-			pendingHitCount = NBMGOEMJJAF.pendingHitCount;
+			animation = source.animation;
+			totalDamage = source.totalDamage;
+			pendingDamage = source.pendingDamage;
+			_count = source._count;
+			totalHitCount = source.totalHitCount;
+			pendingHitCount = source.pendingHitCount;
 			_strikeIndex = 0;
 		}
 
@@ -142,25 +142,25 @@ public class ModelStatistics
 			totalHitCount = value;
 		}
 
-		private void ApplyDecay(int BCAOGKPNMFG, float DAIGFEOMFIE)
+		private void ApplyDecay(int strikeIndex, float halfLife)
 		{
-			int num = BCAOGKPNMFG - _strikeIndex;
+			int num = strikeIndex - _strikeIndex;
 			if (0 < num)
 			{
-				float num2 = Mathf.Pow(2f, (0f - (float)num) / DAIGFEOMFIE);
+				float num2 = Mathf.Pow(2f, (0f - (float)num) / halfLife);
 				totalDamage *= num2;
 				pendingDamage *= num2;
 				_count *= num2;
 				totalHitCount *= num2;
 				pendingHitCount *= num2;
 			}
-			_strikeIndex = BCAOGKPNMFG;
+			_strikeIndex = strikeIndex;
 		}
 
-		public void AddDamage(float CKKFKEIELCP, int BCAOGKPNMFG, float DAIGFEOMFIE)
+		public void AddDamage(float damage, int strikeIndex, float halfLife)
 		{
-			ApplyDecay(BCAOGKPNMFG, DAIGFEOMFIE);
-			pendingDamage += CKKFKEIELCP;
+			ApplyDecay(strikeIndex, halfLife);
+			pendingDamage += damage;
 			pendingHitCount++;
 		}
 
@@ -172,27 +172,27 @@ public class ModelStatistics
 			pendingHitCount = 0f;
 		}
 
-		public void AddUse(int BCAOGKPNMFG, float DAIGFEOMFIE)
+		public void AddUse(int strikeIndex, float halfLife)
 		{
-			ApplyDecay(BCAOGKPNMFG, DAIGFEOMFIE);
+			ApplyDecay(strikeIndex, halfLife);
 			_count++;
 		}
 
-		public float GetDecayedTotalDamage(int BCAOGKPNMFG, float DAIGFEOMFIE)
+		public float GetDecayedTotalDamage(int strikeIndex, float halfLife)
 		{
-			ApplyDecay(BCAOGKPNMFG, DAIGFEOMFIE);
+			ApplyDecay(strikeIndex, halfLife);
 			return totalDamage;
 		}
 
-		public float GetDecayedCount(int BCAOGKPNMFG, float DAIGFEOMFIE)
+		public float GetDecayedCount(int strikeIndex, float halfLife)
 		{
-			ApplyDecay(BCAOGKPNMFG, DAIGFEOMFIE);
+			ApplyDecay(strikeIndex, halfLife);
 			return _count;
 		}
 
-		public float GetDecayedTotalHitCount(int BCAOGKPNMFG, float DAIGFEOMFIE)
+		public float GetDecayedTotalHitCount(int strikeIndex, float halfLife)
 		{
-			ApplyDecay(BCAOGKPNMFG, DAIGFEOMFIE);
+			ApplyDecay(strikeIndex, halfLife);
 			return totalHitCount;
 		}
 
@@ -228,9 +228,9 @@ public class ModelStatistics
 		}
 	}
 
-	public ModelStatistics(Model ACENLMONNPA)
+	public ModelStatistics(Model model)
 	{
-		_model = ACENLMONNPA;
+		_model = model;
 	}
 
     internal void RebindFormOwner(Model model)
@@ -239,38 +239,38 @@ public class ModelStatistics
         _model = model;
     }
 
-	private AttackStatistics GetOrCreateStatistics(bool MNJPFPLKNFA, InfoAnimation DBOLBEOCEME)
+	private AttackStatistics GetOrCreateStatistics(bool isDealt, InfoAnimation animation)
 	{
-		Dictionary<InfoAnimation, AttackStatistics> dictionary = ((!MNJPFPLKNFA) ? receivedStats : dealtStats);
-		if (dictionary.ContainsKey(DBOLBEOCEME))
+		Dictionary<InfoAnimation, AttackStatistics> dictionary = ((!isDealt) ? receivedStats : dealtStats);
+		if (dictionary.ContainsKey(animation))
 		{
-			return dictionary[DBOLBEOCEME];
+			return dictionary[animation];
 		}
-		AttackStatistics iINOIHKEDDJ = new AttackStatistics(DBOLBEOCEME);
-		dictionary.Add(DBOLBEOCEME, iINOIHKEDDJ);
-		return iINOIHKEDDJ;
+		AttackStatistics attackStatistics = new AttackStatistics(animation);
+		dictionary.Add(animation, attackStatistics);
+		return attackStatistics;
 	}
 
-	public void RecordDamage(bool MNJPFPLKNFA, InfoAnimation DBOLBEOCEME, float CKKFKEIELCP)
+	public void RecordDamage(bool isDealt, InfoAnimation animation, float damage)
 	{
-		int bCAOGKPNMFG = _model.GetStrikesTaken();
-		float dAIGFEOMFIE = GetStrikeHalfLife();
-		AttackStatistics iINOIHKEDDJ = GetOrCreateStatistics(MNJPFPLKNFA, DBOLBEOCEME);
-		iINOIHKEDDJ.AddDamage(CKKFKEIELCP, bCAOGKPNMFG, dAIGFEOMFIE);
+		int strikeIndex = _model.GetStrikesTaken();
+		float halfLife = GetStrikeHalfLife();
+		AttackStatistics attackStatistics = GetOrCreateStatistics(isDealt, animation);
+		attackStatistics.AddDamage(damage, strikeIndex, halfLife);
 	}
 
-	public void CommitPendingStatistics(bool MNJPFPLKNFA, InfoAnimation DBOLBEOCEME)
+	public void CommitPendingStatistics(bool isDealt, InfoAnimation animation)
 	{
-		AttackStatistics iINOIHKEDDJ = GetOrCreateStatistics(MNJPFPLKNFA, DBOLBEOCEME);
-		iINOIHKEDDJ.CommitPending();
+		AttackStatistics attackStatistics = GetOrCreateStatistics(isDealt, animation);
+		attackStatistics.CommitPending();
 	}
 
-	public void RecordUse(bool MNJPFPLKNFA, InfoAnimation DBOLBEOCEME)
+	public void RecordUse(bool isDealt, InfoAnimation animation)
 	{
-		int bCAOGKPNMFG = _model.GetStrikesTaken();
-		float dAIGFEOMFIE = GetStrikeHalfLife();
-		AttackStatistics iINOIHKEDDJ = GetOrCreateStatistics(MNJPFPLKNFA, DBOLBEOCEME);
-		iINOIHKEDDJ.AddUse(bCAOGKPNMFG, dAIGFEOMFIE);
+		int strikeIndex = _model.GetStrikesTaken();
+		float halfLife = GetStrikeHalfLife();
+		AttackStatistics attackStatistics = GetOrCreateStatistics(isDealt, animation);
+		attackStatistics.AddUse(strikeIndex, halfLife);
 	}
 
 	public void Reset()
@@ -299,44 +299,44 @@ public class ModelStatistics
 		}
 	}
 
-	public void GetCountAndDamage(bool MNJPFPLKNFA, string KCAIJCBMNKP, ref float count, ref float CKKFKEIELCP, ref float JOOJIMPEPOJ)
+	public void GetCountAndDamage(bool isDealt, string templateName, ref float count, ref float damage, ref float hitCount)
 	{
 		count = 0f;
-		CKKFKEIELCP = 0f;
+		damage = 0f;
 		animationBuffer.Clear();
-		AnimationData.AddTemplateAnimations(KCAIJCBMNKP, animationBuffer);
+		AnimationData.AddTemplateAnimations(templateName, animationBuffer);
 		float BLJGEOEHIGP2 = 0f;
 		float CKKFKEIELCP2 = 0f;
 		float JOOJIMPEPOJ2 = 0f;
 		for (int i = 0; i < animationBuffer.Count; i++)
 		{
-			GetCountAndDamage(MNJPFPLKNFA, animationBuffer[i], ref BLJGEOEHIGP2, ref CKKFKEIELCP2, ref JOOJIMPEPOJ2);
+			GetCountAndDamage(isDealt, animationBuffer[i], ref BLJGEOEHIGP2, ref CKKFKEIELCP2, ref JOOJIMPEPOJ2);
 			count += BLJGEOEHIGP2;
-			CKKFKEIELCP += CKKFKEIELCP2;
-			JOOJIMPEPOJ += JOOJIMPEPOJ2;
+			damage += CKKFKEIELCP2;
+			hitCount += JOOJIMPEPOJ2;
 		}
 	}
 
-	public void GetCountAndDamage(bool MNJPFPLKNFA, InfoAnimation DBOLBEOCEME, ref float count, ref float CKKFKEIELCP, ref float JOOJIMPEPOJ)
+	public void GetCountAndDamage(bool isDealt, InfoAnimation animation, ref float count, ref float damage, ref float hitCount)
 	{
-		AttackStatistics iINOIHKEDDJ = GetOrCreateStatistics(MNJPFPLKNFA, DBOLBEOCEME);
-		int bCAOGKPNMFG = _model.GetStrikesTaken();
-		float dAIGFEOMFIE = GetStrikeHalfLife();
-		count = iINOIHKEDDJ.GetDecayedCount(bCAOGKPNMFG, dAIGFEOMFIE);
-		CKKFKEIELCP = iINOIHKEDDJ.GetDecayedTotalDamage(bCAOGKPNMFG, dAIGFEOMFIE);
-		JOOJIMPEPOJ = iINOIHKEDDJ.GetDecayedTotalHitCount(bCAOGKPNMFG, dAIGFEOMFIE);
+		AttackStatistics attackStatistics = GetOrCreateStatistics(isDealt, animation);
+		int strikeIndex = _model.GetStrikesTaken();
+		float halfLife = GetStrikeHalfLife();
+		count = attackStatistics.GetDecayedCount(strikeIndex, halfLife);
+		damage = attackStatistics.GetDecayedTotalDamage(strikeIndex, halfLife);
+		hitCount = attackStatistics.GetDecayedTotalHitCount(strikeIndex, halfLife);
 	}
 
 	private float GetStrikeHalfLife()
 	{
 		float result = 0f;
-		ModelAi pCFGKAFOCDO = _model.GetAi();
-		if (pCFGKAFOCDO != null)
+		ModelAi modelAi = _model.GetAi();
+		if (modelAi != null)
 		{
-			Tactic eEJNOAKLOLG = pCFGKAFOCDO.get_Tactic();
-			if (eEJNOAKLOLG != null)
+			Tactic tactic = modelAi.get_Tactic();
+			if (tactic != null)
 			{
-				result = eEJNOAKLOLG.MemoryConfig.Strikes;
+				result = tactic.MemoryConfig.Strikes;
 			}
 		}
 		return result;
@@ -345,25 +345,25 @@ public class ModelStatistics
 	private float GetRoundFactor()
 	{
 		float result = 0f;
-		ModelAi pCFGKAFOCDO = _model.GetAi();
-		if (pCFGKAFOCDO != null)
+		ModelAi modelAi = _model.GetAi();
+		if (modelAi != null)
 		{
-			Tactic eEJNOAKLOLG = pCFGKAFOCDO.get_Tactic();
-			if (eEJNOAKLOLG != null)
+			Tactic tactic = modelAi.get_Tactic();
+			if (tactic != null)
 			{
-				result = eEJNOAKLOLG.MemoryConfig.RoundFactor;
+				result = tactic.MemoryConfig.RoundFactor;
 			}
 		}
 		return result;
 	}
 
-	public void AddRaidHitInfo(bool OOCLHFGEPML, bool OOGIBOBMGJA)
+	public void AddRaidHitInfo(bool isBlocked, bool isCritical)
 	{
-		if (!OOCLHFGEPML)
+		if (!isBlocked)
 		{
 			raidHitCount++;
 		}
-		if (OOGIBOBMGJA)
+		if (isCritical)
 		{
 			raidCritCount++;
 		}
@@ -371,9 +371,9 @@ public class ModelStatistics
 
 	public bool CheckCritAvailable()
 	{
-		int pOJMKEEPBJK = QuestUtils.GetNoAnimationMoves().GetCritSettings().CritAdditional;
-		float iMPHONCGFGP = QuestUtils.GetNoAnimationMoves().GetCritSettings().CritProbablity;
-		int num = pOJMKEEPBJK + (int)((float)raidHitCount * iMPHONCGFGP);
+		int critAdditional = QuestUtils.GetNoAnimationMoves().GetCritSettings().CritAdditional;
+		float critProbability = QuestUtils.GetNoAnimationMoves().GetCritSettings().CritProbablity;
+		int num = critAdditional + (int)((float)raidHitCount * critProbability);
 		if (raidCritCount + 1 <= num)
 		{
 			return true;

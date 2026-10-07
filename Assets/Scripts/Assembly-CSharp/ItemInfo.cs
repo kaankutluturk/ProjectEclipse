@@ -660,9 +660,9 @@ public class ItemInfo
 		DeliveryCoinPrice.RandomizeCryptoKey();
 		ReceiveGold.RandomizeCryptoKey();
 		ReceiveBonus.RandomizeCryptoKey();
-		LocalUpgrades.ForEach((UpgradeData DHDMNHCIPEH) =>
+		LocalUpgrades.ForEach((UpgradeData upgrade) =>
 		{
-			DHDMNHCIPEH.RandomizeObscuredVars();
+			upgrade.RandomizeObscuredVars();
 		});
 	}
 
@@ -728,9 +728,9 @@ public class ItemInfo
 
 	public virtual ItemInfo Clone()
 	{
-		ItemInfo dJKEECEOCJB = new ItemInfo(this);
-		dJKEECEOCJB.DefaultEnchantments.Clear();
-		return dJKEECEOCJB;
+		ItemInfo clone = new ItemInfo(this);
+		clone.DefaultEnchantments.Clear();
+		return clone;
 	}
 
 	private void ReadCombatClassification(XmlNode node)
@@ -914,13 +914,13 @@ public class ItemInfo
 		{
 			LegacyPaidItem = node.Attributes["PaidItem"].GetStringOrDefault(string.Empty);
 		}
-		List<WarriorAttribute> iBLHIAHECLK = GameUtils.WarriorAttributeList.AttributeList;
-		foreach (WarriorAttribute item in iBLHIAHECLK)
+		List<WarriorAttribute> warriorAttributes = GameUtils.WarriorAttributeList.AttributeList;
+		foreach (WarriorAttribute item in warriorAttributes)
 		{
-			XmlAttribute cJBEMNNNHDM = node.Attributes[item.get_Name()];
-			if (!cJBEMNNNHDM.Empty())
+			XmlAttribute attributeNode = node.Attributes[item.get_Name()];
+			if (!attributeNode.Empty())
 			{
-				ItemAttributes.Set(item.get_Name(), cJBEMNNNHDM.ParseInt());
+				ItemAttributes.Set(item.get_Name(), attributeNode.ParseInt());
 			}
 		}
 		XmlNode xmlNode3 = node["Upgrades"];
@@ -956,30 +956,30 @@ public class ItemInfo
 		InnatePerks.Clear();
 		foreach (XmlNode childNode in node.ChildNodes)
 		{
-			PerkInfoItem aCONCDFDNJH = ParsePerk(childNode);
-			if (aCONCDFDNJH != null)
+			PerkInfoItem perk = ParsePerk(childNode);
+			if (perk != null)
 			{
-				InnatePerks.Add(aCONCDFDNJH);
+				InnatePerks.Add(perk);
 			}
 		}
 	}
 
 	public static PerkInfoItem ParsePerk(XmlNode node)
 	{
-		string gOHIIMFFFJI = node.Attributes["Name"].GetStringOrDefault(string.Empty);
-		PerkInfoItem aCONCDFDNJH = GameUtils.PerkItemList.FindBasePerk(gOHIIMFFFJI);
-		if (aCONCDFDNJH != null)
+		string perkName = node.Attributes["Name"].GetStringOrDefault(string.Empty);
+		PerkInfoItem perk = GameUtils.PerkItemList.FindBasePerk(perkName);
+		if (perk != null)
 		{
 			if (node["Set"] != null || node["RatingEvaluation"] != null)
 			{
-				aCONCDFDNJH = aCONCDFDNJH.Clone(node["Set"], node["RatingEvaluation"]);
+				perk = perk.Clone(node["Set"], node["RatingEvaluation"]);
 				string text = node.Attributes["Description"].GetStringOrDefault(string.Empty);
 				if (text != null && !text.Equals(string.Empty))
 				{
-					aCONCDFDNJH.DescriptionKey = text;
+					perk.DescriptionKey = text;
 				}
 			}
-			return aCONCDFDNJH;
+			return perk;
 		}
 		return null;
 	}
@@ -989,10 +989,10 @@ public class ItemInfo
 		DefaultEnchantmentPreviews.Clear();
 		foreach (XmlNode childNode in node.ChildNodes)
 		{
-			PerkInfoItem aCONCDFDNJH = ParsePerk(childNode);
-			if (aCONCDFDNJH != null)
+			PerkInfoItem perk = ParsePerk(childNode);
+			if (perk != null)
 			{
-				DefaultEnchantmentPreviews.Add(aCONCDFDNJH);
+				DefaultEnchantmentPreviews.Add(perk);
 			}
 		}
 	}
@@ -1006,11 +1006,11 @@ public class ItemInfo
 		}
 		foreach (XmlNode childNode in node.ChildNodes)
 		{
-			PerkInfoItem aCONCDFDNJH = ParsePerk(childNode);
-			if (aCONCDFDNJH != null)
+			PerkInfoItem perk = ParsePerk(childNode);
+			if (perk != null)
 			{
-				ParsedPerks.Add(aCONCDFDNJH);
-				InnatePerks.Add(aCONCDFDNJH);
+				ParsedPerks.Add(perk);
+				InnatePerks.Add(perk);
 			}
 		}
 	}
@@ -1030,43 +1030,43 @@ public class ItemInfo
 		DefaultEnchantments.Clear();
 	}
 
-	private void DenominateReservedPrices(int NPFOBKBJAOB)
+	private void DenominateReservedPrices(int digits)
 	{
 	}
 
-	private void DenominateReservedValues(int NPFOBKBJAOB)
+	private void DenominateReservedValues(int digits)
 	{
 	}
 
-	public void AddLocalUpgrade(UpgradeData IFOFMGAKHEP)
+	public void AddLocalUpgrade(UpgradeData upgrade)
 	{
-		UpgradeData item = CompleteUpgradeData(IFOFMGAKHEP);
+		UpgradeData item = CompleteUpgradeData(upgrade);
 		LocalUpgrades.Add(item);
 	}
 
 	public int GetMaxLocalUpgradeLevel()
 	{
-		int LPINKLMDEEF = int.MinValue;
-		LocalUpgrades.ForEach((UpgradeData DHDMNHCIPEH) =>
+		int maxLevel = int.MinValue;
+		LocalUpgrades.ForEach((UpgradeData upgrade) =>
 		{
-			if (DHDMNHCIPEH.Values.UpgradeLevel > LPINKLMDEEF)
+			if (upgrade.Values.UpgradeLevel > maxLevel)
 			{
-				LPINKLMDEEF = DHDMNHCIPEH.Values.UpgradeLevel;
+				maxLevel = upgrade.Values.UpgradeLevel;
 			}
 		});
-		return LPINKLMDEEF;
+		return maxLevel;
 	}
 
-	public List<UpgradeData> GetUpgrades(bool NNDOJGMBEDC = false, int JELPMBDMLAB = int.MaxValue)
+	public List<UpgradeData> GetUpgrades(bool onlyAboveCurrent = false, int maxItemLevel = int.MaxValue)
 	{
 		List<UpgradeData> list = new List<UpgradeData>();
 		List<UpgradeData> list2 = new List<UpgradeData>();
 		int num = GetMaxLocalUpgradeLevel();
 		list2.AddRange(LocalUpgrades);
-		UpgradeDataContainer aKHJNNDCKMK = ListSF.GetItems().GetUpgradeDataContainerByName(UpgradeTemplateName);
-		if (aKHJNNDCKMK != null)
+		UpgradeDataContainer upgradeContainer = ListSF.GetItems().GetUpgradeDataContainerByName(UpgradeTemplateName);
+		if (upgradeContainer != null)
 		{
-			foreach (UpgradeData item in aKHJNNDCKMK.Upgrades)
+			foreach (UpgradeData item in upgradeContainer.Upgrades)
 			{
 				if (item.Values.UpgradeLevel > num)
 				{
@@ -1077,7 +1077,7 @@ public class ItemInfo
 		list2.Sort();
 		foreach (UpgradeData item2 in list2)
 		{
-			if ((!NNDOJGMBEDC || item2.Values.UpgradeLevel > UpgradeLevel) && item2.Values.Level <= JELPMBDMLAB)
+			if ((!onlyAboveCurrent || item2.Values.UpgradeLevel > UpgradeLevel) && item2.Values.Level <= maxItemLevel)
 			{
 				list.Add(item2);
 			}
@@ -1085,53 +1085,53 @@ public class ItemInfo
 		return list;
 	}
 
-	public void ApplyUpgrade(UpgradeData LILLEENHNCG)
+	public void ApplyUpgrade(UpgradeData upgrade)
 	{
-		List<WarriorAttribute> iBLHIAHECLK = GameUtils.WarriorAttributeList.AttributeList;
-		foreach (WarriorAttribute item in iBLHIAHECLK)
+		List<WarriorAttribute> warriorAttributes = GameUtils.WarriorAttributeList.AttributeList;
+		foreach (WarriorAttribute item in warriorAttributes)
 		{
-			int OEMALIFPGPO = 0;
-			if (LILLEENHNCG.Values.Attributes.Get(item.get_Name(), ref OEMALIFPGPO))
+			int attributeValue = 0;
+			if (upgrade.Values.Attributes.Get(item.get_Name(), ref attributeValue))
 			{
-				ItemAttributes.Set(item.get_Name(), OEMALIFPGPO);
+				ItemAttributes.Set(item.get_Name(), attributeValue);
 			}
 		}
-		if (LILLEENHNCG.HasValues.HasBonusDeliveryPrice)
+		if (upgrade.HasValues.HasBonusDeliveryPrice)
 		{
-			DeliveryGemPrice = LILLEENHNCG.Values.BonusDeliveryPrice;
+			DeliveryGemPrice = upgrade.Values.BonusDeliveryPrice;
 		}
-		if (LILLEENHNCG.HasValues.HasBonusPrice)
+		if (upgrade.HasValues.HasBonusPrice)
 		{
-			GemPrice = LILLEENHNCG.Values.BonusPrice;
+			GemPrice = upgrade.Values.BonusPrice;
 		}
-		if (LILLEENHNCG.HasValues.HasDeliveryTime)
+		if (upgrade.HasValues.HasDeliveryTime)
 		{
-			DeliveryTime = LILLEENHNCG.Values.DeliveryTime;
+			DeliveryTime = upgrade.Values.DeliveryTime;
 		}
-		if (LILLEENHNCG.HasValues.Level)
+		if (upgrade.HasValues.Level)
 		{
-			ItemLevel = LILLEENHNCG.Values.Level;
+			ItemLevel = upgrade.Values.Level;
 		}
-		if (LILLEENHNCG.HasValues.HasMilestone)
+		if (upgrade.HasValues.HasMilestone)
 		{
-			Milestone = LILLEENHNCG.Values.Milestone;
+			Milestone = upgrade.Values.Milestone;
 		}
-		if (LILLEENHNCG.HasValues.HasPrice)
+		if (upgrade.HasValues.HasPrice)
 		{
-			CoinPrice = LILLEENHNCG.Values.Price;
+			CoinPrice = upgrade.Values.Price;
 		}
-		if (LILLEENHNCG.HasValues.HasUpgradeLevel)
+		if (upgrade.HasValues.HasUpgradeLevel)
 		{
-			UpgradeLevel = LILLEENHNCG.Values.UpgradeLevel;
+			UpgradeLevel = upgrade.Values.UpgradeLevel;
 		}
 	}
 
-	public ItemInfo GetUpgradeItemByUpgradeLevel(int GNLOCMLBNHF)
+	public ItemInfo GetUpgradeItemByUpgradeLevel(int upgradeLevel)
 	{
 		List<UpgradeData> list = GetUpgrades();
 		foreach (UpgradeData item in list)
 		{
-			if (item.Values.UpgradeLevel == GNLOCMLBNHF)
+			if (item.Values.UpgradeLevel == upgradeLevel)
 			{
 				return CreateUpgradedItem(item);
 			}
@@ -1139,12 +1139,12 @@ public class ItemInfo
 		return null;
 	}
 
-	public ItemInfo GetUpgradeItemAtOrAboveUpgradeLevel(int GNLOCMLBNHF)
+	public ItemInfo GetUpgradeItemAtOrAboveUpgradeLevel(int upgradeLevel)
 	{
 		List<UpgradeData> list = GetUpgrades();
 		foreach (UpgradeData item in list)
 		{
-			if (item.Values.UpgradeLevel >= GNLOCMLBNHF)
+			if (item.Values.UpgradeLevel >= upgradeLevel)
 			{
 				return CreateUpgradedItem(item);
 			}
@@ -1152,34 +1152,34 @@ public class ItemInfo
 		return null;
 	}
 
-	public ItemInfo GetUpdateItemByLevel(int JHLGOAFNPNM, bool GHNLHKBJOIH = true)
+	public ItemInfo GetUpdateItemByLevel(int level, bool usePreviousUpgrade = true)
 	{
-		UpgradeData fKFLGOCPFEB = null;
+		UpgradeData exactMatch = null;
 		UpgradeData fKFLGOCPFEB2 = null;
 		UpgradeData fKFLGOCPFEB3 = null;
 		bool flag = false;
 		List<UpgradeData> list = GetUpgrades();
 		foreach (UpgradeData item in list)
 		{
-			int gCAPLEJMMPM = item.Values.Level;
-			if (!flag && gCAPLEJMMPM == JHLGOAFNPNM)
+			int itemLevel = item.Values.Level;
+			if (!flag && itemLevel == level)
 			{
-				fKFLGOCPFEB = item;
+				exactMatch = item;
 				flag = true;
 			}
-			if (gCAPLEJMMPM > JHLGOAFNPNM)
+			if (itemLevel > level)
 			{
 				fKFLGOCPFEB2 = fKFLGOCPFEB3;
 				break;
 			}
 			fKFLGOCPFEB3 = item;
 		}
-		if (fKFLGOCPFEB == null && fKFLGOCPFEB2 == null)
+		if (exactMatch == null && fKFLGOCPFEB2 == null)
 		{
 			return null;
 		}
-		UpgradeData lILLEENHNCG = ((!GHNLHKBJOIH) ? fKFLGOCPFEB : fKFLGOCPFEB2);
-		return CreateUpgradedItem(lILLEENHNCG);
+		UpgradeData selectedUpgrade = ((!usePreviousUpgrade) ? exactMatch : fKFLGOCPFEB2);
+		return CreateUpgradedItem(selectedUpgrade);
 	}
 
 	public ItemInfo GetUpgradeItemByIndex(int index)
@@ -1193,17 +1193,17 @@ public class ItemInfo
 		return null;
 	}
 
-	public UpgradeIndexItem GetUpgradeIndexItem(int OMHDLKNHNMJ, int upgradeLevel)
+	public UpgradeIndexItem GetUpgradeIndexItem(int maxItemLevel, int upgradeLevel)
 	{
-		UpgradeIndexItem aACAFOBANOH = new UpgradeIndexItem();
+		UpgradeIndexItem indexItem = new UpgradeIndexItem();
 		int num = 0;
 		if (ParentItem != null)
 		{
 			List<UpgradeData> list = ParentItem.GetUpgrades();
 			foreach (UpgradeData item in list)
 			{
-				UpgradeData.UpgradeValues oGLHOJNMEBD = item.Values;
-				if (oGLHOJNMEBD.Level == ItemLevel && oGLHOJNMEBD.UpgradeLevel < UpgradeLevel && oGLHOJNMEBD.UpgradeLevel > ParentItem.UpgradeLevel)
+				UpgradeData.UpgradeValues values = item.Values;
+				if (values.Level == ItemLevel && values.UpgradeLevel < UpgradeLevel && values.UpgradeLevel > ParentItem.UpgradeLevel)
 				{
 					num++;
 				}
@@ -1215,118 +1215,118 @@ public class ItemInfo
 		}
 		if (num == 0)
 		{
-			aACAFOBANOH.Type = UpgradeIndexItem.UpgradeIndexType.UPGRADE_INDEX_MILESTONE;
-			aACAFOBANOH.Index = ItemLevel;
+			indexItem.Type = UpgradeIndexItem.UpgradeIndexType.UPGRADE_INDEX_MILESTONE;
+			indexItem.Index = ItemLevel;
 		}
 		else
 		{
-			aACAFOBANOH.Index = num;
+			indexItem.Index = num;
 		}
-		return aACAFOBANOH;
+		return indexItem;
 	}
 
-	public void FindNextUpgradeItems(int OMHDLKNHNMJ, int upgradeLevel, ref ItemInfo HDMHCCKLLGK, ref ItemInfo JLNLOCNBGEK)
+	public void FindNextUpgradeItems(int maxItemLevel, int upgradeLevel, ref ItemInfo currentItem, ref ItemInfo nextItem)
 	{
 		List<UpgradeData> list = GetUpgrades();
 		List<UpgradeData> list2 = new List<UpgradeData>();
-		UpgradeData fKFLGOCPFEB = null;
+		UpgradeData currentUpgrade = null;
 		UpgradeData fKFLGOCPFEB2 = null;
 		UpgradeData fKFLGOCPFEB3 = null;
 		float num = GameUtils.OutdateLevelTable.GetValue(Type);
 		int num2 = upgradeLevel / 100;
 		foreach (UpgradeData item in list)
 		{
-			int aKKLOMFOLNO = item.Values.UpgradeLevel;
-			if (aKKLOMFOLNO == upgradeLevel)
+			int candidateLevel = item.Values.UpgradeLevel;
+			if (candidateLevel == upgradeLevel)
 			{
-				fKFLGOCPFEB = item;
+				currentUpgrade = item;
 			}
-			if (item.Values.Level <= OMHDLKNHNMJ && aKKLOMFOLNO > upgradeLevel)
+			if (item.Values.Level <= maxItemLevel && candidateLevel > upgradeLevel)
 			{
-				if (item.Values.Milestone > 0 && (float)item.Values.Level >= (float)num2 + num && (fKFLGOCPFEB2 == null || fKFLGOCPFEB2.Values.UpgradeLevel < aKKLOMFOLNO))
+				if (item.Values.Milestone > 0 && (float)item.Values.Level >= (float)num2 + num && (fKFLGOCPFEB2 == null || fKFLGOCPFEB2.Values.UpgradeLevel < candidateLevel))
 				{
 					fKFLGOCPFEB2 = item;
 				}
-				if (item.Values.Milestone <= 0 && (fKFLGOCPFEB3 == null || fKFLGOCPFEB3.Values.UpgradeLevel > aKKLOMFOLNO))
+				if (item.Values.Milestone <= 0 && (fKFLGOCPFEB3 == null || fKFLGOCPFEB3.Values.UpgradeLevel > candidateLevel))
 				{
 					fKFLGOCPFEB3 = item;
 				}
 			}
 		}
-		if (fKFLGOCPFEB != null)
+		if (currentUpgrade != null)
 		{
-			HDMHCCKLLGK = CreateUpgradedItem(fKFLGOCPFEB);
+			currentItem = CreateUpgradedItem(currentUpgrade);
 		}
 		else
 		{
-			HDMHCCKLLGK = null;
+			currentItem = null;
 		}
 		if (fKFLGOCPFEB2 != null)
 		{
-			JLNLOCNBGEK = CreateUpgradedItem(fKFLGOCPFEB2);
+			nextItem = CreateUpgradedItem(fKFLGOCPFEB2);
 		}
 		else if (fKFLGOCPFEB3 != null)
 		{
-			JLNLOCNBGEK = CreateUpgradedItem(fKFLGOCPFEB3);
+			nextItem = CreateUpgradedItem(fKFLGOCPFEB3);
 		}
 		else
 		{
-			JLNLOCNBGEK = null;
+			nextItem = null;
 		}
 	}
 
-	public static void DenominateItems(int NPFOBKBJAOB = 0)
+	public static void DenominateItems(int digits = 0)
 	{
 		List<ItemInfo> list = ListSF.GetItems().GetAllItems();
 		foreach (ItemInfo item in list)
 		{
-			item.CoinPrice = (ObscuredLong)(GameUtils.GetDenominatedValue((ObscuredLong)(item.CoinPrice), NPFOBKBJAOB));
-			item.DenominateReservedPrices(NPFOBKBJAOB);
-			item.DenominateReservedValues(NPFOBKBJAOB);
-			List<UpgradeData> kEFPALGDBOC = item.LocalUpgrades;
-			foreach (UpgradeData item2 in kEFPALGDBOC)
+			item.CoinPrice = (ObscuredLong)(GameUtils.GetDenominatedValue((ObscuredLong)(item.CoinPrice), digits));
+			item.DenominateReservedPrices(digits);
+			item.DenominateReservedValues(digits);
+			List<UpgradeData> localUpgrades = item.LocalUpgrades;
+			foreach (UpgradeData item2 in localUpgrades)
 			{
-				item2.Values.Price = (ObscuredLong)(GameUtils.GetDenominatedValue((ObscuredLong)(item2.Values.Price), NPFOBKBJAOB));
+				item2.Values.Price = (ObscuredLong)(GameUtils.GetDenominatedValue((ObscuredLong)(item2.Values.Price), digits));
 			}
 			if (item.Type.Equals("RealMoneyItem"))
 			{
-				item.ReceiveGold = (ObscuredLong)(GameUtils.GetDenominatedValue((ObscuredLong)(item.ReceiveGold), NPFOBKBJAOB));
+				item.ReceiveGold = (ObscuredLong)(GameUtils.GetDenominatedValue((ObscuredLong)(item.ReceiveGold), digits));
 			}
 		}
 		foreach (UpgradeDataContainer item3 in ListSF.GetItems().GetUpgradeContainers())
 		{
 			foreach (UpgradeData item4 in item3.Upgrades)
 			{
-				item4.Values.Price = (ObscuredLong)(GameUtils.GetDenominatedValue((ObscuredLong)(item4.Values.Price), NPFOBKBJAOB));
+				item4.Values.Price = (ObscuredLong)(GameUtils.GetDenominatedValue((ObscuredLong)(item4.Values.Price), digits));
 			}
 		}
 		ListSF.GetRoster().GetInventory().RefreshUpgradeStates();
 	}
 
-	public ItemInfo CreateUpgradedItem(UpgradeData LILLEENHNCG)
+	public ItemInfo CreateUpgradedItem(UpgradeData upgrade)
 	{
-		if (LILLEENHNCG == null)
+		if (upgrade == null)
 		{
 			return null;
 		}
-		ItemInfo dJKEECEOCJB = Clone();
-		dJKEECEOCJB.ParentItem = this;
-		dJKEECEOCJB.ApplyUpgrade(LILLEENHNCG);
-		return dJKEECEOCJB;
+		ItemInfo upgradedItem = Clone();
+		upgradedItem.ParentItem = this;
+		upgradedItem.ApplyUpgrade(upgrade);
+		return upgradedItem;
 	}
 
 	private void RemoveParsedPerks()
 	{
-		ParsedPerks.ForEach((PerkInfoItem DHDMNHCIPEH) =>
+		ParsedPerks.ForEach((PerkInfoItem perk) =>
 		{
-			RemoveInnatePerk(DHDMNHCIPEH);
+			RemoveInnatePerk(perk);
 		});
 		ParsedPerks.Clear();
 	}
 
-	private void RemoveInnatePerk(PerkInfoItem DPLEGFCHOCE)
+	private void RemoveInnatePerk(PerkInfoItem perk)
 	{
-		InnatePerks.Remove(DPLEGFCHOCE);
+		InnatePerks.Remove(perk);
 	}
 
 	private void Init()
@@ -1363,64 +1363,64 @@ public class ItemInfo
 		isEnabledByDefault = true;
 	}
 
-	private UpgradeData CompleteUpgradeData(UpgradeData IFOFMGAKHEP)
+	private UpgradeData CompleteUpgradeData(UpgradeData upgrade)
 	{
-		UpgradeData fKFLGOCPFEB = new UpgradeData(IFOFMGAKHEP);
-		List<WarriorAttribute> iBLHIAHECLK = GameUtils.WarriorAttributeList.AttributeList;
-		foreach (WarriorAttribute item in iBLHIAHECLK)
+		UpgradeData completedUpgrade = new UpgradeData(upgrade);
+		List<WarriorAttribute> warriorAttributes = GameUtils.WarriorAttributeList.AttributeList;
+		foreach (WarriorAttribute item in warriorAttributes)
 		{
-			int OEMALIFPGPO = 0;
-			if (ItemAttributes.Get(item.get_Name(), ref OEMALIFPGPO) && !fKFLGOCPFEB.Values.Attributes.Get(item.get_Name(), ref OEMALIFPGPO))
+			int attributeValue = 0;
+			if (ItemAttributes.Get(item.get_Name(), ref attributeValue) && !completedUpgrade.Values.Attributes.Get(item.get_Name(), ref attributeValue))
 			{
-				ItemAttributes.Get(item.get_Name(), ref OEMALIFPGPO);
-				fKFLGOCPFEB.Values.Attributes.Set(item.get_Name(), OEMALIFPGPO);
+				ItemAttributes.Get(item.get_Name(), ref attributeValue);
+				completedUpgrade.Values.Attributes.Set(item.get_Name(), attributeValue);
 			}
 		}
-		if (!fKFLGOCPFEB.HasValues.HasBonusDeliveryPrice)
+		if (!completedUpgrade.HasValues.HasBonusDeliveryPrice)
 		{
-			fKFLGOCPFEB.Values.BonusDeliveryPrice = DeliveryGemPrice;
+			completedUpgrade.Values.BonusDeliveryPrice = DeliveryGemPrice;
 		}
-		if (!fKFLGOCPFEB.HasValues.HasBonusPrice)
+		if (!completedUpgrade.HasValues.HasBonusPrice)
 		{
-			fKFLGOCPFEB.Values.BonusPrice = GemPrice;
+			completedUpgrade.Values.BonusPrice = GemPrice;
 		}
-		if (!fKFLGOCPFEB.HasValues.HasDeliveryTime)
+		if (!completedUpgrade.HasValues.HasDeliveryTime)
 		{
-			fKFLGOCPFEB.Values.DeliveryTime = DeliveryTime;
+			completedUpgrade.Values.DeliveryTime = DeliveryTime;
 		}
-		if (!fKFLGOCPFEB.HasValues.Level)
+		if (!completedUpgrade.HasValues.Level)
 		{
-			fKFLGOCPFEB.Values.Level = ItemLevel;
+			completedUpgrade.Values.Level = ItemLevel;
 		}
-		if (!fKFLGOCPFEB.HasValues.HasMilestone)
+		if (!completedUpgrade.HasValues.HasMilestone)
 		{
-			fKFLGOCPFEB.Values.Milestone = Milestone;
+			completedUpgrade.Values.Milestone = Milestone;
 		}
-		if (!fKFLGOCPFEB.HasValues.HasPrice)
+		if (!completedUpgrade.HasValues.HasPrice)
 		{
-			fKFLGOCPFEB.Values.Price = CoinPrice;
+			completedUpgrade.Values.Price = CoinPrice;
 		}
-		if (!fKFLGOCPFEB.HasValues.HasUpgradeLevel)
+		if (!completedUpgrade.HasValues.HasUpgradeLevel)
 		{
-			fKFLGOCPFEB.Values.UpgradeLevel = UpgradeLevel;
+			completedUpgrade.Values.UpgradeLevel = UpgradeLevel;
 		}
-		return fKFLGOCPFEB;
+		return completedUpgrade;
 	}
 
-	public void ApplyProductMetadata(ProductMetadata CFDFJHGLMNH)
+	public void ApplyProductMetadata(ProductMetadata metadata)
 	{
-		LocalizedPriceString = CFDFJHGLMNH.localizedPriceString;
-		PriceAmountText = CFDFJHGLMNH.localizedPrice.ToString();
-		CurrencyCode = CFDFJHGLMNH.isoCurrencyCode;
+		LocalizedPriceString = metadata.localizedPriceString;
+		PriceAmountText = metadata.localizedPrice.ToString();
+		CurrencyCode = metadata.isoCurrencyCode;
 	}
 
 	public void SortLocalUpgrades()
 	{
 		LocalUpgrades.Sort();
 		int index = 0;
-		LocalUpgrades.ForEach((UpgradeData DHDMNHCIPEH) =>
+		LocalUpgrades.ForEach((UpgradeData upgrade) =>
 		{
-			DHDMNHCIPEH.UpgradeIndex = index;
+			upgrade.UpgradeIndex = index;
 			index++;
 		});
 	}

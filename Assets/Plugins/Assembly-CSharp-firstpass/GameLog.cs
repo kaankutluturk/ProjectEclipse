@@ -2,38 +2,38 @@ using UnityEngine;
 
 public static class GameLog
 {
-	public static void Write(string LIOGIBJBHAH)
+	public static void Write(string message)
 	{
-		Debug.Log(LIOGIBJBHAH);
+		Debug.Log(message);
 	}
 
-	public static void Write(string LIOGIBJBHAH, params object[] LKIOKGCNKHE)
+	public static void Write(string format, params object[] args)
 	{
-		Debug.LogFormat(LIOGIBJBHAH, LKIOKGCNKHE);
+		Debug.LogFormat(format, args);
 	}
 
-	public static void Error(string LIOGIBJBHAH)
+	public static void Error(string message)
 	{
-		Debug.LogError(LIOGIBJBHAH);
+		Debug.LogError(message);
 	}
 
-	public static void Error(string LIOGIBJBHAH, params object[] LKIOKGCNKHE)
+	public static void Error(string format, params object[] args)
 	{
-		Debug.LogErrorFormat(LIOGIBJBHAH, LKIOKGCNKHE);
+		Debug.LogErrorFormat(format, args);
 	}
 
-	public static void Warning(string LIOGIBJBHAH, params object[] LKIOKGCNKHE)
+	public static void Warning(string format, params object[] args)
 	{
-		Debug.LogWarningFormat(LIOGIBJBHAH, LKIOKGCNKHE);
+		Debug.LogWarningFormat(format, args);
 	}
 
-	public static void Info(string LIOGIBJBHAH)
+	public static void Info(string message)
 	{
-		Debug.Log(LIOGIBJBHAH);
+		Debug.Log(message);
 	}
 
-	public static void Info(string LIOGIBJBHAH, params object[] LKIOKGCNKHE)
+	public static void Info(string format, params object[] args)
 	{
-		Debug.LogFormat(LIOGIBJBHAH, LKIOKGCNKHE);
+		Debug.LogFormat(format, args);
 	}
 }

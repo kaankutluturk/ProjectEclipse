@@ -14,57 +14,57 @@ public static class CommonExtensions
 		return new RpnParser.Formula(value).Calculate().ToString();
 	}
 
-	public static IEnumerable<string> SplitKeepDelimiters(this string JDCCBCNFENK, char[] delims)
+	public static IEnumerable<string> SplitKeepDelimiters(this string source, char[] delims)
 	{
 		int num = 0;
 		while (true)
 		{
 			int num3;
-			int num2 = (num3 = JDCCBCNFENK.IndexOfAny(delims, num));
+			int num2 = (num3 = source.IndexOfAny(delims, num));
 			if (num3 == -1)
 			{
 				break;
 			}
 			if (num2 - num > 0)
 			{
-				yield return JDCCBCNFENK.Substring(num, num2 - num);
+				yield return source.Substring(num, num2 - num);
 			}
-			yield return JDCCBCNFENK.Substring(num2, 1);
+			yield return source.Substring(num2, 1);
 			num = num2 + 1;
 		}
-		if (num < JDCCBCNFENK.Length)
+		if (num < source.Length)
 		{
-			yield return JDCCBCNFENK.Substring(num);
+			yield return source.Substring(num);
 		}
 	}
 
-	public static void LogColored(this object HCPNFPMHFCM, string color = "green")
+	public static void LogColored(this object message, string color = "green")
 	{
-		Debug.Log(string.Concat("$<color=", color, "><b>", HCPNFPMHFCM, "</b></color>"));
+		Debug.Log(string.Concat("$<color=", color, "><b>", message, "</b></color>"));
 	}
 
-	public static void LogRed(this object HCPNFPMHFCM)
+	public static void LogRed(this object message)
 	{
-		HCPNFPMHFCM.LogColored("red");
+		message.LogColored("red");
 	}
 
-	public static void LogBlue(this object HCPNFPMHFCM)
+	public static void LogBlue(this object message)
 	{
-		HCPNFPMHFCM.LogColored("blue");
+		message.LogColored("blue");
 	}
 
-	public static string Colorize(this string HCPNFPMHFCM, string ABHINJEKNLG)
+	public static string Colorize(this string text, string colorHex)
 	{
-		return "<color=#" + ABHINJEKNLG + ">" + HCPNFPMHFCM + "</color>";
+		return "<color=#" + colorHex + ">" + text + "</color>";
 	}
 
-	public static string Colorize(this int HCPNFPMHFCM, string ABHINJEKNLG)
+	public static string Colorize(this int number, string colorHex)
 	{
-		return HCPNFPMHFCM.ToString().Colorize(ABHINJEKNLG);
+		return number.ToString().Colorize(colorHex);
 	}
 
-	public static string Colorize(this float HCPNFPMHFCM, string ABHINJEKNLG)
+	public static string Colorize(this float number, string colorHex)
 	{
-		return HCPNFPMHFCM.ToString(CultureInfo.InvariantCulture).Colorize(ABHINJEKNLG);
+		return number.ToString(CultureInfo.InvariantCulture).Colorize(colorHex);
 	}
 }

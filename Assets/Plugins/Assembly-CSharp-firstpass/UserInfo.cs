@@ -65,9 +65,9 @@ public class UserInfo
 		}
 	}
 
-	internal UserInfo(string BBNKIBKPBLO)
+	internal UserInfo(string serialized)
 	{
-		string[] array = BBNKIBKPBLO.Split('|');
+		string[] array = serialized.Split('|');
 		SetUserId(array[0]);
 		SetPhotoUrl(array[1]);
 		if (array[2].Contains(" "))
@@ -83,12 +83,12 @@ public class UserInfo
 		}
 	}
 
-	internal UserInfo(string MEEFALMGOMC, string NEEAGKJGKDM, string HGLELKMAJMJ, string PDJEDKAFEAK)
+	internal UserInfo(string userId, string photoUrl, string lastName, string firstName)
 	{
-		SetFirstName(PDJEDKAFEAK);
-		SetLastName(HGLELKMAJMJ);
-		SetPhotoUrl(NEEAGKJGKDM);
-		SetUserId(MEEFALMGOMC);
+		SetFirstName(firstName);
+		SetLastName(lastName);
+		SetPhotoUrl(photoUrl);
+		SetUserId(userId);
 	}
 
 	private UserInfo()
@@ -135,28 +135,28 @@ public class UserInfo
 		userId = value;
 	}
 
-	internal static Dictionary<string, UserInfo> GetInfos(string BBNKIBKPBLO)
+	internal static Dictionary<string, UserInfo> GetInfos(string serialized)
 	{
 		Dictionary<string, UserInfo> dictionary = new Dictionary<string, UserInfo>();
-		string[] array = BBNKIBKPBLO.Split(new char[1] { '^' }, StringSplitOptions.RemoveEmptyEntries);
+		string[] array = serialized.Split(new char[1] { '^' }, StringSplitOptions.RemoveEmptyEntries);
 		for (int i = 0; i < array.Length; i++)
 		{
-			UserInfo jPKEEFNNAAP = new UserInfo(array[i]);
-			if (!dictionary.ContainsKey(jPKEEFNNAAP.GetUserId()))
+			UserInfo userInfo = new UserInfo(array[i]);
+			if (!dictionary.ContainsKey(userInfo.GetUserId()))
 			{
-				dictionary.Add(jPKEEFNNAAP.GetUserId(), jPKEEFNNAAP);
+				dictionary.Add(userInfo.GetUserId(), userInfo);
 			}
 			else
 			{
-				dictionary[jPKEEFNNAAP.GetUserId()] = jPKEEFNNAAP;
+				dictionary[userInfo.GetUserId()] = userInfo;
 			}
 		}
 		return dictionary;
 	}
 
 	[SpecialName]
-	public static bool op_Implicit(UserInfo KEJDJHAGBMK)
+	public static bool op_Implicit(UserInfo userInfo)
 	{
-		return KEJDJHAGBMK != null;
+		return userInfo != null;
 	}
 }

@@ -74,10 +74,10 @@ public class ModelAi
 			Wait = 0;
 		}
 
-		public Decision(InfoAnimation DBOLBEOCEME, int JOHDCPNACOC)
+		public Decision(InfoAnimation animation, int wait)
 		{
-			Animation = DBOLBEOCEME;
-			Wait = JOHDCPNACOC;
+			Animation = animation;
+			Wait = wait;
 		}
 
 		public bool HasAnimation()
@@ -254,17 +254,17 @@ public class ModelAi
 		}
 	}
 
-	public ModelAi(ModelAnimation MEKLGEGJPFP, ModelPhysics LBELNKIDMIB, string PPIEODBOOJA, ModelParameters JCICKLIMBEF)
+	public ModelAi(ModelAnimation modelAnimation, ModelPhysics modelPhysics, string weaponSubtype, ModelParameters modelParameters)
 	{
-		_ModelAnimation = MEKLGEGJPFP;
-		_ModelPhysics = LBELNKIDMIB;
+		_ModelAnimation = modelAnimation;
+		_ModelPhysics = modelPhysics;
 		enemyAnimation = null;
 		botAnimation = null;
-		botWeaponSubtype = AiData.GetItemEquivalent(PPIEODBOOJA);
+		botWeaponSubtype = AiData.GetItemEquivalent(weaponSubtype);
 		distanceError = 0f;
 		frameError = 0;
 		unusedCounter = 0;
-		parameters = JCICKLIMBEF;
+		parameters = modelParameters;
 		resultSource = AiData.TableType.noneTable;
 		unusedFlag = false;
 		aiState = AiState.Nostate;
@@ -321,13 +321,13 @@ public class ModelAi
 		return tactic;
 	}
 
-	public void setAvailableAnimations(List<InfoAnimation> MAHEJFLCCHP)
+	public void setAvailableAnimations(List<InfoAnimation> animations)
 	{
 	}
 
-	public InfoAnimation Render(Model FNKFIMEDNLP, int JLLPJLEDBPG)
+	public InfoAnimation Render(Model enemy, int frame)
 	{
-		if (!get_IsEnabled() || FNKFIMEDNLP == null || _ModelAnimation.GetCurrentInfo() == null)
+		if (!get_IsEnabled() || enemy == null || _ModelAnimation.GetCurrentInfo() == null)
 		{
 			return null;
 		}
@@ -335,7 +335,7 @@ public class ModelAi
         // animating, before another animation-start notification arrives.
         if (enemyAnimation == null)
         {
-            StartAnimationEnemy(FNKFIMEDNLP);
+            StartAnimationEnemy(enemy);
             if (enemyAnimation == null) return null;
         }
         // A controller joining an ongoing fight may miss its own animation-start
@@ -345,13 +345,13 @@ public class ModelAi
         {
             StartAnimationBot(_ModelAnimation.GetCurrentInfo());
         }
-		ModelAnimation oJIEPADIEDE = FNKFIMEDNLP.GetAnimationModule();
-		TacticFactors fJCBLOKOBBD = SetFactors(FNKFIMEDNLP);
-		if (oJIEPADIEDE.GetIsPlaying())
+		ModelAnimation enemyModelAnimation = enemy.GetAnimationModule();
+		TacticFactors factors = SetFactors(enemy);
+		if (enemyModelAnimation.GetIsPlaying())
 		{
-			int num = oJIEPADIEDE.GetFrameInMove();
-			int num2 = oJIEPADIEDE.GetStartFrameOffset();
-			int num3 = GetFrameError(fJCBLOKOBBD);
+			int num = enemyModelAnimation.GetFrameInMove();
+			int num2 = enemyModelAnimation.GetStartFrameOffset();
+			int num3 = GetFrameError(factors);
 			enemyFrame = num + num2 + num3;
 		}
 		else
@@ -371,18 +371,18 @@ public class ModelAi
 		if (waitRequested)
 		{
 			waitRequested = false;
-			if (_ModelAnimation.GetIsPlaying() && oJIEPADIEDE.GetIsPlaying())
+			if (_ModelAnimation.GetIsPlaying() && enemyModelAnimation.GetIsPlaying())
 			{
-				InfoAnimation pJAHIOELGGD = _ModelAnimation.GetCurrentInfo();
-				InfoAnimation pJAHIOELGGD2 = oJIEPADIEDE.GetCurrentInfo();
-				if (pJAHIOELGGD != null && pJAHIOELGGD2 != null)
+				InfoAnimation animation = _ModelAnimation.GetCurrentInfo();
+				InfoAnimation pJAHIOELGGD2 = enemyModelAnimation.GetCurrentInfo();
+				if (animation != null && pJAHIOELGGD2 != null)
 				{
-					int num6 = pJAHIOELGGD.GetMoveLengthStrict();
+					int num6 = animation.GetMoveLengthStrict();
 					switch (waitMode)
 					{
 					case WaitMode.SetWaitRandAttack:
 						decisionWait = pJAHIOELGGD2.GetLastAttackFrame(true) - enemyFrame + 1;
-						decisionWait = Mathf.Min(decisionWait, pJAHIOELGGD.GetMoveLengthExtended());
+						decisionWait = Mathf.Min(decisionWait, animation.GetMoveLengthExtended());
 						if (num6 > decisionWait)
 						{
 							decisionWait = num6;
@@ -391,7 +391,7 @@ public class ModelAi
 						break;
 					case WaitMode.SetWaitRandUnint:
 						decisionWait = pJAHIOELGGD2.GetLastUninterruptFrame(true) - enemyFrame + 1;
-						decisionWait = Mathf.Min(decisionWait, pJAHIOELGGD.GetMoveLengthExtended());
+						decisionWait = Mathf.Min(decisionWait, animation.GetMoveLengthExtended());
 						if (num6 > decisionWait)
 						{
 							decisionWait = num6;
@@ -408,8 +408,8 @@ public class ModelAi
 		}
 		else
 		{
-			WaitMode pLDABIGHHFG = waitMode;
-			if (pLDABIGHHFG == WaitMode.SetWaitRandAttack || pLDABIGHHFG == WaitMode.SetWaitRandUnint || pLDABIGHHFG == WaitMode.SetWaitAnimationLength)
+			WaitMode mode = waitMode;
+			if (mode == WaitMode.SetWaitRandAttack || mode == WaitMode.SetWaitRandUnint || mode == WaitMode.SetWaitAnimationLength)
 			{
 				GameLog.Error("!");
 			}
@@ -420,7 +420,7 @@ public class ModelAi
 			decisionWait--;
 			return null;
 		}
-		InfoAnimation pJAHIOELGGD3 = oJIEPADIEDE.GetCurrentInfo();
+		InfoAnimation pJAHIOELGGD3 = enemyModelAnimation.GetCurrentInfo();
 		if (pJAHIOELGGD3 != null)
 		{
 			bool flag = false;
@@ -436,7 +436,7 @@ public class ModelAi
 			}
 			if (flag)
 			{
-				RandomizeBehavior(FNKFIMEDNLP);
+				RandomizeBehavior(enemy);
 			}
 		}
 		SetQuickAttackRnd();
@@ -470,25 +470,25 @@ public class ModelAi
                 var available = new List<InfoAnimation>(_Model.GetAvailableAnimations());
                 if (GetPlayableAnimations(available) == 0) available.Clear();
                 else available.RemoveAll(move => !IsTacticPlayableAnimations(move));
-                int? chosen = Eclipse.Modding.ModRuntime.DecideAi(modTactic, this, _Model, FNKFIMEDNLP, decisionFrame, available);
+                int? chosen = Eclipse.Modding.ModRuntime.DecideAi(modTactic, this, _Model, enemy, decisionFrame, available);
                 _modDecisionOwned = chosen.HasValue;
                 if (chosen.HasValue) return chosen.Value >= 0 && chosen.Value < available.Count ? available[chosen.Value] : null;
             }
         }
-		defenceMode = SelectDefenceMode(FNKFIMEDNLP);
-		safeAttackChance = tactic.GetUseSafeAttackChance(fJCBLOKOBBD);
+		defenceMode = SelectDefenceMode(enemy);
+		safeAttackChance = tactic.GetUseSafeAttackChance(factors);
 		useSafeAttack = safeAttackRoll < safeAttackChance;
-		tableAttackChance = tactic.GetTableAttackChance(fJCBLOKOBBD);
+		tableAttackChance = tactic.GetTableAttackChance(factors);
 		useTableAttack = tableAttackRoll < tableAttackChance;
-		SetQuickAttackChances(fJCBLOKOBBD);
-		SetEvadesChances(fJCBLOKOBBD);
-		cautiousMovementChance = tactic.GetCautiousMovementsChance(fJCBLOKOBBD);
+		SetQuickAttackChances(factors);
+		SetEvadesChances(factors);
+		cautiousMovementChance = tactic.GetCautiousMovementsChance(factors);
 		useCautiousMovement = cautiousMovementRoll < cautiousMovementChance;
-		dodgeMissileChance = tactic.GetDodgeMissileChance(fJCBLOKOBBD);
+		dodgeMissileChance = tactic.GetDodgeMissileChance(factors);
 		dodgeMissile = dodgeMissileRoll < dodgeMissileChance;
-		dodgeMagicChance = tactic.GetDodgeMagicChance(fJCBLOKOBBD);
+		dodgeMagicChance = tactic.GetDodgeMagicChance(factors);
 		dodgeMagic = dodgeMagicRoll < dodgeMagicChance;
-		int num7 = SetDecisionList(FNKFIMEDNLP, JLLPJLEDBPG);
+		int num7 = SetDecisionList(enemy, frame);
 		if (0 < num7)
 		{
 			waitElapsed = false;
@@ -498,47 +498,47 @@ public class ModelAi
 			if (-1 < num8)
 			{
 				decisionWait = _InterframesList[num8];
-				InfoAnimation dBOLBEOCEME = candidateAnimations[num8];
-				LogTable(FNKFIMEDNLP.GetAnimationModule(), JLLPJLEDBPG, num7, dBOLBEOCEME, decisionWait);
+				InfoAnimation chosenAnimation = candidateAnimations[num8];
+				LogTable(enemy.GetAnimationModule(), frame, num7, chosenAnimation, decisionWait);
 				return candidateAnimations[num8];
 			}
 		}
 		else if (waitRequested)
 		{
-			LogTable(FNKFIMEDNLP.GetAnimationModule(), JLLPJLEDBPG - 1, 1, null, 0);
+			LogTable(enemy.GetAnimationModule(), frame - 1, 1, null, 0);
 			waitElapsed = false;
 		}
 		return null;
 	}
 
-	public void RandomizeBehavior(Model OGBHDKKOIGH)
+	public void RandomizeBehavior(Model enemy)
 	{
-		TacticFactors oHKCJDCMOKN = new TacticFactors(_Model.GetModelStats(), _Model.GetNoRangedFlag(), _Model.GetMagicCharges());
-		_Model.GetModelStats().GetCountAndDamage(true, enemyAnimation, ref oHKCJDCMOKN.FactorsCount, ref oHKCJDCMOKN.Damage, ref oHKCJDCMOKN.Hits);
-		oHKCJDCMOKN.Health = (ObscuredFloat)(_Model.Parameters.GetCurrentLife());
-		oHKCJDCMOKN.EnemyHealth = (ObscuredFloat)(OGBHDKKOIGH.Parameters.GetCurrentLife());
-		oHKCJDCMOKN.AnimationFrames = OGBHDKKOIGH.GetAnimationModule().GetFrameInMove();
-		oHKCJDCMOKN.ChildFrames = ChildMaxModelFrame(OGBHDKKOIGH);
+		TacticFactors factors = new TacticFactors(_Model.GetModelStats(), _Model.GetNoRangedFlag(), _Model.GetMagicCharges());
+		_Model.GetModelStats().GetCountAndDamage(true, enemyAnimation, ref factors.FactorsCount, ref factors.Damage, ref factors.Hits);
+		factors.Health = (ObscuredFloat)(_Model.Parameters.GetCurrentLife());
+		factors.EnemyHealth = (ObscuredFloat)(enemy.Parameters.GetCurrentLife());
+		factors.AnimationFrames = enemy.GetAnimationModule().GetFrameInMove();
+		factors.ChildFrames = ChildMaxModelFrame(enemy);
 		attackRoll = NekkiMath.randomFloat();
 		safeAttackRoll = NekkiMath.randomFloat();
 		tableAttackRoll = NekkiMath.randomFloat();
 		cautiousMovementRoll = NekkiMath.randomFloat();
 		dodgeMissileRoll = NekkiMath.randomFloat();
 		dodgeMagicRoll = NekkiMath.randomFloat();
-		distanceError = GetDistanceError(oHKCJDCMOKN);
-		frameError = GetFrameError(oHKCJDCMOKN);
+		distanceError = GetDistanceError(factors);
+		frameError = GetFrameError(factors);
 	}
 
-	private int ChildMaxModelFrame(Model ACENLMONNPA)
+	private int ChildMaxModelFrame(Model model)
 	{
 		int num = 0;
 		int i = 0;
-		for (int count = ACENLMONNPA.GetWeaponModels().Count; i < count; i++)
+		for (int count = model.GetWeaponModels().Count; i < count; i++)
 		{
-			WeaponModel gKIANLDJFCH = ACENLMONNPA.GetWeaponModels()[i];
-			if (gKIANLDJFCH != null)
+			WeaponModel weaponModel = model.GetWeaponModels()[i];
+			if (weaponModel != null)
 			{
-				int num2 = gKIANLDJFCH.GetAnimationModule().GetRenderTickCount();
+				int num2 = weaponModel.GetAnimationModule().GetRenderTickCount();
 				if (num2 > num)
 				{
 					num = num2;
@@ -548,22 +548,22 @@ public class ModelAi
 		return num;
 	}
 
-	public void StartAnimationBot(InfoAnimation DBOLBEOCEME)
+	public void StartAnimationBot(InfoAnimation animation)
 	{
 		if (!get_IsEnabled())
 		{
 			return;
 		}
-		if (_ModelAnimation.GetIsPlaying() && DBOLBEOCEME != null)
+		if (_ModelAnimation.GetIsPlaying() && animation != null)
 		{
-			InfoAnimation pJAHIOELGGD = DBOLBEOCEME.GetTacticEquivalent();
-			if (pJAHIOELGGD != null)
+			InfoAnimation equivalentAnimation = animation.GetTacticEquivalent();
+			if (equivalentAnimation != null)
 			{
-				botAnimation = pJAHIOELGGD;
+				botAnimation = equivalentAnimation;
 			}
 			else
 			{
-				botAnimation = DBOLBEOCEME;
+				botAnimation = animation;
 			}
 		}
 		else
@@ -576,46 +576,46 @@ public class ModelAi
 		}
 	}
 
-	public void StartAnimationEnemy(Model OGBHDKKOIGH)
+	public void StartAnimationEnemy(Model enemy)
 	{
 		if (!get_IsEnabled())
 		{
 			return;
 		}
-		ModelAnimation oJIEPADIEDE = OGBHDKKOIGH.GetAnimationModule();
-		InfoAnimation pJAHIOELGGD = oJIEPADIEDE.GetCurrentInfo();
-		if (oJIEPADIEDE.GetIsPlaying() && pJAHIOELGGD != null)
+		ModelAnimation enemyModelAnimation = enemy.GetAnimationModule();
+		InfoAnimation animation = enemyModelAnimation.GetCurrentInfo();
+		if (enemyModelAnimation.GetIsPlaying() && animation != null)
 		{
-			InfoAnimation pJAHIOELGGD2 = pJAHIOELGGD.GetTacticEquivalent();
+			InfoAnimation pJAHIOELGGD2 = animation.GetTacticEquivalent();
 			if (pJAHIOELGGD2 == null)
 			{
-				enemyAnimation = pJAHIOELGGD;
+				enemyAnimation = animation;
 			}
 			else
 			{
 				enemyAnimation = pJAHIOELGGD2;
 			}
-			InfoAnimation cOKFBIJAFLH = enemyAnimation;
-			RandomizeBehavior(OGBHDKKOIGH);
-			if (!IsIgnoredEnemyAnimation(cOKFBIJAFLH))
+			InfoAnimation enemyMove = enemyAnimation;
+			RandomizeBehavior(enemy);
+			if (!IsIgnoredEnemyAnimation(enemyMove))
 			{
-				TacticFactors oHKCJDCMOKN = new TacticFactors(_Model.GetModelStats(), _Model.GetNoRangedFlag(), _Model.GetMagicCharges());
-				_Model.GetModelStats().GetCountAndDamage(true, enemyAnimation, ref oHKCJDCMOKN.FactorsCount, ref oHKCJDCMOKN.Damage, ref oHKCJDCMOKN.Hits);
-				oHKCJDCMOKN.Health = (ObscuredFloat)(_Model.Parameters.GetCurrentLife());
-				oHKCJDCMOKN.EnemyHealth = (ObscuredFloat)(OGBHDKKOIGH.Parameters.GetCurrentLife());
-				oHKCJDCMOKN.AnimationFrames = OGBHDKKOIGH.GetAnimationModule().GetFrameInMove();
-				oHKCJDCMOKN.ChildFrames = ChildMaxModelFrame(OGBHDKKOIGH);
-				responseDelay = GetResponseDelay(oHKCJDCMOKN);
+				TacticFactors factors = new TacticFactors(_Model.GetModelStats(), _Model.GetNoRangedFlag(), _Model.GetMagicCharges());
+				_Model.GetModelStats().GetCountAndDamage(true, enemyAnimation, ref factors.FactorsCount, ref factors.Damage, ref factors.Hits);
+				factors.Health = (ObscuredFloat)(_Model.Parameters.GetCurrentLife());
+				factors.EnemyHealth = (ObscuredFloat)(enemy.Parameters.GetCurrentLife());
+				factors.AnimationFrames = enemy.GetAnimationModule().GetFrameInMove();
+				factors.ChildFrames = ChildMaxModelFrame(enemy);
+				responseDelay = GetResponseDelay(factors);
 			}
 		}
 	}
 
-	private bool IsIgnoredEnemyAnimation(InfoAnimation DBOLBEOCEME)
+	private bool IsIgnoredEnemyAnimation(InfoAnimation animation)
 	{
 		List<string> list = AiData.get_IgnoredEnemyAnimations();
 		foreach (string item in list)
 		{
-			if (DBOLBEOCEME.HasName(item))
+			if (animation.HasName(item))
 			{
 				return true;
 			}
@@ -631,9 +631,9 @@ public class ModelAi
 		}
 	}
 
-	public void SetWeaponEnemy(string PPIEODBOOJA)
+	public void SetWeaponEnemy(string weaponSubtype)
 	{
-		enemyWeaponSubtype = AiData.GetItemEquivalent(PPIEODBOOJA);
+		enemyWeaponSubtype = AiData.GetItemEquivalent(weaponSubtype);
 	}
 
     internal System.Action CaptureEnemyWeapon()
@@ -675,9 +675,9 @@ public class ModelAi
         };
     }
 
-	public void SetWeaponBot(string PPIEODBOOJA)
+	public void SetWeaponBot(string weaponSubtype)
 	{
-		botWeaponSubtype = AiData.GetItemEquivalent(PPIEODBOOJA);
+		botWeaponSubtype = AiData.GetItemEquivalent(weaponSubtype);
 	}
 
 	public void OnGetHit()
@@ -694,68 +694,68 @@ public class ModelAi
 		}
 	}
 
-	public int SelectAnimationWithWeights(List<InfoAnimation> MAHEJFLCCHP)
+	public int SelectAnimationWithWeights(List<InfoAnimation> animations)
 	{
-		Model fGCODGKLHED = _Model.GetCombatTarget();
-		if (fGCODGKLHED != null)
+		Model combatTarget = _Model.GetCombatTarget();
+		if (combatTarget != null)
 		{
-			Model fNKFIMEDNLP = fGCODGKLHED.GetRootModel();
-			TacticFactors fJCBLOKOBBD = SetFactors(fNKFIMEDNLP);
-			return tactic.SelectAnimationWithWeights(MAHEJFLCCHP, botAnimation, fJCBLOKOBBD);
+			Model enemyRoot = combatTarget.GetRootModel();
+			TacticFactors factors = SetFactors(enemyRoot);
+			return tactic.SelectAnimationWithWeights(animations, botAnimation, factors);
 		}
 		return -1;
 	}
 
 	public void ChangeTactic(string name)
 	{
-		Tactic bJBIGPGJKIE = AiData.GetTacticByName(name);
-		ChangeTactic(bJBIGPGJKIE);
+		Tactic newTactic = AiData.GetTacticByName(name);
+		ChangeTactic(newTactic);
 	}
 
-	public void ChangeTactic(Tactic BJBIGPGJKIE)
+	public void ChangeTactic(Tactic newTactic)
 	{
-		if (BJBIGPGJKIE != null)
+		if (newTactic != null)
 		{
-			tactic = BJBIGPGJKIE;
+			tactic = newTactic;
 		}
 	}
 
-	private int GetResponseDelay(TacticFactors FJCBLOKOBBD)
+	private int GetResponseDelay(TacticFactors factors)
 	{
-		return tactic.GetResponseDelay(FJCBLOKOBBD) + 1;
+		return tactic.GetResponseDelay(factors) + 1;
 	}
 
-	private float GetDistanceError(TacticFactors FJCBLOKOBBD)
+	private float GetDistanceError(TacticFactors factors)
 	{
-		return tactic.GetDistanceError(FJCBLOKOBBD);
+		return tactic.GetDistanceError(factors);
 	}
 
-	private int GetFrameError(TacticFactors FJCBLOKOBBD)
+	private int GetFrameError(TacticFactors factors)
 	{
-		return tactic.GetFrameError(FJCBLOKOBBD);
+		return tactic.GetFrameError(factors);
 	}
 
-	private int GetEnemyResponseDelay(TacticFactors FJCBLOKOBBD)
+	private int GetEnemyResponseDelay(TacticFactors factors)
 	{
-		return tactic.GetEnemyResponseDelay(FJCBLOKOBBD);
+		return tactic.GetEnemyResponseDelay(factors);
 	}
 
-	private static bool GetRandomFlag(float KFJGPCLOMIG)
+	private static bool GetRandomFlag(float chance)
 	{
 		float num = NekkiMath.randomFloat();
-		return num < KFJGPCLOMIG;
+		return num < chance;
 	}
 
 	private void LoadParameters()
 	{
-		Tactic hBFMBOHLKPJ = parameters.FightTactic;
-		if (hBFMBOHLKPJ != null)
+		Tactic loadedTactic = parameters.FightTactic;
+		if (loadedTactic != null)
 		{
-			tactic = hBFMBOHLKPJ;
+			tactic = loadedTactic;
 		}
 	}
 
-	private void LogTable(ModelAnimation IPNLKNLBLIE, int JLLPJLEDBPG, int count, InfoAnimation DBOLBEOCEME, int JOHDCPNACOC)
+	private void LogTable(ModelAnimation modelAnimation, int frame, int count, InfoAnimation animation, int wait)
 	{
 	}
 
@@ -763,27 +763,27 @@ public class ModelAi
 	{
 	}
 
-	private int GetNearestKeyFrameId(int KKEGODOKGCB)
+	private int GetNearestKeyFrameId(int frame)
 	{
-		if (KKEGODOKGCB % AiData.MovementsStep == 0)
+		if (frame % AiData.MovementsStep == 0)
 		{
-			return KKEGODOKGCB;
+			return frame;
 		}
-		if (0 < KKEGODOKGCB)
+		if (0 < frame)
 		{
-			return KKEGODOKGCB - KKEGODOKGCB % AiData.MovementsStep + AiData.MovementsStep;
+			return frame - frame % AiData.MovementsStep + AiData.MovementsStep;
 		}
-		return KKEGODOKGCB - KKEGODOKGCB % AiData.MovementsStep;
+		return frame - frame % AiData.MovementsStep;
 	}
 
-	private bool IsFitStartAnimation(InfoAnimation DBOLBEOCEME)
+	private bool IsFitStartAnimation(InfoAnimation animation)
 	{
-		if (_ModelAnimation.GetIsPlaying() && DBOLBEOCEME != null)
+		if (_ModelAnimation.GetIsPlaying() && animation != null)
 		{
 			List<string> list = AiData.get_UnexpectedMoves();
 			foreach (string item in list)
 			{
-				if (DBOLBEOCEME.HasName(item))
+				if (animation.HasName(item))
 				{
 					return true;
 				}
@@ -792,12 +792,12 @@ public class ModelAi
 		return false;
 	}
 
-	private bool IsFitBotAnimation(InfoAnimation DBOLBEOCEME, AnimationListType LFLGCDNKNJI = AnimationListType.Standard)
+	private bool IsFitBotAnimation(InfoAnimation animation, AnimationListType listType = AnimationListType.Standard)
 	{
-		if (DBOLBEOCEME != null)
+		if (animation != null)
 		{
 			List<string> list = null;
-			switch (LFLGCDNKNJI)
+			switch (listType)
 			{
 			case AnimationListType.Standard:
 				list = AiData.get_MovesLastIteration();
@@ -808,7 +808,7 @@ public class ModelAi
 			}
 			foreach (string item in list)
 			{
-				if (DBOLBEOCEME.HasName(item))
+				if (animation.HasName(item))
 				{
 					return true;
 				}
@@ -817,12 +817,12 @@ public class ModelAi
 		return false;
 	}
 
-	private bool IsSafeDodges(InfoAnimation DBOLBEOCEME)
+	private bool IsSafeDodges(InfoAnimation animation)
 	{
 		List<string> list = AiData.get_SafeDodgesAnimations();
 		foreach (string item in list)
 		{
-			if (DBOLBEOCEME.HasName(item))
+			if (animation.HasName(item))
 			{
 				return true;
 			}
@@ -835,19 +835,19 @@ public class ModelAi
 		List<string> list = AiData.get_NoDecisionIntervals();
 		foreach (string item in list)
 		{
-			IntervalAnimation mNOIEOBBCMI = _ModelAnimation.FindInterval(item);
-			if (mNOIEOBBCMI != null)
+			IntervalAnimation interval = _ModelAnimation.FindInterval(item);
+			if (interval != null)
 			{
 				return false;
 			}
 		}
 		if (_ModelAnimation.GetIsPlaying() && botAnimation != null)
 		{
-			InfoAnimation cGPDPHJIDPA = botAnimation;
+			InfoAnimation botMove = botAnimation;
 			List<string> list2 = AiData.get_NoDecisionMoves();
 			foreach (string item2 in list2)
 			{
-				if (cGPDPHJIDPA.HasName(item2))
+				if (botMove.HasName(item2))
 				{
 					return false;
 				}
@@ -857,27 +857,27 @@ public class ModelAi
 		return false;
 	}
 
-	private bool IsMissileAnimation(InfoAnimation DBOLBEOCEME)
+	private bool IsMissileAnimation(InfoAnimation animation)
 	{
-		List<TemplateAnimation> nNGPIGIMNPD = AiData.get_MissileAnimations();
-		return IsGivenTemplateAnimation(DBOLBEOCEME, nNGPIGIMNPD);
+		List<TemplateAnimation> templateAnimations = AiData.get_MissileAnimations();
+		return IsGivenTemplateAnimation(animation, templateAnimations);
 	}
 
-	private bool IsMagicAnimation(InfoAnimation DBOLBEOCEME)
+	private bool IsMagicAnimation(InfoAnimation animation)
 	{
-		List<TemplateAnimation> nNGPIGIMNPD = AiData.get_MagicAnimations();
-		return IsGivenTemplateAnimation(DBOLBEOCEME, nNGPIGIMNPD);
+		List<TemplateAnimation> templateAnimations = AiData.get_MagicAnimations();
+		return IsGivenTemplateAnimation(animation, templateAnimations);
 	}
 
-	private bool IsGivenTemplateAnimation(InfoAnimation DBOLBEOCEME, List<TemplateAnimation> NNGPIGIMNPD)
+	private bool IsGivenTemplateAnimation(InfoAnimation animation, List<TemplateAnimation> templateAnimations)
 	{
 		bool result = false;
-		if (DBOLBEOCEME != null)
+		if (animation != null)
 		{
-			foreach (TemplateAnimation item in NNGPIGIMNPD)
+			foreach (TemplateAnimation item in templateAnimations)
 			{
 				List<InfoAnimation> list = item.GetAnimations();
-				if (list.Contains(DBOLBEOCEME))
+				if (list.Contains(animation))
 				{
 					result = true;
 					break;
@@ -887,17 +887,17 @@ public class ModelAi
 		return result;
 	}
 
-	private bool GetUseChildrenDodge(Model FNKFIMEDNLP, MissileKind LFLGCDNKNJI)
+	private bool GetUseChildrenDodge(Model enemy, MissileKind missileKind)
 	{
-		if (FNKFIMEDNLP.GetWeaponModels().Count == 0 || _Model == null)
+		if (enemy.GetWeaponModels().Count == 0 || _Model == null)
 		{
 			return false;
 		}
 		bool result = false;
-		int num = GetModelDirection(_Model, FNKFIMEDNLP);
-		foreach (WeaponModel item in FNKFIMEDNLP.GetWeaponModels())
+		int num = GetModelDirection(_Model, enemy);
+		foreach (WeaponModel item in enemy.GetWeaponModels())
 		{
-			if (item.GetAnimationModule() != null && (item.GetAnimationModule() == null || item.GetAnimationModule().GetFirstInfo() != null) && (IsMissileAnimation(item.GetAnimationModule().GetCurrentInfo()) || LFLGCDNKNJI != MissileKind.SimpleMissile) && (IsMagicAnimation(item.GetAnimationModule().GetCurrentInfo()) || LFLGCDNKNJI != MissileKind.MagicMissile))
+			if (item.GetAnimationModule() != null && (item.GetAnimationModule() == null || item.GetAnimationModule().GetFirstInfo() != null) && (IsMissileAnimation(item.GetAnimationModule().GetCurrentInfo()) || missileKind != MissileKind.SimpleMissile) && (IsMagicAnimation(item.GetAnimationModule().GetCurrentInfo()) || missileKind != MissileKind.MagicMissile))
 			{
 				float num2 = _Model.GetBodyObject().GetPivotNode().GetStart()
 					.GetX();
@@ -917,47 +917,47 @@ public class ModelAi
 		return result;
 	}
 
-	private DefenceMode SelectDefenceMode(Model FNKFIMEDNLP)
+	private DefenceMode SelectDefenceMode(Model enemy)
 	{
 		float num = NekkiMath.randomFloat();
-		TacticFactors fJCBLOKOBBD = SetFactors(FNKFIMEDNLP);
-		counterAttackChance = tactic.GetCounterAttackChance(fJCBLOKOBBD);
-		dodgeChance = tactic.GetDodgeChance(fJCBLOKOBBD);
-		blockChance = tactic.GetBlockChance(fJCBLOKOBBD);
-		float cJBHLGHFEGC = counterAttackChance;
+		TacticFactors factors = SetFactors(enemy);
+		counterAttackChance = tactic.GetCounterAttackChance(factors);
+		dodgeChance = tactic.GetDodgeChance(factors);
+		blockChance = tactic.GetBlockChance(factors);
+		float cumulativeChance = counterAttackChance;
 		if (num < counterAttackChance)
 		{
 			return DefenceMode.DefenceUseCounterAttack;
 		}
-		cJBHLGHFEGC += dodgeChance;
-		if (num < cJBHLGHFEGC)
+		cumulativeChance += dodgeChance;
+		if (num < cumulativeChance)
 		{
 			return DefenceMode.DefenceUseDodge;
 		}
-		cJBHLGHFEGC += blockChance;
-		if (num < cJBHLGHFEGC)
+		cumulativeChance += blockChance;
+		if (num < cumulativeChance)
 		{
 			return DefenceMode.DefenceUseBlock;
 		}
 		return DefenceMode.DefenceUseRandom;
 	}
 
-	private float GetNodeX(string IMGCANJHPND, Model ACENLMONNPA, Model FNKFIMEDNLP)
+	private float GetNodeX(string nodeName, Model model, Model enemy)
 	{
-		int aOJJBKLCHJO = GetModelDirection(ACENLMONNPA, FNKFIMEDNLP);
-		ModelNode lCDGOCIAIDK = ACENLMONNPA.GetAnimationModule().GetNodeByNameForSign(IMGCANJHPND, aOJJBKLCHJO);
-		if (lCDGOCIAIDK != null)
+		int direction = GetModelDirection(model, enemy);
+		ModelNode node = model.GetAnimationModule().GetNodeByNameForSign(nodeName, direction);
+		if (node != null)
 		{
-			return lCDGOCIAIDK.GetStart().GetX();
+			return node.GetStart().GetX();
 		}
 		return float.MaxValue;
 	}
 
-	private float GetNodeX(string IMGCANJHPND, List<global::Pair<string, float>> EGMLEFHEBLL)
+	private float GetNodeX(string nodeName, List<global::Pair<string, float>> nodePositions)
 	{
-		foreach (global::Pair<string, float> item in EGMLEFHEBLL)
+		foreach (global::Pair<string, float> item in nodePositions)
 		{
-			if (item.First == IMGCANJHPND)
+			if (item.First == nodeName)
 			{
 				return item.Second;
 			}
@@ -973,95 +973,95 @@ public class ModelAi
 		decisionWait = int.MinValue;
 	}
 
-	private int GetPlayableAnimations(List<InfoAnimation> MAHEJFLCCHP, List<int> FIFFFOLGCND = null, bool AEGBKDJEABP = false)
+	private int GetPlayableAnimations(List<InfoAnimation> animations, List<int> interframes = null, bool useTacticRules = false)
 	{
 		List<InfoAnimation> list = _Model.GetAvailableAnimations();
 		int num = 0;
-		int count = MAHEJFLCCHP.Count;
-		ModelConditions dGJJDPIAEAO = get_Model().GetConditions();
-		if (dGJJDPIAEAO == null)
+		int count = animations.Count;
+		ModelConditions modelConditions = get_Model().GetConditions();
+		if (modelConditions == null)
 		{
 			GameLog.Error("modelConditions is null");
 			return 0;
 		}
-		dGJJDPIAEAO.IsKeyCheckEnabled = false;
+		modelConditions.IsKeyCheckEnabled = false;
 		for (int i = 0; i < count; i++)
 		{
-			InfoAnimation pJAHIOELGGD = MAHEJFLCCHP[i];
-			if (pJAHIOELGGD != null && ((!AEGBKDJEABP) ? IsPlayableAnimations(pJAHIOELGGD) : IsTacticPlayableAnimations(pJAHIOELGGD)))
+			InfoAnimation animation = animations[i];
+			if (animation != null && ((!useTacticRules) ? IsPlayableAnimations(animation) : IsTacticPlayableAnimations(animation)))
 			{
-				MAHEJFLCCHP[num] = MAHEJFLCCHP[i];
-				if (FIFFFOLGCND != null)
+				animations[num] = animations[i];
+				if (interframes != null)
 				{
-					FIFFFOLGCND[num] = FIFFFOLGCND[i];
+					interframes[num] = interframes[i];
 				}
 				num++;
 			}
 		}
-		MAHEJFLCCHP.Resize(num);
-		if (FIFFFOLGCND != null)
+		animations.Resize(num);
+		if (interframes != null)
 		{
-			FIFFFOLGCND.Resize(num);
+			interframes.Resize(num);
 		}
 		return num;
 	}
 
-	private int GetPlayableAnimations(List<Decision> PJGOCFKJGJJ)
+	private int GetPlayableAnimations(List<Decision> decisionList)
 	{
 		List<InfoAnimation> list = _Model.GetAvailableAnimations();
 		int num = 0;
-		int count = PJGOCFKJGJJ.Count;
-		ModelConditions dGJJDPIAEAO = get_Model().GetConditions();
-		if (dGJJDPIAEAO == null)
+		int count = decisionList.Count;
+		ModelConditions modelConditions = get_Model().GetConditions();
+		if (modelConditions == null)
 		{
 			GameLog.Error("modelConditions is null");
 			return 0;
 		}
-		dGJJDPIAEAO.IsKeyCheckEnabled = false;
+		modelConditions.IsKeyCheckEnabled = false;
 		for (int i = 0; i < count; i++)
 		{
-			InfoAnimation fGICHADOEHF = PJGOCFKJGJJ[i].Animation;
-			if (fGICHADOEHF == null || IsPlayableAnimations(fGICHADOEHF))
+			InfoAnimation animation = decisionList[i].Animation;
+			if (animation == null || IsPlayableAnimations(animation))
 			{
-				PJGOCFKJGJJ[num] = PJGOCFKJGJJ[i];
+				decisionList[num] = decisionList[i];
 				num++;
 			}
 		}
-		PJGOCFKJGJJ.Resize(num);
+		decisionList.Resize(num);
 		return num;
 	}
 
-	private bool IsPlayableAnimations(InfoAnimation DBOLBEOCEME)
+	private bool IsPlayableAnimations(InfoAnimation animation)
 	{
 		// AI executes its choices through key input. Event-only animations are
 		// started by their runtime events and cannot be selected by this path.
-		if (DBOLBEOCEME.GetFirstKeysCondition() == null) return false;
+		if (animation.GetFirstKeysCondition() == null) return false;
 		List<InfoAnimation> list = _Model.GetAvailableAnimations();
-		if (!list.Contains(DBOLBEOCEME))
+		if (!list.Contains(animation))
 		{
 			return false;
 		}
-		ModelConditions dGJJDPIAEAO = get_Model().GetConditions();
-		dGJJDPIAEAO.IsKeyCheckEnabled = false;
-		dGJJDPIAEAO.CandidateMoveNames = DBOLBEOCEME.GetTemplateNames();
-		dGJJDPIAEAO.AnimationSign = DBOLBEOCEME.GetDirection(dGJJDPIAEAO, _ModelAnimation.GetSign());
-		dGJJDPIAEAO.PivotPairSelector = (int)DBOLBEOCEME.MoveData.AlignData.PivotSideKind;
-		if (!DBOLBEOCEME.AreConditionsMet(get_Model(), null, DBOLBEOCEME.FindMoveEventByType(EventAnimation.EventAnimationType.EVENT_KEY_PRESSED)))
+		ModelConditions modelConditions = get_Model().GetConditions();
+		modelConditions.IsKeyCheckEnabled = false;
+		modelConditions.CandidateMoveNames = animation.GetTemplateNames();
+		modelConditions.AnimationSign = animation.GetDirection(modelConditions, _ModelAnimation.GetSign());
+		modelConditions.PivotPairSelector = (int)animation.MoveData.AlignData.PivotSideKind;
+		if (!animation.AreConditionsMet(get_Model(), null, animation.FindMoveEventByType(EventAnimation.EventAnimationType.EVENT_KEY_PRESSED)))
 		{
 			return false;
 		}
-		InfoAnimation.CapabilityTable iCANLHJKKNE = DBOLBEOCEME.PriorityConflicts;
-		int count = iCANLHJKKNE.HigherPriorityMoves.Count;
+		InfoAnimation.CapabilityTable capabilities = animation.PriorityConflicts;
+		int count = capabilities.HigherPriorityMoves.Count;
 		if (0 < count)
 		{
-			foreach (InfoAnimation item in iCANLHJKKNE.HigherPriorityMoves)
+			foreach (InfoAnimation item in capabilities.HigherPriorityMoves)
 			{
 				if (list.Contains(item) && item.GetFirstKeysCondition() != null)
 				{
-					dGJJDPIAEAO.CandidateMoveNames = item.GetTemplateNames();
-					dGJJDPIAEAO.AnimationSign = item.GetDirection(dGJJDPIAEAO, _ModelAnimation.GetSign());
-					dGJJDPIAEAO.PivotPairSelector = (int)item.MoveData.AlignData.PivotSideKind;
-					if (item.AreConditionsMet(get_Model(), null, DBOLBEOCEME.FindMoveEventByType(EventAnimation.EventAnimationType.EVENT_KEY_PRESSED)))
+					modelConditions.CandidateMoveNames = item.GetTemplateNames();
+					modelConditions.AnimationSign = item.GetDirection(modelConditions, _ModelAnimation.GetSign());
+					modelConditions.PivotPairSelector = (int)item.MoveData.AlignData.PivotSideKind;
+					if (item.AreConditionsMet(get_Model(), null, animation.FindMoveEventByType(EventAnimation.EventAnimationType.EVENT_KEY_PRESSED)))
 					{
 						return false;
 					}
@@ -1071,35 +1071,35 @@ public class ModelAi
 		return true;
 	}
 
-	private bool IsTacticPlayableAnimations(InfoAnimation DBOLBEOCEME)
+	private bool IsTacticPlayableAnimations(InfoAnimation animation)
 	{
-		if (DBOLBEOCEME.GetFirstKeysCondition() == null) return false;
+		if (animation.GetFirstKeysCondition() == null) return false;
 		List<InfoAnimation> list = _Model.GetAvailableAnimations();
-		if (!list.Contains(DBOLBEOCEME))
+		if (!list.Contains(animation))
 		{
 			return false;
 		}
-		ModelConditions dGJJDPIAEAO = get_Model().GetConditions();
-		dGJJDPIAEAO.IsKeyCheckEnabled = false;
-		dGJJDPIAEAO.CandidateMoveNames = DBOLBEOCEME.GetTemplateNames();
-		dGJJDPIAEAO.AnimationSign = DBOLBEOCEME.GetDirection(dGJJDPIAEAO, _ModelAnimation.GetSign());
-		dGJJDPIAEAO.PivotPairSelector = (int)DBOLBEOCEME.MoveData.AlignData.PivotSideKind;
-		if (!DBOLBEOCEME.AreConditionsMet(_Model.GetConditions(), DBOLBEOCEME.MoveData.TacticsConditions, DBOLBEOCEME.FindMoveEventByType(EventAnimation.EventAnimationType.EVENT_KEY_PRESSED)))
+		ModelConditions modelConditions = get_Model().GetConditions();
+		modelConditions.IsKeyCheckEnabled = false;
+		modelConditions.CandidateMoveNames = animation.GetTemplateNames();
+		modelConditions.AnimationSign = animation.GetDirection(modelConditions, _ModelAnimation.GetSign());
+		modelConditions.PivotPairSelector = (int)animation.MoveData.AlignData.PivotSideKind;
+		if (!animation.AreConditionsMet(_Model.GetConditions(), animation.MoveData.TacticsConditions, animation.FindMoveEventByType(EventAnimation.EventAnimationType.EVENT_KEY_PRESSED)))
 		{
 			return false;
 		}
 		return true;
 	}
 
-	private float GetCurrentDirectionToEnemy(ModelAnimation HFGPAELCNMF)
+	private float GetCurrentDirectionToEnemy(ModelAnimation modelAnimation)
 	{
-		ModelNode lCDGOCIAIDK = HFGPAELCNMF.GetPlayingNode();
+		ModelNode node = modelAnimation.GetPlayingNode();
 		ModelNode lCDGOCIAIDK2 = _ModelAnimation.GetPlayingNode();
-		if (lCDGOCIAIDK == null || lCDGOCIAIDK2 == null)
+		if (node == null || lCDGOCIAIDK2 == null)
 		{
 			return 0f;
 		}
-		float num = lCDGOCIAIDK.GetStart().GetX() - lCDGOCIAIDK2.GetStart().GetX();
+		float num = node.GetStart().GetX() - lCDGOCIAIDK2.GetStart().GetX();
 		if (num >= 0f)
 		{
 			return 1f;
@@ -1107,40 +1107,40 @@ public class ModelAi
 		return -1f;
 	}
 
-	private bool IsFitCondition(InfoAnimation DBOLBEOCEME, bool EMALNKEEEEN)
+	private bool IsFitCondition(InfoAnimation animation, bool useTacticsConditions)
 	{
-		ModelConditions dGJJDPIAEAO = get_Model().GetConditions();
-		if (dGJJDPIAEAO == null)
+		ModelConditions modelConditions = get_Model().GetConditions();
+		if (modelConditions == null)
 		{
 			GameLog.Error("modelConditions is null");
 			return false;
 		}
-		dGJJDPIAEAO.CandidateMoveNames = DBOLBEOCEME.GetTemplateNames();
-		dGJJDPIAEAO.AnimationSign = DBOLBEOCEME.GetDirection(dGJJDPIAEAO, _ModelAnimation.GetSign());
-		dGJJDPIAEAO.PivotPairSelector = (int)DBOLBEOCEME.MoveData.AlignData.PivotSideKind;
-		return DBOLBEOCEME.AreConditionsMet(dGJJDPIAEAO, (!EMALNKEEEEN) ? null : DBOLBEOCEME.MoveData.TacticsConditions);
+		modelConditions.CandidateMoveNames = animation.GetTemplateNames();
+		modelConditions.AnimationSign = animation.GetDirection(modelConditions, _ModelAnimation.GetSign());
+		modelConditions.PivotPairSelector = (int)animation.MoveData.AlignData.PivotSideKind;
+		return animation.AreConditionsMet(modelConditions, (!useTacticsConditions) ? null : animation.MoveData.TacticsConditions);
 	}
 
-	private int SetDecisionList(Model FNKFIMEDNLP, int JLLPJLEDBPG)
+	private int SetDecisionList(Model enemy, int frame)
 	{
 		decisions.Clear();
-		ModelAnimation oJIEPADIEDE = FNKFIMEDNLP.GetAnimationModule();
-		if (GetCurrentDirectionToEnemy(oJIEPADIEDE) * (float)oJIEPADIEDE.GetSign() > 0f)
+		ModelAnimation enemyModelAnimation = enemy.GetAnimationModule();
+		if (GetCurrentDirectionToEnemy(enemyModelAnimation) * (float)enemyModelAnimation.GetSign() > 0f)
 		{
 			SetRandomAnimation();
 			waitMode = WaitMode.SetWaitAnimationLength;
 			return 0;
 		}
 		bool flag = false;
-		if (GetUseChildrenDodge(FNKFIMEDNLP, MissileKind.SimpleMissile) && dodgeMissile)
+		if (GetUseChildrenDodge(enemy, MissileKind.SimpleMissile) && dodgeMissile)
 		{
-			int num = GetForDodgeMissiles(FNKFIMEDNLP, MissileKind.SimpleMissile);
+			int num = GetForDodgeMissiles(enemy, MissileKind.SimpleMissile);
 			resultSource = AiData.TableType.dodgeTable;
 			flag = true;
 		}
-		if (dodgeMagic && GetUseChildrenDodge(FNKFIMEDNLP, MissileKind.MagicMissile))
+		if (dodgeMagic && GetUseChildrenDodge(enemy, MissileKind.MagicMissile))
 		{
-			int num2 = GetForDodgeMissiles(FNKFIMEDNLP, MissileKind.MagicMissile);
+			int num2 = GetForDodgeMissiles(enemy, MissileKind.MagicMissile);
 			resultSource = AiData.TableType.dodgeTable;
 			flag = true;
 		}
@@ -1148,25 +1148,25 @@ public class ModelAi
 		{
 			return decisions.Count;
 		}
-		int num3 = oJIEPADIEDE.GetFrameInMove();
-		if (responseDelay < num3 && !IsUninteruptIntervalEnd(oJIEPADIEDE))
+		int num3 = enemyModelAnimation.GetFrameInMove();
+		if (responseDelay < num3 && !IsUninteruptIntervalEnd(enemyModelAnimation))
 		{
 			if (enemyAnimation.IsIntervalActiveAtInterpolatedFrame("Uninterrupt", enemyFrame))
 			{
-				if (!IsAttackIntervalEnd(oJIEPADIEDE))
+				if (!IsAttackIntervalEnd(enemyModelAnimation))
 				{
 					switch (defenceMode)
 					{
 					case DefenceMode.DefenceUseCounterAttack:
 					{
-						int num5 = GetFromTablesMove(FNKFIMEDNLP);
+						int num5 = GetFromTablesMove(enemy);
 						if (0 < num5)
 						{
 							resultSource = AiData.TableType.movementsTable;
 						}
 						if (num5 == 0)
 						{
-							num5 = GetFromTablesDodge(FNKFIMEDNLP);
+							num5 = GetFromTablesDodge(enemy);
 							if (0 < num5)
 							{
 								resultSource = AiData.TableType.dodgeTable;
@@ -1176,7 +1176,7 @@ public class ModelAi
 					}
 					case DefenceMode.DefenceUseDodge:
 					{
-						int num4 = GetFromTablesDodge(FNKFIMEDNLP);
+						int num4 = GetFromTablesDodge(enemy);
 						if (0 < num4)
 						{
 							resultSource = AiData.TableType.dodgeTable;
@@ -1194,7 +1194,7 @@ public class ModelAi
 				}
 				if (useSafeAttack)
 				{
-					int num6 = GetFromTablesMove(FNKFIMEDNLP);
+					int num6 = GetFromTablesMove(enemy);
 					if (0 < num6)
 					{
 						resultSource = AiData.TableType.movementsTable;
@@ -1206,7 +1206,7 @@ public class ModelAi
 				}
 				if (useTableAttack)
 				{
-					int num7 = GetFromTablesAttack(FNKFIMEDNLP);
+					int num7 = GetFromTablesAttack(enemy);
 					if (0 < num7)
 					{
 						resultSource = AiData.TableType.outcometablesforattack;
@@ -1219,11 +1219,11 @@ public class ModelAi
 				if (useCautiousMovement)
 				{
 					List<TemplateAnimation> list = AiData.get_CautiousMovements();
-					InfoAnimation pJAHIOELGGD = FNKFIMEDNLP.GetAnimationModule().GetCurrentInfo();
+					InfoAnimation animation = enemy.GetAnimationModule().GetCurrentInfo();
 					int num8 = 0;
-					if (pJAHIOELGGD != null && FNKFIMEDNLP.GetAnimationModule().GetIsPlaying())
+					if (animation != null && enemy.GetAnimationModule().GetIsPlaying())
 					{
-						num8 = pJAHIOELGGD.GetLastUninterruptFrame(true) - enemyFrame + 1;
+						num8 = animation.GetLastUninterruptFrame(true) - enemyFrame + 1;
 					}
 					decisions.Clear();
 					foreach (TemplateAnimation item in list)
@@ -1259,20 +1259,20 @@ public class ModelAi
 		List<global::Pair<string, TacticValue>> list3 = tactic.get_QuickAttacks();
 		for (int i = 0; i < count2; i++)
 		{
-			ChanceRoll bHDKGLJIOJD = quickAttackRolls[i];
-			if (!bHDKGLJIOJD.Flag)
+			ChanceRoll chanceRoll = quickAttackRolls[i];
+			if (!chanceRoll.Flag)
 			{
 				continue;
 			}
-			global::Pair<string, TacticValue> cCKLNOPEKHO = list3[i];
+			global::Pair<string, TacticValue> quickAttackEntry = list3[i];
 			List<InfoAnimation> list4 = new List<InfoAnimation>();
-			AnimationData.AddTemplateAnimations(cCKLNOPEKHO.First, list4);
+			AnimationData.AddTemplateAnimations(quickAttackEntry.First, list4);
 			foreach (InfoAnimation item3 in list4)
 			{
 				if (item3 != null && IsPlayableAnimations(item3))
 				{
-					int jOHDCPNACOC = item3.GetMoveLengthStrict();
-					decisions.Add(new Decision(item3, jOHDCPNACOC));
+					int wait = item3.GetMoveLengthStrict();
+					decisions.Add(new Decision(item3, wait));
 					flag2 = true;
 				}
 			}
@@ -1298,22 +1298,22 @@ public class ModelAi
 			global::Pair<string, TacticValue> cCKLNOPEKHO2 = list5[j];
 			List<InfoAnimation> list6 = new List<InfoAnimation>();
 			AnimationData.AddTemplateAnimations(cCKLNOPEKHO2.First, list6);
-			ModelAi pCFGKAFOCDO = FNKFIMEDNLP.GetAi();
-			if (pCFGKAFOCDO == null)
+			ModelAi enemyAi = enemy.GetAi();
+			if (enemyAi == null)
 			{
 				continue;
 			}
 			foreach (InfoAnimation item4 in list6)
 			{
-				if (item4 != null && pCFGKAFOCDO.IsPlayableAnimations(item4))
+				if (item4 != null && enemyAi.IsPlayableAnimations(item4))
 				{
 					enemyCanEvade = true;
 					break;
 				}
 			}
 		}
-		TacticFactors fJCBLOKOBBD = SetFactors(FNKFIMEDNLP);
-		float num10 = tactic.GetExpectedWait(botAnimation, fJCBLOKOBBD);
+		TacticFactors factors = SetFactors(enemy);
+		float num10 = tactic.GetExpectedWait(botAnimation, factors);
 		if (num10 < 1f)
 		{
 			num10 = 1f;
@@ -1329,7 +1329,7 @@ public class ModelAi
 			int num13 = 0;
 			if (useTableAttack)
 			{
-				num13 = GetFromTablesAttack(FNKFIMEDNLP);
+				num13 = GetFromTablesAttack(enemy);
 				if (0 < num13)
 				{
 					resultSource = AiData.TableType.outcometablesforattack;
@@ -1395,15 +1395,15 @@ public class ModelAi
 		return decisions.Count;
 	}
 
-	private static bool IsUninteruptIntervalEnd(ModelAnimation MEKLGEGJPFP)
+	private static bool IsUninteruptIntervalEnd(ModelAnimation modelAnimation)
 	{
-		if (MEKLGEGJPFP.GetIsPlaying())
+		if (modelAnimation.GetIsPlaying())
 		{
-			InfoAnimation pJAHIOELGGD = MEKLGEGJPFP.GetCurrentInfo();
-			if (pJAHIOELGGD != null)
+			InfoAnimation animation = modelAnimation.GetCurrentInfo();
+			if (animation != null)
 			{
-				int num = pJAHIOELGGD.GetLastUninterruptFrame(false);
-				int num2 = MEKLGEGJPFP.GetCurrentFrame();
+				int num = animation.GetLastUninterruptFrame(false);
+				int num2 = modelAnimation.GetCurrentFrame();
 				if (num2 <= num)
 				{
 					return false;
@@ -1413,15 +1413,15 @@ public class ModelAi
 		return true;
 	}
 
-	private static bool IsAttackIntervalEnd(ModelAnimation MEKLGEGJPFP)
+	private static bool IsAttackIntervalEnd(ModelAnimation modelAnimation)
 	{
-		if (MEKLGEGJPFP.GetIsPlaying())
+		if (modelAnimation.GetIsPlaying())
 		{
-			InfoAnimation pJAHIOELGGD = MEKLGEGJPFP.GetCurrentInfo();
-			if (pJAHIOELGGD != null)
+			InfoAnimation animation = modelAnimation.GetCurrentInfo();
+			if (animation != null)
 			{
-				int num = pJAHIOELGGD.GetLastAttackFrame(false);
-				int num2 = MEKLGEGJPFP.GetCurrentFrame();
+				int num = animation.GetLastAttackFrame(false);
+				int num2 = modelAnimation.GetCurrentFrame();
 				if (num2 <= num)
 				{
 					return false;
@@ -1455,22 +1455,22 @@ public class ModelAi
 		return num;
 	}
 
-	private bool IsThrowingState(InfoAnimation DBOLBEOCEME, int IHICCKAOPKG)
+	private bool IsThrowingState(InfoAnimation animation, int frame)
 	{
-		List<string> nIKHAICFGNM = AiData.get_ThrowableIntervals();
-		bool fPMGBALCKPI = true;
-		return DBOLBEOCEME.AreIntervalsActiveAtInterpolatedFrame(nIKHAICFGNM, IHICCKAOPKG, fPMGBALCKPI);
+		List<string> intervalNames = AiData.get_ThrowableIntervals();
+		bool useInterpolation = true;
+		return animation.AreIntervalsActiveAtInterpolatedFrame(intervalNames, frame, useInterpolation);
 	}
 
-	private bool IsModelCanThrow(Model ACENLMONNPA)
+	private bool IsModelCanThrow(Model model)
 	{
 		candidateAnimations.Clear();
-		List<string> nIKHAICFGNM = AiData.get_Throws();
-		AnimationData.AddTemplateAnimationsByNames(nIKHAICFGNM, candidateAnimations);
+		List<string> throwNames = AiData.get_Throws();
+		AnimationData.AddTemplateAnimationsByNames(throwNames, candidateAnimations);
 		int num = candidateAnimations.Count;
 		if (0 < num)
 		{
-			num = ACENLMONNPA.GetAi().GetPlayableAnimations(candidateAnimations);
+			num = model.GetAi().GetPlayableAnimations(candidateAnimations);
 		}
 		if (0 < num)
 		{
@@ -1496,7 +1496,7 @@ public class ModelAi
 		return 0;
 	}
 
-	private int GetSafetyAnimations(Model FNKFIMEDNLP)
+	private int GetSafetyAnimations(Model enemy)
 	{
 		List<TemplateAnimation> list = AiData.get_CautiousMovements();
 		candidateAnimations.Clear();
@@ -1508,15 +1508,15 @@ public class ModelAi
 				candidateAnimations.Add(item2);
 			}
 		}
-		InfoAnimation pJAHIOELGGD = FNKFIMEDNLP.GetAnimationModule().GetCurrentInfo();
+		InfoAnimation animation = enemy.GetAnimationModule().GetCurrentInfo();
 		decisions.Clear();
 		foreach (InfoAnimation item3 in candidateAnimations)
 		{
 			int num = 0;
-			if (pJAHIOELGGD != null && FNKFIMEDNLP.GetAnimationModule().GetIsPlaying())
+			if (animation != null && enemy.GetAnimationModule().GetIsPlaying())
 			{
 				int num2 = item3.GetMoveLengthStrict();
-				num = pJAHIOELGGD.GetLastUninterruptFrame(true) - enemyFrame + 1;
+				num = animation.GetLastUninterruptFrame(true) - enemyFrame + 1;
 				if (num2 < num)
 				{
 					num = num2;
@@ -1527,7 +1527,7 @@ public class ModelAi
 		return decisions.Count;
 	}
 
-	private int GetFromTablesMove(Model FNKFIMEDNLP)
+	private int GetFromTablesMove(Model enemy)
 	{
 		if (enemyFrame % AiData.MovementsStep != 0)
 		{
@@ -1539,7 +1539,7 @@ public class ModelAi
 		}
 		if (botAnimation != null && enemyAnimation != null)
 		{
-			int num = GetFromTablesMove(FNKFIMEDNLP, botAnimation, enemyAnimation, _ModelAnimation.GetStartPosition(), FNKFIMEDNLP.GetAnimationModule().GetStartPosition(), ownFrame, enemyFrame, distanceError);
+			int num = GetFromTablesMove(enemy, botAnimation, enemyAnimation, _ModelAnimation.GetStartPosition(), enemy.GetAnimationModule().GetStartPosition(), ownFrame, enemyFrame, distanceError);
 			if (0 < num)
 			{
 				num = GetPlayableAnimations(decisions);
@@ -1549,8 +1549,8 @@ public class ModelAi
 				int num2 = 0;
 				for (int i = 0; i < num; i++)
 				{
-					InfoAnimation fGICHADOEHF = decisions[i].Animation;
-					if (fGICHADOEHF == null || TestWall(fGICHADOEHF, _Model, FNKFIMEDNLP))
+					InfoAnimation animation = decisions[i].Animation;
+					if (animation == null || TestWall(animation, _Model, enemy))
 					{
 						if (num2 < i)
 						{
@@ -1567,47 +1567,47 @@ public class ModelAi
 		return 0;
 	}
 
-	private int GetFromTablesMove(Model FNKFIMEDNLP, InfoAnimation GJAGBKICAGF, InfoAnimation GPHCOBPINCK, float JPPHFIKBFDM, float KACDJBFHICO, int FIPCJOMEPCJ, int FHDLJPNEOLD, float GLFFEFOFCFE, List<global::Pair<string, float>> PJCNHALDPHO = null)
+	private int GetFromTablesMove(Model enemy, InfoAnimation botMove, InfoAnimation enemyMove, float ownStartPosition, float enemyStartPosition, int ownFrameIndex, int enemyFrameIndex, float errorOffset, List<global::Pair<string, float>> nodePositions = null)
 	{
 		decisions.Clear();
-		GroupTables kMLMHGLLOHM = null;
-		List<global::Pair<List<GroupTables>, string>> list = GPHCOBPINCK.GetTacticGroupTables()[1];
+		GroupTables groupTables = null;
+		List<global::Pair<List<GroupTables>, string>> list = enemyMove.GetTacticGroupTables()[1];
 		foreach (global::Pair<List<GroupTables>, string> item in list)
 		{
 			if (!(botWeaponSubtype == item.Second))
 			{
 				continue;
 			}
-			List<GroupTables> lLHEDBIEHAA = item.First;
-			foreach (GroupTables item2 in lLHEDBIEHAA)
+			List<GroupTables> groupTablesList = item.First;
+			foreach (GroupTables item2 in groupTablesList)
 			{
 				if (botWeaponSubtype == item2.GroupLabel)
 				{
-					kMLMHGLLOHM = item2;
+					groupTables = item2;
 					break;
 				}
 			}
 			break;
 		}
-		if (kMLMHGLLOHM != null)
+		if (groupTables != null)
 		{
-			ModelAnimation oJIEPADIEDE = FNKFIMEDNLP.GetAnimationModule();
-			int num = oJIEPADIEDE.GetSign();
-			if (IsFitBotAnimation(GJAGBKICAGF))
+			ModelAnimation enemyModelAnimation = enemy.GetAnimationModule();
+			int num = enemyModelAnimation.GetSign();
+			if (IsFitBotAnimation(botMove))
 			{
-				GroupTables cIHPJCIFLHN = kMLMHGLLOHM;
-				string mMJNDPGKNPM = GJAGBKICAGF.GetPivotPartName();
-				int num2 = FHDLJPNEOLD - FIPCJOMEPCJ;
+				GroupTables botGroup = groupTables;
+				string pivotPart = botMove.GetPivotPartName();
+				int num2 = enemyFrameIndex - ownFrameIndex;
 				int num3 = GetNearestKeyFrameId(num2);
 				int num4 = num3 - num2;
-				float oIOMNNFMDOO = (float)num * (JPPHFIKBFDM - KACDJBFHICO) + GLFFEFOFCFE;
+				float distance = (float)num * (ownStartPosition - enemyStartPosition) + errorOffset;
 				decisions.Clear();
-				int num5 = GetRow(cIHPJCIFLHN, mMJNDPGKNPM, num3, oIOMNNFMDOO, decisions);
+				int num5 = GetRow(botGroup, pivotPart, num3, distance, decisions);
 				foreach (Decision item3 in decisions)
 				{
-					if (GJAGBKICAGF == item3.Animation)
+					if (botMove == item3.Animation)
 					{
-						int num6 = item3.Wait - FIPCJOMEPCJ + num4;
+						int num6 = item3.Wait - ownFrameIndex + num4;
 						decisions.Clear();
 						if (0 < num6)
 						{
@@ -1618,33 +1618,33 @@ public class ModelAi
 					}
 				}
 			}
-			int num7 = ((FHDLJPNEOLD % AiData.MovementsStep == 0) ? FHDLJPNEOLD : (FHDLJPNEOLD + AiData.MovementsStep - FHDLJPNEOLD % AiData.MovementsStep));
+			int num7 = ((enemyFrameIndex % AiData.MovementsStep == 0) ? enemyFrameIndex : (enemyFrameIndex + AiData.MovementsStep - enemyFrameIndex % AiData.MovementsStep));
 			decisions.Clear();
 			int num8 = _ModelAnimation.GetSign();
 			int num9 = 0;
-			int count = kMLMHGLLOHM.Tables.Count;
+			int count = groupTables.Tables.Count;
 			for (int i = 0; i < count; i++)
 			{
-				string hOGFLOLGGOL = kMLMHGLLOHM.Tables[i].Label;
-				float num10 = ((PJCNHALDPHO != null) ? GetNodeX(hOGFLOLGGOL, PJCNHALDPHO) : GetNodeX(hOGFLOLGGOL, _Model, FNKFIMEDNLP));
-				float num11 = GJAGBKICAGF.ShiftTable.GetDistance(FHDLJPNEOLD, hOGFLOLGGOL);
-				float num12 = GJAGBKICAGF.ShiftTable.GetDistance(num7, hOGFLOLGGOL);
+				string tableLabel = groupTables.Tables[i].Label;
+				float num10 = ((nodePositions != null) ? GetNodeX(tableLabel, nodePositions) : GetNodeX(tableLabel, _Model, enemy));
+				float num11 = botMove.ShiftTable.GetDistance(enemyFrameIndex, tableLabel);
+				float num12 = botMove.ShiftTable.GetDistance(num7, tableLabel);
 				float num13 = num12 - num11;
-				float oIOMNNFMDOO2 = (float)num * (num10 + num13 * (float)num8 - KACDJBFHICO) + GLFFEFOFCFE;
-				num9 += GetRow(kMLMHGLLOHM, hOGFLOLGGOL, num7, oIOMNNFMDOO2, decisions);
+				float oIOMNNFMDOO2 = (float)num * (num10 + num13 * (float)num8 - enemyStartPosition) + errorOffset;
+				num9 += GetRow(groupTables, tableLabel, num7, oIOMNNFMDOO2, decisions);
 			}
-			if (num7 == FHDLJPNEOLD || num9 == 0)
+			if (num7 == enemyFrameIndex || num9 == 0)
 			{
 				return num9;
 			}
 			decisions.Clear();
-			decisions.Add(new Decision(null, num7 - FHDLJPNEOLD));
+			decisions.Add(new Decision(null, num7 - enemyFrameIndex));
 			return 1;
 		}
 		return decisions.Count;
 	}
 
-	private int GetFromTablesAttack(Model FNKFIMEDNLP)
+	private int GetFromTablesAttack(Model enemy)
 	{
 		decisions.Clear();
 		if (enemyFrame % AiData.MovementsStep != 0)
@@ -1653,9 +1653,9 @@ public class ModelAi
 			return 0;
 		}
 		offKeyFrame = false;
-		TacticFactors fJCBLOKOBBD = SetFactors(FNKFIMEDNLP);
-		int num = GetEnemyResponseDelay(fJCBLOKOBBD);
-		GroupTables kMLMHGLLOHM = null;
+		TacticFactors factors = SetFactors(enemy);
+		int num = GetEnemyResponseDelay(factors);
+		GroupTables groupTables = null;
 		List<global::Pair<List<GroupTables>, string>> list = enemyAnimation.GetTacticGroupTables()[0];
 		foreach (global::Pair<List<GroupTables>, string> item in list)
 		{
@@ -1663,42 +1663,42 @@ public class ModelAi
 			{
 				continue;
 			}
-			List<GroupTables> lLHEDBIEHAA = item.First;
-			foreach (GroupTables item2 in lLHEDBIEHAA)
+			List<GroupTables> groupTablesList = item.First;
+			foreach (GroupTables item2 in groupTablesList)
 			{
 				if (botWeaponSubtype == item2.GroupLabel)
 				{
-					kMLMHGLLOHM = item2;
+					groupTables = item2;
 					break;
 				}
 			}
 			break;
 		}
-		if (kMLMHGLLOHM != null)
+		if (groupTables != null)
 		{
-			ModelAnimation oJIEPADIEDE = FNKFIMEDNLP.GetAnimationModule();
-			int mEHOEEIGCEP = enemyFrame;
-			int nJPDFMHHIDE = ownFrame;
-			float num2 = oJIEPADIEDE.GetStartPosition();
-			int num3 = oJIEPADIEDE.GetSign();
-			int count = kMLMHGLLOHM.Tables.Count;
+			ModelAnimation enemyModelAnimation = enemy.GetAnimationModule();
+			int frameIndex = enemyFrame;
+			int ownFrameIndex = ownFrame;
+			float num2 = enemyModelAnimation.GetStartPosition();
+			int num3 = enemyModelAnimation.GetSign();
+			int count = groupTables.Tables.Count;
 			candidateAnimations.Clear();
 			_InterframesList.Clear();
 			int num4 = enemyFrame + num;
 			for (int i = 0; i < count; i++)
 			{
-				TacticalTable iCLOAGENLJG = kMLMHGLLOHM.Tables[i];
-				int num5 = iCLOAGENLJG.GetArrayIndexByFrameIndex(mEHOEEIGCEP);
+				TacticalTable table = groupTables.Tables[i];
+				int num5 = table.GetArrayIndexByFrameIndex(frameIndex);
 				if (-1 >= num5)
 				{
 					continue;
 				}
-				float num6 = GetNodeX(iCLOAGENLJG.Label, _Model, FNKFIMEDNLP);
-				float oIOMNNFMDOO = (float)num3 * (num6 - num2) + distanceError;
-				List<IntervalNew> mFFPCMPGEBK = iCLOAGENLJG.IntervalList[num5].Items;
-				foreach (IntervalNew item3 in mFFPCMPGEBK)
+				float num6 = GetNodeX(table.Label, _Model, enemy);
+				float distance = (float)num3 * (num6 - num2) + distanceError;
+				List<IntervalNew> intervals = table.IntervalList[num5].Items;
+				foreach (IntervalNew item3 in intervals)
 				{
-					int num7 = item3.GetInterframeByDistance(oIOMNNFMDOO);
+					int num7 = item3.GetInterframeByDistance(distance);
 					if (0 < num7 && num7 <= num4)
 					{
 						candidateAnimations.Add(item3.Animation);
@@ -1716,12 +1716,12 @@ public class ModelAi
 				int num9 = 0;
 				for (int j = 0; j < num8; j++)
 				{
-					InfoAnimation pJAHIOELGGD = candidateAnimations[j];
-					if (TestWall(pJAHIOELGGD, _Model, FNKFIMEDNLP))
+					InfoAnimation animation = candidateAnimations[j];
+					if (TestWall(animation, _Model, enemy))
 					{
 						if (num9 < j)
 						{
-							candidateAnimations[num9] = pJAHIOELGGD;
+							candidateAnimations[num9] = animation;
 							_InterframesList[num9] = _InterframesList[j];
 						}
 						num9++;
@@ -1739,22 +1739,22 @@ public class ModelAi
 		return decisions.Count;
 	}
 
-	private int GetFromTablesDodge(Model FNKFIMEDNLP, AnimationListType NPIOFGMJDKI = AnimationListType.Standard)
+	private int GetFromTablesDodge(Model enemy, AnimationListType listType = AnimationListType.Standard)
 	{
 		decisions.Clear();
 		int num = 0;
-		switch (NPIOFGMJDKI)
+		switch (listType)
 		{
 		case AnimationListType.Standard:
 			num = enemyFrame;
 			break;
 		case AnimationListType.Missile:
-			num = FNKFIMEDNLP.GetAnimationModule().GetRenderTickCount();
+			num = enemy.GetAnimationModule().GetRenderTickCount();
 			break;
 		}
 		if (num % AiData.MovementsStep != 0)
 		{
-			switch (NPIOFGMJDKI)
+			switch (listType)
 			{
 			case AnimationListType.Standard:
 				offKeyFrame = true;
@@ -1772,43 +1772,43 @@ public class ModelAi
 		{
 			offKeyFrame = false;
 		}
-		InfoAnimation pJAHIOELGGD = null;
-		switch (NPIOFGMJDKI)
+		InfoAnimation animation = null;
+		switch (listType)
 		{
 		case AnimationListType.Standard:
-			pJAHIOELGGD = FNKFIMEDNLP.GetAnimationModule().GetCurrentInfo();
+			animation = enemy.GetAnimationModule().GetCurrentInfo();
 			break;
 		case AnimationListType.Missile:
-			pJAHIOELGGD = FNKFIMEDNLP.GetAnimationModule().GetFirstInfo();
+			animation = enemy.GetAnimationModule().GetFirstInfo();
 			break;
 		}
-		GroupTables kMLMHGLLOHM = null;
-		List<global::Pair<List<GroupTables>, string>> list = pJAHIOELGGD.GetTacticGroupTables()[2];
+		GroupTables groupTables = null;
+		List<global::Pair<List<GroupTables>, string>> list = animation.GetTacticGroupTables()[2];
 		// Event-only poses/steps can legitimately have no precomputed dodge table.
-		if (list.Count == 0 && NPIOFGMJDKI == AnimationListType.Standard && pJAHIOELGGD.GetFirstKeysCondition() == null)
+		if (list.Count == 0 && listType == AnimationListType.Standard && animation.GetFirstKeysCondition() == null)
 			return 0;
 		if (list.Count == 1)
 		{
-			List<GroupTables> lLHEDBIEHAA = list[0].First;
-			if (lLHEDBIEHAA.Count == 1)
+			List<GroupTables> groupTablesList = list[0].First;
+			if (groupTablesList.Count == 1)
 			{
-				kMLMHGLLOHM = lLHEDBIEHAA[0];
-				if (kMLMHGLLOHM != null)
+				groupTables = groupTablesList[0];
+				if (groupTables != null)
 				{
-					List<string> nIKHAICFGNM = null;
+					List<string> intervalNames = null;
 					List<string> list2 = null;
-					switch (NPIOFGMJDKI)
+					switch (listType)
 					{
 					case AnimationListType.Standard:
-						nIKHAICFGNM = AiData.get_MovesFirstIteration();
+						intervalNames = AiData.get_MovesFirstIteration();
 						list2 = AiData.get_MovesLastIteration();
 						break;
 					case AnimationListType.Missile:
-						nIKHAICFGNM = AiData.get_MissilesFirstIteration();
+						intervalNames = AiData.get_MissilesFirstIteration();
 						list2 = AiData.get_MissilesLastIteration();
 						break;
 					}
-					ModelAnimation oJIEPADIEDE = FNKFIMEDNLP.GetAnimationModule();
+					ModelAnimation enemyModelAnimation = enemy.GetAnimationModule();
 					InfoAnimation pJAHIOELGGD2 = botAnimation;
 					if (_ModelAnimation.GetIsPlaying() && pJAHIOELGGD2 != null)
 					{
@@ -1828,31 +1828,31 @@ public class ModelAi
 						}
 						if (flag)
 						{
-							string iCBBNJMLDJH = pJAHIOELGGD2.GetPivotPartName();
-							TacticalTable iCLOAGENLJG = kMLMHGLLOHM.GetTacticalTableByLabel(iCBBNJMLDJH);
-							if (iCLOAGENLJG != null)
+							string tableLabel = pJAHIOELGGD2.GetPivotPartName();
+							TacticalTable table = groupTables.GetTacticalTableByLabel(tableLabel);
+							if (table != null)
 							{
 								int num4 = num - ownFrame;
 								int num5 = GetNearestKeyFrameId(num4);
 								int num6 = num5 - num4;
-								int num7 = iCLOAGENLJG.GetArrayIndexByFrameIndex(num5);
+								int num7 = table.GetArrayIndexByFrameIndex(num5);
 								if (-1 < num7)
 								{
-									float num8 = oJIEPADIEDE.GetStartPosition();
-									if (NPIOFGMJDKI == AnimationListType.Missile)
+									float num8 = enemyModelAnimation.GetStartPosition();
+									if (listType == AnimationListType.Missile)
 									{
-										num8 = oJIEPADIEDE.GetFirstStartPositionX();
+										num8 = enemyModelAnimation.GetFirstStartPositionX();
 									}
-									int num9 = oJIEPADIEDE.GetSign();
+									int num9 = enemyModelAnimation.GetSign();
 									float num10 = _ModelAnimation.GetStartPosition();
-									float oIOMNNFMDOO = (float)num9 * (num10 - num8) + distanceError;
-									Intervals gOOGNIPMCEM = iCLOAGENLJG.IntervalList[num7];
+									float distance = (float)num9 * (num10 - num8) + distanceError;
+									Intervals frameIntervals = table.IntervalList[num7];
 									bool flag2 = false;
-									foreach (IntervalNew item2 in gOOGNIPMCEM.Items)
+									foreach (IntervalNew item2 in frameIntervals.Items)
 									{
 										if (item2.Animation == pJAHIOELGGD2)
 										{
-											int num11 = item2.GetInterframeByDistance(oIOMNNFMDOO);
+											int num11 = item2.GetInterframeByDistance(distance);
 											if (0 < num11)
 											{
 												flag2 = true;
@@ -1862,9 +1862,9 @@ public class ModelAi
 									}
 									if (!flag2)
 									{
-										int num12 = pJAHIOELGGD.GetLastAttackFrame(true);
-										int jOHDCPNACOC = num12 - enemyFrame + 1;
-										decisions.Add(new Decision(null, jOHDCPNACOC));
+										int num12 = animation.GetLastAttackFrame(true);
+										int wait = num12 - enemyFrame + 1;
+										decisions.Add(new Decision(null, wait));
 										return decisions.Count;
 									}
 								}
@@ -1873,7 +1873,7 @@ public class ModelAi
 					}
 					if (num % AiData.MovementsStep != 0)
 					{
-						switch (NPIOFGMJDKI)
+						switch (listType)
 						{
 						case AnimationListType.Standard:
 							offKeyFrame = true;
@@ -1893,13 +1893,13 @@ public class ModelAi
 						offKeyFrame = false;
 					}
 					candidateAnimations.Clear();
-					AnimationData.AddTemplateAnimationsByNames(nIKHAICFGNM, candidateAnimations);
+					AnimationData.AddTemplateAnimationsByNames(intervalNames, candidateAnimations);
 					int count = candidateAnimations.Count;
 					int num14 = 0;
 					for (int i = 0; i < count; i++)
 					{
 						InfoAnimation pJAHIOELGGD4 = candidateAnimations[i];
-						if (TestWall(pJAHIOELGGD4, _Model, FNKFIMEDNLP))
+						if (TestWall(pJAHIOELGGD4, _Model, enemy))
 						{
 							if (num14 < i)
 							{
@@ -1910,17 +1910,17 @@ public class ModelAi
 					}
 					count = num14;
 					candidateAnimations.Resize(count);
-					float num15 = oJIEPADIEDE.GetStartPosition();
-					if (NPIOFGMJDKI == AnimationListType.Missile)
+					float num15 = enemyModelAnimation.GetStartPosition();
+					if (listType == AnimationListType.Missile)
 					{
-						num15 = oJIEPADIEDE.GetFirstStartPositionX();
+						num15 = enemyModelAnimation.GetFirstStartPositionX();
 					}
-					int num16 = oJIEPADIEDE.GetSign();
-					foreach (TacticalTable item3 in kMLMHGLLOHM.Tables)
+					int num16 = enemyModelAnimation.GetSign();
+					foreach (TacticalTable item3 in groupTables.Tables)
 					{
-						string hOGFLOLGGOL = item3.Label;
+						string nodeName = item3.Label;
 						int num17;
-						if (NPIOFGMJDKI == AnimationListType.Missile)
+						if (listType == AnimationListType.Missile)
 						{
 							num17 = num;
 						}
@@ -1932,7 +1932,7 @@ public class ModelAi
 						}
 						if (-1 < num17)
 						{
-							float num20 = GetNodeX(hOGFLOLGGOL, _Model, FNKFIMEDNLP.GetRootModel());
+							float num20 = GetNodeX(nodeName, _Model, enemy.GetRootModel());
 							float oIOMNNFMDOO2 = (float)num16 * (num20 - num15) + distanceError;
 							Intervals gOOGNIPMCEM2 = null;
 							gOOGNIPMCEM2 = ((num17 >= item3.IntervalList.Count) ? item3.IntervalList[0] : item3.IntervalList[num17]);
@@ -1960,10 +1960,10 @@ public class ModelAi
 						}
 					}
 					candidateAnimations.Resize(count);
-					IntervalAnimation mNOIEOBBCMI = oJIEPADIEDE.FindInterval(IntervalAnimation.IntervalType.INTERVAL_UNINTERRUPT);
-					InfoAnimation pJAHIOELGGD5 = pJAHIOELGGD;
-					bool flag3 = oJIEPADIEDE.GetIsPlaying();
-					if (mNOIEOBBCMI != null && pJAHIOELGGD5 != null && flag3)
+					IntervalAnimation interval = enemyModelAnimation.FindInterval(IntervalAnimation.IntervalType.INTERVAL_UNINTERRUPT);
+					InfoAnimation pJAHIOELGGD5 = animation;
+					bool flag3 = enemyModelAnimation.GetIsPlaying();
+					if (interval != null && pJAHIOELGGD5 != null && flag3)
 					{
 						int num22 = pJAHIOELGGD5.GetLastUninterruptFrame(true);
 						int num23 = num22 - enemyFrame;
@@ -1985,7 +1985,7 @@ public class ModelAi
 					{
 						count2 = GetPlayableAnimations(candidateAnimations);
 					}
-					if (candidateAnimations.Count == 0 && NPIOFGMJDKI == AnimationListType.Standard)
+					if (candidateAnimations.Count == 0 && listType == AnimationListType.Standard)
 					{
 						List<TemplateAnimation> list3 = AiData.get_EmergencyDodgesAnimations();
 						foreach (TemplateAnimation item5 in list3)
@@ -2005,7 +2005,7 @@ public class ModelAi
 					}
 					for (int l = 0; l < num25; l++)
 					{
-						int num26 = pJAHIOELGGD.GetLastAttackFrame(true);
+						int num26 = animation.GetLastAttackFrame(true);
 						int jOHDCPNACOC2 = num26 - enemyFrame + 1;
 						decisions.Add(new Decision(candidateAnimations[l], jOHDCPNACOC2));
 					}
@@ -2019,20 +2019,20 @@ public class ModelAi
 		return 0;
 	}
 
-	private int GetForDodgeMissiles(Model FNKFIMEDNLP, MissileKind OKIFFDGBGDA)
+	private int GetForDodgeMissiles(Model enemy, MissileKind missileKind)
 	{
 		int num = 0;
 		List<Decision> list = new List<Decision>();
 		List<Decision> list2 = new List<Decision>(decisions);
 		int i = 0;
-		for (int count = FNKFIMEDNLP.GetWeaponModels().Count; i < count; i++)
+		for (int count = enemy.GetWeaponModels().Count; i < count; i++)
 		{
-			WeaponModel gKIANLDJFCH = FNKFIMEDNLP.GetWeaponModels()[i];
-			List<Decision> jOJBDADJOAP = new List<Decision>(list);
-			if ((IsMissileAnimation(gKIANLDJFCH.GetAnimationModule().GetCurrentInfo()) || OKIFFDGBGDA != MissileKind.SimpleMissile) && (IsMagicAnimation(gKIANLDJFCH.GetAnimationModule().GetCurrentInfo()) || OKIFFDGBGDA != MissileKind.MagicMissile) && gKIANLDJFCH.GetAnimationModule().GetCurrentInfo() != null)
+			WeaponModel weaponModel = enemy.GetWeaponModels()[i];
+			List<Decision> missileDecisions = new List<Decision>(list);
+			if ((IsMissileAnimation(weaponModel.GetAnimationModule().GetCurrentInfo()) || missileKind != MissileKind.SimpleMissile) && (IsMagicAnimation(weaponModel.GetAnimationModule().GetCurrentInfo()) || missileKind != MissileKind.MagicMissile) && weaponModel.GetAnimationModule().GetCurrentInfo() != null)
 			{
-				num = GetFromTablesDodge(gKIANLDJFCH, AnimationListType.Missile);
-				list = ((list.Count <= 0) ? new List<Decision>(decisions) : Intersection(jOJBDADJOAP, decisions));
+				num = GetFromTablesDodge(weaponModel, AnimationListType.Missile);
+				list = ((list.Count <= 0) ? new List<Decision>(decisions) : Intersection(missileDecisions, decisions));
 			}
 		}
 		num = list.Count;
@@ -2047,32 +2047,32 @@ public class ModelAi
 		return num;
 	}
 
-	private bool IsSafetyAnimations(InfoAnimation DBOLBEOCEME, Model ACENLMONNPA, int IHICCKAOPKG)
+	private bool IsSafetyAnimations(InfoAnimation animation, Model model, int frame)
 	{
 		return false;
 	}
 
-	private int GetRow(GroupTables CIHPJCIFLHN, string MMJNDPGKNPM, int FMNGLKIGFNA, float OIOMNNFMDOO, List<Decision> OEMALIFPGPO)
+	private int GetRow(GroupTables groupTables, string tableLabel, int frameIndex, float distance, List<Decision> results)
 	{
-		int count = OEMALIFPGPO.Count;
-		TacticalTable iCLOAGENLJG = CIHPJCIFLHN.GetTacticalTableByLabel(MMJNDPGKNPM);
-		if (iCLOAGENLJG != null)
+		int count = results.Count;
+		TacticalTable table = groupTables.GetTacticalTableByLabel(tableLabel);
+		if (table != null)
 		{
-			Intervals gOOGNIPMCEM = iCLOAGENLJG.GetFrameByFrameIndex(FMNGLKIGFNA);
-			if (gOOGNIPMCEM != null)
+			Intervals frameIntervals = table.GetFrameByFrameIndex(frameIndex);
+			if (frameIntervals != null)
 			{
-				foreach (IntervalNew item in gOOGNIPMCEM.Items)
+				foreach (IntervalNew item in frameIntervals.Items)
 				{
-					int num = item.GetInterframeByDistance(OIOMNNFMDOO);
+					int num = item.GetInterframeByDistance(distance);
 					if (0 < num)
 					{
-						OEMALIFPGPO.Add(new Decision(item.Animation, num));
-						AddModTacticAlternatives(item.Animation, num, OEMALIFPGPO);
+						results.Add(new Decision(item.Animation, num));
+						AddModTacticAlternatives(item.Animation, num, results);
 					}
 				}
 			}
 		}
-		return OEMALIFPGPO.Count - count;
+		return results.Count - count;
 	}
 
 	private List<InfoAnimation> _modTacticSource;
@@ -2125,24 +2125,24 @@ public class ModelAi
 		}
 	}
 
-	private int GetModelDirection(Model ACENLMONNPA, Model FNKFIMEDNLP)
+	private int GetModelDirection(Model model, Model enemy)
 	{
 		int num = 0;
-		if (ACENLMONNPA.GetBodyObject().GetPivotNode() == null || FNKFIMEDNLP.GetBodyObject().GetPivotNode() == null)
+		if (model.GetBodyObject().GetPivotNode() == null || enemy.GetBodyObject().GetPivotNode() == null)
 		{
 			return 0;
 		}
-		return (ACENLMONNPA.GetBodyObject().GetPivotNode().GetStart()
-			.GetX() < FNKFIMEDNLP.GetBodyObject().GetPivotNode().GetStart()
+		return (model.GetBodyObject().GetPivotNode().GetStart()
+			.GetX() < enemy.GetBodyObject().GetPivotNode().GetStart()
 			.GetX()) ? 1 : (-1);
 	}
 
-	private List<Decision> Intersection(List<Decision> JOJBDADJOAP, List<Decision> DLADGODCJMD)
+	private List<Decision> Intersection(List<Decision> firstList, List<Decision> secondList)
 	{
 		List<Decision> list = new List<Decision>();
-		foreach (Decision item in JOJBDADJOAP)
+		foreach (Decision item in firstList)
 		{
-			foreach (Decision item2 in DLADGODCJMD)
+			foreach (Decision item2 in secondList)
 			{
 				if (item2.Animation == item.Animation)
 				{
@@ -2153,44 +2153,44 @@ public class ModelAi
 		return list;
 	}
 
-	private bool TestBack(InfoAnimation DBOLBEOCEME, Model ACENLMONNPA, Model FNKFIMEDNLP)
+	private bool TestBack(InfoAnimation animation, Model model, Model enemy)
 	{
-		return true && TestBack(DBOLBEOCEME, _Model, FNKFIMEDNLP, "NPivot", "NPivot");
+		return true && TestBack(animation, _Model, enemy, "NPivot", "NPivot");
 	}
 
-	private bool TestWall(InfoAnimation DBOLBEOCEME, Model ACENLMONNPA, Model FNKFIMEDNLP)
+	private bool TestWall(InfoAnimation animation, Model model, Model enemy)
 	{
 		bool flag = true;
-		Model fNKFIMEDNLP = FNKFIMEDNLP.GetRootModel();
-		return flag && TestWall(DBOLBEOCEME, _Model, fNKFIMEDNLP, "NPivot");
+		Model enemyRoot = enemy.GetRootModel();
+		return flag && TestWall(animation, _Model, enemyRoot, "NPivot");
 	}
 
-	private bool TestBack(InfoAnimation DBOLBEOCEME, Model ACENLMONNPA, Model FNKFIMEDNLP, string name, string ODEADGPBDEM)
+	private bool TestBack(InfoAnimation animation, Model model, Model enemy, string name, string enemyNodeName)
 	{
-		float num = ACENLMONNPA.GetBodyObject().GetNodeByName(name).GetStart()
+		float num = model.GetBodyObject().GetNodeByName(name).GetStart()
 			.GetX();
-		float num2 = FNKFIMEDNLP.GetBodyObject().GetNodeByName(ODEADGPBDEM).GetStart()
+		float num2 = enemy.GetBodyObject().GetNodeByName(enemyNodeName).GetStart()
 			.GetX();
-		int num3 = DBOLBEOCEME.GetLastUninterruptFrame(true);
+		int num3 = animation.GetLastUninterruptFrame(true);
 		if (num3 < 0)
 		{
 			num3 = 0;
 		}
-		float num4 = DBOLBEOCEME.ShiftTable.GetDistance(num3, name);
-		float num5 = num + (float)GetModelDirection(ACENLMONNPA, FNKFIMEDNLP) * num4;
+		float num4 = animation.ShiftTable.GetDistance(num3, name);
+		float num5 = num + (float)GetModelDirection(model, enemy) * num4;
 		float num8;
-		if (FNKFIMEDNLP.GetAnimationModule().GetIsPlaying())
+		if (enemy.GetAnimationModule().GetIsPlaying())
 		{
-			InfoAnimation pJAHIOELGGD = FNKFIMEDNLP.GetAnimationModule().GetCurrentInfo();
-			int mEHOEEIGCEP = enemyFrame;
-			int jAPBDIJOKDJ = mEHOEEIGCEP + num3;
-			float num6 = pJAHIOELGGD.ShiftTable.GetDistance(jAPBDIJOKDJ, ODEADGPBDEM);
-			float num7 = FNKFIMEDNLP.GetAnimationModule().GetStartPosition();
-			num8 = num7 + (float)FNKFIMEDNLP.GetFacingSign() * num6;
+			InfoAnimation enemyMove = enemy.GetAnimationModule().GetCurrentInfo();
+			int currentEnemyFrame = enemyFrame;
+			int shiftFrame = currentEnemyFrame + num3;
+			float num6 = enemyMove.ShiftTable.GetDistance(shiftFrame, enemyNodeName);
+			float num7 = enemy.GetAnimationModule().GetStartPosition();
+			num8 = num7 + (float)enemy.GetFacingSign() * num6;
 		}
 		else
 		{
-			num8 = FNKFIMEDNLP.GetBodyObject().GetNodeByName(ODEADGPBDEM).GetStart()
+			num8 = enemy.GetBodyObject().GetNodeByName(enemyNodeName).GetStart()
 				.GetX();
 		}
 		if ((num - num2) * (num5 - num8) < 0f)
@@ -2200,21 +2200,21 @@ public class ModelAi
 		return true;
 	}
 
-	private bool TestWall(InfoAnimation DBOLBEOCEME, Model ACENLMONNPA, Model FNKFIMEDNLP, string name)
+	private bool TestWall(InfoAnimation animation, Model model, Model enemy, string name)
 	{
-		int num = DBOLBEOCEME.GetLastUninterruptFrame(true);
+		int num = animation.GetLastUninterruptFrame(true);
 		if (num < 0)
 		{
 			num = 0;
 		}
-		float num2 = ACENLMONNPA.GetBodyObject().GetNodeByName(name).GetStart()
+		float num2 = model.GetBodyObject().GetNodeByName(name).GetStart()
 			.GetX();
-		float num3 = DBOLBEOCEME.ShiftTable.GetDistance(num, name);
-		float num4 = num2 + (float)GetModelDirection(ACENLMONNPA, FNKFIMEDNLP) * num3;
-		float num5 = ACENLMONNPA.GetAnimationModule().GetLeftWallX();
-		float num6 = ACENLMONNPA.GetAnimationModule().GetRightWallX();
-		float num7 = ACENLMONNPA.GetAnimationModule().GetFrontAlignMargin();
-		float num8 = ACENLMONNPA.GetAnimationModule().GetBackAlignMargin();
+		float num3 = animation.ShiftTable.GetDistance(num, name);
+		float num4 = num2 + (float)GetModelDirection(model, enemy) * num3;
+		float num5 = model.GetAnimationModule().GetLeftWallX();
+		float num6 = model.GetAnimationModule().GetRightWallX();
+		float num7 = model.GetAnimationModule().GetFrontAlignMargin();
+		float num8 = model.GetAnimationModule().GetBackAlignMargin();
 		float num9 = ((!(num8 < num7)) ? num8 : num7);
 		if (num4 - num9 < num5 || num6 < num4 + num9)
 		{
@@ -2223,10 +2223,10 @@ public class ModelAi
 		return true;
 	}
 
-	private bool IsIncludeIntervalAttack(InfoAnimation DBOLBEOCEME)
+	private bool IsIncludeIntervalAttack(InfoAnimation animation)
 	{
-		List<IntervalAnimation> cAANBJEPGAA = DBOLBEOCEME.MoveData.Intervals;
-		foreach (IntervalAnimation item in cAANBJEPGAA)
+		List<IntervalAnimation> intervals = animation.MoveData.Intervals;
+		foreach (IntervalAnimation item in intervals)
 		{
 			if (item.Type == IntervalAnimation.IntervalType.INTERVAL_ATTACK)
 			{
@@ -2247,15 +2247,15 @@ public class ModelAi
 		}
 	}
 
-	private void SetQuickAttackChances(TacticFactors FJCBLOKOBBD)
+	private void SetQuickAttackChances(TacticFactors factors)
 	{
 		List<global::Pair<string, TacticValue>> list = tactic.get_QuickAttacks();
 		int count = list.Count;
 		for (int i = 0; i < count; i++)
 		{
-			ChanceRoll bHDKGLJIOJD = quickAttackRolls[i];
-			bHDKGLJIOJD.Chance = list[i].Second.GetValue(FJCBLOKOBBD);
-			bHDKGLJIOJD.Flag = bHDKGLJIOJD.Roll < bHDKGLJIOJD.Chance;
+			ChanceRoll chanceRoll = quickAttackRolls[i];
+			chanceRoll.Chance = list[i].Second.GetValue(factors);
+			chanceRoll.Flag = chanceRoll.Roll < chanceRoll.Chance;
 		}
 	}
 
@@ -2270,44 +2270,44 @@ public class ModelAi
 		}
 	}
 
-	private void SetEvadesChances(TacticFactors FJCBLOKOBBD)
+	private void SetEvadesChances(TacticFactors factors)
 	{
 		List<global::Pair<string, TacticValue>> list = tactic.get_Evades();
 		int count = list.Count;
 		for (int i = 0; i < count; i++)
 		{
-			ChanceRoll bHDKGLJIOJD = evadeRolls[i];
-			bHDKGLJIOJD.Chance = list[i].Second.GetValue(FJCBLOKOBBD);
-			bHDKGLJIOJD.Flag = bHDKGLJIOJD.Roll < bHDKGLJIOJD.Chance;
+			ChanceRoll chanceRoll = evadeRolls[i];
+			chanceRoll.Chance = list[i].Second.GetValue(factors);
+			chanceRoll.Flag = chanceRoll.Roll < chanceRoll.Chance;
 		}
 	}
 
-	private float GetDistanceToEnemy(Model ACENLMONNPA)
+	private float GetDistanceToEnemy(Model model)
 	{
-		int aOJJBKLCHJO = GetModelDirection(ACENLMONNPA, ACENLMONNPA.GetCombatTarget().GetRootModel());
-		int aOJJBKLCHJO2 = GetModelDirection(ACENLMONNPA.GetCombatTarget().GetRootModel(), ACENLMONNPA);
-		ModelNode lCDGOCIAIDK = ACENLMONNPA.GetAnimationModule().GetNodeByNameForSign(AiData.get_DistanceNode(), aOJJBKLCHJO);
-		ModelNode lCDGOCIAIDK2 = ACENLMONNPA.GetCombatTarget().GetRootModel().GetAnimationModule()
+		int direction = GetModelDirection(model, model.GetCombatTarget().GetRootModel());
+		int aOJJBKLCHJO2 = GetModelDirection(model.GetCombatTarget().GetRootModel(), model);
+		ModelNode node = model.GetAnimationModule().GetNodeByNameForSign(AiData.get_DistanceNode(), direction);
+		ModelNode lCDGOCIAIDK2 = model.GetCombatTarget().GetRootModel().GetAnimationModule()
 			.GetNodeByNameForSign(AiData.get_DistanceNode(), aOJJBKLCHJO2);
-		if (lCDGOCIAIDK != null && lCDGOCIAIDK2 != null)
+		if (node != null && lCDGOCIAIDK2 != null)
 		{
-			float f = lCDGOCIAIDK.GetStart().GetX() - lCDGOCIAIDK2.GetStart().GetX();
+			float f = node.GetStart().GetX() - lCDGOCIAIDK2.GetStart().GetX();
 			return Mathf.Abs(f);
 		}
 		return 0f;
 	}
 
-	private TacticFactors SetFactors(Model FNKFIMEDNLP)
+	private TacticFactors SetFactors(Model enemy)
 	{
-		TacticFactors oHKCJDCMOKN = new TacticFactors(_Model.GetModelStats(), _Model.GetNoRangedFlag(), _Model.GetMagicCharges());
-		_Model.GetModelStats().GetCountAndDamage(true, enemyAnimation, ref oHKCJDCMOKN.FactorsCount, ref oHKCJDCMOKN.Damage, ref oHKCJDCMOKN.Hits);
-		oHKCJDCMOKN.Health = (ObscuredFloat)(_Model.Parameters.GetCurrentLife());
-		oHKCJDCMOKN.EnemyHealth = (ObscuredFloat)(FNKFIMEDNLP.Parameters.GetCurrentLife());
-		oHKCJDCMOKN.AnimationFrames = FNKFIMEDNLP.GetAnimationModule().GetFrameInMove();
-		oHKCJDCMOKN.ChildFrames = ChildMaxModelFrame(FNKFIMEDNLP);
-		oHKCJDCMOKN.Distance = GetDistanceToEnemy(_Model);
-		oHKCJDCMOKN.CurrentAnimation = _Model.GetAnimationModule().GetCurrentInfo();
-		oHKCJDCMOKN.EnemyCurrentAnimation = FNKFIMEDNLP.GetAnimationModule().GetCurrentInfo();
-		return oHKCJDCMOKN;
+		TacticFactors factors = new TacticFactors(_Model.GetModelStats(), _Model.GetNoRangedFlag(), _Model.GetMagicCharges());
+		_Model.GetModelStats().GetCountAndDamage(true, enemyAnimation, ref factors.FactorsCount, ref factors.Damage, ref factors.Hits);
+		factors.Health = (ObscuredFloat)(_Model.Parameters.GetCurrentLife());
+		factors.EnemyHealth = (ObscuredFloat)(enemy.Parameters.GetCurrentLife());
+		factors.AnimationFrames = enemy.GetAnimationModule().GetFrameInMove();
+		factors.ChildFrames = ChildMaxModelFrame(enemy);
+		factors.Distance = GetDistanceToEnemy(_Model);
+		factors.CurrentAnimation = _Model.GetAnimationModule().GetCurrentInfo();
+		factors.EnemyCurrentAnimation = enemy.GetAnimationModule().GetCurrentInfo();
+		return factors;
 	}
 }

@@ -35,23 +35,23 @@ public class StrangerDialogInfo
 
 	public Action<object> Dlg;
 
-	public StrangerDialogInfo(string JFJKJIJPJJM, string HFEGNMEEDCF, List<StoryDialogContent> IHMEPGICLGF, float _ratio, Action<object> _dlg = null, string FGJCMOLFFGH = "", string NMFJJEJEHMC = "", string BFNHNNFIBNM = "", LabelButton.ButtonColor FEAEKLBFDPA = LabelButton.ButtonColor.BUTTON_WHITE, LabelButton.ButtonColor ODLCOLGNJFF = LabelButton.ButtonColor.BUTTON_DARK, LabelButton.ButtonColor DGMLFODMFKD = LabelButton.ButtonColor.BUTTON_WHITE, bool HFCFEKNIEEA = true, bool AOFKALBFNNI = false, bool NKPIIFBDEIB = false, bool CJJBDGPDOFF = false, string IAHHOEJJJHP = "")
+	public StrangerDialogInfo(string portraitName, string title, List<StoryDialogContent> contents, float _ratio, Action<object> _dlg = null, string storeButtonText = "", string rejectButtonText = "", string acceptButtonText = "", LabelButton.ButtonColor storeButtonColor = LabelButton.ButtonColor.BUTTON_WHITE, LabelButton.ButtonColor rejectButtonColor = LabelButton.ButtonColor.BUTTON_DARK, LabelButton.ButtonColor acceptButtonColor = LabelButton.ButtonColor.BUTTON_WHITE, bool showDifficulty = true, bool useEdgeButtons = false, bool showCheckBox = false, bool checkBoxChecked = false, string checkBoxText = "")
 	{
-		PortraitName = JFJKJIJPJJM;
-		Title = HFEGNMEEDCF;
-		Contents = IHMEPGICLGF;
+		PortraitName = portraitName;
+		Title = title;
+		Contents = contents;
 		Ratio = _ratio;
-		StoreButtonText = FGJCMOLFFGH;
-		RejectButtonText = NMFJJEJEHMC;
-		AcceptButtonText = BFNHNNFIBNM;
-		StoreButtonColor = FEAEKLBFDPA;
-		RejectButtonColor = ODLCOLGNJFF;
-		AcceptButtonColor = DGMLFODMFKD;
-		ShowDifficulty = HFCFEKNIEEA;
-		UseEdgeButtons = AOFKALBFNNI;
-		ShowCheckBox = NKPIIFBDEIB;
-		CheckBoxChecked = CJJBDGPDOFF;
-		CheckBoxText = IAHHOEJJJHP;
+		StoreButtonText = storeButtonText;
+		RejectButtonText = rejectButtonText;
+		AcceptButtonText = acceptButtonText;
+		StoreButtonColor = storeButtonColor;
+		RejectButtonColor = rejectButtonColor;
+		AcceptButtonColor = acceptButtonColor;
+		ShowDifficulty = showDifficulty;
+		UseEdgeButtons = useEdgeButtons;
+		ShowCheckBox = showCheckBox;
+		CheckBoxChecked = checkBoxChecked;
+		CheckBoxText = checkBoxText;
 		Dlg = _dlg;
 	}
 }

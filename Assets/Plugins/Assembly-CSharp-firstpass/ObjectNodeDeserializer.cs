@@ -8,44 +8,44 @@ public sealed class ObjectNodeDeserializer : INodeDeserializer
 
 	private readonly bool _ignoreUnmatched;
 
-	public ObjectNodeDeserializer(IObjectFactory EJPHFDCKCCE, ITypeInspector GIJPGEHPILC, bool GNFDAJLHBCN)
+	public ObjectNodeDeserializer(IObjectFactory factory, ITypeInspector typeDescriptor, bool ignoreUnmatched)
 	{
-		_objectFactory = EJPHFDCKCCE;
-		_typeDescriptor = GIJPGEHPILC;
-		_ignoreUnmatched = GNFDAJLHBCN;
+		_objectFactory = factory;
+		_typeDescriptor = typeDescriptor;
+		_ignoreUnmatched = ignoreUnmatched;
 	}
 
-	bool INodeDeserializer.Deserialize(EventReader reader, Type MBLGNMBFHBI, Func<EventReader, Type, object> IJBAEAEDMCC, out object value)
+	bool INodeDeserializer.Deserialize(EventReader reader, Type expectedType, Func<EventReader, Type, object> nestedObjectDeserializer, out object value)
 	{
-		MappingStart oGMPNFCPPDH = reader.Allow<MappingStart>();
-		if (oGMPNFCPPDH == null)
+		MappingStart mappingStart = reader.Allow<MappingStart>();
+		if (mappingStart == null)
 		{
 			value = null;
 			return false;
 		}
-		value = _objectFactory.Create(MBLGNMBFHBI);
+		value = _objectFactory.Create(expectedType);
 		while (!reader.Accept<MappingEnd>())
 		{
-			Scalar lEACOCDHICF = reader.Expect<Scalar>();
-			IPropertyDescriptor JLCGLCLEGBD = _typeDescriptor.GetProperty(MBLGNMBFHBI, null, lEACOCDHICF.GetValue(), _ignoreUnmatched);
-			if (JLCGLCLEGBD == null)
+			Scalar scalar = reader.Expect<Scalar>();
+			IPropertyDescriptor property = _typeDescriptor.GetProperty(expectedType, null, scalar.GetValue(), _ignoreUnmatched);
+			if (property == null)
 			{
 				reader.SkipThisAndNestedEvents();
 				continue;
 			}
-			object obj = IJBAEAEDMCC(reader, JLCGLCLEGBD.get_Type());
-			IValuePromise aGAMFLELGLG = obj as IValuePromise;
-			if (aGAMFLELGLG == null)
+			object obj = nestedObjectDeserializer(reader, property.get_Type());
+			IValuePromise valuePromise = obj as IValuePromise;
+			if (valuePromise == null)
 			{
-				object bAINMLLIKOL = TypeConverterHelper.ChangeType(obj, JLCGLCLEGBD.get_Type());
-				JLCGLCLEGBD.Write(value, bAINMLLIKOL);
+				object convertedValue = TypeConverterHelper.ChangeType(obj, property.get_Type());
+				property.Write(value, convertedValue);
 				continue;
 			}
 			object valueRef = value;
-			aGAMFLELGLG.add_ValueAvailable((object AFIEJABPAKA) =>
+			valuePromise.add_ValueAvailable((object resolvedValue) =>
 			{
-				object bAINMLLIKOL2 = TypeConverterHelper.ChangeType(AFIEJABPAKA, JLCGLCLEGBD.get_Type());
-				JLCGLCLEGBD.Write(valueRef, bAINMLLIKOL2);
+				object bAINMLLIKOL2 = TypeConverterHelper.ChangeType(resolvedValue, property.get_Type());
+				property.Write(valueRef, bAINMLLIKOL2);
 			});
 		}
 		reader.Expect<MappingEnd>();

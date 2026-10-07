@@ -2,79 +2,79 @@ using SimpleJSON;
 
 public static class JsonUtils
 {
-	public static int ParseInt(this JSONNode MEEAKLDGLDF, int KDLNPAGLMHF = 0)
+	public static int ParseInt(this JSONNode node, int defaultValue = 0)
 	{
-		if (MEEAKLDGLDF == null)
+		if (node == null)
 		{
-			return KDLNPAGLMHF;
+			return defaultValue;
 		}
 		int result;
-		return (!int.TryParse(MEEAKLDGLDF.Value, out result)) ? KDLNPAGLMHF : result;
+		return (!int.TryParse(node.Value, out result)) ? defaultValue : result;
 	}
 
-	public static long ParseLong(this JSONNode MEEAKLDGLDF, long KDLNPAGLMHF = 0L)
+	public static long ParseLong(this JSONNode node, long defaultValue = 0L)
 	{
-		if (MEEAKLDGLDF == null)
+		if (node == null)
 		{
-			return KDLNPAGLMHF;
+			return defaultValue;
 		}
 		long result;
-		return (!long.TryParse(MEEAKLDGLDF.Value, out result)) ? KDLNPAGLMHF : result;
+		return (!long.TryParse(node.Value, out result)) ? defaultValue : result;
 	}
 
-	public static uint ParseUint(this JSONNode MEEAKLDGLDF, uint KDLNPAGLMHF = 0u)
+	public static uint ParseUint(this JSONNode node, uint defaultValue = 0u)
 	{
-		if (MEEAKLDGLDF == null)
+		if (node == null)
 		{
-			return KDLNPAGLMHF;
+			return defaultValue;
 		}
 		uint result;
-		return (!uint.TryParse(MEEAKLDGLDF.Value, out result)) ? KDLNPAGLMHF : result;
+		return (!uint.TryParse(node.Value, out result)) ? defaultValue : result;
 	}
 
-	public static float ParseFloat(this JSONNode MEEAKLDGLDF, float KDLNPAGLMHF = 0f)
+	public static float ParseFloat(this JSONNode node, float defaultValue = 0f)
 	{
-		if (MEEAKLDGLDF == null)
+		if (node == null)
 		{
-			return KDLNPAGLMHF;
+			return defaultValue;
 		}
 		float result;
-		return (!float.TryParse(MEEAKLDGLDF.Value, out result)) ? KDLNPAGLMHF : result;
+		return (!float.TryParse(node.Value, out result)) ? defaultValue : result;
 	}
 
-	public static bool ParseBool(this JSONNode MEEAKLDGLDF, bool KDLNPAGLMHF = false)
+	public static bool ParseBool(this JSONNode node, bool defaultValue = false)
 	{
-		if (MEEAKLDGLDF == null)
+		if (node == null)
 		{
-			return KDLNPAGLMHF;
+			return defaultValue;
 		}
 		int result;
-		return (!int.TryParse(MEEAKLDGLDF.Value, out result)) ? KDLNPAGLMHF : (result > 0);
+		return (!int.TryParse(node.Value, out result)) ? defaultValue : (result > 0);
 	}
 
-	public static string ParseString(JSONNode MEEAKLDGLDF, string KDLNPAGLMHF = null)
+	public static string ParseString(JSONNode node, string defaultValue = null)
 	{
-		if (MEEAKLDGLDF == null)
+		if (node == null)
 		{
-			return KDLNPAGLMHF;
+			return defaultValue;
 		}
-		return MEEAKLDGLDF.Value;
+		return node.Value;
 	}
 
-	public static string GetString(this JSONNode MEEAKLDGLDF, string KDLNPAGLMHF = null)
+	public static string GetString(this JSONNode node, string defaultValue = null)
 	{
-		if (MEEAKLDGLDF == null)
+		if (node == null)
 		{
-			return KDLNPAGLMHF;
+			return defaultValue;
 		}
-		return MEEAKLDGLDF.Value;
+		return node.Value;
 	}
 
-	public static JSONNode GetNode(this JSONNode MEEAKLDGLDF, string PEMMNLHBHIA)
+	public static JSONNode GetNode(this JSONNode node, string key)
 	{
-		if (MEEAKLDGLDF != null && !string.IsNullOrEmpty(PEMMNLHBHIA))
+		if (node != null && !string.IsNullOrEmpty(key))
 		{
-			return MEEAKLDGLDF[PEMMNLHBHIA];
+			return node[key];
 		}
 		return null;
 	}

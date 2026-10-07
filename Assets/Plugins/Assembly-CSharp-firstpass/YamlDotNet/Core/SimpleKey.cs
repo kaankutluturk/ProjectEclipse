@@ -50,12 +50,12 @@ namespace YamlDotNet.Core
 			cursor = new Cursor();
 		}
 
-		public SimpleKey(bool LNJDPJDHNKI, bool MMIJJJMNNND, int MCJIOGPPMMF, Cursor LIMLDKKPJIA)
+		public SimpleKey(bool isPossible, bool isRequired, int tokenNumber, Cursor sourceCursor)
 		{
-			IsPossible = LNJDPJDHNKI;
-			IsRequired = MMIJJJMNNND;
-			TokenNumber = MCJIOGPPMMF;
-			cursor = new Cursor(LIMLDKKPJIA);
+			IsPossible = isPossible;
+			IsRequired = isRequired;
+			TokenNumber = tokenNumber;
+			cursor = new Cursor(sourceCursor);
 		}
 	}
 }

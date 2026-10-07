@@ -113,14 +113,14 @@ public static class AnimationData
 		return _WeaponTypeList;
 	}
 
-	public static void Load(string PMFEIPCHENB, bool OOJAEKEOEFJ)
+	public static void Load(string path, bool isDebug)
 	{
-		MovesParser.Parse(PMFEIPCHENB, _Animations, _TemplatesByName, _Tricks, _Triggers, OOJAEKEOEFJ);
-		InfoAnimation pJAHIOELGGD = null;
+		MovesParser.Parse(path, _Animations, _TemplatesByName, _Tricks, _Triggers, isDebug);
+		InfoAnimation animation = null;
 		for (int i = 0; i < _Animations.Count; i++)
 		{
-			pJAHIOELGGD = _Animations[i];
-			_AnimationsByName[pJAHIOELGGD.Name] = pJAHIOELGGD;
+			animation = _Animations[i];
+			_AnimationsByName[animation.Name] = animation;
 		}
 		CreateCapabilityTables();
 	}
@@ -315,28 +315,28 @@ public static class AnimationData
 			CreateCapabilityTable(_Animations[i], keys[i], _Animations, keys);
 	}
 
-	public static void CreateCapabilityTable(InfoAnimation DBOLBEOCEME, List<InfoAnimation> MAHEJFLCCHP)
+	public static void CreateCapabilityTable(InfoAnimation animation, List<InfoAnimation> animations)
 	{
-		List<ConditionKeys> list = DBOLBEOCEME.CollectKeyConditions();
+		List<ConditionKeys> list = animation.CollectKeyConditions();
 		if (list.Count == 0) return;
-		var keys = new List<ConditionKeys>[MAHEJFLCCHP.Count];
-		for (int i = 0; i < MAHEJFLCCHP.Count; i++)
-			if (DBOLBEOCEME.Priority < MAHEJFLCCHP[i].Priority) keys[i] = MAHEJFLCCHP[i].CollectKeyConditions();
-		CreateCapabilityTable(DBOLBEOCEME, list, MAHEJFLCCHP, keys);
+		var keys = new List<ConditionKeys>[animations.Count];
+		for (int i = 0; i < animations.Count; i++)
+			if (animation.Priority < animations[i].Priority) keys[i] = animations[i].CollectKeyConditions();
+		CreateCapabilityTable(animation, list, animations, keys);
 	}
 
-	private static void CreateCapabilityTable(InfoAnimation DBOLBEOCEME, List<ConditionKeys> list,
-		List<InfoAnimation> MAHEJFLCCHP, List<ConditionKeys>[] keys)
+	private static void CreateCapabilityTable(InfoAnimation animation, List<ConditionKeys> list,
+		List<InfoAnimation> animations, List<ConditionKeys>[] keys)
 	{
 		int count = list.Count;
 		if (0 >= count)
 		{
 			return;
 		}
-		for (int candidate = 0; candidate < MAHEJFLCCHP.Count; candidate++)
+		for (int candidate = 0; candidate < animations.Count; candidate++)
 		{
-			InfoAnimation item = MAHEJFLCCHP[candidate];
-			if (DBOLBEOCEME.Priority >= item.Priority)
+			InfoAnimation item = animations[candidate];
+			if (animation.Priority >= item.Priority)
 			{
 				continue;
 			}
@@ -349,11 +349,11 @@ public static class AnimationData
 			bool flag = false;
 			foreach (ConditionKeys item2 in list)
 			{
-				KeyData fONEJOKEIEN = item2.RequiredKeys;
+				KeyData requiredKeys = item2.RequiredKeys;
 				foreach (ConditionKeys item3 in list2)
 				{
 					KeyData fONEJOKEIEN2 = item3.RequiredKeys;
-					if (fONEJOKEIEN2.IsVariable(fONEJOKEIEN))
+					if (fONEJOKEIEN2.IsVariable(requiredKeys))
 					{
 						flag = true;
 						break;
@@ -366,69 +366,69 @@ public static class AnimationData
 			}
 			if (flag)
 			{
-				DBOLBEOCEME.PriorityConflicts.HigherPriorityMoves.Add(item);
+				animation.PriorityConflicts.HigherPriorityMoves.Add(item);
 			}
 		}
 	}
 
-	public static void CollectAvailableAnimations(List<InfoAnimation> MAHEJFLCCHP, List<ItemInfo> HELFDCAIJNE, bool ABGINCCBACK = false, List<string> JHJPMONBIDI = null, SceneTypes NFNJJIGAKNN = SceneTypes.SceneFight, List<PerkInfoItem> MAFPBEFKNGE = null, List<PerkInfoItem> CFKCGBEONAM = null)
+	public static void CollectAvailableAnimations(List<InfoAnimation> animations, List<ItemInfo> items, bool isWeapon = false, List<string> excludedNames = null, SceneTypes sceneType = SceneTypes.SceneFight, List<PerkInfoItem> selfPerks = null, List<PerkInfoItem> otherPerks = null)
 	{
 		List<ConditionAnimation> list = new List<ConditionAnimation>();
-		ModelConditions dGJJDPIAEAO = new ModelConditions();
-		dGJJDPIAEAO.Items = HELFDCAIJNE;
-		dGJJDPIAEAO.IsWeapon = ABGINCCBACK;
-		dGJJDPIAEAO.SceneType = NFNJJIGAKNN;
-		dGJJDPIAEAO.SelfPerks = MAFPBEFKNGE;
-		dGJJDPIAEAO.OtherPerks = CFKCGBEONAM;
+		ModelConditions conditions = new ModelConditions();
+		conditions.Items = items;
+		conditions.IsWeapon = isWeapon;
+		conditions.SceneType = sceneType;
+		conditions.SelfPerks = selfPerks;
+		conditions.OtherPerks = otherPerks;
 		foreach (InfoAnimation lNKJIIGBEDum in _Animations)
 		{
 			list = lNKJIIGBEDum.MoveData.Locks;
-			if (lNKJIIGBEDum.AreConditionsMet(dGJJDPIAEAO, list) && (JHJPMONBIDI == null || !lNKJIIGBEDum.CheckAnimationName(JHJPMONBIDI)))
+			if (lNKJIIGBEDum.AreConditionsMet(conditions, list) && (excludedNames == null || !lNKJIIGBEDum.CheckAnimationName(excludedNames)))
 			{
-				MAHEJFLCCHP.Add(lNKJIIGBEDum);
+				animations.Add(lNKJIIGBEDum);
 			}
 		}
 	}
 
-	public static void CollectAvailableTriggers(List<Trigger> CMHFKBKKKOK, List<ItemInfo> HELFDCAIJNE, bool ABGINCCBACK = false, SceneTypes NFNJJIGAKNN = SceneTypes.SceneFight, List<PerkInfoItem> MAFPBEFKNGE = null, List<PerkInfoItem> CFKCGBEONAM = null)
+	public static void CollectAvailableTriggers(List<Trigger> triggers, List<ItemInfo> items, bool isWeapon = false, SceneTypes sceneType = SceneTypes.SceneFight, List<PerkInfoItem> selfPerks = null, List<PerkInfoItem> otherPerks = null)
 	{
-		CMHFKBKKKOK.Clear();
+		triggers.Clear();
 		List<ConditionAnimation> list = new List<ConditionAnimation>();
-		ModelConditions dGJJDPIAEAO = new ModelConditions();
-		dGJJDPIAEAO.Items = HELFDCAIJNE;
-		dGJJDPIAEAO.IsWeapon = ABGINCCBACK;
-		dGJJDPIAEAO.SceneType = NFNJJIGAKNN;
-		dGJJDPIAEAO.SelfPerks = MAFPBEFKNGE;
-		dGJJDPIAEAO.OtherPerks = CFKCGBEONAM;
+		ModelConditions conditions = new ModelConditions();
+		conditions.Items = items;
+		conditions.IsWeapon = isWeapon;
+		conditions.SceneType = sceneType;
+		conditions.SelfPerks = selfPerks;
+		conditions.OtherPerks = otherPerks;
 		foreach (Trigger item in _Triggers)
 		{
 			list = item.Definition.ExtraConditions;
-			if (item.CheckConditions(dGJJDPIAEAO, list))
+			if (item.CheckConditions(conditions, list))
 			{
-				CMHFKBKKKOK.Add(item);
+				triggers.Add(item);
 			}
 		}
 	}
 
-	public static void AddTemplateAnimationsByNames(List<string> NIKHAICFGNM, List<InfoAnimation> OEMALIFPGPO)
+	public static void AddTemplateAnimationsByNames(List<string> names, List<InfoAnimation> animations)
 	{
-		for (int i = 0; i < NIKHAICFGNM.Count; i++)
+		for (int i = 0; i < names.Count; i++)
 		{
-			AddTemplateAnimations(NIKHAICFGNM[i], OEMALIFPGPO);
+			AddTemplateAnimations(names[i], animations);
 		}
 	}
 
-	public static void AddTemplateAnimations(string name, List<InfoAnimation> OEMALIFPGPO)
+	public static void AddTemplateAnimations(string name, List<InfoAnimation> animations)
 	{
 		if (_TemplatesByName.ContainsKey(name))
 		{
-			if (OEMALIFPGPO.Count == 0)
+			if (animations.Count == 0)
 			{
-				OEMALIFPGPO.AddRange(_TemplatesByName[name].GetAnimations());
+				animations.AddRange(_TemplatesByName[name].GetAnimations());
 			}
 			else
 			{
-				OEMALIFPGPO.AddIfNotExist(_TemplatesByName[name].GetAnimations());
+				animations.AddIfNotExist(_TemplatesByName[name].GetAnimations());
 			}
 		}
 	}
@@ -442,19 +442,19 @@ public static class AnimationData
 		return null;
 	}
 
-	public static InfoAnimation GetStanceAnimation(ItemInfo LGCMGHAFEDD)
+	public static InfoAnimation GetStanceAnimation(ItemInfo itemInfo)
 	{
-		if (LGCMGHAFEDD == null)
+		if (itemInfo == null)
 		{
 			return GetAnimationByName("StanceIdle");
 		}
 		string item = "Stance";
-		string mENAJEAJJBE = LGCMGHAFEDD.Name;
+		string itemName = itemInfo.Name;
 		foreach (InfoAnimation lNKJIIGBEDum in _Animations)
 		{
 			List<string> list = lNKJIIGBEDum.GetTemplateNames();
 			List<string> list2 = lNKJIIGBEDum.GetTacticWeapons();
-			if (((list2.Count == 0 && string.IsNullOrEmpty(mENAJEAJJBE)) || (list2.Count != 0 && list2.IndexOf(mENAJEAJJBE) != -1)) && list.IndexOf(item) != -1)
+			if (((list2.Count == 0 && string.IsNullOrEmpty(itemName)) || (list2.Count != 0 && list2.IndexOf(itemName) != -1)) && list.IndexOf(item) != -1)
 			{
 				return lNKJIIGBEDum;
 			}
@@ -462,30 +462,30 @@ public static class AnimationData
 		return GetAnimationByName("StanceIdle");
 	}
 
-	public static void CollectAvailableTricks(List<Trick> IAGDAAPCDNI, List<ItemInfo> HELFDCAIJNE, bool ABGINCCBACK = false, List<string> JHJPMONBIDI = null, List<PerkInfoItem> JOGBKOJCINM = null, SceneTypes NFNJJIGAKNN = SceneTypes.SceneFight)
+	public static void CollectAvailableTricks(List<Trick> tricks, List<ItemInfo> items, bool isWeapon = false, List<string> excludedNames = null, List<PerkInfoItem> selfPerks = null, SceneTypes sceneType = SceneTypes.SceneFight)
 	{
 		List<InfoAnimation> list = new List<InfoAnimation>();
-		CollectAvailableAnimations(list, HELFDCAIJNE, ABGINCCBACK, JHJPMONBIDI, NFNJJIGAKNN, JOGBKOJCINM);
+		CollectAvailableAnimations(list, items, isWeapon, excludedNames, sceneType, selfPerks);
 		foreach (Trick item in _Tricks)
 		{
 			foreach (InfoAnimation item2 in list)
 			{
 				if (item.Animation == item2)
 				{
-					IAGDAAPCDNI.Add(item);
+					tricks.Add(item);
 				}
 			}
 		}
 	}
 
-	public static InfoAnimation GetAnimationByName(string name, bool ADCNNABFIDL = true)
+	public static InfoAnimation GetAnimationByName(string name, bool logAsError = true)
 	{
 		InfoAnimation value = null;
 		if (_AnimationsByName.TryGetValue(name, out value))
 		{
 			return value;
 		}
-		if (ADCNNABFIDL)
+		if (logAsError)
 		{
 			GameLog.Error("Animation " + name + " not found");
 		}
@@ -496,25 +496,25 @@ public static class AnimationData
 		return null;
 	}
 
-	public static void CollectPivotNodeNames(List<string> GKHEPKGMEFI, List<InfoAnimation> FKFEKLNOAGE = null)
+	public static void CollectPivotNodeNames(List<string> names, List<InfoAnimation> animations = null)
 	{
-		List<InfoAnimation> list = ((FKFEKLNOAGE != null) ? FKFEKLNOAGE : _Animations);
+		List<InfoAnimation> list = ((animations != null) ? animations : _Animations);
 		foreach (InfoAnimation item in list)
 		{
-			InfoAnimation.MovePivot iLOEBFFAEAN = item.MoveData.AlignData;
-			if (iLOEBFFAEAN.PivotObjectType != InfoAnimation.AlignObjectType.ObjectNodes || iLOEBFFAEAN.PositionModelType != ModelType.ModelTargetType.MODEL_THIS || iLOEBFFAEAN.PositionObjectType != InfoAnimation.AlignObjectType.ObjectPivot)
+			InfoAnimation.MovePivot alignData = item.MoveData.AlignData;
+			if (alignData.PivotObjectType != InfoAnimation.AlignObjectType.ObjectNodes || alignData.PositionModelType != ModelType.ModelTargetType.MODEL_THIS || alignData.PositionObjectType != InfoAnimation.AlignObjectType.ObjectPivot)
 			{
 				continue;
 			}
-			string bLODCIGDJFK = item.MoveData.AlignData.PivotPart;
-			if (string.IsNullOrEmpty(bLODCIGDJFK))
+			string pivotPart = item.MoveData.AlignData.PivotPart;
+			if (string.IsNullOrEmpty(pivotPart))
 			{
 				continue;
 			}
 			bool flag = true;
-			foreach (string item2 in GKHEPKGMEFI)
+			foreach (string item2 in names)
 			{
-				if (item2 == bLODCIGDJFK)
+				if (item2 == pivotPart)
 				{
 					flag = false;
 					break;
@@ -522,7 +522,7 @@ public static class AnimationData
 			}
 			if (flag)
 			{
-				GKHEPKGMEFI.Add(bLODCIGDJFK);
+				names.Add(pivotPart);
 			}
 		}
 	}

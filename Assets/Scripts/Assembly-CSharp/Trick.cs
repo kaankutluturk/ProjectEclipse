@@ -19,37 +19,37 @@ public class Trick : IComparable<Trick>
 
 	public InfoAnimation Animation;
 
-	public Trick(XmlNode BHBHAOJHABE, InfoAnimation KJHGIKMFJOB)
+	public Trick(XmlNode node, InfoAnimation animation)
 	{
-		Icon = BHBHAOJHABE.Attributes["Icon"].GetStringOrDefault(string.Empty);
-		Rank = BHBHAOJHABE.Attributes["Rank"].ParseInt();
-		KeysDescription = BHBHAOJHABE.Attributes["KeysDescription"].GetStringOrDefault(string.Empty);
-		EffectDescription = BHBHAOJHABE.Attributes["EffectDescription"].GetStringOrDefault(string.Empty);
-		Name = KJHGIKMFJOB.Name;
-		DisplayName = BHBHAOJHABE.Attributes["DisplayName"].GetStringOrDefault(Name);
-		Animation = KJHGIKMFJOB;
+		Icon = node.Attributes["Icon"].GetStringOrDefault(string.Empty);
+		Rank = node.Attributes["Rank"].ParseInt();
+		KeysDescription = node.Attributes["KeysDescription"].GetStringOrDefault(string.Empty);
+		EffectDescription = node.Attributes["EffectDescription"].GetStringOrDefault(string.Empty);
+		Name = animation.Name;
+		DisplayName = node.Attributes["DisplayName"].GetStringOrDefault(Name);
+		Animation = animation;
 		IsNew = false;
 	}
 
-	public Trick(string NCKCDCODNHA, string _name, InfoAnimation KJHGIKMFJOB, int HEIBENBPNLN, string PHDCIEGEKBC, string LDKAELDNKGH)
+	public Trick(string icon, string _name, InfoAnimation animation, int rank, string keysDescription, string effectDescription)
 	{
-		Icon = NCKCDCODNHA;
+		Icon = icon;
 		Name = _name;
 		DisplayName = _name;
-		Animation = KJHGIKMFJOB;
-		Rank = HEIBENBPNLN;
-		KeysDescription = PHDCIEGEKBC;
-		EffectDescription = LDKAELDNKGH;
+		Animation = animation;
+		Rank = rank;
+		KeysDescription = keysDescription;
+		EffectDescription = effectDescription;
 		IsNew = false;
 	}
 
-	public static bool Compare(Trick KOOLDHKJHNH, Trick MHFCMOONCHB)
+	public static bool Compare(Trick left, Trick right)
 	{
-		return KOOLDHKJHNH.Rank < MHFCMOONCHB.Rank;
+		return left.Rank < right.Rank;
 	}
 
-	public int CompareTo(Trick NOLFMPDGCOC)
+	public int CompareTo(Trick other)
 	{
-		return Rank.CompareTo(NOLFMPDGCOC.Rank);
+		return Rank.CompareTo(other.Rank);
 	}
 }

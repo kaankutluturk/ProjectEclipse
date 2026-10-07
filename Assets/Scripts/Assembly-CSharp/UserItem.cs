@@ -223,36 +223,36 @@ public class UserItem
 		}
 	}
 
-	public UserItem(XmlNode EMOEJIOAKEG)
+	public UserItem(XmlNode node)
 	{
-		string gOHIIMFFFJI = EMOEJIOAKEG.Attributes["Name"].GetStringOrDefault(string.Empty);
-		int bLJGEOEHIGP = EMOEJIOAKEG.Attributes["Count"].ParseInt();
-		int gNLOCMLBNHF = EMOEJIOAKEG.Attributes["UpgradeLevel"].ParseInt(-1);
-		bool cBDBANOPFDM = EMOEJIOAKEG.Attributes["Equipped"].ParseBool();
-		long bMNFPNBAMAF = EMOEJIOAKEG.Attributes["DeliveryTime"].ParseLong(0L);
-		int gIPFIKDILKL = EMOEJIOAKEG.Attributes["DeliveryUpgradeLevel"].ParseInt(-1);
-		string aFGFKAANGLL = EMOEJIOAKEG.Attributes["AcquireType"].GetStringOrDefault("Item");
-		if (EMOEJIOAKEG.Attributes["IsUpgrade"] != null)
+		string itemName = node.Attributes["Name"].GetStringOrDefault(string.Empty);
+		int itemCount = node.Attributes["Count"].ParseInt();
+		int savedUpgradeLevel = node.Attributes["UpgradeLevel"].ParseInt(-1);
+		bool equipped = node.Attributes["Equipped"].ParseBool();
+		long deliveryTime = node.Attributes["DeliveryTime"].ParseLong(0L);
+		int savedDeliveryUpgradeLevel = node.Attributes["DeliveryUpgradeLevel"].ParseInt(-1);
+		string itemAcquireType = node.Attributes["AcquireType"].GetStringOrDefault("Item");
+		if (node.Attributes["IsUpgrade"] != null)
 		{
-			bool flag = EMOEJIOAKEG.Attributes["IsUpgrade"].ParseBool();
-			EMOEJIOAKEG.Attributes.RemoveNamedItem("IsUpgrade");
-			aFGFKAANGLL = ((!flag) ? "Item" : "Upgrade");
+			bool flag = node.Attributes["IsUpgrade"].ParseBool();
+			node.Attributes.RemoveNamedItem("IsUpgrade");
+			itemAcquireType = ((!flag) ? "Item" : "Upgrade");
 		}
-		Init(EMOEJIOAKEG, gOHIIMFFFJI, cBDBANOPFDM, bLJGEOEHIGP, gNLOCMLBNHF, bMNFPNBAMAF, gIPFIKDILKL, true, aFGFKAANGLL);
+		Init(node, itemName, equipped, itemCount, savedUpgradeLevel, deliveryTime, savedDeliveryUpgradeLevel, true, itemAcquireType);
 	}
 
-	public UserItem(XmlNode FMBDAPOMFGN, string name, bool CBDBANOPFDM, int count, int GNLOCMLBNHF = -1, long time = 0L, int MDFLLEJODHJ = -1, bool KNGJACCPGPA = true, string AFGFKAANGLL = "Item")
+	public UserItem(XmlNode parentNode, string name, bool equipped, int count, int upgradeLevelValue = -1, long time = 0L, int deliveryUpgradeLevelValue = -1, bool shouldWriteToNode = true, string itemAcquireType = "Item")
 	{
-		XmlNode hKPPBKPJOEO = FMBDAPOMFGN.AppendElement("Item");
-		Init(hKPPBKPJOEO, name, CBDBANOPFDM, count, GNLOCMLBNHF, time, MDFLLEJODHJ, KNGJACCPGPA, AFGFKAANGLL);
+		XmlNode itemNode = parentNode.AppendElement("Item");
+		Init(itemNode, name, equipped, count, upgradeLevelValue, time, deliveryUpgradeLevelValue, shouldWriteToNode, itemAcquireType);
 	}
 
-	public UserItem(ItemInfo PJDAGCBPLJE, bool CBDBANOPFDM, int count, int GNLOCMLBNHF = -1, long time = 0L, int MDFLLEJODHJ = -1, bool KNGJACCPGPA = true, string AFGFKAANGLL = "Item")
+	public UserItem(ItemInfo sourceInfo, bool equipped, int count, int upgradeLevelValue = -1, long time = 0L, int deliveryUpgradeLevelValue = -1, bool shouldWriteToNode = true, string itemAcquireType = "Item")
 	{
 		if (ListSF.GetRoster().GetItemsNode() != null)
 		{
-			XmlNode hKPPBKPJOEO = ListSF.GetRoster().GetItemsNode().AppendElement("Item");
-			Init(hKPPBKPJOEO, PJDAGCBPLJE.Name, CBDBANOPFDM, count, GNLOCMLBNHF, time, MDFLLEJODHJ, KNGJACCPGPA, AFGFKAANGLL);
+			XmlNode itemNode = ListSF.GetRoster().GetItemsNode().AppendElement("Item");
+			Init(itemNode, sourceInfo.Name, equipped, count, upgradeLevelValue, time, deliveryUpgradeLevelValue, shouldWriteToNode, itemAcquireType);
 		}
 	}
 
@@ -458,8 +458,8 @@ public class UserItem
 
 	public void SetIsUpgrade(bool value)
 	{
-		string bAINMLLIKOL = ((!value) ? "Item" : "Upgrade");
-		SetAcquireType(bAINMLLIKOL);
+		string newAcquireType = ((!value) ? "Item" : "Upgrade");
+		SetAcquireType(newAcquireType);
 	}
 
 	public bool GetHasUpgradedItem()
@@ -506,10 +506,10 @@ public class UserItem
 		return GetCount() > 0;
 	}
 
-	private void Init(XmlNode node, string name, bool CBDBANOPFDM, int count, int GNLOCMLBNHF, long BMNFPNBAMAF, int GIPFIKDILKL, bool KNGJACCPGPA, string AFGFKAANGLL)
+	private void Init(XmlNode node, string name, bool equipped, int count, int upgradeLevelValue, long deliveryTime, int deliveryUpgradeLevelValue, bool shouldWriteToNode, string itemAcquireType)
 	{
 		_Node = node;
-		writesToNode = KNGJACCPGPA;
+		writesToNode = shouldWriteToNode;
 		itemInfo = null;
 		recipeDelivery = null;
 		currentUpgradeItem = null;
@@ -518,12 +518,12 @@ public class UserItem
 		hasUpgradedItem = false;
 		isMaxUpgrade = false;
 		set_Name(name);
-		SetIsEquipped(CBDBANOPFDM);
+		SetIsEquipped(equipped);
 		SetCount(count);
-		SetUpgradeLevel(GNLOCMLBNHF);
-		set_DeliveryTime(BMNFPNBAMAF);
-		SetDeliveryUpgradeLevel(GIPFIKDILKL);
-		SetAcquireType(AFGFKAANGLL);
+		SetUpgradeLevel(upgradeLevelValue);
+		set_DeliveryTime(deliveryTime);
+		SetDeliveryUpgradeLevel(deliveryUpgradeLevelValue);
+		SetAcquireType(itemAcquireType);
 		if (node["Enchantments"] != null)
 		{
 			ParseEnchantments(node["Enchantments"]);
@@ -544,11 +544,11 @@ public class UserItem
 		RemoveEnchantments();
 		foreach (XmlNode childNode in node.ChildNodes)
 		{
-			PerkInfoItem aCONCDFDNJH = ItemInfo.ParsePerk(childNode);
-			if (aCONCDFDNJH != null)
+			PerkInfoItem perk = ItemInfo.ParsePerk(childNode);
+			if (perk != null)
 			{
-				enchantments.Add(aCONCDFDNJH);
-				EnsureExternalEnchantmentKind(childNode, aCONCDFDNJH);
+				enchantments.Add(perk);
+				EnsureExternalEnchantmentKind(childNode, perk);
 			}
 		}
 	}
@@ -566,29 +566,29 @@ public class UserItem
 			node.AppendAttribute(PerkStruct.EclipseKindAttribute).Value = expectedKind;
 	}
 
-	private void RemoveEnchantments(bool KBLMKFKJHCE = true, bool removeNodes = false)
+	private void RemoveEnchantments(bool includeCombo = true, bool removeNodes = false)
 	{
 		List<PerkInfoItem> list = new List<PerkInfoItem>();
 		foreach (PerkInfoItem item in enchantments)
 		{
-			if (item.Kind != PerkInfoItem.PerkKind.COMBO || KBLMKFKJHCE)
+			if (item.Kind != PerkInfoItem.PerkKind.COMBO || includeCombo)
 			{
 				list.Add(item);
 			}
 		}
-		list.ForEach((PerkInfoItem DHDMNHCIPEH) =>
+		list.ForEach((PerkInfoItem perk) =>
 		{
-			enchantments.Remove(DHDMNHCIPEH);
+			enchantments.Remove(perk);
 			if (removeNodes)
 			{
 				XmlNode xmlNode = _Node["Enchantments"];
-				XmlNode oldChild = xmlNode.FindChildWithAttribute("Perk", "Name", DHDMNHCIPEH.Name);
+				XmlNode oldChild = xmlNode.FindChildWithAttribute("Perk", "Name", perk.Name);
 				xmlNode.RemoveChild(oldChild);
 			}
 		});
 	}
 
-	public void RefreshUpgradeState(int OMHDLKNHNMJ)
+	public void RefreshUpgradeState(int playerLevel)
 	{
 		currentUpgradeItem = null;
 		nextUpgradeItem = null;
@@ -598,7 +598,7 @@ public class UserItem
 		hasNextUpgrade = false;
 		if (itemInfo != null)
 		{
-			itemInfo.FindNextUpgradeItems(OMHDLKNHNMJ, upgradeLevel, ref currentUpgradeItem, ref nextUpgradeItem);
+			itemInfo.FindNextUpgradeItems(playerLevel, upgradeLevel, ref currentUpgradeItem, ref nextUpgradeItem);
 			hasUpgrades = itemInfo.GetUpgrades().Count > 0;
 			hasUpgradedItem = hasUpgrades && currentUpgradeItem != null;
 			isMaxUpgrade = hasUpgrades && nextUpgradeItem == null;
@@ -606,38 +606,38 @@ public class UserItem
 		}
 	}
 
-	public ItemInfo GetDisplayInfo(bool EECHKLPPCKH)
+	public ItemInfo GetDisplayInfo(bool showUpgrades)
 	{
-		ItemInfo dJKEECEOCJB = null;
-		if (EECHKLPPCKH && GetHasUpgrades() && GetIsOwned())
+		ItemInfo displayInfo = null;
+		if (showUpgrades && GetHasUpgrades() && GetIsOwned())
 		{
-			dJKEECEOCJB = GetNextUpgradeItem();
+			displayInfo = GetNextUpgradeItem();
 		}
-		if (dJKEECEOCJB == null && GetIsUpgrade())
+		if (displayInfo == null && GetIsUpgrade())
 		{
-			dJKEECEOCJB = GetCurrentUpgradeItem();
+			displayInfo = GetCurrentUpgradeItem();
 		}
-		return (dJKEECEOCJB == null) ? GetInfo() : dJKEECEOCJB;
+		return (displayInfo == null) ? GetInfo() : displayInfo;
 	}
 
 	public ItemInfo GetEffectiveInfo()
 	{
-		ItemInfo dJKEECEOCJB = null;
+		ItemInfo deliveryInfo = null;
 		if (GetDeliveryUpgradeLevel() > 0)
 		{
-			dJKEECEOCJB = itemInfo.GetUpgradeItemByUpgradeLevel(GetDeliveryUpgradeLevel());
+			deliveryInfo = itemInfo.GetUpgradeItemByUpgradeLevel(GetDeliveryUpgradeLevel());
 		}
-		return (dJKEECEOCJB == null) ? GetDisplayInfo(ListSF.GetRoster().GetShowUpgrades()) : dJKEECEOCJB;
+		return (deliveryInfo == null) ? GetDisplayInfo(ListSF.GetRoster().GetShowUpgrades()) : deliveryInfo;
 	}
 
 	public void ApplyDefaultEnchantments()
 	{
-		int mHNCENBCECJ = ListSF.GetRoster().GetLevel();
-		int mHGODOLNDLE = itemInfo.ItemLevel;
-		ApplyEnchantments(itemInfo.DefaultEnchantments, mHGODOLNDLE, mHNCENBCECJ);
+		int playerLevel = ListSF.GetRoster().GetLevel();
+		int itemLevel = itemInfo.ItemLevel;
+		ApplyEnchantments(itemInfo.DefaultEnchantments, itemLevel, playerLevel);
 	}
 
-	public void ApplyEnchantments(List<PerkStruct> HALHGEGADKA, int MPAGFAKIEJG, int MHNCENBCECJ)
+	public void ApplyEnchantments(List<PerkStruct> perkStructs, int itemLevel, int playerLevel)
 	{
 		if (!writesToNode)
 		{
@@ -645,16 +645,16 @@ public class UserItem
 		}
 		bool flag = false;
 		bool flag2 = false;
-		foreach (PerkStruct item in HALHGEGADKA)
+		foreach (PerkStruct item in perkStructs)
 		{
-			PerkInfoItem aCONCDFDNJH = GameUtils.PerkItemList.FindBasePerk(item.get_Name());
-			if (aCONCDFDNJH != null)
+			PerkInfoItem basePerk = GameUtils.PerkItemList.FindBasePerk(item.get_Name());
+			if (basePerk != null)
 			{
-				if (aCONCDFDNJH.Kind == PerkInfoItem.PerkKind.SINGLE)
+				if (basePerk.Kind == PerkInfoItem.PerkKind.SINGLE)
 				{
 					flag = true;
 				}
-				if (aCONCDFDNJH.Kind == PerkInfoItem.PerkKind.COMBO)
+				if (basePerk.Kind == PerkInfoItem.PerkKind.COMBO)
 				{
 					flag2 = true;
 				}
@@ -668,15 +668,15 @@ public class UserItem
 		{
 			RemoveComboEnchantments();
 		}
-		Roster nKGLHEGIKKP = ListSF.GetRoster();
-		nKGLHEGIKKP.LevelOverride = MHNCENBCECJ;
-		nKGLHEGIKKP.UseLevelOverride = true;
-		if (HALHGEGADKA.Count > 0)
+		Roster roster = ListSF.GetRoster();
+		roster.LevelOverride = playerLevel;
+		roster.UseLevelOverride = true;
+		if (perkStructs.Count > 0)
 		{
-			XmlNode mEEAKLDGLDF = ((_Node["Enchantments"] != null) ? _Node["Enchantments"] : _Node.AppendElement("Enchantments"));
-			foreach (PerkStruct item2 in HALHGEGADKA)
+			XmlNode enchantmentsNode = ((_Node["Enchantments"] != null) ? _Node["Enchantments"] : _Node.AppendElement("Enchantments"));
+			foreach (PerkStruct item2 in perkStructs)
 			{
-					XmlNode xmlNode = mEEAKLDGLDF.AppendNewNode("Perk");
+					XmlNode xmlNode = enchantmentsNode.AppendNewNode("Perk");
 					xmlNode.AppendAttribute("Name").Value = item2.get_Name();
 					if (!string.IsNullOrEmpty(item2.EclipseEnchantment))
 						xmlNode.AppendAttribute(PerkStruct.EclipseEnchantmentAttribute).Value = item2.EclipseEnchantment;
@@ -696,9 +696,9 @@ public class UserItem
 					if (item2.GetPairs().Count > 0)
 					{
 						XmlNode mEEAKLDGLDF2 = xmlNode.AppendNewNode("Set");
-					PerkStruct jLFJOECODOF = new PerkStruct(item2);
-					jLFJOECODOF.EvaluatePairValues();
-					foreach (KeyValuePair<string, string> item3 in jLFJOECODOF.GetPairs())
+					PerkStruct perkStruct = new PerkStruct(item2);
+					perkStruct.EvaluatePairValues();
+					foreach (KeyValuePair<string, string> item3 in perkStruct.GetPairs())
 					{
 						mEEAKLDGLDF2.AppendAttribute(item3.Key).Value = item3.Value;
 					}
@@ -710,7 +710,7 @@ public class UserItem
 				}
 			}
 		}
-		nKGLHEGIKKP.UseLevelOverride = false;
+		roster.UseLevelOverride = false;
 	}
 
 	private void RemoveSingleEnchantments()
@@ -718,12 +718,12 @@ public class UserItem
 		int num = 0;
 		while (num < enchantments.Count)
 		{
-			PerkInfoItem aCONCDFDNJH = enchantments[num];
-			if (aCONCDFDNJH.Kind != PerkInfoItem.PerkKind.COMBO)
+			PerkInfoItem enchantment = enchantments[num];
+			if (enchantment.Kind != PerkInfoItem.PerkKind.COMBO)
 			{
-				enchantments.Remove(aCONCDFDNJH);
+				enchantments.Remove(enchantment);
 				XmlNode xmlNode = _Node["Enchantments"];
-				XmlNode oldChild = xmlNode.FindChildWithAttribute("Perk", "Name", aCONCDFDNJH.Name);
+				XmlNode oldChild = xmlNode.FindChildWithAttribute("Perk", "Name", enchantment.Name);
 				xmlNode.RemoveChild(oldChild);
 			}
 			else
@@ -739,12 +739,12 @@ public class UserItem
 		int num = 0;
 		while (num < enchantments.Count)
 		{
-			PerkInfoItem aCONCDFDNJH = enchantments[num];
-			if (aCONCDFDNJH.Kind == PerkInfoItem.PerkKind.COMBO)
+			PerkInfoItem enchantment = enchantments[num];
+			if (enchantment.Kind == PerkInfoItem.PerkKind.COMBO)
 			{
-				enchantments.Remove(aCONCDFDNJH);
+				enchantments.Remove(enchantment);
 				XmlNode xmlNode = _Node["Enchantments"];
-				XmlNode oldChild = xmlNode.FindChildWithAttribute("Perk", "Name", aCONCDFDNJH.Name);
+				XmlNode oldChild = xmlNode.FindChildWithAttribute("Perk", "Name", enchantment.Name);
 				xmlNode.RemoveChild(oldChild);
 			}
 			else
@@ -781,11 +781,11 @@ public class UserItem
 			id.Category == "perks";
 	}
 
-	public bool HasEnchantment(PerkInfoItem AEFFHJGMNFI)
+	public bool HasEnchantment(PerkInfoItem perk)
 	{
 		for (int i = 0; i < enchantments.Count; i++)
 		{
-			if (enchantments[i].Name == AEFFHJGMNFI.Name)
+			if (enchantments[i].Name == perk.Name)
 			{
 				return true;
 			}
@@ -793,27 +793,27 @@ public class UserItem
 		return false;
 	}
 
-	public void ReplaceEnchantments(List<PerkStruct> HALHGEGADKA, int MPAGFAKIEJG, int MHNCENBCECJ)
+	public void ReplaceEnchantments(List<PerkStruct> perkStructs, int itemLevel, int playerLevel)
 	{
-		RemoveEnchantmentsByName(HALHGEGADKA);
-		ApplyEnchantments(HALHGEGADKA, MPAGFAKIEJG, MHNCENBCECJ);
+		RemoveEnchantmentsByName(perkStructs);
+		ApplyEnchantments(perkStructs, itemLevel, playerLevel);
 	}
 
-	private void RemoveEnchantmentsByName(List<PerkStruct> NIBJKBMNOKG)
+	private void RemoveEnchantmentsByName(List<PerkStruct> perkStructs)
 	{
 		XmlNode xmlNode = _Node["Enchantments"];
-		for (int i = 0; i < NIBJKBMNOKG.Count; i++)
+		for (int i = 0; i < perkStructs.Count; i++)
 		{
-			PerkStruct jLFJOECODOF = NIBJKBMNOKG[i];
+			PerkStruct perkStruct = perkStructs[i];
 			foreach (PerkInfoItem item in enchantments)
 			{
-				if (enchantments[i].Name == jLFJOECODOF.get_Name())
+				if (enchantments[i].Name == perkStruct.get_Name())
 				{
 					enchantments.Remove(item);
 					break;
 				}
 			}
-			XmlNode xmlNode2 = xmlNode.FindChildWithAttribute("Perk", "Name", jLFJOECODOF.get_Name());
+			XmlNode xmlNode2 = xmlNode.FindChildWithAttribute("Perk", "Name", perkStruct.get_Name());
 			if (xmlNode2 != null)
 			{
 				xmlNode.RemoveChild(xmlNode2);

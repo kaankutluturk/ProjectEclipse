@@ -7,8 +7,8 @@ public class NekkiWebDownload : NekkiWebRequest
 
 	private readonly string _tempPath;
 
-	public NekkiWebDownload(string path, float DGDKHFPEHOG = 5f)
-		: base(DGDKHFPEHOG)
+	public NekkiWebDownload(string path, float timeoutSeconds = 5f)
+		: base(timeoutSeconds)
 	{
 		_targetPath = path;
 		_tempPath = Path.GetDirectoryName(path) + "/" + Path.GetFileNameWithoutExtension(path) + "_download.nekki";
@@ -16,14 +16,14 @@ public class NekkiWebDownload : NekkiWebRequest
 		FileUtils.DeleteFile(_tempPath);
 	}
 
-	public void Send(UnityWebRequest DLILAFJFLAI)
+	public void Send(UnityWebRequest webRequest)
 	{
 		if (FileUtils.FileExists(_tempPath))
 		{
 			FileInfo fileInfo = new FileInfo(_tempPath);
-			DLILAFJFLAI.SetRequestHeader("range-start", fileInfo.Length.ToString());
+			webRequest.SetRequestHeader("range-start", fileInfo.Length.ToString());
 		}
-		Send(DLILAFJFLAI);
+		Send(webRequest);
 	}
 
 	protected override void SendSuccess()
@@ -36,15 +36,15 @@ public class NekkiWebDownload : NekkiWebRequest
 		base.SendSuccess();
 	}
 
-	protected override void SendError(bool BALCNGAKGKN = false)
+	protected override void SendError(bool logAsError = false)
 	{
 		FileUtils.DeleteFile(_targetPath);
 		FileUtils.DeleteFile(_tempPath);
 		base.SendError();
 	}
 
-	protected override NekkiWebHandler CreateHandler(NekkiUri KJHNCLAJMLO)
+	protected override NekkiWebHandler CreateHandler(NekkiUri uri)
 	{
-		return new NekkiWebHandlerDownload(KJHNCLAJMLO, _targetPath, _tempPath);
+		return new NekkiWebHandlerDownload(uri, _targetPath, _tempPath);
 	}
 }

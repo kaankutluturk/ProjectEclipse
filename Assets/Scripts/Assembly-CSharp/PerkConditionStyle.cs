@@ -47,19 +47,19 @@ public class PerkConditionStyle : PerkConditionMatchMinMax
 		}
 	}
 
-	public override bool IsEqual(Model GIAMLEDNFJD, List<string> NIKHAICFGNM)
+	public override bool IsEqual(Model model, List<string> args)
 	{
-		Model fGCODGKLHED = ResolveTargetModel(GIAMLEDNFJD);
-		if (fGCODGKLHED == null)
+		Model targetModel = ResolveTargetModel(model);
+		if (targetModel == null)
 		{
 			return false;
 		}
-		int pACHBHGEIGN = fGCODGKLHED.StyleRank;
-		if (!minMax.GetMinUnbounded() && (int)minMax.GetMinValue() > pACHBHGEIGN)
+		int styleRank = targetModel.StyleRank;
+		if (!minMax.GetMinUnbounded() && (int)minMax.GetMinValue() > styleRank)
 		{
 			return false;
 		}
-		if (!minMax.GetMaxUnbounded() && (int)minMax.GetMaxValue() < pACHBHGEIGN)
+		if (!minMax.GetMaxUnbounded() && (int)minMax.GetMaxValue() < styleRank)
 		{
 			return false;
 		}

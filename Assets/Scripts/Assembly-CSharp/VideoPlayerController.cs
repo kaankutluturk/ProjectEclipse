@@ -41,26 +41,26 @@ public class VideoPlayerController : MonoBehaviour
 
 	public void add_ShowCompleted(ShowCompletedHandler value)
 	{
-		ShowCompletedHandler pPCCKEGFAHH = ShowCompleted;
+		ShowCompletedHandler currentHandler = ShowCompleted;
 		ShowCompletedHandler pPCCKEGFAHH2;
 		do
 		{
-			pPCCKEGFAHH2 = pPCCKEGFAHH;
-			pPCCKEGFAHH = Interlocked.CompareExchange(ref ShowCompleted, (ShowCompletedHandler)Delegate.Combine(pPCCKEGFAHH2, value), pPCCKEGFAHH);
+			pPCCKEGFAHH2 = currentHandler;
+			currentHandler = Interlocked.CompareExchange(ref ShowCompleted, (ShowCompletedHandler)Delegate.Combine(pPCCKEGFAHH2, value), currentHandler);
 		}
-		while ((object)pPCCKEGFAHH != pPCCKEGFAHH2);
+		while ((object)currentHandler != pPCCKEGFAHH2);
 	}
 
 	public void remove_ShowCompleted(ShowCompletedHandler value)
 	{
-		ShowCompletedHandler pPCCKEGFAHH = ShowCompleted;
+		ShowCompletedHandler currentHandler = ShowCompleted;
 		ShowCompletedHandler pPCCKEGFAHH2;
 		do
 		{
-			pPCCKEGFAHH2 = pPCCKEGFAHH;
-			pPCCKEGFAHH = Interlocked.CompareExchange(ref ShowCompleted, (ShowCompletedHandler)Delegate.Remove(pPCCKEGFAHH2, value), pPCCKEGFAHH);
+			pPCCKEGFAHH2 = currentHandler;
+			currentHandler = Interlocked.CompareExchange(ref ShowCompleted, (ShowCompletedHandler)Delegate.Remove(pPCCKEGFAHH2, value), currentHandler);
 		}
-		while ((object)pPCCKEGFAHH != pPCCKEGFAHH2);
+		while ((object)currentHandler != pPCCKEGFAHH2);
 	}
 
 	public void Init()
@@ -97,13 +97,13 @@ public class VideoPlayerController : MonoBehaviour
 		}
 	}
 
-	public void Play(string BEPKJNKCKPH)
+	public void Play(string url)
 	{
 		Screen.sleepTimeout = -1;
 		videoPlayer.source = VideoSource.Url;
 		if (videoPlayer != null)
 		{
-			videoPlayer.url = BEPKJNKCKPH;
+			videoPlayer.url = url;
 			videoPlayer.audioOutputMode = VideoAudioOutputMode.AudioSource;
 			videoPlayer.controlledAudioTrackCount = 1;
 			videoPlayer.EnableAudioTrack(0, true);
@@ -115,13 +115,13 @@ public class VideoPlayerController : MonoBehaviour
 		}
 	}
 
-	public void Play(VideoClip PIKHEAGHOKB)
+	public void Play(VideoClip clip)
 	{
 		Screen.sleepTimeout = -1;
 		videoPlayer.source = VideoSource.VideoClip;
 		if (videoPlayer != null)
 		{
-			videoPlayer.clip = PIKHEAGHOKB;
+			videoPlayer.clip = clip;
 			playStartedFrame = Time.frameCount;
 			prepareStartedAt = Time.realtimeSinceStartup;
 			videoPlayer.Prepare();
@@ -129,7 +129,7 @@ public class VideoPlayerController : MonoBehaviour
 		}
 	}
 
-	private void OnPrepareCompleted(VideoPlayer EJPOJJKKICO)
+	private void OnPrepareCompleted(VideoPlayer player)
 	{
 		Sound.PauseMusic();
 		SetUiCanvasEnabled(false);
@@ -144,7 +144,7 @@ public class VideoPlayerController : MonoBehaviour
 		}
 	}
 
-	private void OnPlaybackFinished(VideoPlayer EJPOJJKKICO = null)
+	private void OnPlaybackFinished(VideoPlayer player = null)
 	{
 		if (completionRaised)
 		{

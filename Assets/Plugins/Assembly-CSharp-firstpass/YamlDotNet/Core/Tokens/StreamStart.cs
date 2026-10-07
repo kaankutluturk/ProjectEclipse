@@ -10,8 +10,8 @@ namespace YamlDotNet.Core.Tokens
 		{
 		}
 
-		public StreamStart(Mark ILENLCMAMBH, Mark PCLFFOBJJFO)
-			: base(ILENLCMAMBH, PCLFFOBJJFO)
+		public StreamStart(Mark startMark, Mark endMark)
+			: base(startMark, endMark)
 		{
 		}
 	}

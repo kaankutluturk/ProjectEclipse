@@ -22,10 +22,10 @@ public class TextTimer : global::EventDispatcher<object>
 			}
 		}
 
-		public TimerDataStruct(TextTimer EDAIGLJNLJE, object data = null)
+		public TimerDataStruct(TextTimer timer, object data = null)
 		{
 			Data = data;
-			_timer = EDAIGLJNLJE;
+			_timer = timer;
 		}
 
 		public long GetTime()
@@ -75,9 +75,9 @@ public class TextTimer : global::EventDispatcher<object>
 
 	private TimerLabel _timerLabel;
 
-	public TextTimer(Action<object> ODDEOFKLIAG = null)
+	public TextTimer(Action<object> callback = null)
 	{
-		Delegate = ODDEOFKLIAG;
+		Delegate = callback;
 		_timerData = new TimerDataStruct(this, _data);
 	}
 

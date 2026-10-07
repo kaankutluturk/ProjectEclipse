@@ -58,9 +58,9 @@ public sealed class AliasValueDeserializer : IValueDeserializer
 			}
 		}
 
-		public ValuePromise(AnchorAlias LOKLDPLAPOL)
+		public ValuePromise(AnchorAlias alias)
 		{
-			Alias = LOKLDPLAPOL;
+			Alias = alias;
 		}
 
 		public ValuePromise(object value)
@@ -129,36 +129,36 @@ public sealed class AliasValueDeserializer : IValueDeserializer
 
 	private readonly IValueDeserializer innerDeserializer;
 
-	public AliasValueDeserializer(IValueDeserializer PMODPPCDACN)
+	public AliasValueDeserializer(IValueDeserializer valueDeserializer)
 	{
-		if (PMODPPCDACN == null)
+		if (valueDeserializer == null)
 		{
 			throw new ArgumentNullException("innerDeserializer");
 		}
-		this.innerDeserializer = PMODPPCDACN;
+		this.innerDeserializer = valueDeserializer;
 	}
 
-	public object DeserializeValue(EventReader reader, Type MBLGNMBFHBI, SerializerState state, IValueDeserializer IJBAEAEDMCC)
+	public object DeserializeValue(EventReader reader, Type expectedType, SerializerState state, IValueDeserializer nestedObjectDeserializer)
 	{
-		AnchorAlias mBEGNNDMDKH = reader.Allow<AnchorAlias>();
-		if (mBEGNNDMDKH != null)
+		AnchorAlias aliasEvent = reader.Allow<AnchorAlias>();
+		if (aliasEvent != null)
 		{
-			AliasState dMGFMLMIFGL = state.Get<AliasState>();
+			AliasState aliasStates = state.Get<AliasState>();
 			ValuePromise value;
-			if (!dMGFMLMIFGL.TryGetValue(mBEGNNDMDKH.GetValue(), out value))
+			if (!aliasStates.TryGetValue(aliasEvent.GetValue(), out value))
 			{
-				value = new ValuePromise(mBEGNNDMDKH);
-				dMGFMLMIFGL.Add(mBEGNNDMDKH.GetValue(), value);
+				value = new ValuePromise(aliasEvent);
+				aliasStates.Add(aliasEvent.GetValue(), value);
 			}
 			return (!value.GetHasValue()) ? value : value.GetValue();
 		}
 		string text = null;
-		NodeEvent dGMPGIHHKCN = reader.Peek<NodeEvent>();
-		if (dGMPGIHHKCN != null && !string.IsNullOrEmpty(dGMPGIHHKCN.GetAnchor()))
+		NodeEvent nodeEvent = reader.Peek<NodeEvent>();
+		if (nodeEvent != null && !string.IsNullOrEmpty(nodeEvent.GetAnchor()))
 		{
-			text = dGMPGIHHKCN.GetAnchor();
+			text = nodeEvent.GetAnchor();
 		}
-		object obj = innerDeserializer.DeserializeValue(reader, MBLGNMBFHBI, state, IJBAEAEDMCC);
+		object obj = innerDeserializer.DeserializeValue(reader, expectedType, state, nestedObjectDeserializer);
 		if (text != null)
 		{
 			AliasState dMGFMLMIFGL2 = state.Get<AliasState>();
@@ -171,7 +171,7 @@ public sealed class AliasValueDeserializer : IValueDeserializer
 			{
 				if (value2.GetHasValue())
 				{
-					throw new DuplicateAnchorException(dGMPGIHHKCN.GetStart(), dGMPGIHHKCN.GetEnd(), string.Format("Anchor '{0}' already defined", text));
+					throw new DuplicateAnchorException(nodeEvent.GetStart(), nodeEvent.GetEnd(), string.Format("Anchor '{0}' already defined", text));
 				}
 				value2.set_Value(obj);
 			}

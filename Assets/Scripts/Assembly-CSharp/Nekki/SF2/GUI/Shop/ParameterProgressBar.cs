@@ -28,30 +28,30 @@ namespace Nekki.SF2.GUI.Shop
 			}
 		}
 
-		public virtual void SetValue(float OKEFHDDPMEC, int HDOJFLBLPMO, float _Duration = 0f)
+		public virtual void SetValue(float fillAmount, int stripeIndex, float _Duration = 0f)
 		{
-			if (Stripes.Count > HDOJFLBLPMO)
+			if (Stripes.Count > stripeIndex)
 			{
-				ResolutionImage target = Stripes[HDOJFLBLPMO];
+				ResolutionImage target = Stripes[stripeIndex];
 				target.DOKill();
-				target.DOFillAmount(OKEFHDDPMEC, _Duration);
+				target.DOFillAmount(fillAmount, _Duration);
 			}
 		}
 
-		public virtual void SetValue(float OKEFHDDPMEC, float _Duration = 0f)
+		public virtual void SetValue(float fillAmount, float _Duration = 0f)
 		{
 			foreach (ResolutionImage stripe in Stripes)
 			{
 				stripe.DOKill();
-				stripe.DOFillAmount(OKEFHDDPMEC, _Duration);
+				stripe.DOFillAmount(fillAmount, _Duration);
 			}
 		}
 
-		public virtual float GetValue(int HDOJFLBLPMO)
+		public virtual float GetValue(int stripeIndex)
 		{
-			if (Stripes.Count > HDOJFLBLPMO)
+			if (Stripes.Count > stripeIndex)
 			{
-				return Stripes[HDOJFLBLPMO].fillAmount;
+				return Stripes[stripeIndex].fillAmount;
 			}
 			return 0f;
 		}

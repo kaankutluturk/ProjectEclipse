@@ -75,10 +75,10 @@ internal class HeaderAuthenticator : IAuthenticationProvider
 		}
 	}
 
-	public HeaderAuthenticator(string KEJDJHAGBMK, string NNMKKAKIJCP)
+	public HeaderAuthenticator(string user, string roles)
 	{
-		SetUser(KEJDJHAGBMK);
-		SetRoles(NNMKKAKIJCP);
+		SetUser(user);
+		SetRoles(roles);
 	}
 
 	public string GetUser()
@@ -108,59 +108,59 @@ internal class HeaderAuthenticator : IAuthenticationProvider
 
 	public void AddAuthenticationSucceeded(OnAuthenticationSuccededDelegate value)
 	{
-		OnAuthenticationSuccededDelegate lACLODBGJEI = OnAuthenticationSucceded;
+		OnAuthenticationSuccededDelegate current = OnAuthenticationSucceded;
 		OnAuthenticationSuccededDelegate lACLODBGJEI2;
 		do
 		{
-			lACLODBGJEI2 = lACLODBGJEI;
-			lACLODBGJEI = Interlocked.CompareExchange(ref OnAuthenticationSucceded, (OnAuthenticationSuccededDelegate)Delegate.Combine(lACLODBGJEI2, value), lACLODBGJEI);
+			lACLODBGJEI2 = current;
+			current = Interlocked.CompareExchange(ref OnAuthenticationSucceded, (OnAuthenticationSuccededDelegate)Delegate.Combine(lACLODBGJEI2, value), current);
 		}
-		while ((object)lACLODBGJEI != lACLODBGJEI2);
+		while ((object)current != lACLODBGJEI2);
 	}
 
 	public void RemoveAuthenticationSucceeded(OnAuthenticationSuccededDelegate value)
 	{
-		OnAuthenticationSuccededDelegate lACLODBGJEI = OnAuthenticationSucceded;
+		OnAuthenticationSuccededDelegate current = OnAuthenticationSucceded;
 		OnAuthenticationSuccededDelegate lACLODBGJEI2;
 		do
 		{
-			lACLODBGJEI2 = lACLODBGJEI;
-			lACLODBGJEI = Interlocked.CompareExchange(ref OnAuthenticationSucceded, (OnAuthenticationSuccededDelegate)Delegate.Remove(lACLODBGJEI2, value), lACLODBGJEI);
+			lACLODBGJEI2 = current;
+			current = Interlocked.CompareExchange(ref OnAuthenticationSucceded, (OnAuthenticationSuccededDelegate)Delegate.Remove(lACLODBGJEI2, value), current);
 		}
-		while ((object)lACLODBGJEI != lACLODBGJEI2);
+		while ((object)current != lACLODBGJEI2);
 	}
 
 	public void AddAuthenticationFailed(OnAuthenticationFailedDelegate value)
 	{
-		OnAuthenticationFailedDelegate bCHANFGJONF = OnAuthenticationFailed;
+		OnAuthenticationFailedDelegate current = OnAuthenticationFailed;
 		OnAuthenticationFailedDelegate bCHANFGJONF2;
 		do
 		{
-			bCHANFGJONF2 = bCHANFGJONF;
-			bCHANFGJONF = Interlocked.CompareExchange(ref OnAuthenticationFailed, (OnAuthenticationFailedDelegate)Delegate.Combine(bCHANFGJONF2, value), bCHANFGJONF);
+			bCHANFGJONF2 = current;
+			current = Interlocked.CompareExchange(ref OnAuthenticationFailed, (OnAuthenticationFailedDelegate)Delegate.Combine(bCHANFGJONF2, value), current);
 		}
-		while ((object)bCHANFGJONF != bCHANFGJONF2);
+		while ((object)current != bCHANFGJONF2);
 	}
 
 	public void RemoveAuthenticationFailed(OnAuthenticationFailedDelegate value)
 	{
-		OnAuthenticationFailedDelegate bCHANFGJONF = OnAuthenticationFailed;
+		OnAuthenticationFailedDelegate current = OnAuthenticationFailed;
 		OnAuthenticationFailedDelegate bCHANFGJONF2;
 		do
 		{
-			bCHANFGJONF2 = bCHANFGJONF;
-			bCHANFGJONF = Interlocked.CompareExchange(ref OnAuthenticationFailed, (OnAuthenticationFailedDelegate)Delegate.Remove(bCHANFGJONF2, value), bCHANFGJONF);
+			bCHANFGJONF2 = current;
+			current = Interlocked.CompareExchange(ref OnAuthenticationFailed, (OnAuthenticationFailedDelegate)Delegate.Remove(bCHANFGJONF2, value), current);
 		}
-		while ((object)bCHANFGJONF != bCHANFGJONF2);
+		while ((object)current != bCHANFGJONF2);
 	}
 
 	public void StartAuthentication()
 	{
 	}
 
-	public void PrepareRequest(HTTPRequest ONOCIELLAPL, SignalRRequestType LFLGCDNKNJI)
+	public void PrepareRequest(HTTPRequest request, SignalRRequestType requestType)
 	{
-		ONOCIELLAPL.SetHeader("username", GetUser());
-		ONOCIELLAPL.SetHeader("roles", GetRoles());
+		request.SetHeader("username", GetUser());
+		request.SetHeader("roles", GetRoles());
 	}
 }

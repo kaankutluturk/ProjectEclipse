@@ -4,31 +4,31 @@ using UnityEngine;
 
 public static class ListExtension
 {
-	public static int AddIfNotExist<T>(this List<T> OMKIGJOLJJE, T FAKOMBAIFPP)
+	public static int AddIfNotExist<T>(this List<T> list, T item)
 	{
-		int num = OMKIGJOLJJE.IndexOf(FAKOMBAIFPP);
+		int num = list.IndexOf(item);
 		if (num == -1)
 		{
-			OMKIGJOLJJE.Add(FAKOMBAIFPP);
-			return OMKIGJOLJJE.Count - 1;
+			list.Add(item);
+			return list.Count - 1;
 		}
 		return num;
 	}
 
-	public static int AddIfNotExist<T>(this List<T> OMKIGJOLJJE, List<T> FNGODBOFAJD) where T : class
+	public static int AddIfNotExist<T>(this List<T> list, List<T> itemsToAdd) where T : class
 	{
-		int count = OMKIGJOLJJE.Count;
-		for (int i = 0; i < FNGODBOFAJD.Count; i++)
+		int count = list.Count;
+		for (int i = 0; i < itemsToAdd.Count; i++)
 		{
-			OMKIGJOLJJE.AddIfNotExist(FNGODBOFAJD[i]);
+			list.AddIfNotExist(itemsToAdd[i]);
 		}
-		return OMKIGJOLJJE.Count - count;
+		return list.Count - count;
 	}
 
-	public static bool ContainsAllItems<T>(this List<T> EGJHGBCEPHO, List<T> BPLIHEIIBFP) where T : IComparable
+	public static bool ContainsAllItems<T>(this List<T> sourceList, List<T> requiredItems) where T : IComparable
 	{
-		int count = BPLIHEIIBFP.Count;
-		int count2 = EGJHGBCEPHO.Count;
+		int count = requiredItems.Count;
+		int count2 = sourceList.Count;
 		if (count <= count2)
 		{
 			List<bool> list = new List<bool>(count2);
@@ -36,12 +36,12 @@ public static class ListExtension
 			{
 				list.Add(false);
 			}
-			foreach (T item in BPLIHEIIBFP)
+			foreach (T item in requiredItems)
 			{
 				bool flag = false;
-				for (int j = 0; j < EGJHGBCEPHO.Count; j++)
+				for (int j = 0; j < sourceList.Count; j++)
 				{
-					if (!list[j] && item.Equals(EGJHGBCEPHO[j]))
+					if (!list[j] && item.Equals(sourceList[j]))
 					{
 						flag = true;
 						list[j] = true;
@@ -58,43 +58,43 @@ public static class ListExtension
 		return false;
 	}
 
-	public static T GetRandomElement<T>(this List<T> OMKIGJOLJJE) where T : class
+	public static T GetRandomElement<T>(this List<T> list) where T : class
 	{
-		int count = OMKIGJOLJJE.Count;
+		int count = list.Count;
 		if (count == 0)
 		{
 			return (T)null;
 		}
-		return OMKIGJOLJJE[UnityEngine.Random.Range(0, count)];
+		return list[UnityEngine.Random.Range(0, count)];
 	}
 
-	public static void Resize<T>(this List<T> OMKIGJOLJJE, int GNDPBMIJEMH) where T : new()
+	public static void Resize<T>(this List<T> list, int size) where T : new()
 	{
-		int count = OMKIGJOLJJE.Count;
-		if (count == GNDPBMIJEMH)
+		int count = list.Count;
+		if (count == size)
 		{
 			return;
 		}
-		if (count > GNDPBMIJEMH)
+		if (count > size)
 		{
-			for (int num = count - 1; num >= GNDPBMIJEMH; num--)
+			for (int num = count - 1; num >= size; num--)
 			{
-				OMKIGJOLJJE.RemoveAt(num);
+				list.RemoveAt(num);
 			}
 		}
 		else
 		{
-			for (int i = count; i < GNDPBMIJEMH; i++)
+			for (int i = count; i < size; i++)
 			{
-				OMKIGJOLJJE.Add(new T());
+				list.Add(new T());
 			}
 		}
 	}
 
-	public static List<T> GetDistinct<T>(this List<T> OMKIGJOLJJE)
+	public static List<T> GetDistinct<T>(this List<T> source)
 	{
 		List<T> list = new List<T>();
-		foreach (T item in OMKIGJOLJJE)
+		foreach (T item in source)
 		{
 			if (!list.Contains(item))
 			{

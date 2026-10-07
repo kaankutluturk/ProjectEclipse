@@ -93,45 +93,45 @@ public class Module : global::EventDispatcher<object>
 		instance = null;
 	}
 
-	public static bool OpenScreenByName(string HBGBPDEGKFE, object data = null, Action<object> ODDEOFKLIAG = null, bool EOIDGPINLAH = true)
+	public static bool OpenScreenByName(string screenName, object data = null, Action<object> callback = null, bool notifyListeners = true)
 	{
-		ScreenType hBGBPDEGKFE = ParseScreenType(HBGBPDEGKFE);
-		return OpenScreen(hBGBPDEGKFE, data, ODDEOFKLIAG, EOIDGPINLAH);
+		ScreenType screenType = ParseScreenType(screenName);
+		return OpenScreen(screenType, data, callback, notifyListeners);
 	}
 
-	public static bool OpenScreen(ScreenType HBGBPDEGKFE, object data = null, Action<object> ODDEOFKLIAG = null, bool EOIDGPINLAH = true)
+	public static bool OpenScreen(ScreenType screenType, object data = null, Action<object> callback = null, bool notifyListeners = true)
 	{
-		Module jLINNJGCFOG = GetInstance();
-		QuestParameters hHKLFIIBIFF = ListSF.GetInstance().GetQuestParameters();
-		hHKLFIIBIFF.sceneFrom = hHKLFIIBIFF.currentSceneName;
-		hHKLFIIBIFF.sceneTo = GetScreenName(HBGBPDEGKFE);
-		SliderType oFEMKBGPNBH = GameUtils.GetSliderTypeByName(hHKLFIIBIFF.currentTabName);
-		SliderType cFDMHKKBGIN = GetSliderTypeForScreen(HBGBPDEGKFE, data);
-		if (EOIDGPINLAH && GameUtils.NotifyShopOpened(HBGBPDEGKFE))
+		Module moduleInstance = GetInstance();
+		QuestParameters questParameters = ListSF.GetInstance().GetQuestParameters();
+		questParameters.sceneFrom = questParameters.currentSceneName;
+		questParameters.sceneTo = GetScreenName(screenType);
+		SliderType previousSliderType = GameUtils.GetSliderTypeByName(questParameters.currentTabName);
+		SliderType targetSliderType = GetSliderTypeForScreen(screenType, data);
+		if (notifyListeners && GameUtils.NotifyShopOpened(screenType))
 		{
 			return false;
 		}
-		if (EOIDGPINLAH && GameUtils.NotifyTabChanged(oFEMKBGPNBH, cFDMHKKBGIN))
+		if (notifyListeners && GameUtils.NotifyTabChanged(previousSliderType, targetSliderType))
 		{
 			return false;
 		}
-		string bPPAPLLPBIJ = hHKLFIIBIFF.currentSceneName;
+		string currentSceneName = questParameters.currentSceneName;
 		string text = GetScreenName(ScreenType.ModuleShop);
-		if (bPPAPLLPBIJ == text)
+		if (currentSceneName == text)
 		{
 			MenuController.SetNormalViewMode(false);
 		}
 		MenuController.RefreshRubySale();
-		jLINNJGCFOG.ScreenInfo.PreviousScreenType = jLINNJGCFOG.ScreenInfo.ScreenType;
-		jLINNJGCFOG.ScreenInfo.ScreenType = HBGBPDEGKFE;
-		jLINNJGCFOG.ScreenInfo.Data = data;
-		jLINNJGCFOG.ScreenInfo.Dlg = ODDEOFKLIAG;
+		moduleInstance.ScreenInfo.PreviousScreenType = moduleInstance.ScreenInfo.ScreenType;
+		moduleInstance.ScreenInfo.ScreenType = screenType;
+		moduleInstance.ScreenInfo.Data = data;
+		moduleInstance.ScreenInfo.Dlg = callback;
 		Action load = () =>
 		{
-			jLINNJGCFOG.LoadCurrentScreen();
-			jLINNJGCFOG.CallEvent(0, jLINNJGCFOG.ScreenInfo);
+			moduleInstance.LoadCurrentScreen();
+			moduleInstance.CallEvent(0, moduleInstance.ScreenInfo);
 		};
-		if (!Eclipse.UI.MenuSceneFade.Begin(jLINNJGCFOG.ScreenInfo.PreviousScreenType, HBGBPDEGKFE, load)) load();
+		if (!Eclipse.UI.MenuSceneFade.Begin(moduleInstance.ScreenInfo.PreviousScreenType, screenType, load)) load();
 		return true;
 	}
 
@@ -156,8 +156,8 @@ public class Module : global::EventDispatcher<object>
 		DialogsManager.CloseNonQuestDialogs();
 		SceneManagerSF.Load(ScreenInfo.ScreenType);
 		CallEvent(4, ScreenInfo.ScreenType);
-		QuestParameters hHKLFIIBIFF = ListSF.GetInstance().GetQuestParameters();
-		hHKLFIIBIFF.currentSceneName = GetScreenName(ScreenInfo.ScreenType);
+		QuestParameters questParameters = ListSF.GetInstance().GetQuestParameters();
+		questParameters.currentSceneName = GetScreenName(ScreenInfo.ScreenType);
 		if (ListSF.GetInstance().RaiseQuestEvent(QuestEvent.QuestEventType.QUEST_EVENT_SCENE_LOADED))
 		{
 			ListSF.GetInstance().RunQuestActions();
@@ -175,9 +175,9 @@ public class Module : global::EventDispatcher<object>
 		return SceneManagerSF.GetActiveScene();
 	}
 
-	public static ScreenType ParseScreenType(string PHJPOKBOJOG)
+	public static ScreenType ParseScreenType(string screenName)
 	{
-		switch (PHJPOKBOJOG)
+		switch (screenName)
 		{
 		case "Dojo":
 			return ScreenType.ModuleDojo;
@@ -190,15 +190,15 @@ public class Module : global::EventDispatcher<object>
 		case "Loader":
 			return ScreenType.ModulePreloader;
 		default:
-			GameLog.Error("Module::getScreenTypeFromString - screen: %s", PHJPOKBOJOG);
+			GameLog.Error("Module::getScreenTypeFromString - screen: %s", screenName);
 			return ScreenType.ModuleFight;
 		}
 	}
 
-	public static string GetScreenName(ScreenType HBGBPDEGKFE)
+	public static string GetScreenName(ScreenType screenType)
 	{
 		string result = string.Empty;
-		switch (HBGBPDEGKFE)
+		switch (screenType)
 		{
 		case ScreenType.ModulePreloader:
 			result = "Loader";
@@ -222,23 +222,23 @@ public class Module : global::EventDispatcher<object>
 			result = "Dojo";
 			break;
 		default:
-			GameLog.Error("Module::getScreenNameFromType - screen: " + HBGBPDEGKFE);
+			GameLog.Error("Module::getScreenNameFromType - screen: " + screenType);
 			break;
 		}
 		return result;
 	}
 
-	public static SliderType GetSliderTypeForScreen(ScreenType HBGBPDEGKFE, object data)
+	public static SliderType GetSliderTypeForScreen(ScreenType screenType, object data)
 	{
-		SliderType lBFKFBALMGA = SliderType.SliderNone;
-		switch (HBGBPDEGKFE)
+		SliderType sliderType = SliderType.SliderNone;
+		switch (screenType)
 		{
 		case ScreenType.ModuleShop:
 		{
-			DelayedStrike dDFFCNPELBC = ((data == null) ? null : ((DelayedStrike)data));
-			if (dDFFCNPELBC != null)
+			DelayedStrike delayedStrike = ((data == null) ? null : ((DelayedStrike)data));
+			if (delayedStrike != null)
 			{
-				return dDFFCNPELBC.SliderType;
+				return delayedStrike.SliderType;
 			}
 			return SliderType.SliderWeapon;
 		}
@@ -276,13 +276,13 @@ public class Module : global::EventDispatcher<object>
 		CallEvent(2, 0);
 	}
 
-	public void RegisterHolder(ModuleHolder MHOCFOODLLL)
+	public void RegisterHolder(ModuleHolder holder)
 	{
-		currentHolder = MHOCFOODLLL;
+		currentHolder = holder;
 		OnSceneReady();
 	}
 
-	public void UnregisterHolder(ModuleHolder MHOCFOODLLL)
+	public void UnregisterHolder(ModuleHolder holder)
 	{
 		currentHolder = null;
 		BackKeyManager.get_Instance().Clear();
@@ -290,34 +290,34 @@ public class Module : global::EventDispatcher<object>
 
 	public bool IsUserTutorialComplete()
 	{
-		Roster nKGLHEGIKKP = ListSF.GetRoster();
-		if (nKGLHEGIKKP == null)
+		Roster roster = ListSF.GetRoster();
+		if (roster == null)
 		{
 			return true;
 		}
-		return nKGLHEGIKKP.GetTutorials().GetIsStoryTutorialActive();
+		return roster.GetTutorials().GetIsStoryTutorialActive();
 	}
 
-	public void SetGameInputLock(bool NKCGCFGFNDL, bool LLOLBKJMKNC = true)
+	public void SetGameInputLock(bool locked, bool visible = true)
 	{
-		gameInputLock = NKCGCFGFNDL;
-		RefreshInputLock(LLOLBKJMKNC);
+		gameInputLock = locked;
+		RefreshInputLock(visible);
 	}
 
-	public void SetQuestInputLock(bool FHFEIGOAJHO, bool LLOLBKJMKNC = true)
+	public void SetQuestInputLock(bool locked, bool visible = true)
 	{
-		questInputLock = FHFEIGOAJHO;
-		RefreshInputLock(LLOLBKJMKNC);
+		questInputLock = locked;
+		RefreshInputLock(visible);
 	}
 
     // best guess for name
-	public void RefreshInputLock(bool LLOLBKJMKNC)
+	public void RefreshInputLock(bool visible)
 	{
 		bool flag = gameInputLock || questInputLock || unusedInputLock || _presentationLocks > 0;
 		if (_inputLocked != flag)
 		{
 			_inputLocked = flag;
-			_visibleInputLock = LLOLBKJMKNC;
+			_visibleInputLock = visible;
 			if (_inputLocked)
 			{
 				ShowInputLock(_visibleInputLock);
@@ -327,22 +327,22 @@ public class Module : global::EventDispatcher<object>
 				ReleaseInputLock();
 			}
 		}
-		else if (_inputLocked && _inputLocked == flag && _visibleInputLock != LLOLBKJMKNC)
+		else if (_inputLocked && _inputLocked == flag && _visibleInputLock != visible)
 		{
-			_visibleInputLock = LLOLBKJMKNC;
+			_visibleInputLock = visible;
 			ReleaseInputLock();
 			ShowInputLock(_visibleInputLock);
 		}
 	}
 
-	private void ApplyLockScreen(bool value, bool LLOLBKJMKNC = true)
+	private void ApplyLockScreen(bool value, bool visible = true)
 	{
-		LockScreen.Lock(value, LLOLBKJMKNC);
+		LockScreen.Lock(value, visible);
 	}
 
-	private void ShowInputLock(bool LLOLBKJMKNC)
+	private void ShowInputLock(bool visible)
 	{
-		ApplyLockScreen(_inputLocked, LLOLBKJMKNC);
+		ApplyLockScreen(_inputLocked, visible);
 	}
 
 	private void ReleaseInputLock()
@@ -352,7 +352,7 @@ public class Module : global::EventDispatcher<object>
 
 	public void ReloadCurrentScreen()
 	{
-		ScreenType hBGBPDEGKFE = GetCurrentScreenType();
-		OpenScreen(hBGBPDEGKFE);
+		ScreenType screenType = GetCurrentScreenType();
+		OpenScreen(screenType);
 	}
 }

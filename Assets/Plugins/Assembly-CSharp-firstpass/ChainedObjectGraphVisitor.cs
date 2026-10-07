@@ -4,9 +4,9 @@ public abstract class ChainedObjectGraphVisitor : IObjectGraphVisitor
 {
 	private readonly IObjectGraphVisitor nextVisitor;
 
-	protected ChainedObjectGraphVisitor(IObjectGraphVisitor GDMFLLGPLNO)
+	protected ChainedObjectGraphVisitor(IObjectGraphVisitor visitor)
 	{
-		this.nextVisitor = GDMFLLGPLNO;
+		this.nextVisitor = visitor;
 	}
 
 	public virtual bool Enter(IObjectDescriptor value)
@@ -14,34 +14,34 @@ public abstract class ChainedObjectGraphVisitor : IObjectGraphVisitor
 		return nextVisitor.Enter(value);
 	}
 
-	public virtual bool EnterMapping(IObjectDescriptor KGBGENDIMBC, IObjectDescriptor value)
+	public virtual bool EnterMapping(IObjectDescriptor key, IObjectDescriptor value)
 	{
-		return nextVisitor.EnterMapping(KGBGENDIMBC, value);
+		return nextVisitor.EnterMapping(key, value);
 	}
 
-	public virtual bool EnterMapping(IPropertyDescriptor KGBGENDIMBC, IObjectDescriptor value)
+	public virtual bool EnterMapping(IPropertyDescriptor key, IObjectDescriptor value)
 	{
-		return nextVisitor.EnterMapping(KGBGENDIMBC, value);
+		return nextVisitor.EnterMapping(key, value);
 	}
 
-	public virtual void VisitScalar(IObjectDescriptor ADDIBOMFCNH)
+	public virtual void VisitScalar(IObjectDescriptor scalar)
 	{
-		nextVisitor.VisitScalar(ADDIBOMFCNH);
+		nextVisitor.VisitScalar(scalar);
 	}
 
-	public virtual void VisitMappingStart(IObjectDescriptor JPEFEBICPFI, Type FHNELPLPIPI, Type EJGJHBGMCDM)
+	public virtual void VisitMappingStart(IObjectDescriptor mapping, Type keyType, Type valueType)
 	{
-		nextVisitor.VisitMappingStart(JPEFEBICPFI, FHNELPLPIPI, EJGJHBGMCDM);
+		nextVisitor.VisitMappingStart(mapping, keyType, valueType);
 	}
 
-	public virtual void VisitMappingEnd(IObjectDescriptor JPEFEBICPFI)
+	public virtual void VisitMappingEnd(IObjectDescriptor mapping)
 	{
-		nextVisitor.VisitMappingEnd(JPEFEBICPFI);
+		nextVisitor.VisitMappingEnd(mapping);
 	}
 
-	public virtual void VisitSequenceStart(IObjectDescriptor sequence, Type LKAAAFHOAGD)
+	public virtual void VisitSequenceStart(IObjectDescriptor sequence, Type elementType)
 	{
-		nextVisitor.VisitSequenceStart(sequence, LKAAAFHOAGD);
+		nextVisitor.VisitSequenceStart(sequence, elementType);
 	}
 
 	public virtual void VisitSequenceEnd(IObjectDescriptor sequence)

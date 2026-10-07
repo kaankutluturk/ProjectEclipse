@@ -1,1 +1,1 @@
-public delegate void OnWebSocketMessageDelegate(WebSocket ILNFPNFEOCL, string LIOGIBJBHAH);
+public delegate void OnWebSocketMessageDelegate(WebSocket webSocket, string message);

@@ -38,8 +38,8 @@ internal sealed class EventSourceResponse : HTTPResponse, IProtocol
 		}
 	}
 
-	internal EventSourceResponse(HTTPRequest ONOCIELLAPL, Stream ABJIEFMMIEK, bool IBIIADCLKCH, bool PEAJIKCANHP)
-		: base(ONOCIELLAPL, ABJIEFMMIEK, IBIIADCLKCH, PEAJIKCANHP)
+	internal EventSourceResponse(HTTPRequest request, Stream stream, bool isStreamed, bool isFromCache)
+		: base(request, stream, isStreamed, isFromCache)
 	{
 		SetIsClosedManually(true);
 	}
@@ -54,13 +54,13 @@ internal sealed class EventSourceResponse : HTTPResponse, IProtocol
 		isClosed = value;
 	}
 
-	internal override bool Receive(int JHFPNBPNHEH = -1, bool NDCKHEGBAGO = true)
+	internal override bool Receive(int forceReadRawContentLength = -1, bool readPayloadData = true)
 	{
-		bool flag = base.Receive(JHFPNBPNHEH, false);
+		bool flag = base.Receive(forceReadRawContentLength, false);
 		SetIsUpgraded(flag && GetStatusCode() == 200 && HasHeaderWithValue("content-type", "text/event-stream"));
 		if (!GetIsUpgraded())
 		{
-			ReadPayload(JHFPNBPNHEH);
+			ReadPayload(forceReadRawContentLength);
 		}
 		return flag;
 	}
@@ -93,9 +93,9 @@ internal sealed class EventSourceResponse : HTTPResponse, IProtocol
 		{
 			BaseRequest.set_State(HTTPRequestStates.Aborted);
 		}
-		catch (Exception bAINMLLIKOL)
+		catch (Exception ex)
 		{
-			BaseRequest.set_Exception(bAINMLLIKOL);
+			BaseRequest.set_Exception(ex);
 			BaseRequest.set_State(HTTPRequestStates.Error);
 		}
 		finally
@@ -104,9 +104,9 @@ internal sealed class EventSourceResponse : HTTPResponse, IProtocol
 		}
 	}
 
-	private new void ReadChunked(Stream ABJIEFMMIEK)
+	private new void ReadChunked(Stream stream)
 	{
-		int num = ReadChunkLength(ABJIEFMMIEK);
+		int num = ReadChunkLength(stream);
 		byte[] array = new byte[num];
 		while (num != 0)
 		{
@@ -117,7 +117,7 @@ internal sealed class EventSourceResponse : HTTPResponse, IProtocol
 			int num2 = 0;
 			do
 			{
-				int num3 = ABJIEFMMIEK.Read(array, num2, num - num2);
+				int num3 = stream.Read(array, num2, num - num2);
 				if (num3 == 0)
 				{
 					throw new Exception("The remote server closed the connection unexpectedly!");
@@ -126,19 +126,19 @@ internal sealed class EventSourceResponse : HTTPResponse, IProtocol
 			}
 			while (num2 < num);
 			FeedData(array, num2);
-			HTTPResponse.ReadTo(ABJIEFMMIEK, 10);
-			num = ReadChunkLength(ABJIEFMMIEK);
+			HTTPResponse.ReadTo(stream, 10);
+			num = ReadChunkLength(stream);
 		}
-		ReadHeaders(ABJIEFMMIEK);
+		ReadHeaders(stream);
 	}
 
-	private new void ReadRaw(Stream ABJIEFMMIEK, int HDIIBKGCCNB)
+	private new void ReadRaw(Stream stream, int contentLength)
 	{
 		byte[] array = new byte[1024];
 		int num;
 		do
 		{
-			num = ABJIEFMMIEK.Read(array, 0, array.Length);
+			num = stream.Read(array, 0, array.Length);
 			FeedData(array, num);
 		}
 		while (num > 0);
@@ -265,8 +265,8 @@ internal sealed class EventSourceResponse : HTTPResponse, IProtocol
 			{
 				if (currentMessage.GetData() != null)
 				{
-					Message bCHHNNNFDGI = currentMessage;
-					bCHHNNNFDGI.set_Data(bCHHNNNFDGI.GetData() + Environment.NewLine);
+					Message message = currentMessage;
+					message.set_Data(message.GetData() + Environment.NewLine);
 				}
 				Message bCHHNNNFDGI2 = currentMessage;
 				bCHHNNNFDGI2.set_Data(bCHHNNNFDGI2.GetData() + text2);
@@ -299,9 +299,9 @@ internal sealed class EventSourceResponse : HTTPResponse, IProtocol
 						{
 							OnMessage(this, completedMessages[i]);
 						}
-						catch (Exception mPFFFAOGBJE)
+						catch (Exception ex)
 						{
-							HTTPManager.GetLogger().Exception("EventSourceMessage", "HandleEvents - OnMessage", mPFFFAOGBJE);
+							HTTPManager.GetLogger().Exception("EventSourceMessage", "HandleEvents - OnMessage", ex);
 						}
 					}
 				}

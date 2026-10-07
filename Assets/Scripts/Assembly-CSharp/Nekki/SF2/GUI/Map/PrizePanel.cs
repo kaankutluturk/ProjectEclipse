@@ -14,40 +14,40 @@ namespace Nekki.SF2.GUI.Map
 
 		public const float PRIZE_CONTAINER_HEIGHT_BOSSES = 300f;
 
-		public void Init(int count, bool MMDLKOPCFLK, FightList KOMGFJOCEDN)
+		public void Init(int count, bool includeRewards, FightList fightList)
 		{
-			if (KOMGFJOCEDN != null)
+			if (fightList != null)
 			{
-				long bAINMLLIKOL = 0L;
+				long money = 0L;
 				long num = 0L;
-				if (MMDLKOPCFLK)
+				if (includeRewards)
 				{
-					bAINMLLIKOL = (ObscuredLong)(KOMGFJOCEDN.PrizeMoney);
-					num = (ObscuredLong)(KOMGFJOCEDN.PrizeBonus);
+					money = (ObscuredLong)(fightList.PrizeMoney);
+					num = (ObscuredLong)(fightList.PrizeBonus);
 				}
-				bAINMLLIKOL = GameUtils.GetDenominatedValue(bAINMLLIKOL);
+				money = GameUtils.GetDenominatedValue(money);
 				if (count > 0)
 				{
-					bAINMLLIKOL *= count;
+					money *= count;
 					num *= count;
 				}
-				RewardStruct fDFKLPHBAHJ = null;
-				if (KOMGFJOCEDN.GetRewards().Count > 0)
+				RewardStruct lastReward = null;
+				if (fightList.GetRewards().Count > 0)
 				{
-					fDFKLPHBAHJ = KOMGFJOCEDN.GetRewards()[KOMGFJOCEDN.GetRewards().Count - 1];
+					lastReward = fightList.GetRewards()[fightList.GetRewards().Count - 1];
 				}
 				float num2 = 0f;
-				BattleType pJMEMGHKKBM = KOMGFJOCEDN.get_Type();
-				num2 = ((pJMEMGHKKBM != BattleType.FightBosses && pJMEMGHKKBM != BattleType.FightFinalTitan) ? 200f : 300f);
-				int gNLOCMLBNHF = ListSF.GetRoster().GetLevel();
-				RewardPrize dPIIJICBGGA = fDFKLPHBAHJ == null ? new RewardPrize() : fDFKLPHBAHJ.GetPrizeForLevel(gNLOCMLBNHF);
-				int cFMPJLLNCFF = 68;
-				_prize.Init(bAINMLLIKOL, num, dPIIJICBGGA, 0f, num2, cFMPJLLNCFF);
+				BattleType fightType = fightList.get_Type();
+				num2 = ((fightType != BattleType.FightBosses && fightType != BattleType.FightFinalTitan) ? 200f : 300f);
+				int playerLevel = ListSF.GetRoster().GetLevel();
+				RewardPrize rewardPrize = lastReward == null ? new RewardPrize() : lastReward.GetPrizeForLevel(playerLevel);
+				int prizeIconSize = 68;
+				_prize.Init(money, num, rewardPrize, 0f, num2, prizeIconSize);
 				UpdatePrizeLayout(0f, num2);
 			}
 		}
 
-		private void UpdatePrizeLayout(float JMLAKAKDBBL, float FEIHFIPFNKF)
+		private void UpdatePrizeLayout(float offset, float containerHeight)
 		{
 		}
 	}

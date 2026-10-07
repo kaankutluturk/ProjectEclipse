@@ -38,9 +38,9 @@ public class ActionAddBullets : ActionAnimation
 		return _Value;
 	}
 
-	public override void Visit(Model ACENLMONNPA)
+	public override void Visit(Model model)
 	{
-		ACENLMONNPA.StartAction(this);
+		model.StartAction(this);
 	}
 
 	protected override void Parse(XmlNode node)

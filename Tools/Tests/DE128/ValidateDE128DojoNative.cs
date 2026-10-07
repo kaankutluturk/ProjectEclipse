@@ -255,5 +255,5 @@ public static class ValidateDE128DojoNative
     static MapButtonInfo ArchivedButton(MapButtonInfo current) =>
         new MapButtonInfo(current.Name, current.ImageName, "",
             new Vector2(-3095f, -645f), anchorMinX: 1f, anchorMaxX: 1f,
-            BFBFKHHANJG: "Both");
+            showTypeName: "Both");
 }

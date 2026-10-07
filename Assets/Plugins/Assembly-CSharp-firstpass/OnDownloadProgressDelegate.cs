@@ -1,1 +1,1 @@
-public delegate void OnDownloadProgressDelegate(HTTPRequest BPMCLBNFEDK, int GALGEEMNAOM, int OOFJBEJPMJE);
+public delegate void OnDownloadProgressDelegate(HTTPRequest request, int downloaded, int downloadLength);

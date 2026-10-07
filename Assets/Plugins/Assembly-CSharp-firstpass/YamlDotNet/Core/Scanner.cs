@@ -73,11 +73,11 @@ namespace YamlDotNet.Core
 			}
 		}
 
-		public Scanner(TextReader NILNDHEKNLJ, bool CGNHIACFHMM = true)
+		public Scanner(TextReader input, bool skipComments = true)
 		{
-			analyzer = new CharacterAnalyzer<LookAheadBuffer>(new LookAheadBuffer(NILNDHEKNLJ, 8));
+			analyzer = new CharacterAnalyzer<LookAheadBuffer>(new LookAheadBuffer(input, 8));
 			cursor = new Cursor();
-			SkipComments = CGNHIACFHMM;
+			SkipComments = skipComments;
 		}
 
 		public bool MoveNext()
@@ -162,9 +162,9 @@ namespace YamlDotNet.Core
 			tokenAvailable = true;
 		}
 
-		private static bool StartsWithChar(StringBuilder BMKNHNOGIHO, char ILENLCMAMBH)
+		private static bool StartsWithChar(StringBuilder builder, char character)
 		{
-			return BMKNHNOGIHO.Length > 0 && BMKNHNOGIHO[0] == ILENLCMAMBH;
+			return builder.Length > 0 && builder[0] == character;
 		}
 
 		private void StaleSimpleKeys()
@@ -294,10 +294,10 @@ namespace YamlDotNet.Core
 				FetchPlainScalar();
 				return;
 			}
-			Mark iLENLCMAMBH = cursor.Mark();
+			Mark startMark = cursor.Mark();
 			Skip();
-			Mark pCLFFOBJJFO = cursor.Mark();
-			throw new SyntaxErrorException(iLENLCMAMBH, pCLFFOBJJFO, "While scanning for the next token, find character that cannot start any token.");
+			Mark endMark = cursor.Mark();
+			throw new SyntaxErrorException(startMark, endMark, "While scanning for the next token, find character that cannot start any token.");
 		}
 
 		private bool IsWhitespaceToSkip()
@@ -380,8 +380,8 @@ namespace YamlDotNet.Core
 				}
 				if (!SkipComments)
 				{
-					bool eKOKIGANOMO = previous != null && previous.End.Line == mark.Line && !(previous is StreamStart);
-					tokens.Enqueue(new Tokens.Comment(stringBuilder.ToString(), eKOKIGANOMO, mark, cursor.Mark()));
+					bool isInline = previous != null && previous.End.Line == mark.Line && !(previous is StreamStart);
+					tokens.Enqueue(new Tokens.Comment(stringBuilder.ToString(), isInline, mark, cursor.Mark()));
 				}
 			}
 		}
@@ -395,11 +395,11 @@ namespace YamlDotNet.Core
 			tokens.Enqueue(new Tokens.StreamStart(mark, mark));
 		}
 
-		private void UnrollIndent(int DLPJJBPDNDE)
+		private void UnrollIndent(int column)
 		{
 			if (flowLevel == 0)
 			{
-				while (indent > DLPJJBPDNDE)
+				while (indent > column)
 				{
 					Mark mark = cursor.Mark();
 					tokens.Enqueue(new BlockEnd(mark, mark));
@@ -424,25 +424,25 @@ namespace YamlDotNet.Core
 			UnrollIndent(-1);
 			RemoveSimpleKey();
 			simpleKeyAllowed = false;
-			Token mBIJKDIEFIF = ScanDirective();
-			tokens.Enqueue(mBIJKDIEFIF);
+			Token token = ScanDirective();
+			tokens.Enqueue(token);
 		}
 
 		private Token ScanDirective()
 		{
-			Mark iLENLCMAMBH = cursor.Mark();
+			Mark startMark = cursor.Mark();
 			Skip();
 			Token result;
-			switch (ScanDirectiveName(iLENLCMAMBH))
+			switch (ScanDirectiveName(startMark))
 			{
 			case "YAML":
-				result = ScanVersionDirective(iLENLCMAMBH);
+				result = ScanVersionDirective(startMark);
 				break;
 			case "TAG":
-				result = ScanTagDirective(iLENLCMAMBH);
+				result = ScanTagDirective(startMark);
 				break;
 			default:
-				throw new SyntaxErrorException(iLENLCMAMBH, cursor.Mark(), "While scanning a directive, find uknown directive name.");
+				throw new SyntaxErrorException(startMark, cursor.Mark(), "While scanning a directive, find uknown directive name.");
 			}
 			while (analyzer.IsWhite())
 			{
@@ -451,7 +451,7 @@ namespace YamlDotNet.Core
 			SkipComment();
 			if (!analyzer.IsBreakOrZero())
 			{
-				throw new SyntaxErrorException(iLENLCMAMBH, cursor.Mark(), "While scanning a directive, did not find expected comment or line break.");
+				throw new SyntaxErrorException(startMark, cursor.Mark(), "While scanning a directive, did not find expected comment or line break.");
 			}
 			if (analyzer.IsBreak())
 			{
@@ -460,7 +460,7 @@ namespace YamlDotNet.Core
 			return result;
 		}
 
-		private void FetchDocumentIndicator(bool EFNNCDEPIFB)
+		private void FetchDocumentIndicator(bool isStart)
 		{
 			UnrollIndent(-1);
 			RemoveSimpleKey();
@@ -469,19 +469,19 @@ namespace YamlDotNet.Core
 			Skip();
 			Skip();
 			Skip();
-			Token mBIJKDIEFIF = ((!EFNNCDEPIFB) ? ((Token)new Tokens.DocumentEnd(mark, mark)) : ((Token)new Tokens.DocumentStart(mark, cursor.Mark())));
-			tokens.Enqueue(mBIJKDIEFIF);
+			Token token = ((!isStart) ? ((Token)new Tokens.DocumentEnd(mark, mark)) : ((Token)new Tokens.DocumentStart(mark, cursor.Mark())));
+			tokens.Enqueue(token);
 		}
 
-		private void FetchFlowCollectionStart(bool AHKFNJKIBCN)
+		private void FetchFlowCollectionStart(bool isSequence)
 		{
 			SaveSimpleKey();
 			IncreaseFlowLevel();
 			simpleKeyAllowed = true;
 			Mark mark = cursor.Mark();
 			Skip();
-			Token mBIJKDIEFIF = ((!AHKFNJKIBCN) ? ((Token)new FlowMappingStart(mark, mark)) : ((Token)new FlowSequenceStart(mark, mark)));
-			tokens.Enqueue(mBIJKDIEFIF);
+			Token token = ((!isSequence) ? ((Token)new FlowMappingStart(mark, mark)) : ((Token)new FlowSequenceStart(mark, mark)));
+			tokens.Enqueue(token);
 		}
 
 		private void IncreaseFlowLevel()
@@ -490,15 +490,15 @@ namespace YamlDotNet.Core
 			flowLevel++;
 		}
 
-		private void FetchFlowCollectionEnd(bool AHKFNJKIBCN)
+		private void FetchFlowCollectionEnd(bool isSequence)
 		{
 			RemoveSimpleKey();
 			DecreaseFlowLevel();
 			simpleKeyAllowed = false;
 			Mark mark = cursor.Mark();
 			Skip();
-			Token mBIJKDIEFIF = ((!AHKFNJKIBCN) ? ((Token)new FlowMappingEnd(mark, mark)) : ((Token)new FlowSequenceEnd(mark, mark)));
-			tokens.Enqueue(mBIJKDIEFIF);
+			Token token = ((!isSequence) ? ((Token)new FlowMappingEnd(mark, mark)) : ((Token)new FlowSequenceEnd(mark, mark)));
+			tokens.Enqueue(token);
 		}
 
 		private void DecreaseFlowLevel()
@@ -514,9 +514,9 @@ namespace YamlDotNet.Core
 		{
 			RemoveSimpleKey();
 			simpleKeyAllowed = true;
-			Mark iLENLCMAMBH = cursor.Mark();
+			Mark startMark = cursor.Mark();
 			Skip();
-			tokens.Enqueue(new FlowEntry(iLENLCMAMBH, cursor.Mark()));
+			tokens.Enqueue(new FlowEntry(startMark, cursor.Mark()));
 		}
 
 		private void FetchBlockEntry()
@@ -532,9 +532,9 @@ namespace YamlDotNet.Core
 			}
 			RemoveSimpleKey();
 			simpleKeyAllowed = true;
-			Mark iLENLCMAMBH = cursor.Mark();
+			Mark startMark = cursor.Mark();
 			Skip();
-			tokens.Enqueue(new BlockEntry(iLENLCMAMBH, cursor.Mark()));
+			tokens.Enqueue(new BlockEntry(startMark, cursor.Mark()));
 		}
 
 		private void FetchKey()
@@ -550,9 +550,9 @@ namespace YamlDotNet.Core
 			}
 			RemoveSimpleKey();
 			simpleKeyAllowed = flowLevel == 0;
-			Mark iLENLCMAMBH = cursor.Mark();
+			Mark startMark = cursor.Mark();
 			Skip();
-			tokens.Enqueue(new Key(iLENLCMAMBH, cursor.Mark()));
+			tokens.Enqueue(new Key(startMark, cursor.Mark()));
 		}
 
 		private void FetchValue()
@@ -578,39 +578,39 @@ namespace YamlDotNet.Core
 				}
 				simpleKeyAllowed = flowLevel == 0;
 			}
-			Mark iLENLCMAMBH = cursor.Mark();
+			Mark startMark = cursor.Mark();
 			Skip();
-			tokens.Enqueue(new Value(iLENLCMAMBH, cursor.Mark()));
+			tokens.Enqueue(new Value(startMark, cursor.Mark()));
 		}
 
-		private void RollIndent(int DLPJJBPDNDE, int number, bool ANLMKAJLJIJ, Mark MGMMDGFPBLP)
+		private void RollIndent(int column, int number, bool isSequence, Mark mark)
 		{
-			if (flowLevel <= 0 && indent < DLPJJBPDNDE)
+			if (flowLevel <= 0 && indent < column)
 			{
 				indents.Push(indent);
-				indent = DLPJJBPDNDE;
-				Token mBIJKDIEFIF = ((!ANLMKAJLJIJ) ? ((Token)new BlockMappingStart(MGMMDGFPBLP, MGMMDGFPBLP)) : ((Token)new BlockSequenceStart(MGMMDGFPBLP, MGMMDGFPBLP)));
+				indent = column;
+				Token token = ((!isSequence) ? ((Token)new BlockMappingStart(mark, mark)) : ((Token)new BlockSequenceStart(mark, mark)));
 				if (number == -1)
 				{
-					tokens.Enqueue(mBIJKDIEFIF);
+					tokens.Enqueue(token);
 				}
 				else
 				{
-					tokens.Insert(number - tokensParsed, mBIJKDIEFIF);
+					tokens.Insert(number - tokensParsed, token);
 				}
 			}
 		}
 
-		private void FetchAnchor(bool LCPNKFDMFIA)
+		private void FetchAnchor(bool isAlias)
 		{
 			SaveSimpleKey();
 			simpleKeyAllowed = false;
-			tokens.Enqueue(ScanAnchor(LCPNKFDMFIA));
+			tokens.Enqueue(ScanAnchor(isAlias));
 		}
 
-		private Token ScanAnchor(bool LCPNKFDMFIA)
+		private Token ScanAnchor(bool isAlias)
 		{
-			Mark iLENLCMAMBH = cursor.Mark();
+			Mark startMark = cursor.Mark();
 			Skip();
 			StringBuilder stringBuilder = new StringBuilder();
 			while (analyzer.IsAlphaNumericDashOrUnderscore())
@@ -619,13 +619,13 @@ namespace YamlDotNet.Core
 			}
 			if (stringBuilder.Length == 0 || (!analyzer.IsWhiteBreakOrZero() && !analyzer.Check("?:,]}%@`")))
 			{
-				throw new SyntaxErrorException(iLENLCMAMBH, cursor.Mark(), "While scanning an anchor or alias, did not find expected alphabetic or numeric character.");
+				throw new SyntaxErrorException(startMark, cursor.Mark(), "While scanning an anchor or alias, did not find expected alphabetic or numeric character.");
 			}
-			if (LCPNKFDMFIA)
+			if (isAlias)
 			{
-				return new Tokens.AnchorAlias(stringBuilder.ToString(), iLENLCMAMBH, cursor.Mark());
+				return new Tokens.AnchorAlias(stringBuilder.ToString(), startMark, cursor.Mark());
 			}
-			return new Anchor(stringBuilder.ToString(), iLENLCMAMBH, cursor.Mark());
+			return new Anchor(stringBuilder.ToString(), startMark, cursor.Mark());
 		}
 
 		private void FetchTag()
@@ -637,7 +637,7 @@ namespace YamlDotNet.Core
 
 		private Token ScanTag()
 		{
-			Mark iLENLCMAMBH = cursor.Mark();
+			Mark startMark = cursor.Mark();
 			string text;
 			string text2;
 			if (analyzer.Check('<', 1))
@@ -645,24 +645,24 @@ namespace YamlDotNet.Core
 				text = string.Empty;
 				Skip();
 				Skip();
-				text2 = ScanTagUri(null, iLENLCMAMBH);
+				text2 = ScanTagUri(null, startMark);
 				if (!analyzer.Check('>'))
 				{
-					throw new SyntaxErrorException(iLENLCMAMBH, cursor.Mark(), "While scanning a tag, did not find the expected '>'.");
+					throw new SyntaxErrorException(startMark, cursor.Mark(), "While scanning a tag, did not find the expected '>'.");
 				}
 				Skip();
 			}
 			else
 			{
-				string text3 = ScanTagHandle(false, iLENLCMAMBH);
+				string text3 = ScanTagHandle(false, startMark);
 				if (text3.Length > 1 && text3[0] == '!' && text3[text3.Length - 1] == '!')
 				{
 					text = text3;
-					text2 = ScanTagUri(null, iLENLCMAMBH);
+					text2 = ScanTagUri(null, startMark);
 				}
 				else
 				{
-					text2 = ScanTagUri(text3, iLENLCMAMBH);
+					text2 = ScanTagUri(text3, startMark);
 					text = "!";
 					if (text2.Length == 0)
 					{
@@ -673,28 +673,28 @@ namespace YamlDotNet.Core
 			}
 			if (!analyzer.IsWhiteBreakOrZero())
 			{
-				throw new SyntaxErrorException(iLENLCMAMBH, cursor.Mark(), "While scanning a tag, did not find expected whitespace or line break.");
+				throw new SyntaxErrorException(startMark, cursor.Mark(), "While scanning a tag, did not find expected whitespace or line break.");
 			}
-			return new Tag(text, text2, iLENLCMAMBH, cursor.Mark());
+			return new Tag(text, text2, startMark, cursor.Mark());
 		}
 
-		private void FetchBlockScalar(bool HLIHDHJFPJP)
+		private void FetchBlockScalar(bool isLiteral)
 		{
 			RemoveSimpleKey();
 			simpleKeyAllowed = true;
-			tokens.Enqueue(ScanBlockScalar(HLIHDHJFPJP));
+			tokens.Enqueue(ScanBlockScalar(isLiteral));
 		}
 
-		private Token ScanBlockScalar(bool HLIHDHJFPJP)
+		private Token ScanBlockScalar(bool isLiteral)
 		{
 			StringBuilder stringBuilder = new StringBuilder();
 			StringBuilder stringBuilder2 = new StringBuilder();
 			StringBuilder stringBuilder3 = new StringBuilder();
 			int num = 0;
 			int num2 = 0;
-			int nAPIKMHPLFP = 0;
+			int blockIndent = 0;
 			bool flag = false;
-			Mark iLENLCMAMBH = cursor.Mark();
+			Mark startMark = cursor.Mark();
 			Skip();
 			if (analyzer.Check("+-"))
 			{
@@ -704,7 +704,7 @@ namespace YamlDotNet.Core
 				{
 					if (analyzer.Check('0'))
 					{
-						throw new SyntaxErrorException(iLENLCMAMBH, cursor.Mark(), "While scanning a block scalar, find an intendation indicator equal to 0.");
+						throw new SyntaxErrorException(startMark, cursor.Mark(), "While scanning a block scalar, find an intendation indicator equal to 0.");
 					}
 					num2 = analyzer.AsDigit();
 					Skip();
@@ -714,7 +714,7 @@ namespace YamlDotNet.Core
 			{
 				if (analyzer.Check('0'))
 				{
-					throw new SyntaxErrorException(iLENLCMAMBH, cursor.Mark(), "While scanning a block scalar, find an intendation indicator equal to 0.");
+					throw new SyntaxErrorException(startMark, cursor.Mark(), "While scanning a block scalar, find an intendation indicator equal to 0.");
 				}
 				num2 = analyzer.AsDigit();
 				Skip();
@@ -731,22 +731,22 @@ namespace YamlDotNet.Core
 			SkipComment();
 			if (!analyzer.IsBreakOrZero())
 			{
-				throw new SyntaxErrorException(iLENLCMAMBH, cursor.Mark(), "While scanning a block scalar, did not find expected comment or line break.");
+				throw new SyntaxErrorException(startMark, cursor.Mark(), "While scanning a block scalar, did not find expected comment or line break.");
 			}
 			if (analyzer.IsBreak())
 			{
 				SkipLineBreak();
 			}
-			Mark PCLFFOBJJFO = cursor.Mark();
+			Mark endMark = cursor.Mark();
 			if (num2 != 0)
 			{
-				nAPIKMHPLFP = ((indent < 0) ? num2 : (indent + num2));
+				blockIndent = ((indent < 0) ? num2 : (indent + num2));
 			}
-			nAPIKMHPLFP = ScanBlockScalarBreaks(nAPIKMHPLFP, stringBuilder3, iLENLCMAMBH, ref PCLFFOBJJFO);
-			while (cursor.LineOffset == nAPIKMHPLFP && !analyzer.IsZero())
+			blockIndent = ScanBlockScalarBreaks(blockIndent, stringBuilder3, startMark, ref endMark);
+			while (cursor.LineOffset == blockIndent && !analyzer.IsZero())
 			{
 				bool flag2 = analyzer.IsWhite();
-				if (!HLIHDHJFPJP && StartsWithChar(stringBuilder2, '\n') && !flag && !flag2)
+				if (!isLiteral && StartsWithChar(stringBuilder2, '\n') && !flag && !flag2)
 				{
 					if (stringBuilder3.Length == 0)
 					{
@@ -767,7 +767,7 @@ namespace YamlDotNet.Core
 					stringBuilder.Append(ReadChar());
 				}
 				stringBuilder2.Append(ReadLineBreakNormalized());
-				nAPIKMHPLFP = ScanBlockScalarBreaks(nAPIKMHPLFP, stringBuilder3, iLENLCMAMBH, ref PCLFFOBJJFO);
+				blockIndent = ScanBlockScalarBreaks(blockIndent, stringBuilder3, startMark, ref endMark);
 			}
 			if (num != -1)
 			{
@@ -777,17 +777,17 @@ namespace YamlDotNet.Core
 			{
 				stringBuilder.Append(stringBuilder3);
 			}
-			ScalarStyle kIGNIBIMLKK = ((!HLIHDHJFPJP) ? ScalarStyle.Folded : ScalarStyle.Literal);
-			return new Tokens.Scalar(stringBuilder.ToString(), kIGNIBIMLKK, iLENLCMAMBH, PCLFFOBJJFO);
+			ScalarStyle style = ((!isLiteral) ? ScalarStyle.Folded : ScalarStyle.Literal);
+			return new Tokens.Scalar(stringBuilder.ToString(), style, startMark, endMark);
 		}
 
-		private int ScanBlockScalarBreaks(int NAPIKMHPLFP, StringBuilder IIAFKNDBKLN, Mark ILENLCMAMBH, ref Mark PCLFFOBJJFO)
+		private int ScanBlockScalarBreaks(int blockIndent, StringBuilder breaks, Mark startMark, ref Mark endMark)
 		{
 			int num = 0;
-			PCLFFOBJJFO = cursor.Mark();
+			endMark = cursor.Mark();
 			while (true)
 			{
-				if ((NAPIKMHPLFP == 0 || cursor.LineOffset < NAPIKMHPLFP) && analyzer.IsSpace())
+				if ((blockIndent == 0 || cursor.LineOffset < blockIndent) && analyzer.IsSpace())
 				{
 					Skip();
 					continue;
@@ -796,34 +796,34 @@ namespace YamlDotNet.Core
 				{
 					num = cursor.LineOffset;
 				}
-				if ((NAPIKMHPLFP == 0 || cursor.LineOffset < NAPIKMHPLFP) && analyzer.IsTab())
+				if ((blockIndent == 0 || cursor.LineOffset < blockIndent) && analyzer.IsTab())
 				{
-					throw new SyntaxErrorException(ILENLCMAMBH, cursor.Mark(), "While scanning a block scalar, find a tab character where an intendation space is expected.");
+					throw new SyntaxErrorException(startMark, cursor.Mark(), "While scanning a block scalar, find a tab character where an intendation space is expected.");
 				}
 				if (!analyzer.IsBreak())
 				{
 					break;
 				}
-				IIAFKNDBKLN.Append(ReadLineBreakNormalized());
-				PCLFFOBJJFO = cursor.Mark();
+				breaks.Append(ReadLineBreakNormalized());
+				endMark = cursor.Mark();
 			}
-			if (NAPIKMHPLFP == 0)
+			if (blockIndent == 0)
 			{
-				NAPIKMHPLFP = Math.Max(num, Math.Max(indent + 1, 1));
+				blockIndent = Math.Max(num, Math.Max(indent + 1, 1));
 			}
-			return NAPIKMHPLFP;
+			return blockIndent;
 		}
 
-		private void FetchFlowScalar(bool JNEECJAOIHK)
+		private void FetchFlowScalar(bool isSingleQuoted)
 		{
 			SaveSimpleKey();
 			simpleKeyAllowed = false;
-			tokens.Enqueue(ScanFlowScalar(JNEECJAOIHK));
+			tokens.Enqueue(ScanFlowScalar(isSingleQuoted));
 		}
 
-		private Token ScanFlowScalar(bool JNEECJAOIHK)
+		private Token ScanFlowScalar(bool isSingleQuoted)
 		{
-			Mark iLENLCMAMBH = cursor.Mark();
+			Mark startMark = cursor.Mark();
 			Skip();
 			StringBuilder stringBuilder = new StringBuilder();
 			StringBuilder stringBuilder2 = new StringBuilder();
@@ -833,34 +833,34 @@ namespace YamlDotNet.Core
 			{
 				if (IsDocumentIndicator())
 				{
-					throw new SyntaxErrorException(iLENLCMAMBH, cursor.Mark(), "While scanning a quoted scalar, find unexpected document indicator.");
+					throw new SyntaxErrorException(startMark, cursor.Mark(), "While scanning a quoted scalar, find unexpected document indicator.");
 				}
 				if (analyzer.IsZero())
 				{
-					throw new SyntaxErrorException(iLENLCMAMBH, cursor.Mark(), "While scanning a quoted scalar, find unexpected end of stream.");
+					throw new SyntaxErrorException(startMark, cursor.Mark(), "While scanning a quoted scalar, find unexpected end of stream.");
 				}
 				bool flag = false;
 				while (!analyzer.IsWhiteBreakOrZero())
 				{
-					if (JNEECJAOIHK && analyzer.Check('\'') && analyzer.Check('\'', 1))
+					if (isSingleQuoted && analyzer.Check('\'') && analyzer.Check('\'', 1))
 					{
 						stringBuilder.Append('\'');
 						Skip();
 						Skip();
 						continue;
 					}
-					if (analyzer.Check((!JNEECJAOIHK) ? '"' : '\''))
+					if (analyzer.Check((!isSingleQuoted) ? '"' : '\''))
 					{
 						break;
 					}
-					if (!JNEECJAOIHK && analyzer.Check('\\') && analyzer.IsBreak(1))
+					if (!isSingleQuoted && analyzer.Check('\\') && analyzer.IsBreak(1))
 					{
 						Skip();
 						SkipLineBreak();
 						flag = true;
 						break;
 					}
-					if (!JNEECJAOIHK && analyzer.Check('\\'))
+					if (!isSingleQuoted && analyzer.Check('\\'))
 					{
 						int num = 0;
 						char c = analyzer.Peek(1);
@@ -883,7 +883,7 @@ namespace YamlDotNet.Core
 								stringBuilder.Append(value);
 								break;
 							}
-							throw new SyntaxErrorException(iLENLCMAMBH, cursor.Mark(), "While parsing a quoted scalar, find unknown escape character.");
+							throw new SyntaxErrorException(startMark, cursor.Mark(), "While parsing a quoted scalar, find unknown escape character.");
 						}
 						}
 						Skip();
@@ -897,13 +897,13 @@ namespace YamlDotNet.Core
 						{
 							if (!analyzer.IsHex(i))
 							{
-								throw new SyntaxErrorException(iLENLCMAMBH, cursor.Mark(), "While parsing a quoted scalar, did not find expected hexdecimal number.");
+								throw new SyntaxErrorException(startMark, cursor.Mark(), "While parsing a quoted scalar, did not find expected hexdecimal number.");
 							}
 							num2 = (uint)((num2 << 4) + analyzer.AsHex(i));
 						}
 						if ((num2 >= 55296 && num2 <= 57343) || num2 > 1114111)
 						{
-							throw new SyntaxErrorException(iLENLCMAMBH, cursor.Mark(), "While parsing a quoted scalar, find invalid Unicode character escape code.");
+							throw new SyntaxErrorException(startMark, cursor.Mark(), "While parsing a quoted scalar, find invalid Unicode character escape code.");
 						}
 						stringBuilder.Append((char)num2);
 						for (int j = 0; j < num; j++)
@@ -916,7 +916,7 @@ namespace YamlDotNet.Core
 						stringBuilder.Append(ReadChar());
 					}
 				}
-				if (analyzer.Check((!JNEECJAOIHK) ? '"' : '\''))
+				if (analyzer.Check((!isSingleQuoted) ? '"' : '\''))
 				{
 					break;
 				}
@@ -972,7 +972,7 @@ namespace YamlDotNet.Core
 				}
 			}
 			Skip();
-			return new Tokens.Scalar(stringBuilder.ToString(), (!JNEECJAOIHK) ? ScalarStyle.DoubleQuoted : ScalarStyle.SingleQuoted);
+			return new Tokens.Scalar(stringBuilder.ToString(), (!isSingleQuoted) ? ScalarStyle.DoubleQuoted : ScalarStyle.SingleQuoted);
 		}
 
 		private void FetchPlainScalar()
@@ -991,7 +991,7 @@ namespace YamlDotNet.Core
 			bool flag = false;
 			int num = indent + 1;
 			Mark mark = cursor.Mark();
-			Mark pCLFFOBJJFO = mark;
+			Mark endMark = mark;
 			while (!IsDocumentIndicator() && !analyzer.Check('#'))
 			{
 				while (!analyzer.IsWhiteBreakOrZero())
@@ -1035,7 +1035,7 @@ namespace YamlDotNet.Core
 						}
 					}
 					stringBuilder.Append(ReadChar());
-					pCLFFOBJJFO = cursor.Mark();
+					endMark = cursor.Mark();
 				}
 				if (!analyzer.IsWhite() && !analyzer.IsBreak())
 				{
@@ -1078,7 +1078,7 @@ namespace YamlDotNet.Core
 			{
 				simpleKeyAllowed = true;
 			}
-			return new Tokens.Scalar(stringBuilder.ToString(), ScalarStyle.Plain, mark, pCLFFOBJJFO);
+			return new Tokens.Scalar(stringBuilder.ToString(), ScalarStyle.Plain, mark, endMark);
 		}
 
 		private void RemoveSimpleKey()
@@ -1091,7 +1091,7 @@ namespace YamlDotNet.Core
 			simpleKey.IsPossible = false;
 		}
 
-		private string ScanDirectiveName(Mark ILENLCMAMBH)
+		private string ScanDirectiveName(Mark startMark)
 		{
 			StringBuilder stringBuilder = new StringBuilder();
 			while (analyzer.IsAlphaNumericDashOrUnderscore())
@@ -1100,11 +1100,11 @@ namespace YamlDotNet.Core
 			}
 			if (stringBuilder.Length == 0)
 			{
-				throw new SyntaxErrorException(ILENLCMAMBH, cursor.Mark(), "While scanning a directive, could not find expected directive name.");
+				throw new SyntaxErrorException(startMark, cursor.Mark(), "While scanning a directive, could not find expected directive name.");
 			}
 			if (!analyzer.IsWhiteBreakOrZero())
 			{
-				throw new SyntaxErrorException(ILENLCMAMBH, cursor.Mark(), "While scanning a directive, find unexpected non-alphabetical character.");
+				throw new SyntaxErrorException(startMark, cursor.Mark(), "While scanning a directive, find unexpected non-alphabetical character.");
 			}
 			return stringBuilder.ToString();
 		}
@@ -1117,48 +1117,48 @@ namespace YamlDotNet.Core
 			}
 		}
 
-		private Token ScanVersionDirective(Mark ILENLCMAMBH)
+		private Token ScanVersionDirective(Mark startMark)
 		{
 			SkipWhitespace();
-			int iBGMIGIFNJM = ScanVersionDirectiveNumber(ILENLCMAMBH);
+			int major = ScanVersionDirectiveNumber(startMark);
 			if (!analyzer.Check('.'))
 			{
-				throw new SyntaxErrorException(ILENLCMAMBH, cursor.Mark(), "While scanning a %YAML directive, did not find expected digit or '.' character.");
+				throw new SyntaxErrorException(startMark, cursor.Mark(), "While scanning a %YAML directive, did not find expected digit or '.' character.");
 			}
 			Skip();
-			int lDKAECLLDNG = ScanVersionDirectiveNumber(ILENLCMAMBH);
-			return new VersionDirective(new Version(iBGMIGIFNJM, lDKAECLLDNG), ILENLCMAMBH, ILENLCMAMBH);
+			int minor = ScanVersionDirectiveNumber(startMark);
+			return new VersionDirective(new Version(major, minor), startMark, startMark);
 		}
 
-		private Token ScanTagDirective(Mark ILENLCMAMBH)
+		private Token ScanTagDirective(Mark startMark)
 		{
 			SkipWhitespace();
-			string fODGADCGDBH = ScanTagHandle(true, ILENLCMAMBH);
+			string handle = ScanTagHandle(true, startMark);
 			if (!analyzer.IsWhite())
 			{
-				throw new SyntaxErrorException(ILENLCMAMBH, cursor.Mark(), "While scanning a %TAG directive, did not find expected whitespace.");
+				throw new SyntaxErrorException(startMark, cursor.Mark(), "While scanning a %TAG directive, did not find expected whitespace.");
 			}
 			SkipWhitespace();
-			string jMOHMLIGHHD = ScanTagUri(null, ILENLCMAMBH);
+			string prefix = ScanTagUri(null, startMark);
 			if (!analyzer.IsWhiteBreakOrZero())
 			{
-				throw new SyntaxErrorException(ILENLCMAMBH, cursor.Mark(), "While scanning a %TAG directive, did not find expected whitespace or line break.");
+				throw new SyntaxErrorException(startMark, cursor.Mark(), "While scanning a %TAG directive, did not find expected whitespace or line break.");
 			}
-			return new TagDirective(fODGADCGDBH, jMOHMLIGHHD, ILENLCMAMBH, ILENLCMAMBH);
+			return new TagDirective(handle, prefix, startMark, startMark);
 		}
 
-		private string ScanTagUri(string POLFAHOJJCN, Mark ILENLCMAMBH)
+		private string ScanTagUri(string head, Mark startMark)
 		{
 			StringBuilder stringBuilder = new StringBuilder();
-			if (POLFAHOJJCN != null && POLFAHOJJCN.Length > 1)
+			if (head != null && head.Length > 1)
 			{
-				stringBuilder.Append(POLFAHOJJCN.Substring(1));
+				stringBuilder.Append(head.Substring(1));
 			}
 			while (analyzer.IsAlphaNumericDashOrUnderscore() || analyzer.Check(";/?:@&=+$,.!~*'()[]%"))
 			{
 				if (analyzer.Check('%'))
 				{
-					stringBuilder.Append(ScanUriEscapes(ILENLCMAMBH));
+					stringBuilder.Append(ScanUriEscapes(startMark));
 				}
 				else
 				{
@@ -1167,12 +1167,12 @@ namespace YamlDotNet.Core
 			}
 			if (stringBuilder.Length == 0)
 			{
-				throw new SyntaxErrorException(ILENLCMAMBH, cursor.Mark(), "While parsing a tag, did not find expected tag URI.");
+				throw new SyntaxErrorException(startMark, cursor.Mark(), "While parsing a tag, did not find expected tag URI.");
 			}
 			return stringBuilder.ToString();
 		}
 
-		private char ScanUriEscapes(Mark ILENLCMAMBH)
+		private char ScanUriEscapes(Mark startMark)
 		{
 			List<byte> list = new List<byte>();
 			int num = 0;
@@ -1180,7 +1180,7 @@ namespace YamlDotNet.Core
 			{
 				if (!analyzer.Check('%') || !analyzer.IsHex(1) || !analyzer.IsHex(2))
 				{
-					throw new SyntaxErrorException(ILENLCMAMBH, cursor.Mark(), "While parsing a tag, did not find URI escaped octet.");
+					throw new SyntaxErrorException(startMark, cursor.Mark(), "While parsing a tag, did not find URI escaped octet.");
 				}
 				int num2 = (analyzer.AsHex(1) << 4) + analyzer.AsHex(2);
 				if (num == 0)
@@ -1188,12 +1188,12 @@ namespace YamlDotNet.Core
 					num = (((num2 & 0x80) == 0) ? 1 : (((num2 & 0xE0) == 192) ? 2 : (((num2 & 0xF0) == 224) ? 3 : (((num2 & 0xF8) == 240) ? 4 : 0))));
 					if (num == 0)
 					{
-						throw new SyntaxErrorException(ILENLCMAMBH, cursor.Mark(), "While parsing a tag, find an incorrect leading UTF-8 octet.");
+						throw new SyntaxErrorException(startMark, cursor.Mark(), "While parsing a tag, find an incorrect leading UTF-8 octet.");
 					}
 				}
 				else if ((num2 & 0xC0) != 128)
 				{
-					throw new SyntaxErrorException(ILENLCMAMBH, cursor.Mark(), "While parsing a tag, find an incorrect trailing UTF-8 octet.");
+					throw new SyntaxErrorException(startMark, cursor.Mark(), "While parsing a tag, find an incorrect trailing UTF-8 octet.");
 				}
 				list.Add((byte)num2);
 				Skip();
@@ -1204,16 +1204,16 @@ namespace YamlDotNet.Core
 			char[] chars = Encoding.UTF8.GetChars(list.ToArray());
 			if (chars.Length != 1)
 			{
-				throw new SyntaxErrorException(ILENLCMAMBH, cursor.Mark(), "While parsing a tag, find an incorrect UTF-8 sequence.");
+				throw new SyntaxErrorException(startMark, cursor.Mark(), "While parsing a tag, find an incorrect UTF-8 sequence.");
 			}
 			return chars[0];
 		}
 
-		private string ScanTagHandle(bool NDFFLMEDCFH, Mark ILENLCMAMBH)
+		private string ScanTagHandle(bool isDirective, Mark startMark)
 		{
 			if (!analyzer.Check('!'))
 			{
-				throw new SyntaxErrorException(ILENLCMAMBH, cursor.Mark(), "While scanning a tag, did not find expected '!'.");
+				throw new SyntaxErrorException(startMark, cursor.Mark(), "While scanning a tag, did not find expected '!'.");
 			}
 			StringBuilder stringBuilder = new StringBuilder();
 			stringBuilder.Append(ReadChar());
@@ -1225,14 +1225,14 @@ namespace YamlDotNet.Core
 			{
 				stringBuilder.Append(ReadChar());
 			}
-			else if (NDFFLMEDCFH && (stringBuilder.Length != 1 || stringBuilder[0] != '!'))
+			else if (isDirective && (stringBuilder.Length != 1 || stringBuilder[0] != '!'))
 			{
-				throw new SyntaxErrorException(ILENLCMAMBH, cursor.Mark(), "While parsing a tag directive, did not find expected '!'.");
+				throw new SyntaxErrorException(startMark, cursor.Mark(), "While parsing a tag directive, did not find expected '!'.");
 			}
 			return stringBuilder.ToString();
 		}
 
-		private int ScanVersionDirectiveNumber(Mark ILENLCMAMBH)
+		private int ScanVersionDirectiveNumber(Mark startMark)
 		{
 			int num = 0;
 			int num2 = 0;
@@ -1240,24 +1240,24 @@ namespace YamlDotNet.Core
 			{
 				if (++num2 > 9)
 				{
-					throw new SyntaxErrorException(ILENLCMAMBH, cursor.Mark(), "While scanning a %YAML directive, find extremely long version number.");
+					throw new SyntaxErrorException(startMark, cursor.Mark(), "While scanning a %YAML directive, find extremely long version number.");
 				}
 				num = num * 10 + analyzer.AsDigit();
 				Skip();
 			}
 			if (num2 == 0)
 			{
-				throw new SyntaxErrorException(ILENLCMAMBH, cursor.Mark(), "While scanning a %YAML directive, did not find expected version number.");
+				throw new SyntaxErrorException(startMark, cursor.Mark(), "While scanning a %YAML directive, did not find expected version number.");
 			}
 			return num;
 		}
 
 		private void SaveSimpleKey()
 		{
-			bool mMIJJJMNNND = flowLevel == 0 && indent == cursor.LineOffset;
+			bool isRequired = flowLevel == 0 && indent == cursor.LineOffset;
 			if (simpleKeyAllowed)
 			{
-				SimpleKey t = new SimpleKey(true, mMIJJJMNNND, tokensParsed + tokens.Count, cursor);
+				SimpleKey t = new SimpleKey(true, isRequired, tokensParsed + tokens.Count, cursor);
 				RemoveSimpleKey();
 				simpleKeys.Pop();
 				simpleKeys.Push(t);

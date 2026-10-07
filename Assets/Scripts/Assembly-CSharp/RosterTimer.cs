@@ -24,14 +24,14 @@ public class RosterTimer
 		}
 	}
 
-	public RosterTimer(string name, long MCEDKIPLOMO)
+	public RosterTimer(string name, long endTime)
 	{
 		set_Name(name);
-		set_EndTimeSeconds(MCEDKIPLOMO);
-		Roster nKGLHEGIKKP = ListSF.GetRoster();
-		RosterTimerContainer kCMICMHCEBB = nKGLHEGIKKP.GetTimerContainer();
-		XmlNode mEEAKLDGLDF = kCMICMHCEBB.GetNode();
-		set_Node(mEEAKLDGLDF.AppendElement("Timer"));
+		set_EndTimeSeconds(endTime);
+		Roster roster = ListSF.GetRoster();
+		RosterTimerContainer timerContainer = roster.GetTimerContainer();
+		XmlNode timersNode = timerContainer.GetNode();
+		set_Node(timersNode.AppendElement("Timer"));
 		GetNode().AppendAttribute("Name").Value = get_Name();
 		GetNode().AppendAttribute("EndTime").Value = ((ulong)GetEndTimeSeconds()/*cast due to constrained. prefix*/).ToString();
 	}

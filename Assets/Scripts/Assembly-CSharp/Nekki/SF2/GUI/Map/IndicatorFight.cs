@@ -23,7 +23,7 @@ namespace Nekki.SF2.GUI.Map
 
 		private float _scale = 1f;
 
-		public IndicatorState GCDHNODCJAA
+		public IndicatorState State
 		{
 			get
 			{

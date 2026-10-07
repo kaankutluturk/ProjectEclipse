@@ -87,11 +87,11 @@ namespace Nekki.SF2.GUI.Fight
 			tableType = value;
 		}
 
-		public void Init(PointsTableType LFLGCDNKNJI, int LOMKKEAMMIG = 0, int CFMPJLLNCFF = 120)
+		public void Init(PointsTableType pointsTableType, int maxPoints = 0, int width = 120)
 		{
-			set_Type(LFLGCDNKNJI);
-			this.maxScore = LOMKKEAMMIG;
-			switch (LFLGCDNKNJI)
+			set_Type(pointsTableType);
+			this.maxScore = maxPoints;
+			switch (pointsTableType)
 			{
 			case PointsTableType.POINTS_TABLE_CONTEST:
 				leftScoreText.set_text(leftScore.ToString());
@@ -100,7 +100,7 @@ namespace Nekki.SF2.GUI.Fight
 				break;
 			case PointsTableType.POINTS_TABLE_SCORE:
 				leftScoreText.set_text(leftScore.ToString());
-				rightScoreText.set_text(LOMKKEAMMIG.ToString());
+				rightScoreText.set_text(maxPoints.ToString());
 				delimiterText.set_text("/");
 				break;
 			}

@@ -29,10 +29,10 @@ public class ComplexRule : Rule
 	{
 		foreach (XmlNode childNode in node.ChildNodes)
 		{
-			Rule gKAJMMNJBGA = RuleParser.ParseRule(childNode);
-			if (gKAJMMNJBGA != null)
+			Rule childRule = RuleParser.ParseRule(childNode);
+			if (childRule != null)
 			{
-				_rules.Add(gKAJMMNJBGA);
+				_rules.Add(childRule);
 			}
 		}
 	}

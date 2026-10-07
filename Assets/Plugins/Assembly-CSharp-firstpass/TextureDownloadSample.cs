@@ -60,31 +60,31 @@ public sealed class TextureDownloadSample : MonoBehaviour
 		for (int i = 0; i < Images.Length; i++)
 		{
 			Textures[i] = new Texture2D(100, 150);
-			HTTPRequest iPLGNIDJDCF = new HTTPRequest(new Uri("http://besthttp.azurewebsites.net/Content/" + Images[i]), OnImageDownloaded);
-			iPLGNIDJDCF.set_Tag(Textures[i]);
-			iPLGNIDJDCF.Send();
+			HTTPRequest request = new HTTPRequest(new Uri("http://besthttp.azurewebsites.net/Content/" + Images[i]), OnImageDownloaded);
+			request.set_Tag(Textures[i]);
+			request.Send();
 		}
 	}
 
-	private void OnImageDownloaded(HTTPRequest CGOIOKHEGOE, HTTPResponse BEIGFGCBICO)
+	private void OnImageDownloaded(HTTPRequest request, HTTPResponse response)
 	{
 		finishedCount++;
-		switch (CGOIOKHEGOE.GetState())
+		switch (request.GetState())
 		{
 		case HTTPRequestStates.Finished:
-			if (BEIGFGCBICO.GetIsSuccess())
+			if (response.GetIsSuccess())
 			{
-				Texture2D texture2D = CGOIOKHEGOE.GetTag() as Texture2D;
-				texture2D.LoadImage(BEIGFGCBICO.GetData());
-				allDownloadedFromLocalCache = allDownloadedFromLocalCache && BEIGFGCBICO.GetIsFromCache();
+				Texture2D texture2D = request.GetTag() as Texture2D;
+				texture2D.LoadImage(response.GetData());
+				allDownloadedFromLocalCache = allDownloadedFromLocalCache && response.GetIsFromCache();
 			}
 			else
 			{
-				AdvLog.LogWarning(string.Format("Request finished Successfully, but the server sent an error. Status Code: {0}-{1} Message: {2}", BEIGFGCBICO.GetStatusCode(), BEIGFGCBICO.GetMessage(), BEIGFGCBICO.GetDataAsText()));
+				AdvLog.LogWarning(string.Format("Request finished Successfully, but the server sent an error. Status Code: {0}-{1} Message: {2}", response.GetStatusCode(), response.GetMessage(), response.GetDataAsText()));
 			}
 			break;
 		case HTTPRequestStates.Error:
-			AdvLog.LogError("Request Finished with Error! " + ((CGOIOKHEGOE.GetException() == null) ? "No Exception" : (CGOIOKHEGOE.GetException().Message + "\n" + CGOIOKHEGOE.GetException().StackTrace)));
+			AdvLog.LogError("Request Finished with Error! " + ((request.GetException() == null) ? "No Exception" : (request.GetException().Message + "\n" + request.GetException().StackTrace)));
 			break;
 		case HTTPRequestStates.Aborted:
 			AdvLog.LogWarning("Request Aborted!");

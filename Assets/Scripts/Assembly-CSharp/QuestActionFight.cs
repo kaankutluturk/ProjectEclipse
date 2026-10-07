@@ -4,15 +4,15 @@ public class QuestActionFight : QuestAction
 {
 	private string _name = string.Empty;
 
-	public override void Parse(XmlNode EPKLCPOEELO)
+	public override void Parse(XmlNode node)
 	{
-		base.Parse(EPKLCPOEELO);
-		_name = EPKLCPOEELO.Attributes["Name"].GetStringOrDefault(string.Empty);
+		base.Parse(node);
+		_name = node.Attributes["Name"].GetStringOrDefault(string.Empty);
 	}
 
-	public override void Execute(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters parameters)
 	{
-		base.Execute(GFIHPBCEEOB);
+		base.Execute(parameters);
 		ListSF.GetInstance().ClearQuestsStack();
 		if (string.IsNullOrEmpty(_name))
 		{
@@ -23,17 +23,17 @@ public class QuestActionFight : QuestAction
 			FinishAction();
 			return;
 		}
-		ConditionExtension.CompareResult lNIDLHOIHIM = new ConditionExtension.CompareResult();
-		QuestCondition kKDGLNECFHA = new QuestCondition();
-		kKDGLNECFHA.SetParameters(GFIHPBCEEOB);
-		kKDGLNECFHA.SetValue(_name, lNIDLHOIHIM);
-		string bAINMLLIKOL = lNIDLHOIHIM.ToString();
-		FightIDS mOCEDDJOAEB = new FightIDS();
-		mOCEDDJOAEB.SetFightIDSByString(bAINMLLIKOL);
-		FightList jDIPBIHBGPF = ListSF.GetFightById(mOCEDDJOAEB);
-		if (jDIPBIHBGPF != null)
+		ConditionExtension.CompareResult result = new ConditionExtension.CompareResult();
+		QuestCondition condition = new QuestCondition();
+		condition.SetParameters(parameters);
+		condition.SetValue(_name, result);
+		string fightIdsText = result.ToString();
+		FightIDS fightIds = new FightIDS();
+		fightIds.SetFightIDSByString(fightIdsText);
+		FightList fight = ListSF.GetFightById(fightIds);
+		if (fight != null)
 		{
-			GameUtils.StartFight(jDIPBIHBGPF);
+			GameUtils.StartFight(fight);
 		}
 		else
 		{

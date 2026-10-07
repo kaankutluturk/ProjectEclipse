@@ -7,9 +7,9 @@ public class AssetsData
 
 	public string BundleName;
 
-	public AssetsData(string path, string JNMDLEEBHDO)
+	public AssetsData(string path, string bundleName)
 	{
 		Path = path;
-		BundleName = JNMDLEEBHDO;
+		BundleName = bundleName;
 	}
 }

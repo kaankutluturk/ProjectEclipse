@@ -1,1 +1,1 @@
-public delegate void OnWebSocketBinaryDelegate(WebSocket ILNFPNFEOCL, byte[] data);
+public delegate void OnWebSocketBinaryDelegate(WebSocket webSocket, byte[] data);

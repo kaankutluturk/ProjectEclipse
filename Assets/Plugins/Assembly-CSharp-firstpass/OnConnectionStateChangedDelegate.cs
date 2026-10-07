@@ -1,1 +1,1 @@
-public delegate void OnConnectionStateChangedDelegate(Connection MDGFGCDPGFI, ConnectionStates JOBAGBFMMFP, ConnectionStates MPJEMGJIBBD);
+public delegate void OnConnectionStateChangedDelegate(Connection connection, ConnectionStates oldState, ConnectionStates newState);

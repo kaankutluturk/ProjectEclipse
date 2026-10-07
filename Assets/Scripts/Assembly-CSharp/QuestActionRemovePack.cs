@@ -4,13 +4,13 @@ public class QuestActionRemovePack : QuestAction
 {
 	private string packName = string.Empty;
 
-	public override void Parse(XmlNode EPKLCPOEELO)
+	public override void Parse(XmlNode node)
 	{
-		base.Parse(EPKLCPOEELO);
-		packName = EPKLCPOEELO.Attributes["Name"].GetStringOrDefault(string.Empty);
+		base.Parse(node);
+		packName = node.Attributes["Name"].GetStringOrDefault(string.Empty);
 	}
 
-	public override void Execute(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters parameters)
 	{
 		if (packName != string.Empty)
 		{

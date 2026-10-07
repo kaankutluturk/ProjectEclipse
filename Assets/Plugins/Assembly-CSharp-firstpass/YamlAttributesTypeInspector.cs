@@ -6,43 +6,43 @@ public sealed class YamlAttributesTypeInspector : TypeInspectorSkeleton
 {
 	private readonly ITypeInspector innerTypeDescriptor;
 
-	public YamlAttributesTypeInspector(ITypeInspector CECGLIIIJJH)
+	public YamlAttributesTypeInspector(ITypeInspector innerTypeDescriptor)
 	{
-		this.innerTypeDescriptor = CECGLIIIJJH;
+		this.innerTypeDescriptor = innerTypeDescriptor;
 	}
 
-	public override IEnumerable<IPropertyDescriptor> GetProperties(Type LFLGCDNKNJI, object EGJHGBCEPHO)
+	public override IEnumerable<IPropertyDescriptor> GetProperties(Type type, object container)
 	{
-		return from PIIEECCHMAC in (from PIIEECCHMAC in innerTypeDescriptor.GetProperties(LFLGCDNKNJI, EGJHGBCEPHO)
-				where PIIEECCHMAC.GetCustomAttribute<YamlIgnoreAttribute>() == null
-				select PIIEECCHMAC).Select((Func<IPropertyDescriptor, IPropertyDescriptor>)((IPropertyDescriptor PIIEECCHMAC) =>
+		return from property in (from property in innerTypeDescriptor.GetProperties(type, container)
+				where property.GetCustomAttribute<YamlIgnoreAttribute>() == null
+				select property).Select((Func<IPropertyDescriptor, IPropertyDescriptor>)((IPropertyDescriptor property) =>
 			{
-				PropertyDescriptor fLAHDIEMBAL = new PropertyDescriptor(PIIEECCHMAC);
-				YamlAliasAttribute gAANEGEKJGH = PIIEECCHMAC.GetCustomAttribute<YamlAliasAttribute>();
-				if (gAANEGEKJGH != null)
+				PropertyDescriptor wrappedProperty = new PropertyDescriptor(property);
+				YamlAliasAttribute aliasAttribute = property.GetCustomAttribute<YamlAliasAttribute>();
+				if (aliasAttribute != null)
 				{
-					fLAHDIEMBAL.set_Name(gAANEGEKJGH.GetAlias());
+					wrappedProperty.set_Name(aliasAttribute.GetAlias());
 				}
-				YamlMemberAttribute kGBEBCLPIIO = PIIEECCHMAC.GetCustomAttribute<YamlMemberAttribute>();
-				if (kGBEBCLPIIO != null)
+				YamlMemberAttribute memberAttribute = property.GetCustomAttribute<YamlMemberAttribute>();
+				if (memberAttribute != null)
 				{
-					if (kGBEBCLPIIO.GetSerializeAs() != null)
+					if (memberAttribute.GetSerializeAs() != null)
 					{
-						fLAHDIEMBAL.set_TypeOverride(kGBEBCLPIIO.GetSerializeAs());
+						wrappedProperty.set_TypeOverride(memberAttribute.GetSerializeAs());
 					}
-					fLAHDIEMBAL.set_Order(kGBEBCLPIIO.GetOrder());
-					if (kGBEBCLPIIO.GetName() != null)
+					wrappedProperty.set_Order(memberAttribute.GetOrder());
+					if (memberAttribute.GetName() != null)
 					{
-						if (gAANEGEKJGH != null)
+						if (aliasAttribute != null)
 						{
 							throw new InvalidOperationException("Mixing YamlAlias(...) with YamlMember(Alias = ...) is an error. The YamlAlias attribute is obsolete and should be removed.");
 						}
-						fLAHDIEMBAL.set_Name(kGBEBCLPIIO.GetName());
+						wrappedProperty.set_Name(memberAttribute.GetName());
 					}
 				}
-				return fLAHDIEMBAL;
+				return wrappedProperty;
 			}))
-			orderby PIIEECCHMAC.GetOrder()
-			select PIIEECCHMAC;
+			orderby property.GetOrder()
+			select property;
 	}
 }

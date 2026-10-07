@@ -123,106 +123,106 @@ public class SceneLoader : ExtentionBehaviour
 		}
 	}
 
-	public static void GetScene(string MHOCFOODLLL)
+	public static void GetScene(string sceneName)
 	{
-		if (CachedScenes.ContainsKey(MHOCFOODLLL))
+		if (CachedScenes.ContainsKey(sceneName))
 		{
-			get_Instance().callEvent(0, Object.Instantiate(CachedScenes[MHOCFOODLLL].mainAsset));
+			get_Instance().callEvent(0, Object.Instantiate(CachedScenes[sceneName].mainAsset));
 		}
-		else if (File.Exists(string.Format("{0}/{1}/SceneRoot_{2}.ab", get_Datapath(), GetPlatformFolder(), MHOCFOODLLL)))
+		else if (File.Exists(string.Format("{0}/{1}/SceneRoot_{2}.ab", get_Datapath(), GetPlatformFolder(), sceneName)))
 		{
-			get_Instance().StartCoroutine(LoadSceneBundle(MHOCFOODLLL));
-		}
-		else
-		{
-			get_Instance().StartCoroutine(LoadLocalScene(MHOCFOODLLL));
-		}
-		if (CachedConfigs.ContainsKey(MHOCFOODLLL))
-		{
-			get_Instance().callEvent(1, CachedConfigs[MHOCFOODLLL]);
-		}
-		else if (File.Exists(string.Format("{0}/{1}/SceneRoot_{2}_config.ab", get_Datapath(), GetPlatformFolder(), MHOCFOODLLL)))
-		{
-			get_Instance().StartCoroutine(LoadConfigBundle(MHOCFOODLLL));
+			get_Instance().StartCoroutine(LoadSceneBundle(sceneName));
 		}
 		else
 		{
-			get_Instance().StartCoroutine(LoadLocalConfig(MHOCFOODLLL));
+			get_Instance().StartCoroutine(LoadLocalScene(sceneName));
+		}
+		if (CachedConfigs.ContainsKey(sceneName))
+		{
+			get_Instance().callEvent(1, CachedConfigs[sceneName]);
+		}
+		else if (File.Exists(string.Format("{0}/{1}/SceneRoot_{2}_config.ab", get_Datapath(), GetPlatformFolder(), sceneName)))
+		{
+			get_Instance().StartCoroutine(LoadConfigBundle(sceneName));
+		}
+		else
+		{
+			get_Instance().StartCoroutine(LoadLocalConfig(sceneName));
 		}
 	}
 
-	private static IEnumerator LoadConfigBundle(string MHOCFOODLLL)
+	private static IEnumerator LoadConfigBundle(string sceneName)
 	{
-		string text = string.Format("file:///{0}/{1}/SceneRoot_{2}_config.ab", get_Datapath().Replace("\\", "/"), GetPlatformFolder(), MHOCFOODLLL);
+		string text = string.Format("file:///{0}/{1}/SceneRoot_{2}_config.ab", get_Datapath().Replace("\\", "/"), GetPlatformFolder(), sceneName);
 		UnityEngine.Debug.Log(text);
 		WWW wWW = new WWW(text);
 		yield return wWW;
 		if (string.IsNullOrEmpty(wWW.error))
 		{
-			if (!CachedConfigs.ContainsKey(MHOCFOODLLL))
+			if (!CachedConfigs.ContainsKey(sceneName))
 			{
-				CachedConfigs.Add(MHOCFOODLLL, ((GameObject)wWW.assetBundle.mainAsset).GetComponent<SceneConfig>());
+				CachedConfigs.Add(sceneName, ((GameObject)wWW.assetBundle.mainAsset).GetComponent<SceneConfig>());
 			}
 			else
 			{
-				CachedConfigs[MHOCFOODLLL] = ((GameObject)wWW.assetBundle.mainAsset).GetComponent<SceneConfig>();
+				CachedConfigs[sceneName] = ((GameObject)wWW.assetBundle.mainAsset).GetComponent<SceneConfig>();
 			}
-			get_Instance().callEvent(1, CachedConfigs[MHOCFOODLLL]);
+			get_Instance().callEvent(1, CachedConfigs[sceneName]);
 		}
 		else
 		{
-			get_Instance().LogError(string.Format("cant load scene config {0}: {1}", MHOCFOODLLL, wWW.error));
+			get_Instance().LogError(string.Format("cant load scene config {0}: {1}", sceneName, wWW.error));
 		}
 	}
 
-	private static IEnumerator LoadSceneBundle(string MHOCFOODLLL)
+	private static IEnumerator LoadSceneBundle(string sceneName)
 	{
-		string text = string.Format("file:///{0}/{1}/SceneRoot_{2}.ab", get_Datapath().Replace("\\", "/"), GetPlatformFolder(), MHOCFOODLLL);
+		string text = string.Format("file:///{0}/{1}/SceneRoot_{2}.ab", get_Datapath().Replace("\\", "/"), GetPlatformFolder(), sceneName);
 		UnityEngine.Debug.Log(text);
 		WWW wWW = new WWW(text);
 		yield return wWW;
 		if (string.IsNullOrEmpty(wWW.error))
 		{
-			if (!CachedScenes.ContainsKey(MHOCFOODLLL))
+			if (!CachedScenes.ContainsKey(sceneName))
 			{
-				CachedScenes.Add(MHOCFOODLLL, wWW.assetBundle);
+				CachedScenes.Add(sceneName, wWW.assetBundle);
 			}
 			else
 			{
-				CachedScenes[MHOCFOODLLL] = wWW.assetBundle;
+				CachedScenes[sceneName] = wWW.assetBundle;
 			}
-			get_Instance().callEvent(0, Object.Instantiate(CachedScenes[MHOCFOODLLL].mainAsset));
+			get_Instance().callEvent(0, Object.Instantiate(CachedScenes[sceneName].mainAsset));
 		}
 		else
 		{
-			get_Instance().LogError(string.Format("cant load scene {0}: {1}", MHOCFOODLLL, wWW.error));
+			get_Instance().LogError(string.Format("cant load scene {0}: {1}", sceneName, wWW.error));
 		}
 	}
 
-	private static IEnumerator LoadLocalScene(string MHOCFOODLLL)
+	private static IEnumerator LoadLocalScene(string sceneName)
 	{
-		GameObject gameObject = GlobalLoad.GetLoadGameObject(string.Format("Export/SceneRoot_{0}", MHOCFOODLLL));
+		GameObject gameObject = GlobalLoad.GetLoadGameObject(string.Format("Export/SceneRoot_{0}", sceneName));
 		if ((bool)gameObject)
 		{
 			get_Instance().callEvent(0, Object.Instantiate(gameObject));
 		}
 		else
 		{
-			get_Instance().LogError(string.Format("cant load local scene {0}", MHOCFOODLLL));
+			get_Instance().LogError(string.Format("cant load local scene {0}", sceneName));
 		}
 		yield break;
 	}
 
-	private static IEnumerator LoadLocalConfig(string MHOCFOODLLL)
+	private static IEnumerator LoadLocalConfig(string sceneName)
 	{
-		GameObject gameObject = GlobalLoad.GetLoadGameObject(string.Format("Export/SceneRoot_{0}_config", MHOCFOODLLL));
+		GameObject gameObject = GlobalLoad.GetLoadGameObject(string.Format("Export/SceneRoot_{0}_config", sceneName));
 		if ((bool)gameObject)
 		{
 			get_Instance().callEvent(0, Object.Instantiate(gameObject));
 		}
 		else
 		{
-			get_Instance().LogWarning(string.Format("cant load local scene config {0}", MHOCFOODLLL));
+			get_Instance().LogWarning(string.Format("cant load local scene config {0}", sceneName));
 		}
 		yield break;
 	}

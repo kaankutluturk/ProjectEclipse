@@ -36,14 +36,14 @@ namespace Nekki.SF2.GUI.Shop
 				if (component != null)
 				{
 					component.set_AtlasName(iconAtlasPrefix);
-					bool eIAKNKDEEKA = false;
-					component.Init(string.Empty, item.ImageName, item.BarValue, item.BarValue, eIAKNKDEEKA, item.BarScale);
+					bool isItemLimit = false;
+					component.Init(string.Empty, item.ImageName, item.BarValue, item.BarValue, isItemLimit, item.BarScale);
 					component.set_MinHeight(100f);
 					component.interactable = false;
 					_items.Add(component);
 					GameObject gameObject2 = new GameObject("TouchHandler");
 					RectTransform rectTransform = gameObject2.AddComponent<RectTransform>();
-					TouchHandler fPDGFGEEJEA = gameObject2.AddComponent<TouchHandler>();
+					TouchHandler touchHandler = gameObject2.AddComponent<TouchHandler>();
 					Image image = gameObject2.AddComponent<Image>();
 					image.color = new Color(1f, 1f, 1f, 0f);
 					if (rectTransform != null)
@@ -54,19 +54,19 @@ namespace Nekki.SF2.GUI.Shop
 					}
 					gameObject2.transform.SetParent(component.transform, false);
 					gameObject2.transform.SetAsLastSibling();
-					AddTouchListener(fPDGFGEEJEA, item);
+					AddTouchListener(touchHandler, item);
 				}
 			}
 		}
 
-		private void AddTouchListener(TouchHandler FPDGFGEEJEA, PerkInfoItem AEFFHJGMNFI)
+		private void AddTouchListener(TouchHandler touchHandler, PerkInfoItem perkItem)
 		{
-			if (FPDGFGEEJEA != null)
+			if (touchHandler != null)
 			{
-				FPDGFGEEJEA.get_OnTouch().AddListener(() =>
+				touchHandler.get_OnTouch().AddListener(() =>
 				{
-					Vector3 position = FPDGFGEEJEA.transform.position;
-					onPerksClick.Invoke(AEFFHJGMNFI, position, hintOffset, FPDGFGEEJEA.gameObject);
+					Vector3 position = touchHandler.transform.position;
+					onPerksClick.Invoke(perkItem, position, hintOffset, touchHandler.gameObject);
 				});
 			}
 		}

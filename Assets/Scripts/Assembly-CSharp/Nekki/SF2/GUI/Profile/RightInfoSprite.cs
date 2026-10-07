@@ -34,12 +34,12 @@ namespace Nekki.SF2.GUI.Profile
 			InitLabels();
 		}
 
-		public void SetPerkInfo(PerkContentData BPANICNCIAO)
+		public void SetPerkInfo(PerkContentData perkContentData)
 		{
 			_perkContent.gameObject.SetActive(true);
 			_trickContent.gameObject.SetActive(false);
 			_achievContent.gameObject.SetActive(false);
-			_perkContent.Init(BPANICNCIAO.description, BPANICNCIAO.state, BPANICNCIAO.Callback, BPANICNCIAO.Animation, BPANICNCIAO.LabelWidth);
+			_perkContent.Init(perkContentData.description, perkContentData.state, perkContentData.Callback, perkContentData.Animation, perkContentData.LabelWidth);
 			if (_perkContent.HeaderFontSize > 0)
 			{
 				headerFontSize = _perkContent.HeaderFontSize;
@@ -49,17 +49,17 @@ namespace Nekki.SF2.GUI.Profile
 				headerFontSize = 104;
 			}
 			_noContentMessage.gameObject.SetActive(false);
-			SetLabel(BPANICNCIAO.name);
+			SetLabel(perkContentData.name);
 			float upBorder = _header.transform.localPosition.y - _header.rectTransform.rect.height / 2f;
 			_perkContent.SetUpBorder(upBorder);
 		}
 
-		public void SetTrickInfo(TrickInfo ACNOAOIBCBM)
+		public void SetTrickInfo(TrickInfo trickInfo)
 		{
 			_perkContent.gameObject.SetActive(false);
 			_trickContent.gameObject.SetActive(true);
 			_achievContent.gameObject.SetActive(false);
-			_trickContent.Init(ACNOAOIBCBM.Animation, ACNOAOIBCBM.AttackDamages, ACNOAOIBCBM.OnClickCallback, ACNOAOIBCBM.Description);
+			_trickContent.Init(trickInfo.Animation, trickInfo.AttackDamages, trickInfo.OnClickCallback, trickInfo.Description);
 			if (_perkContent.HeaderFontSize > 0)
 			{
 				headerFontSize = _perkContent.HeaderFontSize;
@@ -69,17 +69,17 @@ namespace Nekki.SF2.GUI.Profile
 				headerFontSize = 104;
 			}
 			_noContentMessage.gameObject.SetActive(false);
-			SetLabel(ACNOAOIBCBM.Title);
+			SetLabel(trickInfo.Title);
 			float upBorder = _header.transform.localPosition.y - _header.rectTransform.rect.height / 2f;
 			_trickContent.SetUpBorder(upBorder);
 		}
 
-		public void SetAchievementInfo(AchievementInfo BBOFGPLPEPB)
+		public void SetAchievementInfo(AchievementInfo achievementInfo)
 		{
 			_perkContent.gameObject.SetActive(false);
 			_trickContent.gameObject.SetActive(false);
 			_achievContent.gameObject.SetActive(true);
-			_achievContent.Init(BBOFGPLPEPB.Description, BBOFGPLPEPB.MoneyPrize, BBOFGPLPEPB.BonusPrize, BBOFGPLPEPB.OnTakeReward, BBOFGPLPEPB.CanTakeReward, BBOFGPLPEPB.IsCompleted);
+			_achievContent.Init(achievementInfo.Description, achievementInfo.MoneyPrize, achievementInfo.BonusPrize, achievementInfo.OnTakeReward, achievementInfo.CanTakeReward, achievementInfo.IsCompleted);
 			if (_achievContent.HeaderFontSize > 0)
 			{
 				headerFontSize = _achievContent.HeaderFontSize;
@@ -89,17 +89,17 @@ namespace Nekki.SF2.GUI.Profile
 				headerFontSize = 104;
 			}
 			_noContentMessage.gameObject.SetActive(false);
-			SetLabel(BBOFGPLPEPB.Title);
+			SetLabel(achievementInfo.Title);
 			float upBorder = _header.transform.localPosition.y - _header.rectTransform.rect.height / 2f;
 			_trickContent.SetUpBorder(upBorder);
 		}
 
-		public void SetItemInfo(ItemInfo PJDAGCBPLJE)
+		public void SetItemInfo(ItemInfo itemInfo)
 		{
 			_perkContent.gameObject.SetActive(false);
 			_trickContent.gameObject.SetActive(false);
 			_achievContent.gameObject.SetActive(true);
-			_achievContent.Init(PJDAGCBPLJE.DescriptionAlias);
+			_achievContent.Init(itemInfo.DescriptionAlias);
 			if (_achievContent.HeaderFontSize > 0)
 			{
 				headerFontSize = _achievContent.HeaderFontSize;
@@ -109,20 +109,20 @@ namespace Nekki.SF2.GUI.Profile
 				headerFontSize = 104;
 			}
 			_noContentMessage.gameObject.SetActive(false);
-			SetLabel(PJDAGCBPLJE.Name);
+			SetLabel(itemInfo.Name);
 			float upBorder = _header.transform.localPosition.y - _header.rectTransform.rect.height / 2f;
 			_trickContent.SetUpBorder(upBorder);
 		}
 
-		public void SetLabel(string HHAAFADDOJB)
+		public void SetLabel(string label)
 		{
 			_header.set_LabelFontSize(headerFontSize);
-			_header.set_Alias(HHAAFADDOJB);
+			_header.set_Alias(label);
 		}
 
-		public void SetNoContentMessage(string LIOGIBJBHAH)
+		public void SetNoContentMessage(string message)
 		{
-			_noContentMessage.set_Alias(LIOGIBJBHAH);
+			_noContentMessage.set_Alias(message);
 		}
 
 		public void Clear()

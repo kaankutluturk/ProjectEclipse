@@ -12,28 +12,28 @@ namespace UIFigures
 
 		protected List<UIVertex> _Vertexes = new List<UIVertex>();
 
-		protected override void OnPopulateMesh(VertexHelper DHJBOKKAOJK)
+		protected override void OnPopulateMesh(VertexHelper vertexHelper)
 		{
-			base.OnPopulateMesh(DHJBOKKAOJK);
-			Vector2 pEEOEOMEBFG = new Vector2(base.rectTransform.rect.width, base.rectTransform.rect.height);
-			Draw(DHJBOKKAOJK, pEEOEOMEBFG, base.rectTransform.pivot);
+			base.OnPopulateMesh(vertexHelper);
+			Vector2 halfSize = new Vector2(base.rectTransform.rect.width, base.rectTransform.rect.height);
+			Draw(vertexHelper, halfSize, base.rectTransform.pivot);
 		}
 
-		protected void Draw(VertexHelper DHJBOKKAOJK, Vector2 PEEOEOMEBFG, Vector2 BBKPOIGBHPI)
+		protected void Draw(VertexHelper vertexHelper, Vector2 halfSize, Vector2 pivot)
 		{
-			DHJBOKKAOJK.Clear();
+			vertexHelper.Clear();
 			_Vertexes.Clear();
 			float f = (float)Math.PI * _SkewAngle / 180f;
-			float num = PEEOEOMEBFG.y * Mathf.Tan(f);
-			Vector2 vector = new Vector2((0f - PEEOEOMEBFG.x) * BBKPOIGBHPI.x, (0f - PEEOEOMEBFG.y) * BBKPOIGBHPI.y);
-			Vector2 vector2 = new Vector2((0f - PEEOEOMEBFG.x) * BBKPOIGBHPI.x + num, PEEOEOMEBFG.y * (1f - BBKPOIGBHPI.y));
-			Vector2 vector3 = new Vector2(PEEOEOMEBFG.x * (1f - BBKPOIGBHPI.x), PEEOEOMEBFG.y * (1f - BBKPOIGBHPI.y));
-			Vector2 vector4 = new Vector2(PEEOEOMEBFG.x * (1f - BBKPOIGBHPI.x) - num, (0f - PEEOEOMEBFG.y) * BBKPOIGBHPI.y);
+			float num = halfSize.y * Mathf.Tan(f);
+			Vector2 vector = new Vector2((0f - halfSize.x) * pivot.x, (0f - halfSize.y) * pivot.y);
+			Vector2 vector2 = new Vector2((0f - halfSize.x) * pivot.x + num, halfSize.y * (1f - pivot.y));
+			Vector2 vector3 = new Vector2(halfSize.x * (1f - pivot.x), halfSize.y * (1f - pivot.y));
+			Vector2 vector4 = new Vector2(halfSize.x * (1f - pivot.x) - num, (0f - halfSize.y) * pivot.y);
 			AddVertex(vector);
 			AddVertex(vector2);
 			AddVertex(vector3);
 			AddVertex(vector4);
-			DHJBOKKAOJK.AddUIVertexQuad(_Vertexes.ToArray());
+			vertexHelper.AddUIVertexQuad(_Vertexes.ToArray());
 		}
 
 		protected void AddVertex(Vector3 GIAEPIIIMDH)

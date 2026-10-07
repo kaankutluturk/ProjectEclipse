@@ -120,22 +120,22 @@ public class PerkTrigger
 	public void Parse(XmlNode node)
 	{
 		set_Name(node.Attributes["Name"].GetStringOrDefault(string.Empty));
-		XmlNode hKPPBKPJOEO = node["Events"];
+		XmlNode eventsNode = node["Events"];
 		XmlNode hKPPBKPJOEO2 = node["Conditions"];
 		XmlNode hKPPBKPJOEO3 = node["Actions"];
-		SetEvents(PerkEvent.Create(hKPPBKPJOEO, GetPerk()));
+		SetEvents(PerkEvent.Create(eventsNode, GetPerk()));
 		SetConditions(PerkCondition.Create(hKPPBKPJOEO2, GetPerk()));
 		SetActions(PerkAction.Create(hKPPBKPJOEO3, GetPerk(), this));
 	}
 
-	public bool MatchesEvent(PerkEvent.EventStruct EJMEALJNNIL)
+	public bool MatchesEvent(PerkEvent.EventStruct eventData)
 	{
-		PerkEvent gBMAKFJNAPG = null;
+		PerkEvent triggerEvent = null;
 		for (int i = 0; i < GetEvents().Count; i++)
 		{
-			gBMAKFJNAPG = GetEvents()[i];
-			bool flag = gBMAKFJNAPG.IsEqual(EJMEALJNNIL);
-			if ((!gBMAKFJNAPG.IsNot) ? flag : (!flag))
+			triggerEvent = GetEvents()[i];
+			bool flag = triggerEvent.IsEqual(eventData);
+			if ((!triggerEvent.IsNot) ? flag : (!flag))
 			{
 				return true;
 			}
@@ -143,14 +143,14 @@ public class PerkTrigger
 		return false;
 	}
 
-	public bool AreConditionsMet(Model ACENLMONNPA, List<string> NIKHAICFGNM)
+	public bool AreConditionsMet(Model model, List<string> activeActionNames)
 	{
-		PerkCondition iDJILNODHAD = null;
+		PerkCondition condition = null;
 		for (int i = 0; i < GetConditions().Count; i++)
 		{
-			iDJILNODHAD = GetConditions()[i];
-			bool flag = iDJILNODHAD.IsEqual(ACENLMONNPA, NIKHAICFGNM);
-			if (!((!iDJILNODHAD.IsNot) ? flag : (!flag)))
+			condition = GetConditions()[i];
+			bool flag = condition.IsEqual(model, activeActionNames);
+			if (!((!condition.IsNot) ? flag : (!flag)))
 			{
 				return false;
 			}

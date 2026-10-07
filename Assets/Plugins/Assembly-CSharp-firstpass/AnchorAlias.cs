@@ -13,16 +13,16 @@ public class AnchorAlias : ParsingEvent
 		}
 	}
 
-	public AnchorAlias(string value, Mark ILENLCMAMBH, Mark PCLFFOBJJFO)
-		: base(ILENLCMAMBH, PCLFFOBJJFO)
+	public AnchorAlias(string value, Mark start, Mark end)
+		: base(start, end)
 	{
 		if (string.IsNullOrEmpty(value))
 		{
-			throw new YamlException(ILENLCMAMBH, PCLFFOBJJFO, "Anchor value must not be empty.");
+			throw new YamlException(start, end, "Anchor value must not be empty.");
 		}
 		if (!NodeEvent.anchorValidator.IsMatch(value))
 		{
-			throw new YamlException(ILENLCMAMBH, PCLFFOBJJFO, "Anchor value must contain alphanumerical characters only.");
+			throw new YamlException(start, end, "Anchor value must contain alphanumerical characters only.");
 		}
 		this.value = value;
 	}
@@ -47,8 +47,8 @@ public class AnchorAlias : ParsingEvent
 		return string.Format(CultureInfo.InvariantCulture, "Alias [value = {0}]", value);
 	}
 
-	public override void Accept(IParsingEventVisitor NKECMANOOEM)
+	public override void Accept(IParsingEventVisitor visitor)
 	{
-		NKECMANOOEM.Visit(this);
+		visitor.Visit(this);
 	}
 }

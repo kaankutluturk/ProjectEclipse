@@ -2,13 +2,13 @@ using System.IO;
 
 public class HTTPProxyResponse : HTTPResponse
 {
-	internal HTTPProxyResponse(HTTPRequest ONOCIELLAPL, Stream ABJIEFMMIEK, bool IBIIADCLKCH, bool PEAJIKCANHP)
-		: base(ONOCIELLAPL, ABJIEFMMIEK, IBIIADCLKCH, PEAJIKCANHP)
+	internal HTTPProxyResponse(HTTPRequest request, Stream stream, bool isStreamed, bool isFromCache)
+		: base(request, stream, isStreamed, isFromCache)
 	{
 	}
 
-	internal override bool Receive(int JHFPNBPNHEH = -1, bool NDCKHEGBAGO = false)
+	internal override bool Receive(int forceReadRawContentLength = -1, bool readPayloadData = false)
 	{
-		return base.Receive(JHFPNBPNHEH, false);
+		return base.Receive(forceReadRawContentLength, false);
 	}
 }

@@ -34,7 +34,7 @@ public abstract class TransportBase
 
 	public abstract bool SupportsKeepAlive { get; }
 
-	public IConnection PEBFDIFIMBO
+	public IConnection TransportConnection
 	{
 		get
 		{
@@ -42,7 +42,7 @@ public abstract class TransportBase
 		}
 		protected set
 		{
-			GNLCPJFBAJE(value);
+			SetConnection(value);
 		}
 	}
 
@@ -70,10 +70,10 @@ public abstract class TransportBase
 		}
 	}
 
-	public TransportBase(string name, Connection MDGFGCDPGFI)
+	public TransportBase(string name, Connection connection)
 	{
 		set_Name(name);
-		GNLCPJFBAJE(MDGFGCDPGFI);
+		SetConnection(connection);
 		set_State(TransportStates.Initial);
 	}
 
@@ -96,7 +96,7 @@ public abstract class TransportBase
 		return connection;
 	}
 
-	protected void GNLCPJFBAJE(IConnection value)
+	protected void SetConnection(IConnection value)
 	{
 		connection = value;
 	}
@@ -108,43 +108,43 @@ public abstract class TransportBase
 
 	protected void set_State(TransportStates value)
 	{
-		TransportStates mAFFNGPOMJD = CurrentStateValue;
+		TransportStates previousState = CurrentStateValue;
 		CurrentStateValue = value;
 		if (OnStateChanged != null)
 		{
-			OnStateChanged(this, mAFFNGPOMJD, CurrentStateValue);
+			OnStateChanged(this, previousState, CurrentStateValue);
 		}
 	}
 
 	public void AddStateChangedHandler(OnTransportStateChangedDelegate value)
 	{
-		OnTransportStateChangedDelegate lCGIFKDMOMP = OnStateChanged;
+		OnTransportStateChangedDelegate currentHandler = OnStateChanged;
 		OnTransportStateChangedDelegate lCGIFKDMOMP2;
 		do
 		{
-			lCGIFKDMOMP2 = lCGIFKDMOMP;
-			lCGIFKDMOMP = Interlocked.CompareExchange(ref OnStateChanged, (OnTransportStateChangedDelegate)Delegate.Combine(lCGIFKDMOMP2, value), lCGIFKDMOMP);
+			lCGIFKDMOMP2 = currentHandler;
+			currentHandler = Interlocked.CompareExchange(ref OnStateChanged, (OnTransportStateChangedDelegate)Delegate.Combine(lCGIFKDMOMP2, value), currentHandler);
 		}
-		while ((object)lCGIFKDMOMP != lCGIFKDMOMP2);
+		while ((object)currentHandler != lCGIFKDMOMP2);
 	}
 
 	public void RemoveStateChangedHandler(OnTransportStateChangedDelegate value)
 	{
-		OnTransportStateChangedDelegate lCGIFKDMOMP = OnStateChanged;
+		OnTransportStateChangedDelegate currentHandler = OnStateChanged;
 		OnTransportStateChangedDelegate lCGIFKDMOMP2;
 		do
 		{
-			lCGIFKDMOMP2 = lCGIFKDMOMP;
-			lCGIFKDMOMP = Interlocked.CompareExchange(ref OnStateChanged, (OnTransportStateChangedDelegate)Delegate.Remove(lCGIFKDMOMP2, value), lCGIFKDMOMP);
+			lCGIFKDMOMP2 = currentHandler;
+			currentHandler = Interlocked.CompareExchange(ref OnStateChanged, (OnTransportStateChangedDelegate)Delegate.Remove(lCGIFKDMOMP2, value), currentHandler);
 		}
-		while ((object)lCGIFKDMOMP != lCGIFKDMOMP2);
+		while ((object)currentHandler != lCGIFKDMOMP2);
 	}
 
 	public abstract void Connect();
 
 	public abstract void Stop();
 
-	protected abstract void SendImpl(string EMDHMHOKGFP);
+	protected abstract void SendImpl(string message);
 
 	protected abstract void OnStarted();
 
@@ -166,23 +166,23 @@ public abstract class TransportBase
 	{
 		HTTPManager.GetLogger().Information("Transport - " + get_Name(), "Sending Start Request");
 		set_State(TransportStates.Starting);
-		HTTPRequest iPLGNIDJDCF = new HTTPRequest(GetConnection().BuildUri(SignalRRequestType.Start, this), HTTPMethods.Get, true, true, OnStartRequestFinished);
-		iPLGNIDJDCF.set_Tag(0);
-		iPLGNIDJDCF.SetDisableRetry(true);
-		iPLGNIDJDCF.SetTimeout(GetConnection().GetNegotiationResult().GetConnectionTimeout() + TimeSpan.FromSeconds(10.0));
-		GetConnection().PrepareRequest(iPLGNIDJDCF, SignalRRequestType.Start);
-		iPLGNIDJDCF.Send();
+		HTTPRequest startRequest = new HTTPRequest(GetConnection().BuildUri(SignalRRequestType.Start, this), HTTPMethods.Get, true, true, OnStartRequestFinished);
+		startRequest.set_Tag(0);
+		startRequest.SetDisableRetry(true);
+		startRequest.SetTimeout(GetConnection().GetNegotiationResult().GetConnectionTimeout() + TimeSpan.FromSeconds(10.0));
+		GetConnection().PrepareRequest(startRequest, SignalRRequestType.Start);
+		startRequest.Send();
 	}
 
-	private void OnStartRequestFinished(HTTPRequest CGOIOKHEGOE, HTTPResponse BEIGFGCBICO)
+	private void OnStartRequestFinished(HTTPRequest request, HTTPResponse response)
 	{
-		HTTPRequestStates cFGBMHKCENK = CGOIOKHEGOE.GetState();
-		if (cFGBMHKCENK == HTTPRequestStates.Finished)
+		HTTPRequestStates requestState = request.GetState();
+		if (requestState == HTTPRequestStates.Finished)
 		{
-			if (BEIGFGCBICO.GetIsSuccess())
+			if (response.GetIsSuccess())
 			{
-				HTTPManager.GetLogger().Information("Transport - " + get_Name(), "Start - Returned: " + BEIGFGCBICO.GetDataAsText());
-				string text = GetConnection().ParseResponse(BEIGFGCBICO.GetDataAsText());
+				HTTPManager.GetLogger().Information("Transport - " + get_Name(), "Start - Returned: " + response.GetDataAsText());
+				string text = GetConnection().ParseResponse(response.GetDataAsText());
 				if (text != "started")
 				{
 					GetConnection().Error(string.Format("Expected 'started' response, but '{0}' found!", text));
@@ -193,14 +193,14 @@ public abstract class TransportBase
 				GetConnection().TransportStarted();
 				return;
 			}
-			HTTPManager.GetLogger().Warning("Transport - " + get_Name(), string.Format("Start - request finished Successfully, but the server sent an error. Status Code: {0}-{1} Message: {2} Uri: {3}", BEIGFGCBICO.GetStatusCode(), BEIGFGCBICO.GetMessage(), BEIGFGCBICO.GetDataAsText(), CGOIOKHEGOE.GetCurrentUri()));
+			HTTPManager.GetLogger().Warning("Transport - " + get_Name(), string.Format("Start - request finished Successfully, but the server sent an error. Status Code: {0}-{1} Message: {2} Uri: {3}", response.GetStatusCode(), response.GetMessage(), response.GetDataAsText(), request.GetCurrentUri()));
 		}
-		HTTPManager.GetLogger().Information("Transport - " + get_Name(), "Start request state: " + CGOIOKHEGOE.GetState());
-		int num = (int)CGOIOKHEGOE.GetTag();
+		HTTPManager.GetLogger().Information("Transport - " + get_Name(), "Start request state: " + request.GetState());
+		int num = (int)request.GetTag();
 		if (num++ < 5)
 		{
-			CGOIOKHEGOE.set_Tag(num);
-			CGOIOKHEGOE.Send();
+			request.set_Tag(num);
+			request.Send();
 		}
 		else
 		{
@@ -213,11 +213,11 @@ public abstract class TransportBase
 		if (GetState() == TransportStates.Started)
 		{
 			set_State(TransportStates.Closing);
-			HTTPRequest iPLGNIDJDCF = new HTTPRequest(GetConnection().BuildUri(SignalRRequestType.Abort, this), HTTPMethods.Get, true, true, OnAbortRequestFinished);
-			iPLGNIDJDCF.set_Tag(0);
-			iPLGNIDJDCF.SetDisableRetry(true);
-			GetConnection().PrepareRequest(iPLGNIDJDCF, SignalRRequestType.Abort);
-			iPLGNIDJDCF.Send();
+			HTTPRequest abortRequest = new HTTPRequest(GetConnection().BuildUri(SignalRRequestType.Abort, this), HTTPMethods.Get, true, true, OnAbortRequestFinished);
+			abortRequest.set_Tag(0);
+			abortRequest.SetDisableRetry(true);
+			GetConnection().PrepareRequest(abortRequest, SignalRRequestType.Abort);
+			abortRequest.Send();
 		}
 	}
 
@@ -228,28 +228,28 @@ public abstract class TransportBase
 		OnAborted();
 	}
 
-	private void OnAbortRequestFinished(HTTPRequest CGOIOKHEGOE, HTTPResponse BEIGFGCBICO)
+	private void OnAbortRequestFinished(HTTPRequest request, HTTPResponse response)
 	{
-		HTTPRequestStates cFGBMHKCENK = CGOIOKHEGOE.GetState();
-		if (cFGBMHKCENK == HTTPRequestStates.Finished)
+		HTTPRequestStates requestState = request.GetState();
+		if (requestState == HTTPRequestStates.Finished)
 		{
-			if (BEIGFGCBICO.GetIsSuccess())
+			if (response.GetIsSuccess())
 			{
-				HTTPManager.GetLogger().Information("Transport - " + get_Name(), "Abort - Returned: " + BEIGFGCBICO.GetDataAsText());
+				HTTPManager.GetLogger().Information("Transport - " + get_Name(), "Abort - Returned: " + response.GetDataAsText());
 				if (GetState() == TransportStates.Closing)
 				{
 					AbortFinished();
 				}
 				return;
 			}
-			HTTPManager.GetLogger().Warning("Transport - " + get_Name(), string.Format("Abort - Handshake request finished Successfully, but the server sent an error. Status Code: {0}-{1} Message: {2} Uri: {3}", BEIGFGCBICO.GetStatusCode(), BEIGFGCBICO.GetMessage(), BEIGFGCBICO.GetDataAsText(), CGOIOKHEGOE.GetCurrentUri()));
+			HTTPManager.GetLogger().Warning("Transport - " + get_Name(), string.Format("Abort - Handshake request finished Successfully, but the server sent an error. Status Code: {0}-{1} Message: {2} Uri: {3}", response.GetStatusCode(), response.GetMessage(), response.GetDataAsText(), request.GetCurrentUri()));
 		}
-		HTTPManager.GetLogger().Information("Transport - " + get_Name(), "Abort request state: " + CGOIOKHEGOE.GetState());
-		int num = (int)CGOIOKHEGOE.GetTag();
+		HTTPManager.GetLogger().Information("Transport - " + get_Name(), "Abort request state: " + request.GetState());
+		int num = (int)request.GetTag();
 		if (num++ < 5)
 		{
-			CGOIOKHEGOE.set_Tag(num);
-			CGOIOKHEGOE.Send();
+			request.set_Tag(num);
+			request.Send();
 		}
 		else
 		{
@@ -257,16 +257,16 @@ public abstract class TransportBase
 		}
 	}
 
-	public void Send(string DGNLDMDLKDA)
+	public void Send(string message)
 	{
 		try
 		{
-			HTTPManager.GetLogger().Information("Transport - " + get_Name(), "Sending: " + DGNLDMDLKDA);
-			SendImpl(DGNLDMDLKDA);
+			HTTPManager.GetLogger().Information("Transport - " + get_Name(), "Sending: " + message);
+			SendImpl(message);
 		}
-		catch (Exception mPFFFAOGBJE)
+		catch (Exception exception)
 		{
-			HTTPManager.GetLogger().Exception("Transport - " + get_Name(), "Send", mPFFFAOGBJE);
+			HTTPManager.GetLogger().Exception("Transport - " + get_Name(), "Send", exception);
 		}
 	}
 
@@ -278,35 +278,35 @@ public abstract class TransportBase
 		Connect();
 	}
 
-	public static IServerMessage Parse(IJsonEncoder GLOJHMAIFOK, string EMDHMHOKGFP)
+	public static IServerMessage Parse(IJsonEncoder encoder, string json)
 	{
-		if (string.IsNullOrEmpty(EMDHMHOKGFP))
+		if (string.IsNullOrEmpty(json))
 		{
 			HTTPManager.GetLogger().Error("MessageFactory", "Parse - called with empty or null string!");
 			return null;
 		}
-		if (EMDHMHOKGFP.Length == 2 && EMDHMHOKGFP == "{}")
+		if (json.Length == 2 && json == "{}")
 		{
 			return new KeepAliveMessage();
 		}
 		IDictionary<string, object> dictionary = null;
 		try
 		{
-			dictionary = GLOJHMAIFOK.DecodeMessage(EMDHMHOKGFP);
+			dictionary = encoder.DecodeMessage(json);
 		}
-		catch (Exception mPFFFAOGBJE)
+		catch (Exception exception)
 		{
-			HTTPManager.GetLogger().Exception("MessageFactory", "Parse - encoder.DecodeMessage", mPFFFAOGBJE);
+			HTTPManager.GetLogger().Exception("MessageFactory", "Parse - encoder.DecodeMessage", exception);
 			return null;
 		}
 		if (dictionary == null)
 		{
-			HTTPManager.GetLogger().Error("MessageFactory", "Parse - Json Decode failed for json string: \"" + EMDHMHOKGFP + "\"");
+			HTTPManager.GetLogger().Error("MessageFactory", "Parse - Json Decode failed for json string: \"" + json + "\"");
 			return null;
 		}
-		IServerMessage bNGPAAAKBOP = null;
-		bNGPAAAKBOP = (dictionary.ContainsKey("C") ? new MultiMessage() : (dictionary.ContainsKey("E") ? ((IServerMessage)new FailureMessage()) : ((IServerMessage)new ResultMessage())));
-		bNGPAAAKBOP.Parse(dictionary);
-		return bNGPAAAKBOP;
+		IServerMessage message = null;
+		message = (dictionary.ContainsKey("C") ? new MultiMessage() : (dictionary.ContainsKey("E") ? ((IServerMessage)new FailureMessage()) : ((IServerMessage)new ResultMessage())));
+		message.Parse(dictionary);
+		return message;
 	}
 }

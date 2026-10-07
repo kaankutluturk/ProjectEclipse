@@ -55,10 +55,10 @@ public sealed class PropertyDescriptor : IPropertyDescriptor
 		}
 	}
 
-	public PropertyDescriptor(IPropertyDescriptor PNBMNIMMEOF)
+	public PropertyDescriptor(IPropertyDescriptor innerDescriptor)
 	{
-		this.baseDescriptor = PNBMNIMMEOF;
-		set_Name(PNBMNIMMEOF.get_Name());
+		this.baseDescriptor = innerDescriptor;
+		set_Name(innerDescriptor.get_Name());
 	}
 
 	public string get_Name()

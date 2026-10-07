@@ -5,33 +5,33 @@ public class EventHit : EventAnimation
 	{
 	}
 
-	protected override bool Compare(EventAnimation FOPOKALJIIJ)
+	protected override bool Compare(EventAnimation other)
 	{
 		bool flag = false;
-		EventHit eLGNDOJMOBH = FOPOKALJIIJ as EventHit;
+		EventHit otherHit = other as EventHit;
 		if (string.IsNullOrEmpty(AnimationName))
 		{
 			flag = true;
 		}
 		else
 		{
-			Model.StrikeResult jEGHAGLEJCB = (Model.StrikeResult)FOPOKALJIIJ.Conditions.StrikeResult;
-			Model gAIBPAGPEGK = jEGHAGLEJCB.AttackerModel;
-			IntervalAttack hFIIPNLCIEE = (IntervalAttack)gAIBPAGPEGK.GetAnimationModule().FindInterval(IntervalAnimation.IntervalType.INTERVAL_ATTACK);
-			if (hFIIPNLCIEE != null)
+			Model.StrikeResult strikeResult = (Model.StrikeResult)other.Conditions.StrikeResult;
+			Model attacker = strikeResult.AttackerModel;
+			IntervalAttack attackInterval = (IntervalAttack)attacker.GetAnimationModule().FindInterval(IntervalAnimation.IntervalType.INTERVAL_ATTACK);
+			if (attackInterval != null)
 			{
-				string text = hFIIPNLCIEE.GetReactionName(gAIBPAGPEGK.GetReactionFrame());
+				string text = attackInterval.GetReactionName(attacker.GetReactionFrame());
 				flag = text == AnimationName;
 			}
 		}
 		if (flag && !HitType.IsNullOrEmpty())
 		{
-			bool flag2 = HitType == eLGNDOJMOBH.HitType;
+			bool flag2 = HitType == otherHit.HitType;
 			flag = flag && flag2;
 		}
 		if (flag && !StageName.IsNullOrEmpty())
 		{
-			bool flag3 = StageName == eLGNDOJMOBH.StageName;
+			bool flag3 = StageName == otherHit.StageName;
 			flag = flag && flag3;
 		}
 		return flag;

@@ -17,15 +17,15 @@ public class CreditsScreen : SFMonoBehaviour<object>, IPointerClickHandler, IEve
 
 	private Action onClosed;
 
-	public static CreditsScreen Create(Action OCLNBMKHLMH = null)
+	public static CreditsScreen Create(Action closedCallback = null)
 	{
 		CreditsScreen original = Resources.Load<CreditsScreen>("Prefabs/Credits/CreditsScreen");
 		original = UnityEngine.Object.Instantiate(original);
-		original.onClosed = OCLNBMKHLMH;
+		original.onClosed = closedCallback;
 		return original;
 	}
 
-	public void OnPointerClick(PointerEventData BHOLFGOGPCP)
+	public void OnPointerClick(PointerEventData eventData)
 	{
 		Hide();
 	}
@@ -38,10 +38,10 @@ public class CreditsScreen : SFMonoBehaviour<object>, IPointerClickHandler, IEve
 		XmlNode xmlNode = xmlDocument["Credits"];
 		foreach (XmlNode item in xmlNode)
 		{
-			string kNNEDNHONBJ = item.Attributes["Name"].GetStringOrDefault();
+			string creditName = item.Attributes["Name"].GetStringOrDefault();
 			string innerText = item.InnerText;
 			CreditsScreenElement creditsScreenElement = UnityEngine.Object.Instantiate(elementPrefab, content, false);
-			creditsScreenElement.Init(kNNEDNHONBJ, innerText);
+			creditsScreenElement.Init(creditName, innerText);
 		}
 	}
 
@@ -74,7 +74,7 @@ public class CreditsScreen : SFMonoBehaviour<object>, IPointerClickHandler, IEve
 		}
 	}
 
-	public void OnBackKeyClicked(object GHDPPHAAPCA)
+	public void OnBackKeyClicked(object sender)
 	{
 		Hide();
 	}

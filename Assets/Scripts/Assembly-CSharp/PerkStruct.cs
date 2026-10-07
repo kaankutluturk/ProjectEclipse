@@ -54,23 +54,23 @@ public class PerkStruct
 
 	public IReadOnlyDictionary<string, string> EclipseParameters => _eclipseParameters;
 
-	public PerkStruct(PerkStruct NOLFMPDGCOC)
+	public PerkStruct(PerkStruct source)
 	{
-		_name = string.Copy(NOLFMPDGCOC.get_Name());
-		_eclipseEnchantment = string.Copy(NOLFMPDGCOC._eclipseEnchantment);
-		_eclipseKind = string.Copy(NOLFMPDGCOC._eclipseKind);
-		foreach (KeyValuePair<string, string> pair in NOLFMPDGCOC._eclipseParameters)
+		_name = string.Copy(source.get_Name());
+		_eclipseEnchantment = string.Copy(source._eclipseEnchantment);
+		_eclipseKind = string.Copy(source._eclipseKind);
+		foreach (KeyValuePair<string, string> pair in source._eclipseParameters)
 			_eclipseParameters.Add(string.Copy(pair.Key), string.Copy(pair.Value));
 		_itemTypes = new List<string>();
-		NOLFMPDGCOC._itemTypes.ForEach((string DHDMNHCIPEH) =>
+		source._itemTypes.ForEach((string itemType) =>
 		{
-			_itemTypes.Add(string.Copy(DHDMNHCIPEH));
+			_itemTypes.Add(string.Copy(itemType));
 		});
 		setPairs = new List<KeyValuePair<string, string>>();
-		NOLFMPDGCOC.setPairs.ForEach((KeyValuePair<string, string> DHDMNHCIPEH) =>
+		source.setPairs.ForEach((KeyValuePair<string, string> pair) =>
 		{
-			string key = string.Copy(DHDMNHCIPEH.Key);
-			string value = string.Copy(DHDMNHCIPEH.Value);
+			string key = string.Copy(pair.Key);
+			string value = string.Copy(pair.Value);
 			setPairs.Add(new KeyValuePair<string, string>(key, value));
 		});
 	}
@@ -125,11 +125,11 @@ public class PerkStruct
 		return setPairs;
 	}
 
-	private bool CompareItemType(string LMNNBBKHMEI)
+	private bool CompareItemType(string itemType)
 	{
 		foreach (string item in _itemTypes)
 		{
-			if (item == LMNNBBKHMEI)
+			if (item == itemType)
 			{
 				return true;
 			}
@@ -139,20 +139,20 @@ public class PerkStruct
 
 	public void EvaluatePairValues()
 	{
-		FunctionExtension oPIFBDJNMKD = new FunctionExtension();
-		PerkInfoItem aCONCDFDNJH = GameUtils.PerkItemList.FindBasePerk(_name);
-		if (aCONCDFDNJH == null)
+		FunctionExtension functionExtension = new FunctionExtension();
+		PerkInfoItem basePerk = GameUtils.PerkItemList.FindBasePerk(_name);
+		if (basePerk == null)
 		{
 			return;
 		}
 		List<KeyValuePair<string, string>> list = new List<KeyValuePair<string, string>>();
 		foreach (KeyValuePair<string, string> item in setPairs)
 		{
-			oPIFBDJNMKD.Parse(item.Value);
-			oPIFBDJNMKD.SetFunctionCallback(aCONCDFDNJH.EvaluateFunctionCallback);
-			oPIFBDJNMKD.SetVariableCallback(aCONCDFDNJH.OnFunctionPreCallback);
-			FunctionResult dEIHAOLOPLC = oPIFBDJNMKD.Calculate();
-			list.Add(new KeyValuePair<string, string>(item.Key, dEIHAOLOPLC.Value));
+			functionExtension.Parse(item.Value);
+			functionExtension.SetFunctionCallback(basePerk.EvaluateFunctionCallback);
+			functionExtension.SetVariableCallback(basePerk.OnFunctionPreCallback);
+			FunctionResult functionResult = functionExtension.Calculate();
+			list.Add(new KeyValuePair<string, string>(item.Key, functionResult.Value));
 		}
 		setPairs = list;
 	}

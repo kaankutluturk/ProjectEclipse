@@ -32,8 +32,8 @@ public class ObjectEventInfo : EventInfo
 		}
 	}
 
-	protected ObjectEventInfo(IObjectDescriptor BBNKIBKPBLO)
-		: base(BBNKIBKPBLO)
+	protected ObjectEventInfo(IObjectDescriptor objectDescriptor)
+		: base(objectDescriptor)
 	{
 	}
 

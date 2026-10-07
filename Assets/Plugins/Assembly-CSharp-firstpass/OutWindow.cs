@@ -14,22 +14,22 @@ public class OutWindow
 
 	public uint TrainSize;
 
-	public void Create(uint AKOEOKJFINO)
+	public void Create(uint windowSize)
 	{
-		if (_windowSize != AKOEOKJFINO)
+		if (_windowSize != windowSize)
 		{
-			_buffer = new byte[AKOEOKJFINO];
+			_buffer = new byte[windowSize];
 		}
-		_windowSize = AKOEOKJFINO;
+		_windowSize = windowSize;
 		_pos = 0u;
 		_streamPos = 0u;
 	}
 
-	public void Init(Stream ABJIEFMMIEK, bool POOADOMADDK)
+	public void Init(Stream stream, bool solid)
 	{
 		ReleaseStream();
-		_stream = ABJIEFMMIEK;
-		if (!POOADOMADDK)
+		_stream = stream;
+		if (!solid)
 		{
 			_streamPos = 0u;
 			_pos = 0u;
@@ -37,11 +37,11 @@ public class OutWindow
 		}
 	}
 
-	public bool Train(Stream ABJIEFMMIEK)
+	public bool Train(Stream stream)
 	{
-		long length = ABJIEFMMIEK.Length;
+		long length = stream.Length;
 		uint num = (TrainSize = (uint)((length >= _windowSize) ? _windowSize : length));
-		ABJIEFMMIEK.Position = length - num;
+		stream.Position = length - num;
 		_streamPos = (_pos = 0u);
 		while (num != 0)
 		{
@@ -50,7 +50,7 @@ public class OutWindow
 			{
 				num2 = num;
 			}
-			int num3 = ABJIEFMMIEK.Read(_buffer, (int)_pos, (int)num2);
+			int num3 = stream.Read(_buffer, (int)_pos, (int)num2);
 			if (num3 == 0)
 			{
 				return false;
@@ -86,14 +86,14 @@ public class OutWindow
 		}
 	}
 
-	public void CopyBlock(uint OIOMNNFMDOO, uint JCAJDBOMGOM)
+	public void CopyBlock(uint distance, uint length)
 	{
-		uint num = _pos - OIOMNNFMDOO - 1;
+		uint num = _pos - distance - 1;
 		if (num >= _windowSize)
 		{
 			num += _windowSize;
 		}
-		while (JCAJDBOMGOM != 0)
+		while (length != 0)
 		{
 			if (num >= _windowSize)
 			{
@@ -104,22 +104,22 @@ public class OutWindow
 			{
 				Flush();
 			}
-			JCAJDBOMGOM--;
+			length--;
 		}
 	}
 
-	public void PutByte(byte AAOIAEJJINO)
+	public void PutByte(byte byteValue)
 	{
-		_buffer[_pos++] = AAOIAEJJINO;
+		_buffer[_pos++] = byteValue;
 		if (_pos >= _windowSize)
 		{
 			Flush();
 		}
 	}
 
-	public byte GetByte(uint OIOMNNFMDOO)
+	public byte GetByte(uint distance)
 	{
-		uint num = _pos - OIOMNNFMDOO - 1;
+		uint num = _pos - distance - 1;
 		if (num >= _windowSize)
 		{
 			num += _windowSize;

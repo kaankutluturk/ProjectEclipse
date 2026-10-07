@@ -17,7 +17,7 @@ public class HotGroundRule : AnimationListRule
 
 		public float MinY;
 
-		public LimitedNode(XmlNode EABJIAHGLEO)
+		public LimitedNode(XmlNode xmlNode)
 		{
 			MaxX = float.MaxValue;
 			MinX = float.MinValue;
@@ -25,17 +25,17 @@ public class HotGroundRule : AnimationListRule
 			MinY = float.MinValue;
 			name = string.Empty;
 			node = null;
-			name = EABJIAHGLEO.Attributes["Name"].GetStringOrDefault(string.Empty);
-			string text = EABJIAHGLEO.Attributes["Axis"].GetStringOrDefault(string.Empty);
+			name = xmlNode.Attributes["Name"].GetStringOrDefault(string.Empty);
+			string text = xmlNode.Attributes["Axis"].GetStringOrDefault(string.Empty);
 			if (text == "X")
 			{
-				MaxX = EABJIAHGLEO.Attributes["Max"].ParseFloat(float.MaxValue);
-				MinX = EABJIAHGLEO.Attributes["Min"].ParseFloat(float.MinValue);
+				MaxX = xmlNode.Attributes["Max"].ParseFloat(float.MaxValue);
+				MinX = xmlNode.Attributes["Min"].ParseFloat(float.MinValue);
 			}
 			if (text == "Y")
 			{
-				MaxY = EABJIAHGLEO.Attributes["Max"].ParseFloat(float.MaxValue);
-				MinY = EABJIAHGLEO.Attributes["Min"].ParseFloat(float.MinValue);
+				MaxY = xmlNode.Attributes["Max"].ParseFloat(float.MaxValue);
+				MinY = xmlNode.Attributes["Min"].ParseFloat(float.MinValue);
 			}
 		}
 	}
@@ -83,8 +83,8 @@ public class HotGroundRule : AnimationListRule
 
 	private int slowModeDivisor;
 
-	public HotGroundRule(XmlNode node, RuleAppliance EJPOJJKKICO)
-		: base(RuleType.RuleHotGround, EJPOJJKKICO, node)
+	public HotGroundRule(XmlNode node, RuleAppliance ruleAppliance)
+		: base(RuleType.RuleHotGround, ruleAppliance, node)
 	{
 		timerChanged = true;
 		offsetX = 0f;
@@ -119,27 +119,27 @@ public class HotGroundRule : AnimationListRule
 
 	public override void InitRule(object data)
 	{
-		RuleInitData oIFPCFEGFOB = (RuleInitData)data;
-		if (oIFPCFEGFOB.FightLocation != null)
+		RuleInitData initData = (RuleInitData)data;
+		if (initData.FightLocation != null)
 		{
-			offsetX = (0f - oIFPCFEGFOB.FightLocation.width) / 2f;
-			offsetY = 0f - oIFPCFEGFOB.FightLocation.floorHeight;
+			offsetX = (0f - initData.FightLocation.width) / 2f;
+			offsetY = 0f - initData.FightLocation.floorHeight;
 		}
-		Model fGCODGKLHED = null;
+		Model targetModel = null;
 		switch (appliance)
 		{
 		case RuleAppliance.AppliancePlayer:
-			fGCODGKLHED = oIFPCFEGFOB.PlayerModel;
+			targetModel = initData.PlayerModel;
 			break;
 		case RuleAppliance.ApplianceOpponent:
-			fGCODGKLHED = oIFPCFEGFOB.OpponentModel;
+			targetModel = initData.OpponentModel;
 			break;
 		}
-		if (fGCODGKLHED != null)
+		if (targetModel != null)
 		{
 			foreach (LimitedNode item in limitedNodes)
 			{
-				item.node = fGCODGKLHED.GetBodyObject().GetNodeByName(item.name);
+				item.node = targetModel.GetBodyObject().GetNodeByName(item.name);
 				if (item.node == null)
 				{
 					GameLog.Error("RingoutRule::initRule error - no ModelNode found with name " + item.name);
@@ -166,8 +166,8 @@ public class HotGroundRule : AnimationListRule
 
 	protected override bool CompareSingle(object data)
 	{
-		FightData hCPJJKMNMCE = (FightData)data;
-		switch (hCPJJKMNMCE.FightEventType)
+		FightData fightData = (FightData)data;
+		switch (fightData.FightEventType)
 		{
 		case FightEvent.RenderEvent:
 			if (isAnimationMatched && AreAllNodesOutsideLimits())
@@ -194,7 +194,7 @@ public class HotGroundRule : AnimationListRule
 			break;
 		case FightEvent.AnimationStartEvent:
 			isTimerReset = false;
-			isAnimationMatched = CheckAnimation(hCPJJKMNMCE.CurrentAnimation);
+			isAnimationMatched = CheckAnimation(fightData.CurrentAnimation);
 			break;
 		}
 		return remainingSeconds <= 0;
@@ -202,8 +202,8 @@ public class HotGroundRule : AnimationListRule
 
 	protected override void PrepareCompare(object data)
 	{
-		PlayersFightData jNGGHELCPFM = (PlayersFightData)data;
-		slowModeDivisor = jNGGHELCPFM.SlowMode;
+		PlayersFightData playersData = (PlayersFightData)data;
+		slowModeDivisor = playersData.SlowMode;
 	}
 
 	protected override void Parse(XmlNode node)

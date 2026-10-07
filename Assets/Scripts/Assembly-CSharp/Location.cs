@@ -156,18 +156,18 @@ public class Location
 		return _loadedDojo != null && ResolveDojo(_loadedDojoEncounter) != _loadedDojo;
 	}
 
-	public Location(string JLEKBBJBLOE, string FGCHEGMCGPD, bool preferCustomLayout = false)
+	public Location(string locationName, string musicName, bool preferCustomLayout = false)
 	{
 		_preferCustomLayout = preferCustomLayout;
-		GameLog.Write("Location:" + JLEKBBJBLOE);
-		name = JLEKBBJBLOE;
+		GameLog.Write("Location:" + locationName);
+		name = locationName;
 		gridSize = 0;
 		floorHeight = 0f;
 		positionY = 0f;
 		wallWidth = 0f;
 		width = 0f;
 		height = 0f;
-		encounterMusic = FGCHEGMCGPD;
+		encounterMusic = musicName;
 		gameLayer = null;
 		layers = null;
 	}
@@ -229,8 +229,8 @@ public class Location
 			string[] collection = xmlDocument["Root"].GetAttribute("Music").Split(new[] { '|' }, System.StringSplitOptions.RemoveEmptyEntries);
 			musics = new List<string>(collection);
 		}
-		XmlAttribute cJBEMNNNHDM = xmlDocument["Root"].Attributes["FrictionForce"];
-		PhysicsController.SetFrictionForce(cJBEMNNNHDM.ParseFloat(PhysicsController.GetFriction()));
+		XmlAttribute frictionAttribute = xmlDocument["Root"].Attributes["FrictionForce"];
+		PhysicsController.SetFrictionForce(frictionAttribute.ParseFloat(PhysicsController.GetFriction()));
 		wallWidth = xmlDocument["Root"].Attributes["Wall"].ParseFloat();
 		floorHeight = xmlDocument["Root"].Attributes["Floor"].ParseFloat();
 		positionY = xmlDocument["Root"].Attributes["PositionY"].ParseFloat();
@@ -289,9 +289,9 @@ public class Location
 
 	public Vector3f GetModelsCenter()
 	{
-		Vector3f eMAFACPEPDK = Vector3f.op_Addition(playerStartPosition, enemyStartPosition);
-		eMAFACPEPDK.Multiply(0.5f);
-		return eMAFACPEPDK;
+		Vector3f center = Vector3f.op_Addition(playerStartPosition, enemyStartPosition);
+		center.Multiply(0.5f);
+		return center;
 	}
 
 	public Vector2f GetHalfSize()
@@ -318,29 +318,29 @@ public class Location
 		return string.Format("Textures/Locations/{0}", artworkFolderName);
 	}
 
-	private string ResolveLayerTexturePath(string FAAALPKKJID)
+	private string ResolveLayerTexturePath(string path)
 	{
-		if (Eclipse.Modding.AssetId.TryParse(FAAALPKKJID, out _))
+		if (Eclipse.Modding.AssetId.TryParse(path, out _))
 		{
-			return FAAALPKKJID.TrimEnd('/');
+			return path.TrimEnd('/');
 		}
-		return "Textures/" + FAAALPKKJID.Trim('/');
+		return "Textures/" + path.Trim('/');
 	}
 
-	private void ParseLayer(XmlNode node, int DFIDNHKKNMB)
+	private void ParseLayer(XmlNode node, int depth)
 	{
 		int num = 0;
 		int num2 = node.Attributes["Scaling"].ParseInt();
-		LocationSelector hEOCIOGMDKG = new LocationSelector(DFIDNHKKNMB);
+		LocationSelector selector = new LocationSelector(depth);
 		string text = null;
 		text = ((node.Attributes["Path"] == null) ? GetTexturesPath() : ResolveLayerTexturePath(node.Attributes["Path"].GetStringOrDefault()));
-		hEOCIOGMDKG.SetScalingEnabled(num2 > 0);
-		hEOCIOGMDKG.set_Type(node.Attributes["Type"].ParseInt());
-		hEOCIOGMDKG.SetFactor(node.Attributes["Factor"].ParseFloat());
-		hEOCIOGMDKG.SetAtlasName(node.Attributes["Atlas"].GetStringOrDefault());
-		if (!string.IsNullOrEmpty(hEOCIOGMDKG.GetAtlasName()))
+		selector.SetScalingEnabled(num2 > 0);
+		selector.set_Type(node.Attributes["Type"].ParseInt());
+		selector.SetFactor(node.Attributes["Factor"].ParseFloat());
+		selector.SetAtlasName(node.Attributes["Atlas"].GetStringOrDefault());
+		if (!string.IsNullOrEmpty(selector.GetAtlasName()))
 		{
-			hEOCIOGMDKG.SetCocosAnimationData(CocosAnimationData.Create(string.Format("{0}/{1}_xml.xml", text, hEOCIOGMDKG.GetAtlasName()), true));
+			selector.SetCocosAnimationData(CocosAnimationData.Create(string.Format("{0}/{1}_xml.xml", text, selector.GetAtlasName()), true));
 		}
 		foreach (XmlNode childNode in node.ChildNodes)
 		{
@@ -352,37 +352,37 @@ public class Location
 				gridSize = num;
 				break;
 			case "ParticleEffect":
-				ParseParticleEffect(childNode, hEOCIOGMDKG, num, 0);
+				ParseParticleEffect(childNode, selector, num, 0);
 				break;
 			case "NewParticleEffect":
-				ParseParticleEffect(childNode, hEOCIOGMDKG, num, 1);
+				ParseParticleEffect(childNode, selector, num, 1);
 				break;
 			case "Image":
 			case "SpriteMask":
-				ParseImage(childNode, text, hEOCIOGMDKG, num);
+				ParseImage(childNode, text, selector, num);
 				break;
 			case "SimpleEffect":
-				ParseSimpleEffect(childNode, text, hEOCIOGMDKG, num);
+				ParseSimpleEffect(childNode, text, selector, num);
 				break;
 			}
 		}
-		layers.Add(hEOCIOGMDKG);
-		if (hEOCIOGMDKG.GetIsGameLayer())
+		layers.Add(selector);
+		if (selector.GetIsGameLayer())
 		{
-			gameLayer = hEOCIOGMDKG;
+			gameLayer = selector;
 		}
 	}
 
-	private void ParseImage(XmlNode node, string PPAJIHNNNDG, LocationSelector IDHKNBECKKO, int EELGIMCJLAI)
+	private void ParseImage(XmlNode node, string texturePath, LocationSelector selector, int index)
 	{
-		string ODMCNMJPHFJ = node.Attributes["ClassName"].GetStringOrDefault();
-		Sprite sprite = LocationSpriteCache.GetSprite(PPAJIHNNNDG, ODMCNMJPHFJ, IDHKNBECKKO.GetAtlasName());
+		string imageName = node.Attributes["ClassName"].GetStringOrDefault();
+		Sprite sprite = LocationSpriteCache.GetSprite(texturePath, imageName, selector.GetAtlasName());
 		if (sprite == null)
 		{
-			GameLog.Write("Pic: {0}", ODMCNMJPHFJ);
+			GameLog.Write("Pic: {0}", imageName);
 			return;
 		}
-		GameObject gameObject = new GameObject(ODMCNMJPHFJ);
+		GameObject gameObject = new GameObject(imageName);
 		SpriteRenderer spriteRenderer = gameObject.AddComponent<SpriteRenderer>();
 		spriteRenderer.sprite = sprite;
 		spriteRenderer.flipX = node.Attributes["FlipX"].ParseInt() != 0;
@@ -408,16 +408,16 @@ public class Location
 		float x = sprite.rect.size.x;
 		float y = sprite.rect.size.y;
 		bool flag = false;
-		if (IDHKNBECKKO.GetCocosAnimationData() != null)
+		if (selector.GetCocosAnimationData() != null)
 		{
-			CocosAnimationData.SpriteFrameCocos pBAHNJDFMBO = IDHKNBECKKO.GetCocosAnimationData().GetFrames().Find((CocosAnimationData.SpriteFrameCocos DHDMNHCIPEH) => DHDMNHCIPEH.get_Name() == ODMCNMJPHFJ);
-			if (pBAHNJDFMBO != null)
+			CocosAnimationData.SpriteFrameCocos frame = selector.GetCocosAnimationData().GetFrames().Find((CocosAnimationData.SpriteFrameCocos cocosFrame) => cocosFrame.get_Name() == imageName);
+			if (frame != null)
 			{
-				flag = pBAHNJDFMBO.GetRotated();
-				num3 = pBAHNJDFMBO.GetOffset().x;
-				num4 = pBAHNJDFMBO.GetOffset().y;
-				x = pBAHNJDFMBO.GetSourceSize().x;
-				y = pBAHNJDFMBO.GetSourceSize().y;
+				flag = frame.GetRotated();
+				num3 = frame.GetOffset().x;
+				num4 = frame.GetOffset().y;
+				x = frame.GetSourceSize().x;
+				y = frame.GetSourceSize().y;
 			}
 		}
 		Vector3 vector = default(Vector3);
@@ -432,13 +432,13 @@ public class Location
 			vector = new Vector3(num5 / x, num6 / y, 1f);
 		}
 		// Qualified sprites carry their own pixels-per-unit import density.
-		if (Eclipse.Modding.AssetId.TryParse(PPAJIHNNNDG, out _))
+		if (Eclipse.Modding.AssetId.TryParse(texturePath, out _))
 		{
 			vector.x *= sprite.pixelsPerUnit;
 			vector.y *= sprite.pixelsPerUnit;
 		}
-		if (PPAJIHNNNDG.Replace('\\', '/').TrimEnd('/').EndsWith("/dojo", System.StringComparison.OrdinalIgnoreCase) &&
-            (ODMCNMJPHFJ == "background_1" || ODMCNMJPHFJ == "background_2"))
+		if (texturePath.Replace('\\', '/').TrimEnd('/').EndsWith("/dojo", System.StringComparison.OrdinalIgnoreCase) &&
+            (imageName == "background_1" || imageName == "background_2"))
         {
             float width = flag ? sprite.bounds.size.y * vector.y : sprite.bounds.size.x * vector.x;
             if (width > 0f && num5 > 0f)
@@ -449,14 +449,14 @@ public class Location
         }
         gameObject.transform.localScale = vector;
 		gameObject.transform.localPosition = new Vector3(num + num3 * vector.x, num2 + num4 * vector.y, 0f);
-		IDHKNBECKKO.AddImage(gameObject, EELGIMCJLAI);
+		selector.AddImage(gameObject, index);
 	}
 
-	private void ParseSimpleEffect(XmlNode node, string OKNJDIMPKCB, LocationSelector IDHKNBECKKO, int EELGIMCJLAI)
+	private void ParseSimpleEffect(XmlNode node, string texturePath, LocationSelector selector, int index)
 	{
 		bool flag = false;
-		string text = OKNJDIMPKCB;
-		ChangingSprite fEMGGEAGICG = null;
+		string text = texturePath;
+		ChangingSprite effect = null;
 		string text2 = node.Attributes["PictureLocation"].GetStringOrDefault();
 		if (text2 == "global")
 		{
@@ -470,17 +470,17 @@ public class Location
 		string text3 = node.Attributes["Type"].GetStringOrDefault();
 		if (text3 == "Picture")
 		{
-			string ODMCNMJPHFJ = node.Attributes["ClassName"].GetStringOrDefault();
-			CocosAnimationData animationData = IDHKNBECKKO.GetCocosAnimationData();
-			CocosAnimationData.SpriteFrameCocos pIDBGGLFBCO = animationData == null ? null : animationData.GetFrames().Find((CocosAnimationData.SpriteFrameCocos DHDMNHCIPEH) => DHDMNHCIPEH.get_Name() == ODMCNMJPHFJ);
-			if (LocationSpriteCache.GetSprite(text, ODMCNMJPHFJ, IDHKNBECKKO.GetAtlasName()) == null)
+			string imageName = node.Attributes["ClassName"].GetStringOrDefault();
+			CocosAnimationData animationData = selector.GetCocosAnimationData();
+			CocosAnimationData.SpriteFrameCocos frame = animationData == null ? null : animationData.GetFrames().Find((CocosAnimationData.SpriteFrameCocos cocosFrame) => cocosFrame.get_Name() == imageName);
+			if (LocationSpriteCache.GetSprite(text, imageName, selector.GetAtlasName()) == null)
 			{
-				Debug.LogWarning("[Location] Missing picture effect '" + ODMCNMJPHFJ + "' in " + name);
+				Debug.LogWarning("[Location] Missing picture effect '" + imageName + "' in " + name);
 				return;
 			}
-			fEMGGEAGICG = new ChangingSprite(ChangingSprite.SpriteEffectType.PictureBased);
-			fEMGGEAGICG.InitPicture(text, ODMCNMJPHFJ, IDHKNBECKKO.GetAtlasName(), pIDBGGLFBCO, node.Attributes["Width"].ParseFloat(), node.Attributes["Height"].ParseFloat());
-			SpriteRenderer renderer = fEMGGEAGICG.SpriteObject.GetComponent<SpriteRenderer>();
+			effect = new ChangingSprite(ChangingSprite.SpriteEffectType.PictureBased);
+			effect.InitPicture(text, imageName, selector.GetAtlasName(), frame, node.Attributes["Width"].ParseFloat(), node.Attributes["Height"].ParseFloat());
+			SpriteRenderer renderer = effect.SpriteObject.GetComponent<SpriteRenderer>();
 			renderer.flipX = node.Attributes["FlipX"].ParseInt() != 0;
 			renderer.flipY = node.Attributes["FlipY"].ParseInt() != 0;
 		}
@@ -490,89 +490,89 @@ public class Location
 			{
 				return;
 			}
-			fEMGGEAGICG = new ChangingSprite(ChangingSprite.SpriteEffectType.AtlasBased);
-			if (!fEMGGEAGICG.InitAtlasAnimation(node.Attributes["ClassName"].GetStringOrDefault(), text.TrimEnd('/') + "/Atlases/", node.Attributes["Speed"].ParseFloat(), node.Attributes["Offset"].ParseFloat(), node.Attributes["Width"].ParseFloat(), node.Attributes["Height"].ParseFloat()))
+			effect = new ChangingSprite(ChangingSprite.SpriteEffectType.AtlasBased);
+			if (!effect.InitAtlasAnimation(node.Attributes["ClassName"].GetStringOrDefault(), text.TrimEnd('/') + "/Atlases/", node.Attributes["Speed"].ParseFloat(), node.Attributes["Offset"].ParseFloat(), node.Attributes["Width"].ParseFloat(), node.Attributes["Height"].ParseFloat()))
 			{
-				fEMGGEAGICG = null;
+				effect = null;
 				return;
 			}
 			flag = true;
-			fEMGGEAGICG.SetPause(node.Attributes["Pause"].ParseFloat());
+			effect.SetPause(node.Attributes["Pause"].ParseFloat());
 		}
-		if (fEMGGEAGICG == null)
+		if (effect == null)
 		{
 			Debug.LogWarning("[Location] Unsupported effect type '" + text3 + "' in " + name);
 			return;
 		}
-		fEMGGEAGICG.SetPosition(node.Attributes["X"].ParseFloat(), 0f - node.Attributes["Y"].ParseFloat());
+		effect.SetPosition(node.Attributes["X"].ParseFloat(), 0f - node.Attributes["Y"].ParseFloat());
 		foreach (XmlNode childNode in node.ChildNodes)
 		{
 			string name = childNode.Name;
 			if (name == "OscillationX")
 			{
-				fEMGGEAGICG.SetOscillationXOffset(childNode.Attributes["Offset"].ParseFloat());
+				effect.SetOscillationXOffset(childNode.Attributes["Offset"].ParseFloat());
 				foreach (XmlNode childNode2 in childNode.ChildNodes)
 				{
-					fEMGGEAGICG.AddOscillationXKeyframe(childNode2.Attributes["Period"].ParseFloat(), childNode2.Attributes["Value"].ParseFloat(), childNode2.Attributes["Ease"].ParseFloat());
+					effect.AddOscillationXKeyframe(childNode2.Attributes["Period"].ParseFloat(), childNode2.Attributes["Value"].ParseFloat(), childNode2.Attributes["Ease"].ParseFloat());
 				}
 			}
 			if (name == "OscillationY")
 			{
-				fEMGGEAGICG.SetOscillationYOffset(childNode.Attributes["Offset"].ParseFloat());
+				effect.SetOscillationYOffset(childNode.Attributes["Offset"].ParseFloat());
 				foreach (XmlNode childNode3 in childNode.ChildNodes)
 				{
-					fEMGGEAGICG.AddOscillationYKeyframe(childNode3.Attributes["Period"].ParseFloat(), childNode3.Attributes["Value"].ParseFloat(), childNode3.Attributes["Ease"].ParseFloat());
+					effect.AddOscillationYKeyframe(childNode3.Attributes["Period"].ParseFloat(), childNode3.Attributes["Value"].ParseFloat(), childNode3.Attributes["Ease"].ParseFloat());
 				}
 			}
 			if (name == "Transparency")
 			{
-				fEMGGEAGICG.SetTransparencyOffset(childNode.Attributes["Offset"].ParseFloat());
+				effect.SetTransparencyOffset(childNode.Attributes["Offset"].ParseFloat());
 				foreach (XmlNode childNode4 in childNode.ChildNodes)
 				{
-					fEMGGEAGICG.AddTransparencyKeyframe(childNode4.Attributes["Period"].ParseFloat(), childNode4.Attributes["Value"].ParseFloat(), childNode4.Attributes["Ease"].ParseFloat());
+					effect.AddTransparencyKeyframe(childNode4.Attributes["Period"].ParseFloat(), childNode4.Attributes["Value"].ParseFloat(), childNode4.Attributes["Ease"].ParseFloat());
 				}
 			}
 			if (name == "Rotation")
 			{
-				fEMGGEAGICG.SetRotationOffset(childNode.Attributes["Offset"].ParseFloat());
+				effect.SetRotationOffset(childNode.Attributes["Offset"].ParseFloat());
 				foreach (XmlNode childNode5 in childNode.ChildNodes)
 				{
-					fEMGGEAGICG.AddRotationKeyframe(childNode5.Attributes["Period"].ParseFloat(), childNode5.Attributes["Value"].ParseFloat(), childNode5.Attributes["Ease"].ParseFloat());
+					effect.AddRotationKeyframe(childNode5.Attributes["Period"].ParseFloat(), childNode5.Attributes["Value"].ParseFloat(), childNode5.Attributes["Ease"].ParseFloat());
 				}
 			}
 			if (name == "Speed")
 			{
-				fEMGGEAGICG.SetSpeed(childNode.Attributes["X"].ParseFloat(), childNode.Attributes["Y"].ParseFloat());
+				effect.SetSpeed(childNode.Attributes["X"].ParseFloat(), childNode.Attributes["Y"].ParseFloat());
 			}
 			if (name == "ReappearX")
 			{
-				fEMGGEAGICG.SetReappearX(childNode.Attributes["Min"].ParseFloat(), childNode.Attributes["Max"].ParseFloat());
+				effect.SetReappearX(childNode.Attributes["Min"].ParseFloat(), childNode.Attributes["Max"].ParseFloat());
 			}
 			if (name == "ReappearY")
 			{
-				fEMGGEAGICG.SetReappearY(childNode.Attributes["Min"].ParseFloat(), childNode.Attributes["Max"].ParseFloat());
+				effect.SetReappearY(childNode.Attributes["Min"].ParseFloat(), childNode.Attributes["Max"].ParseFloat());
 			}
 		}
-		IDHKNBECKKO.AddSimpleEffect(fEMGGEAGICG, EELGIMCJLAI);
+		selector.AddSimpleEffect(effect, index);
 	}
 
-	private void ParseParticleEffect(XmlNode node, LocationSelector IDHKNBECKKO, int EELGIMCJLAI, int LFLGCDNKNJI)
+	private void ParseParticleEffect(XmlNode node, LocationSelector selector, int index, int particleType)
 	{
 		if (!GameUtils.ParticlesDisabled)
 		{
-			string jIPAAPBPNJM = "Textures/Location_effects/Particles/" + node.Attributes["ClassName"].GetStringOrDefault();
-			ChangingSprite fEMGGEAGICG = new ChangingSprite(ChangingSprite.SpriteEffectType.ParticleBased);
-			float fNDOOJNDJDC = node.Attributes["X"].ParseFloat();
+			string particlePath = "Textures/Location_effects/Particles/" + node.Attributes["ClassName"].GetStringOrDefault();
+			ChangingSprite effect = new ChangingSprite(ChangingSprite.SpriteEffectType.ParticleBased);
+			float posX = node.Attributes["X"].ParseFloat();
 			float num = node.Attributes["Y"].ParseFloat();
 			int num2 = node.Attributes["MiddleColor"].ParseInt();
 			bool flag = false;
-			switch (LFLGCDNKNJI)
+			switch (particleType)
 			{
 			case 0:
-				flag = fEMGGEAGICG.InitParticles(jIPAAPBPNJM, fNDOOJNDJDC, 0f - num);
+				flag = effect.InitParticles(particlePath, posX, 0f - num);
 				break;
 			case 1:
-				flag = fEMGGEAGICG.InitParticles(jIPAAPBPNJM, fNDOOJNDJDC, 0f - num);
+				flag = effect.InitParticles(particlePath, posX, 0f - num);
 				break;
 			default:
 				GameLog.Write("unknown type in parseParticleEffect");
@@ -580,7 +580,7 @@ public class Location
 			}
 			if (flag)
 			{
-				IDHKNBECKKO.AddParticleEffect(fEMGGEAGICG, EELGIMCJLAI);
+				selector.AddParticleEffect(effect, index);
 			}
 		}
 	}

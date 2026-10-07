@@ -243,17 +243,17 @@ public class PerkInfoItem
 		return false;
 	}
 
-	public static float AspectToMultiplier(float FIJMPFHAKPB)
+	public static float AspectToMultiplier(float aspect)
 	{
-		float lFIPMCAHODJ = GameUtils.GetAspectConstants().Antilimit;
-		float jHJAFHLMOBJ = GameUtils.GetAspectConstants().DoublingRange;
-		float gPEPDPOJJLM = GameUtils.GetAspectConstants().Limit;
+		float antilimit = GameUtils.GetAspectConstants().Antilimit;
+		float doublingRange = GameUtils.GetAspectConstants().DoublingRange;
+		float limit = GameUtils.GetAspectConstants().Limit;
 		float num = 0f;
-		if (FIJMPFHAKPB >= 0f)
+		if (aspect >= 0f)
 		{
-			return gPEPDPOJJLM - (gPEPDPOJJLM - 1f) * Mathf.Pow(2f, (0f - FIJMPFHAKPB) / jHJAFHLMOBJ);
+			return limit - (limit - 1f) * Mathf.Pow(2f, (0f - aspect) / doublingRange);
 		}
-		return lFIPMCAHODJ + Mathf.Pow(2f, FIJMPFHAKPB / jHJAFHLMOBJ);
+		return antilimit + Mathf.Pow(2f, aspect / doublingRange);
 	}
 
 	public string GetSetValue(string name)
@@ -261,15 +261,15 @@ public class PerkInfoItem
 		return perkSetAttributes.GetValue(name);
 	}
 
-	public PerkInfoItem Clone(XmlNode HKCGPHLLOEA, XmlNode KKBODEIBPAK)
+	public PerkInfoItem Clone(XmlNode setNode, XmlNode ratingEvaluationNode)
 	{
-		PerkInfoItem aCONCDFDNJH = GameUtils.PerkItemList.FindBasePerk(Name);
+		PerkInfoItem basePerk = GameUtils.PerkItemList.FindBasePerk(Name);
 		XmlDocument xmlDocument = new XmlDocument();
-		if (aCONCDFDNJH != null && aCONCDFDNJH.GetDefaultNode() != null)
+		if (basePerk != null && basePerk.GetDefaultNode() != null)
 		{
-			xmlDocument.AppendImportedClone(aCONCDFDNJH.GetDefaultNode());
+			xmlDocument.AppendImportedClone(basePerk.GetDefaultNode());
 		}
-		if (HKCGPHLLOEA != null)
+		if (setNode != null)
 		{
 			XmlNode xmlNode = null;
 			if (xmlDocument["Perk"] != null)
@@ -284,7 +284,7 @@ public class PerkInfoItem
 				}
 				xmlNode = xmlDocument["Perk"].AppendElement("Set");
 			}
-			foreach (XmlAttribute attribute in HKCGPHLLOEA.Attributes)
+			foreach (XmlAttribute attribute in setNode.Attributes)
 			{
 				string name = attribute.Name;
 				string value = attribute.Value;
@@ -297,7 +297,7 @@ public class PerkInfoItem
 				xmlAttribute2.Value = value;
 			}
 		}
-		if (KKBODEIBPAK != null)
+		if (ratingEvaluationNode != null)
 		{
 			XmlNode xmlNode2 = null;
 			if (xmlDocument["Perk"] != null)
@@ -310,7 +310,7 @@ public class PerkInfoItem
 				{
 					xmlDocument.AppendElement("Perk");
 				}
-				xmlNode2 = xmlDocument["Perk"].AppendImportedClone(KKBODEIBPAK);
+				xmlNode2 = xmlDocument["Perk"].AppendImportedClone(ratingEvaluationNode);
 			}
 		}
 		PerkInfoItem aCONCDFDNJH2 = new PerkInfoItem();
@@ -333,9 +333,9 @@ public class PerkInfoItem
 
 	public void Parse(XmlNode node)
 	{
-		XmlDocument mEEAKLDGLDF = new XmlDocument();
+		XmlDocument document = new XmlDocument();
 		defaultNode = defaultDocument.AppendImportedClone(node);
-		XmlNode xmlNode = mEEAKLDGLDF.AppendImportedClone(node);
+		XmlNode xmlNode = document.AppendImportedClone(node);
 		Id = node.Attributes["ID"].ParseInt(-1);
 		Level = node.Attributes["Level"].ParseInt();
 		Name = node.Attributes["Name"].GetStringOrDefault();
@@ -356,8 +356,8 @@ public class PerkInfoItem
 		{
 			Kind = PerkKind.COMBO;
 		}
-		List<WarriorAttribute> iBLHIAHECLK = GameUtils.WarriorAttributeList.AttributeList;
-		foreach (WarriorAttribute item in iBLHIAHECLK)
+		List<WarriorAttribute> attributes = GameUtils.WarriorAttributeList.AttributeList;
+		foreach (WarriorAttribute item in attributes)
 		{
 			XmlAttribute xmlAttribute = xmlNode.Attributes[item.get_Name()];
 			if (xmlAttribute != null)
@@ -397,31 +397,31 @@ public class PerkInfoItem
 		{
 			ParseRatings(xmlNode4, perkSetAttributes);
 		}
-		mEEAKLDGLDF = null;
+		document = null;
 	}
 
-	private void ParseAttributes(XmlNode node, PerkInfoItem AEFFHJGMNFI)
+	private void ParseAttributes(XmlNode node, PerkInfoItem basePerk)
 	{
-		Name = node.Attributes["Name"].GetStringOrDefault((AEFFHJGMNFI == null) ? Name : AEFFHJGMNFI.Name);
-		Id = node.Attributes["ID"].ParseInt((AEFFHJGMNFI == null) ? Id : AEFFHJGMNFI.Id);
-		Level = node.Attributes["Level"].ParseInt((AEFFHJGMNFI == null) ? Level : AEFFHJGMNFI.Level);
-		Alias = node.Attributes["Alias"].GetStringOrDefault((AEFFHJGMNFI == null) ? Alias : AEFFHJGMNFI.Alias);
-		BarScale = node.Attributes["BarScale"].GetStringOrDefault((AEFFHJGMNFI == null) ? BarScale : AEFFHJGMNFI.BarScale);
-		BarShift = node.Attributes["BarShift"].ParseInt((AEFFHJGMNFI == null) ? BarShift : AEFFHJGMNFI.BarShift);
-		BarSetAttribute = node.Attributes["BarSetAttribute"].GetStringOrDefault((AEFFHJGMNFI == null) ? BarSetAttribute : AEFFHJGMNFI.BarSetAttribute);
-		ImageName = node.Attributes["Image"].GetStringOrDefault((AEFFHJGMNFI == null) ? ImageName : AEFFHJGMNFI.ImageName);
-		DescriptionKey = node.Attributes["Description"].GetStringOrDefault((AEFFHJGMNFI == null) ? DescriptionKey : AEFFHJGMNFI.DescriptionKey);
-		MoveName = node.Attributes["Move"].GetStringOrDefault((AEFFHJGMNFI == null) ? MoveName : AEFFHJGMNFI.MoveName);
-		IsHidden = node.Attributes["Hidden"].ParseBool((AEFFHJGMNFI == null) ? IsHidden : AEFFHJGMNFI.IsHidden);
-		ItemSetName = node.Attributes["ItemSet"].GetStringOrDefault((AEFFHJGMNFI == null) ? ItemSetName : AEFFHJGMNFI.ItemSetName);
+		Name = node.Attributes["Name"].GetStringOrDefault((basePerk == null) ? Name : basePerk.Name);
+		Id = node.Attributes["ID"].ParseInt((basePerk == null) ? Id : basePerk.Id);
+		Level = node.Attributes["Level"].ParseInt((basePerk == null) ? Level : basePerk.Level);
+		Alias = node.Attributes["Alias"].GetStringOrDefault((basePerk == null) ? Alias : basePerk.Alias);
+		BarScale = node.Attributes["BarScale"].GetStringOrDefault((basePerk == null) ? BarScale : basePerk.BarScale);
+		BarShift = node.Attributes["BarShift"].ParseInt((basePerk == null) ? BarShift : basePerk.BarShift);
+		BarSetAttribute = node.Attributes["BarSetAttribute"].GetStringOrDefault((basePerk == null) ? BarSetAttribute : basePerk.BarSetAttribute);
+		ImageName = node.Attributes["Image"].GetStringOrDefault((basePerk == null) ? ImageName : basePerk.ImageName);
+		DescriptionKey = node.Attributes["Description"].GetStringOrDefault((basePerk == null) ? DescriptionKey : basePerk.DescriptionKey);
+		MoveName = node.Attributes["Move"].GetStringOrDefault((basePerk == null) ? MoveName : basePerk.MoveName);
+		IsHidden = node.Attributes["Hidden"].ParseBool((basePerk == null) ? IsHidden : basePerk.IsHidden);
+		ItemSetName = node.Attributes["ItemSet"].GetStringOrDefault((basePerk == null) ? ItemSetName : basePerk.ItemSetName);
 		string text = node.Attributes["PerkType"].GetStringOrDefault(string.Empty);
 		Kind = ((!text.Equals("COMBO")) ? PerkKind.SINGLE : PerkKind.COMBO);
-		if (AEFFHJGMNFI != null)
+		if (basePerk != null)
 		{
-			AttributeValues.AddRange(AEFFHJGMNFI.AttributeValues);
+			AttributeValues.AddRange(basePerk.AttributeValues);
 		}
-		List<WarriorAttribute> iBLHIAHECLK = GameUtils.WarriorAttributeList.AttributeList;
-		foreach (WarriorAttribute item in iBLHIAHECLK)
+		List<WarriorAttribute> attributes = GameUtils.WarriorAttributeList.AttributeList;
+		foreach (WarriorAttribute item in attributes)
 		{
 			XmlAttribute xmlAttribute = node.Attributes[item.get_Name()];
 			if (xmlAttribute != null)
@@ -439,15 +439,15 @@ public class PerkInfoItem
 		List<string> list = new List<string>();
 		foreach (string item in inheritedTemplateNames)
 		{
-			PerkInfoItem aCONCDFDNJH = GameUtils.PerkItemList.FindBasePerk(item);
-			if (aCONCDFDNJH != null)
+			PerkInfoItem basePerk = GameUtils.PerkItemList.FindBasePerk(item);
+			if (basePerk != null)
 			{
-				list.AddRange(aCONCDFDNJH.inheritedTemplateNames);
+				list.AddRange(basePerk.inheritedTemplateNames);
 			}
 		}
-		list.ForEach((string DHDMNHCIPEH) =>
+		list.ForEach((string templateName) =>
 		{
-			inheritedTemplateNames.AddIfNotExist(DHDMNHCIPEH);
+			inheritedTemplateNames.AddIfNotExist(templateName);
 		});
 	}
 
@@ -455,12 +455,12 @@ public class PerkInfoItem
 	{
 		foreach (string item in inheritedTemplateNames)
 		{
-			PerkInfoItem aCONCDFDNJH = GameUtils.PerkItemList.FindBasePerk(item);
-			if (aCONCDFDNJH == null)
+			PerkInfoItem basePerk = GameUtils.PerkItemList.FindBasePerk(item);
+			if (basePerk == null)
 			{
 				continue;
 			}
-			XmlNode xmlNode = aCONCDFDNJH.GetDefaultNode().Clone();
+			XmlNode xmlNode = basePerk.GetDefaultNode().Clone();
 			foreach (XmlNode childNode in xmlNode.ChildNodes)
 			{
 				string name = childNode.Name;
@@ -482,10 +482,10 @@ public class PerkInfoItem
 		}
 		foreach (string item in inheritedTemplateNames)
 		{
-			PerkInfoItem aCONCDFDNJH = GameUtils.PerkItemList.FindBasePerk(item);
-			if (aCONCDFDNJH != null)
+			PerkInfoItem basePerk = GameUtils.PerkItemList.FindBasePerk(item);
+			if (basePerk != null)
 			{
-				XmlNode xmlNode = aCONCDFDNJH.GetDefaultNode()["RatingEvaluation"];
+				XmlNode xmlNode = basePerk.GetDefaultNode()["RatingEvaluation"];
 				if (xmlNode != null)
 				{
 					ParseRatings(xmlNode, GetPerkSet());
@@ -501,12 +501,12 @@ public class PerkInfoItem
 		list.Reverse();
 		foreach (string item in list)
 		{
-			PerkInfoItem aCONCDFDNJH = GameUtils.PerkItemList.FindBasePerk(item);
-			if (aCONCDFDNJH == null)
+			PerkInfoItem basePerk = GameUtils.PerkItemList.FindBasePerk(item);
+			if (basePerk == null)
 			{
 				continue;
 			}
-			foreach (KeyValuePair<string, string> item2 in aCONCDFDNJH.GetPerkSet().Values)
+			foreach (KeyValuePair<string, string> item2 in basePerk.GetPerkSet().Values)
 			{
 				perkSetAttributes.SetValue(item2.Key, item2.Value);
 			}
@@ -519,10 +519,10 @@ public class PerkInfoItem
 
 	private void AddTrigger(XmlNode node)
 	{
-		PerkTrigger eICIICPBDMC = new PerkTrigger();
-		eICIICPBDMC.SetPerk(this);
-		eICIICPBDMC.Parse(node);
-		GetTriggers().Add(eICIICPBDMC);
+		PerkTrigger trigger = new PerkTrigger();
+		trigger.SetPerk(this);
+		trigger.Parse(node);
+		GetTriggers().Add(trigger);
 	}
 
 	private void ResolveTriggerVariables(XmlNode node)
@@ -540,23 +540,23 @@ public class PerkInfoItem
 		}
 	}
 
-	private void SetAttributes(XmlAttribute CJEPEDKEEGF)
+	private void SetAttributes(XmlAttribute attribute)
 	{
-		string name = CJEPEDKEEGF.Name;
-		string text = CJEPEDKEEGF.Value;
-		FunctionExtension oPIFBDJNMKD = new FunctionExtension();
-		oPIFBDJNMKD.Parse(text);
-		List<FunctionExtension.FunctionObject> list = oPIFBDJNMKD.GetValueObjects();
+		string name = attribute.Name;
+		string text = attribute.Value;
+		FunctionExtension functionExtension = new FunctionExtension();
+		functionExtension.Parse(text);
+		List<FunctionExtension.FunctionObject> list = functionExtension.GetValueObjects();
 		foreach (FunctionExtension.FunctionObject item in list)
 		{
 			if (item.body[0] == '_')
 			{
-				string gOHIIMFFFJI = item.body.Substring(1, item.body.Length - 1);
-				string newValue = perkSetAttributes.GetValue(gOHIIMFFFJI);
+				string attributeName = item.body.Substring(1, item.body.Length - 1);
+				string newValue = perkSetAttributes.GetValue(attributeName);
 				text = text.Replace(item.body, newValue);
 			}
 		}
-		CJEPEDKEEGF.Value = text;
+		attribute.Value = text;
 	}
 
 	private void ReadSetAttributes(XmlNode node)
@@ -569,506 +569,506 @@ public class PerkInfoItem
 		}
 	}
 
-	private void ParseRatings(XmlNode MGOANJIJHGB, PerkSetAttributes CJILONFAJIK)
+	private void ParseRatings(XmlNode ratingsNode, PerkSetAttributes setAttributes)
 	{
-		int count = MGOANJIJHGB.ChildNodes.Count;
+		int count = ratingsNode.ChildNodes.Count;
 		if (count > 0)
 		{
 			Ratings.Clear();
 		}
-		foreach (XmlNode childNode in MGOANJIJHGB.ChildNodes)
+		foreach (XmlNode childNode in ratingsNode.ChildNodes)
 		{
 			string name = childNode.Name;
 			if (name.Equals("Rating"))
 			{
-				Rating cNLOJEAEGLG = new Rating();
-				cNLOJEAEGLG.Parse(childNode, CJILONFAJIK);
-				Ratings.Add(cNLOJEAEGLG);
+				Rating rating = new Rating();
+				rating.Parse(childNode, setAttributes);
+				Ratings.Add(rating);
 			}
 		}
 	}
 
-	public void CollectTriggersForEvent(List<PerkTrigger> DCJLKCFKCOM, PerkEvent.PerkEventType LFLGCDNKNJI)
+	public void CollectTriggersForEvent(List<PerkTrigger> triggers, PerkEvent.PerkEventType eventType)
 	{
 		foreach (PerkTrigger item in GetTriggers())
 		{
 			List<PerkEvent> list = item.GetEvents();
 			foreach (PerkEvent item2 in list)
 			{
-				if (item2.get_Type() == LFLGCDNKNJI)
+				if (item2.get_Type() == eventType)
 				{
-					DCJLKCFKCOM.Add(item);
+					triggers.Add(item);
 					break;
 				}
 			}
 		}
 	}
 
-	public void OnFunctionPreCallback(FunctionExtension.CallbackResult DCJLKCFKCOM)
+	public void OnFunctionPreCallback(FunctionExtension.CallbackResult callbackResult)
 	{
 	}
 
-	public void EvaluateFunctionCallback(FunctionExtension.CallbackResult DCJLKCFKCOM)
+	public void EvaluateFunctionCallback(FunctionExtension.CallbackResult callbackResult)
 	{
-		FunctionExtension.FunctionCall gLBAFLLMOOH = DCJLKCFKCOM.data as FunctionExtension.FunctionCall;
-		FunctionResult nAGGNMIFFGK = DCJLKCFKCOM.result;
-		PerkObject iNCAIGLKDIE = DCJLKCFKCOM.target as PerkObject;
-		Model fGCODGKLHED = ((GetOwnerModel() == null) ? null : GetOwnerModel());
-		if (fGCODGKLHED != null && nAGGNMIFFGK.Value.Equals("Enemy"))
+		FunctionExtension.FunctionCall functionCall = callbackResult.data as FunctionExtension.FunctionCall;
+		FunctionResult functionResult = callbackResult.result;
+		PerkObject perkObject = callbackResult.target as PerkObject;
+		Model targetModel = ((GetOwnerModel() == null) ? null : GetOwnerModel());
+		if (targetModel != null && functionResult.Value.Equals("Enemy"))
 		{
-			fGCODGKLHED = fGCODGKLHED.GetCombatTarget();
+			targetModel = targetModel.GetCombatTarget();
 		}
-		switch (gLBAFLLMOOH.functionName)
+		switch (functionCall.functionName)
 		{
 		case "UniformFloatRandom":
-			EvaluateUniformFloatRandom(fGCODGKLHED, gLBAFLLMOOH, iNCAIGLKDIE, nAGGNMIFFGK);
+			EvaluateUniformFloatRandom(targetModel, functionCall, perkObject, functionResult);
 			return;
 		case "PlayerAttribute":
-			EvaluatePlayerAttribute(fGCODGKLHED, gLBAFLLMOOH, iNCAIGLKDIE, nAGGNMIFFGK);
+			EvaluatePlayerAttribute(targetModel, functionCall, perkObject, functionResult);
 			return;
 		case "PlayerParameter":
-			EvaluatePlayerParameter(fGCODGKLHED, gLBAFLLMOOH, iNCAIGLKDIE, nAGGNMIFFGK);
+			EvaluatePlayerParameter(targetModel, functionCall, perkObject, functionResult);
 			return;
 		case "RoundParameter":
-			EvaluateRoundParameter(fGCODGKLHED, gLBAFLLMOOH, iNCAIGLKDIE, nAGGNMIFFGK);
+			EvaluateRoundParameter(targetModel, functionCall, perkObject, functionResult);
 			return;
 		case "Hit":
-			EvaluateHit(fGCODGKLHED, gLBAFLLMOOH, iNCAIGLKDIE, nAGGNMIFFGK);
+			EvaluateHit(targetModel, functionCall, perkObject, functionResult);
 			return;
 		case "StringInArray":
-			EvaluateStringInArray(fGCODGKLHED, gLBAFLLMOOH, iNCAIGLKDIE, nAGGNMIFFGK);
+			EvaluateStringInArray(targetModel, functionCall, perkObject, functionResult);
 			return;
 		case "CoordX":
-			EvaluateCoordX(fGCODGKLHED, gLBAFLLMOOH, iNCAIGLKDIE, nAGGNMIFFGK);
+			EvaluateCoordX(targetModel, functionCall, perkObject, functionResult);
 			return;
 		case "CoordY":
-			EvaluateCoordY(fGCODGKLHED, gLBAFLLMOOH, iNCAIGLKDIE, nAGGNMIFFGK);
+			EvaluateCoordY(targetModel, functionCall, perkObject, functionResult);
 			return;
 		case "CoordZ":
-			EvaluateCoordZ(fGCODGKLHED, gLBAFLLMOOH, iNCAIGLKDIE, nAGGNMIFFGK);
+			EvaluateCoordZ(targetModel, functionCall, perkObject, functionResult);
 			return;
 		case "RandomAspect":
-			EvaluateRandomAspect(fGCODGKLHED, gLBAFLLMOOH, iNCAIGLKDIE, nAGGNMIFFGK);
+			EvaluateRandomAspect(targetModel, functionCall, perkObject, functionResult);
 			return;
 		case "Abs":
-			EvaluateAbs(fGCODGKLHED, gLBAFLLMOOH, iNCAIGLKDIE, nAGGNMIFFGK);
+			EvaluateAbs(targetModel, functionCall, perkObject, functionResult);
 			return;
 		case "Aspect":
-			EvaluateAspect(fGCODGKLHED, gLBAFLLMOOH, iNCAIGLKDIE, nAGGNMIFFGK);
+			EvaluateAspect(targetModel, functionCall, perkObject, functionResult);
 			return;
 		case "Round":
-			EvaluateRound(fGCODGKLHED, gLBAFLLMOOH, iNCAIGLKDIE, nAGGNMIFFGK);
+			EvaluateRound(targetModel, functionCall, perkObject, functionResult);
 			return;
 		case "Variable":
-			EvaluateVariable(fGCODGKLHED, gLBAFLLMOOH, iNCAIGLKDIE, nAGGNMIFFGK);
+			EvaluateVariable(targetModel, functionCall, perkObject, functionResult);
 			return;
 		case "MovesVariable":
-			EvaluateVariable(fGCODGKLHED, gLBAFLLMOOH, iNCAIGLKDIE, nAGGNMIFFGK);
+			EvaluateVariable(targetModel, functionCall, perkObject, functionResult);
 			return;
 		case "Player":
-			EvaluatePlayer(fGCODGKLHED, gLBAFLLMOOH, iNCAIGLKDIE, nAGGNMIFFGK);
+			EvaluatePlayer(targetModel, functionCall, perkObject, functionResult);
 			return;
 		case "CurrentFight":
-			EvaluateCurrentFight(fGCODGKLHED, gLBAFLLMOOH, iNCAIGLKDIE, nAGGNMIFFGK);
+			EvaluateCurrentFight(targetModel, functionCall, perkObject, functionResult);
 			return;
 		}
-		FunctionExtension.CompareType dLLJOIFFBPL = FunctionExtension.ParseCompareType(gLBAFLLMOOH.functionName);
-		bool flag = gLBAFLLMOOH.functionName.Equals("Compare");
-		if (flag || dLLJOIFFBPL != FunctionExtension.CompareType.COMPARE_NONE)
+		FunctionExtension.CompareType compareType = FunctionExtension.ParseCompareType(functionCall.functionName);
+		bool flag = functionCall.functionName.Equals("Compare");
+		if (flag || compareType != FunctionExtension.CompareType.COMPARE_NONE)
 		{
-			EvaluateCompare(flag, fGCODGKLHED, gLBAFLLMOOH, iNCAIGLKDIE, nAGGNMIFFGK);
+			EvaluateCompare(flag, targetModel, functionCall, perkObject, functionResult);
 		}
 	}
 
-	private void EvaluateCurrentFight(Model ACENLMONNPA, FunctionExtension.FunctionCall KJFKPMCPIBH, PerkObject INCAIGLKDIE, FunctionResult DCJLKCFKCOM)
+	private void EvaluateCurrentFight(Model model, FunctionExtension.FunctionCall functionCall, PerkObject perkObject, FunctionResult functionResult)
 	{
-		if (Fight.GetCurrentFight() != null && KJFKPMCPIBH.propertyName.Equals("isRaid"))
+		if (Fight.GetCurrentFight() != null && functionCall.propertyName.Equals("isRaid"))
 		{
 			bool flag = Fight.GetCurrentFight().GetFightDefinition().get_Type() == BattleType.FightRaid;
-			DCJLKCFKCOM.Value = ((!flag) ? "0" : "1");
+			functionResult.Value = ((!flag) ? "0" : "1");
 		}
 	}
 
-	private void EvaluateVariable(Model ACENLMONNPA, FunctionExtension.FunctionCall KJFKPMCPIBH, PerkObject INCAIGLKDIE, FunctionResult DCJLKCFKCOM)
+	private void EvaluateVariable(Model model, FunctionExtension.FunctionCall functionCall, PerkObject perkObject, FunctionResult functionResult)
 	{
-		if (KJFKPMCPIBH.argumentValues.Count == 0)
+		if (functionCall.argumentValues.Count == 0)
 		{
-			DCJLKCFKCOM.Value = string.Empty;
+			functionResult.Value = string.Empty;
 		}
-		string mJOCMMIBOGJ = KJFKPMCPIBH.argumentValues[0].body;
-		Dictionary<string, float> cNOPDMEAODG = ACENLMONNPA.GetConditions().PerkVariables;
-		Dictionary<string, string> stringVariables = ACENLMONNPA.GetConditions().PerkStringVariables;
-		if (stringVariables.ContainsKey(mJOCMMIBOGJ))
+		string variableName = functionCall.argumentValues[0].body;
+		Dictionary<string, float> numericVariables = model.GetConditions().PerkVariables;
+		Dictionary<string, string> stringVariables = model.GetConditions().PerkStringVariables;
+		if (stringVariables.ContainsKey(variableName))
 		{
-			DCJLKCFKCOM.Value = stringVariables[mJOCMMIBOGJ];
+			functionResult.Value = stringVariables[variableName];
 		}
-		else if (cNOPDMEAODG.ContainsKey(mJOCMMIBOGJ))
+		else if (numericVariables.ContainsKey(variableName))
 		{
-			DCJLKCFKCOM.Value = cNOPDMEAODG[mJOCMMIBOGJ].ToString();
+			functionResult.Value = numericVariables[variableName].ToString();
 		}
 		else
 		{
-			DCJLKCFKCOM.Value = string.Empty;
+			functionResult.Value = string.Empty;
 		}
 	}
 
-	private void EvaluatePlayer(Model ACENLMONNPA, FunctionExtension.FunctionCall KJFKPMCPIBH, PerkObject INCAIGLKDIE, FunctionResult DCJLKCFKCOM)
+	private void EvaluatePlayer(Model model, FunctionExtension.FunctionCall functionCall, PerkObject perkObject, FunctionResult functionResult)
 	{
-		if (KJFKPMCPIBH.propertyName.Equals("Level"))
+		if (functionCall.propertyName.Equals("Level"))
 		{
-			DCJLKCFKCOM.Value = ListSF.GetRoster().GetLevel().ToString();
+			functionResult.Value = ListSF.GetRoster().GetLevel().ToString();
 		}
 	}
 
-	private void EvaluateUniformFloatRandom(Model ACENLMONNPA, FunctionExtension.FunctionCall KJFKPMCPIBH, PerkObject INCAIGLKDIE, FunctionResult DCJLKCFKCOM)
+	private void EvaluateUniformFloatRandom(Model model, FunctionExtension.FunctionCall functionCall, PerkObject perkObject, FunctionResult functionResult)
 	{
-		DCJLKCFKCOM.Value = NekkiMath.randomFloat(1f).ToString();
+		functionResult.Value = NekkiMath.randomFloat(1f).ToString();
 	}
 
-	private void EvaluatePlayerAttribute(Model ACENLMONNPA, FunctionExtension.FunctionCall KJFKPMCPIBH, PerkObject INCAIGLKDIE, FunctionResult DCJLKCFKCOM)
+	private void EvaluatePlayerAttribute(Model model, FunctionExtension.FunctionCall functionCall, PerkObject perkObject, FunctionResult functionResult)
 	{
-		if (ACENLMONNPA != null)
+		if (model != null)
 		{
-			ModelParameters kMMJCHDKBDO = ACENLMONNPA.Parameters;
-			if (kMMJCHDKBDO != null)
+			ModelParameters modelParameters = model.Parameters;
+			if (modelParameters != null)
 			{
-				int OEMALIFPGPO = 0;
-				kMMJCHDKBDO.FinalAttributes.Get(KJFKPMCPIBH.propertyName, ref OEMALIFPGPO);
-				DCJLKCFKCOM.Value = OEMALIFPGPO.ToString();
+				int attributeValue = 0;
+				modelParameters.FinalAttributes.Get(functionCall.propertyName, ref attributeValue);
+				functionResult.Value = attributeValue.ToString();
 			}
 		}
 	}
 
-	private void EvaluatePlayerParameter(Model ACENLMONNPA, FunctionExtension.FunctionCall KJFKPMCPIBH, PerkObject INCAIGLKDIE, FunctionResult DCJLKCFKCOM)
+	private void EvaluatePlayerParameter(Model model, FunctionExtension.FunctionCall functionCall, PerkObject perkObject, FunctionResult functionResult)
 	{
-		if (ACENLMONNPA != null)
+		if (model != null)
 		{
-			switch (KJFKPMCPIBH.propertyName)
+			switch (functionCall.propertyName)
 			{
 			case "Health":
-				DCJLKCFKCOM.Value = ACENLMONNPA.GetLife().ToString();
+				functionResult.Value = model.GetLife().ToString();
 				break;
 			case "Pain":
-				DCJLKCFKCOM.Value = ACENLMONNPA.GetPain().ToString();
+				functionResult.Value = model.GetPain().ToString();
 				break;
 			case "Shock":
-				DCJLKCFKCOM.Value = ((!ACENLMONNPA.IsInShock()) ? "0" : "1");
+				functionResult.Value = ((!model.IsInShock()) ? "0" : "1");
 				break;
 			case "Disarm":
-				DCJLKCFKCOM.Value = ((!ACENLMONNPA.WasDisarmed()) ? "0" : "1");
+				functionResult.Value = ((!model.WasDisarmed()) ? "0" : "1");
 				break;
 			case "Style":
-				DCJLKCFKCOM.Value = ACENLMONNPA.StyleName;
+				functionResult.Value = model.StyleName;
 				break;
 			case "StyleGain":
-				DCJLKCFKCOM.Value = ACENLMONNPA.StyleProgress.ToString();
+				functionResult.Value = model.StyleProgress.ToString();
 				break;
 			case "Combo":
-				DCJLKCFKCOM.Value = ACENLMONNPA.GetComboCount().ToString();
+				functionResult.Value = model.GetComboCount().ToString();
 				break;
 			case "MagicBullet":
-				DCJLKCFKCOM.Value = ACENLMONNPA.GetMagicCharges().ToString();
+				functionResult.Value = model.GetMagicCharges().ToString();
 				break;
 			case "MagicCharge":
-				DCJLKCFKCOM.Value = ACENLMONNPA.GetMagicChargeFraction().ToString();
+				functionResult.Value = model.GetMagicChargeFraction().ToString();
 				break;
 			case "Magic":
-				DCJLKCFKCOM.Value = (ACENLMONNPA.Parameters.Magic == null) ?
-					string.Empty : ACENLMONNPA.Parameters.Magic.Name;
+				functionResult.Value = (model.Parameters.Magic == null) ?
+					string.Empty : model.Parameters.Magic.Name;
 				break;
 			case "Ranged":
-				DCJLKCFKCOM.Value = (ACENLMONNPA.Parameters.Ranged == null) ?
-					string.Empty : ACENLMONNPA.Parameters.Ranged.Name;
+				functionResult.Value = (model.Parameters.Ranged == null) ?
+					string.Empty : model.Parameters.Ranged.Name;
 				break;
 			case "Weapon":
-				DCJLKCFKCOM.Value = (ACENLMONNPA.Parameters.Weapon == null) ?
-					string.Empty : ACENLMONNPA.Parameters.Weapon.Name;
+				functionResult.Value = (model.Parameters.Weapon == null) ?
+					string.Empty : model.Parameters.Weapon.Name;
 				break;
 			case "Skeleton":
-				DCJLKCFKCOM.Value = (ACENLMONNPA.Parameters.Skeleton == null) ?
-					string.Empty : ACENLMONNPA.Parameters.Skeleton.Name;
+				functionResult.Value = (model.Parameters.Skeleton == null) ?
+					string.Empty : model.Parameters.Skeleton.Name;
 				break;
 			case "RaidChargeBullet":
 				break;
 			case "DamageConverter":
-				DCJLKCFKCOM.Value = ACENLMONNPA.GetPowerMultiplier().ToString();
+				functionResult.Value = model.GetPowerMultiplier().ToString();
 				break;
 			case "DefaultPerksAspect":
-				DCJLKCFKCOM.Value = ACENLMONNPA.GetBonusModifier().ToString();
+				functionResult.Value = model.GetBonusModifier().ToString();
 				break;
 			case "isPlayer":
-				DCJLKCFKCOM.Value = ((!ACENLMONNPA.IsPlayerModel()) ? "0" : "1");
+				functionResult.Value = ((!model.IsPlayerModel()) ? "0" : "1");
 				break;
 			}
 		}
 	}
 
-	private void EvaluateRoundParameter(Model ACENLMONNPA, FunctionExtension.FunctionCall KJFKPMCPIBH, PerkObject INCAIGLKDIE, FunctionResult DCJLKCFKCOM)
+	private void EvaluateRoundParameter(Model model, FunctionExtension.FunctionCall functionCall, PerkObject perkObject, FunctionResult functionResult)
 	{
 		if (Fight.GetCurrentFight() != null)
 		{
-			switch (KJFKPMCPIBH.propertyName)
+			switch (functionCall.propertyName)
 			{
 			case "Number":
-				DCJLKCFKCOM.Value = Fight.GetCurrentFight().get_RoundNumber().ToString();
+				functionResult.Value = Fight.GetCurrentFight().get_RoundNumber().ToString();
 				break;
 			case "TimeLeft":
-				DCJLKCFKCOM.Value = Fight.GetCurrentFight().get_RoundTimeLeftFrames().ToString();
+				functionResult.Value = Fight.GetCurrentFight().get_RoundTimeLeftFrames().ToString();
 				break;
 			case "TimePassed":
-				DCJLKCFKCOM.Value = Fight.GetCurrentFight().get_RoundTimePassedFrames().ToString();
+				functionResult.Value = Fight.GetCurrentFight().get_RoundTimePassedFrames().ToString();
 				break;
 			case "RoundTime":
-				DCJLKCFKCOM.Value = Fight.GetCurrentFight().get_RoundTimeTotalFrames().ToString();
+				functionResult.Value = Fight.GetCurrentFight().get_RoundTimeTotalFrames().ToString();
 				break;
 			}
 		}
 	}
 
-	private void EvaluateCompare(bool GOIOEAHAAIA, Model ACENLMONNPA, FunctionExtension.FunctionCall KJFKPMCPIBH, PerkObject INCAIGLKDIE, FunctionResult DCJLKCFKCOM)
+	private void EvaluateCompare(bool isCompareOperatorIncluded, Model model, FunctionExtension.FunctionCall functionCall, PerkObject perkObject, FunctionResult functionResult)
 	{
-		if (DCJLKCFKCOM != null)
+		if (functionResult != null)
 		{
 			StringBuilder stringBuilder = new StringBuilder();
-			stringBuilder.Append(DCJLKCFKCOM.Value);
-			if (!GOIOEAHAAIA)
+			stringBuilder.Append(functionResult.Value);
+			if (!isCompareOperatorIncluded)
 			{
 				stringBuilder.Append(",");
-				stringBuilder.Append(KJFKPMCPIBH.functionName);
+				stringBuilder.Append(functionCall.functionName);
 			}
 			bool flag = FunctionExtension.IsCompare(stringBuilder.ToString());
-			DCJLKCFKCOM.Value = ((!flag) ? "0" : "1");
+			functionResult.Value = ((!flag) ? "0" : "1");
 		}
 	}
 
-	private void EvaluateCoordX(Model ACENLMONNPA, FunctionExtension.FunctionCall KJFKPMCPIBH, PerkObject INCAIGLKDIE, FunctionResult DCJLKCFKCOM)
+	private void EvaluateCoordX(Model model, FunctionExtension.FunctionCall functionCall, PerkObject perkObject, FunctionResult functionResult)
 	{
-		if (KJFKPMCPIBH.argumentValues.Count < 2)
+		if (functionCall.argumentValues.Count < 2)
 		{
-			DCJLKCFKCOM.Value = "-10000";
+			functionResult.Value = "-10000";
 			return;
 		}
-		string mJOCMMIBOGJ = KJFKPMCPIBH.argumentValues[0].body;
-		string mJOCMMIBOGJ2 = KJFKPMCPIBH.argumentValues[1].body;
+		string firstArgument = functionCall.argumentValues[0].body;
+		string mJOCMMIBOGJ2 = functionCall.argumentValues[1].body;
 		string text = string.Empty;
-		if (KJFKPMCPIBH.argumentValues.Count >= 3)
+		if (functionCall.argumentValues.Count >= 3)
 		{
-			text = KJFKPMCPIBH.argumentValues[2].body;
+			text = functionCall.argumentValues[2].body;
 		}
-		DistancePoint oGHICEHKFOL = new DistancePoint();
-		oGHICEHKFOL.Create(mJOCMMIBOGJ, mJOCMMIBOGJ2, text);
+		DistancePoint distancePoint = new DistancePoint();
+		distancePoint.Create(firstArgument, mJOCMMIBOGJ2, text);
 		float num = 0f;
-		if (oGHICEHKFOL.ObjectType != DistancePoint.Object.OBJECT_NODES)
+		if (distancePoint.ObjectType != DistancePoint.Object.OBJECT_NODES)
 		{
-			num = oGHICEHKFOL.GetX(ACENLMONNPA.GetConditions());
+			num = distancePoint.GetX(model.GetConditions());
 		}
 		else
 		{
-			if (oGHICEHKFOL.TargetModel == ModelType.ModelTargetType.MODEL_THIS)
+			if (distancePoint.TargetModel == ModelType.ModelTargetType.MODEL_THIS)
 			{
-				ModelNode lCDGOCIAIDK = ACENLMONNPA.GetBodyObject().GetNodeByName(text);
-				num = lCDGOCIAIDK.GetStart().GetX();
+				ModelNode bodyNode = model.GetBodyObject().GetNodeByName(text);
+				num = bodyNode.GetStart().GetX();
 			}
-			if (oGHICEHKFOL.TargetModel == ModelType.ModelTargetType.MODEL_OTHER)
+			if (distancePoint.TargetModel == ModelType.ModelTargetType.MODEL_OTHER)
 			{
-				ModelNode lCDGOCIAIDK2 = ACENLMONNPA.GetCombatTarget().GetBodyObject().GetNodeByName(text);
+				ModelNode lCDGOCIAIDK2 = model.GetCombatTarget().GetBodyObject().GetNodeByName(text);
 				num = lCDGOCIAIDK2.GetStart().GetX();
 			}
 		}
-		DCJLKCFKCOM.Value = num.ToString();
+		functionResult.Value = num.ToString();
 	}
 
-	private void EvaluateCoordY(Model ACENLMONNPA, FunctionExtension.FunctionCall KJFKPMCPIBH, PerkObject INCAIGLKDIE, FunctionResult DCJLKCFKCOM)
+	private void EvaluateCoordY(Model model, FunctionExtension.FunctionCall functionCall, PerkObject perkObject, FunctionResult functionResult)
 	{
-		if (KJFKPMCPIBH.argumentValues.Count < 2)
+		if (functionCall.argumentValues.Count < 2)
 		{
-			DCJLKCFKCOM.Value = "-10000";
+			functionResult.Value = "-10000";
 			return;
 		}
-		string mJOCMMIBOGJ = KJFKPMCPIBH.argumentValues[0].body;
-		string mJOCMMIBOGJ2 = KJFKPMCPIBH.argumentValues[1].body;
+		string firstArgument = functionCall.argumentValues[0].body;
+		string mJOCMMIBOGJ2 = functionCall.argumentValues[1].body;
 		string text = string.Empty;
-		if (KJFKPMCPIBH.argumentValues.Count >= 3)
+		if (functionCall.argumentValues.Count >= 3)
 		{
-			text = KJFKPMCPIBH.argumentValues[2].body;
+			text = functionCall.argumentValues[2].body;
 		}
-		DistancePoint oGHICEHKFOL = new DistancePoint();
-		oGHICEHKFOL.Create(mJOCMMIBOGJ, mJOCMMIBOGJ2, text);
+		DistancePoint distancePoint = new DistancePoint();
+		distancePoint.Create(firstArgument, mJOCMMIBOGJ2, text);
 		float num = 0f;
-		if (oGHICEHKFOL.ObjectType != DistancePoint.Object.OBJECT_NODES)
+		if (distancePoint.ObjectType != DistancePoint.Object.OBJECT_NODES)
 		{
-			num = oGHICEHKFOL.GetY(ACENLMONNPA.GetConditions());
+			num = distancePoint.GetY(model.GetConditions());
 		}
 		else
 		{
-			if (oGHICEHKFOL.TargetModel == ModelType.ModelTargetType.MODEL_THIS)
+			if (distancePoint.TargetModel == ModelType.ModelTargetType.MODEL_THIS)
 			{
-				ModelNode lCDGOCIAIDK = ACENLMONNPA.GetBodyObject().GetNodeByName(text);
-				num = lCDGOCIAIDK.GetStart().GetY();
+				ModelNode bodyNode = model.GetBodyObject().GetNodeByName(text);
+				num = bodyNode.GetStart().GetY();
 			}
-			if (oGHICEHKFOL.TargetModel == ModelType.ModelTargetType.MODEL_OTHER)
+			if (distancePoint.TargetModel == ModelType.ModelTargetType.MODEL_OTHER)
 			{
-				ModelNode lCDGOCIAIDK2 = ACENLMONNPA.GetCombatTarget().GetBodyObject().GetNodeByName(text);
+				ModelNode lCDGOCIAIDK2 = model.GetCombatTarget().GetBodyObject().GetNodeByName(text);
 				num = lCDGOCIAIDK2.GetStart().GetY();
 			}
 		}
-		DCJLKCFKCOM.Value = num.ToString();
+		functionResult.Value = num.ToString();
 	}
 
-	private void EvaluateCoordZ(Model ACENLMONNPA, FunctionExtension.FunctionCall KJFKPMCPIBH, PerkObject INCAIGLKDIE, FunctionResult DCJLKCFKCOM)
+	private void EvaluateCoordZ(Model model, FunctionExtension.FunctionCall functionCall, PerkObject perkObject, FunctionResult functionResult)
 	{
-		if (KJFKPMCPIBH.argumentValues.Count < 2)
+		if (functionCall.argumentValues.Count < 2)
 		{
-			DCJLKCFKCOM.Value = "-10000";
+			functionResult.Value = "-10000";
 			return;
 		}
-		string mJOCMMIBOGJ = KJFKPMCPIBH.argumentValues[0].body;
-		string mJOCMMIBOGJ2 = KJFKPMCPIBH.argumentValues[1].body;
+		string firstArgument = functionCall.argumentValues[0].body;
+		string mJOCMMIBOGJ2 = functionCall.argumentValues[1].body;
 		string text = string.Empty;
-		if (KJFKPMCPIBH.argumentValues.Count >= 3)
+		if (functionCall.argumentValues.Count >= 3)
 		{
-			text = KJFKPMCPIBH.argumentValues[2].body;
+			text = functionCall.argumentValues[2].body;
 		}
-		DistancePoint oGHICEHKFOL = new DistancePoint();
-		oGHICEHKFOL.Create(mJOCMMIBOGJ, mJOCMMIBOGJ2, text);
+		DistancePoint distancePoint = new DistancePoint();
+		distancePoint.Create(firstArgument, mJOCMMIBOGJ2, text);
 		float num = 0f;
-		if (oGHICEHKFOL.ObjectType != DistancePoint.Object.OBJECT_NODES)
+		if (distancePoint.ObjectType != DistancePoint.Object.OBJECT_NODES)
 		{
-			num = oGHICEHKFOL.GetZ(ACENLMONNPA.GetConditions());
+			num = distancePoint.GetZ(model.GetConditions());
 		}
 		else
 		{
-			if (oGHICEHKFOL.TargetModel == ModelType.ModelTargetType.MODEL_THIS)
+			if (distancePoint.TargetModel == ModelType.ModelTargetType.MODEL_THIS)
 			{
-				ModelNode lCDGOCIAIDK = ACENLMONNPA.GetBodyObject().GetNodeByName(text);
-				num = lCDGOCIAIDK.GetStart().GetZ();
+				ModelNode bodyNode = model.GetBodyObject().GetNodeByName(text);
+				num = bodyNode.GetStart().GetZ();
 			}
-			if (oGHICEHKFOL.TargetModel == ModelType.ModelTargetType.MODEL_OTHER)
+			if (distancePoint.TargetModel == ModelType.ModelTargetType.MODEL_OTHER)
 			{
-				ModelNode lCDGOCIAIDK2 = ACENLMONNPA.GetCombatTarget().GetBodyObject().GetNodeByName(text);
+				ModelNode lCDGOCIAIDK2 = model.GetCombatTarget().GetBodyObject().GetNodeByName(text);
 				num = lCDGOCIAIDK2.GetStart().GetZ();
 			}
 		}
-		DCJLKCFKCOM.Value = num.ToString();
+		functionResult.Value = num.ToString();
 	}
 
-	private void EvaluateAbs(Model ACENLMONNPA, FunctionExtension.FunctionCall KJFKPMCPIBH, PerkObject INCAIGLKDIE, FunctionResult DCJLKCFKCOM)
+	private void EvaluateAbs(Model model, FunctionExtension.FunctionCall functionCall, PerkObject perkObject, FunctionResult functionResult)
 	{
-		string dCJLKCFKCOM = DCJLKCFKCOM.Value;
+		string expression = functionResult.Value;
 		double value = 0.0;
-		Dictionary<string, RpnParser.VariableDelegate> pPEABEJMCPI = new Dictionary<string, RpnParser.VariableDelegate>();
-		Dictionary<string, RpnParser.ParameterDelegate> gIOGAJGIGMO = new Dictionary<string, RpnParser.ParameterDelegate>();
-		RpnParser.init(pPEABEJMCPI, gIOGAJGIGMO);
-		RpnParser.Formula lANLKOHCGEJ = new RpnParser.Formula(dCJLKCFKCOM);
-		if (lANLKOHCGEJ.GetVariableCount() == 0)
+		Dictionary<string, RpnParser.VariableDelegate> variables = new Dictionary<string, RpnParser.VariableDelegate>();
+		Dictionary<string, RpnParser.ParameterDelegate> parameters = new Dictionary<string, RpnParser.ParameterDelegate>();
+		RpnParser.init(variables, parameters);
+		RpnParser.Formula formula = new RpnParser.Formula(expression);
+		if (formula.GetVariableCount() == 0)
 		{
 			double result;
-			if (double.TryParse(lANLKOHCGEJ.Calculate().ToString(), out result))
+			if (double.TryParse(formula.Calculate().ToString(), out result))
 			{
 				value = result;
 			}
 		}
 		else
 		{
-			GameLog.Error("Abs function error! Argument is not valid expression: {0}", DCJLKCFKCOM.Value);
+			GameLog.Error("Abs function error! Argument is not valid expression: {0}", functionResult.Value);
 		}
-		DCJLKCFKCOM.Value = Math.Abs(value).ToString();
+		functionResult.Value = Math.Abs(value).ToString();
 	}
 
-	private void EvaluateRandomAspect(Model ACENLMONNPA, FunctionExtension.FunctionCall KJFKPMCPIBH, PerkObject INCAIGLKDIE, FunctionResult DCJLKCFKCOM)
+	private void EvaluateRandomAspect(Model model, FunctionExtension.FunctionCall functionCall, PerkObject perkObject, FunctionResult functionResult)
 	{
-		if (KJFKPMCPIBH.argumentValues.Count < 2)
+		if (functionCall.argumentValues.Count < 2)
 		{
-			DCJLKCFKCOM.Value = "0";
+			functionResult.Value = "0";
 			return;
 		}
-		string mJOCMMIBOGJ = KJFKPMCPIBH.argumentValues[0].body;
-		string mJOCMMIBOGJ2 = KJFKPMCPIBH.argumentValues[1].body;
-		int lHNCHOAEGEA = mJOCMMIBOGJ.ToInt();
-		int kAEPJHHLLPK = mJOCMMIBOGJ2.ToInt() + 1;
+		string minText = functionCall.argumentValues[0].body;
+		string mJOCMMIBOGJ2 = functionCall.argumentValues[1].body;
+		int minValue = minText.ToInt();
+		int maxValue = mJOCMMIBOGJ2.ToInt() + 1;
 		NekkiMath.SetSeed();
-		int num = NekkiMath.randomInt(lHNCHOAEGEA, kAEPJHHLLPK);
-		int mHNCENBCECJ = ListSF.GetRoster().GetLevel();
-		int num2 = ForgeManager.GetInstance().GetAspectValueByLevel(mHNCENBCECJ);
-		DCJLKCFKCOM.Value = (num2 + num).ToString();
+		int num = NekkiMath.randomInt(minValue, maxValue);
+		int aspectLevel = ListSF.GetRoster().GetLevel();
+		int num2 = ForgeManager.GetInstance().GetAspectValueByLevel(aspectLevel);
+		functionResult.Value = (num2 + num).ToString();
 	}
 
-	private void EvaluateAspect(Model ACENLMONNPA, FunctionExtension.FunctionCall KJFKPMCPIBH, PerkObject INCAIGLKDIE, FunctionResult DCJLKCFKCOM)
+	private void EvaluateAspect(Model model, FunctionExtension.FunctionCall functionCall, PerkObject perkObject, FunctionResult functionResult)
 	{
-		if (KJFKPMCPIBH.argumentValues.Count != 1)
+		if (functionCall.argumentValues.Count != 1)
 		{
-			DCJLKCFKCOM.Value = "0";
-			GameLog.Error("Aspect function error! Number of argument is not 1: {0}", DCJLKCFKCOM.Value);
+			functionResult.Value = "0";
+			GameLog.Error("Aspect function error! Number of argument is not 1: {0}", functionResult.Value);
 		}
 		else
 		{
-			string mJOCMMIBOGJ = KJFKPMCPIBH.argumentValues[0].body;
-			float fIJMPFHAKPB = mJOCMMIBOGJ.ToFloat();
-			DCJLKCFKCOM.Value = AspectToMultiplier(fIJMPFHAKPB).ToString();
+			string argumentText = functionCall.argumentValues[0].body;
+			float aspect = argumentText.ToFloat();
+			functionResult.Value = AspectToMultiplier(aspect).ToString();
 		}
 	}
 
-	private void EvaluateRound(Model ACENLMONNPA, FunctionExtension.FunctionCall KJFKPMCPIBH, PerkObject INCAIGLKDIE, FunctionResult DCJLKCFKCOM)
+	private void EvaluateRound(Model model, FunctionExtension.FunctionCall functionCall, PerkObject perkObject, FunctionResult functionResult)
 	{
 		float num = 0f;
 		int num2 = 0;
 		string key = "trunc";
-		RoundingMode jFOFGHPCIBE = RoundingMode.RT_TRUNC;
-		if (KJFKPMCPIBH.argumentValues.Count < 1)
+		RoundingMode roundingMode = RoundingMode.RT_TRUNC;
+		if (functionCall.argumentValues.Count < 1)
 		{
-			DCJLKCFKCOM.Value = "RoundingError";
+			functionResult.Value = "RoundingError";
 			return;
 		}
-		if (KJFKPMCPIBH.argumentValues.Count > 3)
+		if (functionCall.argumentValues.Count > 3)
 		{
-			DCJLKCFKCOM.Value = "RoundingError";
+			functionResult.Value = "RoundingError";
 			return;
 		}
-		if (KJFKPMCPIBH.argumentValues.Count >= 1)
+		if (functionCall.argumentValues.Count >= 1)
 		{
-			string mJOCMMIBOGJ = KJFKPMCPIBH.argumentValues[0].body;
-			num = mJOCMMIBOGJ.ToFloat();
+			string valueText = functionCall.argumentValues[0].body;
+			num = valueText.ToFloat();
 		}
-		if (KJFKPMCPIBH.argumentValues.Count >= 2)
+		if (functionCall.argumentValues.Count >= 2)
 		{
-			string mJOCMMIBOGJ2 = KJFKPMCPIBH.argumentValues[1].body;
+			string mJOCMMIBOGJ2 = functionCall.argumentValues[1].body;
 			num2 = mJOCMMIBOGJ2.ToInt();
 		}
-		if (KJFKPMCPIBH.argumentValues.Count == 3)
+		if (functionCall.argumentValues.Count == 3)
 		{
-			string mJOCMMIBOGJ3 = KJFKPMCPIBH.argumentValues[2].body;
+			string mJOCMMIBOGJ3 = functionCall.argumentValues[2].body;
 			key = mJOCMMIBOGJ3;
 		}
 		if (!roundingModesByName.ContainsKey(key))
 		{
-			DCJLKCFKCOM.Value = "RoundingError";
+			functionResult.Value = "RoundingError";
 			return;
 		}
-		jFOFGHPCIBE = roundingModesByName[key];
+		roundingMode = roundingModesByName[key];
 		float num3 = 0f;
-		switch (jFOFGHPCIBE)
+		switch (roundingMode)
 		{
 		case RoundingMode.RT_FLOOR:
-			DCJLKCFKCOM.Value = NekkiMath.FloorToDecimals(num, num2).ToString();
+			functionResult.Value = NekkiMath.FloorToDecimals(num, num2).ToString();
 			break;
 		case RoundingMode.RT_CEIL:
-			DCJLKCFKCOM.Value = NekkiMath.CeilToDecimals(num, num2).ToString();
+			functionResult.Value = NekkiMath.CeilToDecimals(num, num2).ToString();
 			break;
 		case RoundingMode.RT_TRUNC:
-			DCJLKCFKCOM.Value = NekkiMath.TruncateToDecimals(num, num2).ToString();
+			functionResult.Value = NekkiMath.TruncateToDecimals(num, num2).ToString();
 			break;
 		case RoundingMode.RT_INF:
-			DCJLKCFKCOM.Value = NekkiMath.RoundAwayFromZero(num, num2).ToString();
+			functionResult.Value = NekkiMath.RoundAwayFromZero(num, num2).ToString();
 			break;
 		default:
-			DCJLKCFKCOM.Value = string.Empty;
+			functionResult.Value = string.Empty;
 			break;
 		}
 	}
 
-	private void EvaluateStringInArray(Model ACENLMONNPA, FunctionExtension.FunctionCall KJFKPMCPIBH, PerkObject INCAIGLKDIE, FunctionResult DCJLKCFKCOM)
+	private void EvaluateStringInArray(Model model, FunctionExtension.FunctionCall functionCall, PerkObject perkObject, FunctionResult functionResult)
 	{
-		List<string> list = new List<string>(DCJLKCFKCOM.Value.Split(','));
+		List<string> list = new List<string>(functionResult.Value.Split(','));
 		if (list.Count > 1)
 		{
 			string text = list[0];
@@ -1079,46 +1079,46 @@ public class PerkInfoItem
 			{
 				if (list2[i].Equals(value))
 				{
-					DCJLKCFKCOM.Value = "1";
+					functionResult.Value = "1";
 					return;
 				}
 			}
 		}
-		DCJLKCFKCOM.Value = "0";
+		functionResult.Value = "0";
 	}
 
-	private void EvaluateHit(Model ACENLMONNPA, FunctionExtension.FunctionCall KJFKPMCPIBH, PerkObject INCAIGLKDIE, FunctionResult DCJLKCFKCOM)
+	private void EvaluateHit(Model model, FunctionExtension.FunctionCall functionCall, PerkObject perkObject, FunctionResult functionResult)
 	{
 		if (Fight.GetCurrentFight() == null)
 		{
 			return;
 		}
-		Model.StrikeResult fKGAAFNNCNE = Fight.GetCurrentFight().LastStrikeResult;
-		if (fKGAAFNNCNE == null)
+		Model.StrikeResult strikeResult = Fight.GetCurrentFight().LastStrikeResult;
+		if (strikeResult == null)
 		{
 			return;
 		}
-		switch (KJFKPMCPIBH.propertyName)
+		switch (functionCall.propertyName)
 		{
 		case "Player":
-			DCJLKCFKCOM.Value = ((fKGAAFNNCNE.Victim != ACENLMONNPA) ? "Enemy" : "Me");
+			functionResult.Value = ((strikeResult.Victim != model) ? "Enemy" : "Me");
 			break;
 		case "DefenseAttribute":
-			DCJLKCFKCOM.Value = fKGAAFNNCNE.DefenceAttribute;
+			functionResult.Value = strikeResult.DefenceAttribute;
 			break;
 		case "Block":
-			DCJLKCFKCOM.Value = ((!fKGAAFNNCNE.IsBlocked) ? "0" : "1");
+			functionResult.Value = ((!strikeResult.IsBlocked) ? "0" : "1");
 			break;
 		case "Critical":
-			DCJLKCFKCOM.Value = ((!fKGAAFNNCNE.IsCritical) ? "0" : "1");
+			functionResult.Value = ((!strikeResult.IsCritical) ? "0" : "1");
 			break;
 		case "Shock":
-			DCJLKCFKCOM.Value = ((!fKGAAFNNCNE.IsShock) ? "0" : "1");
+			functionResult.Value = ((!strikeResult.IsShock) ? "0" : "1");
 			break;
 		case "Animations":
 		{
 			StringBuilder stringBuilder = new StringBuilder();
-			List<string> list = fKGAAFNNCNE.AttackAnimation.GetTemplateNames();
+			List<string> list = strikeResult.AttackAnimation.GetTemplateNames();
 			int i = 0;
 			for (int count = list.Count; i < count; i++)
 			{
@@ -1128,80 +1128,80 @@ public class PerkInfoItem
 					stringBuilder.Append("|");
 				}
 			}
-			DCJLKCFKCOM.Value = stringBuilder.ToString();
+			functionResult.Value = stringBuilder.ToString();
 			break;
 		}
 		case "Damage":
-			DCJLKCFKCOM.Value = fKGAAFNNCNE.FinalDamage.ToString();
+			functionResult.Value = strikeResult.FinalDamage.ToString();
 			break;
 		case "BaseDamage":
 		{
-			float hMOLHIEDINK = fKGAAFNNCNE.BaseDamage;
+			float baseDamage = strikeResult.BaseDamage;
 			float num = 1f;
-			if (fKGAAFNNCNE.IsBlocked)
+			if (strikeResult.IsBlocked)
 			{
-				int OEMALIFPGPO = 0;
-				string nJFGLOECJEK = GameUtils.GetBlockDamageFactor().Attribute;
-				fKGAAFNNCNE.Victim.Parameters.FinalAttributes.Get(nJFGLOECJEK, ref OEMALIFPGPO);
-				float aMKPAGCFMIN = GameUtils.GetBlockDamageFactor().Base;
-				num = Mathf.Pow(2f, (float)OEMALIFPGPO * aMKPAGCFMIN);
+				int attributeValue = 0;
+				string attributeName = GameUtils.GetBlockDamageFactor().Attribute;
+				strikeResult.Victim.Parameters.FinalAttributes.Get(attributeName, ref attributeValue);
+				float blockDamageBase = GameUtils.GetBlockDamageFactor().Base;
+				num = Mathf.Pow(2f, (float)attributeValue * blockDamageBase);
 			}
 			float num2 = 1f;
-			if (fKGAAFNNCNE.IsCritical && fKGAAFNNCNE.AttackerModel != null)
+			if (strikeResult.IsCritical && strikeResult.AttackerModel != null)
 			{
 				int OEMALIFPGPO2 = 0;
 				string nJFGLOECJEK2 = GameUtils.GetCriticalHitDamage().Attribute;
-				fKGAAFNNCNE.AttackerModel.Parameters.FinalAttributes.Get(nJFGLOECJEK2, ref OEMALIFPGPO2);
+				strikeResult.AttackerModel.Parameters.FinalAttributes.Get(nJFGLOECJEK2, ref OEMALIFPGPO2);
 				float aMKPAGCFMIN2 = GameUtils.GetCriticalHitDamage().Base;
 				num2 = Mathf.Pow(2f, (float)OEMALIFPGPO2 * aMKPAGCFMIN2);
 			}
-			DCJLKCFKCOM.Value = (hMOLHIEDINK * num * num2).ToString();
+			functionResult.Value = (baseDamage * num * num2).ToString();
 			break;
 		}
 		}
 	}
 
-	public string ResolveDescriptionText(string PMDPPGNJAFE)
+	public string ResolveDescriptionText(string description)
 	{
-		if (string.IsNullOrEmpty(PMDPPGNJAFE))
+		if (string.IsNullOrEmpty(description))
 		{
 			return string.Empty;
 		}
-		int num = PMDPPGNJAFE.IndexOf('{');
+		int num = description.IndexOf('{');
 		if (num == -1)
 		{
-			return PMDPPGNJAFE;
+			return description;
 		}
-		int num2 = PMDPPGNJAFE.LastIndexOf('}');
+		int num2 = description.LastIndexOf('}');
 		if (num2 == -1)
 		{
-			return PMDPPGNJAFE;
+			return description;
 		}
 		StringBuilder stringBuilder = new StringBuilder();
-		stringBuilder.Append(PMDPPGNJAFE);
-		QuestParameters jCICKLIMBEF = ListSF.GetInstance().GetQuestParameters();
-		ConditionExtension.CompareResult lNIDLHOIHIM = new ConditionExtension.CompareResult();
-		QuestCondition kKDGLNECFHA = new QuestCondition();
-		kKDGLNECFHA.SetParameters(jCICKLIMBEF);
+		stringBuilder.Append(description);
+		QuestParameters questParameters = ListSF.GetInstance().GetQuestParameters();
+		ConditionExtension.CompareResult compareResult = new ConditionExtension.CompareResult();
+		QuestCondition questCondition = new QuestCondition();
+		questCondition.SetParameters(questParameters);
 		while (num <= num2)
 		{
 			string newValue = string.Empty;
-			if (PMDPPGNJAFE[num] == '{')
+			if (description[num] == '{')
 			{
-				int num3 = PMDPPGNJAFE.IndexOf('}', num);
-				string text = PMDPPGNJAFE.Substring(num + 1, num3 - num - 1);
+				int num3 = description.IndexOf('}', num);
+				string text = description.Substring(num + 1, num3 - num - 1);
 				if (!string.IsNullOrEmpty(text))
 				{
-					FunctionExtension oPIFBDJNMKD = new FunctionExtension();
-					oPIFBDJNMKD.SetVariableCallback(OnFunctionPreCallback);
-					oPIFBDJNMKD.SetFunctionCallback(EvaluateFunctionCallback);
+					FunctionExtension functionExtension = new FunctionExtension();
+					functionExtension.SetVariableCallback(OnFunctionPreCallback);
+					functionExtension.SetFunctionCallback(EvaluateFunctionCallback);
 					foreach (KeyValuePair<string, string> item in perkSetAttributes.Values)
 					{
-						oPIFBDJNMKD.SetVariable(item.Key, item.Value);
+						functionExtension.SetVariable(item.Key, item.Value);
 					}
-					oPIFBDJNMKD.Parse(text);
-					FunctionResult dEIHAOLOPLC = oPIFBDJNMKD.Calculate();
-					newValue = dEIHAOLOPLC.Value;
+					functionExtension.Parse(text);
+					FunctionResult functionResult = functionExtension.Calculate();
+					newValue = functionResult.Value;
 				}
 				stringBuilder.Replace(text, newValue);
 				num = num3 + 1;

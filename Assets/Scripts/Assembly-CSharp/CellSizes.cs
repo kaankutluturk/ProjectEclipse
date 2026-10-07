@@ -65,39 +65,39 @@ public class CellSizes
 		_cumulativeSizes = new float[count];
 	}
 
-	public void SetRowSize(float PEEOEOMEBFG, int IBAKGENOEPH)
+	public void SetRowSize(float size, int rowIndex)
 	{
-		if (!(PEEOEOMEBFG <= 0f) && IBAKGENOEPH < GetRowCount())
+		if (!(size <= 0f) && rowIndex < GetRowCount())
 		{
-			_rowSizes[IBAKGENOEPH] = PEEOEOMEBFG;
+			_rowSizes[rowIndex] = size;
 		}
 	}
 
-	public float GetRowSize(int IBAKGENOEPH)
+	public float GetRowSize(int rowIndex)
 	{
-		if (IBAKGENOEPH < 0)
+		if (rowIndex < 0)
 		{
 			return 0f;
 		}
-		return _rowSizes[IBAKGENOEPH];
+		return _rowSizes[rowIndex];
 	}
 
-	public float SumWithRange(Range JMPCNIOBPAI)
+	public float SumWithRange(Range range)
 	{
-		if (JMPCNIOBPAI.count == 0)
+		if (range.count == 0)
 		{
 			return 0f;
 		}
-		return GetCumulativeSize(JMPCNIOBPAI.from + JMPCNIOBPAI.count - 1) - GetCumulativeSize(JMPCNIOBPAI.from - 1);
+		return GetCumulativeSize(range.from + range.count - 1) - GetCumulativeSize(range.from - 1);
 	}
 
-	public float GetCumulativeSize(int IBAKGENOEPH)
+	public float GetCumulativeSize(int rowIndex)
 	{
-		if (IBAKGENOEPH < 0)
+		if (rowIndex < 0)
 		{
 			return 0f;
 		}
-		while (CumulativeIndex < IBAKGENOEPH)
+		while (CumulativeIndex < rowIndex)
 		{
 			CumulativeIndex++;
 			_cumulativeSizes[CumulativeIndex] = _rowSizes[CumulativeIndex];
@@ -107,6 +107,6 @@ public class CellSizes
 				_cumulativeSizes[CumulativeIndex] += _cumulativeSizes[CumulativeIndex - 1];
 			}
 		}
-		return _cumulativeSizes[IBAKGENOEPH];
+		return _cumulativeSizes[rowIndex];
 	}
 }

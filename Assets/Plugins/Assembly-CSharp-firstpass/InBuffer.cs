@@ -16,15 +16,15 @@ public class InBuffer
 
 	private ulong m_ProcessedSize;
 
-	public InBuffer(uint KOGACKBGCFP)
+	public InBuffer(uint bufferSize)
 	{
-		m_Buffer = new byte[KOGACKBGCFP];
-		m_BufferSize = KOGACKBGCFP;
+		m_Buffer = new byte[bufferSize];
+		m_BufferSize = bufferSize;
 	}
 
-	public void Init(Stream ABJIEFMMIEK)
+	public void Init(Stream stream)
 	{
-		m_Stream = ABJIEFMMIEK;
+		m_Stream = stream;
 		m_ProcessedSize = 0uL;
 		m_Limit = 0u;
 		m_Pos = 0u;
@@ -50,13 +50,13 @@ public class InBuffer
 		m_Stream = null;
 	}
 
-	public bool ReadByte(byte AAOIAEJJINO)
+	public bool ReadByte(byte result)
 	{
 		if (m_Pos >= m_Limit && !ReadBlock())
 		{
 			return false;
 		}
-		AAOIAEJJINO = m_Buffer[m_Pos++];
+		result = m_Buffer[m_Pos++];
 		return true;
 	}
 

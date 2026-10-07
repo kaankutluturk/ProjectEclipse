@@ -4,8 +4,8 @@ public class WinStyleRule : InFightRule
 {
 	private FightStatistics.FightStyle requiredStyle;
 
-	public WinStyleRule(XmlNode node, RuleAppliance EJPOJJKKICO)
-		: base(RuleType.RuleWinStyle, EJPOJJKKICO, node)
+	public WinStyleRule(XmlNode node, RuleAppliance ruleAppliance)
+		: base(RuleType.RuleWinStyle, ruleAppliance, node)
 	{
 		Parse(node);
 		applianceLosesOnTrigger = false;
@@ -14,8 +14,8 @@ public class WinStyleRule : InFightRule
 
 	protected override bool CompareSingle(object data)
 	{
-		FightData hCPJJKMNMCE = (FightData)data;
-		return hCPJJKMNMCE.Style >= requiredStyle;
+		FightData fightData = (FightData)data;
+		return fightData.Style >= requiredStyle;
 	}
 
 	protected override void Parse(XmlNode node)
@@ -26,11 +26,11 @@ public class WinStyleRule : InFightRule
 
 	public override InFightRule Copy()
 	{
-		InFightRule aAJIFBJLJOA = null;
-		RuleAppliance eJPOJJKKICO = GetAppliance();
-		XmlNode hKPPBKPJOEO = GetXmlSource().GetNode();
-		aAJIFBJLJOA = new WinStyleRule(hKPPBKPJOEO, eJPOJJKKICO);
-		aAJIFBJLJOA.IsRandom = IsRandom;
-		return aAJIFBJLJOA;
+		InFightRule ruleCopy = null;
+		RuleAppliance ruleAppliance = GetAppliance();
+		XmlNode sourceNode = GetXmlSource().GetNode();
+		ruleCopy = new WinStyleRule(sourceNode, ruleAppliance);
+		ruleCopy.IsRandom = IsRandom;
+		return ruleCopy;
 	}
 }

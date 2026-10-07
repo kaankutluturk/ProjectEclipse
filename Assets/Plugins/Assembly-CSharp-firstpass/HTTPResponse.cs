@@ -215,12 +215,12 @@ public class HTTPResponse : IDisposable
 		}
 	}
 
-	internal HTTPResponse(HTTPRequest ONOCIELLAPL, Stream ABJIEFMMIEK, bool IBIIADCLKCH, bool PEAJIKCANHP)
+	internal HTTPResponse(HTTPRequest request, Stream stream, bool isStreamed, bool isFromCache)
 	{
-		BaseRequest = ONOCIELLAPL;
-		Stream = ABJIEFMMIEK;
-		SetIsStreamed(IBIIADCLKCH);
-		SetIsFromCache(PEAJIKCANHP);
+		BaseRequest = request;
+		Stream = stream;
+		SetIsStreamed(isStreamed);
+		SetIsFromCache(isFromCache);
 		SetIsClosedManually(false);
 	}
 
@@ -377,7 +377,7 @@ public class HTTPResponse : IDisposable
 		isClosedManually = value;
 	}
 
-	internal virtual bool Receive(int JHFPNBPNHEH = -1, bool NDCKHEGBAGO = true)
+	internal virtual bool Receive(int forceReadRawContentLength = -1, bool readPayloadData = true)
 	{
 		string empty = string.Empty;
 		try
@@ -420,19 +420,19 @@ public class HTTPResponse : IDisposable
 		}
 		ReadHeaders(Stream);
 		SetIsUpgraded(GetStatusCode() == 101 && (HasHeaderWithValue("connection", "upgrade") || HasHeader("upgrade")));
-		if (!NDCKHEGBAGO)
+		if (!readPayloadData)
 		{
 			return true;
 		}
-		return ReadPayload(JHFPNBPNHEH);
+		return ReadPayload(forceReadRawContentLength);
 	}
 
-	protected bool ReadPayload(int JHFPNBPNHEH)
+	protected bool ReadPayload(int forceReadRawContentLength)
 	{
-		if (JHFPNBPNHEH != -1)
+		if (forceReadRawContentLength != -1)
 		{
 			SetIsFromCache(true);
-			ReadRaw(Stream, JHFPNBPNHEH);
+			ReadRaw(Stream, forceReadRawContentLength);
 			return true;
 		}
 		if ((GetStatusCode() >= 100 && GetStatusCode() < 200) || GetStatusCode() == 204 || GetStatusCode() == 304 || BaseRequest.GetMethodType() == HTTPMethods.Head)
@@ -453,8 +453,8 @@ public class HTTPResponse : IDisposable
 			}
 			else if (list2 != null)
 			{
-				HTTPRange jALPJGLIOFH = GetRange();
-				ReadRaw(Stream, jALPJGLIOFH.GetLastBytePos() - jALPJGLIOFH.GetFirstBytePos() + 1);
+				HTTPRange range = GetRange();
+				ReadRaw(Stream, range.GetLastBytePos() - range.GetFirstBytePos() + 1);
 			}
 			else
 			{
@@ -464,14 +464,14 @@ public class HTTPResponse : IDisposable
 		return true;
 	}
 
-	protected void ReadHeaders(Stream ABJIEFMMIEK)
+	protected void ReadHeaders(Stream stream)
 	{
-		string text = ReadTo(ABJIEFMMIEK, 58, 10).Trim();
+		string text = ReadTo(stream, 58, 10).Trim();
 		while (text != string.Empty)
 		{
-			string bAINMLLIKOL = ReadTo(ABJIEFMMIEK, 10);
-			AddHeader(text, bAINMLLIKOL);
-			text = ReadTo(ABJIEFMMIEK, 58, 10);
+			string headerValue = ReadTo(stream, 10);
+			AddHeader(text, headerValue);
+			text = ReadTo(stream, 58, 10);
 		}
 	}
 
@@ -520,9 +520,9 @@ public class HTTPResponse : IDisposable
 		return value[0];
 	}
 
-	public bool HasHeaderWithValue(string JOKIBHMEDAO, string value)
+	public bool HasHeaderWithValue(string headerName, string value)
 	{
-		List<string> list = GetHeaderValues(JOKIBHMEDAO);
+		List<string> list = GetHeaderValues(headerName);
 		if (list == null)
 		{
 			return false;
@@ -537,9 +537,9 @@ public class HTTPResponse : IDisposable
 		return false;
 	}
 
-	public bool HasHeader(string JOKIBHMEDAO)
+	public bool HasHeader(string headerName)
 	{
-		List<string> list = GetHeaderValues(JOKIBHMEDAO);
+		List<string> list = GetHeaderValues(headerName);
 		if (list == null)
 		{
 			return false;
@@ -562,51 +562,51 @@ public class HTTPResponse : IDisposable
 		return new HTTPRange(int.Parse(array[1]), int.Parse(array[2]), (!(array[3] != "*")) ? (-1) : int.Parse(array[3]));
 	}
 
-	public static string ReadTo(Stream ABJIEFMMIEK, byte MOFIAGJPCNA)
+	public static string ReadTo(Stream stream, byte blocker)
 	{
 		using (MemoryStream memoryStream = new MemoryStream())
 		{
-			int num = ABJIEFMMIEK.ReadByte();
-			while (num != MOFIAGJPCNA && num != -1)
+			int num = stream.ReadByte();
+			while (num != blocker && num != -1)
 			{
 				memoryStream.WriteByte((byte)num);
-				num = ABJIEFMMIEK.ReadByte();
+				num = stream.ReadByte();
 			}
 			return memoryStream.ToArray().AsciiToString().Trim();
 		}
 	}
 
-	public static string ReadTo(Stream ABJIEFMMIEK, byte ECEBLBGKFPF, byte NELKINPNIGD)
+	public static string ReadTo(Stream stream, byte blocker1, byte blocker2)
 	{
 		using (MemoryStream memoryStream = new MemoryStream())
 		{
-			int num = ABJIEFMMIEK.ReadByte();
-			while (num != ECEBLBGKFPF && num != NELKINPNIGD && num != -1)
+			int num = stream.ReadByte();
+			while (num != blocker1 && num != blocker2 && num != -1)
 			{
 				memoryStream.WriteByte((byte)num);
-				num = ABJIEFMMIEK.ReadByte();
+				num = stream.ReadByte();
 			}
 			return memoryStream.ToArray().AsciiToString().Trim();
 		}
 	}
 
-	public static string NoTrimReadTo(Stream ABJIEFMMIEK, byte ECEBLBGKFPF, byte NELKINPNIGD)
+	public static string NoTrimReadTo(Stream stream, byte blocker1, byte blocker2)
 	{
 		using (MemoryStream memoryStream = new MemoryStream())
 		{
-			int num = ABJIEFMMIEK.ReadByte();
-			while (num != ECEBLBGKFPF && num != NELKINPNIGD && num != -1)
+			int num = stream.ReadByte();
+			while (num != blocker1 && num != blocker2 && num != -1)
 			{
 				memoryStream.WriteByte((byte)num);
-				num = ABJIEFMMIEK.ReadByte();
+				num = stream.ReadByte();
 			}
 			return memoryStream.ToArray().AsciiToString();
 		}
 	}
 
-	protected int ReadChunkLength(Stream ABJIEFMMIEK)
+	protected int ReadChunkLength(Stream stream)
 	{
-		string text = ReadTo(ABJIEFMMIEK, 10);
+		string text = ReadTo(stream, 10);
 		string[] array = text.Split(';');
 		string text2 = array[0];
 		int result;
@@ -617,12 +617,12 @@ public class HTTPResponse : IDisposable
 		throw new Exception(string.Format("Can't parse '{0}' as a hex number!", text2));
 	}
 
-	protected void ReadChunked(Stream ABJIEFMMIEK)
+	protected void ReadChunked(Stream stream)
 	{
 		BeginReceiveStreamFragments();
 		using (MemoryStream memoryStream = new MemoryStream())
 		{
-			int num = ReadChunkLength(ABJIEFMMIEK);
+			int num = ReadChunkLength(stream);
 			byte[] array = new byte[num];
 			int num2 = 0;
 			BaseRequest.SetDownloadLength(num);
@@ -637,7 +637,7 @@ public class HTTPResponse : IDisposable
 				WaitWhileHasFragments();
 				do
 				{
-					int num4 = ABJIEFMMIEK.Read(array, num3, num - num3);
+					int num4 = stream.Read(array, num3, num - num3);
 					if (num4 == 0)
 					{
 						throw new Exception("The remote server closed the connection unexpectedly!");
@@ -653,11 +653,11 @@ public class HTTPResponse : IDisposable
 				{
 					memoryStream.Write(array, 0, num3);
 				}
-				ReadTo(ABJIEFMMIEK, 10);
+				ReadTo(stream, 10);
 				num2 += num3;
-				num = ReadChunkLength(ABJIEFMMIEK);
-				HTTPRequest kEEGKCNNPGM = BaseRequest;
-				kEEGKCNNPGM.SetDownloadLength(kEEGKCNNPGM.GetDownloadLength() + num);
+				num = ReadChunkLength(stream);
+				HTTPRequest request = BaseRequest;
+				request.SetDownloadLength(request.GetDownloadLength() + num);
 				BaseRequest.SetDownloaded(num2);
 				BaseRequest.SetDownloadProgressChanged(GetIsSuccess() || GetIsFromCache());
 			}
@@ -665,7 +665,7 @@ public class HTTPResponse : IDisposable
 			{
 				FlushRemainingFragmentBuffer();
 			}
-			ReadHeaders(ABJIEFMMIEK);
+			ReadHeaders(stream);
 			if (!BaseRequest.GetUseStreaming())
 			{
 				set_Data(DecodeStream(memoryStream));
@@ -673,33 +673,33 @@ public class HTTPResponse : IDisposable
 		}
 	}
 
-	internal void ReadRaw(Stream ABJIEFMMIEK, int HDIIBKGCCNB)
+	internal void ReadRaw(Stream stream, int contentLength)
 	{
 		BeginReceiveStreamFragments();
-		BaseRequest.SetDownloadLength(HDIIBKGCCNB);
+		BaseRequest.SetDownloadLength(contentLength);
 		BaseRequest.SetDownloadProgressChanged(GetIsSuccess() || GetIsFromCache());
-		using (MemoryStream memoryStream = new MemoryStream((!BaseRequest.GetUseStreaming()) ? HDIIBKGCCNB : 0))
+		using (MemoryStream memoryStream = new MemoryStream((!BaseRequest.GetUseStreaming()) ? contentLength : 0))
 		{
 			byte[] array = new byte[Math.Max(BaseRequest.GetStreamFragmentSize(), 4096)];
 			int num = 0;
-			while (HDIIBKGCCNB > 0)
+			while (contentLength > 0)
 			{
 				num = 0;
 				WaitWhileHasFragments();
 				do
 				{
-					int num2 = ABJIEFMMIEK.Read(array, num, Math.Min(HDIIBKGCCNB, array.Length - num));
+					int num2 = stream.Read(array, num, Math.Min(contentLength, array.Length - num));
 					if (num2 == 0)
 					{
 						throw new Exception("The remote server closed the connection unexpectedly!");
 					}
 					num += num2;
-					HDIIBKGCCNB -= num2;
-					HTTPRequest kEEGKCNNPGM = BaseRequest;
-					kEEGKCNNPGM.SetDownloaded(kEEGKCNNPGM.GetDownloaded() + num2);
+					contentLength -= num2;
+					HTTPRequest request = BaseRequest;
+					request.SetDownloaded(request.GetDownloaded() + num2);
 					BaseRequest.SetDownloadProgressChanged(GetIsSuccess() || GetIsFromCache());
 				}
-				while (num < array.Length && HDIIBKGCCNB > 0);
+				while (num < array.Length && contentLength > 0);
 				if (BaseRequest.GetUseStreaming())
 				{
 					FeedStreamFragment(array, 0, num);
@@ -720,9 +720,9 @@ public class HTTPResponse : IDisposable
 		}
 	}
 
-	protected void ReadUnknownSize(Stream ABJIEFMMIEK)
+	protected void ReadUnknownSize(Stream stream)
 	{
-		NetworkStream networkStream = ABJIEFMMIEK as NetworkStream;
+		NetworkStream networkStream = stream as NetworkStream;
 		using (MemoryStream memoryStream = new MemoryStream())
 		{
 			byte[] array = new byte[Math.Max(BaseRequest.GetStreamFragmentSize(), 4096)];
@@ -742,7 +742,7 @@ public class HTTPResponse : IDisposable
 							{
 								break;
 							}
-							int num3 = ABJIEFMMIEK.ReadByte();
+							int num3 = stream.ReadByte();
 							if (num3 >= 0)
 							{
 								array[i] = (byte)num3;
@@ -754,11 +754,11 @@ public class HTTPResponse : IDisposable
 					}
 					else
 					{
-						num2 = ABJIEFMMIEK.Read(array, num, array.Length - num);
+						num2 = stream.Read(array, num, array.Length - num);
 					}
 					num += num2;
-					HTTPRequest kEEGKCNNPGM = BaseRequest;
-					kEEGKCNNPGM.SetDownloaded(kEEGKCNNPGM.GetDownloaded() + num2);
+					HTTPRequest request = BaseRequest;
+					request.SetDownloaded(request.GetDownloaded() + num2);
 					BaseRequest.SetDownloadLength(BaseRequest.GetDownloaded());
 					BaseRequest.SetDownloadProgressChanged(GetIsSuccess() || GetIsFromCache());
 				}
@@ -784,31 +784,31 @@ public class HTTPResponse : IDisposable
 		}
 	}
 
-	protected byte[] DecodeStream(Stream JGFDPHDCFNL)
+	protected byte[] DecodeStream(Stream inputStream)
 	{
-		JGFDPHDCFNL.Seek(0L, SeekOrigin.Begin);
+		inputStream.Seek(0L, SeekOrigin.Begin);
 		List<string> list = ((!GetIsFromCache()) ? GetHeaderValues("content-encoding") : null);
 		Stream stream = null;
 		if (list == null)
 		{
-			stream = JGFDPHDCFNL;
+			stream = inputStream;
 		}
 		else
 		{
 			switch (list[0])
 			{
 			case "gzip":
-				stream = new GZipCompressionStream(JGFDPHDCFNL, ZlibCompressionMode.Decompress);
+				stream = new GZipCompressionStream(inputStream, ZlibCompressionMode.Decompress);
 				break;
 			case "deflate":
-				stream = new ZlibDeflateStream(JGFDPHDCFNL, ZlibCompressionMode.Decompress);
+				stream = new ZlibDeflateStream(inputStream, ZlibCompressionMode.Decompress);
 				break;
 			default:
-				stream = JGFDPHDCFNL;
+				stream = inputStream;
 				break;
 			}
 		}
-		using (MemoryStream memoryStream = new MemoryStream((int)JGFDPHDCFNL.Length))
+		using (MemoryStream memoryStream = new MemoryStream((int)inputStream.Length))
 		{
 			byte[] array = new byte[1024];
 			int num = 0;
@@ -829,17 +829,17 @@ public class HTTPResponse : IDisposable
 		allFragmentSize = 0;
 	}
 
-	protected void FeedStreamFragment(byte[] buffer, int LCCLEFMKLPB, int BDBOAEGELMC)
+	protected void FeedStreamFragment(byte[] buffer, int offset, int length)
 	{
 		if (fragmentBuffer == null)
 		{
 			fragmentBuffer = new byte[BaseRequest.GetStreamFragmentSize()];
 			fragmentBufferDataLength = 0;
 		}
-		if (fragmentBufferDataLength + BDBOAEGELMC <= BaseRequest.GetStreamFragmentSize())
+		if (fragmentBufferDataLength + length <= BaseRequest.GetStreamFragmentSize())
 		{
-			Array.Copy(buffer, LCCLEFMKLPB, fragmentBuffer, fragmentBufferDataLength, BDBOAEGELMC);
-			fragmentBufferDataLength += BDBOAEGELMC;
+			Array.Copy(buffer, offset, fragmentBuffer, fragmentBufferDataLength, length);
+			fragmentBufferDataLength += length;
 			if (fragmentBufferDataLength == BaseRequest.GetStreamFragmentSize())
 			{
 				AddStreamedFragment(fragmentBuffer);
@@ -850,8 +850,8 @@ public class HTTPResponse : IDisposable
 		else
 		{
 			int num = BaseRequest.GetStreamFragmentSize() - fragmentBufferDataLength;
-			FeedStreamFragment(buffer, LCCLEFMKLPB, num);
-			FeedStreamFragment(buffer, LCCLEFMKLPB + num, BDBOAEGELMC - num);
+			FeedStreamFragment(buffer, offset, num);
+			FeedStreamFragment(buffer, offset + num, length - num);
 		}
 	}
 

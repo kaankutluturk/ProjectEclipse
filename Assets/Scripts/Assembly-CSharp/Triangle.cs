@@ -51,20 +51,20 @@ public class Triangle
 		_nodes[2] = new ModelNode("tmp");
 	}
 
-	public Triangle(ModelNode NOLAMPHAAII, ModelNode BIPPDOPJCOI, ModelNode LJOMMHPDFCI, string name)
+	public Triangle(ModelNode firstNode, ModelNode secondNode, ModelNode thirdNode, string name)
 	{
-		_nodes[0] = NOLAMPHAAII;
-		_nodes[1] = BIPPDOPJCOI;
-		_nodes[2] = LJOMMHPDFCI;
+		_nodes[0] = firstNode;
+		_nodes[1] = secondNode;
+		_nodes[2] = thirdNode;
 		_name = name;
 	}
 
-	public Triangle(Triangle EDANJNHMLBC)
+	public Triangle(Triangle source)
 	{
-		_nodes[0] = EDANJNHMLBC._nodes[0];
-		_nodes[1] = EDANJNHMLBC._nodes[1];
-		_nodes[2] = EDANJNHMLBC._nodes[2];
-		_name = EDANJNHMLBC._name;
+		_nodes[0] = source._nodes[0];
+		_nodes[1] = source._nodes[1];
+		_nodes[2] = source._nodes[2];
+		_name = source._name;
 	}
 
 	public string get_Name()
@@ -107,11 +107,11 @@ public class Triangle
 		_nodes[2] = value;
 	}
 
-	public void CopyFrom(Triangle CJAGCDNBEPA)
+	public void CopyFrom(Triangle source)
 	{
-		_nodes[0].CopyFrom(CJAGCDNBEPA.GetFirstNode());
-		_nodes[1].CopyFrom(CJAGCDNBEPA.GetSecondNode());
-		_nodes[2].CopyFrom(CJAGCDNBEPA.GetThirdNode());
+		_nodes[0].CopyFrom(source.GetFirstNode());
+		_nodes[1].CopyFrom(source.GetSecondNode());
+		_nodes[2].CopyFrom(source.GetThirdNode());
 	}
 
 	public void Reset()

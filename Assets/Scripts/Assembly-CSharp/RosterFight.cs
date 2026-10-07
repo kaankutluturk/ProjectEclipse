@@ -486,9 +486,9 @@ public class RosterFight
 
 	public string GetBattleName()
 	{
-		FightIDS mOCEDDJOAEB = new FightIDS();
-		mOCEDDJOAEB.SetFightIDSByString(_fightIDS);
-		return mOCEDDJOAEB.GetBattle();
+		FightIDS fightIds = new FightIDS();
+		fightIds.SetFightIDSByString(_fightIDS);
+		return fightIds.GetBattle();
 	}
 
 	public void RecordWin()
@@ -519,9 +519,9 @@ public class RosterFight
 		ListSF.GetInstance().RequestSave();
 	}
 
-	public bool RerandomizeIfElapsed(long LHLPFBOAEPA)
+	public bool RerandomizeIfElapsed(long interval)
 	{
-		if (elapsedSinceRandomize >= LHLPFBOAEPA || elapsedSinceRandomize == -1)
+		if (elapsedSinceRandomize >= interval || elapsedSinceRandomize == -1)
 		{
 			RandomizeSeeds();
 			return true;

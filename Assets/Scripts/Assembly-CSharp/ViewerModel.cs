@@ -70,37 +70,37 @@ public class ViewerModel
 		models.Clear();
 	}
 
-	public void Init(float GBNPHCHGKDO)
+	public void Init(float floorHeight)
 	{
 	}
 
-	public int AddModel(ModelObject ACENLMONNPA, Color color, bool IGGHECALMMP)
+	public int AddModel(ModelObject modelObject, Color color, bool isFighter)
 	{
-		if (IGGHECALMMP)
+		if (isFighter)
 		{
 			if (firstFighter == null)
 			{
-				firstFighter = ACENLMONNPA;
+				firstFighter = modelObject;
 			}
 			else
 			{
-				secondFighter = ACENLMONNPA;
+				secondFighter = modelObject;
 			}
 		}
-		ACENLMONNPA.GetModel().GetGameObject().transform.SetParent(_UnityObject.transform, false);
-		ACENLMONNPA.GetModel().set_color(color);
-		models.Add(ACENLMONNPA);
+		modelObject.GetModel().GetGameObject().transform.SetParent(_UnityObject.transform, false);
+		modelObject.GetModel().set_color(color);
+		models.Add(modelObject);
 		return 0;
 	}
 
 	public void RemoveModel(int index)
 	{
-		ModelObject oIEODIEHJMH = models[index];
-		if (oIEODIEHJMH == firstFighter)
+		ModelObject removedModel = models[index];
+		if (removedModel == firstFighter)
 		{
 			firstFighter = null;
 		}
-		else if (oIEODIEHJMH == secondFighter)
+		else if (removedModel == secondFighter)
 		{
 			secondFighter = null;
 		}
@@ -120,11 +120,11 @@ public class ViewerModel
         return true;
     }
 
-	public void SetModelActive(ModelObject ACENLMONNPA, bool value)
+	public void SetModelActive(ModelObject modelObject, bool value)
 	{
 		foreach (ModelObject item in models)
 		{
-			if (item == ACENLMONNPA)
+			if (item == modelObject)
 			{
 				// Rollback remembers the previous state, so an undone vanish is shown again.
 				Eclipse.Multiplayer.Rollback.RollbackObjects.SetActive(item.GetModel().GetGameObject(), value);

@@ -7,43 +7,43 @@ public class QuestActionResumeQuests : QuestAction
 
 	private QuestActionsSequence errorSequence = new QuestActionsSequence();
 
-	public override void Parse(XmlNode EPKLCPOEELO)
+	public override void Parse(XmlNode node)
 	{
-		base.Parse(EPKLCPOEELO);
-		XmlNode ePKLCPOEELO = EPKLCPOEELO["Success"];
-		XmlNode ePKLCPOEELO2 = EPKLCPOEELO["Error"];
-		ParseSequenceWithUnlock(ePKLCPOEELO, successSequence, OnSuccessComplete);
+		base.Parse(node);
+		XmlNode successNode = node["Success"];
+		XmlNode ePKLCPOEELO2 = node["Error"];
+		ParseSequenceWithUnlock(successNode, successSequence, OnSuccessComplete);
 		ParseSequenceWithUnlock(ePKLCPOEELO2, errorSequence, OnActionComplete);
 	}
 
-	public override void Execute(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters parameters)
 	{
 		ResetSequences();
-		base.Execute(GFIHPBCEEOB);
-		Roster nKGLHEGIKKP = ListSF.GetRoster();
+		base.Execute(parameters);
+		Roster roster = ListSF.GetRoster();
 		int num = 0;
-		List<RosterQuest> list = nKGLHEGIKKP.GetQuests();
+		List<RosterQuest> list = roster.GetQuests();
 		foreach (RosterQuest item in list)
 		{
 			if (ListSF.GetInstance().IsEclipseQuestSuppressed(item.Name, item.FileName)) continue;
 			if (QuestName != item.Name && item.get_Parameters() != null)
 			{
-				QuestStage mLLKDGBEGJI = ListSF.GetInstance().FindEclipseSavedQuest(item.Name, item.FileName);
-				if (mLLKDGBEGJI != null && !mLLKDGBEGJI.IsUnresumable())
+				QuestStage stage = ListSF.GetInstance().FindEclipseSavedQuest(item.Name, item.FileName);
+				if (stage != null && !stage.IsUnresumable())
 				{
 					num++;
 				}
 			}
 		}
-		ScreenType iPKNDMINFMJ = Module.GetInstance().GetCurrentScreenType();
+		ScreenType currentScreen = Module.GetInstance().GetCurrentScreenType();
 		bool flag = false;
-		if (num == 0 && (iPKNDMINFMJ == ScreenType.ModulePreloader || iPKNDMINFMJ == ScreenType.ModuleNone || flag))
+		if (num == 0 && (currentScreen == ScreenType.ModulePreloader || currentScreen == ScreenType.ModuleNone || flag))
 		{
-			errorSequence.Run(GFIHPBCEEOB);
+			errorSequence.Run(parameters);
 		}
 		else
 		{
-			successSequence.Run(GFIHPBCEEOB);
+			successSequence.Run(parameters);
 		}
 	}
 

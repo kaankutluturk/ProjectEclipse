@@ -17,38 +17,38 @@ public class QuestActionSetParameter : QuestAction
 
 	private string value;
 
-	public override void Parse(XmlNode EPKLCPOEELO)
+	public override void Parse(XmlNode node)
 	{
-		base.Parse(EPKLCPOEELO);
-		name = EPKLCPOEELO.Attributes["Name"].GetStringOrDefault(string.Empty);
-		parameterExpression = EPKLCPOEELO.Attributes["Parameter"].GetStringOrDefault(string.Empty);
-		value = EPKLCPOEELO.Attributes["Value"].GetStringOrDefault(string.Empty);
+		base.Parse(node);
+		name = node.Attributes["Name"].GetStringOrDefault(string.Empty);
+		parameterExpression = node.Attributes["Parameter"].GetStringOrDefault(string.Empty);
+		value = node.Attributes["Value"].GetStringOrDefault(string.Empty);
 	}
 
-	public override void Execute(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters parameters)
 	{
-		base.Execute(GFIHPBCEEOB);
-		SetParameterOperands kJHEFADMIOA = new SetParameterOperands();
-		QuestCondition kKDGLNECFHA = new QuestCondition();
-		kKDGLNECFHA.SetParameters(GFIHPBCEEOB);
-		kKDGLNECFHA.SetValue(name, kJHEFADMIOA.itemNameResult);
-		kKDGLNECFHA.SetValue(parameterExpression, kJHEFADMIOA.parameterNameResult);
-		kKDGLNECFHA.SetValue(value, kJHEFADMIOA.valueResult);
-		ApplyParameter(kJHEFADMIOA);
+		base.Execute(parameters);
+		SetParameterOperands operands = new SetParameterOperands();
+		QuestCondition condition = new QuestCondition();
+		condition.SetParameters(parameters);
+		condition.SetValue(name, operands.itemNameResult);
+		condition.SetValue(parameterExpression, operands.parameterNameResult);
+		condition.SetValue(value, operands.valueResult);
+		ApplyParameter(operands);
 		FinishAction();
 	}
 
-	private void ApplyParameter(SetParameterOperands DCJLKCFKCOM)
+	private void ApplyParameter(SetParameterOperands operands)
 	{
-		Roster nKGLHEGIKKP = ListSF.GetRoster();
-		UserItem dKCHDHMLKHN = nKGLHEGIKKP.GetInventory().FindItem(DCJLKCFKCOM.itemNameResult.resultSTR);
-		if (dKCHDHMLKHN != null)
+		Roster roster = ListSF.GetRoster();
+		UserItem userItem = roster.GetInventory().FindItem(operands.itemNameResult.resultSTR);
+		if (userItem != null)
 		{
-			string iBBAMMHHBFE = DCJLKCFKCOM.parameterNameResult.resultSTR;
-			if (iBBAMMHHBFE.Equals("UpgradeLevel"))
+			string parameterName = operands.parameterNameResult.resultSTR;
+			if (parameterName.Equals("UpgradeLevel"))
 			{
-				dKCHDHMLKHN.SetUpgradeLevel((int)DCJLKCFKCOM.valueResult.resultNumber);
-				dKCHDHMLKHN.RefreshUpgradeState(nKGLHEGIKKP.GetLevel());
+				userItem.SetUpgradeLevel((int)operands.valueResult.resultNumber);
+				userItem.RefreshUpgradeState(roster.GetLevel());
 			}
 		}
 	}

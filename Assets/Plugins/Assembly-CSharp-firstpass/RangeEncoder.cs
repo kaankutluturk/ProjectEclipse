@@ -16,9 +16,9 @@ internal class RangeEncoder
 
 	private long StartPosition;
 
-	public void SetStream(Stream ABJIEFMMIEK)
+	public void SetStream(Stream stream)
 	{
-		Stream = ABJIEFMMIEK;
+		Stream = stream;
 	}
 
 	public void ReleaseStream()
@@ -53,10 +53,10 @@ internal class RangeEncoder
 		Stream.Close();
 	}
 
-	public void Encode(uint ILENLCMAMBH, uint PEEOEOMEBFG, uint ADLMOFDBBMG)
+	public void Encode(uint start, uint size, uint total)
 	{
-		Low += ILENLCMAMBH * (Range /= ADLMOFDBBMG);
-		Range *= PEEOEOMEBFG;
+		Low += start * (Range /= total);
+		Range *= size;
 		while (Range < 16777216)
 		{
 			Range <<= 8;
@@ -81,12 +81,12 @@ internal class RangeEncoder
 		Low = (uint)((int)Low << 8);
 	}
 
-	public void EncodeDirectBits(uint AFIEJABPAKA, int HEGEFMNECOF)
+	public void EncodeDirectBits(uint bits, int numBits)
 	{
-		for (int num = HEGEFMNECOF - 1; num >= 0; num--)
+		for (int num = numBits - 1; num >= 0; num--)
 		{
 			Range >>= 1;
-			if (((AFIEJABPAKA >> num) & 1) == 1)
+			if (((bits >> num) & 1) == 1)
 			{
 				Low += Range;
 			}
@@ -98,9 +98,9 @@ internal class RangeEncoder
 		}
 	}
 
-	public void EncodeBit(uint DOONDFDPDFH, int HEGEFMNECOF, uint symbol)
+	public void EncodeBit(uint probability, int numTotalBits, uint symbol)
 	{
-		uint num = (Range >> HEGEFMNECOF) * DOONDFDPDFH;
+		uint num = (Range >> numTotalBits) * probability;
 		if (symbol == 0)
 		{
 			Range = num;

@@ -1,8 +1,8 @@
 public class QuestActionUpdateScreen : QuestAction
 {
-	public override void Execute(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters parameters)
 	{
-		base.Execute(GFIHPBCEEOB);
+		base.Execute(parameters);
 		Module module = Module.GetInstance();
 		ScreenType currentScreen = module.GetCurrentScreenType();
 		// UpdateScreen can be resumed from the save before the first real module

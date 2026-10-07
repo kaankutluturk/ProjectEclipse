@@ -147,9 +147,9 @@ public class QuestAction : global::EventDispatcher<object>
 
 	private InputLockMode lockMode;
 
-	public static QuestActionType GetActionTypeByName(string LFLGCDNKNJI)
+	public static QuestActionType GetActionTypeByName(string actionName)
 	{
-		switch (LFLGCDNKNJI)
+		switch (actionName)
 		{
 		case "Dialog":
 			return QuestActionType.QUEST_ACTION_DIALOG;
@@ -353,25 +353,25 @@ public class QuestAction : global::EventDispatcher<object>
 		case "UpdateEclipseBattles":
 			return QuestActionType.QUEST_ACTION_UPDATE_ECLIPSE_BATTLES;
 		default:
-			GameLog.Error(string.Format("{0} {1}", "Unknown quest type: ", LFLGCDNKNJI));
+			GameLog.Error(string.Format("{0} {1}", "Unknown quest type: ", actionName));
 			return QuestActionType.QUEST_ACTION_NONE;
 		}
 	}
 
-	public static QuestAction GetClassActionByName(string CNKBLODAFDO)
+	public static QuestAction GetClassActionByName(string actionName)
 	{
-		QuestAction compatibilityAction = Eclipse.Content.QuestCompatibility.CreateRuntimeAction(CNKBLODAFDO);
+		QuestAction compatibilityAction = Eclipse.Content.QuestCompatibility.CreateRuntimeAction(actionName);
 		if (compatibilityAction != null)
 		{
 			return compatibilityAction;
 		}
-		QuestActionType lFLGCDNKNJI = GetActionTypeByName(CNKBLODAFDO);
-		return CreateActionByType(lFLGCDNKNJI);
+		QuestActionType actionType = GetActionTypeByName(actionName);
+		return CreateActionByType(actionType);
 	}
 
-	public static QuestAction CreateActionByType(QuestActionType LFLGCDNKNJI)
+	public static QuestAction CreateActionByType(QuestActionType actionType)
 	{
-		switch (LFLGCDNKNJI)
+		switch (actionType)
 		{
 		case QuestActionType.QUEST_ACTION_DIALOG:
 			return new QuestActionDialog();
@@ -572,7 +572,7 @@ public class QuestAction : global::EventDispatcher<object>
 		case QuestActionType.QUEST_ACTION_UPDATE_ECLIPSE_BATTLES:
 			return new QuestActionUpdateEclipseBattles();
 		default:
-			GameLog.Error(string.Format("{0} {1}", "QuestAction.getClassActionByType - type: ", LFLGCDNKNJI));
+			GameLog.Error(string.Format("{0} {1}", "QuestAction.getClassActionByType - type: ", actionType));
 			return new QuestAction();
 		}
 	}
@@ -595,14 +595,14 @@ public class QuestAction : global::EventDispatcher<object>
 		CallEvent(1, Parameters);
 	}
 
-	public virtual void Parse(XmlNode EPKLCPOEELO)
+	public virtual void Parse(XmlNode node)
 	{
-		ActionName = EPKLCPOEELO.Name;
-		lockMode = ParseLockMode(XmlUtils.ParseString(EPKLCPOEELO.Attributes["Lock"], string.Empty));
-		soundName = XmlUtils.ParseString(EPKLCPOEELO.Attributes["Sound"], string.Empty);
+		ActionName = node.Name;
+		lockMode = ParseLockMode(XmlUtils.ParseString(node.Attributes["Lock"], string.Empty));
+		soundName = XmlUtils.ParseString(node.Attributes["Sound"], string.Empty);
 	}
 
-	public virtual void Execute(QuestParameters GFIHPBCEEOB)
+	public virtual void Execute(QuestParameters parameters)
 	{
 		CallEvent(0, Parameters);
 		if (LogRules.GetInstance().GetLogQuestActions())
@@ -622,7 +622,7 @@ public class QuestAction : global::EventDispatcher<object>
 		{
 			PlaySound();
 		}
-		Parameters = GFIHPBCEEOB;
+		Parameters = parameters;
 	}
 
 	public virtual void ResetSequences()
@@ -635,33 +635,33 @@ public class QuestAction : global::EventDispatcher<object>
 
 	public virtual void CompleteQuestStage()
 	{
-		QuestStage mLLKDGBEGJI = ListSF.GetInstance().GetQuestByName(QuestName);
-		if (mLLKDGBEGJI != null)
+		QuestStage questStage = ListSF.GetInstance().GetQuestByName(QuestName);
+		if (questStage != null)
 		{
-			mLLKDGBEGJI.FinishQuest();
+			questStage.FinishQuest();
 		}
 	}
 
-	public virtual void ParseSequence(XmlNode EPKLCPOEELO, QuestActionsSequence AFENHJFICNN, Action<object> ODDEOFKLIAG)
+	public virtual void ParseSequence(XmlNode node, QuestActionsSequence sequence, Action<object> onComplete)
 	{
-		if (EPKLCPOEELO != null)
+		if (node != null)
 		{
-			foreach (XmlNode childNode in EPKLCPOEELO.ChildNodes)
+			foreach (XmlNode childNode in node.ChildNodes)
 			{
 				string name = childNode.Name;
-				QuestAction mBAAKHELFKL = GetClassActionByName(name);
-				mBAAKHELFKL.QuestName = QuestName;
-				mBAAKHELFKL.Parse(childNode);
-				AFENHJFICNN.AddAction(mBAAKHELFKL);
+				QuestAction childAction = GetClassActionByName(name);
+				childAction.QuestName = QuestName;
+				childAction.Parse(childNode);
+				sequence.AddAction(childAction);
 			}
 		}
-		AFENHJFICNN.AddEventListener(1, ODDEOFKLIAG);
+		sequence.AddEventListener(1, onComplete);
 	}
 
-	public virtual void ParseSequenceWithUnlock(XmlNode EPKLCPOEELO, QuestActionsSequence AFENHJFICNN, Action<object> ODDEOFKLIAG)
+	public virtual void ParseSequenceWithUnlock(XmlNode node, QuestActionsSequence sequence, Action<object> onComplete)
 	{
-		ParseSequence(EPKLCPOEELO, AFENHJFICNN, ODDEOFKLIAG);
-		AFENHJFICNN.AddEventListener(0, OnRunSuccessAndErrorAction);
+		ParseSequence(node, sequence, onComplete);
+		sequence.AddEventListener(0, OnRunSuccessAndErrorAction);
 	}
 
 	public void OnRunSuccessAndErrorAction(object data)
@@ -672,9 +672,9 @@ public class QuestAction : global::EventDispatcher<object>
 		}
 	}
 
-	public virtual void SetStage(QuestStage DOKAIKMLLDK)
+	public virtual void SetStage(QuestStage questStage)
 	{
-		this.stage = DOKAIKMLLDK;
+		this.stage = questStage;
 	}
 
 	public QuestStage GetStage()

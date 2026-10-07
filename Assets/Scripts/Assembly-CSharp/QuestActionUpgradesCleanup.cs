@@ -1,8 +1,8 @@
 public class QuestActionUpgradesCleanup : QuestAction
 {
-	public override void Execute(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters parameters)
 	{
-		base.Execute(GFIHPBCEEOB);
+		base.Execute(parameters);
 		ListSF.GetRoster().GetInventory().CorrectUpgradeLevels();
 		FinishAction();
 	}

@@ -41,10 +41,10 @@ internal class CRC32
 	{
 	}
 
-	public CRC32(int OEFFIELGAEI, bool reverseBits)
+	public CRC32(int polynomial, bool reverseBits)
 	{
 		this.reverseBits = reverseBits;
-		dwPolynomial = (uint)OEFFIELGAEI;
+		dwPolynomial = (uint)polynomial;
 		GenerateLookupTable();
 	}
 
@@ -58,21 +58,21 @@ internal class CRC32
 		return (int)(~_register);
 	}
 
-	public int GetCrc32(Stream NILNDHEKNLJ)
+	public int GetCrc32(Stream input)
 	{
-		return GetCrc32AndCopy(NILNDHEKNLJ, null);
+		return GetCrc32AndCopy(input, null);
 	}
 
-	public int GetCrc32AndCopy(Stream NILNDHEKNLJ, Stream output)
+	public int GetCrc32AndCopy(Stream input, Stream output)
 	{
-		if (NILNDHEKNLJ == null)
+		if (input == null)
 		{
 			throw new Exception("The input stream must not be null.");
 		}
 		byte[] array = new byte[8192];
 		int count = 8192;
 		_TotalBytesRead = 0L;
-		int num = NILNDHEKNLJ.Read(array, 0, count);
+		int num = input.Read(array, 0, count);
 		if (output != null)
 		{
 			output.Write(array, 0, num);
@@ -81,7 +81,7 @@ internal class CRC32
 		while (num > 0)
 		{
 			SlurpBlock(array, 0, num);
-			num = NILNDHEKNLJ.Read(array, 0, count);
+			num = input.Read(array, 0, count);
 			if (output != null)
 			{
 				output.Write(array, 0, num);
@@ -91,26 +91,26 @@ internal class CRC32
 		return (int)(~_register);
 	}
 
-	public int ComputeCrc32(int BLFBMIOIPOI, byte LDKCOIHONPG)
+	public int ComputeCrc32(int crcValue, byte byteValue)
 	{
-		return _InternalComputeCrc32((uint)BLFBMIOIPOI, LDKCOIHONPG);
+		return _InternalComputeCrc32((uint)crcValue, byteValue);
 	}
 
-	internal int _InternalComputeCrc32(uint BLFBMIOIPOI, byte LDKCOIHONPG)
+	internal int _InternalComputeCrc32(uint crcValue, byte byteValue)
 	{
-		return (int)(crc32Table[(BLFBMIOIPOI ^ LDKCOIHONPG) & 0xFF] ^ (BLFBMIOIPOI >> 8));
+		return (int)(crc32Table[(crcValue ^ byteValue) & 0xFF] ^ (crcValue >> 8));
 	}
 
-	public void SlurpBlock(byte[] JILGHDDEMPE, int IPCOBJBKNAO, int count)
+	public void SlurpBlock(byte[] block, int offset, int count)
 	{
-		if (JILGHDDEMPE == null)
+		if (block == null)
 		{
 			throw new Exception("The data buffer must not be null.");
 		}
 		for (int i = 0; i < count; i++)
 		{
-			int num = IPCOBJBKNAO + i;
-			byte b = JILGHDDEMPE[num];
+			int num = offset + i;
+			byte b = block[num];
 			if (reverseBits)
 			{
 				uint num2 = (_register >> 24) ^ b;
@@ -125,32 +125,32 @@ internal class CRC32
 		_TotalBytesRead += count;
 	}
 
-	public void UpdateCRC(byte AAOIAEJJINO)
+	public void UpdateCRC(byte byteValue)
 	{
 		if (reverseBits)
 		{
-			uint num = (_register >> 24) ^ AAOIAEJJINO;
+			uint num = (_register >> 24) ^ byteValue;
 			_register = (_register << 8) ^ crc32Table[num];
 		}
 		else
 		{
-			uint num2 = (_register & 0xFF) ^ AAOIAEJJINO;
+			uint num2 = (_register & 0xFF) ^ byteValue;
 			_register = (_register >> 8) ^ crc32Table[num2];
 		}
 	}
 
-	public void UpdateCRC(byte AAOIAEJJINO, int HDKKKCDKFEE)
+	public void UpdateCRC(byte byteValue, int count)
 	{
-		while (HDKKKCDKFEE-- > 0)
+		while (count-- > 0)
 		{
 			if (reverseBits)
 			{
-				uint num = (_register >> 24) ^ AAOIAEJJINO;
+				uint num = (_register >> 24) ^ byteValue;
 				_register = (_register << 8) ^ crc32Table[(num < 0) ? (num + 256) : num];
 			}
 			else
 			{
-				uint num2 = (_register & 0xFF) ^ AAOIAEJJINO;
+				uint num2 = (_register & 0xFF) ^ byteValue;
 				_register = (_register >> 8) ^ crc32Table[(num2 < 0) ? (num2 + 256) : num2];
 			}
 		}
@@ -198,35 +198,35 @@ internal class CRC32
 		while (b != 0);
 	}
 
-	private uint gf2_matrix_times(uint[] NHBBGODHBEF, uint HCMPBOCKJOP)
+	private uint gf2_matrix_times(uint[] matrix, uint vector)
 	{
 		uint num = 0u;
 		int num2 = 0;
-		while (HCMPBOCKJOP != 0)
+		while (vector != 0)
 		{
-			if ((HCMPBOCKJOP & 1) == 1)
+			if ((vector & 1) == 1)
 			{
-				num ^= NHBBGODHBEF[num2];
+				num ^= matrix[num2];
 			}
-			HCMPBOCKJOP >>= 1;
+			vector >>= 1;
 			num2++;
 		}
 		return num;
 	}
 
-	private void gf2_matrix_square(uint[] AACJHHFILGC, uint[] BLBBHHDOBEB)
+	private void gf2_matrix_square(uint[] square, uint[] matrix)
 	{
 		for (int i = 0; i < 32; i++)
 		{
-			AACJHHFILGC[i] = gf2_matrix_times(BLBBHHDOBEB, BLBBHHDOBEB[i]);
+			square[i] = gf2_matrix_times(matrix, matrix[i]);
 		}
 	}
 
-	public void Combine(int GAICMJOFOJD, int BDBOAEGELMC)
+	public void Combine(int crc, int length)
 	{
 		uint[] array = new uint[32];
 		uint[] array2 = new uint[32];
-		if (BDBOAEGELMC == 0)
+		if (length == 0)
 		{
 			return;
 		}
@@ -240,7 +240,7 @@ internal class CRC32
 		}
 		gf2_matrix_square(array, array2);
 		gf2_matrix_square(array2, array);
-		uint num3 = (uint)BDBOAEGELMC;
+		uint num3 = (uint)length;
 		do
 		{
 			gf2_matrix_square(array, array2);
@@ -261,7 +261,7 @@ internal class CRC32
 			num3 >>= 1;
 		}
 		while (num3 != 0);
-		num ^= (uint)GAICMJOFOJD;
+		num ^= (uint)crc;
 		_register = ~num;
 	}
 

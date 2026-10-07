@@ -58,9 +58,9 @@ public class VisibleCells
 		return value;
 	}
 
-	public void SetCellAtIndex(int index, TableViewCell HJCPCBLCJJN)
+	public void SetCellAtIndex(int index, TableViewCell cell)
 	{
-		GetCells()[index] = HJCPCBLCJJN;
+		GetCells()[index] = cell;
 	}
 
 	public void RemoveCellAtIndex(int index)

@@ -4,9 +4,9 @@ public sealed class EmittingObjectGraphVisitor : IObjectGraphVisitor
 {
 	private readonly IEventEmitter eventEmitter;
 
-	public EmittingObjectGraphVisitor(IEventEmitter OPIGMJHGIDL)
+	public EmittingObjectGraphVisitor(IEventEmitter eventEmitter)
 	{
-		this.eventEmitter = OPIGMJHGIDL;
+		this.eventEmitter = eventEmitter;
 	}
 
 	bool IObjectGraphVisitor.Enter(IObjectDescriptor value)
@@ -14,32 +14,32 @@ public sealed class EmittingObjectGraphVisitor : IObjectGraphVisitor
 		return true;
 	}
 
-	bool IObjectGraphVisitor.EnterMapping(IObjectDescriptor KGBGENDIMBC, IObjectDescriptor value)
+	bool IObjectGraphVisitor.EnterMapping(IObjectDescriptor key, IObjectDescriptor value)
 	{
 		return true;
 	}
 
-	bool IObjectGraphVisitor.EnterMapping(IPropertyDescriptor KGBGENDIMBC, IObjectDescriptor value)
+	bool IObjectGraphVisitor.EnterMapping(IPropertyDescriptor key, IObjectDescriptor value)
 	{
 		return true;
 	}
 
-	void IObjectGraphVisitor.VisitScalar(IObjectDescriptor ADDIBOMFCNH)
+	void IObjectGraphVisitor.VisitScalar(IObjectDescriptor scalar)
 	{
-		eventEmitter.Emit(new ScalarEventInfo(ADDIBOMFCNH));
+		eventEmitter.Emit(new ScalarEventInfo(scalar));
 	}
 
-	void IObjectGraphVisitor.VisitMappingStart(IObjectDescriptor JPEFEBICPFI, Type FHNELPLPIPI, Type EJGJHBGMCDM)
+	void IObjectGraphVisitor.VisitMappingStart(IObjectDescriptor mapping, Type keyType, Type valueType)
 	{
-		eventEmitter.Emit(new MappingStartEventInfo(JPEFEBICPFI));
+		eventEmitter.Emit(new MappingStartEventInfo(mapping));
 	}
 
-	void IObjectGraphVisitor.VisitMappingEnd(IObjectDescriptor JPEFEBICPFI)
+	void IObjectGraphVisitor.VisitMappingEnd(IObjectDescriptor mapping)
 	{
-		eventEmitter.Emit(new MappingEndEventInfo(JPEFEBICPFI));
+		eventEmitter.Emit(new MappingEndEventInfo(mapping));
 	}
 
-	void IObjectGraphVisitor.VisitSequenceStart(IObjectDescriptor sequence, Type LKAAAFHOAGD)
+	void IObjectGraphVisitor.VisitSequenceStart(IObjectDescriptor sequence, Type elementType)
 	{
 		eventEmitter.Emit(new SequenceStartEventInfo(sequence));
 	}

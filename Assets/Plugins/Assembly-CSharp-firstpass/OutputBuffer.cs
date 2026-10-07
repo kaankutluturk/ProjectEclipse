@@ -65,10 +65,10 @@ internal class OutputBuffer
 		byteBuffer[pos++] = (byte)(value >> 8);
 	}
 
-	internal void WriteBits(int HDKKKCDKFEE, uint HLFOKLCKNEE)
+	internal void WriteBits(int count, uint bits)
 	{
-		bitBuf |= HLFOKLCKNEE << bitCount;
-		bitCount += HDKKKCDKFEE;
+		bitBuf |= bits << bitCount;
+		bitCount += count;
 		if (bitCount >= 16)
 		{
 			byteBuffer[pos++] = (byte)bitBuf;
@@ -94,31 +94,31 @@ internal class OutputBuffer
 		}
 	}
 
-	internal void WriteBytes(byte[] HFADMOEOHFA, int IPCOBJBKNAO, int count)
+	internal void WriteBytes(byte[] buffer, int offset, int count)
 	{
 		if (bitCount == 0)
 		{
-			Array.Copy(HFADMOEOHFA, IPCOBJBKNAO, byteBuffer, pos, count);
+			Array.Copy(buffer, offset, byteBuffer, pos, count);
 			pos += count;
 		}
 		else
 		{
-			WriteBytesUnaligned(HFADMOEOHFA, IPCOBJBKNAO, count);
+			WriteBytesUnaligned(buffer, offset, count);
 		}
 	}
 
-	private void WriteBytesUnaligned(byte[] HFADMOEOHFA, int IPCOBJBKNAO, int count)
+	private void WriteBytesUnaligned(byte[] buffer, int offset, int count)
 	{
 		for (int i = 0; i < count; i++)
 		{
-			byte aAOIAEJJINO = HFADMOEOHFA[IPCOBJBKNAO + i];
-			WriteByteUnaligned(aAOIAEJJINO);
+			byte byteValue = buffer[offset + i];
+			WriteByteUnaligned(byteValue);
 		}
 	}
 
-	private void WriteByteUnaligned(byte AAOIAEJJINO)
+	private void WriteByteUnaligned(byte byteValue)
 	{
-		WriteBits(8, AAOIAEJJINO);
+		WriteBits(8, byteValue);
 	}
 
 	internal int GetBitsInBuffer()

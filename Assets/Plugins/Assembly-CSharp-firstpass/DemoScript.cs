@@ -8,8 +8,8 @@ public class DemoScript : MonoBehaviour
 		GamePad.GetButtonDown(GamePad.Button.A, GamePad.Player.One);
 		GamePad.GetStick(GamePad.Stick.LeftStick, GamePad.Player.One);
 		GamePad.GetTrigger(GamePad.Trigger.RightTrigger, GamePad.Player.One);
-		GamepadState iOIGCCPIJPN = GamePad.GetState(GamePad.Player.One);
-		MonoBehaviour.print("A: " + iOIGCCPIJPN.A);
+		GamepadState gamepadState = GamePad.GetState(GamePad.Player.One);
+		MonoBehaviour.print("A: " + gamepadState.A);
 	}
 
 	private void OnGUI()
@@ -27,33 +27,33 @@ public class DemoScript : MonoBehaviour
 		GUILayout.EndArea();
 	}
 
-	private void DrawGamepadState(GamePad.Player OJINMMFLEEB)
+	private void DrawGamepadState(GamePad.Player player)
 	{
 		GUILayout.Space(45f);
 		GUILayout.BeginVertical();
-		GamepadState iOIGCCPIJPN = GamePad.GetState(OJINMMFLEEB);
-		GUILayout.Label("Gamepad " + OJINMMFLEEB);
-		GUILayout.Label(string.Empty + iOIGCCPIJPN.A);
-		GUILayout.Label(string.Empty + iOIGCCPIJPN.IsButtonBPressed);
-		GUILayout.Label(string.Empty + iOIGCCPIJPN.X);
-		GUILayout.Label(string.Empty + iOIGCCPIJPN.Y);
-		GUILayout.Label(string.Empty + iOIGCCPIJPN.Start);
-		GUILayout.Label(string.Empty + iOIGCCPIJPN.Back);
-		GUILayout.Label(string.Empty + iOIGCCPIJPN.LeftShoulder);
-		GUILayout.Label(string.Empty + iOIGCCPIJPN.RightShoulder);
-		GUILayout.Label(string.Empty + iOIGCCPIJPN.Left);
-		GUILayout.Label(string.Empty + iOIGCCPIJPN.Right);
-		GUILayout.Label(string.Empty + iOIGCCPIJPN.Up);
-		GUILayout.Label(string.Empty + iOIGCCPIJPN.Down);
-		GUILayout.Label(string.Empty + iOIGCCPIJPN.LeftStick);
-		GUILayout.Label(string.Empty + iOIGCCPIJPN.RightStick);
+		GamepadState gamepadState = GamePad.GetState(player);
+		GUILayout.Label("Gamepad " + player);
+		GUILayout.Label(string.Empty + gamepadState.A);
+		GUILayout.Label(string.Empty + gamepadState.IsButtonBPressed);
+		GUILayout.Label(string.Empty + gamepadState.X);
+		GUILayout.Label(string.Empty + gamepadState.Y);
+		GUILayout.Label(string.Empty + gamepadState.Start);
+		GUILayout.Label(string.Empty + gamepadState.Back);
+		GUILayout.Label(string.Empty + gamepadState.LeftShoulder);
+		GUILayout.Label(string.Empty + gamepadState.RightShoulder);
+		GUILayout.Label(string.Empty + gamepadState.Left);
+		GUILayout.Label(string.Empty + gamepadState.Right);
+		GUILayout.Label(string.Empty + gamepadState.Up);
+		GUILayout.Label(string.Empty + gamepadState.Down);
+		GUILayout.Label(string.Empty + gamepadState.LeftStick);
+		GUILayout.Label(string.Empty + gamepadState.RightStick);
 		GUILayout.Label(string.Empty);
-		GUILayout.Label(string.Empty + Math.Round(iOIGCCPIJPN.LeftTrigger, 2));
-		GUILayout.Label(string.Empty + Math.Round(iOIGCCPIJPN.RightTrigger, 2));
+		GUILayout.Label(string.Empty + Math.Round(gamepadState.LeftTrigger, 2));
+		GUILayout.Label(string.Empty + Math.Round(gamepadState.RightTrigger, 2));
 		GUILayout.Label(string.Empty);
-		GUILayout.Label(string.Empty + iOIGCCPIJPN.LeftStickAxis);
-		GUILayout.Label(string.Empty + iOIGCCPIJPN.RightStickAxis);
-		GUILayout.Label(string.Empty + iOIGCCPIJPN.DpadAxis);
+		GUILayout.Label(string.Empty + gamepadState.LeftStickAxis);
+		GUILayout.Label(string.Empty + gamepadState.RightStickAxis);
+		GUILayout.Label(string.Empty + gamepadState.DpadAxis);
 		GUILayout.EndVertical();
 	}
 

@@ -9,11 +9,11 @@ public class FunctionResult
 		float result;
 		if (!float.TryParse(Value, out result))
 		{
-			Dictionary<string, RpnParser.VariableDelegate> pPEABEJMCPI = new Dictionary<string, RpnParser.VariableDelegate>();
-			Dictionary<string, RpnParser.ParameterDelegate> gIOGAJGIGMO = new Dictionary<string, RpnParser.ParameterDelegate>();
-			RpnParser.init(pPEABEJMCPI, gIOGAJGIGMO);
-			RpnParser.Formula lANLKOHCGEJ = new RpnParser.Formula(Value);
-			object obj = lANLKOHCGEJ.Calculate();
+			Dictionary<string, RpnParser.VariableDelegate> variableDelegates = new Dictionary<string, RpnParser.VariableDelegate>();
+			Dictionary<string, RpnParser.ParameterDelegate> parameterDelegates = new Dictionary<string, RpnParser.ParameterDelegate>();
+			RpnParser.init(variableDelegates, parameterDelegates);
+			RpnParser.Formula formula = new RpnParser.Formula(Value);
+			object obj = formula.Calculate();
 			if (!float.TryParse(obj.ToString(), out result))
 			{
 				result = 0f;
@@ -27,11 +27,11 @@ public class FunctionResult
 		float result;
 		if (!float.TryParse(Value, out result))
 		{
-			Dictionary<string, RpnParser.VariableDelegate> pPEABEJMCPI = new Dictionary<string, RpnParser.VariableDelegate>();
-			Dictionary<string, RpnParser.ParameterDelegate> gIOGAJGIGMO = new Dictionary<string, RpnParser.ParameterDelegate>();
-			RpnParser.init(pPEABEJMCPI, gIOGAJGIGMO);
-			RpnParser.Formula lANLKOHCGEJ = new RpnParser.Formula(Value);
-			object obj = lANLKOHCGEJ.Calculate();
+			Dictionary<string, RpnParser.VariableDelegate> variableDelegates = new Dictionary<string, RpnParser.VariableDelegate>();
+			Dictionary<string, RpnParser.ParameterDelegate> parameterDelegates = new Dictionary<string, RpnParser.ParameterDelegate>();
+			RpnParser.init(variableDelegates, parameterDelegates);
+			RpnParser.Formula formula = new RpnParser.Formula(Value);
+			object obj = formula.Calculate();
 			if (!float.TryParse(obj.ToString(), out result))
 			{
 				return 0f;

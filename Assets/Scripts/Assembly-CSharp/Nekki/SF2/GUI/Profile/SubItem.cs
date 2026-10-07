@@ -64,18 +64,18 @@ namespace Nekki.SF2.GUI.Profile
 
 		private float selectFlashMaxOpacity = 1f;
 
-		public void Init(int OKNNNLIPODI)
+		public void Init(int buttonId)
 		{
 			selectedMaxOpacity = ProfileGUI.SelectOpacity.Max / 255f;
 			selectedMinOpacity = ProfileGUI.SelectOpacity.Min / 255f;
 			animationFrameCount = ProfileGUI.AnimationSpeed;
-			ButtonId = OKNNNLIPODI;
+			ButtonId = buttonId;
 			_backPicture.gameObject.SetActive(false);
 		}
 
-		public virtual void SetLock(bool AJPDLMOHKEN)
+		public virtual void SetLock(bool locked)
 		{
-			isLocked = AJPDLMOHKEN;
+			isLocked = locked;
 			UpdateLockPicture();
 		}
 
@@ -84,9 +84,9 @@ namespace Nekki.SF2.GUI.Profile
 			return isLocked;
 		}
 
-		public virtual void SetActive(bool HNJDHGDLLPD)
+		public virtual void SetActive(bool isActive)
 		{
-			_active = HNJDHGDLLPD;
+			_active = isActive;
 			UpdateInactivePicture();
 		}
 
@@ -95,9 +95,9 @@ namespace Nekki.SF2.GUI.Profile
 			return _active;
 		}
 
-		public virtual void SetSelected(bool CMEFIGAKNFG)
+		public virtual void SetSelected(bool selected)
 		{
-			isSelected = CMEFIGAKNFG;
+			isSelected = selected;
 			if ((bool)_selectedPicture)
 			{
 				_selectedPicture.gameObject.SetActive(isSelected);
@@ -128,20 +128,20 @@ namespace Nekki.SF2.GUI.Profile
 			animationEnabled = value;
 		}
 
-		public void SetSelectFlashing(bool LHGLOOMODPK)
+		public void SetSelectFlashing(bool flashing)
 		{
 			if (_selectWhiteSquare != null)
 			{
 			}
-			isSelectFlashing = LHGLOOMODPK;
+			isSelectFlashing = flashing;
 		}
 
-		public void SetSelectFlashingMinOpacity(float IEKAFNFKBNE)
+		public void SetSelectFlashingMinOpacity(float minOpacity)
 		{
 			if (_selectWhiteSquare != null)
 			{
 			}
-			selectFlashMinOpacity = IEKAFNFKBNE;
+			selectFlashMinOpacity = minOpacity;
 			if (selectFlashMinOpacity < 0f)
 			{
 				selectFlashMinOpacity = 0f;
@@ -152,12 +152,12 @@ namespace Nekki.SF2.GUI.Profile
 			}
 		}
 
-		public void SetSelectFlashingMaxOpacity(int BIPFOECJBNE)
+		public void SetSelectFlashingMaxOpacity(int maxOpacity)
 		{
 			if (_selectWhiteSquare != null)
 			{
 			}
-			selectFlashMaxOpacity = BIPFOECJBNE;
+			selectFlashMaxOpacity = maxOpacity;
 			if (selectFlashMaxOpacity < 0f)
 			{
 				selectFlashMaxOpacity = 0f;
@@ -176,8 +176,8 @@ namespace Nekki.SF2.GUI.Profile
 				if (num > 0f && animationFrameCount > 0)
 				{
 					float num2 = num / (float)animationFrameCount * (float)animationFrame;
-					float kGJALFLDIBG = ((!isFadingIn) ? (selectedMaxOpacity - num2) : (selectedMinOpacity + num2));
-					UIExtensions.SetAlpha(_selectedPicture, kGJALFLDIBG);
+					float alpha = ((!isFadingIn) ? (selectedMaxOpacity - num2) : (selectedMinOpacity + num2));
+					UIExtensions.SetAlpha(_selectedPicture, alpha);
 				}
 			}
 		}
@@ -188,10 +188,10 @@ namespace Nekki.SF2.GUI.Profile
 			if (num > 0f && animationFrameCount > 0)
 			{
 				float num2 = num / (float)animationFrameCount * (float)animationFrame;
-				float kGJALFLDIBG = ((!isFadingIn) ? (iconMaxOpacity - num2) : (iconMinOpacity + num2));
+				float alpha = ((!isFadingIn) ? (iconMaxOpacity - num2) : (iconMinOpacity + num2));
 				if (_icon != null)
 				{
-					UIExtensions.SetAlpha(_icon, kGJALFLDIBG);
+					UIExtensions.SetAlpha(_icon, alpha);
 				}
 			}
 		}
@@ -226,7 +226,7 @@ namespace Nekki.SF2.GUI.Profile
 			}
 		}
 
-		protected virtual void OnPressTypeChanged(ButtonStateExtensions.ButtonPressType LFLGCDNKNJI)
+		protected virtual void OnPressTypeChanged(ButtonStateExtensions.ButtonPressType pressType)
 		{
 			UpdateInactivePicture();
 		}
@@ -245,18 +245,18 @@ namespace Nekki.SF2.GUI.Profile
 			}
 		}
 
-		public override void OnPointerClick(PointerEventData BHOLFGOGPCP)
+		public override void OnPointerClick(PointerEventData eventData)
 		{
-			base.OnPointerClick(BHOLFGOGPCP);
+			base.OnPointerClick(eventData);
 			if (!GetLock())
 			{
 				Choose();
 			}
 		}
 
-		protected virtual void SetBackPictureVisible(bool LPPNCLBEAFA)
+		protected virtual void SetBackPictureVisible(bool isVisible)
 		{
-			_backPicture.gameObject.SetActive(LPPNCLBEAFA);
+			_backPicture.gameObject.SetActive(isVisible);
 		}
 	}
 }

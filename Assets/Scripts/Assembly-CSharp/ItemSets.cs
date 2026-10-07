@@ -16,12 +16,12 @@ public class ItemSets
 		}
 	}
 
-	public ItemSet FindSetByItemName(string OHCGEEEKEJH)
+	public ItemSet FindSetByItemName(string itemName)
 	{
 		foreach (ItemSet item in sets)
 		{
-			ItemSetItem bADHNGONFNC = item.GetItemByName(OHCGEEEKEJH);
-			if (bADHNGONFNC != null)
+			ItemSetItem setItem = item.GetItemByName(itemName);
+			if (setItem != null)
 			{
 				return item;
 			}
@@ -29,11 +29,11 @@ public class ItemSets
 		return null;
 	}
 
-	public ItemSet GetSetByName(string JFGJBCGEGCN)
+	public ItemSet GetSetByName(string setName)
 	{
 		foreach (ItemSet item in sets)
 		{
-			if (item.Name.Equals(JFGJBCGEGCN))
+			if (item.Name.Equals(setName))
 			{
 				return item;
 			}

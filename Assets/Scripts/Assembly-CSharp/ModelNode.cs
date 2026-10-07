@@ -274,9 +274,9 @@ public partial class ModelNode
 		SetType(NodeType.Node);
 	}
 
-	public ModelNode(ModelNode NPDJNAMFIKD)
+	public ModelNode(ModelNode source)
 	{
-		_Name = NPDJNAMFIKD._Name;
+		_Name = source._Name;
 		_Id = 0;
 		_Weight = 0f;
 		_Attenuation = 0f;
@@ -287,7 +287,7 @@ public partial class ModelNode
 		_physicsActive = false;
 		_defaultPhysics = false;
 		_skipMacroUpdate = false;
-		CopyFrom(NPDJNAMFIKD);
+		CopyFrom(source);
 	}
 
 	public ModelNode GetPairNode()
@@ -475,21 +475,21 @@ public partial class ModelNode
 		_skipMacroUpdate = value;
 	}
 
-	public void CopyFrom(ModelNode NPDJNAMFIKD)
+	public void CopyFrom(ModelNode source)
 	{
-		_Start.Set(NPDJNAMFIKD._Start);
-		_End.Set(NPDJNAMFIKD._End);
-		_Type = NPDJNAMFIKD._Type;
-		_Id = NPDJNAMFIKD._Id;
-		_Weight = NPDJNAMFIKD._Weight;
-		_Attenuation = NPDJNAMFIKD._Attenuation;
-		_IsNode = NPDJNAMFIKD._IsNode;
-		_IsFixed = NPDJNAMFIKD._IsFixed;
-		_IsCloth = NPDJNAMFIKD._IsCloth;
-		_IsPhysics = NPDJNAMFIKD._IsPhysics;
-		_IsFixedAndNotNode = NPDJNAMFIKD._IsFixedAndNotNode;
-		_Visible = NPDJNAMFIKD._Visible;
-		_physicsActive = NPDJNAMFIKD._physicsActive;
+		_Start.Set(source._Start);
+		_End.Set(source._End);
+		_Type = source._Type;
+		_Id = source._Id;
+		_Weight = source._Weight;
+		_Attenuation = source._Attenuation;
+		_IsNode = source._IsNode;
+		_IsFixed = source._IsFixed;
+		_IsCloth = source._IsCloth;
+		_IsPhysics = source._IsPhysics;
+		_IsFixedAndNotNode = source._IsFixedAndNotNode;
+		_Visible = source._Visible;
+		_physicsActive = source._physicsActive;
 	}
 
 	public void RestoreDefaultPhysics()
@@ -518,13 +518,13 @@ public partial class ModelNode
 		_End.Set(_Start);
 	}
 
-	public void ChangeSpeed(float ELDDBMFEFIP)
+	public void ChangeSpeed(float speed)
 	{
-		Vector3f aKKEJFKBIHF = Vector3f.op_Subtraction(_Start, _End);
+		Vector3f offset = Vector3f.op_Subtraction(_Start, _End);
 		if (_IsPhysics)
 		{
 		}
-		_End.Set(Vector3f.op_Subtraction(_Start, aKKEJFKBIHF));
+		_End.Set(Vector3f.op_Subtraction(_Start, offset));
 	}
 
 	public void TimeStep(float gravity)
@@ -536,8 +536,8 @@ public partial class ModelNode
 			_TimeStepVector.Multiply(1f - _Attenuation);
 		}
 		_TimeStepVector.Add(_Start);
-		Vector3f cANBEOHLBMH = _TimeStepVector;
-		cANBEOHLBMH.SetY(cANBEOHLBMH.GetY() + gravity);
+		Vector3f stepVector = _TimeStepVector;
+		stepVector.SetY(stepVector.GetY() + gravity);
 		_End.Set(_Start);
 		_Start.Set(_TimeStepVector);
 	}

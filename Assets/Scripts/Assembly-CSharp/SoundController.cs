@@ -84,12 +84,12 @@ public class SoundController
 		}
 	}
 
-	public static void StartBackgroundMusic(string name = "menu", bool KKHJAJFEPPA = true)
+	public static void StartBackgroundMusic(string name = "menu", bool loop = true)
 	{
 		if (!IsBackgroundMusicIntro)
 		{
 			IsBackgroundMusicIntro = true;
-			Sound.PlayMusic(name, KKHJAJFEPPA);
+			Sound.PlayMusic(name, loop);
 		}
 	}
 

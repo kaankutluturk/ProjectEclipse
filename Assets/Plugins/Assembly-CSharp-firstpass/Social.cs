@@ -32,14 +32,14 @@ public class Social
 		return network;
 	}
 
-	public static void Init(Callbacks EODBKOHACMO)
+	public static void Init(Callbacks callbacks)
 	{
-		_wrap = SocialWrapper.Init(EODBKOHACMO, OnNetworkSelected);
+		_wrap = SocialWrapper.Init(callbacks, OnNetworkSelected);
 	}
 
-	private static void OnNetworkSelected(SocialNetworkType KPJKACAJHDF)
+	private static void OnNetworkSelected(SocialNetworkType networkType)
 	{
-		if (KPJKACAJHDF != SocialNetworkType.None && KPJKACAJHDF == SocialNetworkType.VKontakte)
+		if (networkType != SocialNetworkType.None && networkType == SocialNetworkType.VKontakte)
 		{
 			network = new VK();
 			network.Init(_wrap);

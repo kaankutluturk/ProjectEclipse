@@ -143,9 +143,9 @@ public sealed class SocketManager : IHeartbeat, IManager
 	}
 
 	// C# has no syntax for parameterized property 'DLKPBAJDHBO'.
-	public Socket get_DLKPBAJDHBO(string JBALIKEKHGL)
+	public Socket get_DLKPBAJDHBO(string namespaceName)
 	{
-		return get_Item(JBALIKEKHGL);
+		return get_Item(namespaceName);
 	}
 
 	public int ReconnectAttemptCount
@@ -200,15 +200,15 @@ public sealed class SocketManager : IHeartbeat, IManager
 		}
 	}
 
-	public SocketManager(Uri KJHNCLAJMLO)
-		: this(KJHNCLAJMLO, new SocketOptions())
+	public SocketManager(Uri uri)
+		: this(uri, new SocketOptions())
 	{
 	}
 
-	public SocketManager(Uri KJHNCLAJMLO, SocketOptions LHONCAIFCAF)
+	public SocketManager(Uri uri, SocketOptions options)
 	{
-		set_Uri(KJHNCLAJMLO);
-		SetOptions(LHONCAIFCAF);
+		set_Uri(uri);
+		SetOptions(options);
 		set_State(SocketManagerState.Initial);
 		SetPreviousState(SocketManagerState.Initial);
 		SetEncoder(DefaultEncoder);
@@ -280,9 +280,9 @@ public sealed class SocketManager : IHeartbeat, IManager
 		return GetSocket();
 	}
 
-	public Socket get_Item(string JBALIKEKHGL)
+	public Socket get_Item(string namespaceName)
 	{
-		return GetSocket(JBALIKEKHGL);
+		return GetSocket(namespaceName);
 	}
 
 	public int GetReconnectAttempts()
@@ -330,27 +330,27 @@ public sealed class SocketManager : IHeartbeat, IManager
 		return GetSocket("/");
 	}
 
-	public Socket GetSocket(string JBALIKEKHGL)
+	public Socket GetSocket(string namespaceName)
 	{
-		if (string.IsNullOrEmpty(JBALIKEKHGL))
+		if (string.IsNullOrEmpty(namespaceName))
 		{
 			throw new ArgumentNullException("Namespace parameter is null or empty!");
 		}
 		Socket value = null;
-		if (!namespaces.TryGetValue(JBALIKEKHGL, out value))
+		if (!namespaces.TryGetValue(namespaceName, out value))
 		{
-			value = new Socket(JBALIKEKHGL, this);
-			namespaces.Add(JBALIKEKHGL, value);
+			value = new Socket(namespaceName, this);
+			namespaces.Add(namespaceName, value);
 			sockets.Add(value);
 			((ISocket)value).Open();
 		}
 		return value;
 	}
 
-	void IManager.Remove(Socket JLEACANCMJF)
+	void IManager.Remove(Socket socket)
 	{
-		namespaces.Remove(JLEACANCMJF.GetNamespace());
-		sockets.Remove(JLEACANCMJF);
+		namespaces.Remove(socket.GetNamespace());
+		sockets.Remove(socket);
 	}
 
 	public void Open()
@@ -360,13 +360,13 @@ public sealed class SocketManager : IHeartbeat, IManager
 			HTTPManager.GetLogger().Information("SocketManager", "Opening");
 			reconnectAt = DateTime.MinValue;
 			SetHandshake(new HandshakeData(this));
-			GetHandshake().OnReceived = (HandshakeData LLAAFNOMDHA) =>
+			GetHandshake().OnReceived = (HandshakeData handshake) =>
 			{
 				OnHandshakeCallback();
 			};
-			GetHandshake().OnError = (HandshakeData LLAAFNOMDHA, string KEPBNIIECPN) =>
+			GetHandshake().OnError = (HandshakeData handshake, string error) =>
 			{
-				((IManager)this).EmitError(SocketIOErrors.Internal, KEPBNIIECPN);
+				((IManager)this).EmitError(SocketIOErrors.Internal, error);
 				((IManager)this).TryToReconnect();
 			};
 			GetHandshake().Start();
@@ -383,7 +383,7 @@ public sealed class SocketManager : IHeartbeat, IManager
 		((IManager)this).Close(true);
 	}
 
-	void IManager.Close(bool IEPJILJMNDN)
+	void IManager.Close(bool removeSockets)
 	{
 		if (GetState() == SocketManagerState.Closed)
 		{
@@ -391,18 +391,18 @@ public sealed class SocketManager : IHeartbeat, IManager
 		}
 		HTTPManager.GetLogger().Information("SocketManager", "Closing");
 		HTTPManager.GetHeartbeats().Unsubscribe(this);
-		if (IEPJILJMNDN)
+		if (removeSockets)
 		{
 			while (sockets.Count > 0)
 			{
-				((ISocket)sockets[sockets.Count - 1]).Disconnect(IEPJILJMNDN);
+				((ISocket)sockets[sockets.Count - 1]).Disconnect(removeSockets);
 			}
 		}
 		else
 		{
 			for (int i = 0; i < sockets.Count; i++)
 			{
-				((ISocket)sockets[i]).Disconnect(IEPJILJMNDN);
+				((ISocket)sockets[i]).Disconnect(removeSockets);
 			}
 		}
 		set_State(SocketManagerState.Closed);
@@ -411,7 +411,7 @@ public sealed class SocketManager : IHeartbeat, IManager
 		{
 			offlinePackets.Clear();
 		}
-		if (IEPJILJMNDN)
+		if (removeSockets)
 		{
 			namespaces.Clear();
 		}
@@ -472,7 +472,7 @@ public sealed class SocketManager : IHeartbeat, IManager
 		GetTransport().OpenTransport();
 	}
 
-	bool IManager.OnTransportConnected(ITransport DLAOOGHJGBI)
+	bool IManager.OnTransportConnected(ITransport transport)
 	{
 		if (GetState() != SocketManagerState.Opening)
 		{
@@ -490,14 +490,14 @@ public sealed class SocketManager : IHeartbeat, IManager
 		return true;
 	}
 
-	void IManager.OnTransportError(ITransport DLAOOGHJGBI, string KEPBNIIECPN)
+	void IManager.OnTransportError(ITransport transport, string error)
 	{
-		((IManager)this).EmitError(SocketIOErrors.Internal, KEPBNIIECPN);
-		if (DLAOOGHJGBI.GetState() == SocketIOTransportState.Connecting || DLAOOGHJGBI.GetState() == SocketIOTransportState.Opening)
+		((IManager)this).EmitError(SocketIOErrors.Internal, error);
+		if (transport.GetState() == SocketIOTransportState.Connecting || transport.GetState() == SocketIOTransportState.Opening)
 		{
-			if (DLAOOGHJGBI is SocketIoWebSocketTransport)
+			if (transport is SocketIoWebSocketTransport)
 			{
-				DLAOOGHJGBI.Close();
+				transport.Close();
 				SetTransport(new SocketIOPollingTransport(this));
 				GetTransport().OpenTransport();
 			}
@@ -508,7 +508,7 @@ public sealed class SocketManager : IHeartbeat, IManager
 		}
 		else
 		{
-			DLAOOGHJGBI.Close();
+			transport.Close();
 			((IManager)this).TryToReconnect();
 		}
 	}
@@ -524,22 +524,22 @@ public sealed class SocketManager : IHeartbeat, IManager
 
 	private void SendOfflinePackets()
 	{
-		ITransport bNPCOHLEHNM = SelectTransport();
-		if (offlinePackets != null && offlinePackets.Count > 0 && bNPCOHLEHNM != null)
+		ITransport transport = SelectTransport();
+		if (offlinePackets != null && offlinePackets.Count > 0 && transport != null)
 		{
-			bNPCOHLEHNM.Send(offlinePackets);
+			transport.Send(offlinePackets);
 			offlinePackets.Clear();
 		}
 	}
 
-	void IManager.SendPacket(Packet NPKADBPBKIG)
+	void IManager.SendPacket(Packet packet)
 	{
-		ITransport bNPCOHLEHNM = SelectTransport();
-		if (bNPCOHLEHNM != null)
+		ITransport transport = SelectTransport();
+		if (transport != null)
 		{
 			try
 			{
-				bNPCOHLEHNM.Send(NPKADBPBKIG);
+				transport.Send(packet);
 				return;
 			}
 			catch (Exception ex)
@@ -552,14 +552,14 @@ public sealed class SocketManager : IHeartbeat, IManager
 		{
 			offlinePackets = new List<Packet>();
 		}
-		offlinePackets.Add(NPKADBPBKIG.Clone());
+		offlinePackets.Add(packet.Clone());
 	}
 
-	void IManager.OnPacket(Packet NPKADBPBKIG)
+	void IManager.OnPacket(Packet packet)
 	{
 		if (GetState() != SocketManagerState.Closed)
 		{
-			switch (NPKADBPBKIG.GetTransportEvent())
+			switch (packet.GetTransportEvent())
 			{
 			case TransportEventTypes.Ping:
 				((IManager)this).SendPacket(new Packet(TransportEventTypes.Pong, SocketIOEventType.Unknown, "/", string.Empty));
@@ -569,56 +569,56 @@ public sealed class SocketManager : IHeartbeat, IManager
 				break;
 			}
 			Socket value = null;
-			if (namespaces.TryGetValue(NPKADBPBKIG.GetNamespace(), out value))
+			if (namespaces.TryGetValue(packet.GetNamespace(), out value))
 			{
-				((ISocket)value).OnPacket(NPKADBPBKIG);
+				((ISocket)value).OnPacket(packet);
 			}
 			else
 			{
-				HTTPManager.GetLogger().Warning("SocketManager", "Namespace \"" + NPKADBPBKIG.GetNamespace() + "\" not found!");
+				HTTPManager.GetLogger().Warning("SocketManager", "Namespace \"" + packet.GetNamespace() + "\" not found!");
 			}
 		}
 	}
 
-	public void EmitAll(string DOPHKKGNAEF, params object[] LKIOKGCNKHE)
+	public void EmitAll(string eventName, params object[] args)
 	{
 		for (int i = 0; i < sockets.Count; i++)
 		{
-			sockets[i].Emit(DOPHKKGNAEF, LKIOKGCNKHE);
+			sockets[i].Emit(eventName, args);
 		}
 	}
 
-	void IManager.EmitEvent(string DOPHKKGNAEF, params object[] LKIOKGCNKHE)
+	void IManager.EmitEvent(string eventName, params object[] args)
 	{
 		Socket value = null;
 		if (namespaces.TryGetValue("/", out value))
 		{
-			((ISocket)value).EmitEvent(DOPHKKGNAEF, LKIOKGCNKHE);
+			((ISocket)value).EmitEvent(eventName, args);
 		}
 	}
 
-	void IManager.EmitEvent(SocketIOEventType LFLGCDNKNJI, params object[] LKIOKGCNKHE)
+	void IManager.EmitEvent(SocketIOEventType eventType, params object[] args)
 	{
-		((IManager)this).EmitEvent(EventNames.GetNameFor(LFLGCDNKNJI), LKIOKGCNKHE);
+		((IManager)this).EmitEvent(EventNames.GetNameFor(eventType), args);
 	}
 
-	void IManager.EmitError(SocketIOErrors GNKCGOGKAEK, string CKEHOEGLMBM)
+	void IManager.EmitError(SocketIOErrors errorType, string errorMessage)
 	{
 		((IManager)this).EmitEvent(SocketIOEventType.Error, new object[1]
 		{
-			new Error(GNKCGOGKAEK, CKEHOEGLMBM)
+			new Error(errorType, errorMessage)
 		});
 	}
 
-	void IManager.EmitAll(string DOPHKKGNAEF, params object[] LKIOKGCNKHE)
+	void IManager.EmitAll(string eventName, params object[] args)
 	{
 		for (int i = 0; i < sockets.Count; i++)
 		{
-			((ISocket)sockets[i]).EmitEvent(DOPHKKGNAEF, LKIOKGCNKHE);
+			((ISocket)sockets[i]).EmitEvent(eventName, args);
 		}
 	}
 
-	void IHeartbeat.OnHeartbeatUpdate(TimeSpan OJOKANCMPLG)
+	void IHeartbeat.OnHeartbeatUpdate(TimeSpan delta)
 	{
 		switch (GetState())
 		{
@@ -640,16 +640,16 @@ public sealed class SocketManager : IHeartbeat, IManager
 			break;
 		case SocketManagerState.Open:
 		{
-			ITransport bNPCOHLEHNM = null;
+			ITransport transport = null;
 			if (GetTransport() != null && GetTransport().GetState() == SocketIOTransportState.Open)
 			{
-				bNPCOHLEHNM = GetTransport();
+				transport = GetTransport();
 			}
-			if (bNPCOHLEHNM == null || bNPCOHLEHNM.GetState() != SocketIOTransportState.Open)
+			if (transport == null || transport.GetState() != SocketIOTransportState.Open)
 			{
 				break;
 			}
-			bNPCOHLEHNM.Poll();
+			transport.Poll();
 			SendOfflinePackets();
 			if (lastHeartbeat == DateTime.MinValue)
 			{

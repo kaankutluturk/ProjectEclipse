@@ -210,28 +210,28 @@ public class Battle
 		}
 	}
 
-	public Battle(string LFLGCDNKNJI, Vector2 MGMMDGFPBLP, string name, string ADONPNOBBDE, string LHCFHAIDNDP, string EMDJGBHIAIA, ushort CDCJKJNGPOE, ushort MCDAHGPLLDO, string LOKLDPLAPOL, string PEMOECLNECD, string LPJNEDFCBOI, string PINIIFIOECE, string OAPKHNPPGHP, string IHBMPGKIBAN)
+	public Battle(string typeName, Vector2 MGMMDGFPBLP, string name, string iconName, string previewIcon, string description, ushort rewardDigits, ushort prizeBaseDigits, string alias, string title, string location, string music, string rewardImage, string showResistance)
 	{
 		_pos = MGMMDGFPBLP;
 		_name = name;
-		_alias = LOKLDPLAPOL;
-		_title = PEMOECLNECD;
-		_iconName = ADONPNOBBDE;
-		_previewIcon = LHCFHAIDNDP;
-		_description = EMDJGBHIAIA;
+		_alias = alias;
+		_title = title;
+		_iconName = iconName;
+		_previewIcon = previewIcon;
+		_description = description;
 		_zone = null;
 		IsMapVisible = false;
 		_rosterBattle = null;
-		_rewardDigits = CDCJKJNGPOE;
-		_prizeBaseDigits = MCDAHGPLLDO;
+		_rewardDigits = rewardDigits;
+		_prizeBaseDigits = prizeBaseDigits;
 		_fightsParsed = false;
 		LoadedFightCount = 0;
-		_location = LPJNEDFCBOI;
-		_music = PINIIFIOECE;
+		_location = location;
+		_music = music;
 		_fightCount = 0;
-		_rewardImage = OAPKHNPPGHP;
-		_showResistance = IHBMPGKIBAN;
-		ParseTypeBattle(LFLGCDNKNJI);
+		_rewardImage = rewardImage;
+		_showResistance = showResistance;
+		ParseTypeBattle(typeName);
 	}
 
 	public RosterBattle GetRosterBattle()
@@ -362,8 +362,8 @@ public class Battle
 		{
 			return null;
 		}
-		FightList jDIPBIHBGPF = FindLoadedFightByName(name);
-		if (jDIPBIHBGPF == null)
+		FightList fight = FindLoadedFightByName(name);
+		if (fight == null)
 		{
 			XmlNode xmlNode = _sourceDefinition.GetNode();
 			int num = 0;
@@ -372,13 +372,13 @@ public class Battle
 				string text = item.Attributes["Name"].GetStringOrDefault(string.Empty);
 				if (text == name)
 				{
-					jDIPBIHBGPF = ParseFightNode(item, num);
+					fight = ParseFightNode(item, num);
 					break;
 				}
 				num++;
 			}
 		}
-		return jDIPBIHBGPF;
+		return fight;
 	}
 
 	// best guess for name
@@ -395,10 +395,10 @@ public class Battle
 	{
 		for (int i = 0; i < _fightCount; i++)
 		{
-			FightList jDIPBIHBGPF = GetFightByIndex(i);
-			if (jDIPBIHBGPF.Status == ConditionStatus.StatusOpen)
+			FightList fight = GetFightByIndex(i);
+			if (fight.Status == ConditionStatus.StatusOpen)
 			{
-				return jDIPBIHBGPF;
+				return fight;
 			}
 		}
 		return null;
@@ -453,16 +453,16 @@ public class Battle
 	public virtual ConditionStatus GetStatus()
 	{
         if (Eclipse.Modding.ModModeRuntime.TryCurrent(this, out var modeFight)) return modeFight != null ? ConditionStatus.StatusOpen : ConditionStatus.StatusComplete;
-		uint aIKIOPMGCEG = _fightCount;
+		uint fightCount = _fightCount;
 		if (!_fightsParsed)
 		{
 			LoadAllFights();
 		}
-		if (CountFightsWithStatus(ConditionStatus.StatusComplete) == aIKIOPMGCEG)
+		if (CountFightsWithStatus(ConditionStatus.StatusComplete) == fightCount)
 		{
 			return ConditionStatus.StatusComplete;
 		}
-		if (CountFightsWithStatus(ConditionStatus.StatusIncomplete) == aIKIOPMGCEG)
+		if (CountFightsWithStatus(ConditionStatus.StatusIncomplete) == fightCount)
 		{
 			return ConditionStatus.StatusIncomplete;
 		}
@@ -490,14 +490,14 @@ public class Battle
 		GameLog.Error("Battle::update ERROR - calling ancestor method. Must call BattleDaily::update or BattlePeriodic::update instead");
 	}
 
-	public virtual void UpdateRosterFight(FightList KGKDKENMAOA, bool FFIBGBMOMPD)
+	public virtual void UpdateRosterFight(FightList fight, bool isWinner)
 	{
-		KGKDKENMAOA.SetRosterFight(ListSF.LoadRosterFight(KGKDKENMAOA, FFIBGBMOMPD));
+		fight.SetRosterFight(ListSF.LoadRosterFight(fight, isWinner));
 	}
 
 	public virtual void ResetLastFightProgress()
 	{
-		FightList jDIPBIHBGPF = null;
+		FightList fight = null;
 		if (!_fightsParsed)
 		{
 			LoadAllFights();
@@ -508,20 +508,20 @@ public class Battle
 			{
 				if (item.Index > 0)
 				{
-					jDIPBIHBGPF = _fights[item.Index - 1];
+					fight = _fights[item.Index - 1];
 				}
 				break;
 			}
 		}
-		if (jDIPBIHBGPF == null)
+		if (fight == null)
 		{
-			jDIPBIHBGPF = _fights[_fights.Count - 1];
+			fight = _fights[_fights.Count - 1];
 		}
-		RosterFight pIGKOIFBOME = jDIPBIHBGPF.GetRosterFight();
-		if (pIGKOIFBOME != null)
+		RosterFight rosterFight = fight.GetRosterFight();
+		if (rosterFight != null)
 		{
-			pIGKOIFBOME.SetWinCount(0);
-			pIGKOIFBOME.SetEclipseWinCount(0);
+			rosterFight.SetWinCount(0);
+			rosterFight.SetEclipseWinCount(0);
 		}
 	}
 
@@ -634,16 +634,16 @@ public class Battle
 
 	public void UnloadFights()
 	{
-		QuestParameters hHKLFIIBIFF = ListSF.GetInstance().GetQuestParameters();
-		QuestParameters hAOHNNFLOGK = ListSF.GetInstance().LotteryQuestParameters;
+		QuestParameters questParameters = ListSF.GetInstance().GetQuestParameters();
+		QuestParameters lotteryQuestParameters = ListSF.GetInstance().LotteryQuestParameters;
 		int num = 0;
 		while (num != _fights.Count)
 		{
-			FightList jDIPBIHBGPF = _fights[num];
-			if (hHKLFIIBIFF.GetFightList() != jDIPBIHBGPF && hAOHNNFLOGK.GetFightList() != jDIPBIHBGPF)
+			FightList fight = _fights[num];
+			if (questParameters.GetFightList() != fight && lotteryQuestParameters.GetFightList() != fight)
 			{
 				_fights.RemoveAt(num);
-				ListSF.GetInstance().RemoveFight(jDIPBIHBGPF);
+				ListSF.GetInstance().RemoveFight(fight);
 			}
 			else
 			{
@@ -679,12 +679,12 @@ public class Battle
 		}
 	}
 
-	public virtual void AddFight(FightList KGKDKENMAOA, int index)
+	public virtual void AddFight(FightList addedFight, int index)
 	{
-		KGKDKENMAOA.Battle = this;
-		KGKDKENMAOA.Index = index;
-		_fights.Add(KGKDKENMAOA);
-		ListSF.GetInstance().AddFight(KGKDKENMAOA);
+		addedFight.Battle = this;
+		addedFight.Index = index;
+		_fights.Add(addedFight);
+		ListSF.GetInstance().AddFight(addedFight);
 		LoadedFightCount++;
 		if (LoadedFightCount >= _fightCount)
 		{
@@ -697,9 +697,9 @@ public class Battle
 	{
 	}
 
-	protected void ParseTypeBattle(string LFLGCDNKNJI)
+	protected void ParseTypeBattle(string typeName)
 	{
-		_type = ListSF.GetInstance().GetBattleTypeByName(LFLGCDNKNJI);
+		_type = ListSF.GetInstance().GetBattleTypeByName(typeName);
 	}
 
 	protected bool UseAllredyParsedFight(int index)
@@ -720,27 +720,27 @@ public class Battle
 	{
 		XmlNode xmlNode = _sourceDefinition.GetNode();
 		int num = 0;
-		XmlNode hKPPBKPJOEO = null;
+		XmlNode fightNode = null;
 		foreach (XmlNode item in xmlNode.SelectNodes("Fight"))
 		{
 			if (index == num)
 			{
-				hKPPBKPJOEO = item;
+				fightNode = item;
 				break;
 			}
 			num++;
 		}
-		return ParseFightNode(hKPPBKPJOEO, index);
+		return ParseFightNode(fightNode, index);
 	}
 
 	protected virtual FightList ParseFightNode(XmlNode node, int index)
 	{
 		ListSF.GetInstance().IsContentLoaded = false;
-		FightList jDIPBIHBGPF = new FightList();
-		ListSF.GetInstance().ParseFight(jDIPBIHBGPF, node, _type, _location, _music, this);
-		AddFight(jDIPBIHBGPF, index);
+		FightList fight = new FightList();
+		ListSF.GetInstance().ParseFight(fight, node, _type, _location, _music, this);
+		AddFight(fight, index);
 		ListSF.GetInstance().IsContentLoaded = true;
-		return jDIPBIHBGPF;
+		return fight;
 	}
 
 	protected virtual uint CountFightsWithStatus(ConditionStatus status)
@@ -756,15 +756,15 @@ public class Battle
 		return num;
 	}
 
-	protected void ReadFightNames(XmlNode IHKJDPGFDOE)
+	protected void ReadFightNames(XmlNode node)
 	{
 		_fightCount = 0;
 		_fightsNames.Clear();
-		if (IHKJDPGFDOE == null)
+		if (node == null)
 		{
 			return;
 		}
-		XmlNodeList xmlNodeList = IHKJDPGFDOE.SelectNodes("Fight");
+		XmlNodeList xmlNodeList = node.SelectNodes("Fight");
 		_fightCount = (ushort)xmlNodeList.Count;
 		foreach (XmlNode item2 in xmlNodeList)
 		{

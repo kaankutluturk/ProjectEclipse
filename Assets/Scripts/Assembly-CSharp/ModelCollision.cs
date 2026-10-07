@@ -92,10 +92,10 @@ public class ModelCollision
 		}
 	}
 
-	public ModelCollision(ModelObject ACENLMONNPA)
+	public ModelCollision(ModelObject modelObject)
 	{
 		Strike = new StrikeHit();
-		_ModelObject = ACENLMONNPA;
+		_ModelObject = modelObject;
 		_LastStrikePhase = null;
 		lastStrikeInterval = null;
 		_Render = true;
@@ -121,46 +121,46 @@ public class ModelCollision
 		_Render = value;
 	}
 
-	public bool Render(ModelObject HFGPAELCNMF, List<ModelEdge> BLJEFDAPKBH, object HIJDANGMJDM)
+	public bool Render(ModelObject victimModel, List<ModelEdge> attackerEdges, object strikePhase)
 	{
-		if (_Render && IsPhase(HIJDANGMJDM))
+		if (_Render && IsPhase(strikePhase))
 		{
 			return false;
 		}
-		List<ModelEdge> lONAJAHCJGH = HFGPAELCNMF.GetCollisionEdges();
-		foreach (ModelEdge item in BLJEFDAPKBH)
+		List<ModelEdge> victimEdges = victimModel.GetCollisionEdges();
+		foreach (ModelEdge item in attackerEdges)
 		{
-			if (CrossModel(lONAJAHCJGH, item))
+			if (CrossModel(victimEdges, item))
 			{
-				_LastStrikePhase = HIJDANGMJDM;
+				_LastStrikePhase = strikePhase;
 				return true;
 			}
 		}
 		return false;
 	}
 
-	public bool Render(ModelObject HFGPAELCNMF, List<ModelEdge> BLJEFDAPKBH, IntervalAnimation NOJNPFMOFLM)
+	public bool Render(ModelObject victimModel, List<ModelEdge> attackerEdges, IntervalAnimation interval)
 	{
-		if (lastStrikeInterval == NOJNPFMOFLM)
+		if (lastStrikeInterval == interval)
 		{
 			return false;
 		}
-		IntervalAttack hFIIPNLCIEE = NOJNPFMOFLM as IntervalAttack;
-		if (!hFIIPNLCIEE.GetHasAttackingParts())
+		IntervalAttack attackInterval = interval as IntervalAttack;
+		if (!attackInterval.GetHasAttackingParts())
 		{
-			lastStrikeInterval = NOJNPFMOFLM;
+			lastStrikeInterval = interval;
 			Strike.AttackerEdge = null;
 			Strike.VictimEdge = null;
 			Strike.GetPoint().Reset();
 			Strike.GetSecondPoint().Reset();
 			return true;
 		}
-		List<ModelEdge> lONAJAHCJGH = HFGPAELCNMF.GetCollisionEdges();
-		foreach (ModelEdge item in BLJEFDAPKBH)
+		List<ModelEdge> victimEdges = victimModel.GetCollisionEdges();
+		foreach (ModelEdge item in attackerEdges)
 		{
-			if (CrossModel(lONAJAHCJGH, item))
+			if (CrossModel(victimEdges, item))
 			{
-				lastStrikeInterval = NOJNPFMOFLM;
+				lastStrikeInterval = interval;
 				return true;
 			}
 		}
@@ -172,15 +172,15 @@ public class ModelCollision
 		_LastStrikePhase = null;
 	}
 
-	public bool IsPhase(object HIJDANGMJDM)
+	public bool IsPhase(object strikePhase)
 	{
-		return _LastStrikePhase == HIJDANGMJDM;
+		return _LastStrikePhase == strikePhase;
 	}
 
-	public bool CrossModelByEdge(ModelObject HFGPAELCNMF, ModelEdge ADFIIAJCBHA)
+	public bool CrossModelByEdge(ModelObject victimModel, ModelEdge attackerEdge)
 	{
-		List<ModelEdge> lONAJAHCJGH = HFGPAELCNMF.GetCollisionEdges();
-		return CrossModel(lONAJAHCJGH, ADFIIAJCBHA);
+		List<ModelEdge> victimEdges = victimModel.GetCollisionEdges();
+		return CrossModel(victimEdges, attackerEdge);
 	}
 
 	public void ResetInterval()
@@ -188,52 +188,52 @@ public class ModelCollision
 		lastStrikeInterval = null;
 	}
 
-	private bool CrossModel(List<ModelEdge> LONAJAHCJGH, ModelEdge PJMKFHFECLK)
+	private bool CrossModel(List<ModelEdge> victimEdges, ModelEdge attackerEdge)
 	{
-		Vector3f eMAFACPEPDK = new Vector3f();
+		Vector3f firstIntersection = new Vector3f();
 		Vector3f eMAFACPEPDK2 = new Vector3f();
-		float kLDFJGIKIHG = PJMKFHFECLK.GetCollisionRadius();
-		Vector3f hICHONIJHKL = PJMKFHFECLK.GetCollisionStart();
-		Vector3f lNPFHLPCLOP = PJMKFHFECLK.GetCollisionEnd();
-		EquationLine hENNAFMBEAG = PJMKFHFECLK.LineEquation;
-		foreach (ModelEdge item in LONAJAHCJGH)
+		float attackerRadius = attackerEdge.GetCollisionRadius();
+		Vector3f attackerStart = attackerEdge.GetCollisionStart();
+		Vector3f attackerEnd = attackerEdge.GetCollisionEnd();
+		EquationLine attackerLine = attackerEdge.LineEquation;
+		foreach (ModelEdge item in victimEdges)
 		{
-			float mGCKDDGGCBI = item.GetCollisionRadius();
-			Vector3f nMAJNHKJJEM = item.GetCollisionStart();
-			Vector3f oNNJMGGPHEL = item.GetCollisionEnd();
+			float victimRadius = item.GetCollisionRadius();
+			Vector3f victimStart = item.GetCollisionStart();
+			Vector3f victimEnd = item.GetCollisionEnd();
 			EquationLine hENNAFMBEAG2 = item.LineEquation;
-			if (Vector2f.TryIntersectThickSegments(hICHONIJHKL, lNPFHLPCLOP, kLDFJGIKIHG, nMAJNHKJJEM, oNNJMGGPHEL, mGCKDDGGCBI, eMAFACPEPDK, eMAFACPEPDK2, hENNAFMBEAG, hENNAFMBEAG2))
+			if (Vector2f.TryIntersectThickSegments(attackerStart, attackerEnd, attackerRadius, victimStart, victimEnd, victimRadius, firstIntersection, eMAFACPEPDK2, attackerLine, hENNAFMBEAG2))
 			{
-				AddStrike(PJMKFHFECLK, item, eMAFACPEPDK, eMAFACPEPDK2);
+				AddStrike(attackerEdge, item, firstIntersection, eMAFACPEPDK2);
 				return true;
 			}
 		}
 		return false;
 	}
 
-	private void AddStrike(ModelEdge PJMKFHFECLK, ModelEdge KPEGNDLGKFB, Vector3f NAAPALOFBCI, Vector3f GKCGDDBMHNJ)
+	private void AddStrike(ModelEdge attackerEdge, ModelEdge victimEdge, Vector3f firstPoint, Vector3f secondPoint)
 	{
-		Strike.AttackerEdge = PJMKFHFECLK;
-		Strike.VictimEdge = KPEGNDLGKFB;
-		Strike.SetPoint(NAAPALOFBCI);
-		Strike.SetSecondPoint(GKCGDDBMHNJ);
+		Strike.AttackerEdge = attackerEdge;
+		Strike.VictimEdge = victimEdge;
+		Strike.SetPoint(firstPoint);
+		Strike.SetSecondPoint(secondPoint);
 	}
 
-	private static bool IsDistanceStrike(float OIOMNNFMDOO, float JBLFLFOGDFI, EquationLine EGKHHBMCGMK, Vector3f NAAPALOFBCI, Vector3f _base, Vector3f ILENLCMAMBH, Vector3f PCLFFOBJJFO)
+	private static bool IsDistanceStrike(float distance, float radius, EquationLine line, Vector3f hitPoint, Vector3f _base, Vector3f segmentStart, Vector3f segmentEnd)
 	{
-		if (OIOMNNFMDOO < JBLFLFOGDFI)
+		if (distance < radius)
 		{
-			_base.SetX(NAAPALOFBCI.GetX() - OIOMNNFMDOO * EGKHHBMCGMK.A);
-			_base.SetY(NAAPALOFBCI.GetY() - OIOMNNFMDOO * EGKHHBMCGMK.CoefficientB);
-			if (((_base.GetX() <= ILENLCMAMBH.GetX() && _base.GetX() >= PCLFFOBJJFO.GetX()) || (_base.GetX() <= PCLFFOBJJFO.GetX() && _base.GetX() >= ILENLCMAMBH.GetX())) && ((_base.GetY() <= ILENLCMAMBH.GetY() && _base.GetY() >= PCLFFOBJJFO.GetY()) || (_base.GetY() <= PCLFFOBJJFO.GetY() && _base.GetY() >= ILENLCMAMBH.GetY())))
+			_base.SetX(hitPoint.GetX() - distance * line.A);
+			_base.SetY(hitPoint.GetY() - distance * line.CoefficientB);
+			if (((_base.GetX() <= segmentStart.GetX() && _base.GetX() >= segmentEnd.GetX()) || (_base.GetX() <= segmentEnd.GetX() && _base.GetX() >= segmentStart.GetX())) && ((_base.GetY() <= segmentStart.GetY() && _base.GetY() >= segmentEnd.GetY()) || (_base.GetY() <= segmentEnd.GetY() && _base.GetY() >= segmentStart.GetY())))
 			{
 				return true;
 			}
-			if (Mathf.Pow(NAAPALOFBCI.GetX() - ILENLCMAMBH.GetX(), 2f) + Mathf.Pow(NAAPALOFBCI.GetY() - ILENLCMAMBH.GetY(), 2f) <= Mathf.Pow(JBLFLFOGDFI, 2f))
+			if (Mathf.Pow(hitPoint.GetX() - segmentStart.GetX(), 2f) + Mathf.Pow(hitPoint.GetY() - segmentStart.GetY(), 2f) <= Mathf.Pow(radius, 2f))
 			{
 				return true;
 			}
-			if (Mathf.Pow(NAAPALOFBCI.GetX() - PCLFFOBJJFO.GetX(), 2f) + Mathf.Pow(NAAPALOFBCI.GetY() - PCLFFOBJJFO.GetY(), 2f) <= Mathf.Pow(JBLFLFOGDFI, 2f))
+			if (Mathf.Pow(hitPoint.GetX() - segmentEnd.GetX(), 2f) + Mathf.Pow(hitPoint.GetY() - segmentEnd.GetY(), 2f) <= Mathf.Pow(radius, 2f))
 			{
 				return true;
 			}

@@ -14,14 +14,14 @@ public struct ClientMessage
 
 	public readonly OnMethodProgressDelegate ProgressCallback;
 
-	public ClientMessage(Hub CGFIJCNNCKP, string FJLOLCPJACB, object[] LKIOKGCNKHE, ulong KKAADAAPLDC, OnMethodResultDelegate HKHNPNNDHFP, OnMethodFailedDelegate HFFMDOCLOHA, OnMethodProgressDelegate OODDBFJDGJO)
+	public ClientMessage(Hub hub, string method, object[] args, ulong callId, OnMethodResultDelegate resultCallback, OnMethodFailedDelegate errorCallback, OnMethodProgressDelegate progressCallback)
 	{
-		OwnerHub = CGFIJCNNCKP;
-		Method = FJLOLCPJACB;
-		Args = LKIOKGCNKHE;
-		CallIdx = KKAADAAPLDC;
-		ResultCallback = HKHNPNNDHFP;
-		ResultErrorCallback = HFFMDOCLOHA;
-		ProgressCallback = OODDBFJDGJO;
+		OwnerHub = hub;
+		Method = method;
+		Args = args;
+		CallIdx = callId;
+		ResultCallback = resultCallback;
+		ResultErrorCallback = errorCallback;
+		ProgressCallback = progressCallback;
 	}
 }

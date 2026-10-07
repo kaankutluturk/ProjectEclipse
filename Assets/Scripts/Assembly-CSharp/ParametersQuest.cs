@@ -116,9 +116,9 @@ public class ParametersQuest
 		}
 	}
 
-	public ParametersQuest(XmlNode PKHDLOGJKAD)
+	public ParametersQuest(XmlNode xmlNode)
 	{
-		Node = PKHDLOGJKAD;
+		Node = xmlNode;
 		if (Node.Attributes["ScreenIndex"] == null)
 		{
 			Node.AppendAttribute("ScreenIndex").Value = "0";

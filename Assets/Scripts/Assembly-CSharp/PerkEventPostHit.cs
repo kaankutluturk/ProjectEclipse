@@ -113,16 +113,16 @@ public class PerkEventPostHit : PerkEvent
 	{
 	}
 
-	public PerkEventPostHit(PerkEventPostHit NOLFMPDGCOC)
-		: base(NOLFMPDGCOC)
+	public PerkEventPostHit(PerkEventPostHit source)
+		: base(source)
 	{
-		SetDefense(NOLFMPDGCOC.GetDefense());
-		SetAnimation(NOLFMPDGCOC.GetAnimation());
-		SetBlock(NOLFMPDGCOC.GetBlock());
-		SetCritical(NOLFMPDGCOC.GetCritical());
-		set_IsShock(NOLFMPDGCOC.GetIsShock());
-		SetDamageMin(NOLFMPDGCOC.GetDamageMin());
-		SetDamageMax(NOLFMPDGCOC.GetDamageMax());
+		SetDefense(source.GetDefense());
+		SetAnimation(source.GetAnimation());
+		SetBlock(source.GetBlock());
+		SetCritical(source.GetCritical());
+		set_IsShock(source.GetIsShock());
+		SetDamageMin(source.GetDamageMin());
+		SetDamageMax(source.GetDamageMax());
 	}
 
 	public string GetDefense()
@@ -207,14 +207,14 @@ public class PerkEventPostHit : PerkEvent
 		SetDamageMax(node.Attributes["DamageMax"].ParseFloat(-1f));
 	}
 
-	public override bool IsEqual(EventStruct EJMEALJNNIL)
+	public override bool IsEqual(EventStruct eventData)
 	{
-		if (!base.IsEqual(EJMEALJNNIL) || EJMEALJNNIL == null || EJMEALJNNIL.Info == null)
+		if (!base.IsEqual(eventData) || eventData == null || eventData.Info == null)
 		{
 			return false;
 		}
-		Dictionary<string, object> dictionary = (Dictionary<string, object>)EJMEALJNNIL.Info;
-		InfoAnimation pJAHIOELGGD = ((!dictionary.ContainsKey("Animation")) ? null : ((InfoAnimation)dictionary["Animation"]));
+		Dictionary<string, object> dictionary = (Dictionary<string, object>)eventData.Info;
+		InfoAnimation animation = ((!dictionary.ContainsKey("Animation")) ? null : ((InfoAnimation)dictionary["Animation"]));
 		string text = ((!dictionary.ContainsKey("Defense")) ? null : ((string)dictionary["Defense"]));
 		bool flag = dictionary.ContainsKey("Critical") && (bool)dictionary["Critical"];
 		bool flag2 = dictionary.ContainsKey("Shock") && (bool)dictionary["Shock"];
@@ -224,7 +224,7 @@ public class PerkEventPostHit : PerkEvent
 		{
 			return false;
 		}
-		if (GetAnimation() != null && !GetAnimation().Equals(string.Empty) && (pJAHIOELGGD == null || !pJAHIOELGGD.HasName(GetAnimation())))
+		if (GetAnimation() != null && !GetAnimation().Equals(string.Empty) && (animation == null || !animation.HasName(GetAnimation())))
 		{
 			return false;
 		}

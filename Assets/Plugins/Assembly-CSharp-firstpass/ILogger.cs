@@ -38,13 +38,13 @@ public interface ILogger
 
 	void SetFormatEx(string value);
 
-	void Verbose(string HMHPCGBCNGI, string POOAFNBCFHM);
+	void Verbose(string division, string message);
 
-	void Information(string HMHPCGBCNGI, string EMBBNNBFODN);
+	void Information(string division, string message);
 
-	void Warning(string HMHPCGBCNGI, string EPMNBLHHAHF);
+	void Warning(string division, string message);
 
-	void Error(string HMHPCGBCNGI, string KEPBNIIECPN);
+	void Error(string division, string message);
 
-	void Exception(string HMHPCGBCNGI, string CKEHOEGLMBM, Exception MPFFFAOGBJE);
+	void Exception(string division, string method, Exception ex);
 }

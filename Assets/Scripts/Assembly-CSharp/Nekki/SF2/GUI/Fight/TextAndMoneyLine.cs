@@ -43,23 +43,23 @@ namespace Nekki.SF2.GUI.Fight
 
 		private UnityEvent endEvent = new UnityEvent();
 
-		public void Init(string HCPNFPMHFCM, long GBGNFPNCGED, long PAGGOKFIEOP, string BBLOBPOCGNM = "")
+		public void Init(string text, long money, long rubies, string suffix = "")
 		{
 			needShowLabel = true;
-			targetMoney = GBGNFPNCGED;
+			targetMoney = money;
 			displayedMoney = 0L;
-			targetRubies = PAGGOKFIEOP;
+			targetRubies = rubies;
 			displayedRubies = 0L;
 			NumberFormatInfo numberFormatInfo = new NumberFormatInfo();
 			numberFormatInfo.NumberGroupSeparator = " ";
 			NumberFormatInfo numberFormatInfo2 = numberFormatInfo;
-			if (textLabel != null && !string.IsNullOrEmpty(HCPNFPMHFCM))
+			if (textLabel != null && !string.IsNullOrEmpty(text))
 			{
-				if (BBLOBPOCGNM != null)
+				if (suffix != null)
 				{
-					HCPNFPMHFCM = string.Format("{0}{1}", HCPNFPMHFCM, "{" + BBLOBPOCGNM + "}");
+					text = string.Format("{0}{1}", text, "{" + suffix + "}");
 				}
-				textLabel.SetAlias(HCPNFPMHFCM);
+				textLabel.SetAlias(text);
 				// The recovered label has a zero-width rect. Give the localized text
 				// a measurable box before its entrance tween captures the destination.
 				textLabel.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, Mathf.Max(1f, textLabel.preferredWidth));
@@ -125,17 +125,17 @@ namespace Nekki.SF2.GUI.Fight
 			countSequence = DOTween.Sequence();
 			if (moneyCount != null && rubyCount != null)
 			{
-				Tweener t = DOTween.To(() => displayedMoney, (long DHDMNHCIPEH) =>
+				Tweener t = DOTween.To(() => displayedMoney, (long money) =>
 				{
-					displayedMoney = DHDMNHCIPEH;
+					displayedMoney = money;
 					moneyCount.SetText(displayedMoney.ToString("N0", f));
 				}, targetMoney, moneyAddTime);
 				countSequence.Append(t);
 				if (targetRubies > 0)
 				{
-					Tweener t2 = DOTween.To(() => displayedRubies, (long DHDMNHCIPEH) =>
+					Tweener t2 = DOTween.To(() => displayedRubies, (long rubies) =>
 					{
-						displayedRubies = DHDMNHCIPEH;
+						displayedRubies = rubies;
 						rubyCount.SetText(displayedRubies.ToString("N0", f));
 					}, targetRubies, moneyAddTime);
 					countSequence.Join(t2);
@@ -151,14 +151,14 @@ namespace Nekki.SF2.GUI.Fight
 			}
 		}
 
-		public void AddListener(UnityAction ODDEOFKLIAG)
+		public void AddListener(UnityAction listener)
 		{
-			endEvent.AddListener(ODDEOFKLIAG);
+			endEvent.AddListener(listener);
 		}
 
-		public void RemoveListener(UnityAction ODDEOFKLIAG)
+		public void RemoveListener(UnityAction listener)
 		{
-			endEvent.RemoveListener(ODDEOFKLIAG);
+			endEvent.RemoveListener(listener);
 		}
 
 		public void FinishAnimation()

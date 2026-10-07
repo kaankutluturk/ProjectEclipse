@@ -31,11 +31,11 @@ public class GiveLogin
 		{
 			return;
 		}
-		JSONNode mEEAKLDGLDF = jSONNode["Bonus"];
+		JSONNode bonusNode = jSONNode["Bonus"];
 		JSONNode mEEAKLDGLDF2 = jSONNode["Money"];
 		JSONNode jSONNode4 = jSONNode["Items"];
-		long oHHLCBPGOIM = mEEAKLDGLDF.ParseLong(0L);
-		long jDPAGMPKLHB = mEEAKLDGLDF2.ParseLong(0L);
+		long bonusAmount = bonusNode.ParseLong(0L);
+		long moneyAmount = mEEAKLDGLDF2.ParseLong(0L);
 		int num = ((jSONNode4 != null) ? jSONNode4.Count : 0);
 		int i = 0;
 		for (int num2 = num; i < num2; i++)
@@ -48,7 +48,7 @@ public class GiveLogin
 			if (jSONNode6 != null && jSONNode6.Value != null)
 			{
 				string valueText = jSONNode6.Value;
-				int aKKLOMFOLNO = mEEAKLDGLDF3.ParseInt();
+				int upgradeLevel = mEEAKLDGLDF3.ParseInt();
 				int num3 = mEEAKLDGLDF4.ParseInt(1);
 				int num4 = mEEAKLDGLDF5.ParseInt();
 				if (num3 > 0)
@@ -56,7 +56,7 @@ public class GiveLogin
 					GiveItemLogin item = new GiveItemLogin
 					{
 						Name = valueText,
-						UpgradeLevel = aKKLOMFOLNO,
+						UpgradeLevel = upgradeLevel,
 						Count = num3,
 						Equip = (num4 > 0)
 					};
@@ -64,8 +64,8 @@ public class GiveLogin
 				}
 			}
 		}
-		BonusAmount = oHHLCBPGOIM;
-		MoneyAmount = jDPAGMPKLHB;
+		BonusAmount = bonusAmount;
+		MoneyAmount = moneyAmount;
 		HasPendingGive = true;
 	}
 
@@ -78,9 +78,9 @@ public class GiveLogin
 		}
 	}
 
-	private void OnGiveLoginResponse(bool DCJLKCFKCOM, string data, object IEHMCKBJCAK)
+	private void OnGiveLoginResponse(bool success, string data, object state)
 	{
-		if (DCJLKCFKCOM)
+		if (success)
 		{
 			JSONNode jSONNode = JSON.Parse(data)["data"];
 			if (jSONNode != null && jSONNode.Value.Equals("success"))
@@ -92,14 +92,14 @@ public class GiveLogin
 
 	private void ApplyGives()
 	{
-		Roster GJJHILBJOGF = ListSF.GetRoster();
+		Roster roster = ListSF.GetRoster();
 		if (MoneyAmount != 0)
 		{
-			GJJHILBJOGF.SetMoney(Math.Max(0L, GJJHILBJOGF.GetMoney() + MoneyAmount));
+			roster.SetMoney(Math.Max(0L, roster.GetMoney() + MoneyAmount));
 		}
 		if (BonusAmount != 0)
 		{
-			GJJHILBJOGF.SetBonus(Math.Max(0L, GJJHILBJOGF.GetBonus() + BonusAmount), Roster.BalanceChangeType.CHANGE_SERVER_GIVE);
+			roster.SetBonus(Math.Max(0L, roster.GetBonus() + BonusAmount), Roster.BalanceChangeType.CHANGE_SERVER_GIVE);
 		}
 		if (MoneyAmount != 0 || BonusAmount != 0)
 		{
@@ -107,23 +107,23 @@ public class GiveLogin
 		}
 		foreach (GiveItemLogin item in Items)
 		{
-			ListSF.GetItems().GetItemsByMarketId(item.Name).ForEach((ItemInfo PJDAGCBPLJE) =>
+			ListSF.GetItems().GetItemsByMarketId(item.Name).ForEach((ItemInfo itemInfo) =>
 			{
 				if (item.Equip)
 				{
-					ListSF.UnequipOtherItemsOfType(PJDAGCBPLJE);
+					ListSF.UnequipOtherItemsOfType(itemInfo);
 				}
-				ListSF.AddItem(PJDAGCBPLJE, item.Count, 0L, item.Equip);
-				if (PJDAGCBPLJE.ItemLevel <= GJJHILBJOGF.GetLevel())
+				ListSF.AddItem(itemInfo, item.Count, 0L, item.Equip);
+				if (itemInfo.ItemLevel <= roster.GetLevel())
 				{
-					PJDAGCBPLJE.SetIsNew(true);
+					itemInfo.SetIsNew(true);
 				}
 				if (item.UpgradeLevel > 0)
 				{
-					PJDAGCBPLJE.UpgradeLevel = item.UpgradeLevel;
-					ItemInfo HDMHCCKLLGK = null;
-					ItemInfo JLNLOCNBGEK = null;
-					PJDAGCBPLJE.FindNextUpgradeItems(GJJHILBJOGF.GetLevel(), item.UpgradeLevel, ref HDMHCCKLLGK, ref JLNLOCNBGEK);
+					itemInfo.UpgradeLevel = item.UpgradeLevel;
+					ItemInfo currentItem = null;
+					ItemInfo nextItem = null;
+					itemInfo.FindNextUpgradeItems(roster.GetLevel(), item.UpgradeLevel, ref currentItem, ref nextItem);
 				}
 			});
 		}

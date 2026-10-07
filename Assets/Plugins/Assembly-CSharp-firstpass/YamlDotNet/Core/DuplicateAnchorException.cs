@@ -10,23 +10,23 @@ namespace YamlDotNet.Core
 		{
 		}
 
-		public DuplicateAnchorException(string LIOGIBJBHAH)
-			: base(LIOGIBJBHAH)
+		public DuplicateAnchorException(string message)
+			: base(message)
 		{
 		}
 
-		public DuplicateAnchorException(Mark ILENLCMAMBH, Mark PCLFFOBJJFO, string LIOGIBJBHAH)
-			: base(ILENLCMAMBH, PCLFFOBJJFO, LIOGIBJBHAH)
+		public DuplicateAnchorException(Mark startMark, Mark endMark, string message)
+			: base(startMark, endMark, message)
 		{
 		}
 
-		public DuplicateAnchorException(string LIOGIBJBHAH, Exception LEPEAKBGHLB)
-			: base(LIOGIBJBHAH, LEPEAKBGHLB)
+		public DuplicateAnchorException(string message, Exception innerException)
+			: base(message, innerException)
 		{
 		}
 
-		protected DuplicateAnchorException(SerializationInfo EMBBNNBFODN, StreamingContext PDCAHMPCPOC)
-			: base(EMBBNNBFODN, PDCAHMPCPOC)
+		protected DuplicateAnchorException(SerializationInfo info, StreamingContext context)
+			: base(info, context)
 		{
 		}
 	}

@@ -52,11 +52,11 @@ public class NetworkController
 	{
 		GameLog.Info("Login sequence: NetworkController.LoginComplete");
 		GiveLoginService.SendGiveLogin();
-		QuestParameters hHKLFIIBIFF = ListSF.GetInstance().GetQuestParameters();
-		if (hHKLFIIBIFF.GetFightList() == null)
+		QuestParameters questParameters = ListSF.GetInstance().GetQuestParameters();
+		if (questParameters.GetFightList() == null)
 		{
-			hHKLFIIBIFF.fightIds = FightIDS.Empty();
-			hHKLFIIBIFF.fightResult = string.Empty;
+			questParameters.fightIds = FightIDS.Empty();
+			questParameters.fightResult = string.Empty;
 		}
 		if (ListSF.GetInstance().RaiseQuestEvent(QuestEvent.QuestEventType.QUEST_EVENT_LOGIN_END))
 		{

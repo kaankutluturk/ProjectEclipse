@@ -192,11 +192,11 @@ namespace Nekki.SF2.GUI.Shop
 				return;
 			}
 			base.gameObject.name = string.Format("ShopTableViewCell({0})", item.Name);
-			UserItem dKCHDHMLKHN = ListSF.GetRoster().GetInventory().FindItem(item);
-			_itemInfo = ((dKCHDHMLKHN == null) ? item : dKCHDHMLKHN.GetCurrentUpgradeItem());
+			UserItem userItem = ListSF.GetRoster().GetInventory().FindItem(item);
+			_itemInfo = ((userItem == null) ? item : userItem.GetCurrentUpgradeItem());
 			_lockIcon.gameObject.SetActive(item.ItemLevel > ListSF.GetRoster().GetLevel());
-			_jackdawIcon.gameObject.SetActive(dKCHDHMLKHN != null && item.Type != "Seal");
-			_equppiedIcon.gameObject.SetActive(dKCHDHMLKHN != null && dKCHDHMLKHN.GetIsEquipped());
+			_jackdawIcon.gameObject.SetActive(userItem != null && item.Type != "Seal");
+			_equppiedIcon.gameObject.SetActive(userItem != null && userItem.GetIsEquipped());
 			bool active = _itemInfo.ItemLevel > 0;
 			Font font = LocalizationManager.GetContentFont();
 			if (font != null)
@@ -248,12 +248,12 @@ namespace Nekki.SF2.GUI.Shop
 			SetItemInfo(_itemInfo);
 		}
 
-		public int CompareTo(ShopTableViewCell NOLFMPDGCOC)
+		public int CompareTo(ShopTableViewCell other)
 		{
 			int num = ((_itemInfo != null) ? _itemInfo.ItemLevel : 0);
-			int value = ((NOLFMPDGCOC._itemInfo != null) ? NOLFMPDGCOC._itemInfo.ItemLevel : 0);
+			int value = ((other._itemInfo != null) ? other._itemInfo.ItemLevel : 0);
 			int num2 = ((_itemInfo != null) ? _itemInfo.Index : 0);
-			int value2 = ((NOLFMPDGCOC._itemInfo == null) ? 1 : NOLFMPDGCOC._itemInfo.Index);
+			int value2 = ((other._itemInfo == null) ? 1 : other._itemInfo.Index);
 			int num3 = num.CompareTo(value);
 			if (num3 != 0)
 			{

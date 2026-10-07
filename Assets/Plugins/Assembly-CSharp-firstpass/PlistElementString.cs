@@ -2,8 +2,8 @@ public class PlistElementString : PlistElement
 {
 	public string value;
 
-	public PlistElementString(string AFIEJABPAKA)
+	public PlistElementString(string newValue)
 	{
-		value = AFIEJABPAKA;
+		value = newValue;
 	}
 }

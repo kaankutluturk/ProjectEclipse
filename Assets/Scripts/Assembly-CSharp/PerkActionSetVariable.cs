@@ -70,14 +70,14 @@ public class PerkActionSetVariable : PerkAction
 	{
 	}
 
-	public PerkActionSetVariable(PerkActionSetVariable NOLFMPDGCOC)
-		: base(NOLFMPDGCOC)
+	public PerkActionSetVariable(PerkActionSetVariable source)
+		: base(source)
 	{
-		set_Value(NOLFMPDGCOC.GetValue());
-		SetHasMinValue(NOLFMPDGCOC.GetHasMinValue());
-		SetMinValue(NOLFMPDGCOC.GetMinValue());
-		SetHasMaxValue(NOLFMPDGCOC.GetHasMaxValue());
-		SetMaxValue(NOLFMPDGCOC.GetMaxValue());
+		set_Value(source.GetValue());
+		SetHasMinValue(source.GetHasMinValue());
+		SetMinValue(source.GetMinValue());
+		SetHasMaxValue(source.GetHasMaxValue());
+		SetMaxValue(source.GetMaxValue());
 	}
 
 	public FunctionExtension GetValue()

@@ -13,15 +13,15 @@ public class QuestActionStoryTutorialMove : QuestAction
 
 	private bool _LastAnimationIsMove;
 
-	public override void Execute(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters parameters)
 	{
-		base.Execute(GFIHPBCEEOB);
+		base.Execute(parameters);
 		MainMenu.get_Instance().SetEnabled(false);
-		Fight gDBOMJODDEA = Fight.GetCurrentFight();
-		Stick joystick = gDBOMJODDEA.Controller.GetJoystick();
+		Fight fight = Fight.GetCurrentFight();
+		Stick joystick = fight.Controller.GetJoystick();
 		joystick.SetIsFlashing(true);
-		Model fGCODGKLHED = gDBOMJODDEA.ActiveModels[0];
-		fGCODGKLHED.AddEventListener(2, OnAnimationStart);
+		Model playerModel = fight.ActiveModels[0];
+		playerModel.AddEventListener(2, OnAnimationStart);
 		_WaitTimeCoroutine = WaitForTimeout();
 		CoroutineManager.get_Current().StartRoutine(_WaitTimeCoroutine);
 	}
@@ -37,10 +37,10 @@ public class QuestActionStoryTutorialMove : QuestAction
 				CompleteStep();
 			}
 		}
-		Fight gDBOMJODDEA = Fight.GetCurrentFight();
-		Model fGCODGKLHED = gDBOMJODDEA.ActiveModels[0];
-		InfoAnimation.AnimationKind dFLPNNBIFFN = fGCODGKLHED.LastAnimationType;
-		if (dFLPNNBIFFN == InfoAnimation.AnimationKind.AnimationMove)
+		Fight fight = Fight.GetCurrentFight();
+		Model playerModel = fight.ActiveModels[0];
+		InfoAnimation.AnimationKind animationKind = playerModel.LastAnimationType;
+		if (animationKind == InfoAnimation.AnimationKind.AnimationMove)
 		{
 			_LastAnimationIsMove = true;
 		}
@@ -59,11 +59,11 @@ public class QuestActionStoryTutorialMove : QuestAction
 			CoroutineManager.get_Current().StopRoutine(_WaitTimeCoroutine);
 		}
 		MainMenu.get_Instance().SetEnabled(true);
-		Fight gDBOMJODDEA = Fight.GetCurrentFight();
-		Stick joystick = gDBOMJODDEA.Controller.GetJoystick();
+		Fight fight = Fight.GetCurrentFight();
+		Stick joystick = fight.Controller.GetJoystick();
 		joystick.SetIsFlashing(false);
-		Model fGCODGKLHED = gDBOMJODDEA.ActiveModels[0];
-		fGCODGKLHED.RemoveEventListener(2, OnAnimationStart);
+		Model playerModel = fight.ActiveModels[0];
+		playerModel.RemoveEventListener(2, OnAnimationStart);
 		FinishAction();
 	}
 }

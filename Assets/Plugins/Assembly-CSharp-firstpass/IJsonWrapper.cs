@@ -42,17 +42,17 @@ public interface IJsonWrapper : IDictionary, IList, IEnumerable, ICollection, IO
 
 	string GetString();
 
-	void SetBoolean(bool PKHDLOGJKAD);
+	void SetBoolean(bool value);
 
-	void SetDouble(double PKHDLOGJKAD);
+	void SetDouble(double value);
 
-	void SetInt(int PKHDLOGJKAD);
+	void SetInt(int value);
 
-	void SetJsonType(JsonType LFLGCDNKNJI);
+	void SetJsonType(JsonType type);
 
-	void SetLong(long PKHDLOGJKAD);
+	void SetLong(long value);
 
-	void SetString(string PKHDLOGJKAD);
+	void SetString(string value);
 
 	string ToJson();
 

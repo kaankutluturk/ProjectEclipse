@@ -1,24 +1,24 @@
 public class QuestActionCheckPoint : QuestAction
 {
-	public override void Execute(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters parameters)
 	{
-		base.Execute(GFIHPBCEEOB);
-		SaveCheckPoint(GFIHPBCEEOB);
+		base.Execute(parameters);
+		SaveCheckPoint(parameters);
 		ListSF.GetInstance().RequestSave();
 		FinishAction();
 	}
 
-	public void SaveCheckPoint(QuestParameters GFIHPBCEEOB)
+	public void SaveCheckPoint(QuestParameters parameters)
 	{
-		Roster nKGLHEGIKKP = ListSF.GetRoster();
-		RosterQuest dKBDLDGOFDN = nKGLHEGIKKP.FindQuest(QuestName);
-		if (dKBDLDGOFDN == null)
+		Roster roster = ListSF.GetRoster();
+		RosterQuest rosterQuest = roster.FindQuest(QuestName);
+		if (rosterQuest == null)
 		{
-			dKBDLDGOFDN = ListSF.GetRoster().AddQuest(QuestName, QuestFileName);
-			CallEvent(2, dKBDLDGOFDN);
+			rosterQuest = ListSF.GetRoster().AddQuest(QuestName, QuestFileName);
+			CallEvent(2, rosterQuest);
 		}
-		dKBDLDGOFDN.SaveCheckpoint(GFIHPBCEEOB, StageIndex, Index);
-		dKBDLDGOFDN.FileName = QuestFileName;
+		rosterQuest.SaveCheckpoint(parameters, StageIndex, Index);
+		rosterQuest.FileName = QuestFileName;
 		ListSF.GetInstance().RequestSave();
 	}
 }

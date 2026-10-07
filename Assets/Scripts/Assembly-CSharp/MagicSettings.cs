@@ -69,50 +69,50 @@ public class MagicSettings
 		charges.Clear();
 		foreach (XmlNode childNode in node.ChildNodes)
 		{
-			MagicCharge eHONFFPDKOI = new MagicCharge();
-			charges.Add(eHONFFPDKOI);
-			eHONFFPDKOI.Parse(childNode);
+			MagicCharge charge = new MagicCharge();
+			charges.Add(charge);
+			charge.Parse(childNode);
 		}
 	}
 
-	private float GetChargeValue(string JLEKBBJBLOE, ModelParameters IHEFAMAFBIA = null)
+	private float GetChargeValue(string chargeName, ModelParameters parameters = null)
 	{
-		MagicCharge eHONFFPDKOI = FindCharge(JLEKBBJBLOE);
-		if (eHONFFPDKOI == null)
+		MagicCharge charge = FindCharge(chargeName);
+		if (charge == null)
 		{
-			GameLog.Error(JLEKBBJBLOE + " for Magic not found");
+			GameLog.Error(chargeName + " for Magic not found");
 			return 0f;
 		}
-		if (IHEFAMAFBIA == null)
+		if (parameters == null)
 		{
-			return eHONFFPDKOI.GetBase();
+			return charge.GetBase();
 		}
-		int OEMALIFPGPO = 0;
-		if (IHEFAMAFBIA.FinalAttributes.Get(eHONFFPDKOI.GetAttribute(), ref OEMALIFPGPO))
+		int attributeValue = 0;
+		if (parameters.FinalAttributes.Get(charge.GetAttribute(), ref attributeValue))
 		{
-			return eHONFFPDKOI.GetBase() * (float)OEMALIFPGPO;
+			return charge.GetBase() * (float)attributeValue;
 		}
-		return eHONFFPDKOI.GetBase();
+		return charge.GetBase();
 	}
 
-	public float GetInitialCharge(Model ACENLMONNPA)
+	public float GetInitialCharge(Model model)
 	{
-		return GetInitialCharge(ACENLMONNPA.Parameters);
+		return GetInitialCharge(model.Parameters);
 	}
 
-	public float GetPainRecharge(Model ACENLMONNPA)
+	public float GetPainRecharge(Model model)
 	{
-		return GetPainRecharge(ACENLMONNPA.Parameters);
+		return GetPainRecharge(model.Parameters);
 	}
 
-	public float GetDamageRecharge(Model ACENLMONNPA)
+	public float GetDamageRecharge(Model model)
 	{
-		return GetDamageRecharge(ACENLMONNPA.Parameters);
+		return GetDamageRecharge(model.Parameters);
 	}
 
-	public float GetInitialCharge(ModelParameters IHEFAMAFBIA)
+	public float GetInitialCharge(ModelParameters parameters)
 	{
-		return GetChargeValue("InitialCharge", IHEFAMAFBIA);
+		return GetChargeValue("InitialCharge", parameters);
 	}
 
 	public float GetInitialCharge()
@@ -120,9 +120,9 @@ public class MagicSettings
 		return GetChargeValue("InitialCharge");
 	}
 
-	public float GetPainRecharge(ModelParameters IHEFAMAFBIA)
+	public float GetPainRecharge(ModelParameters parameters)
 	{
-		return GetChargeValue("PainRecharge", IHEFAMAFBIA);
+		return GetChargeValue("PainRecharge", parameters);
 	}
 
 	public float GetPainRecharge()
@@ -130,9 +130,9 @@ public class MagicSettings
 		return GetChargeValue("PainRecharge");
 	}
 
-	public float GetDamageRecharge(ModelParameters IHEFAMAFBIA)
+	public float GetDamageRecharge(ModelParameters parameters)
 	{
-		return GetChargeValue("DamageRecharge", IHEFAMAFBIA);
+		return GetChargeValue("DamageRecharge", parameters);
 	}
 
 	public float GetDamageRecharge()

@@ -33,17 +33,17 @@ public class FileDownloader
 		return _Instance;
 	}
 
-	public void Download(string BEPKJNKCKPH, string name, string IMFMPLFADCE, Action<bool> HKHNPNNDHFP, Action<float> OODDBFJDGJO = null, int PEEOEOMEBFG = 0)
+	public void Download(string url, string name, string directory, Action<bool> resultCallback, Action<float> progressCallback = null, int expectedSize = 0)
 	{
-		_resultCallback = HKHNPNNDHFP;
-		_progressCallback = OODDBFJDGJO;
-		destinationDirectory = IMFMPLFADCE;
+		_resultCallback = resultCallback;
+		_progressCallback = progressCallback;
+		destinationDirectory = directory;
 		_name = name;
-		_size = PEEOEOMEBFG;
-		NekkiWebHelper.Download(BEPKJNKCKPH, string.Format("{0}/{1}", destinationDirectory, _name), OnComplete, OnError, OnProgress, null, _timeout);
+		_size = expectedSize;
+		NekkiWebHelper.Download(url, string.Format("{0}/{1}", destinationDirectory, _name), OnComplete, OnError, OnProgress, null, _timeout);
 	}
 
-	private void OnComplete(NekkiWebRequest DCJLKCFKCOM)
+	private void OnComplete(NekkiWebRequest request)
 	{
 		if (_resultCallback != null)
 		{
@@ -51,7 +51,7 @@ public class FileDownloader
 		}
 	}
 
-	private void OnError(NekkiWebRequest DCJLKCFKCOM)
+	private void OnError(NekkiWebRequest request)
 	{
 		if (_resultCallback != null)
 		{
@@ -59,18 +59,18 @@ public class FileDownloader
 		}
 	}
 
-	private void OnProgress(NekkiWebRequest DCJLKCFKCOM)
+	private void OnProgress(NekkiWebRequest request)
 	{
 		if (_progressCallback != null)
 		{
 			if (_size > 0)
 			{
-				float obj = (float)DCJLKCFKCOM.GetDownloadedBytes() / (float)_size;
+				float obj = (float)request.GetDownloadedBytes() / (float)_size;
 				_progressCallback(obj);
 			}
 			else
 			{
-				_progressCallback(DCJLKCFKCOM.GetProgress());
+				_progressCallback(request.GetProgress());
 			}
 		}
 	}

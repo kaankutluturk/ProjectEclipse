@@ -28,20 +28,20 @@ namespace Nekki.Yaml
 			return key;
 		}
 
-		public static Node CreateNode(string OEHJKBNMJPH, YamlNode DOBDLPLFMAC)
+		public static Node CreateNode(string nodeKey, YamlNode yamlNode)
 		{
-			Type type = DOBDLPLFMAC.GetType();
+			Type type = yamlNode.GetType();
 			if (type == typeof(YamlScalarNode))
 			{
-				return new Scalar(OEHJKBNMJPH, (YamlScalarNode)DOBDLPLFMAC);
+				return new Scalar(nodeKey, (YamlScalarNode)yamlNode);
 			}
 			if (type == typeof(YamlSequenceNode))
 			{
-				return new Sequence(OEHJKBNMJPH, (YamlSequenceNode)DOBDLPLFMAC);
+				return new Sequence(nodeKey, (YamlSequenceNode)yamlNode);
 			}
 			if (type == typeof(YamlMappingNode))
 			{
-				return new Mapping(OEHJKBNMJPH, (YamlMappingNode)DOBDLPLFMAC);
+				return new Mapping(nodeKey, (YamlMappingNode)yamlNode);
 			}
 			return null;
 		}

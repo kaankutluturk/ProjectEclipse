@@ -12,11 +12,11 @@ public class RuleInitData
 
 	public PlayersFightData FightData;
 
-	public RuleInitData(Model _playerModel, Model CKNCPOABFBO, Location _location, PlayersFightData DPONLGICLEH)
+	public RuleInitData(Model _playerModel, Model opponentModel, Location _location, PlayersFightData fightData)
 	{
 		PlayerModel = _playerModel;
-		OpponentModel = CKNCPOABFBO;
+		OpponentModel = opponentModel;
 		FightLocation = _location;
-		FightData = DPONLGICLEH;
+		FightData = fightData;
 	}
 }

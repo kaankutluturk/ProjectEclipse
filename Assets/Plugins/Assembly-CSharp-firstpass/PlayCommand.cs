@@ -94,13 +94,13 @@ public class PlayCommand
 		}
 	}
 
-	public PlayCommand(int ADNDLGKIJJK, string LGLFOBEIPKB, bool KKHJAJFEPPA, bool HBCDAPJLKOJ, float JIJAJFEJJHK)
+	public PlayCommand(int channelId, string soundName, bool loop, bool overlap, float volume)
 	{
-		SetVolume(JIJAJFEJJHK);
-		SetOverlap(HBCDAPJLKOJ);
-		SetLoop(KKHJAJFEPPA);
-		set_Sound(LGLFOBEIPKB);
-		set_ChanelID(ADNDLGKIJJK);
+		SetVolume(volume);
+		SetOverlap(overlap);
+		SetLoop(loop);
+		set_Sound(soundName);
+		set_ChanelID(channelId);
 	}
 
 	public int GetChanelID()
@@ -163,13 +163,13 @@ public class PlayCommand
 		volume = Mathf.Clamp01(value);
 	}
 
-	internal void SetMusic(bool MHAFPAHIFKP)
+	internal void SetMusic(bool isMusic)
 	{
-		set_IsMusic(MHAFPAHIFKP);
+		set_IsMusic(isMusic);
 	}
 
-	internal void SetAudioSettings(AudioSettings CCKFFGJGEJE)
+	internal void SetAudioSettings(AudioSettings settings)
 	{
-		audioSettings = CCKFFGJGEJE;
+		audioSettings = settings;
 	}
 }

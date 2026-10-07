@@ -22,10 +22,10 @@ public class PerkActionLifesteal : PerkAction
 	{
 	}
 
-	public PerkActionLifesteal(PerkActionLifesteal NOLFMPDGCOC)
-		: base(NOLFMPDGCOC)
+	public PerkActionLifesteal(PerkActionLifesteal source)
+		: base(source)
 	{
-		set_DamagePart(NOLFMPDGCOC.GetDamagePart());
+		set_DamagePart(source.GetDamagePart());
 	}
 
 	public float GetDamagePart()

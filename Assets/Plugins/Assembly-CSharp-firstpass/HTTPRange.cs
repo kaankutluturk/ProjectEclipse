@@ -68,17 +68,17 @@ public sealed class HTTPRange
 		set_IsValid(false);
 	}
 
-	internal HTTPRange(int HDIIBKGCCNB)
+	internal HTTPRange(int contentLength)
 	{
-		SetContentLength(HDIIBKGCCNB);
+		SetContentLength(contentLength);
 		set_IsValid(false);
 	}
 
-	internal HTTPRange(int JNLLEFJLHIE, int PFOBJOCNOAP, int HDIIBKGCCNB)
+	internal HTTPRange(int firstBytePos, int lastBytePos, int contentLength)
 	{
-		SetFirstBytePos(JNLLEFJLHIE);
-		SetLastBytePos(PFOBJOCNOAP);
-		SetContentLength(HDIIBKGCCNB);
+		SetFirstBytePos(firstBytePos);
+		SetLastBytePos(lastBytePos);
+		SetContentLength(contentLength);
 		set_IsValid(GetFirstBytePos() <= GetLastBytePos() && GetContentLength() > GetLastBytePos());
 	}
 

@@ -291,9 +291,9 @@ namespace Nekki.SF2.GUI
 			UpdateVerticalOverflow();
 		}
 
-		public void SetAlias(string HCPNFPMHFCM)
+		public void SetAlias(string alias)
 		{
-			_Alias = HCPNFPMHFCM ?? string.Empty;
+			_Alias = alias ?? string.Empty;
 			// Explicit clears must discard text left by a previous tooltip or item.
 			if (_Alias.Length == 0) set_text(string.Empty);
 			RefreshLocalizedText();

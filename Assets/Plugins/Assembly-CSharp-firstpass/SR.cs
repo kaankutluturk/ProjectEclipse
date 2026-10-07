@@ -42,8 +42,8 @@ internal class SR
 	{
 	}
 
-	internal static string GetString(string PIIEECCHMAC)
+	internal static string GetString(string key)
 	{
-		return PIIEECCHMAC;
+		return key;
 	}
 }

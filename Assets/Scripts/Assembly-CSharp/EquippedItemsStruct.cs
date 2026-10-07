@@ -16,8 +16,8 @@ public class EquippedItemsStruct
 
 	public ItemInfo Seal;
 
-	public bool Compare(EquippedItemsStruct FNGODBOFAJD)
+	public bool Compare(EquippedItemsStruct other)
 	{
-		return FNGODBOFAJD.Armor == Armor && FNGODBOFAJD.Helm == Helm && FNGODBOFAJD.Skeleton == Skeleton && FNGODBOFAJD.Weapon == Weapon && FNGODBOFAJD.Magic == Magic && FNGODBOFAJD.RaidCharge == RaidCharge && FNGODBOFAJD.Ranged == Ranged;
+		return other.Armor == Armor && other.Helm == Helm && other.Skeleton == Skeleton && other.Weapon == Weapon && other.Magic == Magic && other.RaidCharge == RaidCharge && other.Ranged == Ranged;
 	}
 }

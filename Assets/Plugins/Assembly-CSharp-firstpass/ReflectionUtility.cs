@@ -5,11 +5,11 @@ using System.Reflection;
 
 internal static class ReflectionUtility
 {
-	public static Type GetImplementedGenericInterface(Type LFLGCDNKNJI, Type GLBGHAEDBDC)
+	public static Type GetImplementedGenericInterface(Type type, Type genericInterface)
 	{
-		foreach (Type item in GetImplementedInterfaces(LFLGCDNKNJI))
+		foreach (Type item in GetImplementedInterfaces(type))
 		{
-			if (item.IsGenericTypeCheck() && item.GetGenericTypeDefinition() == GLBGHAEDBDC)
+			if (item.IsGenericTypeCheck() && item.GetGenericTypeDefinition() == genericInterface)
 			{
 				return item;
 			}
@@ -17,22 +17,22 @@ internal static class ReflectionUtility
 		return null;
 	}
 
-	public static IEnumerable<Type> GetImplementedInterfaces(Type LFLGCDNKNJI)
+	public static IEnumerable<Type> GetImplementedInterfaces(Type type)
 	{
-		if (LFLGCDNKNJI.IsInterfaceCheck())
+		if (type.IsInterfaceCheck())
 		{
-			yield return LFLGCDNKNJI;
+			yield return type;
 		}
-		Type[] interfaces = LFLGCDNKNJI.GetInterfaces();
+		Type[] interfaces = type.GetInterfaces();
 		for (int i = 0; i < interfaces.Length; i++)
 		{
 			yield return interfaces[i];
 		}
 	}
 
-	public static MethodInfo GetMethod(Expression<Action> DIMMKEJBJKN)
+	public static MethodInfo GetMethod(Expression<Action> expression)
 	{
-		MethodInfo methodInfo = ((MethodCallExpression)DIMMKEJBJKN.Body).Method;
+		MethodInfo methodInfo = ((MethodCallExpression)expression.Body).Method;
 		if (methodInfo.IsGenericMethod)
 		{
 			methodInfo = methodInfo.GetGenericMethodDefinition();
@@ -40,9 +40,9 @@ internal static class ReflectionUtility
 		return methodInfo;
 	}
 
-	public static MethodInfo GetMethod<T>(Expression<Action<T>> DIMMKEJBJKN)
+	public static MethodInfo GetMethod<T>(Expression<Action<T>> expression)
 	{
-		MethodInfo methodInfo = ((MethodCallExpression)DIMMKEJBJKN.Body).Method;
+		MethodInfo methodInfo = ((MethodCallExpression)expression.Body).Method;
 		if (methodInfo.IsGenericMethod)
 		{
 			methodInfo = methodInfo.GetGenericMethodDefinition();

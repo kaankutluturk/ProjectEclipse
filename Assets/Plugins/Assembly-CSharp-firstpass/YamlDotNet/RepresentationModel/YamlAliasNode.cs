@@ -14,9 +14,9 @@ namespace YamlDotNet.RepresentationModel
 			}
 		}
 
-		internal YamlAliasNode(string KOLNNNLOCFE)
+		internal YamlAliasNode(string anchor)
 		{
-			base.Anchor = KOLNNNLOCFE;
+			base.Anchor = anchor;
 		}
 
 		internal override void ResolveAliases(DocumentLoadingState state)
@@ -24,19 +24,19 @@ namespace YamlDotNet.RepresentationModel
 			throw new NotSupportedException("Resolving an alias on an alias node does not make sense");
 		}
 
-		internal override void Emit(IEmitter NPIDIMCLNEM, EmitterState state)
+		internal override void Emit(IEmitter emitter, EmitterState state)
 		{
 			throw new NotSupportedException("A YamlAliasNode is an implementation detail and should never be saved.");
 		}
 
-		public override void Accept(IYamlVisitor NKECMANOOEM)
+		public override void Accept(IYamlVisitor visitor)
 		{
 			throw new NotSupportedException("A YamlAliasNode is an implementation detail and should never be visited.");
 		}
 
-		public override bool Equals(object NOLFMPDGCOC)
+		public override bool Equals(object obj)
 		{
-			YamlAliasNode yamlAliasNode = NOLFMPDGCOC as YamlAliasNode;
+			YamlAliasNode yamlAliasNode = obj as YamlAliasNode;
 			return yamlAliasNode != null && Equals(yamlAliasNode) && YamlNode.SafeEquals(base.Anchor, yamlAliasNode.Anchor);
 		}
 

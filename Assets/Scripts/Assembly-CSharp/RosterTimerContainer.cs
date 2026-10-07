@@ -38,28 +38,28 @@ public class RosterTimerContainer
 		return timers;
 	}
 
-	public void AddTimer(string name, long MCEDKIPLOMO)
+	public void AddTimer(string name, long endTime)
 	{
-		RosterTimer nFFICPMLCFD = new RosterTimer(name, MCEDKIPLOMO);
-		AddTimer(nFFICPMLCFD);
+		RosterTimer timer = new RosterTimer(name, endTime);
+		AddTimer(timer);
 	}
 
 	public void AddTimer(XmlNode node)
 	{
-		RosterTimer nFFICPMLCFD = new RosterTimer(node);
-		AddTimer(nFFICPMLCFD);
+		RosterTimer timer = new RosterTimer(node);
+		AddTimer(timer);
 	}
 
-	public void AddTimer(RosterTimer NFFICPMLCFD)
+	public void AddTimer(RosterTimer timer)
 	{
-		RosterTimer fPNMILOHPMB = FindTimer(NFFICPMLCFD.get_Name());
-		if (fPNMILOHPMB == null)
+		RosterTimer existingTimer = FindTimer(timer.get_Name());
+		if (existingTimer == null)
 		{
-			timers.Add(NFFICPMLCFD);
+			timers.Add(timer);
 			return;
 		}
-		RemoveTimer(fPNMILOHPMB);
-		AddTimer(NFFICPMLCFD);
+		RemoveTimer(existingTimer);
+		AddTimer(timer);
 	}
 
 	public RosterTimer FindTimer(string name)
@@ -76,23 +76,23 @@ public class RosterTimerContainer
 
 	public void RemoveTimer(string name)
 	{
-		RosterTimer kIKOMNOGKDK = FindTimer(name);
-		RemoveTimer(kIKOMNOGKDK);
+		RosterTimer timer = FindTimer(name);
+		RemoveTimer(timer);
 	}
 
-	public void RemoveTimer(RosterTimer KIKOMNOGKDK)
+	public void RemoveTimer(RosterTimer timer)
 	{
-		if (KIKOMNOGKDK == null)
+		if (timer == null)
 		{
 			return;
 		}
 		for (int i = 0; i < timers.Count; i++)
 		{
-			RosterTimer fPNMILOHPMB = timers[i];
-			if (fPNMILOHPMB == KIKOMNOGKDK)
+			RosterTimer candidate = timers[i];
+			if (candidate == timer)
 			{
-				GetNode().RemoveChild(fPNMILOHPMB.GetNode());
-				timers.Remove(fPNMILOHPMB);
+				GetNode().RemoveChild(candidate.GetNode());
+				timers.Remove(candidate);
 				break;
 			}
 		}
@@ -106,12 +106,12 @@ public class RosterTimerContainer
 		set_Node(parentNode.AppendElement(name));
 	}
 
-	public void CheckTimers(long LBIGLJLMIDG)
+	public void CheckTimers(long currentTime)
 	{
 		List<RosterTimer> list = new List<RosterTimer>();
 		foreach (RosterTimer item in timers)
 		{
-			if (item.GetEndTimeSeconds() <= LBIGLJLMIDG)
+			if (item.GetEndTimeSeconds() <= currentTime)
 			{
 				list.Add(item);
 				FireTimerEnd(item);
@@ -131,16 +131,16 @@ public class RosterTimerContainer
 
 	public void FireTimerEnd(string name)
 	{
-		QuestParameters hHKLFIIBIFF = ListSF.GetInstance().GetQuestParameters();
-		hHKLFIIBIFF.timerName = name;
+		QuestParameters questParameters = ListSF.GetInstance().GetQuestParameters();
+		questParameters.timerName = name;
 		if (ListSF.GetInstance().RaiseQuestEvent(QuestEvent.QuestEventType.QUEST_EVENT_TIMER_END))
 		{
 			ListSF.GetInstance().RunQuestActions();
 		}
 	}
 
-	public void CancelTimer(string EBGIGEGKIBD)
+	public void CancelTimer(string timerName)
 	{
-		RemoveTimer(EBGIGEGKIBD);
+		RemoveTimer(timerName);
 	}
 }

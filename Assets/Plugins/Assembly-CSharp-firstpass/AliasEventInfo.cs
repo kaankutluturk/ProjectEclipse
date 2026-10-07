@@ -17,8 +17,8 @@ public class AliasEventInfo : EventInfo
 		}
 	}
 
-	public AliasEventInfo(IObjectDescriptor BBNKIBKPBLO)
-		: base(BBNKIBKPBLO)
+	public AliasEventInfo(IObjectDescriptor descriptor)
+		: base(descriptor)
 	{
 	}
 

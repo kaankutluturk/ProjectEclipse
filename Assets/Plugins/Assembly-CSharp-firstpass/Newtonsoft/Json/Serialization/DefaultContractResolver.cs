@@ -557,14 +557,14 @@ namespace Newtonsoft.Json.Serialization
 		{
 			hasExplicitAttribute = false;
 			DataContractAttribute dataContractAttribute = JsonTypeReflector.GetDataContractAttribute(declaringType);
-			DataMemberAttribute pMHLKHKKCOJ = ((dataContractAttribute == null || !(attributeProvider is MemberInfo)) ? null : JsonTypeReflector.GetDataMemberAttribute((MemberInfo)attributeProvider));
+			DataMemberAttribute dataMember = ((dataContractAttribute == null || !(attributeProvider is MemberInfo)) ? null : JsonTypeReflector.GetDataMemberAttribute((MemberInfo)attributeProvider));
 			JsonPropertyAttribute attribute = JsonTypeReflector.GetAttribute<JsonPropertyAttribute>(attributeProvider);
 			if (attribute != null)
 			{
 				hasExplicitAttribute = true;
 			}
 			bool flag = JsonTypeReflector.GetAttribute<JsonIgnoreAttribute>(attributeProvider) != null;
-			string propertyName = ((attribute != null && attribute.PropertyName != null) ? attribute.PropertyName : ((pMHLKHKKCOJ == null || pMHLKHKKCOJ.get_Name() == null) ? name : pMHLKHKKCOJ.get_Name()));
+			string propertyName = ((attribute != null && attribute.PropertyName != null) ? attribute.PropertyName : ((dataMember == null || dataMember.get_Name() == null) ? name : dataMember.get_Name()));
 			property.PropertyName = ResolvePropertyName(propertyName);
 			property.UnderlyingName = name;
 			if (attribute != null)
@@ -572,16 +572,16 @@ namespace Newtonsoft.Json.Serialization
 				property.Required = attribute.Required;
 				property.Order = attribute._order;
 			}
-			else if (pMHLKHKKCOJ != null)
+			else if (dataMember != null)
 			{
-				property.Required = (pMHLKHKKCOJ.GetIsRequired() ? Required.AllowNull : Required.Default);
-				property.Order = ((pMHLKHKKCOJ.GetOrder() == -1) ? ((int?)null) : new int?(pMHLKHKKCOJ.GetOrder()));
+				property.Required = (dataMember.GetIsRequired() ? Required.AllowNull : Required.Default);
+				property.Order = ((dataMember.GetOrder() == -1) ? ((int?)null) : new int?(dataMember.GetOrder()));
 			}
 			else
 			{
 				property.Required = Required.Default;
 			}
-			property.Ignored = flag || (memberSerialization == MemberSerialization.OptIn && attribute == null && pMHLKHKKCOJ == null);
+			property.Ignored = flag || (memberSerialization == MemberSerialization.OptIn && attribute == null && dataMember == null);
 			property.Converter = JsonTypeReflector.GetJsonConverter(attributeProvider, property.PropertyType);
 			property.MemberConverter = JsonTypeReflector.GetJsonConverter(attributeProvider, property.PropertyType);
 			DefaultValueAttribute attribute2 = JsonTypeReflector.GetAttribute<DefaultValueAttribute>(attributeProvider);
@@ -601,7 +601,7 @@ namespace Newtonsoft.Json.Serialization
 			{
 				allowNonPublicAccess = true;
 			}
-			if (pMHLKHKKCOJ != null)
+			if (dataMember != null)
 			{
 				allowNonPublicAccess = true;
 				hasExplicitAttribute = true;

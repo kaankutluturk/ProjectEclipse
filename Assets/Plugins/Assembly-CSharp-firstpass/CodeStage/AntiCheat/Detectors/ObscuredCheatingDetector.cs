@@ -139,7 +139,7 @@ namespace CodeStage.AntiCheat.Detectors
 			instancesInScene--;
 		}
 
-		private void OnSceneLoaded(Scene MHOCFOODLLL, LoadSceneMode NMMPBADCFHK)
+		private void OnSceneLoaded(Scene scene, LoadSceneMode loadMode)
 		{
 			OnLevelLoadedCallback();
 		}

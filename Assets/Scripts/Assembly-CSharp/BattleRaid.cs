@@ -4,20 +4,20 @@ using UnityEngine;
 
 public class BattleRaid : Battle
 {
-	public BattleRaid(string LFLGCDNKNJI, Vector2 MGMMDGFPBLP, string name, string ADONPNOBBDE, string LHCFHAIDNDP, string EMDJGBHIAIA, ushort CDCJKJNGPOE, ushort MCDAHGPLLDO, string LOKLDPLAPOL, string PEMOECLNECD, string LPJNEDFCBOI, string PINIIFIOECE, string OAPKHNPPGHP, string IHBMPGKIBAN)
-		: base(LFLGCDNKNJI, MGMMDGFPBLP, name, ADONPNOBBDE, LHCFHAIDNDP, EMDJGBHIAIA, CDCJKJNGPOE, MCDAHGPLLDO, LOKLDPLAPOL, PEMOECLNECD, LPJNEDFCBOI, PINIIFIOECE, OAPKHNPPGHP, IHBMPGKIBAN)
+	public BattleRaid(string typeName, Vector2 MGMMDGFPBLP, string name, string iconName, string previewIcon, string description, ushort rewardDigits, ushort prizeBaseDigits, string alias, string title, string location, string music, string rewardImage, string showResistance)
+		: base(typeName, MGMMDGFPBLP, name, iconName, previewIcon, description, rewardDigits, prizeBaseDigits, alias, title, location, music, rewardImage, showResistance)
 	{
 	}
 
 	public void Parse(XmlNode node)
 	{
-		XmlNode hKPPBKPJOEO = node["RaidData"];
-		ParseRaidData(hKPPBKPJOEO);
+		XmlNode raidNode = node["RaidData"];
+		ParseRaidData(raidNode);
 	}
 
-	public bool CanAffordFightCost(FightList KGKDKENMAOA)
+	public bool CanAffordFightCost(FightList fightList)
 	{
-		List<CurrencyCostRule> list = KGKDKENMAOA.GetCurrencyCostRules();
+		List<CurrencyCostRule> list = fightList.GetCurrencyCostRules();
 		if (list.Count == 0)
 		{
 			return true;

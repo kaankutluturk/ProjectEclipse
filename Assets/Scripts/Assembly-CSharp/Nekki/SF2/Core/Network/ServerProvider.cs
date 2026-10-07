@@ -246,29 +246,29 @@ namespace Nekki.SF2.Core.Network
 			yield break;
 		}
 
-		public void VerifyPurchaseAction(PaymentInfo PAENLDALDGB, string DBKFOHCPLDB, Action<bool, string, object> p_delegate)
+		public void VerifyPurchaseAction(PaymentInfo paymentInfo, string signature, Action<bool, string, object> p_delegate)
 		{
-			StartCoroutine(FailRequest(p_delegate, PAENLDALDGB));
+			StartCoroutine(FailRequest(p_delegate, paymentInfo));
 		}
 
-		public void ConfirmVerificationAction(PaymentInfo PAENLDALDGB, string DBKFOHCPLDB, Action<bool, string, object> p_delegate)
+		public void ConfirmVerificationAction(PaymentInfo paymentInfo, string signature, Action<bool, string, object> p_delegate)
 		{
-			StartCoroutine(FailRequest(p_delegate, PAENLDALDGB));
+			StartCoroutine(FailRequest(p_delegate, paymentInfo));
 		}
 
-		public void SendGiveLogin(Action<bool, string, object> IKFMKMEHJFF)
+		public void SendGiveLogin(Action<bool, string, object> callback)
 		{
-			StartCoroutine(FailRequest(IKFMKMEHJFF, null));
+			StartCoroutine(FailRequest(callback, null));
 		}
 
-		public void CheckLedger(string BEPKJNKCKPH, Action<bool, string, object> IKFMKMEHJFF)
+		public void CheckLedger(string ledgerId, Action<bool, string, object> callback)
 		{
-			StartCoroutine(FailRequest(IKFMKMEHJFF, null));
+			StartCoroutine(FailRequest(callback, null));
 		}
 
-		public void ConfirmLedger(string BEPKJNKCKPH, Action<bool, string, object> IKFMKMEHJFF, string DIAIIPCBMFL)
+		public void ConfirmLedger(string ledgerId, Action<bool, string, object> callback, string confirmationToken)
 		{
-			StartCoroutine(FailRequest(IKFMKMEHJFF, null));
+			StartCoroutine(FailRequest(callback, null));
 		}
 
 		// Retain callback timing and caller state without constructing remote payloads.
@@ -280,7 +280,7 @@ namespace Nekki.SF2.Core.Network
 
 		public const bool OFFLINE = true;
 
-		public void DownloadFile(string p_url, Action<byte[], string, string> p_onDownloadComplete, Action<float> MDJEOHMECHA = null, int DGDKHFPEHOG = 0)
+		public void DownloadFile(string p_url, Action<byte[], string, string> p_onDownloadComplete, Action<float> onProgress = null, int attempt = 0)
 		{
 			p_onDownloadComplete?.Invoke(new byte[0], "offline build", p_url);
 		}

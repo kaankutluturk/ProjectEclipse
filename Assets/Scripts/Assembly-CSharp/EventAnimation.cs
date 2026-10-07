@@ -36,15 +36,15 @@ public class EventAnimation
 
 	public ModelType.ModelTargetType TargetModel;
 
-	public EventAnimation(EventAnimationType LFLGCDNKNJI = EventAnimationType.EVENT_NONE)
+	public EventAnimation(EventAnimationType eventType = EventAnimationType.EVENT_NONE)
 	{
-		Type = LFLGCDNKNJI;
+		Type = eventType;
 		Conditions = null;
 	}
 
-	public static string GetTypeName(EventAnimationType LFLGCDNKNJI)
+	public static string GetTypeName(EventAnimationType eventType)
 	{
-		switch (LFLGCDNKNJI)
+		switch (eventType)
 		{
 		case EventAnimationType.EVENT_NONE:
 			return "None";
@@ -127,31 +127,31 @@ public class EventAnimation
 		}
 	}
 
-	public bool IsEqual(EventAnimation JHJEPJJOCAE)
+	public bool IsEqual(EventAnimation other)
 	{
-		if (Type == JHJEPJJOCAE.Type)
+		if (Type == other.Type)
 		{
-			return Compare(JHJEPJJOCAE);
+			return Compare(other);
 		}
 		return false;
 	}
 
-	public void Init(XmlNode EIGDDPDGIAN)
+	public void Init(XmlNode node)
 	{
-		AnimationName = EIGDDPDGIAN.Attributes["Name"].GetStringOrDefault(string.Empty);
-		HitType = EIGDDPDGIAN.Attributes["Type"].GetStringOrDefault(string.Empty);
-		StageName = EIGDDPDGIAN.Attributes["Stage"].GetStringOrDefault(string.Empty);
-		IsNot = EIGDDPDGIAN.Attributes["Not"].ParseBool();
-		TargetModel = ModelType.ParseTargetType(EIGDDPDGIAN.Attributes["Player"].GetStringOrDefault("Me"));
-		Parse(EIGDDPDGIAN);
+		AnimationName = node.Attributes["Name"].GetStringOrDefault(string.Empty);
+		HitType = node.Attributes["Type"].GetStringOrDefault(string.Empty);
+		StageName = node.Attributes["Stage"].GetStringOrDefault(string.Empty);
+		IsNot = node.Attributes["Not"].ParseBool();
+		TargetModel = ModelType.ParseTargetType(node.Attributes["Player"].GetStringOrDefault("Me"));
+		Parse(node);
 	}
 
-	protected virtual bool Compare(EventAnimation FOPOKALJIIJ)
+	protected virtual bool Compare(EventAnimation other)
 	{
 		if (Type == EventAnimationType.EVENT_HIT)
 		{
 			bool flag = false;
-			if (!string.IsNullOrEmpty(AnimationName) && (!(AnimationName == FOPOKALJIIJ.AnimationName) || 1 == 0))
+			if (!string.IsNullOrEmpty(AnimationName) && (!(AnimationName == other.AnimationName) || 1 == 0))
 			{
 				return false;
 			}
@@ -171,7 +171,7 @@ public class EventAnimation
 		return false;
 	}
 
-	protected virtual void Parse(XmlNode MEEAKLDGLDF)
+	protected virtual void Parse(XmlNode node)
 	{
 	}
 }

@@ -1,1 +1,1 @@
-public delegate void OnWebSocketOpenDelegate(WebSocket ILNFPNFEOCL);
+public delegate void OnWebSocketOpenDelegate(WebSocket webSocket);

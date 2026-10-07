@@ -59,7 +59,7 @@ internal class AuthenticationSample : MonoBehaviour
 		});
 	}
 
-	private void OnSignalRConnected(Connection BJGMPDIKEJC)
+	private void OnSignalRConnected(Connection connection)
 	{
 		for (int i = 0; i < signalRConnection.GetHubs().Length; i++)
 		{

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 public interface IJsonEncoder
 {
-	string Encode(object AOMLCBHAJJH);
+	string Encode(object obj);
 
-	IDictionary<string, object> DecodeMessage(string EMDHMHOKGFP);
+	IDictionary<string, object> DecodeMessage(string json);
 }

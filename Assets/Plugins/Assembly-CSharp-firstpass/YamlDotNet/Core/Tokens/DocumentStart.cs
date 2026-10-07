@@ -10,8 +10,8 @@ namespace YamlDotNet.Core.Tokens
 		{
 		}
 
-		public DocumentStart(Mark ILENLCMAMBH, Mark PCLFFOBJJFO)
-			: base(ILENLCMAMBH, PCLFFOBJJFO)
+		public DocumentStart(Mark startMark, Mark endMark)
+			: base(startMark, endMark)
 		{
 		}
 	}

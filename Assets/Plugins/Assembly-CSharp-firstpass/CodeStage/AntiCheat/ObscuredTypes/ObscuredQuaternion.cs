@@ -44,9 +44,9 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 			inited = true;
 		}
 
-		public static void SetNewCryptoKey(int CNOFJICCAHK)
+		public static void SetNewCryptoKey(int newKey)
 		{
-			cryptoKey = CNOFJICCAHK;
+			cryptoKey = newKey;
 		}
 
 		public static RawEncryptedQuaternion Encrypt(Quaternion value)
@@ -54,17 +54,17 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 			return Encrypt(value, 0);
 		}
 
-		public static RawEncryptedQuaternion Encrypt(Quaternion value, int KGBGENDIMBC)
+		public static RawEncryptedQuaternion Encrypt(Quaternion value, int key)
 		{
-			if (KGBGENDIMBC == 0)
+			if (key == 0)
 			{
-				KGBGENDIMBC = cryptoKey;
+				key = cryptoKey;
 			}
 			RawEncryptedQuaternion result = default(RawEncryptedQuaternion);
-			result.x = ObscuredFloat.Encrypt(value.x, KGBGENDIMBC);
-			result.y = ObscuredFloat.Encrypt(value.y, KGBGENDIMBC);
-			result.z = ObscuredFloat.Encrypt(value.z, KGBGENDIMBC);
-			result.w = ObscuredFloat.Encrypt(value.w, KGBGENDIMBC);
+			result.x = ObscuredFloat.Encrypt(value.x, key);
+			result.y = ObscuredFloat.Encrypt(value.y, key);
+			result.z = ObscuredFloat.Encrypt(value.z, key);
+			result.w = ObscuredFloat.Encrypt(value.w, key);
 			return result;
 		}
 
@@ -73,17 +73,17 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 			return Decrypt(value, 0);
 		}
 
-		public static Quaternion Decrypt(RawEncryptedQuaternion value, int KGBGENDIMBC)
+		public static Quaternion Decrypt(RawEncryptedQuaternion value, int key)
 		{
-			if (KGBGENDIMBC == 0)
+			if (key == 0)
 			{
-				KGBGENDIMBC = cryptoKey;
+				key = cryptoKey;
 			}
 			Quaternion result = default(Quaternion);
-			result.x = ObscuredFloat.Decrypt(value.x, KGBGENDIMBC);
-			result.y = ObscuredFloat.Decrypt(value.y, KGBGENDIMBC);
-			result.z = ObscuredFloat.Decrypt(value.z, KGBGENDIMBC);
-			result.w = ObscuredFloat.Decrypt(value.w, KGBGENDIMBC);
+			result.x = ObscuredFloat.Decrypt(value.x, key);
+			result.y = ObscuredFloat.Decrypt(value.y, key);
+			result.z = ObscuredFloat.Decrypt(value.z, key);
+			result.w = ObscuredFloat.Decrypt(value.w, key);
 			return result;
 		}
 
@@ -98,9 +98,9 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 
 		public void RandomizeCryptoKey()
 		{
-			Quaternion bAINMLLIKOL = InternalDecrypt();
+			Quaternion decrypted = InternalDecrypt();
 			currentCryptoKey = UnityEngine.Random.Range(int.MinValue, int.MaxValue);
-			hiddenValue = Encrypt(bAINMLLIKOL, currentCryptoKey);
+			hiddenValue = Encrypt(decrypted, currentCryptoKey);
 		}
 
 		public RawEncryptedQuaternion GetEncrypted()
@@ -109,10 +109,10 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 			return hiddenValue;
 		}
 
-		public void SetEncrypted(RawEncryptedQuaternion ANGFOBEKKKD)
+		public void SetEncrypted(RawEncryptedQuaternion encrypted)
 		{
 			inited = true;
-			hiddenValue = ANGFOBEKKKD;
+			hiddenValue = encrypted;
 			if (ObscuredCheatingDetector.GetIsRunning())
 			{
 				fakeValue = InternalDecrypt();
@@ -140,10 +140,10 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 			return quaternion;
 		}
 
-		private bool CompareQuaternionsWithTolerance(Quaternion GOFJCIABOEC, Quaternion ENPEGNEGAPE)
+		private bool CompareQuaternionsWithTolerance(Quaternion first, Quaternion second)
 		{
 			float quaternionEpsilon = ObscuredCheatingDetector.get_Instance().quaternionEpsilon;
-			return Math.Abs(GOFJCIABOEC.x - ENPEGNEGAPE.x) < quaternionEpsilon && Math.Abs(GOFJCIABOEC.y - ENPEGNEGAPE.y) < quaternionEpsilon && Math.Abs(GOFJCIABOEC.z - ENPEGNEGAPE.z) < quaternionEpsilon && Math.Abs(GOFJCIABOEC.w - ENPEGNEGAPE.w) < quaternionEpsilon;
+			return Math.Abs(first.x - second.x) < quaternionEpsilon && Math.Abs(first.y - second.y) < quaternionEpsilon && Math.Abs(first.z - second.z) < quaternionEpsilon && Math.Abs(first.w - second.w) < quaternionEpsilon;
 		}
 
 		public static implicit operator ObscuredQuaternion(Quaternion value)
@@ -171,9 +171,9 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 			return InternalDecrypt().ToString();
 		}
 
-		public string ToString(string LBOHOKIBHOH)
+		public string ToString(string format)
 		{
-			return InternalDecrypt().ToString(LBOHOKIBHOH);
+			return InternalDecrypt().ToString(format);
 		}
 	}
 }

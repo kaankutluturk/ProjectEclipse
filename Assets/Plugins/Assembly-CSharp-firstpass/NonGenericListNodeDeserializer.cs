@@ -5,37 +5,37 @@ public sealed class NonGenericListNodeDeserializer : INodeDeserializer
 {
 	private readonly IObjectFactory objectFactory;
 
-	public NonGenericListNodeDeserializer(IObjectFactory EJPHFDCKCCE)
+	public NonGenericListNodeDeserializer(IObjectFactory factory)
 	{
-		objectFactory = EJPHFDCKCCE;
+		objectFactory = factory;
 	}
 
-	bool INodeDeserializer.Deserialize(EventReader reader, Type MBLGNMBFHBI, Func<EventReader, Type, object> IJBAEAEDMCC, out object value)
+	bool INodeDeserializer.Deserialize(EventReader reader, Type expectedType, Func<EventReader, Type, object> nestedObjectDeserializer, out object value)
 	{
-		if (!typeof(IList).IsAssignableFrom(MBLGNMBFHBI))
+		if (!typeof(IList).IsAssignableFrom(expectedType))
 		{
 			value = false;
 			return false;
 		}
 		reader.Expect<SequenceStart>();
-		IList GBAAEMCBDAM = (IList)objectFactory.Create(MBLGNMBFHBI);
+		IList list = (IList)objectFactory.Create(expectedType);
 		while (!reader.Accept<SequenceEnd>())
 		{
-			object obj = IJBAEAEDMCC(reader, typeof(object));
-			IValuePromise aGAMFLELGLG = obj as IValuePromise;
-			if (aGAMFLELGLG == null)
+			object obj = nestedObjectDeserializer(reader, typeof(object));
+			IValuePromise valuePromise = obj as IValuePromise;
+			if (valuePromise == null)
 			{
-				GBAAEMCBDAM.Add(obj);
+				list.Add(obj);
 				continue;
 			}
-			int index = GBAAEMCBDAM.Count;
-			GBAAEMCBDAM.Add(null);
-			aGAMFLELGLG.add_ValueAvailable((object AFIEJABPAKA) =>
+			int index = list.Count;
+			list.Add(null);
+			valuePromise.add_ValueAvailable((object resolvedValue) =>
 			{
-				GBAAEMCBDAM[index] = AFIEJABPAKA;
+				list[index] = resolvedValue;
 			});
 		}
-		value = GBAAEMCBDAM;
+		value = list;
 		reader.Expect<SequenceEnd>();
 		return true;
 	}

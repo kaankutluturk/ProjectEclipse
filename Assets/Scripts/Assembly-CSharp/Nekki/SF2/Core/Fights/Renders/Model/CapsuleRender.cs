@@ -140,10 +140,10 @@ namespace Nekki.SF2.Core.Fights.Renders.Model
 			_Stroke = _Base.GetThickness();
 			_LineRender = base.gameObject.AddComponent<LineRenderer>();
 			_LineRender.numCapVertices = 9;
-			LineRenderer nLHJNOCKKGE = _LineRender;
-			float pJMDIHLGNHB = _Stroke;
-			_LineRender.endWidth = pJMDIHLGNHB;
-			nLHJNOCKKGE.startWidth = pJMDIHLGNHB;
+			LineRenderer lineRenderer = _LineRender;
+			float lineWidth = _Stroke;
+			_LineRender.endWidth = lineWidth;
+			lineRenderer.startWidth = lineWidth;
 			_LineRender.useWorldSpace = false;
 			_LineRender.sharedMaterial = GetDefaultSpriteMaterial();
 			_LineRender.shadowCastingMode = ShadowCastingMode.Off;
@@ -164,9 +164,9 @@ namespace Nekki.SF2.Core.Fights.Renders.Model
 		{
 			if (_Base != null && !Vector2f.op_Equality(_Base.GetStart(), null) && !Vector2f.op_Equality(_Base.GetEnd(), null) && !(_LineRender == null))
 			{
-				Vector3f eMAFACPEPDK = _Base.GetStart();
+				Vector3f startPosition = _Base.GetStart();
 				Vector3f eMAFACPEPDK2 = _Base.GetEnd();
-				Vector3 rawStart = new Vector3(eMAFACPEPDK.GetX(), eMAFACPEPDK.GetY(), eMAFACPEPDK.GetZ());
+				Vector3 rawStart = new Vector3(startPosition.GetX(), startPosition.GetY(), startPosition.GetZ());
 				Vector3 rawEnd = new Vector3(eMAFACPEPDK2.GetX(), eMAFACPEPDK2.GetY(), eMAFACPEPDK2.GetZ());
 				Vector3 start;
 				Vector3 end;
@@ -181,10 +181,10 @@ namespace Nekki.SF2.Core.Fights.Renders.Model
 				if (_Stroke != _Base.GetThickness())
 				{
 					_Stroke = _Base.GetThickness();
-					LineRenderer nLHJNOCKKGE = _LineRender;
-					float pJMDIHLGNHB = _Stroke;
-					_LineRender.endWidth = pJMDIHLGNHB;
-					nLHJNOCKKGE.startWidth = pJMDIHLGNHB;
+					LineRenderer lineRenderer = _LineRender;
+					float lineWidth = _Stroke;
+					_LineRender.endWidth = lineWidth;
+					lineRenderer.startWidth = lineWidth;
 				}
 				_LineRender.SetPosition(0, new Vector3(x, y, 0f));
 				_LineRender.SetPosition(1, new Vector3(x2, y2, 0f));

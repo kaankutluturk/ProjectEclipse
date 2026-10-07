@@ -15,31 +15,31 @@ public class NekkiUtils
 
 	private static DeviceKind _deviceKind;
 
-	public static Vector2 GetVector2FromString(string IGGFGLLIGCG, char DPOEFEMLAKD)
+	public static Vector2 GetVector2FromString(string text, char separator)
 	{
-		IGGFGLLIGCG = IGGFGLLIGCG.Trim();
-		string[] array = IGGFGLLIGCG.Split(DPOEFEMLAKD);
+		text = text.Trim();
+		string[] array = text.Split(separator);
 		return new Vector2(float.Parse(array[0]), float.Parse(array[1]));
 	}
 
-	public static Vector3 GetVector3FromString(string IGGFGLLIGCG, char DPOEFEMLAKD)
+	public static Vector3 GetVector3FromString(string text, char separator)
 	{
-		IGGFGLLIGCG = IGGFGLLIGCG.Trim();
-		string[] array = IGGFGLLIGCG.Split(DPOEFEMLAKD);
+		text = text.Trim();
+		string[] array = text.Split(separator);
 		return new Vector3(float.Parse(array[0]), float.Parse(array[1]), float.Parse(array[2]));
 	}
 
-	public static Vector4 GetVector4FromString(string IGGFGLLIGCG, char DPOEFEMLAKD)
+	public static Vector4 GetVector4FromString(string text, char separator)
 	{
-		IGGFGLLIGCG = IGGFGLLIGCG.Trim();
-		string[] array = IGGFGLLIGCG.Split(DPOEFEMLAKD);
+		text = text.Trim();
+		string[] array = text.Split(separator);
 		return new Vector4(float.Parse(array[0]), float.Parse(array[1]), float.Parse(array[2]), float.Parse(array[3]));
 	}
 
-	public static Matrix4x4 GetMatrixFromStringColumnMajor(string IGGFGLLIGCG, char DPOEFEMLAKD)
+	public static Matrix4x4 GetMatrixFromStringColumnMajor(string text, char separator)
 	{
-		IGGFGLLIGCG = IGGFGLLIGCG.Trim();
-		string[] array = IGGFGLLIGCG.Split(DPOEFEMLAKD);
+		text = text.Trim();
+		string[] array = text.Split(separator);
 		Matrix4x4 result = default(Matrix4x4);
 		short num = 0;
 		for (int i = 0; i < 4; i++)
@@ -53,10 +53,10 @@ public class NekkiUtils
 		return result;
 	}
 
-	public static Matrix4x4 GetMatrixFromStringRowMajor(string IGGFGLLIGCG, char DPOEFEMLAKD)
+	public static Matrix4x4 GetMatrixFromStringRowMajor(string text, char separator)
 	{
-		IGGFGLLIGCG = IGGFGLLIGCG.Trim();
-		string[] array = IGGFGLLIGCG.Split(DPOEFEMLAKD);
+		text = text.Trim();
+		string[] array = text.Split(separator);
 		Matrix4x4 result = default(Matrix4x4);
 		short num = 0;
 		for (int i = 0; i < 4; i++)
@@ -70,30 +70,30 @@ public class NekkiUtils
 		return result;
 	}
 
-	public static string ReadSeparatedTokens(string IGGFGLLIGCG, char DPOEFEMLAKD, int PLBNNDIKAJO, int count, out int JIEODOJKGLD)
+	public static string ReadSeparatedTokens(string text, char separator, int startIndex, int count, out int endIndex)
 	{
-		IGGFGLLIGCG = IGGFGLLIGCG.Trim();
+		text = text.Trim();
 		int num = 0;
-		int num2 = PLBNNDIKAJO;
-		while (num < count && num2 < IGGFGLLIGCG.Length)
+		int num2 = startIndex;
+		while (num < count && num2 < text.Length)
 		{
-			if (IGGFGLLIGCG[num2] == DPOEFEMLAKD)
+			if (text[num2] == separator)
 			{
 				num++;
 			}
 			num2++;
 		}
-		JIEODOJKGLD = num2;
+		endIndex = num2;
 		if (num == count)
 		{
-			return IGGFGLLIGCG.Substring(PLBNNDIKAJO, num2 - PLBNNDIKAJO);
+			return text.Substring(startIndex, num2 - startIndex);
 		}
-		return IGGFGLLIGCG.Substring(PLBNNDIKAJO);
+		return text.Substring(startIndex);
 	}
 
-	public static Quaternion GetQuaternionFromMatrix(Matrix4x4 NHBBGODHBEF)
+	public static Quaternion GetQuaternionFromMatrix(Matrix4x4 matrix)
 	{
-		return Quaternion.LookRotation(NHBBGODHBEF.GetColumn(2), NHBBGODHBEF.GetColumn(1));
+		return Quaternion.LookRotation(matrix.GetColumn(2), matrix.GetColumn(1));
 	}
 
 	public static string ColorToHex(Color32 color)
@@ -101,11 +101,11 @@ public class NekkiUtils
 		return color.r.ToString("X2") + color.g.ToString("X2") + color.b.ToString("X2");
 	}
 
-	public static Color HexToColor(string IJGJLEJKMBJ)
+	public static Color HexToColor(string hex)
 	{
-		byte r = byte.Parse(IJGJLEJKMBJ.Substring(0, 2), NumberStyles.HexNumber);
-		byte g = byte.Parse(IJGJLEJKMBJ.Substring(2, 2), NumberStyles.HexNumber);
-		byte b = byte.Parse(IJGJLEJKMBJ.Substring(4, 2), NumberStyles.HexNumber);
+		byte r = byte.Parse(hex.Substring(0, 2), NumberStyles.HexNumber);
+		byte g = byte.Parse(hex.Substring(2, 2), NumberStyles.HexNumber);
+		byte b = byte.Parse(hex.Substring(4, 2), NumberStyles.HexNumber);
 		return new Color32(r, g, b, byte.MaxValue);
 	}
 

@@ -40,11 +40,11 @@ public class LabelButton : ResolutionButton
 		}
 	}
 
-	public void SetAlias(string LOKLDPLAPOL)
+	public void SetAlias(string alias)
 	{
-		if (LOKLDPLAPOL != null)
+		if (alias != null)
 		{
-			Label.SetAlias(LOKLDPLAPOL);
+			Label.SetAlias(alias);
 		}
 	}
 
@@ -57,11 +57,11 @@ public class LabelButton : ResolutionButton
 		return string.Empty;
 	}
 
-	public void SetText(string IAFMAMJHFMC)
+	public void SetText(string text)
 	{
 		if (Label != null)
 		{
-			Label.set_text(IAFMAMJHFMC);
+			Label.set_text(text);
 		}
 	}
 
@@ -82,13 +82,13 @@ public class LabelButton : ResolutionButton
 		return string.Empty;
 	}
 
-	public void SetColor(ButtonColor AKCKEADANBC)
+	public void SetColor(ButtonColor color)
 	{
 		ResolutionImage resolutionImage = base.targetGraphic as ResolutionImage;
 		if (resolutionImage != null)
 		{
 			resolutionImage.set_TexturePath("UI/Atlases/");
-			resolutionImage.set_SpriteName(buttonSpriteNames[(int)AKCKEADANBC]);
+			resolutionImage.set_SpriteName(buttonSpriteNames[(int)color]);
 		}
 	}
 
@@ -108,17 +108,17 @@ public class LabelButton : ResolutionButton
 		return ButtonColor.BUTTON_WHITE;
 	}
 
-	public virtual void SetOpacity(float KGJALFLDIBG)
+	public virtual void SetOpacity(float newOpacity)
 	{
-		opacity = KGJALFLDIBG;
+		opacity = newOpacity;
 		ResolutionImage resolutionImage = base.targetGraphic as ResolutionImage;
 		Color color = resolutionImage.color;
-		color.a = KGJALFLDIBG;
+		color.a = newOpacity;
 		resolutionImage.color = color;
 		if (Label != null)
 		{
 			Color color2 = Label.color;
-			color2.a = KGJALFLDIBG;
+			color2.a = newOpacity;
 			Label.color = color2;
 		}
 	}
@@ -128,10 +128,10 @@ public class LabelButton : ResolutionButton
 		return opacity;
 	}
 
-	public static ButtonColor GetBtnColor(string EDAGDDKMBKC)
+	public static ButtonColor GetBtnColor(string colorName)
 	{
 		ButtonColor result = ButtonColor.BUTTON_WHITE;
-		switch (EDAGDDKMBKC)
+		switch (colorName)
 		{
 		case "Red":
 			result = ButtonColor.BUTTON_DARK;

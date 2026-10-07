@@ -3,27 +3,27 @@ using YamlDotNet.RepresentationModel;
 
 public abstract class YamlVisitor : IYamlVisitor
 {
-	protected virtual void Visit(YamlStream ABJIEFMMIEK)
+	protected virtual void Visit(YamlStream stream)
 	{
 	}
 
-	protected virtual void Visited(YamlStream ABJIEFMMIEK)
+	protected virtual void Visited(YamlStream stream)
 	{
 	}
 
-	protected virtual void Visit(YamlDocument DPMKHPJABAF)
+	protected virtual void Visit(YamlDocument document)
 	{
 	}
 
-	protected virtual void Visited(YamlDocument DPMKHPJABAF)
+	protected virtual void Visited(YamlDocument document)
 	{
 	}
 
-	protected virtual void Visit(YamlScalarNode ADDIBOMFCNH)
+	protected virtual void Visit(YamlScalarNode scalar)
 	{
 	}
 
-	protected virtual void Visited(YamlScalarNode ADDIBOMFCNH)
+	protected virtual void Visited(YamlScalarNode scalar)
 	{
 	}
 
@@ -35,27 +35,27 @@ public abstract class YamlVisitor : IYamlVisitor
 	{
 	}
 
-	protected virtual void Visit(YamlMappingNode JPEFEBICPFI)
+	protected virtual void Visit(YamlMappingNode mapping)
 	{
 	}
 
-	protected virtual void Visited(YamlMappingNode JPEFEBICPFI)
+	protected virtual void Visited(YamlMappingNode mapping)
 	{
 	}
 
-	protected virtual void VisitChildren(YamlStream ABJIEFMMIEK)
+	protected virtual void VisitChildren(YamlStream stream)
 	{
-		foreach (YamlDocument document in ABJIEFMMIEK.Documents)
+		foreach (YamlDocument document in stream.Documents)
 		{
 			document.Accept(this);
 		}
 	}
 
-	protected virtual void VisitChildren(YamlDocument DPMKHPJABAF)
+	protected virtual void VisitChildren(YamlDocument document)
 	{
-		if (DPMKHPJABAF.RootNode != null)
+		if (document.RootNode != null)
 		{
-			DPMKHPJABAF.RootNode.Accept(this);
+			document.RootNode.Accept(this);
 		}
 	}
 
@@ -67,33 +67,33 @@ public abstract class YamlVisitor : IYamlVisitor
 		}
 	}
 
-	protected virtual void VisitChildren(YamlMappingNode JPEFEBICPFI)
+	protected virtual void VisitChildren(YamlMappingNode mapping)
 	{
-		foreach (KeyValuePair<YamlNode, YamlNode> child in JPEFEBICPFI.Children)
+		foreach (KeyValuePair<YamlNode, YamlNode> child in mapping.Children)
 		{
 			child.Key.Accept(this);
 			child.Value.Accept(this);
 		}
 	}
 
-	void IYamlVisitor.Visit(YamlStream ABJIEFMMIEK)
+	void IYamlVisitor.Visit(YamlStream stream)
 	{
-		Visit(ABJIEFMMIEK);
-		VisitChildren(ABJIEFMMIEK);
-		Visited(ABJIEFMMIEK);
+		Visit(stream);
+		VisitChildren(stream);
+		Visited(stream);
 	}
 
-	void IYamlVisitor.Visit(YamlDocument DPMKHPJABAF)
+	void IYamlVisitor.Visit(YamlDocument document)
 	{
-		Visit(DPMKHPJABAF);
-		VisitChildren(DPMKHPJABAF);
-		Visited(DPMKHPJABAF);
+		Visit(document);
+		VisitChildren(document);
+		Visited(document);
 	}
 
-	void IYamlVisitor.Visit(YamlScalarNode ADDIBOMFCNH)
+	void IYamlVisitor.Visit(YamlScalarNode scalar)
 	{
-		Visit(ADDIBOMFCNH);
-		Visited(ADDIBOMFCNH);
+		Visit(scalar);
+		Visited(scalar);
 	}
 
 	void IYamlVisitor.Visit(YamlSequenceNode sequence)
@@ -103,10 +103,10 @@ public abstract class YamlVisitor : IYamlVisitor
 		Visited(sequence);
 	}
 
-	void IYamlVisitor.Visit(YamlMappingNode JPEFEBICPFI)
+	void IYamlVisitor.Visit(YamlMappingNode mapping)
 	{
-		Visit(JPEFEBICPFI);
-		VisitChildren(JPEFEBICPFI);
-		Visited(JPEFEBICPFI);
+		Visit(mapping);
+		VisitChildren(mapping);
+		Visited(mapping);
 	}
 }

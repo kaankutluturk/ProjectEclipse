@@ -2,9 +2,9 @@ using Nekki.SF2.GUI;
 
 public interface ITableViewDataSource
 {
-	int NumberOfRowsInTableView(TableView OIDFBEAABBA);
+	int NumberOfRowsInTableView(TableView tableView);
 
-	float SizeForRowInTableView(TableView OIDFBEAABBA, int IBAKGENOEPH);
+	float SizeForRowInTableView(TableView tableView, int row);
 
-	TableViewCell CellForRowInTableView(TableView OIDFBEAABBA, int IBAKGENOEPH);
+	TableViewCell CellForRowInTableView(TableView tableView, int row);
 }

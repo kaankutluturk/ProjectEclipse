@@ -37,11 +37,11 @@ public class PerkActionDisableInterval : PerkAction
 	{
 	}
 
-	public PerkActionDisableInterval(PerkActionDisableInterval NOLFMPDGCOC)
-		: base(NOLFMPDGCOC)
+	public PerkActionDisableInterval(PerkActionDisableInterval source)
+		: base(source)
 	{
-		SetIntervalName(NOLFMPDGCOC.GetIntervalName());
-		SetIntervalType(NOLFMPDGCOC.GetIntervalType());
+		SetIntervalName(source.GetIntervalName());
+		SetIntervalType(source.GetIntervalType());
 	}
 
 	public string GetIntervalName()

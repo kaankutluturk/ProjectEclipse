@@ -22,14 +22,14 @@ public class PerkConditionItem : PerkCondition
 		SubType = node.Attributes["Subtype"].GetStringOrDefault(string.Empty);
 	}
 
-	public override bool IsEqual(Model ACENLMONNPA, List<string> NIKHAICFGNM)
+	public override bool IsEqual(Model model, List<string> args)
 	{
-		Model fGCODGKLHED = ResolveTargetModel(ACENLMONNPA);
-		if (ACENLMONNPA == null)
+		Model targetModel = ResolveTargetModel(model);
+		if (model == null)
 		{
 			return false;
 		}
-		List<ItemInfo> list = fGCODGKLHED.Parameters.GetEquippedItemsByType();
+		List<ItemInfo> list = targetModel.Parameters.GetEquippedItemsByType();
 		foreach (ItemInfo item in list)
 		{
 			if ((ItemType.Equals(string.Empty) || ItemType.Equals(item.Type)) && (SubType.Equals(string.Empty) || SubType.Equals(item.SubType)) && (Name.Equals(string.Empty) || Name.Equals(item.Name)))

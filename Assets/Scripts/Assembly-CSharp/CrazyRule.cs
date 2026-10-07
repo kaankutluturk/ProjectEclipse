@@ -4,8 +4,8 @@ public class CrazyRule : DamageRule
 {
 	private FightStatistics.FightStyle styleThreshold;
 
-	public CrazyRule(XmlNode node, RuleAppliance EJPOJJKKICO)
-		: base(node, EJPOJJKKICO, RuleType.RuleCrazy)
+	public CrazyRule(XmlNode node, RuleAppliance ruleAppliance)
+		: base(node, ruleAppliance, RuleType.RuleCrazy)
 	{
 		styleThreshold = FightStatistics.FightStyle.STYLE_TURTLE;
 		applianceLosesOnTrigger = false;
@@ -15,12 +15,12 @@ public class CrazyRule : DamageRule
 
 	protected override bool CompareSingle(object data)
 	{
-		FightData hCPJJKMNMCE = (FightData)data;
-		if (hCPJJKMNMCE.FightEventType == FightEvent.DamageCheckEvent)
+		FightData fightData = (FightData)data;
+		if (fightData.FightEventType == FightEvent.DamageCheckEvent)
 		{
 			return false;
 		}
-		return CheckIsNoDamageChange(hCPJJKMNMCE.Style < styleThreshold);
+		return CheckIsNoDamageChange(fightData.Style < styleThreshold);
 	}
 
 	protected override void Parse(XmlNode node)

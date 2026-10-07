@@ -25,25 +25,25 @@ namespace Nekki.SF2.GUI.Profile
 
 		private bool hasTwoPerks;
 
-		private void BindSubItem(PerkSubItem MDPMIEBJMMD)
+		private void BindSubItem(PerkSubItem subItem)
 		{
-			MDPMIEBJMMD.ParentCell = this;
-			MDPMIEBJMMD.transform.SetLocalY(0f);
-			MDPMIEBJMMD.SetSelectFlashing(true);
-			MDPMIEBJMMD.SetSelectFlashingMinOpacity(1f / 3f);
-			MDPMIEBJMMD.RemoveAllEventListener();
-			MDPMIEBJMMD.AddEventListener(2, OnSubItemClick);
-			MDPMIEBJMMD.AddEventListener(10, Scene<ProfileScene>.get_Current().OnSubItemClick);
-			MDPMIEBJMMD.AddEventListener(12, Scene<ProfileScene>.get_Current().OnPerkImprove);
+			subItem.ParentCell = this;
+			subItem.transform.SetLocalY(0f);
+			subItem.SetSelectFlashing(true);
+			subItem.SetSelectFlashingMinOpacity(1f / 3f);
+			subItem.RemoveAllEventListener();
+			subItem.AddEventListener(2, OnSubItemClick);
+			subItem.AddEventListener(10, Scene<ProfileScene>.get_Current().OnSubItemClick);
+			subItem.AddEventListener(12, Scene<ProfileScene>.get_Current().OnPerkImprove);
 		}
 
-		public void Init(ProfilePerkContainer IFIEEAGMMMF, int BIPGPCAHKIG, bool NMBEADHHHFH, bool IBMGAPMHMOB)
+		public void Init(ProfilePerkContainer perkContainer, int rowIndex, bool isFirst, bool isLast)
 		{
 			Clear();
 			BindSubItem(_iconLeft);
 			BindSubItem(_iconRight);
-			SetPerks(IFIEEAGMMMF.Perks, BIPGPCAHKIG);
-			_perkLines.Init(hasTwoPerks, NMBEADHHHFH, IBMGAPMHMOB);
+			SetPerks(perkContainer.Perks, rowIndex);
+			_perkLines.Init(hasTwoPerks, isFirst, isLast);
 		}
 
 		public override SubItem GetFirstIcon()
@@ -82,36 +82,36 @@ namespace Nekki.SF2.GUI.Profile
 			_iconRight.transform.SetLocalX(num);
 		}
 
-		private void SetPerks(List<ProfilePerk> JOGBKOJCINM, int IBAKGENOEPH)
+		private void SetPerks(List<ProfilePerk> perks, int cellIndex)
 		{
-			if (JOGBKOJCINM == null || JOGBKOJCINM.Count == 0)
+			if (perks == null || perks.Count == 0)
 			{
 				_iconLeft.gameObject.SetActive(false);
 				_iconRight.gameObject.SetActive(false);
 				return;
 			}
 			_iconLeft.gameObject.SetActive(true);
-			hasTwoPerks = JOGBKOJCINM.Count > 1;
-			int num = 10000 + IBAKGENOEPH * 10;
-			InitSubItem(_iconLeft, JOGBKOJCINM[0], num);
+			hasTwoPerks = perks.Count > 1;
+			int num = 10000 + cellIndex * 10;
+			InitSubItem(_iconLeft, perks[0], num);
 			if (hasTwoPerks)
 			{
 				_iconRight.gameObject.SetActive(true);
-				int iPFAAJAOIJL = num + 1;
-				InitSubItem(_iconRight, JOGBKOJCINM[1], iPFAAJAOIJL);
+				int rightButtonId = num + 1;
+				InitSubItem(_iconRight, perks[1], rightButtonId);
 			}
 			LayoutIcons();
 		}
 
-		private void InitSubItem(PerkSubItem MDPMIEBJMMD, ProfilePerk CENAOGICAAK, int IPFAAJAOIJL)
+		private void InitSubItem(PerkSubItem subItem, ProfilePerk perk, int buttonId)
 		{
-			MDPMIEBJMMD.Init(CENAOGICAAK, IPFAAJAOIJL);
-			Scene<ProfileScene>.get_Current().SubItems.Add(MDPMIEBJMMD);
+			subItem.Init(perk, buttonId);
+			Scene<ProfileScene>.get_Current().SubItems.Add(subItem);
 		}
 
-		public void ChoosePerkByName(string NJDDPMPFCGB)
+		public void ChoosePerkByName(string perkName)
 		{
-			if (_iconLeft.get_Perk().GetPerkName() == NJDDPMPFCGB)
+			if (_iconLeft.get_Perk().GetPerkName() == perkName)
 			{
 				_iconLeft.Choose();
 			}

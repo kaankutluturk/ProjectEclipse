@@ -138,42 +138,42 @@ namespace Nekki.SF2.GUI.Map
 		{
 		}
 
-		public void OnCallUpdate(object DPOOIONCEOA)
+		public void OnCallUpdate(object sender)
 		{
-			UpdateBattleInfo(DPOOIONCEOA as Battle);
+			UpdateBattleInfo(sender as Battle);
 		}
 
-		public void UpdateBattleInfo(Battle DPOOIONCEOA)
+		public void UpdateBattleInfo(Battle battle)
 		{
 			ClearInfo();
-			FightList jDIPBIHBGPF = null;
+			FightList fight = null;
 			currentFightIds.SetFightIDSByString(string.Empty);
-			if (DPOOIONCEOA == null)
+			if (battle == null)
 			{
 				return;
 			}
-			RosterBattle dDNLCGOPAGC = DPOOIONCEOA.GetRosterBattle();
-			jDIPBIHBGPF = GameUtils.GetOpenFight(DPOOIONCEOA);
-			if (jDIPBIHBGPF != null)
+			RosterBattle rosterBattle = battle.GetRosterBattle();
+			fight = GameUtils.GetOpenFight(battle);
+			if (fight != null)
 			{
-				currentFightIds = new FightIDS(jDIPBIHBGPF.FightId);
+				currentFightIds = new FightIDS(fight.FightId);
 			}
 			else
 			{
-				currentFightIds.SetFightIDSByZBF(string.Copy((DPOOIONCEOA.GetZone() == null) ? string.Empty : DPOOIONCEOA.GetZone().get_Name()), string.Copy(DPOOIONCEOA.get_Name()), string.Empty);
+				currentFightIds.SetFightIDSByZBF(string.Copy((battle.GetZone() == null) ? string.Empty : battle.GetZone().get_Name()), string.Copy(battle.get_Name()), string.Empty);
 			}
-			if (jDIPBIHBGPF != null && jDIPBIHBGPF.AltImage != string.Empty)
+			if (fight != null && fight.AltImage != string.Empty)
 			{
-				string kHPKDMGDMAB = string.Empty;
-				if (jDIPBIHBGPF != null && jDIPBIHBGPF.AltImage != string.Empty)
+				string altImage = string.Empty;
+				if (fight != null && fight.AltImage != string.Empty)
 				{
-					kHPKDMGDMAB = jDIPBIHBGPF.AltImage;
+					altImage = fight.AltImage;
 				}
-				UpdateAltImage(SF2Paths.GetUsersUiPath(), kHPKDMGDMAB);
+				UpdateAltImage(SF2Paths.GetUsersUiPath(), altImage);
 			}
-			_lblBattleName.SetAlias(DPOOIONCEOA.GetTitle());
-			UpdateIcon(DPOOIONCEOA.GetPreviewIcon());
-            if (Eclipse.Modding.ModModeRuntime.TryCurrent(DPOOIONCEOA, out var modeFight))
+			_lblBattleName.SetAlias(battle.GetTitle());
+			UpdateIcon(battle.GetPreviewIcon());
+            if (Eclipse.Modding.ModModeRuntime.TryCurrent(battle, out var modeFight))
             {
                 string reason = modeFight == null ? "This mode is complete or currently unavailable." : Eclipse.Modding.ModModeRuntime.EntryStatus(modeFight);
                 if (reason != "")
@@ -182,24 +182,24 @@ namespace Nekki.SF2.GUI.Map
                 }
                 else
                 {
-                    string title = LocalizationManager.GetString(DPOOIONCEOA.GetTitle());
+                    string title = LocalizationManager.GetString(battle.GetTitle());
                     if (modeFight.get_Type() == BattleType.FightRaid)
                     {
                         _lblBattleName.set_text(title);
-                        _contentBossesFinal.Init(DPOOIONCEOA, modeFight);
+                        _contentBossesFinal.Init(battle, modeFight);
                         currentContent = _contentBossesFinal;
                     }
                     else
                     {
                         _lblBattleName.set_text(title + Eclipse.Modding.ModModeRuntime.ProgressLabel(modeFight));
-                        _contentTourChall.Init(DPOOIONCEOA, modeFight);
+                        _contentTourChall.Init(battle, modeFight);
                         currentContent = _contentTourChall;
                     }
-                    currentContent.gameObject.SetActive(true); UpdateFightButton(DPOOIONCEOA, modeFight);
+                    currentContent.gameObject.SetActive(true); UpdateFightButton(battle, modeFight);
                 }
                 return;
             }
-			if (DPOOIONCEOA.get_Type() == BattleType.FightRaid)
+			if (battle.get_Type() == BattleType.FightRaid)
 			{
 				_contentClosed.InitText("This raid is not available offline.");
 				currentContent = _contentClosed;
@@ -207,13 +207,13 @@ namespace Nekki.SF2.GUI.Map
 				_btnFight.gameObject.SetActive(false);
 				return;
 			}
-			if (jDIPBIHBGPF != null && GameUtils.AutoWinPending && GameUtils.AutoWinFightKey != jDIPBIHBGPF.Location + jDIPBIHBGPF.Battle.get_Name() + jDIPBIHBGPF.Name)
+			if (fight != null && GameUtils.AutoWinPending && GameUtils.AutoWinFightKey != fight.Location + fight.Battle.get_Name() + fight.Name)
 			{
 				GameUtils.AutoWinPending = false;
 			}
 			if (_btnRemoveFight != null)
 			{
-				if (DPOOIONCEOA.HasCompletedFight() && SystemProperties.IsDebug())
+				if (battle.HasCompletedFight() && SystemProperties.IsDebug())
 				{
 					_btnRemoveFight.gameObject.SetActive(true);
 				}
@@ -222,27 +222,27 @@ namespace Nekki.SF2.GUI.Map
 					_btnRemoveFight.gameObject.SetActive(false);
 				}
 			}
-			if ((dDNLCGOPAGC != null && dDNLCGOPAGC.IsLocked()) || DPOOIONCEOA.get_Type() == BattleType.FightFake)
+			if ((rosterBattle != null && rosterBattle.IsLocked()) || battle.get_Type() == BattleType.FightFake)
 			{
-				_contentClosed.Init(DPOOIONCEOA.GetDescription());
+				_contentClosed.Init(battle.GetDescription());
 				currentContent = _contentClosed;
 				currentContent.gameObject.SetActive(true);
 			}
-			else if (jDIPBIHBGPF != null && jDIPBIHBGPF.IsLocked)
+			else if (fight != null && fight.IsLocked)
 			{
-				_contentClosed.Init(jDIPBIHBGPF.GetDescription());
+				_contentClosed.Init(fight.GetDescription());
 				currentContent = _contentClosed;
 				currentContent.gameObject.SetActive(true);
 			}
-			else if ((jDIPBIHBGPF != null && !jDIPBIHBGPF.IsReplayAvailable()) || DPOOIONCEOA.GetStatus() == ConditionStatus.StatusComplete || DPOOIONCEOA.GetStatus() == ConditionStatus.StatusIncomplete)
+			else if ((fight != null && !fight.IsReplayAvailable()) || battle.GetStatus() == ConditionStatus.StatusComplete || battle.GetStatus() == ConditionStatus.StatusIncomplete)
 			{
-				_contentCompleteOrLocked.Init(DPOOIONCEOA, currentFightIds);
+				_contentCompleteOrLocked.Init(battle, currentFightIds);
 				currentContent = _contentCompleteOrLocked;
 				currentContent.gameObject.SetActive(true);
 			}
 			else
 			{
-				InitContentForBattle(DPOOIONCEOA, jDIPBIHBGPF);
+				InitContentForBattle(battle, fight);
 			}
 		}
 
@@ -304,10 +304,10 @@ namespace Nekki.SF2.GUI.Map
 
 		public void StartCurrentFight()
 		{
-			FightList jDIPBIHBGPF = ListSF.GetFightById(currentFightIds);
-			if (jDIPBIHBGPF != null)
+			FightList fight = ListSF.GetFightById(currentFightIds);
+			if (fight != null)
 			{
-				StartFight(jDIPBIHBGPF);
+				StartFight(fight);
 			}
 		}
 
@@ -369,32 +369,32 @@ namespace Nekki.SF2.GUI.Map
 			}
 		}
 
-		private void UpdateIcon(string DAAIHHNLONA)
+		private void UpdateIcon(string spriteName)
 		{
 			_icon.set_TexturePath("UI/battles/");
-			_icon.set_SpriteName(DAAIHHNLONA);
+			_icon.set_SpriteName(spriteName);
 		}
 
-		private void UpdateAltImage(string KBIHPPDNFJD, string KHPKDMGDMAB)
+		private void UpdateAltImage(string path, string altImage)
 		{
-			if (!(KHPKDMGDMAB == string.Empty))
+			if (!(altImage == string.Empty))
 			{
-				_altImage.set_SpriteName(KHPKDMGDMAB);
+				_altImage.set_SpriteName(altImage);
 			}
 		}
 
-		private void UpdateFightButton(Battle DPOOIONCEOA, FightList KOMGFJOCEDN)
+		private void UpdateFightButton(Battle battle, FightList fight)
 		{
 			_btnFight.gameObject.SetActive(true);
-			_btnFight.interactable = KOMGFJOCEDN == null ||
-				KOMGFJOCEDN.MeetsPlayerItemRequirements(ListSF.GetRoster().get_Parameters());
+			_btnFight.interactable = fight == null ||
+				fight.MeetsPlayerItemRequirements(ListSF.GetRoster().get_Parameters());
 			string alias = string.Empty;
-			if (KOMGFJOCEDN != null && KOMGFJOCEDN.get_Type() == BattleType.FightRaid)
+			if (fight != null && fight.get_Type() == BattleType.FightRaid)
 			{
-				BattleRaid pAHLFJIMKCL = DPOOIONCEOA as BattleRaid;
-				if (pAHLFJIMKCL != null)
+				BattleRaid raidBattle = battle as BattleRaid;
+				if (raidBattle != null)
 				{
-					List<CurrencyCostRule> list = KOMGFJOCEDN.GetCurrencyCostRules();
+					List<CurrencyCostRule> list = fight.GetCurrencyCostRules();
 					if (list.Count == 0)
 					{
 						alias = "enterRaid";
@@ -406,14 +406,14 @@ namespace Nekki.SF2.GUI.Map
 					}
 				}
 			}
-			else if (KOMGFJOCEDN != null && KOMGFJOCEDN.HasCurrencyCost())
+			else if (fight != null && fight.HasCurrencyCost())
 			{
-				List<CurrencyCostRule> list2 = KOMGFJOCEDN.GetCurrencyCostRules();
-				string gOHIIMFFFJI = list2[0].GetCurrencyName();
+				List<CurrencyCostRule> list2 = fight.GetCurrencyCostRules();
+				string currencyName = list2[0].GetCurrencyName();
 				int num2 = list2[0].GetCurrencyValue();
-				GameCurrency cJJOFMHLFFM = GameUtils.GameCurrencies.GetCurrencyByName(gOHIIMFFFJI);
-				string mJBPMLCLMFN = cJJOFMHLFFM.Icon;
-				alias = "startFight |<" + mJBPMLCLMFN + "><offsetX=10>" + num2 + "</>";
+				GameCurrency currency = GameUtils.GameCurrencies.GetCurrencyByName(currencyName);
+				string currencyIcon = currency.Icon;
+				alias = "startFight |<" + currencyIcon + "><offsetX=10>" + num2 + "</>";
 			}
 			else
 			{
@@ -425,16 +425,16 @@ namespace Nekki.SF2.GUI.Map
 		private void OnFightButtonClicked()
 		{
 			GameUtils.AutoWinPending = false;
-			FightList jDIPBIHBGPF = ListSF.GetFightById(currentFightIds);
-			if (jDIPBIHBGPF == null)
+			FightList fight = ListSF.GetFightById(currentFightIds);
+			if (fight == null)
 			{
 				return;
 			}
-			if (Eclipse.Modding.ModModeRuntime.IsRaid(jDIPBIHBGPF))
+			if (Eclipse.Modding.ModModeRuntime.IsRaid(fight))
             {
-                StartFight(jDIPBIHBGPF);
+                StartFight(fight);
             }
-            else if (jDIPBIHBGPF.get_Type() == BattleType.FightPeriodic)
+            else if (fight.get_Type() == BattleType.FightPeriodic)
 			{
 				if (!SystemProperties.CheckOnline())
 				{
@@ -445,20 +445,20 @@ namespace Nekki.SF2.GUI.Map
 					GlobalTimer.ServerTimeSync(OnServerTimeSynced, OnServerTimeSynced);
 				}
 			}
-			else if (jDIPBIHBGPF.get_Type() == BattleType.FightRaid)
+			else if (fight.get_Type() == BattleType.FightRaid)
 			{
-				Battle cNAOMDMIGLJ = jDIPBIHBGPF.Battle;
-				BattleRaid pAHLFJIMKCL = (BattleRaid)cNAOMDMIGLJ;
-				if (pAHLFJIMKCL.CanAffordFightCost(jDIPBIHBGPF))
+				Battle battle = fight.Battle;
+				BattleRaid raidBattle = (BattleRaid)battle;
+				if (raidBattle.CanAffordFightCost(fight))
 				{
 					bool flag = ListSF.GetRoster().GetRaidRemindRandomRule();
-					if (jDIPBIHBGPF.GetRandomRules().Count != 0 && flag)
+					if (fight.GetRandomRules().Count != 0 && flag)
 					{
 					}
 				}
 				else
 				{
-					List<CurrencyCostRule> list = jDIPBIHBGPF.GetCurrencyCostRules();
+					List<CurrencyCostRule> list = fight.GetCurrencyCostRules();
 					if (list.Count != 0)
 					{
 						ShowRaidNotEnoughKeys(list[0] as RaidCurrencyCostRule);
@@ -467,19 +467,19 @@ namespace Nekki.SF2.GUI.Map
 			}
 			else
 			{
-				StartFight(jDIPBIHBGPF);
+				StartFight(fight);
 			}
 		}
 
-		private void InitContentForBattle(Battle DPOOIONCEOA, FightList KOMGFJOCEDN)
+		private void InitContentForBattle(Battle battle, FightList fight)
 		{
-			switch (DPOOIONCEOA.get_Type())
+			switch (battle.get_Type())
 			{
 			case BattleType.FightChallenge:
 			case BattleType.FightTournament:
 			case BattleType.FightStory:
 			case BattleType.FightReplayable:
-				_contentTourChall.Init(DPOOIONCEOA, KOMGFJOCEDN);
+				_contentTourChall.Init(battle, fight);
 				currentContent = _contentTourChall;
 				currentContent.gameObject.SetActive(true);
 				break;
@@ -487,15 +487,15 @@ namespace Nekki.SF2.GUI.Map
 			case BattleType.FightBossesReplayable:
 			case BattleType.FightFinalTitan:
 			{
-				int num = DPOOIONCEOA.GetFightCount();
-				if (KOMGFJOCEDN.Index != num - 1)
+				int num = battle.GetFightCount();
+				if (fight.Index != num - 1)
 				{
-					_contentBosses.Init(DPOOIONCEOA, KOMGFJOCEDN);
+					_contentBosses.Init(battle, fight);
 					currentContent = _contentBosses;
 				}
 				else
 				{
-					_contentBossesFinal.Init(DPOOIONCEOA, KOMGFJOCEDN);
+					_contentBossesFinal.Init(battle, fight);
 					currentContent = _contentBossesFinal;
 				}
 				currentContent.gameObject.SetActive(true);
@@ -503,46 +503,46 @@ namespace Nekki.SF2.GUI.Map
 			}
 			case BattleType.FightFinal:
 			case BattleType.FightFinalReplayable:
-				_contentBossesFinal.Init(DPOOIONCEOA, KOMGFJOCEDN);
+				_contentBossesFinal.Init(battle, fight);
 				currentContent = _contentBossesFinal;
 				currentContent.gameObject.SetActive(true);
 				break;
 			case BattleType.FightPeriodic:
-				_contentDuel.Init(DPOOIONCEOA, KOMGFJOCEDN);
+				_contentDuel.Init(battle, fight);
 				currentContent = _contentDuel;
 				currentContent.gameObject.SetActive(true);
 				break;
 			case BattleType.FightSurvival:
-				_contentSurvival.Init(DPOOIONCEOA);
+				_contentSurvival.Init(battle);
 				currentContent = _contentSurvival;
 				currentContent.gameObject.SetActive(true);
 				break;
 			case BattleType.FightBossesIntermission:
-				_contentBossIntermission.Init(DPOOIONCEOA);
+				_contentBossIntermission.Init(battle);
 				currentContent = _contentBossIntermission;
 				currentContent.gameObject.SetActive(true);
 				break;
 			default:
-				GameLog.Write("ERROR: openStatus() - unknown fight type: " + DPOOIONCEOA.get_Type());
+				GameLog.Write("ERROR: openStatus() - unknown fight type: " + battle.get_Type());
 				break;
 			}
-			UpdateFightButton(DPOOIONCEOA, KOMGFJOCEDN);
+			UpdateFightButton(battle, fight);
 		}
 
-		private void StartFight(FightList KGKDKENMAOA)
+		private void StartFight(FightList fight)
 		{
-			if (KGKDKENMAOA == null ||
-				!KGKDKENMAOA.MeetsPlayerItemRequirements(ListSF.GetRoster().get_Parameters()))
+			if (fight == null ||
+				!fight.MeetsPlayerItemRequirements(ListSF.GetRoster().get_Parameters()))
 			{
 				return;
 			}
-			Battle cNAOMDMIGLJ = KGKDKENMAOA.Battle;
-			if (cNAOMDMIGLJ.get_Type() == BattleType.FightSurvival)
+			Battle battle = fight.Battle;
+			if (battle.get_Type() == BattleType.FightSurvival)
 			{
 				ListSF.GetRoster().set_IndexSlider((uint)survivalSliderIndex);
 			}
-			Battle dPOOIONCEOA = ((cNAOMDMIGLJ.get_Type() != BattleType.FightBosses && cNAOMDMIGLJ.get_Type() != BattleType.FightBossesReplayable && cNAOMDMIGLJ.get_Type() != BattleType.FightFinalTitan) ? null : cNAOMDMIGLJ);
-			GameUtils.StartFight(KGKDKENMAOA, false, dPOOIONCEOA);
+			Battle targetBattle = ((battle.get_Type() != BattleType.FightBosses && battle.get_Type() != BattleType.FightBossesReplayable && battle.get_Type() != BattleType.FightFinalTitan) ? null : battle);
+			GameUtils.StartFight(fight, false, targetBattle);
 		}
 
 		private void ResetPeriodicBattle()
@@ -558,14 +558,14 @@ namespace Nekki.SF2.GUI.Map
 			}
 		}
 
-		private void OnDebugAction(DebugFightAction PNBIFIIMEDL)
+		private void OnDebugAction(DebugFightAction action)
 		{
 			Battle currentBattle = GetCurrentBattle();
 			if (currentBattle == null)
 			{
 				return;
 			}
-			switch (PNBIFIIMEDL)
+			switch (action)
 			{
 			case DebugFightAction.PeriodicReset:
 				ResetPeriodicBattle();
@@ -596,16 +596,16 @@ namespace Nekki.SF2.GUI.Map
 				}
 				return;
 			}
-			FightList jDIPBIHBGPF = currentFight;
+			FightList fight = currentFight;
 			StartFight(currentFight);
-			if (jDIPBIHBGPF != null)
+			if (fight != null)
 			{
-				int num = jDIPBIHBGPF.GetRewards().Count - 2;
+				int num = fight.GetRewards().Count - 2;
 				if (num < 0)
 				{
 					num = 0;
 				}
-				jDIPBIHBGPF.RewardIndex = num;
+				fight.RewardIndex = num;
 			}
 			UpdateBattleInfo(GetCurrentBattle());
 		}
@@ -639,24 +639,24 @@ namespace Nekki.SF2.GUI.Map
 			FightList currentFight = GetCurrentFight();
 			if (currentFight != null && currentFight.FightId.ToString() == "ZONE_6|BOSS_SAMURAI|6")
 			{
-				FightIDS dIAIIPCBMFL = new FightIDS("ZONE_6", "QuestBattle", string.Empty);
-				Battle cGJCGEBPCAF = ListSF.GetBattleById(dIAIIPCBMFL);
-				if (cGJCGEBPCAF != null)
+				FightIDS battleId = new FightIDS("ZONE_6", "QuestBattle", string.Empty);
+				Battle battle = ListSF.GetBattleById(battleId);
+				if (battle != null)
 				{
-					cGJCGEBPCAF.ResetLastFightProgress();
+					battle.ResetLastFightProgress();
 				}
 			}
 		}
 
-		private void ShowRaidNotEnoughKeys(RaidCurrencyCostRule HNBFMAKFJAM)
+		private void ShowRaidNotEnoughKeys(RaidCurrencyCostRule costRule)
 		{
-			if (HNBFMAKFJAM == null)
+			if (costRule == null)
 			{
 				GameLog.Error("showRaidsNotEnoughKeys rule is NULL");
 			}
 			else
 			{
-				string text = HNBFMAKFJAM.GetCurrencyName();
+				string text = costRule.GetCurrencyName();
 			}
 		}
 

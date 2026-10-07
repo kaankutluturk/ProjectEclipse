@@ -37,12 +37,12 @@ public struct LotteryPrizeEntry
 		return true;
 	}
 
-	public LotteryPrizeEntry(XmlNode node, ushort CDCJKJNGPOE, ushort MCDAHGPLLDO)
+	public LotteryPrizeEntry(XmlNode node, ushort rewardDigits, ushort prizeBaseDigits)
 	{
 		reward = null;
 		MinLevel = -1;
 		MaxLevel = -1;
-		reward = new Reward(node, CDCJKJNGPOE, MCDAHGPLLDO);
+		reward = new Reward(node, rewardDigits, prizeBaseDigits);
 		image = node.Attributes["Image"].GetStringOrDefault(string.Empty);
 		cancellingItem = node.Attributes["CancellingItem"].GetStringOrDefault(string.Empty);
 		viewType = node.Attributes["ViewType"].GetStringOrDefault(string.Empty);
@@ -61,21 +61,21 @@ public struct LotteryPrizeEntry
 		}
 	}
 
-	private bool IsLevelInRange(int GNLOCMLBNHF)
+	private bool IsLevelInRange(int level)
 	{
 		if (MinLevel < 0 && MaxLevel < 0)
 		{
 			return true;
 		}
-		if (MinLevel <= GNLOCMLBNHF && MaxLevel >= GNLOCMLBNHF)
+		if (MinLevel <= level && MaxLevel >= level)
 		{
 			return true;
 		}
-		if (MinLevel < 0 && MaxLevel >= GNLOCMLBNHF)
+		if (MinLevel < 0 && MaxLevel >= level)
 		{
 			return true;
 		}
-		if (MinLevel <= GNLOCMLBNHF && MaxLevel < 0)
+		if (MinLevel <= level && MaxLevel < 0)
 		{
 			return true;
 		}

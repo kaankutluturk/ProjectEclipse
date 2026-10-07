@@ -15,8 +15,8 @@ public class StreamStart : ParsingEvent
 	{
 	}
 
-	public StreamStart(Mark ILENLCMAMBH, Mark PCLFFOBJJFO)
-		: base(ILENLCMAMBH, PCLFFOBJJFO)
+	public StreamStart(Mark start, Mark end)
+		: base(start, end)
 	{
 	}
 
@@ -35,8 +35,8 @@ public class StreamStart : ParsingEvent
 		return "Stream start";
 	}
 
-	public override void Accept(IParsingEventVisitor NKECMANOOEM)
+	public override void Accept(IParsingEventVisitor visitor)
 	{
-		NKECMANOOEM.Visit(this);
+		visitor.Visit(this);
 	}
 }

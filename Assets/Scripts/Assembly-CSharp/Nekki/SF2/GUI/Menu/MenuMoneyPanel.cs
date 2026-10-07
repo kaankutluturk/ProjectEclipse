@@ -107,7 +107,7 @@ namespace Nekki.SF2.GUI.Menu
 			UpdateCoinsIcon();
 			long num = ListSF.GetRoster().GetMoney();
 			_infoCoins.text = num.ToString();
-			long pLBBEIGAJEP = rubyCount;
+			long previousRubyCount = rubyCount;
 			rubyCount = ListSF.GetRoster().GetBonus();
 			if (valuesSource != ValuesSource.ServerValues)
 			{
@@ -152,22 +152,22 @@ namespace Nekki.SF2.GUI.Menu
 		public void UpdateRubySale()
 		{
 			List<ItemInfo> list = new List<ItemInfo>();
-			long bAINMLLIKOL = -1L;
+			long saleEndTime = -1L;
 			for (int i = 0; i < list.Count; i++)
 			{
-				ItemInfo dJKEECEOCJB = list[i];
+				ItemInfo itemInfo = list[i];
 			}
-			SetSaleEndTime(bAINMLLIKOL);
+			SetSaleEndTime(saleEndTime);
 		}
 
-		public void SetRubyBtnPressType(ButtonStateExtensions.ButtonPressType LFLGCDNKNJI, bool GHJGPAEDIHG)
+		public void SetRubyBtnPressType(ButtonStateExtensions.ButtonPressType pressType, bool isInteractable)
 		{
-			_btnRuby.SetPressType(LFLGCDNKNJI, GHJGPAEDIHG);
+			_btnRuby.SetPressType(pressType, isInteractable);
 		}
 
-		public void SetServerValuesBtnPressType(ButtonStateExtensions.ButtonPressType LFLGCDNKNJI, bool GHJGPAEDIHG)
+		public void SetServerValuesBtnPressType(ButtonStateExtensions.ButtonPressType pressType, bool isInteractable)
 		{
-			_btnServerValues.SetPressType(LFLGCDNKNJI, GHJGPAEDIHG);
+			_btnServerValues.SetPressType(pressType, isInteractable);
 		}
 
 		public void SetNormalViewMode()
@@ -208,9 +208,9 @@ namespace Nekki.SF2.GUI.Menu
 			return valuesSource;
 		}
 
-		public void SetValuesSource(ValuesSource PPJEFKEKAAC)
+		public void SetValuesSource(ValuesSource newSource)
 		{
-			valuesSource = PPJEFKEKAAC;
+			valuesSource = newSource;
 			UpdateValues();
 		}
 
@@ -223,8 +223,8 @@ namespace Nekki.SF2.GUI.Menu
 		private void OnRubyButtonClicked()
 		{
 			_btnRuby.enabled = false;
-			MainMenu.MenuButtonType bGGGJCMEGPH = MainMenu.MenuButtonType.MENU_MONEY;
-			CallEvent(0, bGGGJCMEGPH);
+			MainMenu.MenuButtonType buttonType = MainMenu.MenuButtonType.MENU_MONEY;
+			CallEvent(0, buttonType);
 		}
 
 		private void ToggleValuesSource()

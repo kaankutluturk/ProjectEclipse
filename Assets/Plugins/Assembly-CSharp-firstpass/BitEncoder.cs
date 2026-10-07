@@ -45,24 +45,24 @@ internal struct BitEncoder
 		}
 	}
 
-	public void Encode(RangeEncoder GLOJHMAIFOK, uint symbol)
+	public void Encode(RangeEncoder rangeEncoder, uint symbol)
 	{
-		uint num = (GLOJHMAIFOK.Range >> 11) * Prob;
+		uint num = (rangeEncoder.Range >> 11) * Prob;
 		if (symbol == 0)
 		{
-			GLOJHMAIFOK.Range = num;
+			rangeEncoder.Range = num;
 			Prob += 2048 - Prob >> 5;
 		}
 		else
 		{
-			GLOJHMAIFOK.Low += num;
-			GLOJHMAIFOK.Range -= num;
+			rangeEncoder.Low += num;
+			rangeEncoder.Range -= num;
 			Prob -= Prob >> 5;
 		}
-		if (GLOJHMAIFOK.Range < 16777216)
+		if (rangeEncoder.Range < 16777216)
 		{
-			GLOJHMAIFOK.Range <<= 8;
-			GLOJHMAIFOK.ShiftLow();
+			rangeEncoder.Range <<= 8;
+			rangeEncoder.ShiftLow();
 		}
 	}
 

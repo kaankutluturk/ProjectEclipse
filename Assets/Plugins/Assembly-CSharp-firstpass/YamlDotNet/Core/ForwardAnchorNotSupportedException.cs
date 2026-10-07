@@ -10,23 +10,23 @@ namespace YamlDotNet.Core
 		{
 		}
 
-		public ForwardAnchorNotSupportedException(string LIOGIBJBHAH)
-			: base(LIOGIBJBHAH)
+		public ForwardAnchorNotSupportedException(string message)
+			: base(message)
 		{
 		}
 
-		public ForwardAnchorNotSupportedException(Mark ILENLCMAMBH, Mark PCLFFOBJJFO, string LIOGIBJBHAH)
-			: base(ILENLCMAMBH, PCLFFOBJJFO, LIOGIBJBHAH)
+		public ForwardAnchorNotSupportedException(Mark startMark, Mark endMark, string message)
+			: base(startMark, endMark, message)
 		{
 		}
 
-		public ForwardAnchorNotSupportedException(string LIOGIBJBHAH, Exception LEPEAKBGHLB)
-			: base(LIOGIBJBHAH, LEPEAKBGHLB)
+		public ForwardAnchorNotSupportedException(string message, Exception innerException)
+			: base(message, innerException)
 		{
 		}
 
-		protected ForwardAnchorNotSupportedException(SerializationInfo EMBBNNBFODN, StreamingContext PDCAHMPCPOC)
-			: base(EMBBNNBFODN, PDCAHMPCPOC)
+		protected ForwardAnchorNotSupportedException(SerializationInfo info, StreamingContext context)
+			: base(info, context)
 		{
 		}
 	}

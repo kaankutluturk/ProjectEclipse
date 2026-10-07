@@ -5,9 +5,9 @@ public sealed class HTTPUrlEncodedForm : HTTPFormBase
 {
 	private byte[] CachedData;
 
-	public override void PrepareRequest(HTTPRequest ONOCIELLAPL)
+	public override void PrepareRequest(HTTPRequest request)
 	{
-		ONOCIELLAPL.SetHeader("Content-Type", "application/x-www-form-urlencoded");
+		request.SetHeader("Content-Type", "application/x-www-form-urlencoded");
 	}
 
 	public override byte[] GetData()
@@ -19,20 +19,20 @@ public sealed class HTTPUrlEncodedForm : HTTPFormBase
 		StringBuilder stringBuilder = new StringBuilder();
 		for (int i = 0; i < GetFields().Count; i++)
 		{
-			HTTPFieldData iIMHHCDGJOL = GetFields()[i];
+			HTTPFieldData field = GetFields()[i];
 			if (i > 0)
 			{
 				stringBuilder.Append("&");
 			}
-			stringBuilder.Append(Uri.EscapeDataString(iIMHHCDGJOL.get_Name()));
+			stringBuilder.Append(Uri.EscapeDataString(field.get_Name()));
 			stringBuilder.Append("=");
-			if (!string.IsNullOrEmpty(iIMHHCDGJOL.GetText()) || iIMHHCDGJOL.GetBinary() == null)
+			if (!string.IsNullOrEmpty(field.GetText()) || field.GetBinary() == null)
 			{
-				stringBuilder.Append(Uri.EscapeDataString(iIMHHCDGJOL.GetText()));
+				stringBuilder.Append(Uri.EscapeDataString(field.GetText()));
 			}
 			else
 			{
-				stringBuilder.Append(Uri.EscapeDataString(Encoding.UTF8.GetString(iIMHHCDGJOL.GetBinary(), 0, iIMHHCDGJOL.GetBinary().Length)));
+				stringBuilder.Append(Uri.EscapeDataString(Encoding.UTF8.GetString(field.GetBinary(), 0, field.GetBinary().Length)));
 			}
 		}
 		SetIsChanged(false);

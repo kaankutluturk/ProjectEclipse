@@ -12,11 +12,11 @@ public class LocationSelectorDarknessData
 
 	public int lightEndFrame;
 
-	public LocationSelectorDarknessData(int JJDLOICPIHC = 0, int PFKGAICNOJB = 0, int OGOGNLDJEDP = 0, int JDDJEAGMNMP = 0)
+	public LocationSelectorDarknessData(int darkeningEnd = 0, int darkEnd = 0, int lightingEnd = 0, int lightEnd = 0)
 	{
-		darkeningEndFrame = JJDLOICPIHC;
-		darkEndFrame = PFKGAICNOJB;
-		lightingEndFrame = OGOGNLDJEDP;
-		lightEndFrame = JDDJEAGMNMP;
+		darkeningEndFrame = darkeningEnd;
+		darkEndFrame = darkEnd;
+		lightingEndFrame = lightingEnd;
+		lightEndFrame = lightEnd;
 	}
 }

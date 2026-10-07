@@ -4,20 +4,20 @@ public class DetailedDamages
 {
 	public Dictionary<string, Dictionary<string, float>> DamagesByType = new Dictionary<string, Dictionary<string, float>>();
 
-	public void Add(float CKKFKEIELCP, string BBNKIBKPBLO, string target)
+	public void Add(float amount, string damageType, string target)
 	{
-		if (!DamagesByType.ContainsKey(BBNKIBKPBLO))
+		if (!DamagesByType.ContainsKey(damageType))
 		{
-			DamagesByType[BBNKIBKPBLO] = new Dictionary<string, float>();
+			DamagesByType[damageType] = new Dictionary<string, float>();
 		}
-		Dictionary<string, float> dictionary = DamagesByType[BBNKIBKPBLO];
+		Dictionary<string, float> dictionary = DamagesByType[damageType];
 		bool flag = dictionary.ContainsKey(target);
-		dictionary[target] = ((!flag) ? CKKFKEIELCP : (dictionary[target] + CKKFKEIELCP));
+		dictionary[target] = ((!flag) ? amount : (dictionary[target] + amount));
 	}
 
-	public void Merge(DetailedDamages NOLFMPDGCOC)
+	public void Merge(DetailedDamages other)
 	{
-		foreach (KeyValuePair<string, Dictionary<string, float>> item in NOLFMPDGCOC.DamagesByType)
+		foreach (KeyValuePair<string, Dictionary<string, float>> item in other.DamagesByType)
 		{
 			foreach (KeyValuePair<string, float> item2 in item.Value)
 			{

@@ -6,9 +6,9 @@ public class MoneyStruct
 
 	public ObscuredInt Count;
 
-	public MoneyStruct(GameCurrency JJPFBOKGIEF, int _count)
+	public MoneyStruct(GameCurrency currency, int _count)
 	{
-		Currency = JJPFBOKGIEF;
+		Currency = currency;
 		Count = (ObscuredInt)(_count);
 	}
 }

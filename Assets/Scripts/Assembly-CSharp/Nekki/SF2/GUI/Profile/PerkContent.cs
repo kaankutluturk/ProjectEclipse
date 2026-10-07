@@ -58,13 +58,13 @@ namespace Nekki.SF2.GUI.Profile
 			_btnImprove.onClick.AddListener(OnImproveClicked);
 		}
 
-		public void Init(string HCPNFPMHFCM, ProfilePerk.ProfilePerkState state, Action<object> ODDEOFKLIAG = null, InfoAnimation HCBDNEOKGNK = null, float JMLAKAKDBBL = -1f)
+		public void Init(string text, ProfilePerk.ProfilePerkState state, Action<object> ODDEOFKLIAG = null, InfoAnimation animation = null, float labelWidth = -1f)
 		{
-			_text = HCPNFPMHFCM;
+			_text = text;
 			improveCallback = ODDEOFKLIAG;
 			perkState = state;
-			textWidth = JMLAKAKDBBL;
-			infoAnimation = HCBDNEOKGNK;
+			textWidth = labelWidth;
+			infoAnimation = animation;
 			improveButtonAlias = "profile_BtnImprove";
 			improveLabelAlias = "profile_LblImprove";
 			HeaderFontSize = 88;
@@ -111,18 +111,18 @@ namespace Nekki.SF2.GUI.Profile
 		{
 			_textLabel.rectTransform.sizeDelta = new Vector2(GetComponent<RectTransform>().rect.width - 120f, _textLabel.rectTransform.rect.height);
 			_lblImprove.rectTransform.sizeDelta = new Vector2(GetComponent<RectTransform>().rect.width - 120f, _lblImprove.rectTransform.rect.height);
-			float bAINMLLIKOL = 0f;
+			float keysY = 0f;
 			if (hasUpBorder)
 			{
-				float eCCMHGEEFLE = upBorder;
+				float contentBottom = upBorder;
 				float num = _btnImprove.transform.localPosition.y + _btnImprove.GetComponent<RectTransform>().rect.height / 2f;
-				bAINMLLIKOL = eCCMHGEEFLE - (eCCMHGEEFLE - num) / 2f;
+				keysY = contentBottom - (contentBottom - num) / 2f;
 			}
 			_lblImprove.transform.SetLocalX(0f);
 			_lblImprove.transform.SetLocalY(-294f);
 			if (_keys.gameObject.activeSelf)
 			{
-				_keys.transform.SetLocalY(bAINMLLIKOL);
+				_keys.transform.SetLocalY(keysY);
 				_textLabel.gameObject.SetActive(false);
 			}
 			else
@@ -156,10 +156,10 @@ namespace Nekki.SF2.GUI.Profile
 			}
 			_keys.gameObject.SetActive(true);
 			float num = 0f;
-			KeyData fONEJOKEIEN = infoAnimation.GetFirstKeysCondition().RequiredKeys;
-			for (int i = 0; i < fONEJOKEIEN.AdditionalKeys.Count; i++)
+			KeyData keyData = infoAnimation.GetFirstKeysCondition().RequiredKeys;
+			for (int i = 0; i < keyData.AdditionalKeys.Count; i++)
 			{
-				ResolutionImage keyIcon = GetKeyIcon(fONEJOKEIEN.AdditionalKeys[i]);
+				ResolutionImage keyIcon = GetKeyIcon(keyData.AdditionalKeys[i]);
 				if (keyIcon != null)
 				{
 					keyIcon.transform.SetParent(_keys.transform, false);
@@ -167,7 +167,7 @@ namespace Nekki.SF2.GUI.Profile
 					num += 110f;
 				}
 			}
-			if (fONEJOKEIEN.AdditionalKeys.Count > 0)
+			if (keyData.AdditionalKeys.Count > 0)
 			{
 				GameObject gameObject = new GameObject("KeyIcon");
 				ResolutionImage resolutionImage = gameObject.AddComponent<ResolutionImage>();
@@ -177,9 +177,9 @@ namespace Nekki.SF2.GUI.Profile
 				resolutionImage.transform.SetLocalX(num);
 				num += 110f;
 			}
-			for (int j = 0; j < fONEJOKEIEN.StarterKeys.Count; j++)
+			for (int j = 0; j < keyData.StarterKeys.Count; j++)
 			{
-				ResolutionImage keyIcon2 = GetKeyIcon(fONEJOKEIEN.StarterKeys[j]);
+				ResolutionImage keyIcon2 = GetKeyIcon(keyData.StarterKeys[j]);
 				if (keyIcon2 != null)
 				{
 					keyIcon2.transform.SetParent(_keys.transform, false);
@@ -190,12 +190,12 @@ namespace Nekki.SF2.GUI.Profile
 			_keys.transform.SetLocalX((0f - (num - 110f)) / 2f);
 		}
 
-		public static ResolutionImage GetKeyIcon(int PONDIGKAALH)
+		public static ResolutionImage GetKeyIcon(int keyId)
 		{
 			ResolutionImage resolutionImage = null;
 			string spriteName = string.Empty;
 			float num = 0f;
-			switch (PONDIGKAALH)
+			switch (keyId)
 			{
 			case 5:
 				spriteName = "ComboButtons.icon_left";
@@ -235,7 +235,7 @@ namespace Nekki.SF2.GUI.Profile
 				num = 225f;
 				break;
 			default:
-				GameLog.Error("PerkContent::getKeyIcon - unknown type: %i", (FightCID)PONDIGKAALH);
+				GameLog.Error("PerkContent::getKeyIcon - unknown type: %i", (FightCID)keyId);
 				break;
 			}
 			GameObject gameObject = new GameObject("KeyIcon");

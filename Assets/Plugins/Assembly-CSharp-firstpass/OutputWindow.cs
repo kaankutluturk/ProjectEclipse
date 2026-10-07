@@ -28,28 +28,28 @@ internal class OutputWindow
 		}
 	}
 
-	public void Write(byte AAOIAEJJINO)
+	public void Write(byte byteValue)
 	{
-		window[end++] = AAOIAEJJINO;
+		window[end++] = byteValue;
 		end &= 32767;
 		bytesUsed++;
 	}
 
-	public void WriteLengthDistance(int BDBOAEGELMC, int OIOMNNFMDOO)
+	public void WriteLengthDistance(int length, int distance)
 	{
-		bytesUsed += BDBOAEGELMC;
-		int num = (end - OIOMNNFMDOO) & 0x7FFF;
-		int num2 = 32768 - BDBOAEGELMC;
+		bytesUsed += length;
+		int num = (end - distance) & 0x7FFF;
+		int num2 = 32768 - length;
 		if (num <= num2 && end < num2)
 		{
-			if (BDBOAEGELMC <= OIOMNNFMDOO)
+			if (length <= distance)
 			{
-				Array.Copy(window, num, window, end, BDBOAEGELMC);
-				end += BDBOAEGELMC;
+				Array.Copy(window, num, window, end, length);
+				end += length;
 			}
 			else
 			{
-				while (BDBOAEGELMC-- > 0)
+				while (length-- > 0)
 				{
 					window[end++] = window[num++];
 				}
@@ -57,7 +57,7 @@ internal class OutputWindow
 		}
 		else
 		{
-			while (BDBOAEGELMC-- > 0)
+			while (length-- > 0)
 			{
 				window[end++] = window[num++];
 				end &= 32767;
@@ -66,22 +66,22 @@ internal class OutputWindow
 		}
 	}
 
-	public int CopyFrom(InputBuffer NILNDHEKNLJ, int BDBOAEGELMC)
+	public int CopyFrom(InputBuffer inputBuffer, int length)
 	{
-		BDBOAEGELMC = Math.Min(Math.Min(BDBOAEGELMC, 32768 - bytesUsed), NILNDHEKNLJ.GetAvailableBytes());
+		length = Math.Min(Math.Min(length, 32768 - bytesUsed), inputBuffer.GetAvailableBytes());
 		int num = 32768 - end;
 		int num2;
-		if (BDBOAEGELMC > num)
+		if (length > num)
 		{
-			num2 = NILNDHEKNLJ.CopyTo(window, end, num);
+			num2 = inputBuffer.CopyTo(window, end, num);
 			if (num2 == num)
 			{
-				num2 += NILNDHEKNLJ.CopyTo(window, 0, BDBOAEGELMC - num);
+				num2 += inputBuffer.CopyTo(window, 0, length - num);
 			}
 		}
 		else
 		{
-			num2 = NILNDHEKNLJ.CopyTo(window, end, BDBOAEGELMC);
+			num2 = inputBuffer.CopyTo(window, end, length);
 		}
 		end = (end + num2) & 0x7FFF;
 		bytesUsed += num2;
@@ -98,27 +98,27 @@ internal class OutputWindow
 		return bytesUsed;
 	}
 
-	public int CopyTo(byte[] output, int IPCOBJBKNAO, int BDBOAEGELMC)
+	public int CopyTo(byte[] output, int outputOffset, int length)
 	{
 		int num;
-		if (BDBOAEGELMC > bytesUsed)
+		if (length > bytesUsed)
 		{
 			num = end;
-			BDBOAEGELMC = bytesUsed;
+			length = bytesUsed;
 		}
 		else
 		{
-			num = (end - bytesUsed + BDBOAEGELMC) & 0x7FFF;
+			num = (end - bytesUsed + length) & 0x7FFF;
 		}
-		int num2 = BDBOAEGELMC;
-		int num3 = BDBOAEGELMC - num;
+		int num2 = length;
+		int num3 = length - num;
 		if (num3 > 0)
 		{
-			Array.Copy(window, 32768 - num3, output, IPCOBJBKNAO, num3);
-			IPCOBJBKNAO += num3;
-			BDBOAEGELMC = num;
+			Array.Copy(window, 32768 - num3, output, outputOffset, num3);
+			outputOffset += num3;
+			length = num;
 		}
-		Array.Copy(window, num - BDBOAEGELMC, output, IPCOBJBKNAO, BDBOAEGELMC);
+		Array.Copy(window, num - length, output, outputOffset, length);
 		bytesUsed -= num2;
 		return num2;
 	}

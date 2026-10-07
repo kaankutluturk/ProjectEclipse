@@ -37,20 +37,20 @@ namespace Nekki.SF2.GUI.Profile
 			_label.set_Alias("ProfileNoPerks");
 		}
 
-		public void AddItem(PerkInfoItem ELHEKFLAIKM)
+		public void AddItem(PerkInfoItem perkInfo)
 		{
-			if (ELHEKFLAIKM == null)
+			if (perkInfo == null)
 			{
 				return;
 			}
-			ProfilePerk pLKCIINIFMJ = FindPerkByName(ELHEKFLAIKM.Name);
-			if (pLKCIINIFMJ != null)
+			ProfilePerk profilePerk = FindPerkByName(perkInfo.Name);
+			if (profilePerk != null)
 			{
-				pLKCIINIFMJ.SetPerkInfo(ELHEKFLAIKM);
-				pLKCIINIFMJ.set_Description(ELHEKFLAIKM.DescriptionKey);
+				profilePerk.SetPerkInfo(perkInfo);
+				profilePerk.set_Description(perkInfo.DescriptionKey);
 				return;
 			}
-			ProfilePerk pLKCIINIFMJ2 = new ProfilePerk(ELHEKFLAIKM, 0, ProfilePerk.ProfilePerkState.PERK_SELECTED, ProfilePerk.ProfilePerkType.TYPE_PERK_SELETED);
+			ProfilePerk pLKCIINIFMJ2 = new ProfilePerk(perkInfo, 0, ProfilePerk.ProfilePerkState.PERK_SELECTED, ProfilePerk.ProfilePerkType.TYPE_PERK_SELETED);
 			perks.Add(pLKCIINIFMJ2);
 			if (!(pLKCIINIFMJ2.GetMoveName() != string.Empty))
 			{
@@ -81,9 +81,9 @@ namespace Nekki.SF2.GUI.Profile
 		public void Clear()
 		{
 			_slider.ClearItems();
-			perks.ForEach((ProfilePerk PIIEECCHMAC) =>
+			perks.ForEach((ProfilePerk perk) =>
 			{
-				PIIEECCHMAC.RemoveAllEventListener();
+				perk.RemoveAllEventListener();
 			});
 			perks.Clear();
 		}

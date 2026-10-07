@@ -11,10 +11,10 @@ public class PerkEventAnimationStart : PerkEvent
 	{
 	}
 
-	public PerkEventAnimationStart(PerkEventAnimationStart NOLFMPDGCOC)
-		: base(NOLFMPDGCOC)
+	public PerkEventAnimationStart(PerkEventAnimationStart source)
+		: base(source)
 	{
-		set_Name(NOLFMPDGCOC.get_Name());
+		set_Name(source.get_Name());
 	}
 
 	public string get_Name()
@@ -33,15 +33,15 @@ public class PerkEventAnimationStart : PerkEvent
 		set_Name(node.Attributes["Name"].GetStringOrDefault(string.Empty));
 	}
 
-	public override bool IsEqual(EventStruct EJMEALJNNIL)
+	public override bool IsEqual(EventStruct eventData)
 	{
-		if (!base.IsEqual(EJMEALJNNIL) || EJMEALJNNIL == null || EJMEALJNNIL.Info == null)
+		if (!base.IsEqual(eventData) || eventData == null || eventData.Info == null)
 		{
 			return false;
 		}
-		Dictionary<string, object> dictionary = (Dictionary<string, object>)EJMEALJNNIL.Info;
-		InfoAnimation pJAHIOELGGD = ((!dictionary.ContainsKey("Animation")) ? null : ((InfoAnimation)dictionary["Animation"]));
-		if (get_Name() != string.Empty && (pJAHIOELGGD == null || !pJAHIOELGGD.HasName(get_Name())))
+		Dictionary<string, object> dictionary = (Dictionary<string, object>)eventData.Info;
+		InfoAnimation animation = ((!dictionary.ContainsKey("Animation")) ? null : ((InfoAnimation)dictionary["Animation"]));
+		if (get_Name() != string.Empty && (animation == null || !animation.HasName(get_Name())))
 		{
 			return false;
 		}

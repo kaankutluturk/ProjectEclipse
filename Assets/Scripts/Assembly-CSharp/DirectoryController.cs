@@ -28,10 +28,10 @@ public class DirectoryController
 		return _instance;
 	}
 
-	public static int GetIndexAfterMarker(string path, string MNMPGNFFOGA)
+	public static int GetIndexAfterMarker(string path, string marker)
 	{
-		int num = path.IndexOf(MNMPGNFFOGA);
-		return (num != -1) ? (num + MNMPGNFFOGA.Length) : 0;
+		int num = path.IndexOf(marker);
+		return (num != -1) ? (num + marker.Length) : 0;
 	}
 
 	public static string GetDrivePrefix()

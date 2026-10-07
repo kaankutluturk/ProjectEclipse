@@ -3,10 +3,10 @@ using System.Linq;
 
 public class FigureTopology
 {
-	public static List<int> CreateFanIndices(int LGKJBIEDKBO)
+	public static List<int> CreateFanIndices(int segments)
 	{
-		int[] array = new int[LGKJBIEDKBO * 3];
-		for (int i = 0; i < LGKJBIEDKBO; i++)
+		int[] array = new int[segments * 3];
+		for (int i = 0; i < segments; i++)
 		{
 			array[3 * i] = 0;
 			array[3 * i + 1] = 2 + i;
@@ -15,10 +15,10 @@ public class FigureTopology
 		return array.ToList();
 	}
 
-	public static List<int> CreateQuadIndices(int LGKJBIEDKBO)
+	public static List<int> CreateQuadIndices(int quadCount)
 	{
-		int[] array = new int[LGKJBIEDKBO * 6];
-		for (int i = 0; i < LGKJBIEDKBO * 6; i += 6)
+		int[] array = new int[quadCount * 6];
+		for (int i = 0; i < quadCount * 6; i += 6)
 		{
 			array[i] = i;
 			array[i + 1] = i + 1;
@@ -30,10 +30,10 @@ public class FigureTopology
 		return array.ToList();
 	}
 
-	public static List<int> CreateStripIndices(int LGKJBIEDKBO)
+	public static List<int> CreateStripIndices(int segments)
 	{
-		int[] array = new int[LGKJBIEDKBO * 3];
-		for (int i = 0; i < LGKJBIEDKBO; i++)
+		int[] array = new int[segments * 3];
+		for (int i = 0; i < segments; i++)
 		{
 			if (i % 2 == 0)
 			{

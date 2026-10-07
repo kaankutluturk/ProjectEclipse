@@ -130,9 +130,9 @@ public class Camera : global::EventDispatcher<object>
 		}
 	}
 
-	public Camera(Transform PKHKBAJOHHF)
+	public Camera(Transform parent)
 	{
-		CreateUnityObject(PKHKBAJOHHF);
+		CreateUnityObject(parent);
 		_targetNode = new ModelNode("Camera");
 		_positionNode = new ModelNode("Position");
 		_render = null;
@@ -189,11 +189,11 @@ public class Camera : global::EventDispatcher<object>
 	private void UpdateCameraPosition()
 	{
 		_targetNode.SetEnd();
-		ModelObject oIEODIEHJMH = _render.GetViewerModel().GetFirstFighter();
+		ModelObject firstFighter = _render.GetViewerModel().GetFirstFighter();
 		ModelObject oIEODIEHJMH2 = _render.GetViewerModel().GetSecondFighter();
-		if (oIEODIEHJMH != null && oIEODIEHJMH2 != null)
+		if (firstFighter != null && oIEODIEHJMH2 != null)
 		{
-			_targetNode.SetStart(Model.GetCameraMidpoint(oIEODIEHJMH, oIEODIEHJMH2));
+			_targetNode.SetStart(Model.GetCameraMidpoint(firstFighter, oIEODIEHJMH2));
 		}
 	}
 
@@ -202,7 +202,7 @@ public class Camera : global::EventDispatcher<object>
 		if (_isEnabled)
 		{
 			_positionNode.TimeStep(0f);
-			Vector3f eMAFACPEPDK = new Vector3f(_targetNode.GetEnd());
+			Vector3f point = new Vector3f(_targetNode.GetEnd());
 			Vector3f eMAFACPEPDK2 = new Vector3f(_targetNode.GetStart());
 			Vector3f eMAFACPEPDK3 = new Vector3f(_positionNode.GetEnd());
 			Vector3f eMAFACPEPDK4 = new Vector3f(_positionNode.GetStart());
@@ -212,10 +212,10 @@ public class Camera : global::EventDispatcher<object>
 			eMAFACPEPDK3.SetZ(num);
 			num = num;
 			eMAFACPEPDK2.SetZ(num);
-			eMAFACPEPDK.SetZ(num);
-			Vector3f aKKEJFKBIHF = Vector3f.op_Subtraction(eMAFACPEPDK2, eMAFACPEPDK);
-			Vector3f nBMEGFBPGFE = Vector3f.op_Addition(eMAFACPEPDK3, aKKEJFKBIHF);
-			Vector3f nBMEGFBPGFE2 = Vector3f.op_Subtraction(nBMEGFBPGFE, eMAFACPEPDK4);
+			point.SetZ(num);
+			Vector3f targetDelta = Vector3f.op_Subtraction(eMAFACPEPDK2, point);
+			Vector3f offset = Vector3f.op_Addition(eMAFACPEPDK3, targetDelta);
+			Vector3f nBMEGFBPGFE2 = Vector3f.op_Subtraction(offset, eMAFACPEPDK4);
 			Vector3f eMAFACPEPDK5 = Vector3f.op_Subtraction(eMAFACPEPDK2, eMAFACPEPDK4);
 			eMAFACPEPDK5.Multiply(0.15f);
 			Vector3f eMAFACPEPDK6 = Vector3f.op_Addition(nBMEGFBPGFE2, eMAFACPEPDK5);
@@ -238,15 +238,15 @@ public class Camera : global::EventDispatcher<object>
 
 	private void DrawPosition()
 	{
-		Vector3f jEBIHODAIKM = _targetNode.GetStart();
-		Vector3f eMAFACPEPDK = _focusNode.GetStart();
+		Vector3f targetPosition = _targetNode.GetStart();
+		Vector3f focusPosition = _focusNode.GetStart();
 		if (_isZooming)
 		{
-			_render.UpdatePosition(_positionNode.GetStart(), jEBIHODAIKM, eMAFACPEPDK.GetX(), eMAFACPEPDK.GetY(), _zoomEffect.CurrentScale);
+			_render.UpdatePosition(_positionNode.GetStart(), targetPosition, focusPosition.GetX(), focusPosition.GetY(), _zoomEffect.CurrentScale);
 		}
 		else
 		{
-			_render.UpdatePosition(_positionNode.GetStart(), jEBIHODAIKM, eMAFACPEPDK.GetX(), eMAFACPEPDK.GetY());
+			_render.UpdatePosition(_positionNode.GetStart(), targetPosition, focusPosition.GetX(), focusPosition.GetY());
 		}
 	}
 
@@ -281,15 +281,15 @@ public class Camera : global::EventDispatcher<object>
 	{
 		if (_isShaking && _hitEffect != null)
 		{
-			float ePIPOLDCCHD = _shakeDuration;
+			float duration = _shakeDuration;
 			float num = _shakeDuration - _shakeFramesLeft;
 			float strength = _hitEffect.Type == "CriticalHit" ? Eclipse.UI.AccessibilitySettings.CriticalShake : 1f;
-			float fMICELIGLPG = _hitEffect.AmplitudeX * strength;
-			float pPKAMOILNLN = _hitEffect.AmplitudeY * strength;
-			float kFEMKHHANDC = _hitEffect.FrequencyX;
-			float gGJBPLHAHFH = _hitEffect.FrequencyY;
-			float num2 = Mathf.Sin(kFEMKHHANDC * num) * fMICELIGLPG * (ePIPOLDCCHD - num) / ePIPOLDCCHD;
-			float num3 = Mathf.Sin(gGJBPLHAHFH * num) * pPKAMOILNLN * (ePIPOLDCCHD - num) / ePIPOLDCCHD;
+			float amplitudeX = _hitEffect.AmplitudeX * strength;
+			float amplitudeY = _hitEffect.AmplitudeY * strength;
+			float frequencyX = _hitEffect.FrequencyX;
+			float frequencyY = _hitEffect.FrequencyY;
+			float num2 = Mathf.Sin(frequencyX * num) * amplitudeX * (duration - num) / duration;
+			float num3 = Mathf.Sin(frequencyY * num) * amplitudeY * (duration - num) / duration;
 			num2 *= SystemProperties.ScaleY;
 			num3 *= SystemProperties.ScaleY;
 			_render.SetRootPosition(num2, num3);
@@ -382,10 +382,10 @@ public class Camera : global::EventDispatcher<object>
 		CallEvent(2, null);
 	}
 
-	private void CreateUnityObject(Transform PKHKBAJOHHF)
+	private void CreateUnityObject(Transform parent)
 	{
 		_UnityObject = new GameObject("Camera");
-		_UnityObject.transform.SetParent(PKHKBAJOHHF, false);
+		_UnityObject.transform.SetParent(parent, false);
 		_UnityObject.transform.localPosition = new Vector3(0f, 0f);
 		_UnityObject.AddComponent<CameraRenderInterpolationDriver>().Init(this);
 	}
@@ -396,18 +396,18 @@ public class Camera : global::EventDispatcher<object>
 		_render = null;
 	}
 
-	public virtual void Init(Location LPJNEDFCBOI)
+	public virtual void Init(Location location)
 	{
 		_render = new Render(_UnityObject);
 		_positionNode.SetAttenuation(0f);
 		_targetNode.SetAttenuation(0f);
-		_location = LPJNEDFCBOI;
+		_location = location;
 		_render.Init(_location);
-		Vector3f bAINMLLIKOL = _location.GetModelsCenter();
-		_positionNode.SetStart(bAINMLLIKOL);
-		_positionNode.SetEnd(bAINMLLIKOL);
-		_targetNode.SetStart(bAINMLLIKOL);
-		_targetNode.SetEnd(bAINMLLIKOL);
+		Vector3f modelsCenter = _location.GetModelsCenter();
+		_positionNode.SetStart(modelsCenter);
+		_positionNode.SetEnd(modelsCenter);
+		_targetNode.SetStart(modelsCenter);
+		_targetNode.SetEnd(modelsCenter);
 		_shakeFramesLeft = 0f;
 		_isShaking = false;
 		_hitPauseFrames = 0f;
@@ -475,15 +475,15 @@ public class Camera : global::EventDispatcher<object>
 		_render.SyncAdditionalDrawsLayerTransform();
 	}
 
-	public void PlayEffectAnimation(Vector3f NAAPALOFBCI, Vector3f KKIKIDNALOL, float time, bool HKNHLNGMOJC, string HJCIKLIPILA, float NOOOCHHKECH)
+	public void PlayEffectAnimation(Vector3f NAAPALOFBCI, Vector3f direction, float time, bool flag, string effectName, float scale)
 	{
-		_render.PlayHitEffect(NAAPALOFBCI, KKIKIDNALOL, time, HKNHLNGMOJC, HJCIKLIPILA, NOOOCHHKECH);
+		_render.PlayHitEffect(NAAPALOFBCI, direction, time, flag, effectName, scale);
 	}
 
-	public void QueueBloodEffect(Vector3f NAAPALOFBCI, Vector3f IHFFJPLMIAL, int count = 4)
+	public void QueueBloodEffect(Vector3f NAAPALOFBCI, Vector3f impulse, int count = 4)
 	{
 		_pendingBlood.Position.Set(NAAPALOFBCI);
-		_pendingBlood.Impulse.Set(IHFFJPLMIAL);
+		_pendingBlood.Impulse.Set(impulse);
 		_pendingBlood.count = count;
 		_pendingBlood.isActive = true;
 	}
@@ -519,28 +519,28 @@ public class Camera : global::EventDispatcher<object>
 		_models.RemoveAt(index);
 	}
 
-	public void RemoveObject(Model ACENLMONNPA)
+	public void RemoveObject(Model model)
 	{
-		int num = _models.IndexOf(ACENLMONNPA);
+		int num = _models.IndexOf(model);
 		if (num != -1)
 		{
 			RemoveObjectByIndex(num);
 		}
 	}
 
-	public int AddModel(Model ACENLMONNPA, bool EKBOGDKIHIH, bool IGGHECALMMP)
+	public int AddModel(Model model, bool isPlayer, bool isFighter)
 	{
 		int result = -1;
-		_models.Add(ACENLMONNPA);
-		_render.AttachModelEffects(ACENLMONNPA);
-		if (EKBOGDKIHIH)
+		_models.Add(model);
+		_render.AttachModelEffects(model);
+		if (isPlayer)
 		{
-			_focusNode = ACENLMONNPA.GetBodyObject().GetNodeByName(GameUtils.GetCameraSettings().BindingNode);
-			_secondaryFocusNode = ACENLMONNPA.GetBodyObject().GetNodeByName(GameUtils.GetCameraSettings().CameraNode);
+			_focusNode = model.GetBodyObject().GetNodeByName(GameUtils.GetCameraSettings().BindingNode);
+			_secondaryFocusNode = model.GetBodyObject().GetNodeByName(GameUtils.GetCameraSettings().CameraNode);
 		}
 		if (_render != null)
 		{
-			result = _render.AddModel(ACENLMONNPA.GetBodyObject(), _location.modelsColor, IGGHECALMMP);
+			result = _render.AddModel(model.GetBodyObject(), _location.modelsColor, isFighter);
 		}
 		return result;
 	}
@@ -576,12 +576,12 @@ public class Camera : global::EventDispatcher<object>
         return true;
     }
 
-	public void ApplyHitEffect(GameUtils.HitEffect HJLADIDMFOM)
+	public void ApplyHitEffect(GameUtils.HitEffect hitEffect)
 	{
 		if (Fight.GetCurrentFight()?.IsTitleSparring == true) return;
-		if (HJLADIDMFOM != null)
+		if (hitEffect != null)
 		{
-			_hitEffect = HJLADIDMFOM;
+			_hitEffect = hitEffect;
 			// Mod-configured impact effect; critical hits respect the shake slider.
 			if (!Eclipse.Multiplayer.VersusTickDriver.IsResimulating)
 				Eclipse.Modding.ModVisuals.TriggerImpact(_hitEffect.Type,
@@ -597,13 +597,13 @@ public class Camera : global::EventDispatcher<object>
 		}
 	}
 
-	public void ApplyZoomEffect(GameUtils.ZoomEffect DCLANCDBJLM)
+	public void ApplyZoomEffect(GameUtils.ZoomEffect zoomEffect)
 	{
 		if (Fight.GetCurrentFight()?.IsTitleSparring == true) return;
-		if (DCLANCDBJLM != null)
+		if (zoomEffect != null)
 		{
 			_isZooming = true;
-			_zoomEffect = DCLANCDBJLM;
+			_zoomEffect = zoomEffect;
 			float num = _render.GetMaxZoom();
 			if (_zoomEffect.TargetScale < num)
 			{

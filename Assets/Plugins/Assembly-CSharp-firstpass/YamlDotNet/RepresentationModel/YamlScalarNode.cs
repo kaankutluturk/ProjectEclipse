@@ -21,12 +21,12 @@ namespace YamlDotNet.RepresentationModel
 			}
 		}
 
-		internal YamlScalarNode(EventReader DNBFFLFBDOB, DocumentLoadingState state)
+		internal YamlScalarNode(EventReader reader, DocumentLoadingState state)
 		{
-			Scalar lEACOCDHICF = DNBFFLFBDOB.Expect<Scalar>();
-			Load(lEACOCDHICF, state);
-			Value = lEACOCDHICF.GetValue();
-			Style = lEACOCDHICF.GetStyle();
+			Scalar scalarEvent = reader.Expect<Scalar>();
+			Load(scalarEvent, state);
+			Value = scalarEvent.GetValue();
+			Style = scalarEvent.GetStyle();
 		}
 
 		public YamlScalarNode()
@@ -43,19 +43,19 @@ namespace YamlDotNet.RepresentationModel
 			throw new NotSupportedException("Resolving an alias on a scalar node does not make sense");
 		}
 
-		internal override void Emit(IEmitter NPIDIMCLNEM, EmitterState state)
+		internal override void Emit(IEmitter emitter, EmitterState state)
 		{
-			NPIDIMCLNEM.Emit(new Scalar(base.Anchor, base.Tag, Value, Style, true, false));
+			emitter.Emit(new Scalar(base.Anchor, base.Tag, Value, Style, true, false));
 		}
 
-		public override void Accept(IYamlVisitor NKECMANOOEM)
+		public override void Accept(IYamlVisitor visitor)
 		{
-			NKECMANOOEM.Visit(this);
+			visitor.Visit(this);
 		}
 
-		public override bool Equals(object NOLFMPDGCOC)
+		public override bool Equals(object obj)
 		{
-			YamlScalarNode yamlScalarNode = NOLFMPDGCOC as YamlScalarNode;
+			YamlScalarNode yamlScalarNode = obj as YamlScalarNode;
 			return yamlScalarNode != null && Equals(yamlScalarNode) && YamlNode.SafeEquals(Value, yamlScalarNode.Value);
 		}
 

@@ -57,10 +57,10 @@ public class ConditionDistance : ConditionAnimation
 		return (!IsNot) ? flag : (!flag);
 	}
 
-	public void UpdateNodes(ModelObject OECPEDPMKCD, bool EKBOGDKIHIH, ModelNode AECCPADGGPG, bool PHADJMAONJG, ModelObject MJCGOJBGFIE = null)
+	public void UpdateNodes(ModelObject rootModel, bool isPlayer, ModelNode pivotNode, bool isChildPoint, ModelObject childModel = null)
 	{
-		_from.UpdateNode(OECPEDPMKCD, EKBOGDKIHIH, AECCPADGGPG, PHADJMAONJG, MJCGOJBGFIE);
-		_to.UpdateNode(OECPEDPMKCD, EKBOGDKIHIH, AECCPADGGPG, PHADJMAONJG, MJCGOJBGFIE);
+		_from.UpdateNode(rootModel, isPlayer, pivotNode, isChildPoint, childModel);
+		_to.UpdateNode(rootModel, isPlayer, pivotNode, isChildPoint, childModel);
 	}
 
 	public void ResetNodes()

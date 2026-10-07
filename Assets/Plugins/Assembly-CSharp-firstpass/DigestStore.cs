@@ -9,12 +9,12 @@ internal static class DigestStore
 
 	private static string[] SupportedAlgorithms = new string[2] { "digest", "basic" };
 
-	public static Digest Get(Uri KJHNCLAJMLO)
+	public static Digest Get(Uri requestUri)
 	{
 		lock (Locker)
 		{
 			Digest value = null;
-			if (Digests.TryGetValue(KJHNCLAJMLO.Host, out value) && !value.IsUriProtected(KJHNCLAJMLO))
+			if (Digests.TryGetValue(requestUri.Host, out value) && !value.IsUriProtected(requestUri))
 			{
 				return null;
 			}
@@ -22,44 +22,44 @@ internal static class DigestStore
 		}
 	}
 
-	public static Digest GetOrCreate(Uri KJHNCLAJMLO)
+	public static Digest GetOrCreate(Uri requestUri)
 	{
 		lock (Locker)
 		{
 			Digest value = null;
-			if (!Digests.TryGetValue(KJHNCLAJMLO.Host, out value))
+			if (!Digests.TryGetValue(requestUri.Host, out value))
 			{
-				Digests.Add(KJHNCLAJMLO.Host, value = new Digest(KJHNCLAJMLO));
+				Digests.Add(requestUri.Host, value = new Digest(requestUri));
 			}
 			return value;
 		}
 	}
 
-	public static void Remove(Uri KJHNCLAJMLO)
+	public static void Remove(Uri requestUri)
 	{
 		lock (Locker)
 		{
-			Digests.Remove(KJHNCLAJMLO.Host);
+			Digests.Remove(requestUri.Host);
 		}
 	}
 
-	public static string FindBest(List<string> DBMBCAIIJAD)
+	public static string FindBest(List<string> headerValues)
 	{
-		if (DBMBCAIIJAD == null || DBMBCAIIJAD.Count == 0)
+		if (headerValues == null || headerValues.Count == 0)
 		{
 			return string.Empty;
 		}
-		List<string> list = new List<string>(DBMBCAIIJAD.Count);
-		for (int i = 0; i < DBMBCAIIJAD.Count; i++)
+		List<string> list = new List<string>(headerValues.Count);
+		for (int i = 0; i < headerValues.Count; i++)
 		{
-			list.Add(DBMBCAIIJAD[i].ToLower());
+			list.Add(headerValues[i].ToLower());
 		}
 		for (int j = 0; j < SupportedAlgorithms.Length; j++)
 		{
-			int num = list.FindIndex((string HHAAFADDOJB) => HHAAFADDOJB.StartsWith(SupportedAlgorithms[j]));
+			int num = list.FindIndex((string header) => header.StartsWith(SupportedAlgorithms[j]));
 			if (num != -1)
 			{
-				return DBMBCAIIJAD[num];
+				return headerValues[num];
 			}
 		}
 		return string.Empty;

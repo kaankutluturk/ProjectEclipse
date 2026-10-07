@@ -18,16 +18,16 @@ public class RosterQuest
 			Value = _value;
 		}
 
-		public QuestVariable(XmlNode PKHDLOGJKAD)
+		public QuestVariable(XmlNode node)
 		{
-			Node = PKHDLOGJKAD;
+			Node = node;
 			Name = Node.Attributes["Name"].GetStringOrDefault(string.Empty);
 			Value = Node.Attributes["Value"].GetStringOrDefault(string.Empty);
 		}
 
-		public void SetValue(string PKHDLOGJKAD)
+		public void SetValue(string newValue)
 		{
-			Value = PKHDLOGJKAD;
+			Value = newValue;
 			Node.Attributes["Value"].Value = Value;
 		}
 	}
@@ -66,10 +66,10 @@ public class RosterQuest
 		bool flag = false;
 		if (Node.Attributes["FileName"] != null)
 		{
-			string iFKJHHPJPLP = Node.Attributes["FileName"].GetStringOrDefault(string.Empty);
+			string questFile = Node.Attributes["FileName"].GetStringOrDefault(string.Empty);
 			flag = DirectoryController.IsPathWithDrive(FileName);
-			iFKJHHPJPLP = DirectoryController.StripProtocol(iFKJHHPJPLP);
-			FileName = DirectoryController.ResolvePath(iFKJHHPJPLP);
+			questFile = DirectoryController.StripProtocol(questFile);
+			FileName = DirectoryController.ResolvePath(questFile);
 		}
 		if (flag)
 		{
@@ -101,23 +101,23 @@ public class RosterQuest
 		}
 	}
 
-	public void SaveCheckpoint(object data, int AAKAPLGDGNM, int ILNNINKHPOC)
+	public void SaveCheckpoint(object data, int screenIndex, int checkpointIndex)
 	{
 		if (get_Parameters() == null)
 		{
-			XmlNode pKHDLOGJKAD = Node.AppendElement("QuestParameters");
-			SetParameters(new ParametersQuest(pKHDLOGJKAD));
+			XmlNode parametersNode = Node.AppendElement("QuestParameters");
+			SetParameters(new ParametersQuest(parametersNode));
 		}
-		QuestParameters hHKLFIIBIFF = (QuestParameters)data;
-		get_Parameters().SetCheckPointIndex(ILNNINKHPOC);
-		get_Parameters().SetScreenIndex(AAKAPLGDGNM);
-		get_Parameters().SetFightName((hHKLFIIBIFF.GetFightList() == null) ? string.Empty : hHKLFIIBIFF.GetFightList().FightId.ToString());
-		get_Parameters().SetFightResultName(hHKLFIIBIFF.fightResult);
-		get_Parameters().SetRaidResultName(hHKLFIIBIFF.raidResult);
-		get_Parameters().SetLevelUp(hHKLFIIBIFF.levelUp);
-		get_Parameters().SetPower(hHKLFIIBIFF.energyChange);
-		get_Parameters().set_FightAvgFPS(hHKLFIIBIFF.fightAvgFps);
-		Eclipse.Modding.ModRuntime.SaveQuestLotteryContext(get_Parameters(), hHKLFIIBIFF);
+		QuestParameters checkpointParameters = (QuestParameters)data;
+		get_Parameters().SetCheckPointIndex(checkpointIndex);
+		get_Parameters().SetScreenIndex(screenIndex);
+		get_Parameters().SetFightName((checkpointParameters.GetFightList() == null) ? string.Empty : checkpointParameters.GetFightList().FightId.ToString());
+		get_Parameters().SetFightResultName(checkpointParameters.fightResult);
+		get_Parameters().SetRaidResultName(checkpointParameters.raidResult);
+		get_Parameters().SetLevelUp(checkpointParameters.levelUp);
+		get_Parameters().SetPower(checkpointParameters.energyChange);
+		get_Parameters().set_FightAvgFPS(checkpointParameters.fightAvgFps);
+		Eclipse.Modding.ModRuntime.SaveQuestLotteryContext(get_Parameters(), checkpointParameters);
 	}
 
 	public void SetFileName(string _fileName)

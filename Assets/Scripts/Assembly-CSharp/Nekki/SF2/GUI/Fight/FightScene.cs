@@ -32,12 +32,12 @@ namespace Nekki.SF2.GUI.Fight
 		protected override void Init(object data)
 		{
 			base.Init(data);
-			FightList jGMLAFOPBBC = (FightList)data;
+			FightList fightList = (FightList)data;
 			if (preFight == null)
 			{
 				GameLog.Error("FightHolder.Start preFight is null");
 			}
-			Fight = GameUtils.CreateFight(jGMLAFOPBBC, preFight, gameController);
+			Fight = GameUtils.CreateFight(fightList, preFight, gameController);
 			GC.Collect();
 		}
 

@@ -86,10 +86,10 @@ public abstract class ConditionExtension
 			resultNumber = value;
 		}
 
-		public CompareResult(string PGIDABLDOAM, float CCJOKGEFOFP)
+		public CompareResult(string text, float number)
 		{
-			resultSTR = PGIDABLDOAM;
-			resultNumber = CCJOKGEFOFP;
+			resultSTR = text;
+			resultNumber = number;
 		}
 
 		public override string ToString()
@@ -117,28 +117,28 @@ public abstract class ConditionExtension
 	{
 	}
 
-	public void SetValue(string value, CompareResult BMDEBHIHIAJ)
+	public void SetValue(string value, CompareResult compareResult)
 	{
 		if (!value.Equals(string.Empty))
 		{
 			char c = value[0];
 			if (c.Equals('_'))
 			{
-				SessionSettings(value, BMDEBHIHIAJ);
+				SessionSettings(value, compareResult);
 			}
 			else if (c.Equals('?'))
 			{
-				ExecuteFunction(value, BMDEBHIHIAJ);
-				if (!BMDEBHIHIAJ.resultSTR.Equals(string.Empty))
+				ExecuteFunction(value, compareResult);
+				if (!compareResult.resultSTR.Equals(string.Empty))
 				{
-					string iBBAMMHHBFE = BMDEBHIHIAJ.resultSTR;
-					BMDEBHIHIAJ.Clear();
-					SetValue(iBBAMMHHBFE, BMDEBHIHIAJ);
+					string resultText = compareResult.resultSTR;
+					compareResult.Clear();
+					SetValue(resultText, compareResult);
 				}
 			}
 			else
 			{
-				SetLiteralValue(value, BMDEBHIHIAJ);
+				SetLiteralValue(value, compareResult);
 			}
 		}
 		else
@@ -174,26 +174,26 @@ public abstract class ConditionExtension
 				GameLog.Error("ConditionExtension::parseFunctions - malformed function: {0}", value);
 				return null;
 			}
-			QuestFunctions bECNHJBBOKO = new QuestFunctions();
-			bECNHJBBOKO.argumentsText = value;
-			bECNHJBBOKO.functionName = value.Substring(1, num - 1);
-			bECNHJBBOKO.argumentsText = value.Substring(num + 1, num2 - num - 1);
-			bECNHJBBOKO.property = ((num3 <= num2) ? string.Empty : value.Substring(num3 + 1, value.Length - num3 - 1));
-			ParseArguments(bECNHJBBOKO);
-			return bECNHJBBOKO;
+			QuestFunctions questFunction = new QuestFunctions();
+			questFunction.argumentsText = value;
+			questFunction.functionName = value.Substring(1, num - 1);
+			questFunction.argumentsText = value.Substring(num + 1, num2 - num - 1);
+			questFunction.property = ((num3 <= num2) ? string.Empty : value.Substring(num3 + 1, value.Length - num3 - 1));
+			ParseArguments(questFunction);
+			return questFunction;
 		}
 		return null;
 	}
 
-	protected void ParseArguments(QuestFunctions KJFKPMCPIBH)
+	protected void ParseArguments(QuestFunctions questFunction)
 	{
-		KJFKPMCPIBH.arguments.Clear();
+		questFunction.arguments.Clear();
 		bool flag = false;
 		bool flag2 = false;
 		int num = 0;
 		StringBuilder stringBuilder = new StringBuilder();
 		StringBuilder stringBuilder2 = new StringBuilder();
-		string text = ClearGaps(KJFKPMCPIBH.argumentsText);
+		string text = ClearGaps(questFunction.argumentsText);
 		int i = 0;
 		for (int length = text.Length; i < length; i++)
 		{
@@ -211,9 +211,9 @@ public abstract class ConditionExtension
 				}
 				else if (stringBuilder2.Length > 0)
 				{
-					FunctionArgument hLCPKKIIBFB = new FunctionArgument();
-					hLCPKKIIBFB.result = stringBuilder2.ToString();
-					KJFKPMCPIBH.arguments.Add(hLCPKKIIBFB);
+					FunctionArgument argument = new FunctionArgument();
+					argument.result = stringBuilder2.ToString();
+					questFunction.arguments.Add(argument);
 					stringBuilder2.Clear();
 				}
 			}
@@ -242,7 +242,7 @@ public abstract class ConditionExtension
 						flag = false;
 						stringBuilder.Append(c);
 						QuestFunctions item = ParseFunctions(stringBuilder.ToString());
-						KJFKPMCPIBH.arguments.Add(item);
+						questFunction.arguments.Add(item);
 						stringBuilder.Clear();
 					}
 				}
@@ -256,17 +256,17 @@ public abstract class ConditionExtension
 		{
 			FunctionArgument hLCPKKIIBFB2 = new FunctionArgument();
 			hLCPKKIIBFB2.result = stringBuilder2.ToString();
-			KJFKPMCPIBH.arguments.Add(hLCPKKIIBFB2);
+			questFunction.arguments.Add(hLCPKKIIBFB2);
 			stringBuilder2.Clear();
 		}
 	}
 
-	protected void SessionSettings(string value, CompareResult BMDEBHIHIAJ)
+	protected void SessionSettings(string value, CompareResult compareResult)
 	{
-		ResolveSessionVariable(value, BMDEBHIHIAJ);
+		ResolveSessionVariable(value, compareResult);
 	}
 
-	protected void SetLiteralValue(string value, CompareResult BMDEBHIHIAJ)
+	protected void SetLiteralValue(string value, CompareResult compareResult)
 	{
 		// An unset session/roster variable is a valid state while a quest waits
 		// for its first event.  Empty strings used to be classified as numbers
@@ -274,24 +274,24 @@ public abstract class ConditionExtension
 		// tutorial action sequence (notably the first Shop button press).
 		if (string.IsNullOrEmpty(value))
 		{
-			BMDEBHIHIAJ.resultSTR = string.Empty;
+			compareResult.resultSTR = string.Empty;
 			return;
 		}
 		switch (GetVariableType(value))
 		{
 		case QuestVariableType.QUEST_CONDITION_VARIABLE_STRING:
-			BMDEBHIHIAJ.resultSTR = value;
+			compareResult.resultSTR = value;
 			break;
 		case QuestVariableType.QUEST_CONDITION_VARIABLE_NUMBER:
 			double result;
 			if (double.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out result) ||
 				double.TryParse(value, out result))
 			{
-				BMDEBHIHIAJ.resultNumber = result;
+				compareResult.resultNumber = result;
 			}
 			else
 			{
-				BMDEBHIHIAJ.resultSTR = value;
+				compareResult.resultSTR = value;
 			}
 			break;
 		}
@@ -313,29 +313,29 @@ public abstract class ConditionExtension
 		return QuestVariableType.QUEST_CONDITION_VARIABLE_NUMBER;
 	}
 
-	protected void ExecuteFunction(string value, CompareResult BMDEBHIHIAJ)
+	protected void ExecuteFunction(string value, CompareResult compareResult)
 	{
-		QuestFunctions kJFKPMCPIBH = ParseFunctions(value);
-		ExecuteFunction(kJFKPMCPIBH, BMDEBHIHIAJ);
-		ResetFunction(kJFKPMCPIBH);
+		QuestFunctions questFunction = ParseFunctions(value);
+		ExecuteFunction(questFunction, compareResult);
+		ResetFunction(questFunction);
 	}
 
-	protected void ExecuteFunction(QuestFunctions KJFKPMCPIBH, CompareResult BMDEBHIHIAJ)
+	protected void ExecuteFunction(QuestFunctions questFunction, CompareResult compareResult)
 	{
-		if (KJFKPMCPIBH == null)
+		if (questFunction == null)
 		{
 			return;
 		}
-		foreach (FunctionArgument item in KJFKPMCPIBH.arguments)
+		foreach (FunctionArgument item in questFunction.arguments)
 		{
-			QuestFunctions bECNHJBBOKO = item as QuestFunctions;
-			if (bECNHJBBOKO != null)
+			QuestFunctions argumentFunction = item as QuestFunctions;
+			if (argumentFunction != null)
 			{
-				if (bECNHJBBOKO.Empty())
+				if (argumentFunction.Empty())
 				{
-					CompareResult lNIDLHOIHIM = new CompareResult();
-					ExecuteFunction(bECNHJBBOKO, lNIDLHOIHIM);
-					bECNHJBBOKO.result = lNIDLHOIHIM.ToString();
+					CompareResult argumentResult = new CompareResult();
+					ExecuteFunction(argumentFunction, argumentResult);
+					argumentFunction.result = argumentResult.ToString();
 				}
 			}
 			else
@@ -345,29 +345,29 @@ public abstract class ConditionExtension
 				item.result = lNIDLHOIHIM2.ToString();
 			}
 		}
-		FullFunction(KJFKPMCPIBH, BMDEBHIHIAJ);
+		FullFunction(questFunction, compareResult);
 	}
 
-	protected abstract void FullFunction(QuestFunctions KJFKPMCPIBH, CompareResult BMDEBHIHIAJ);
+	protected abstract void FullFunction(QuestFunctions questFunction, CompareResult compareResult);
 
-	protected abstract void ResolveSessionVariable(string value, CompareResult BMDEBHIHIAJ);
+	protected abstract void ResolveSessionVariable(string value, CompareResult compareResult);
 
-	protected void ResetFunction(QuestFunctions KJFKPMCPIBH)
+	protected void ResetFunction(QuestFunctions questFunction)
 	{
-		KJFKPMCPIBH.Reset();
-		foreach (FunctionArgument item in KJFKPMCPIBH.arguments)
+		questFunction.Reset();
+		foreach (FunctionArgument item in questFunction.arguments)
 		{
-			QuestFunctions bECNHJBBOKO = item as QuestFunctions;
-			if (bECNHJBBOKO != null)
+			QuestFunctions argumentFunction = item as QuestFunctions;
+			if (argumentFunction != null)
 			{
-				ResetFunction(bECNHJBBOKO);
+				ResetFunction(argumentFunction);
 			}
 		}
 	}
 
-	protected void MathFunction(QuestFunctions KJFKPMCPIBH, CompareResult BMDEBHIHIAJ, MathFunctionType LFLGCDNKNJI)
+	protected void MathFunction(QuestFunctions questFunction, CompareResult compareResult, MathFunctionType mathType)
 	{
-		switch (LFLGCDNKNJI)
+		switch (mathType)
 		{
 		case MathFunctionType.MATH_SUM:
 		case MathFunctionType.MATH_SUB:
@@ -376,7 +376,7 @@ public abstract class ConditionExtension
 		{
 			int num5 = 0;
 			double num6 = 0.0;
-			foreach (FunctionArgument item in KJFKPMCPIBH.arguments)
+			foreach (FunctionArgument item in questFunction.arguments)
 			{
 				double result = 0.0;
 				double.TryParse(item.result, out result);
@@ -386,7 +386,7 @@ public abstract class ConditionExtension
 				}
 				else
 				{
-					switch (LFLGCDNKNJI)
+					switch (mathType)
 					{
 					case MathFunctionType.MATH_SUM:
 						num6 += result;
@@ -405,87 +405,87 @@ public abstract class ConditionExtension
 						num6 /= result;
 						break;
 					default:
-						GameLog.Error(string.Format("{0},{1}", "ConditionExtension::mathFunction - unknown type: ", LFLGCDNKNJI));
+						GameLog.Error(string.Format("{0},{1}", "ConditionExtension::mathFunction - unknown type: ", mathType));
 						break;
 					}
 				}
 				num5++;
 			}
-			BMDEBHIHIAJ.resultNumber = num6;
+			compareResult.resultNumber = num6;
 			break;
 		}
 		case MathFunctionType.MATH_DIVISION_INT:
-			if (KJFKPMCPIBH.arguments.Count == 2)
+			if (questFunction.arguments.Count == 2)
 			{
-				int num3 = int.Parse(KJFKPMCPIBH.arguments[0].result);
-				int num4 = int.Parse(KJFKPMCPIBH.arguments[1].result);
-				BMDEBHIHIAJ.resultNumber = num3 / num4;
+				int num3 = int.Parse(questFunction.arguments[0].result);
+				int num4 = int.Parse(questFunction.arguments[1].result);
+				compareResult.resultNumber = num3 / num4;
 			}
 			else
 			{
-				GameLog.Error(string.Format("{0},{1}", "ConditionExtension::MathFunction - wrong arguments count ", KJFKPMCPIBH.arguments.Count));
+				GameLog.Error(string.Format("{0},{1}", "ConditionExtension::MathFunction - wrong arguments count ", questFunction.arguments.Count));
 			}
 			break;
 		case MathFunctionType.MATH_MOD:
-			if (KJFKPMCPIBH.arguments.Count == 2)
+			if (questFunction.arguments.Count == 2)
 			{
-				int num7 = int.Parse(KJFKPMCPIBH.arguments[0].result);
-				int num8 = int.Parse(KJFKPMCPIBH.arguments[1].result);
-				BMDEBHIHIAJ.resultNumber = num7 % num8;
+				int num7 = int.Parse(questFunction.arguments[0].result);
+				int num8 = int.Parse(questFunction.arguments[1].result);
+				compareResult.resultNumber = num7 % num8;
 			}
 			else
 			{
-				GameLog.Error(string.Format("{0},{1}", "ConditionExtension::MathFunction - wrong arguments count ", KJFKPMCPIBH.arguments.Count));
+				GameLog.Error(string.Format("{0},{1}", "ConditionExtension::MathFunction - wrong arguments count ", questFunction.arguments.Count));
 			}
 			break;
 		case MathFunctionType.MATH_RAND:
-			if (KJFKPMCPIBH.arguments.Count == 2)
+			if (questFunction.arguments.Count == 2)
 			{
-				float num = float.Parse(KJFKPMCPIBH.arguments[0].result);
-				float num2 = float.Parse(KJFKPMCPIBH.arguments[1].result);
-				BMDEBHIHIAJ.resultNumber = NekkiMath.randomInt((int)num, (int)num2 + 1);
+				float num = float.Parse(questFunction.arguments[0].result);
+				float num2 = float.Parse(questFunction.arguments[1].result);
+				compareResult.resultNumber = NekkiMath.randomInt((int)num, (int)num2 + 1);
 			}
 			else
 			{
-				GameLog.Error(string.Format("{0},{1}", "ConditionExtension::MathFunction - wrong arguments count ", KJFKPMCPIBH.arguments.Count));
+				GameLog.Error(string.Format("{0},{1}", "ConditionExtension::MathFunction - wrong arguments count ", questFunction.arguments.Count));
 			}
 			break;
 		default:
-			GameLog.Error(string.Format("{0},{1}", "ConditionExtension::mathFunction - unknown type: ", LFLGCDNKNJI));
+			GameLog.Error(string.Format("{0},{1}", "ConditionExtension::mathFunction - unknown type: ", mathType));
 			break;
 		}
 	}
 
-	protected void StringFunction(QuestFunctions KJFKPMCPIBH, CompareResult BMDEBHIHIAJ, StringFunctionType LFLGCDNKNJI)
+	protected void StringFunction(QuestFunctions questFunction, CompareResult compareResult, StringFunctionType stringType)
 	{
 		int num = 0;
 		StringBuilder stringBuilder = new StringBuilder();
 		List<string> list = new List<string>();
-		foreach (FunctionArgument item in KJFKPMCPIBH.arguments)
+		foreach (FunctionArgument item in questFunction.arguments)
 		{
-			string dCJLKCFKCOM = item.result;
-			list.Add(dCJLKCFKCOM);
+			string argumentText = item.result;
+			list.Add(argumentText);
 			if (num == 0)
 			{
 				stringBuilder.Clear();
-				stringBuilder.Append(dCJLKCFKCOM);
+				stringBuilder.Append(argumentText);
 			}
-			else if (LFLGCDNKNJI == StringFunctionType.STRING_CONCAT)
+			else if (stringType == StringFunctionType.STRING_CONCAT)
 			{
-				stringBuilder.Append(dCJLKCFKCOM);
+				stringBuilder.Append(argumentText);
 			}
 			num++;
 		}
-		if (list.Count >= 3 && LFLGCDNKNJI == StringFunctionType.STRING_SLICE)
+		if (list.Count >= 3 && stringType == StringFunctionType.STRING_SLICE)
 		{
-			string iGGFGLLIGCG = list[0];
-			int iOFHCAAOELD = int.Parse(list[1]);
-			int iPMPAMAHLJG = int.Parse(list[2]);
-			string value = StringFunctionSlice(iGGFGLLIGCG, iOFHCAAOELD, iPMPAMAHLJG);
+			string text = list[0];
+			int startIndex = int.Parse(list[1]);
+			int endIndex = int.Parse(list[2]);
+			string value = StringFunctionSlice(text, startIndex, endIndex);
 			stringBuilder.Clear();
 			stringBuilder.Append(value);
 		}
-		BMDEBHIHIAJ.resultSTR = stringBuilder.ToString();
+		compareResult.resultSTR = stringBuilder.ToString();
 	}
 
 	protected string ClearGaps(string value)
@@ -509,17 +509,17 @@ public abstract class ConditionExtension
 		return stringBuilder.ToString();
 	}
 
-	protected string StringFunctionSlice(string IGGFGLLIGCG, int IOFHCAAOELD, int IPMPAMAHLJG)
+	protected string StringFunctionSlice(string text, int startIndex, int endIndex)
 	{
-		if (IOFHCAAOELD > IGGFGLLIGCG.Length || IPMPAMAHLJG < IOFHCAAOELD || IOFHCAAOELD < 0 || IPMPAMAHLJG < 0)
+		if (startIndex > text.Length || endIndex < startIndex || startIndex < 0 || endIndex < 0)
 		{
 			return string.Empty;
 		}
-		int length = 1 + IPMPAMAHLJG - IOFHCAAOELD;
-		if (1 + IPMPAMAHLJG > IGGFGLLIGCG.Length)
+		int length = 1 + endIndex - startIndex;
+		if (1 + endIndex > text.Length)
 		{
-			length = IGGFGLLIGCG.Length - IOFHCAAOELD;
+			length = text.Length - startIndex;
 		}
-		return IGGFGLLIGCG.Substring(IOFHCAAOELD, length);
+		return text.Substring(startIndex, length);
 	}
 }

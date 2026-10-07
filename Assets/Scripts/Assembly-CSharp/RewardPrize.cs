@@ -29,16 +29,16 @@ public class RewardPrize
 
 	public bool IsCloned;
 
-	public void Parse(XmlNode node, ushort CDCJKJNGPOE = 0, ushort MCDAHGPLLDO = 0)
+	public void Parse(XmlNode node, ushort moneyExponent = 0, ushort prizeBaseExponent = 0)
 	{
 		number = node.Attributes["Number"].ParseInt();
-		money = (ObscuredLong)(node.Attributes["Money"].ParseLong(0L) * (long)Mathf.Pow(10f, (int)CDCJKJNGPOE));
+		money = (ObscuredLong)(node.Attributes["Money"].ParseLong(0L) * (long)Mathf.Pow(10f, (int)moneyExponent));
 		bonus = (ObscuredLong)(node.Attributes["Bonus"].ParseLong(0L));
 		exp = (ObscuredUInt)(node.Attributes["Exp"].ParseUint());
 		prizeBase = (ObscuredFloat)(node.Attributes["PrizeBase"].ParseFloat(-1f));
 		if ((ObscuredFloat)(prizeBase) != -1f)
 		{
-			prizeBase = (ObscuredFloat)((ObscuredFloat)(prizeBase) * Mathf.Pow(10f, (int)MCDAHGPLLDO));
+			prizeBase = (ObscuredFloat)((ObscuredFloat)(prizeBase) * Mathf.Pow(10f, (int)prizeBaseExponent));
 		}
 		foreach (XmlNode item6 in node.SelectNodes("Money"))
 		{
@@ -57,10 +57,10 @@ public class RewardPrize
 		}
 		foreach (XmlNode item9 in node.SelectNodes("Lottery"))
 		{
-			RewardLottery fAPDEKOMOGH = new RewardLottery(item9, CDCJKJNGPOE, MCDAHGPLLDO);
+			RewardLottery rewardLottery = new RewardLottery(item9, moneyExponent, prizeBaseExponent);
 			if (lottery == null)
 			{
-				lottery = fAPDEKOMOGH;
+				lottery = rewardLottery;
 			}
 		}
 		foreach (XmlNode item10 in node.SelectNodes("Item"))
@@ -75,33 +75,33 @@ public class RewardPrize
 		}
 	}
 
-	public void Merge(RewardPrize DPIIJICBGGA)
+	public void Merge(RewardPrize otherPrize)
 	{
-		bonus = (ObscuredLong)((ObscuredLong)(bonus) + (ObscuredLong)(DPIIJICBGGA.bonus));
-		money = (ObscuredLong)((ObscuredLong)(money) + (ObscuredLong)(DPIIJICBGGA.money));
-		exp = (ObscuredUInt)((ObscuredUInt)(exp) + (ObscuredUInt)(DPIIJICBGGA.exp));
+		bonus = (ObscuredLong)((ObscuredLong)(bonus) + (ObscuredLong)(otherPrize.bonus));
+		money = (ObscuredLong)((ObscuredLong)(money) + (ObscuredLong)(otherPrize.money));
+		exp = (ObscuredUInt)((ObscuredUInt)(exp) + (ObscuredUInt)(otherPrize.exp));
 		if ((ObscuredFloat)(prizeBase) < 0f)
 		{
-			prizeBase = DPIIJICBGGA.prizeBase;
+			prizeBase = otherPrize.prizeBase;
 		}
-		else if ((ObscuredFloat)(DPIIJICBGGA.prizeBase) > 0f)
+		else if ((ObscuredFloat)(otherPrize.prizeBase) > 0f)
 		{
-			prizeBase = (ObscuredFloat)((ObscuredFloat)(prizeBase) + (ObscuredFloat)(DPIIJICBGGA.prizeBase));
+			prizeBase = (ObscuredFloat)((ObscuredFloat)(prizeBase) + (ObscuredFloat)(otherPrize.prizeBase));
 		}
-		items.AddRange(DPIIJICBGGA.items);
-		moneyRewards.AddRange(DPIIJICBGGA.moneyRewards);
-		currencyRewards.AddRange(DPIIJICBGGA.currencyRewards);
-		resistanceRewards.AddRange(DPIIJICBGGA.resistanceRewards);
-		choices.AddRange(DPIIJICBGGA.choices);
-		if (DPIIJICBGGA.lottery != null)
+		items.AddRange(otherPrize.items);
+		moneyRewards.AddRange(otherPrize.moneyRewards);
+		currencyRewards.AddRange(otherPrize.currencyRewards);
+		resistanceRewards.AddRange(otherPrize.resistanceRewards);
+		choices.AddRange(otherPrize.choices);
+		if (otherPrize.lottery != null)
 		{
 			if (lottery != null)
 			{
-				lottery.slots.AddRange(DPIIJICBGGA.lottery.slots);
+				lottery.slots.AddRange(otherPrize.lottery.slots);
 			}
 			else
 			{
-				lottery = DPIIJICBGGA.lottery.CloneForRewardComposition();
+				lottery = otherPrize.lottery.CloneForRewardComposition();
 			}
 		}
 	}

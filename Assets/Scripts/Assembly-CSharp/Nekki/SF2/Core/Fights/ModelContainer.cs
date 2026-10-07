@@ -114,10 +114,10 @@ namespace Nekki.SF2.Core.Fights
 			return stageType;
 		}
 
-		public void Init(float JMLAKAKDBBL = 0f, float FEIHFIPFNKF = 0f, float LOJLAFEALJO = 0f, float ILLMIAIFBKL = 0f)
+		public void Init(float containerWidth = 0f, float containerHeight = 0f, float offsetX = 0f, float offsetY = 0f)
 		{
-			SetWidth((JMLAKAKDBBL != 0f) ? JMLAKAKDBBL : ((float)Screen.width));
-			SetHeight(FEIHFIPFNKF);
+			SetWidth((containerWidth != 0f) ? containerWidth : ((float)Screen.width));
+			SetHeight(containerHeight);
 			_location.gameLayer = new LocationSelector(0);
 			_location.gameLayer.GetLayerObject().transform.SetParent(base.transform, false);
 			RecreateRenderContainer();
@@ -141,9 +141,9 @@ namespace Nekki.SF2.Core.Fights
 				_models.Remove(_playerModel);
 				_playerModel.DestroyModel();
 				_playerModel = null;
-				_models.ForEach((Model DHDMNHCIPEH) =>
+				_models.ForEach((Model model) =>
 				{
-					DHDMNHCIPEH.DestroyModel();
+					model.DestroyModel();
 				});
 				_models.Clear();
 			}
@@ -161,9 +161,9 @@ namespace Nekki.SF2.Core.Fights
 			renderContainer.GetRootObject().SetActive(false);
 		}
 
-		public void UpdateModel(ItemInfo item, StageType.Stage LGPIFNMFPAN, string MHOCFOODLLL)
+		public void UpdateModel(ItemInfo item, StageType.Stage stage, string itemType)
 		{
-			stageType = LGPIFNMFPAN;
+			stageType = stage;
 			RecreateRenderContainer();
 			if (_playerModel != null)
 			{
@@ -175,9 +175,9 @@ namespace Nekki.SF2.Core.Fights
 				_models.Remove(_playerModel);
 				_playerModel.DestroyModel();
 				_playerModel = null;
-				_models.ForEach((Model DHDMNHCIPEH) =>
+				_models.ForEach((Model model) =>
 				{
-					DHDMNHCIPEH.DestroyModel();
+					model.DestroyModel();
 				});
 				_models.Clear();
 			}
@@ -185,54 +185,54 @@ namespace Nekki.SF2.Core.Fights
 			modelParameters.SpawnPosition = new Vector3f(_modelPosition);
 			modelParameters.AiControlled = false;
 			modelParameters.UserControlled = false;
-			modelParameters.SceneType = GetSceneTypeForItemType(MHOCFOODLLL);
-			_currentScene = MHOCFOODLLL;
-			ItemInfo dJKEECEOCJB = null;
+			modelParameters.SceneType = GetSceneTypeForItemType(itemType);
+			_currentScene = itemType;
+			ItemInfo equippedItem = null;
 			if (item != null)
 			{
 				if (item.Type.Equals("Weapon"))
 				{
-					dJKEECEOCJB = equippedItems.Weapon;
+					equippedItem = equippedItems.Weapon;
 					modelParameters.Weapon = item;
 				}
 				else if (item.Type.Equals("Armor"))
 				{
-					dJKEECEOCJB = equippedItems.Armor;
+					equippedItem = equippedItems.Armor;
 					modelParameters.Armor = item;
 				}
 				else if (item.Type.Equals("Helm"))
 				{
-					dJKEECEOCJB = equippedItems.Helm;
+					equippedItem = equippedItems.Helm;
 					modelParameters.Helm = item;
 				}
 				else if (item.Type.Equals("Ranged"))
 				{
-					dJKEECEOCJB = equippedItems.Ranged;
+					equippedItem = equippedItems.Ranged;
 					modelParameters.Ranged = item;
 				}
 				else if (item.Type.Equals("Magic"))
 				{
-					dJKEECEOCJB = equippedItems.Magic;
+					equippedItem = equippedItems.Magic;
 					modelParameters.Magic = item;
 				}
 				else if (item.Type.Equals("RaidConsumable") && item.SubType.Equals("RaidCharge"))
 				{
-					dJKEECEOCJB = equippedItems.RaidCharge;
-					RaidModelParameters kAOPLEPILDH = modelParameters as RaidModelParameters;
-					if (kAOPLEPILDH != null)
+					equippedItem = equippedItems.RaidCharge;
+					RaidModelParameters raidParameters = modelParameters as RaidModelParameters;
+					if (raidParameters != null)
 					{
-						kAOPLEPILDH.RaidChargeItem = item;
+						raidParameters.RaidChargeItem = item;
 					}
 				}
 				modelParameters.BuildModelDocuments();
 			}
 			else
 			{
-				dJKEECEOCJB = FindChangedItem();
+				equippedItem = FindChangedItem();
 			}
 			modelParameters.CopyEquippedItemsTo(equippedItems);
 			// A shop's forced preview item is for the saved player, not a versus fighter.
-			if (_eclipseParameters == null) ApplyShopOverride(modelParameters, MHOCFOODLLL);
+			if (_eclipseParameters == null) ApplyShopOverride(modelParameters, itemType);
 			if (needsReapplyItems)
 			{
 				needsReapplyItems = false;
@@ -288,17 +288,17 @@ namespace Nekki.SF2.Core.Fights
 			ResetModelPosition();
 		}
 
-		public void PlayAnimation(string name, int AOJJBKLCHJO = 1)
+		public void PlayAnimation(string name, int repeat = 1)
 		{
 			TryPlayAnimation(name);
 		}
 
 		public bool TryPlayAnimation(string name)
 		{
-			InfoAnimation pJAHIOELGGD = AnimationData.GetAnimationByName(name);
-			if (pJAHIOELGGD != null && _playerModel != null)
+			InfoAnimation animation = AnimationData.GetAnimationByName(name);
+			if (animation != null && _playerModel != null)
 			{
-				_playerModel.PlayAnimationDelay(pJAHIOELGGD);
+				_playerModel.PlayAnimationDelay(animation);
 				return true;
 			}
 			return false;
@@ -306,102 +306,102 @@ namespace Nekki.SF2.Core.Fights
 
 		private void OnModelAdded(object data)
 		{
-			Model fGCODGKLHED = (Model)data;
-			pendingModels.Add(fGCODGKLHED);
-			SetModelOnListening(fGCODGKLHED);
-			renderContainer.GetViewerModel().AddModel(fGCODGKLHED.GetBodyObject(), _colorModel, true);
-			renderContainer.AttachModelEffects(fGCODGKLHED);
-			UpdateAnimationParameters(fGCODGKLHED);
+			Model model = (Model)data;
+			pendingModels.Add(model);
+			SetModelOnListening(model);
+			renderContainer.GetViewerModel().AddModel(model.GetBodyObject(), _colorModel, true);
+			renderContainer.AttachModelEffects(model);
+			UpdateAnimationParameters(model);
 		}
 
 		private void OnModelRemoved(object data)
 		{
-			Model fGCODGKLHED = (Model)data;
+			Model model = (Model)data;
 			int num = 0;
 			foreach (Model item in _models)
 			{
-				if (item == fGCODGKLHED)
+				if (item == model)
 				{
 					break;
 				}
 				num++;
 			}
-			modelsToRemove.AddIfNotExist(fGCODGKLHED);
+			modelsToRemove.AddIfNotExist(model);
 		}
 
-		private void UpdateAnimationParameters(Model CNAAFEHFGKD)
+		private void UpdateAnimationParameters(Model model)
 		{
-			ModelObject bBGCMFGFMCL = CNAAFEHFGKD.GetBodyObject();
-			bool dPKOKLCJEHI = CNAAFEHFGKD.IsPlayerModel();
-			bool eMGNKKHPGCJ = CNAAFEHFGKD.GetParentModel() != null;
-			List<InfoAnimation> lNKFKJKLCKP = CNAAFEHFGKD.GetAvailableAnimations();
+			ModelObject bodyObject = model.GetBodyObject();
+			bool isPlayer = model.IsPlayerModel();
+			bool hasParent = model.GetParentModel() != null;
+			List<InfoAnimation> animations = model.GetAvailableAnimations();
 			foreach (Model item in _models)
 			{
-				SyncAnimationParameters(item, lNKFKJKLCKP, bBGCMFGFMCL, dPKOKLCJEHI, eMGNKKHPGCJ);
+				SyncAnimationParameters(item, animations, bodyObject, isPlayer, hasParent);
 			}
 			foreach (Model item2 in pendingModels)
 			{
-				SyncAnimationParameters(item2, lNKFKJKLCKP, bBGCMFGFMCL, dPKOKLCJEHI, eMGNKKHPGCJ);
+				SyncAnimationParameters(item2, animations, bodyObject, isPlayer, hasParent);
 			}
 		}
 
-		private void SyncAnimationParameters(Model ACENLMONNPA, List<InfoAnimation> LNKFKJKLCKP, ModelObject BBGCMFGFMCL, bool DPKOKLCJEHI, bool EMGNKKHPGCJ)
+		private void SyncAnimationParameters(Model model, List<InfoAnimation> animations, ModelObject ownerBodyObject, bool ownerIsPlayer, bool ownerHasParent)
 		{
-			List<InfoAnimation> list = ACENLMONNPA.GetAvailableAnimations();
+			List<InfoAnimation> list = model.GetAvailableAnimations();
 			foreach (InfoAnimation item in list)
 			{
-				item.UpdateModelObjects(BBGCMFGFMCL, DPKOKLCJEHI, EMGNKKHPGCJ, BBGCMFGFMCL);
+				item.UpdateModelObjects(ownerBodyObject, ownerIsPlayer, ownerHasParent, ownerBodyObject);
 			}
-			ModelObject oIEODIEHJMH = ACENLMONNPA.GetBodyObject();
-			bool eKBOGDKIHIH = ACENLMONNPA.IsPlayerModel();
-			bool pHADJMAONJG = ACENLMONNPA.GetParentModel() != null;
-			foreach (InfoAnimation item2 in LNKFKJKLCKP)
+			ModelObject bodyObject = model.GetBodyObject();
+			bool isPlayer = model.IsPlayerModel();
+			bool hasParent = model.GetParentModel() != null;
+			foreach (InfoAnimation item2 in animations)
 			{
-				item2.UpdateModelObjects(oIEODIEHJMH, eKBOGDKIHIH, pHADJMAONJG, oIEODIEHJMH);
+				item2.UpdateModelObjects(bodyObject, isPlayer, hasParent, bodyObject);
 			}
 		}
 
-		private bool IsItemDifferent(ItemInfo CHJGFBKFKKD, ItemInfo BGCMDCGMPPL)
+		private bool IsItemDifferent(ItemInfo currentItem, ItemInfo otherItem)
 		{
-			if (CHJGFBKFKKD != null && BGCMDCGMPPL != null && !CHJGFBKFKKD.Name.Equals(BGCMDCGMPPL.Name))
+			if (currentItem != null && otherItem != null && !currentItem.Name.Equals(otherItem.Name))
 			{
 				return true;
 			}
 			return false;
 		}
 
-		public bool IsItemDiffer(ModelParameters JCICKLIMBEF)
+		public bool IsItemDiffer(ModelParameters parameters)
 		{
-			if (IsItemDifferent(equippedItems.Armor, JCICKLIMBEF.Armor))
+			if (IsItemDifferent(equippedItems.Armor, parameters.Armor))
 			{
 				return true;
 			}
-			if (IsItemDifferent(equippedItems.Helm, JCICKLIMBEF.Helm))
+			if (IsItemDifferent(equippedItems.Helm, parameters.Helm))
 			{
 				return true;
 			}
-			if (IsItemDifferent(equippedItems.Skeleton, JCICKLIMBEF.Skeleton))
+			if (IsItemDifferent(equippedItems.Skeleton, parameters.Skeleton))
 			{
 				return true;
 			}
-			if (IsItemDifferent(equippedItems.Seal, JCICKLIMBEF.Seal))
+			if (IsItemDifferent(equippedItems.Seal, parameters.Seal))
 			{
 				return true;
 			}
-			if (IsItemDifferent(equippedItems.Weapon, JCICKLIMBEF.Weapon))
+			if (IsItemDifferent(equippedItems.Weapon, parameters.Weapon))
 			{
 				return true;
 			}
-			if (IsItemDifferent(equippedItems.Magic, JCICKLIMBEF.Magic))
+			if (IsItemDifferent(equippedItems.Magic, parameters.Magic))
 			{
 				return true;
 			}
-			if (IsItemDifferent(equippedItems.Ranged, JCICKLIMBEF.Ranged))
+			if (IsItemDifferent(equippedItems.Ranged, parameters.Ranged))
 			{
 				return true;
 			}
-			RaidModelParameters kAOPLEPILDH = JCICKLIMBEF as RaidModelParameters;
-			if (kAOPLEPILDH != null && IsItemDifferent(equippedItems.RaidCharge, kAOPLEPILDH.RaidChargeItem))
+			RaidModelParameters raidParameters = parameters as RaidModelParameters;
+			if (raidParameters != null && IsItemDifferent(equippedItems.RaidCharge, raidParameters.RaidChargeItem))
 			{
 				return true;
 			}
@@ -438,8 +438,8 @@ namespace Nekki.SF2.Core.Fights
 			{
 				return equippedItems.Ranged;
 			}
-			RaidModelParameters kAOPLEPILDH = modelParameters as RaidModelParameters;
-			if (kAOPLEPILDH != null && equippedItems.RaidCharge != kAOPLEPILDH.RaidChargeItem)
+			RaidModelParameters raidParameters = modelParameters as RaidModelParameters;
+			if (raidParameters != null && equippedItems.RaidCharge != raidParameters.RaidChargeItem)
 			{
 				return equippedItems.RaidCharge;
 			}
@@ -464,53 +464,53 @@ namespace Nekki.SF2.Core.Fights
 			modelsToRemove.Clear();
 		}
 
-		private void RemoveModelByIndex(int index, Model LEKHCMIFJAO)
+		private void RemoveModelByIndex(int index, Model model)
 		{
 			int count = _models.Count;
-			Model fGCODGKLHED = null;
+			Model target = null;
 			if (count == 0 || index < 0 || count - 1 < index)
 			{
-				fGCODGKLHED = LEKHCMIFJAO;
+				target = model;
 			}
 			else
 			{
-				fGCODGKLHED = _models[index];
+				target = _models[index];
 				renderContainer.GetViewerModel().RemoveModel(index);
-				renderContainer.DetachModelEffects(fGCODGKLHED);
-				_models.Remove(fGCODGKLHED);
+				renderContainer.DetachModelEffects(target);
+				_models.Remove(target);
 			}
-			RemoveModel(fGCODGKLHED);
+			RemoveModel(target);
 		}
 
-		private void RemoveModel(Model ACENLMONNPA)
+		private void RemoveModel(Model model)
 		{
-			if (ACENLMONNPA == null)
+			if (model == null)
 			{
 				GameLog.Error("Fight::removeModel - cant find model");
 				return;
 			}
-			Model fGCODGKLHED = ACENLMONNPA.GetParentModel();
-			if (fGCODGKLHED != null)
+			Model parentModel = model.GetParentModel();
+			if (parentModel != null)
 			{
-				fGCODGKLHED.RemoveWeaponModel((WeaponModel)ACENLMONNPA);
+				parentModel.RemoveWeaponModel((WeaponModel)model);
 			}
 			foreach (Model item in _models)
 			{
-				item.RemoveEnemy(ACENLMONNPA);
+				item.RemoveEnemy(model);
 				item.SetNearestEnemy();
 			}
-			_selectAnimation.RemoveModel(ACENLMONNPA);
-			ACENLMONNPA.DetachCurrentEffects();
-			ACENLMONNPA.DestroyModel();
+			_selectAnimation.RemoveModel(model);
+			model.DetachCurrentEffects();
+			model.DestroyModel();
 		}
 
 		private void OnPlayerModelRemoved()
 		{
 		}
 
-		private SceneTypes GetSceneTypeForItemType(string LFLGCDNKNJI)
+		private SceneTypes GetSceneTypeForItemType(string itemType)
 		{
-			switch (LFLGCDNKNJI)
+			switch (itemType)
 			{
 			case "Weapon":
 				return SceneTypes.SceneShopWeapon;
@@ -555,30 +555,30 @@ namespace Nekki.SF2.Core.Fights
 			}
 		}
 
-		private void ApplyShopOverride(ModelParameters JCICKLIMBEF, string NFNJJIGAKNN)
+		private void ApplyShopOverride(ModelParameters targetParameters, string screenName)
 		{
-			ShopOverride jHJPEFFBMFM = GameUtils.ShopOverrides.GetOverrideByScreen(NFNJJIGAKNN);
-			if (jHJPEFFBMFM != null)
+			ShopOverride shopOverride = GameUtils.ShopOverrides.GetOverrideByScreen(screenName);
+			if (shopOverride != null)
 			{
-				ItemInfo mBIJKDIEFIF = ListSF.GetItems().GetItemByName(jHJPEFFBMFM.ItemName);
-				modelParameters.SetItemByType(jHJPEFFBMFM.Type, mBIJKDIEFIF);
+				ItemInfo overrideItem = ListSF.GetItems().GetItemByName(shopOverride.ItemName);
+				modelParameters.SetItemByType(shopOverride.Type, overrideItem);
 				modelParameters.BuildModelDocuments();
 			}
 		}
 
-		private void SetModelOnListening(Model ACENLMONNPA)
+		private void SetModelOnListening(Model model)
 		{
 			// Eclipse: menus without a main camera (versus previews) set their walls themselves.
 			if (UnityEngine.Camera.main != null)
 			{
-				float nGHJOCKCCHH = UnityEngine.Camera.main.ScreenToWorldPoint(new Vector2(0f, 0f)).x - base.transform.position.x;
-				float kCNCLAANGGJ = UnityEngine.Camera.main.ScreenToWorldPoint(new Vector2(Screen.width, 0f)).x - base.transform.position.x;
-				ACENLMONNPA.SetWalls(nGHJOCKCCHH, kCNCLAANGGJ, 0, 0);
+				float leftWall = UnityEngine.Camera.main.ScreenToWorldPoint(new Vector2(0f, 0f)).x - base.transform.position.x;
+				float rightWall = UnityEngine.Camera.main.ScreenToWorldPoint(new Vector2(Screen.width, 0f)).x - base.transform.position.x;
+				model.SetWalls(leftWall, rightWall, 0, 0);
 			}
-			ACENLMONNPA.AddEventListener(3, OnAnimationEnd);
-			ACENLMONNPA.AddEventListener(6, OnModelAdded);
-			ACENLMONNPA.AddEventListener(5, OnModelRemoved);
-			ACENLMONNPA.AddEventListener(14, OnTryOnEnd);
+			model.AddEventListener(3, OnAnimationEnd);
+			model.AddEventListener(6, OnModelAdded);
+			model.AddEventListener(5, OnModelRemoved);
+			model.AddEventListener(14, OnTryOnEnd);
 		}
 
 		private void OnAnimationEnd(object data)

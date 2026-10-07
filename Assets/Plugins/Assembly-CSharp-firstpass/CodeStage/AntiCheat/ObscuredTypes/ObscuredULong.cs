@@ -26,9 +26,9 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 			inited = true;
 		}
 
-		public static void SetNewCryptoKey(ulong CNOFJICCAHK)
+		public static void SetNewCryptoKey(ulong newKey)
 		{
-			cryptoKey = CNOFJICCAHK;
+			cryptoKey = newKey;
 		}
 
 		public static ulong Encrypt(ulong value)
@@ -41,22 +41,22 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 			return Decrypt(value, 0uL);
 		}
 
-		public static ulong Encrypt(ulong value, ulong KGBGENDIMBC)
+		public static ulong Encrypt(ulong value, ulong key)
 		{
-			if (KGBGENDIMBC == 0)
+			if (key == 0)
 			{
 				return value ^ cryptoKey;
 			}
-			return value ^ KGBGENDIMBC;
+			return value ^ key;
 		}
 
-		public static ulong Decrypt(ulong value, ulong KGBGENDIMBC)
+		public static ulong Decrypt(ulong value, ulong key)
 		{
-			if (KGBGENDIMBC == 0)
+			if (key == 0)
 			{
 				return value ^ cryptoKey;
 			}
-			return value ^ KGBGENDIMBC;
+			return value ^ key;
 		}
 
 		public void ApplyNewCryptoKey()
@@ -70,9 +70,9 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 
 		public void RandomizeCryptoKey()
 		{
-			ulong bAINMLLIKOL = InternalDecrypt();
+			ulong decrypted = InternalDecrypt();
 			currentCryptoKey = (ulong)UnityEngine.Random.Range(0, int.MaxValue);
-			hiddenValue = Encrypt(bAINMLLIKOL, currentCryptoKey);
+			hiddenValue = Encrypt(decrypted, currentCryptoKey);
 		}
 
 		public ulong GetEncrypted()
@@ -81,10 +81,10 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 			return hiddenValue;
 		}
 
-		public void SetEncrypted(ulong ANGFOBEKKKD)
+		public void SetEncrypted(ulong encrypted)
 		{
 			inited = true;
-			hiddenValue = ANGFOBEKKKD;
+			hiddenValue = encrypted;
 			if (ObscuredCheatingDetector.GetIsRunning())
 			{
 				fakeValue = InternalDecrypt();
@@ -124,45 +124,45 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 		}
 
 		[SpecialName]
-		public static ObscuredULong op_Increment(ObscuredULong NILNDHEKNLJ)
+		public static ObscuredULong op_Increment(ObscuredULong input)
 		{
-			ulong bAINMLLIKOL = NILNDHEKNLJ.InternalDecrypt() + 1;
-			NILNDHEKNLJ.hiddenValue = Encrypt(bAINMLLIKOL, NILNDHEKNLJ.currentCryptoKey);
+			ulong newValue = input.InternalDecrypt() + 1;
+			input.hiddenValue = Encrypt(newValue, input.currentCryptoKey);
 			if (ObscuredCheatingDetector.GetIsRunning())
 			{
-				NILNDHEKNLJ.fakeValue = bAINMLLIKOL;
+				input.fakeValue = newValue;
 			}
-			return NILNDHEKNLJ;
+			return input;
 		}
 
 		[SpecialName]
-		public static ObscuredULong op_Decrement(ObscuredULong NILNDHEKNLJ)
+		public static ObscuredULong op_Decrement(ObscuredULong input)
 		{
-			ulong bAINMLLIKOL = NILNDHEKNLJ.InternalDecrypt() - 1;
-			NILNDHEKNLJ.hiddenValue = Encrypt(bAINMLLIKOL, NILNDHEKNLJ.currentCryptoKey);
+			ulong newValue = input.InternalDecrypt() - 1;
+			input.hiddenValue = Encrypt(newValue, input.currentCryptoKey);
 			if (ObscuredCheatingDetector.GetIsRunning())
 			{
-				NILNDHEKNLJ.fakeValue = bAINMLLIKOL;
+				input.fakeValue = newValue;
 			}
-			return NILNDHEKNLJ;
+			return input;
 		}
 
-		public override bool Equals(object AOMLCBHAJJH)
+		public override bool Equals(object obj)
 		{
-			if (!(AOMLCBHAJJH is ObscuredULong))
+			if (!(obj is ObscuredULong))
 			{
 				return false;
 			}
-			return Equals((ObscuredULong)AOMLCBHAJJH);
+			return Equals((ObscuredULong)obj);
 		}
 
-		public bool Equals(ObscuredULong AOMLCBHAJJH)
+		public bool Equals(ObscuredULong other)
 		{
-			if (currentCryptoKey == AOMLCBHAJJH.currentCryptoKey)
+			if (currentCryptoKey == other.currentCryptoKey)
 			{
-				return hiddenValue == AOMLCBHAJJH.hiddenValue;
+				return hiddenValue == other.hiddenValue;
 			}
-			return Decrypt(hiddenValue, currentCryptoKey) == Decrypt(AOMLCBHAJJH.hiddenValue, AOMLCBHAJJH.currentCryptoKey);
+			return Decrypt(hiddenValue, currentCryptoKey) == Decrypt(other.hiddenValue, other.currentCryptoKey);
 		}
 
 		public override int GetHashCode()
@@ -175,19 +175,19 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 			return InternalDecrypt().ToString();
 		}
 
-		public string ToString(string LBOHOKIBHOH)
+		public string ToString(string format)
 		{
-			return InternalDecrypt().ToString(LBOHOKIBHOH);
+			return InternalDecrypt().ToString(format);
 		}
 
-		public string ToString(IFormatProvider EEGMFLOPLLH)
+		public string ToString(IFormatProvider provider)
 		{
-			return InternalDecrypt().ToString(EEGMFLOPLLH);
+			return InternalDecrypt().ToString(provider);
 		}
 
-		public string ToString(string LBOHOKIBHOH, IFormatProvider EEGMFLOPLLH)
+		public string ToString(string format, IFormatProvider provider)
 		{
-			return InternalDecrypt().ToString(LBOHOKIBHOH, EEGMFLOPLLH);
+			return InternalDecrypt().ToString(format, provider);
 		}
 	}
 }

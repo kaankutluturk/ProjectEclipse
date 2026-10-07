@@ -23,14 +23,14 @@ public class EventRoundStage : EventAnimation
 		return stage;
 	}
 
-	protected override bool Compare(EventAnimation FOPOKALJIIJ)
+	protected override bool Compare(EventAnimation other)
 	{
-		EventRoundStage gBIJAGPBADA = FOPOKALJIIJ as EventRoundStage;
-		bool flag = gBIJAGPBADA.stage == stage;
+		EventRoundStage otherEvent = other as EventRoundStage;
+		bool flag = otherEvent.stage == stage;
 		return (!IsNot) ? flag : (!flag);
 	}
 
-	protected override void Parse(XmlNode MEEAKLDGLDF)
+	protected override void Parse(XmlNode node)
 	{
 		stage = StageType.GetStageByName(AnimationName);
 	}

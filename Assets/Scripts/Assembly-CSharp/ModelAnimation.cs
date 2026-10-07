@@ -388,14 +388,14 @@ public class ModelAnimation : global::EventDispatcher<object>
 		}
 	}
 
-	public ModelAnimation(ModelObject ACENLMONNPA)
+	public ModelAnimation(ModelObject modelObject)
 	{
 		Heel1Node = null;
 		Heel2Node = null;
 		otherAnimation = null;
 		parentAnimation = null;
 		bufferState = -3;
-		_Model = ACENLMONNPA;
+		_Model = modelObject;
 		isPlaying = false;
 		sign = 1;
 		currentNodeId = 0;
@@ -415,7 +415,7 @@ public class ModelAnimation : global::EventDispatcher<object>
 		intervalTypeFilter = null;
 		startFrameOffset = 0;
 		isLooping = false;
-		hasParentModel = ACENLMONNPA.GetModel().GetParentModel() != null;
+		hasParentModel = modelObject.GetModel().GetParentModel() != null;
 		subFrameScale = 1f;
 		shiftWallDelta = 0f;
 		frameChangedPending = false;
@@ -738,9 +738,9 @@ public class ModelAnimation : global::EventDispatcher<object>
 		return currentInfo.MidFrames;
 	}
 
-	public ModelNode GetNodeById(int OKNNNLIPODI)
+	public ModelNode GetNodeById(int nodeId)
 	{
-		return _Model.GetAllNodes()[OKNNNLIPODI];
+		return _Model.GetAllNodes()[nodeId];
 	}
 
 	public ModelNode GetPlayingNode()
@@ -752,34 +752,34 @@ public class ModelAnimation : global::EventDispatcher<object>
 		return null;
 	}
 
-	public ModelNode GetNodeByNameForSign(string name, int AOJJBKLCHJO)
+	public ModelNode GetNodeByNameForSign(string name, int sign)
 	{
 		if (!string.IsNullOrEmpty(name))
 		{
-			ModelNode lCDGOCIAIDK = _Model.GetNodeByName(name);
-			if (lCDGOCIAIDK != null)
+			ModelNode node = _Model.GetNodeByName(name);
+			if (node != null)
 			{
-				ModelNode lCDGOCIAIDK2 = lCDGOCIAIDK.GetPairNode();
+				ModelNode lCDGOCIAIDK2 = node.GetPairNode();
 				if (lCDGOCIAIDK2 == null)
 				{
-					return lCDGOCIAIDK;
+					return node;
 				}
 				char c = name[name.Length - 1];
-				switch (AOJJBKLCHJO)
+				switch (sign)
 				{
 				case 1:
 					switch (c)
 					{
 					case '1':
-						if (lCDGOCIAIDK.GetStart().GetX() < lCDGOCIAIDK2.GetStart().GetX())
+						if (node.GetStart().GetX() < lCDGOCIAIDK2.GetStart().GetX())
 						{
 							return lCDGOCIAIDK2;
 						}
-						return lCDGOCIAIDK;
+						return node;
 					case '2':
-						if (lCDGOCIAIDK.GetStart().GetX() < lCDGOCIAIDK2.GetStart().GetX())
+						if (node.GetStart().GetX() < lCDGOCIAIDK2.GetStart().GetX())
 						{
-							return lCDGOCIAIDK;
+							return node;
 						}
 						return lCDGOCIAIDK2;
 					}
@@ -788,39 +788,39 @@ public class ModelAnimation : global::EventDispatcher<object>
 					switch (c)
 					{
 					case '1':
-						if (lCDGOCIAIDK.GetStart().GetX() < lCDGOCIAIDK2.GetStart().GetX())
+						if (node.GetStart().GetX() < lCDGOCIAIDK2.GetStart().GetX())
 						{
-							return lCDGOCIAIDK;
+							return node;
 						}
 						return lCDGOCIAIDK2;
 					case '2':
-						if (lCDGOCIAIDK.GetStart().GetX() < lCDGOCIAIDK2.GetStart().GetX())
+						if (node.GetStart().GetX() < lCDGOCIAIDK2.GetStart().GetX())
 						{
 							return lCDGOCIAIDK2;
 						}
-						return lCDGOCIAIDK;
+						return node;
 					}
 					break;
 				default:
-					GameLog.Error("strange sign {0}", AOJJBKLCHJO);
-					return lCDGOCIAIDK;
+					GameLog.Error("strange sign {0}", sign);
+					return node;
 				}
 			}
 		}
 		return null;
 	}
 
-	public void SetAligns(float JDJNFNGEDDP, float CCDPMGGMDLP, int CDNFFEFGLKN, int JNKHDFNCOGK)
+	public void SetAligns(float leftX, float rightX, int frontMargin, int backMargin)
 	{
-		frontAlignMargin = CDNFFEFGLKN;
-		backAlignMargin = JNKHDFNCOGK;
-		leftWallX = JDJNFNGEDDP;
-		rightWallX = CCDPMGGMDLP;
+		frontAlignMargin = frontMargin;
+		backAlignMargin = backMargin;
+		leftWallX = leftX;
+		rightWallX = rightX;
 	}
 
-	public void ShiftSequence(float HLBMDDOPKKL, float ELAKEOGEDPN = 0f, float PIIFLHIBODE = 0f)
+	public void ShiftSequence(float shiftX, float shiftY = 0f, float shiftZ = 0f)
 	{
-		_Frames.Shift(HLBMDDOPKKL, ELAKEOGEDPN, PIIFLHIBODE);
+		_Frames.Shift(shiftX, shiftY, shiftZ);
 	}
 
 	public void MirrorSequence()
@@ -831,44 +831,44 @@ public class ModelAnimation : global::EventDispatcher<object>
 		}
 	}
 
-	public void ShiftBuffer(Vector3f OPNPKNEOALJ)
+	public void ShiftBuffer(Vector3f offset)
 	{
 		for (int i = 0; i < bufferedFrames.Count; i++)
 		{
 			List<Vector3f> list = bufferedFrames[i];
 			for (int j = 0; j < list.Count; j++)
 			{
-				list[j].Add(OPNPKNEOALJ);
+				list[j].Add(offset);
 			}
 		}
 	}
 
-	public bool PlayInfo(InfoAnimation DBOLBEOCEME, int AOJJBKLCHJO, bool NAJJLNDPNJC = true, bool HHJGACBCGBP = false, int BADKABIKMBD = -1)
+	public bool PlayInfo(InfoAnimation animation, int direction, bool useInterrupt = true, bool isFrameShift = false, int frameShift = -1)
 	{
-		if (DBOLBEOCEME != null)
+		if (animation != null)
 		{
-			if (RequiredInfo != null && RequiredInfo != DBOLBEOCEME && RequiredInfo != DBOLBEOCEME.GetTacticEquivalent())
+			if (RequiredInfo != null && RequiredInfo != animation && RequiredInfo != animation.GetTacticEquivalent())
 			{
-				GameLog.Error("Animation error need: '{0}' (Priority {1}); Animation played: '{2}' (Priority {3})", RequiredInfo.Name, RequiredInfo.Priority, DBOLBEOCEME.Name, DBOLBEOCEME.Priority);
+				GameLog.Error("Animation error need: '{0}' (Priority {1}); Animation played: '{2}' (Priority {3})", RequiredInfo.Name, RequiredInfo.Priority, animation.Name, animation.Priority);
 			}
 			if (hasParentModel)
 			{
 				ClearIntervals();
 				ClearAttackingEdges();
 			}
-			int num = DBOLBEOCEME.FirstFrame;
-			if (HHJGACBCGBP)
+			int num = animation.FirstFrame;
+			if (isFrameShift)
 			{
 				int num2 = GetCurrentFrame();
-				num = num2 + 1 + BADKABIKMBD;
+				num = num2 + 1 + frameShift;
 			}
-			else if (-1 < BADKABIKMBD)
+			else if (-1 < frameShift)
 			{
-				num = BADKABIKMBD;
+				num = frameShift;
 			}
 			Stop();
-			set_Sign(AOJJBKLCHJO);
-			currentInfo = DBOLBEOCEME;
+			set_Sign(direction);
+			currentInfo = animation;
 			startFrame = num;
 			endFrame = currentInfo.AnimationEndFrame;
 			isLooping = currentInfo.GetIsLooped();
@@ -882,8 +882,8 @@ public class ModelAnimation : global::EventDispatcher<object>
 				isPlaying = false;
 				return false;
 			}
-			useInterruptFrames = NAJJLNDPNJC;
-			if (NAJJLNDPNJC)
+			useInterruptFrames = useInterrupt;
+			if (useInterrupt)
 			{
 				SetInterruptFrames(currentInfo.GetNodesCount());
 			}
@@ -894,8 +894,8 @@ public class ModelAnimation : global::EventDispatcher<object>
 			SetCurrentNode();
 			MirrorNodes();
 			ShiftPoints();
-			int gNDPBMIJEMH = DBOLBEOCEME.GetNodesCount();
-			bufferedFrames.Resize(gNDPBMIJEMH);
+			int nodesCount = animation.GetNodesCount();
+			bufferedFrames.Resize(nodesCount);
 			isPlaying = true;
 			frameCounter = 0;
 			frameCursor = 0;
@@ -908,12 +908,12 @@ public class ModelAnimation : global::EventDispatcher<object>
 			if (!currentInfo.GetSaveVelocity())
 			{
 				velocity.Set(currentInfo.GetVelocity());
-				Vector3f aGAFKHLPLCA = velocity;
-				aGAFKHLPLCA.SetX(aGAFKHLPLCA.GetX() * (float)GetSign());
+				Vector3f currentVelocity = velocity;
+				currentVelocity.SetX(currentVelocity.GetX() * (float)GetSign());
 			}
 			acceleration.Set(currentInfo.GetAcceleration());
-			Vector3f dBCBOPONOBE = acceleration;
-			dBCBOPONOBE.SetX(dBCBOPONOBE.GetX() * (float)GetSign());
+			Vector3f currentAcceleration = acceleration;
+			currentAcceleration.SetX(currentAcceleration.GetX() * (float)GetSign());
 			SetDistanceAlign();
 			OnStartAnimation(currentInfo);
 			RequiredInfo = null;
@@ -958,35 +958,35 @@ public class ModelAnimation : global::EventDispatcher<object>
 		activeIntervals.Clear();
 	}
 
-	public void OnStartIntervals(IntervalAnimation CHCGJBLDPML)
+	public void OnStartIntervals(IntervalAnimation interval)
 	{
-		CallEvent(2, CHCGJBLDPML);
+		CallEvent(2, interval);
 	}
 
-	public void OnEndIntervals(IntervalAnimation CHCGJBLDPML)
+	public void OnEndIntervals(IntervalAnimation interval)
 	{
-		CallEvent(3, CHCGJBLDPML);
+		CallEvent(3, interval);
 	}
 
-	public void OnStartAnimation(InfoAnimation DBOLBEOCEME)
+	public void OnStartAnimation(InfoAnimation animation)
 	{
-		CallEvent(0, DBOLBEOCEME);
+		CallEvent(0, animation);
 	}
 
-	public void OnStopAnimation(InfoAnimation DBOLBEOCEME)
+	public void OnStopAnimation(InfoAnimation animation)
 	{
 		if (!hasParentModel)
 		{
 			ClearIntervals();
 			ClearAttackingEdges();
 		}
-		CallEvent(1, DBOLBEOCEME);
+		CallEvent(1, animation);
 	}
 
-	public void SetAttackingEdges(IntervalAnimation CHCGJBLDPML)
+	public void SetAttackingEdges(IntervalAnimation interval)
 	{
-		IntervalAttack hFIIPNLCIEE = CHCGJBLDPML as IntervalAttack;
-		List<string> list = hFIIPNLCIEE.GetAttackingParts();
+		IntervalAttack attackInterval = interval as IntervalAttack;
+		List<string> list = attackInterval.GetAttackingParts();
 		foreach (string item in list)
 		{
 			string text = item;
@@ -1007,10 +1007,10 @@ public class ModelAnimation : global::EventDispatcher<object>
 					}
 				}
 			}
-			ModelEdge nAKBKCDKEHF = _Model.GetEdgeByName(text);
-			if (nAKBKCDKEHF != null)
+			ModelEdge edge = _Model.GetEdgeByName(text);
+			if (edge != null)
 			{
-				attackingEdges.Add(nAKBKCDKEHF);
+				attackingEdges.Add(edge);
 			}
 		}
 	}
@@ -1020,11 +1020,11 @@ public class ModelAnimation : global::EventDispatcher<object>
 		attackingEdges.Clear();
 	}
 
-	public IntervalAnimation FindInterval(IntervalAnimation.IntervalType LFLGCDNKNJI)
+	public IntervalAnimation FindInterval(IntervalAnimation.IntervalType intervalType)
 	{
 		for (int i = 0; i < activeIntervals.Count; i++)
 		{
-			if (LFLGCDNKNJI == activeIntervals[i].Type)
+			if (intervalType == activeIntervals[i].Type)
 			{
 				return activeIntervals[i];
 			}
@@ -1032,11 +1032,11 @@ public class ModelAnimation : global::EventDispatcher<object>
 		return null;
 	}
 
-	public IntervalAnimation FindInterval(string JDPPEBHEJPI)
+	public IntervalAnimation FindInterval(string intervalName)
 	{
 		for (int i = 0; i < activeIntervals.Count; i++)
 		{
-			if (activeIntervals[i].Name == JDPPEBHEJPI)
+			if (activeIntervals[i].Name == intervalName)
 			{
 				return activeIntervals[i];
 			}
@@ -1044,11 +1044,11 @@ public class ModelAnimation : global::EventDispatcher<object>
 		return null;
 	}
 
-	public void RemoveInterval(IntervalAnimation.IntervalType LFLGCDNKNJI)
+	public void RemoveInterval(IntervalAnimation.IntervalType intervalType)
 	{
 		for (int num = activeIntervals.Count - 1; num >= 0; num--)
 		{
-			if (LFLGCDNKNJI == activeIntervals[num].Type)
+			if (intervalType == activeIntervals[num].Type)
 			{
 				activeIntervals.RemoveAt(num);
 			}
@@ -1066,19 +1066,19 @@ public class ModelAnimation : global::EventDispatcher<object>
 		}
 	}
 
-	public void RemoveIntervals(List<string> NFLDEGMEJAK)
+	public void RemoveIntervals(List<string> intervalNames)
 	{
-		foreach (string item in NFLDEGMEJAK)
+		foreach (string item in intervalNames)
 		{
 			RemoveInterval(item);
 		}
 	}
 
-	public bool CheckIntervals(List<string> NFLDEGMEJAK)
+	public bool CheckIntervals(List<string> intervalNames)
 	{
-		for (int i = 0; i < NFLDEGMEJAK.Count; i++)
+		for (int i = 0; i < intervalNames.Count; i++)
 		{
-			if (FindInterval(NFLDEGMEJAK[i]) != null)
+			if (FindInterval(intervalNames[i]) != null)
 			{
 				return true;
 			}
@@ -1092,13 +1092,13 @@ public class ModelAnimation : global::EventDispatcher<object>
 		Heel2Node = _Model.GetNodeByName("NHeel_2");
 	}
 
-	public void AddIntervalTypeFilter(IntervalAnimation.IntervalType LFLGCDNKNJI)
+	public void AddIntervalTypeFilter(IntervalAnimation.IntervalType intervalType)
 	{
 		if (intervalTypeFilter == null)
 		{
 			intervalTypeFilter = new HashSet<IntervalAnimation.IntervalType>();
 		}
-		intervalTypeFilter.Add(LFLGCDNKNJI);
+		intervalTypeFilter.Add(intervalType);
 	}
 
 	public void ClearIntervalTypeFilter()
@@ -1106,21 +1106,21 @@ public class ModelAnimation : global::EventDispatcher<object>
 		intervalTypeFilter = null;
 	}
 
-	public void TriggerActionsForEvent(EventAnimation.EventAnimationType LFLGCDNKNJI)
+	public void TriggerActionsForEvent(EventAnimation.EventAnimationType eventType)
 	{
 		if (currentInfo == null)
 		{
 			return;
 		}
-		List<ActionAnimation> dJBAIAKOIHM = currentInfo.MoveData.Actions;
-		if (dJBAIAKOIHM.Count <= 0)
+		List<ActionAnimation> actions = currentInfo.MoveData.Actions;
+		if (actions.Count <= 0)
 		{
 			return;
 		}
 		List<ActionAnimation> list = new List<ActionAnimation>();
-		foreach (ActionAnimation item in dJBAIAKOIHM)
+		foreach (ActionAnimation item in actions)
 		{
-			if (item.NeedStart(LFLGCDNKNJI))
+			if (item.NeedStart(eventType))
 			{
 				list.Add(item);
 			}
@@ -1131,96 +1131,96 @@ public class ModelAnimation : global::EventDispatcher<object>
 		}
 	}
 
-	public void MoveByVelocity(Vector3f BLPIMOCGMKJ)
+	public void MoveByVelocity(Vector3f offset)
 	{
 		List<ModelNode> list = _Model.GetAllNodes();
 		foreach (ModelNode item in list)
 		{
 			item.SetEnd();
-			item.GetStart().Add(BLPIMOCGMKJ);
+			item.GetStart().Add(offset);
 		}
 	}
 
-	public static bool CalcIsMirror(ModelObject IPKAHIMPMEG, string PCAMJGFDBID, int AOJJBKLCHJO, Vector3[] MCPABOHDBLO, bool AAGPPKAOHGI = true)
+	public static bool CalcIsMirror(ModelObject modelObject, string nodeName, int sign, Vector3[] framePositions, bool useIdOrder = true)
 	{
-		ModelNode lCDGOCIAIDK = IPKAHIMPMEG.GetNodeByName(PCAMJGFDBID);
-		ModelNode lCDGOCIAIDK2 = ((lCDGOCIAIDK == null) ? null : lCDGOCIAIDK.GetPairNode());
-		if (lCDGOCIAIDK != null && lCDGOCIAIDK2 != null)
+		ModelNode node = modelObject.GetNodeByName(nodeName);
+		ModelNode lCDGOCIAIDK2 = ((node == null) ? null : node.GetPairNode());
+		if (node != null && lCDGOCIAIDK2 != null)
 		{
-			return CalcIsMirror(lCDGOCIAIDK, lCDGOCIAIDK2, AOJJBKLCHJO, MCPABOHDBLO, AAGPPKAOHGI);
+			return CalcIsMirror(node, lCDGOCIAIDK2, sign, framePositions, useIdOrder);
 		}
-		GameLog.Error("ModelAnimation::mirrorNodes - nodes not found: \"{0}\"", PCAMJGFDBID);
+		GameLog.Error("ModelAnimation::mirrorNodes - nodes not found: \"{0}\"", nodeName);
 		return false;
 	}
 
-	public static bool CalcIsMirror(ModelNode NMBEADHHHFH, ModelNode OKCKNALOCCK, int AOJJBKLCHJO, Vector3[] MCPABOHDBLO, bool AAGPPKAOHGI = true)
+	public static bool CalcIsMirror(ModelNode node, ModelNode pairNode, int sign, Vector3[] framePositions, bool useIdOrder = true)
 	{
-		if (AOJJBKLCHJO == -1)
+		if (sign == -1)
 		{
-			Util.Swap(ref NMBEADHHHFH, ref OKCKNALOCCK);
+			Util.Swap(ref node, ref pairNode);
 		}
-		int FBENKEEDIKJ = NMBEADHHHFH.GetID();
-		int PGKPNBGIGEI = OKCKNALOCCK.GetID();
-		if (!AAGPPKAOHGI && AOJJBKLCHJO == -1)
+		int nodeId = node.GetID();
+		int pairNodeId = pairNode.GetID();
+		if (!useIdOrder && sign == -1)
 		{
-			Util.Swap(ref FBENKEEDIKJ, ref PGKPNBGIGEI);
+			Util.Swap(ref nodeId, ref pairNodeId);
 		}
-		return NMBEADHHHFH.GetStart().GetX() >= OKCKNALOCCK.GetStart().GetX() != MCPABOHDBLO[FBENKEEDIKJ].x >= MCPABOHDBLO[PGKPNBGIGEI].x;
+		return node.GetStart().GetX() >= pairNode.GetStart().GetX() != framePositions[nodeId].x >= framePositions[pairNodeId].x;
 	}
 
-	public static bool CalcIsMirror(ModelObject IPKAHIMPMEG, string PCAMJGFDBID, int AOJJBKLCHJO, List<Vector3f> MCPABOHDBLO, bool AAGPPKAOHGI = true)
+	public static bool CalcIsMirror(ModelObject modelObject, string nodeName, int sign, List<Vector3f> framePositions, bool useIdOrder = true)
 	{
-		ModelNode lCDGOCIAIDK = IPKAHIMPMEG.GetNodeByName(PCAMJGFDBID);
-		ModelNode lCDGOCIAIDK2 = ((lCDGOCIAIDK == null) ? null : lCDGOCIAIDK.GetPairNode());
-		if (lCDGOCIAIDK != null && lCDGOCIAIDK2 != null)
+		ModelNode node = modelObject.GetNodeByName(nodeName);
+		ModelNode lCDGOCIAIDK2 = ((node == null) ? null : node.GetPairNode());
+		if (node != null && lCDGOCIAIDK2 != null)
 		{
-			return CalcIsMirror(lCDGOCIAIDK, lCDGOCIAIDK2, AOJJBKLCHJO, MCPABOHDBLO, AAGPPKAOHGI);
+			return CalcIsMirror(node, lCDGOCIAIDK2, sign, framePositions, useIdOrder);
 		}
-		GameLog.Error("ModelAnimation::mirrorNodes - nodes not found: \"{0}\"", PCAMJGFDBID);
+		GameLog.Error("ModelAnimation::mirrorNodes - nodes not found: \"{0}\"", nodeName);
 		return false;
 	}
 
-	public static bool CalcIsMirror(ModelNode NMBEADHHHFH, ModelNode OKCKNALOCCK, int AOJJBKLCHJO, List<Vector3f> MCPABOHDBLO, bool AAGPPKAOHGI = true)
+	public static bool CalcIsMirror(ModelNode node, ModelNode pairNode, int sign, List<Vector3f> framePositions, bool useIdOrder = true)
 	{
-		if (AOJJBKLCHJO == -1)
+		if (sign == -1)
 		{
-			Util.Swap(ref NMBEADHHHFH, ref OKCKNALOCCK);
+			Util.Swap(ref node, ref pairNode);
 		}
-		int FBENKEEDIKJ = NMBEADHHHFH.GetID();
-		int PGKPNBGIGEI = OKCKNALOCCK.GetID();
-		if (!AAGPPKAOHGI && AOJJBKLCHJO == -1)
+		int nodeId = node.GetID();
+		int pairNodeId = pairNode.GetID();
+		if (!useIdOrder && sign == -1)
 		{
-			Util.Swap(ref FBENKEEDIKJ, ref PGKPNBGIGEI);
+			Util.Swap(ref nodeId, ref pairNodeId);
 		}
-		return NMBEADHHHFH.GetStart().GetX() >= OKCKNALOCCK.GetStart().GetX() != MCPABOHDBLO[FBENKEEDIKJ].GetX() >= MCPABOHDBLO[PGKPNBGIGEI].GetX();
+		return node.GetStart().GetX() >= pairNode.GetStart().GetX() != framePositions[nodeId].GetX() >= framePositions[pairNodeId].GetX();
 	}
 
 	private void SetDistanceAlign()
 	{
-		ModelNode lCDGOCIAIDK = GetPlayingNode();
-		float bDHBFDMBMFM = pivotTargetX;
-		int gOBJCKFGIPA = currentInfo.FirstFrame;
+		ModelNode playingNode = GetPlayingNode();
+		float startX = pivotTargetX;
+		int firstFrame = currentInfo.FirstFrame;
 		int num = GetStartFrame();
-		startFrameOffset = (num - gOBJCKFGIPA) * (currentInfo.MidFrames + 1);
+		startFrameOffset = (num - firstFrame) * (currentInfo.MidFrames + 1);
 		float num2 = 0f;
 		if (0 < startFrameOffset && currentInfo.MoveData.AlignData.PivotObjectType == InfoAnimation.AlignObjectType.ObjectNodes)
 		{
 			int num3;
 			if (GetIsMirrored())
 			{
-				ModelNode lCDGOCIAIDK2 = lCDGOCIAIDK.GetPairNode();
+				ModelNode lCDGOCIAIDK2 = playingNode.GetPairNode();
 				num3 = ((lCDGOCIAIDK2 == null) ? GetCurrentNodeId() : lCDGOCIAIDK2.GetID());
 			}
 			else
 			{
 				num3 = GetCurrentNodeId();
 			}
-			num2 = currentInfo.GetAnimationFrames()[num][num3].x - currentInfo.GetAnimationFrames()[gOBJCKFGIPA][num3].x;
+			num2 = currentInfo.GetAnimationFrames()[num][num3].x - currentInfo.GetAnimationFrames()[firstFrame][num3].x;
 		}
-		bDHBFDMBMFM = (startPositionX = bDHBFDMBMFM + num2 * (float)GetSign());
+		startX = (startPositionX = startX + num2 * (float)GetSign());
 		if (!firstPositionCaptured)
 		{
-			firstStartPositionX = bDHBFDMBMFM;
+			firstStartPositionX = startX;
 			firstInfo = currentInfo;
 			renderTickCount = -4;
 			firstPositionCaptured = true;
@@ -1237,16 +1237,16 @@ public class ModelAnimation : global::EventDispatcher<object>
 	{
 		List<ModelNode> list = _Model.GetAllNodes();
 		ApplyVelocity();
-		Vector3f eMAFACPEPDK = new Vector3f();
+		Vector3f point = new Vector3f();
 		for (int i = 0; i < bufferedFrames.Count; i++)
 		{
 			ModelNode Node = list[i];
 			if (!_Model.IsShock() || (_Model.IsShock() && !Node.IsShock()))
 			{
 				Node.SetEnd();
-				eMAFACPEPDK.Set(bufferedFrames[i][bufferIndex]);
-				eMAFACPEPDK.Add(accumulatedOffset);
-				Node.SetStart(eMAFACPEPDK);
+				point.Set(bufferedFrames[i][bufferIndex]);
+				point.Add(accumulatedOffset);
+				Node.SetStart(point);
 				Node.SetSkipMacroUpdate(true);
 			}
 		}
@@ -1278,59 +1278,59 @@ public class ModelAnimation : global::EventDispatcher<object>
 		ApplyAcceleration();
 	}
 
-	private void SetInterruptFrames(int JEJGJGLMKDM)
+	private void SetInterruptFrames(int interruptFrameCount)
 	{
-		_Frames.InterruptFramesSeted(JEJGJGLMKDM);
+		_Frames.InterruptFramesSeted(interruptFrameCount);
 		int num = (currentInfo.MidFrames + 1) / 2;
-		KeyFrames.Frame cJMFONMNFBI = _Frames.GetFrame(0);
+		KeyFrames.Frame firstFrame = _Frames.GetFrame(0);
 		KeyFrames.Frame cJMFONMNFBI2 = _Frames.GetFrame(1);
 		List<ModelNode> list = _Model.GetAllNodes();
-		for (int i = 0; i < cJMFONMNFBI.Size; i++)
+		for (int i = 0; i < firstFrame.Size; i++)
 		{
-			Vector3f eMAFACPEPDK = list[i].GetStart();
+			Vector3f start = list[i].GetStart();
 			Vector3f eMAFACPEPDK2 = list[i].GetEnd();
-			float lHNJJFDIJKK = (eMAFACPEPDK.GetX() - eMAFACPEPDK2.GetX()) * (float)num;
-			float fFFHIOALHGM = (eMAFACPEPDK.GetY() - eMAFACPEPDK2.GetY()) * (float)num;
-			float pDCENMEKIAP = (eMAFACPEPDK.GetZ() - eMAFACPEPDK2.GetZ()) * (float)num;
-			cJMFONMNFBI.Data[i].Set(eMAFACPEPDK);
-			cJMFONMNFBI.Data[i].Subtract(lHNJJFDIJKK, fFFHIOALHGM, pDCENMEKIAP);
-			cJMFONMNFBI2.Data[i].Set(eMAFACPEPDK);
-			cJMFONMNFBI2.Data[i].Add(lHNJJFDIJKK, fFFHIOALHGM, pDCENMEKIAP);
+			float deltaX = (start.GetX() - eMAFACPEPDK2.GetX()) * (float)num;
+			float deltaY = (start.GetY() - eMAFACPEPDK2.GetY()) * (float)num;
+			float deltaZ = (start.GetZ() - eMAFACPEPDK2.GetZ()) * (float)num;
+			firstFrame.Data[i].Set(start);
+			firstFrame.Data[i].Subtract(deltaX, deltaY, deltaZ);
+			cJMFONMNFBI2.Data[i].Set(start);
+			cJMFONMNFBI2.Data[i].Add(deltaX, deltaY, deltaZ);
 		}
 	}
 
 	private void ShiftPoints()
 	{
-		InfoAnimation.MovePivot iLOEBFFAEAN = currentInfo.MoveData.AlignData;
-		ModelAnimation oJIEPADIEDE = GetAnimationByModelType(iLOEBFFAEAN.PivotModelType);
-		ModelAnimation oJIEPADIEDE2 = GetAnimationByModelType(iLOEBFFAEAN.PositionModelType);
-		Vector3f eMAFACPEPDK = new Vector3f();
+		InfoAnimation.MovePivot alignData = currentInfo.MoveData.AlignData;
+		ModelAnimation pivotAnimation = GetAnimationByModelType(alignData.PivotModelType);
+		ModelAnimation oJIEPADIEDE2 = GetAnimationByModelType(alignData.PositionModelType);
+		Vector3f pivotPoint = new Vector3f();
 		Vector3f eMAFACPEPDK2 = new Vector3f();
 		if (oJIEPADIEDE2 == null)
 		{
 			oJIEPADIEDE2 = this;
 		}
-		switch (iLOEBFFAEAN.PivotObjectType)
+		switch (alignData.PivotObjectType)
 		{
 		case InfoAnimation.AlignObjectType.ObjectPivot:
-			eMAFACPEPDK.Set(_Frames.GetFrame(2).Data[currentNodeId]);
+			pivotPoint.Set(_Frames.GetFrame(2).Data[currentNodeId]);
 			break;
 		case InfoAnimation.AlignObjectType.ObjectNodes:
 		{
-			int num = ((!oJIEPADIEDE.GetIsMirrored() || iLOEBFFAEAN.PivotPairNodeId <= -1) ? iLOEBFFAEAN.PivotNodeId : iLOEBFFAEAN.PivotPairNodeId);
+			int num = ((!pivotAnimation.GetIsMirrored() || alignData.PivotPairNodeId <= -1) ? alignData.PivotNodeId : alignData.PivotPairNodeId);
 			num = ((num >= 0 && num < _Frames.GetFrame(2).Size) ? num : 0);
-			eMAFACPEPDK.Set(_Frames.GetFrame(2).Data[num]);
+			pivotPoint.Set(_Frames.GetFrame(2).Data[num]);
 			break;
 		}
 		case InfoAnimation.AlignObjectType.ObjectAnimation:
-			eMAFACPEPDK.Reset();
+			pivotPoint.Reset();
 			break;
 		case InfoAnimation.AlignObjectType.ObjectWall:
-			eMAFACPEPDK.Reset();
-			eMAFACPEPDK.SetX((GetSign() == 1 != (iLOEBFFAEAN.PivotPart == "Back")) ? (0f - rightWallX) : (0f - leftWallX));
+			pivotPoint.Reset();
+			pivotPoint.SetX((GetSign() == 1 != (alignData.PivotPart == "Back")) ? (0f - rightWallX) : (0f - leftWallX));
 			break;
 		}
-		switch (iLOEBFFAEAN.PositionObjectType)
+		switch (alignData.PositionObjectType)
 		{
 		case InfoAnimation.AlignObjectType.ObjectPivot:
 			if (oJIEPADIEDE2.GetCurrentNode() != null)
@@ -1340,8 +1340,8 @@ public class ModelAnimation : global::EventDispatcher<object>
 			break;
 		case InfoAnimation.AlignObjectType.ObjectNodes:
 		{
-			int oKNNNLIPODI = ((!oJIEPADIEDE2.GetIsMirrored() || iLOEBFFAEAN.PositionPairNodeId <= -1) ? iLOEBFFAEAN.PositionNodeId : iLOEBFFAEAN.PositionPairNodeId);
-			eMAFACPEPDK2.Set(oJIEPADIEDE2.GetNodeById(oKNNNLIPODI).GetStart());
+			int positionNodeId = ((!oJIEPADIEDE2.GetIsMirrored() || alignData.PositionPairNodeId <= -1) ? alignData.PositionNodeId : alignData.PositionPairNodeId);
+			eMAFACPEPDK2.Set(oJIEPADIEDE2.GetNodeById(positionNodeId).GetStart());
 			break;
 		}
 		case InfoAnimation.AlignObjectType.ObjectAnimation:
@@ -1349,28 +1349,28 @@ public class ModelAnimation : global::EventDispatcher<object>
 			break;
 		case InfoAnimation.AlignObjectType.ObjectWall:
 			eMAFACPEPDK2.Reset();
-			eMAFACPEPDK2.SetX((GetSign() == 1 != (iLOEBFFAEAN.PositionPart == "Back")) ? rightWallX : leftWallX);
+			eMAFACPEPDK2.SetX((GetSign() == 1 != (alignData.PositionPart == "Back")) ? rightWallX : leftWallX);
 			break;
 		}
-		eMAFACPEPDK2.SetX(eMAFACPEPDK2.GetX() + (float)GetSign() * iLOEBFFAEAN.PositionShift.GetX());
-		eMAFACPEPDK2.SetY(eMAFACPEPDK2.GetY() + iLOEBFFAEAN.PositionShift.GetY());
+		eMAFACPEPDK2.SetX(eMAFACPEPDK2.GetX() + (float)GetSign() * alignData.PositionShift.GetX());
+		eMAFACPEPDK2.SetY(eMAFACPEPDK2.GetY() + alignData.PositionShift.GetY());
 		pivotTargetX = eMAFACPEPDK2.GetX();
-		shift.Set(Vector3f.op_Subtraction(eMAFACPEPDK2, eMAFACPEPDK));
-		ShiftSequence((!iLOEBFFAEAN.AlignX) ? 0f : shift.GetX(), (!iLOEBFFAEAN.AlignY) ? 0f : shift.GetY(), (!iLOEBFFAEAN.AlignZ) ? 0f : shift.GetZ());
-		if (string.IsNullOrEmpty(iLOEBFFAEAN.ShiftModelNode))
+		shift.Set(Vector3f.op_Subtraction(eMAFACPEPDK2, pivotPoint));
+		ShiftSequence((!alignData.AlignX) ? 0f : shift.GetX(), (!alignData.AlignY) ? 0f : shift.GetY(), (!alignData.AlignZ) ? 0f : shift.GetZ());
+		if (string.IsNullOrEmpty(alignData.ShiftModelNode))
 		{
 			return;
 		}
-		ModelNode lCDGOCIAIDK = _Model.GetNodeByName(iLOEBFFAEAN.ShiftModelNode);
-		int index = lCDGOCIAIDK.GetID();
-		eMAFACPEPDK = _Frames.GetFrame(2).Data[index];
-		Vector3f bEHOPOPCJGB = new Vector3f(Vector3f.op_Subtraction(eMAFACPEPDK, lCDGOCIAIDK.GetStart()));
-		Vector3f bEHOPOPCJGB2 = new Vector3f(Vector3f.op_Subtraction(eMAFACPEPDK, lCDGOCIAIDK.GetEnd()));
+		ModelNode shiftNode = _Model.GetNodeByName(alignData.ShiftModelNode);
+		int index = shiftNode.GetID();
+		pivotPoint = _Frames.GetFrame(2).Data[index];
+		Vector3f startOffset = new Vector3f(Vector3f.op_Subtraction(pivotPoint, shiftNode.GetStart()));
+		Vector3f bEHOPOPCJGB2 = new Vector3f(Vector3f.op_Subtraction(pivotPoint, shiftNode.GetEnd()));
 		List<ModelNode> list = _Model.GetAllNodes();
 		int count = list.Count;
 		foreach (ModelNode item in list)
 		{
-			item.GetStart().Add(bEHOPOPCJGB);
+			item.GetStart().Add(startOffset);
 			item.GetEnd().Add(bEHOPOPCJGB2);
 		}
 	}
@@ -1398,12 +1398,12 @@ public class ModelAnimation : global::EventDispatcher<object>
 	private void MirrorNodes()
 	{
 		MirrorSequence();
-		InfoAnimation.MirrorNode cIEEMJJCABC = currentInfo.GetMirrorNode();
-		if (cIEEMJJCABC.GetIsEmpty())
+		InfoAnimation.MirrorNode mirrorNode = currentInfo.GetMirrorNode();
+		if (mirrorNode.GetIsEmpty())
 		{
 			return;
 		}
-		isMirrored = CalcIsMirror(_Model, cIEEMJJCABC.GetNodeName(), GetSign(), _Frames.GetFrame(2).Data);
+		isMirrored = CalcIsMirror(_Model, mirrorNode.GetNodeName(), GetSign(), _Frames.GetFrame(2).Data);
 		if (isMirrored)
 		{
 			int num = _Model.GetNodeIDByPairName(currentNodeId);
@@ -1421,24 +1421,24 @@ public class ModelAnimation : global::EventDispatcher<object>
 		return 0 < bufferedFrames.Count && bufferIndex < bufferedFrames[0].Count;
 	}
 
-	private void SetBufferFrame(int PADOCECKBPE = -1, int AGOKCKGOKLI = -1)
+	private void SetBufferFrame(int firstFrameIndex = -1, int secondFrameIndex = -1)
 	{
-		if (PADOCECKBPE == -1 || AGOKCKGOKLI == -1)
+		if (firstFrameIndex == -1 || secondFrameIndex == -1)
 		{
-			PADOCECKBPE = frameCursor;
-			AGOKCKGOKLI = frameCursor + 1;
+			firstFrameIndex = frameCursor;
+			secondFrameIndex = frameCursor + 1;
 		}
 		bufferState = 1;
 		interpolationSteps = GameUtils.GetSlowMode();
 		subFrameScale = 1f / (float)interpolationSteps;
-		int bLJGEOEHIGP = (GetFrameStep() + 1) * interpolationSteps;
-		List<Vector3f> aLAKNMCKLFI = _Frames.GetFrame(PADOCECKBPE).Data;
-		List<Vector3f> aLAKNMCKLFI2 = _Frames.GetFrame(AGOKCKGOKLI).Data;
-		List<Vector3f> aLAKNMCKLFI3 = _Frames.GetFrame(AGOKCKGOKLI + 1).Data;
-		Bezier kHKJJAKJPAJ = new Bezier(bLJGEOEHIGP);
+		int steps = (GetFrameStep() + 1) * interpolationSteps;
+		List<Vector3f> startPoints = _Frames.GetFrame(firstFrameIndex).Data;
+		List<Vector3f> aLAKNMCKLFI2 = _Frames.GetFrame(secondFrameIndex).Data;
+		List<Vector3f> aLAKNMCKLFI3 = _Frames.GetFrame(secondFrameIndex + 1).Data;
+		Bezier bezier = new Bezier(steps);
 		for (int i = 0; i < bufferedFrames.Count; i++)
 		{
-			kHKJJAKJPAJ.BuildCurve(aLAKNMCKLFI[i], aLAKNMCKLFI2[i], aLAKNMCKLFI3[i], bufferedFrames[i]);
+			bezier.BuildCurve(startPoints[i], aLAKNMCKLFI2[i], aLAKNMCKLFI3[i], bufferedFrames[i]);
 		}
 		bufferIndex = 0;
 	}
@@ -1482,11 +1482,11 @@ public class ModelAnimation : global::EventDispatcher<object>
 		int num6 = ((_Frames.GetSize() >= num2 + 2) ? (num2 + 2) : _Frames.GetSize());
 		for (int i = num2; i < num6; i++)
 		{
-			KeyFrames.Frame cJMFONMNFBI = _Frames.GetFrame(i);
-			for (int j = 0; j < cJMFONMNFBI.Size; j++)
+			KeyFrames.Frame frame = _Frames.GetFrame(i);
+			for (int j = 0; j < frame.Size; j++)
 			{
-				Vector3f eMAFACPEPDK = cJMFONMNFBI.Data[j];
-				eMAFACPEPDK.SetX(eMAFACPEPDK.GetX() - num5);
+				Vector3f point = frame.Data[j];
+				point.SetX(point.GetX() - num5);
 			}
 		}
 	}
@@ -1536,9 +1536,9 @@ public class ModelAnimation : global::EventDispatcher<object>
 		}
 	}
 
-	private ModelAnimation GetAnimationByModelType(ModelType.ModelTargetType HJMMACIELFG)
+	private ModelAnimation GetAnimationByModelType(ModelType.ModelTargetType targetType)
 	{
-		switch (HJMMACIELFG)
+		switch (targetType)
 		{
 		case ModelType.ModelTargetType.MODEL_NULL:
 		case ModelType.ModelTargetType.MODEL_THIS:
@@ -1548,7 +1548,7 @@ public class ModelAnimation : global::EventDispatcher<object>
 		case ModelType.ModelTargetType.MODEL_OTHER:
 			return otherAnimation;
 		default:
-			GameLog.Error("ModelAnimation::getPlayerAnimation - unknown type: {0}", HJMMACIELFG);
+			GameLog.Error("ModelAnimation::getPlayerAnimation - unknown type: {0}", targetType);
 			return null;
 		}
 	}
@@ -1560,16 +1560,16 @@ public class ModelAnimation : global::EventDispatcher<object>
 			return;
 		}
 		frameChangedPending = false;
-		List<ActionAnimation> dJBAIAKOIHM = currentInfo.MoveData.Actions;
-		if (dJBAIAKOIHM.Count <= 0)
+		List<ActionAnimation> actions = currentInfo.MoveData.Actions;
+		if (actions.Count <= 0)
 		{
 			return;
 		}
-		int dBEDGEMEFNB = GetCurrentFrame();
+		int currentFrame = GetCurrentFrame();
 		List<ActionAnimation> list = new List<ActionAnimation>();
-		foreach (ActionAnimation item in dJBAIAKOIHM)
+		foreach (ActionAnimation item in actions)
 		{
-			if (item.NeedStart(dBEDGEMEFNB))
+			if (item.NeedStart(currentFrame))
 			{
 				list.Add(item);
 			}
@@ -1585,14 +1585,14 @@ public class ModelAnimation : global::EventDispatcher<object>
 		ApplyVelocity(velocity);
 	}
 
-	private void ApplyVelocity(Vector3f BLPIMOCGMKJ)
+	private void ApplyVelocity(Vector3f velocityStep)
 	{
-		Vector3f eMAFACPEPDK = new Vector3f(BLPIMOCGMKJ);
+		Vector3f scaledVelocity = new Vector3f(velocityStep);
 		if (subFrameScale != 1f)
 		{
-			eMAFACPEPDK.Multiply(subFrameScale);
+			scaledVelocity.Multiply(subFrameScale);
 		}
-		accumulatedOffset.Add(eMAFACPEPDK);
+		accumulatedOffset.Add(scaledVelocity);
 	}
 
 	private void ApplyAcceleration()
@@ -1600,14 +1600,14 @@ public class ModelAnimation : global::EventDispatcher<object>
 		ApplyAcceleration(acceleration);
 	}
 
-	private void ApplyAcceleration(Vector3f IALBIAFLGFI)
+	private void ApplyAcceleration(Vector3f accelerationStep)
 	{
-		Vector3f eMAFACPEPDK = new Vector3f(IALBIAFLGFI);
+		Vector3f scaledAcceleration = new Vector3f(accelerationStep);
 		if (subFrameScale != 1f)
 		{
-			eMAFACPEPDK.Multiply(subFrameScale);
+			scaledAcceleration.Multiply(subFrameScale);
 		}
-		velocity.Add(eMAFACPEPDK);
+		velocity.Add(scaledAcceleration);
 	}
 
 	private void NoOpHook()

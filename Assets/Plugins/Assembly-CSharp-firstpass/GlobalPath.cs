@@ -78,10 +78,10 @@ public class GlobalPath
 		return Application.dataPath + "/gamedata";
 	}
 
-	public static int GetIndexExtension(string path, int BOGBPHDFGGB = 0)
+	public static int GetIndexExtension(string path, int offset = 0)
 	{
 		int num = path.LastIndexOf(".", StringComparison.OrdinalIgnoreCase);
-		return (num <= -1) ? (path.Length - BOGBPHDFGGB) : (num - BOGBPHDFGGB);
+		return (num <= -1) ? (path.Length - offset) : (num - offset);
 	}
 
 	public static string CombineExternalGameDataPath(string path)
@@ -89,14 +89,14 @@ public class GlobalPath
 		return Path.Combine(GetExternalGameDataPath(), path);
 	}
 
-	private static string GetExternalPathByKey(string KGBGENDIMBC)
+	private static string GetExternalPathByKey(string key)
 	{
-		return InternalSettings.GetExternalPath(KGBGENDIMBC);
+		return InternalSettings.GetExternalPath(key);
 	}
 
-	public static string GetInternalPath(string KGBGENDIMBC, string name = "")
+	public static string GetInternalPath(string key, string name = "")
 	{
-		return GetExternalPathByKey(KGBGENDIMBC) + name;
+		return GetExternalPathByKey(key) + name;
 	}
 
 	public static string GetLoaderPath(string path)

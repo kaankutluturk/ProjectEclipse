@@ -52,15 +52,15 @@ public class ConditionOperator : ConditionCounter
 		return false;
 	}
 
-	public void ParseConditions(XmlNode EBLIGDMALEA)
+	public void ParseConditions(XmlNode node)
 	{
 		_conditions.Clear();
-		foreach (XmlNode childNode in EBLIGDMALEA.ChildNodes)
+		foreach (XmlNode childNode in node.ChildNodes)
 		{
-			ConditionCounter kAJIECHJBNL = CounterConditionsParser.ParseCondition(childNode);
-			if (kAJIECHJBNL != null)
+			ConditionCounter condition = CounterConditionsParser.ParseCondition(childNode);
+			if (condition != null)
 			{
-				_conditions.Add(kAJIECHJBNL);
+				_conditions.Add(condition);
 			}
 		}
 	}
@@ -73,9 +73,9 @@ public class ConditionOperator : ConditionCounter
 		}
 	}
 
-	public void AddCondition(ConditionCounter EPJGLECOIBG)
+	public void AddCondition(ConditionCounter condition)
 	{
-		_conditions.Add(EPJGLECOIBG);
+		_conditions.Add(condition);
 	}
 
 	protected override void Parse(XmlNode node)

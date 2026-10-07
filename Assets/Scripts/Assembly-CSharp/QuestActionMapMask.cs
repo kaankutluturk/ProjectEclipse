@@ -9,16 +9,16 @@ public class QuestActionMapMask : QuestAction
 
 	private bool unusedFlag;
 
-	public override void Parse(XmlNode EPKLCPOEELO)
+	public override void Parse(XmlNode node)
 	{
-		base.Parse(EPKLCPOEELO);
-		string oHJKNABLCMF = EPKLCPOEELO.Attributes["Color"].GetStringOrDefault(string.Empty);
-		maskColor = ColorUtils.ParseHexColor(oHJKNABLCMF);
+		base.Parse(node);
+		string colorText = node.Attributes["Color"].GetStringOrDefault(string.Empty);
+		maskColor = ColorUtils.ParseHexColor(colorText);
 	}
 
-	public override void Execute(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters parameters)
 	{
-		base.Execute(GFIHPBCEEOB);
+		base.Execute(parameters);
 		if (Module.GetInstance().GetCurrentScreenType() == ScreenType.ModuleMap)
 		{
 			MapScene current = Scene<MapScene>.get_Current();

@@ -105,9 +105,9 @@ public class PurchaseReceipt
 		}
 	}
 
-	public PurchaseReceipt(Product KDOEGOIJKLG)
+	public PurchaseReceipt(Product sourceProduct)
 	{
-		product = KDOEGOIJKLG;
+		product = sourceProduct;
 		JSONNode jSONNode = JSONNode.Parse(product.receipt);
 		SetStore((!jSONNode.HasValue("Store")) ? string.Empty : jSONNode["Store"].Value);
 		SetTransactionId((!jSONNode.HasValue("TransactionID")) ? string.Empty : jSONNode["TransactionID"].Value);

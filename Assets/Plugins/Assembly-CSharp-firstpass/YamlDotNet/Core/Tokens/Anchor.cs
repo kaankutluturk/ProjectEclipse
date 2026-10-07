@@ -20,8 +20,8 @@ namespace YamlDotNet.Core.Tokens
 		{
 		}
 
-		public Anchor(string value, Mark ILENLCMAMBH, Mark PCLFFOBJJFO)
-			: base(ILENLCMAMBH, PCLFFOBJJFO)
+		public Anchor(string value, Mark startMark, Mark endMark)
+			: base(startMark, endMark)
 		{
 			value = value;
 		}

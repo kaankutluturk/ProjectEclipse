@@ -20,13 +20,13 @@ internal sealed class StaticTree
 
 	internal int maxLength;
 
-	private StaticTree(short[] CNKMPIHKGLL, int[] extraBits, int GFDLABEMBHB, int PNNMNEEJEGD, int AFKIJFBEHCN)
+	private StaticTree(short[] treeCodes, int[] extraBits, int extraBase, int elems, int maxLength)
 	{
-		this.treeCodes = CNKMPIHKGLL;
+		this.treeCodes = treeCodes;
 		this.extraBits = extraBits;
-		this.extraBase = GFDLABEMBHB;
-		this.elems = PNNMNEEJEGD;
-		this.maxLength = AFKIJFBEHCN;
+		this.extraBase = extraBase;
+		this.elems = elems;
+		this.maxLength = maxLength;
 	}
 
 	static StaticTree()

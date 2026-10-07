@@ -57,10 +57,10 @@ public class RandomAreaRule : InFightRule
 
 	public override void InitRule(object data)
 	{
-		RuleInitData oIFPCFEGFOB = (RuleInitData)data;
+		RuleInitData initData = (RuleInitData)data;
 		random.setSeed((uint)ListSF.GetCurrentTime());
-		minPositionX = (0f - oIFPCFEGFOB.FightLocation.width) / 2f + oIFPCFEGFOB.FightLocation.wallWidth + areaWidth / 2f;
-		maxPositionX = oIFPCFEGFOB.FightLocation.width / 2f - oIFPCFEGFOB.FightLocation.wallWidth - areaWidth / 2f;
+		minPositionX = (0f - initData.FightLocation.width) / 2f + initData.FightLocation.wallWidth + areaWidth / 2f;
+		maxPositionX = initData.FightLocation.width / 2f - initData.FightLocation.wallWidth - areaWidth / 2f;
 		_currentFrame = 0;
 		alpha = 0f;
 		isAreaVisible = false;
@@ -175,10 +175,10 @@ public class RandomAreaRule : InFightRule
 
 	public override InFightRule Copy()
 	{
-		InFightRule aAJIFBJLJOA = null;
-		XmlNode hKPPBKPJOEO = GetXmlSource().GetNode();
-		aAJIFBJLJOA = new RandomAreaRule(hKPPBKPJOEO);
-		aAJIFBJLJOA.IsRandom = IsRandom;
-		return aAJIFBJLJOA;
+		InFightRule copy = null;
+		XmlNode node = GetXmlSource().GetNode();
+		copy = new RandomAreaRule(node);
+		copy.IsRandom = IsRandom;
+		return copy;
 	}
 }

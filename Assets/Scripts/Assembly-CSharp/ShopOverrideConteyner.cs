@@ -10,16 +10,16 @@ public class ShopOverrideConteyner
 		_Overrides.Clear();
 		foreach (XmlNode childNode in node.ChildNodes)
 		{
-			ShopOverride jHJPEFFBMFM = new ShopOverride();
-			jHJPEFFBMFM.Type = childNode.Attributes["Type"].GetStringOrDefault();
-			jHJPEFFBMFM.Screen = childNode.Attributes["Screen"].GetStringOrDefault();
-			jHJPEFFBMFM.ItemName = childNode.Attributes["Name"].GetStringOrDefault();
-			_Overrides.Add(jHJPEFFBMFM);
+			ShopOverride shopOverride = new ShopOverride();
+			shopOverride.Type = childNode.Attributes["Type"].GetStringOrDefault();
+			shopOverride.Screen = childNode.Attributes["Screen"].GetStringOrDefault();
+			shopOverride.ItemName = childNode.Attributes["Name"].GetStringOrDefault();
+			_Overrides.Add(shopOverride);
 		}
 	}
 
-	public ShopOverride GetOverrideByScreen(string JPDNPODKKJP)
+	public ShopOverride GetOverrideByScreen(string screenName)
 	{
-		return _Overrides.Find((ShopOverride DHDMNHCIPEH) => DHDMNHCIPEH.Screen.Equals(JPDNPODKKJP));
+		return _Overrides.Find((ShopOverride shopOverride) => shopOverride.Screen.Equals(screenName));
 	}
 }

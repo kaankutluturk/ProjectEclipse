@@ -30,14 +30,14 @@ internal static class Crc32Helper
 		1567103746u, 711928724u, 3020668471u, 3272380065u, 1510334235u, 755167117u
 	};
 
-	public static uint UpdateCrc32(uint CJGBICDHGGL, byte[] buffer, int IPCOBJBKNAO, int BDBOAEGELMC)
+	public static uint UpdateCrc32(uint crc, byte[] buffer, int offset, int length)
 	{
-		CJGBICDHGGL ^= 0xFFFFFFFFu;
-		while (--BDBOAEGELMC >= 0)
+		crc ^= 0xFFFFFFFFu;
+		while (--length >= 0)
 		{
-			CJGBICDHGGL = crcTable[(CJGBICDHGGL ^ buffer[IPCOBJBKNAO++]) & 0xFF] ^ (CJGBICDHGGL >> 8);
+			crc = crcTable[(crc ^ buffer[offset++]) & 0xFF] ^ (crc >> 8);
 		}
-		CJGBICDHGGL ^= 0xFFFFFFFFu;
-		return CJGBICDHGGL;
+		crc ^= 0xFFFFFFFFu;
+		return crc;
 	}
 }

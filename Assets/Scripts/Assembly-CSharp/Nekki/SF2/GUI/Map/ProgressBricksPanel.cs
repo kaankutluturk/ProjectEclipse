@@ -27,7 +27,7 @@ namespace Nekki.SF2.GUI.Map
 
 		private List<IndicatorFight> _indicators = new List<IndicatorFight>();
 
-		public void Init(Battle DPOOIONCEOA, FightList KOMGFJOCEDN)
+		public void Init(Battle battle, FightList fightList)
 		{
 			foreach (IndicatorFight item in _indicators)
 			{
@@ -36,21 +36,21 @@ namespace Nekki.SF2.GUI.Map
 			_indicators.Clear();
 			_lblTour.set_Alias(string.Empty);
 			_lblTour.set_text(string.Empty);
-            if (Eclipse.Modding.ModModeRuntime.HasCustomRouting(KOMGFJOCEDN))
+            if (Eclipse.Modding.ModModeRuntime.HasCustomRouting(fightList))
             {
                 var rect = GetComponent<RectTransform>();
                 rect.sizeDelta = new Vector2(rect.sizeDelta.x, 0);
                 return;
             }
-			List<FightList> list = DPOOIONCEOA.GetFights();
+			List<FightList> list = battle.GetFights();
 			int num = list.Count;
-			bool modeProgress = Eclipse.Modding.ModModeRuntime.TryProgress(KOMGFJOCEDN, out int completed, out int total);
+			bool modeProgress = Eclipse.Modding.ModModeRuntime.TryProgress(fightList, out int completed, out int total);
 			if (modeProgress) num = total;
-			if (!modeProgress && (DPOOIONCEOA.get_Type() == BattleType.FightBosses || DPOOIONCEOA.get_Type() == BattleType.FightBossesReplayable))
+			if (!modeProgress && (battle.get_Type() == BattleType.FightBosses || battle.get_Type() == BattleType.FightBossesReplayable))
 			{
 				num--;
 			}
-			bool flag = modeProgress || (DPOOIONCEOA.get_Type() != BattleType.FightBosses && DPOOIONCEOA.get_Type() != BattleType.FightBossesReplayable) || KOMGFJOCEDN.Index != num;
+			bool flag = modeProgress || (battle.get_Type() != BattleType.FightBosses && battle.get_Type() != BattleType.FightBossesReplayable) || fightList.Index != num;
 			if (!flag)
 			{
 				return;
@@ -77,12 +77,12 @@ namespace Nekki.SF2.GUI.Map
 				{
 					int index = i * num4 + j;
 					bool flag2 = modeProgress ? index < completed : list[index].Status == ConditionStatus.StatusComplete;
-					bool cNNCIENODGE = modeProgress ? index > completed : list[index].IsLocked;
+					bool isLocked = modeProgress ? index > completed : list[index].IsLocked;
 					GameObject gameObject = Object.Instantiate(IndicatorFightPrefab);
 					IndicatorFight component2 = gameObject.GetComponent<IndicatorFight>();
 					component2.gameObject.transform.SetParent(base.gameObject.transform, false);
 					_indicators.Add(component2);
-					if (cNNCIENODGE)
+					if (isLocked)
 					{
 						component2.set_CurrentState(IndicatorFight.IndicatorState.IsLocked);
 					}
@@ -100,7 +100,7 @@ namespace Nekki.SF2.GUI.Map
 				}
 				num8 -= num3;
 			}
-			switch (DPOOIONCEOA.get_Type())
+			switch (battle.get_Type())
 			{
 			case BattleType.FightChallenge:
 			case BattleType.FightTournament:
@@ -122,7 +122,7 @@ namespace Nekki.SF2.GUI.Map
 				}
 				else
 				{
-					_lblTour.set_text(LocalizationManager.GetString(DPOOIONCEOA.GetTitle()) + " " + LocalizationManager.GetString("challengeBoss"));
+					_lblTour.set_text(LocalizationManager.GetString(battle.GetTitle()) + " " + LocalizationManager.GetString("challengeBoss"));
 				}
 				break;
 			}

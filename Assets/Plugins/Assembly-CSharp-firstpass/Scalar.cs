@@ -51,17 +51,17 @@ public class Scalar : NodeEvent
 		}
 	}
 
-	public Scalar(string KOLNNNLOCFE, string EDLADAAKMDF, string value, ScalarStyle KIGNIBIMLKK, bool OCBIEJBMFJN, bool FAKBCOKEHGP, Mark ILENLCMAMBH, Mark PCLFFOBJJFO)
-		: base(KOLNNNLOCFE, EDLADAAKMDF, ILENLCMAMBH, PCLFFOBJJFO)
+	public Scalar(string anchor, string tag, string value, ScalarStyle style, bool isPlainImplicit, bool isQuotedImplicit, Mark start, Mark end)
+		: base(anchor, tag, start, end)
 	{
 		this.value = value;
-		this.style = KIGNIBIMLKK;
-		this.isPlainImplicit = OCBIEJBMFJN;
-		this.isQuotedImplicit = FAKBCOKEHGP;
+		this.style = style;
+		this.isPlainImplicit = isPlainImplicit;
+		this.isQuotedImplicit = isQuotedImplicit;
 	}
 
-	public Scalar(string KOLNNNLOCFE, string EDLADAAKMDF, string value, ScalarStyle KIGNIBIMLKK, bool OCBIEJBMFJN, bool FAKBCOKEHGP)
-		: this(KOLNNNLOCFE, EDLADAAKMDF, value, KIGNIBIMLKK, OCBIEJBMFJN, FAKBCOKEHGP, Mark.Empty, Mark.Empty)
+	public Scalar(string anchor, string tag, string value, ScalarStyle style, bool isPlainImplicit, bool isQuotedImplicit)
+		: this(anchor, tag, value, style, isPlainImplicit, isQuotedImplicit, Mark.Empty, Mark.Empty)
 	{
 	}
 
@@ -70,13 +70,13 @@ public class Scalar : NodeEvent
 	{
 	}
 
-	public Scalar(string EDLADAAKMDF, string value)
-		: this(null, EDLADAAKMDF, value, ScalarStyle.Any, true, true, Mark.Empty, Mark.Empty)
+	public Scalar(string tag, string value)
+		: this(null, tag, value, ScalarStyle.Any, true, true, Mark.Empty, Mark.Empty)
 	{
 	}
 
-	public Scalar(string KOLNNNLOCFE, string EDLADAAKMDF, string value)
-		: this(KOLNNNLOCFE, EDLADAAKMDF, value, ScalarStyle.Any, true, true, Mark.Empty, Mark.Empty)
+	public Scalar(string anchor, string tag, string value)
+		: this(anchor, tag, value, ScalarStyle.Any, true, true, Mark.Empty, Mark.Empty)
 	{
 	}
 
@@ -115,8 +115,8 @@ public class Scalar : NodeEvent
 		return string.Format(CultureInfo.InvariantCulture, "Scalar [anchor = {0}, tag = {1}, value = {2}, style = {3}, isPlainImplicit = {4}, isQuotedImplicit = {5}]", GetAnchor(), GetTag(), value, style, isPlainImplicit, isQuotedImplicit);
 	}
 
-	public override void Accept(IParsingEventVisitor NKECMANOOEM)
+	public override void Accept(IParsingEventVisitor visitor)
 	{
-		NKECMANOOEM.Visit(this);
+		visitor.Visit(this);
 	}
 }

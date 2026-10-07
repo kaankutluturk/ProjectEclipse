@@ -20,13 +20,13 @@ namespace Nekki.SF2.GUI.Profile
 			_trickSubItem.AddEventListener(12, Scene<ProfileScene>.get_Current().OnTrickShow);
 		}
 
-		public void Init(Trick KPKPFFGEFGI, int BIPGPCAHKIG)
+		public void Init(Trick trick, int cellIndex)
 		{
 			Clear();
 			BindSubItem();
-			string nHKMCLPOMFK = KPKPFFGEFGI.Icon;
-			int oKNNNLIPODI = 20000 + BIPGPCAHKIG * 10;
-			_trickSubItem.Init(nHKMCLPOMFK, KPKPFFGEFGI, oKNNNLIPODI);
+			string iconName = trick.Icon;
+			int buttonId = 20000 + cellIndex * 10;
+			_trickSubItem.Init(iconName, trick, buttonId);
 			Scene<ProfileScene>.get_Current().SubItems.Add(_trickSubItem);
 		}
 

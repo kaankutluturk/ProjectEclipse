@@ -1,9 +1,9 @@
 public static class Util
 {
-	public static void Swap<T>(ref T FBENKEEDIKJ, ref T PGKPNBGIGEI)
+	public static void Swap<T>(ref T first, ref T second)
 	{
-		T val = FBENKEEDIKJ;
-		FBENKEEDIKJ = PGKPNBGIGEI;
-		PGKPNBGIGEI = val;
+		T val = first;
+		first = second;
+		second = val;
 	}
 }

@@ -215,8 +215,8 @@ namespace Nekki.SF2.GUI.Shop
 			}
 			set_Name(item.Name);
 			base.gameObject.name = string.Format("ShopScrollItem({0})", get_Name());
-			UserItem dKCHDHMLKHN = ListSF.GetRoster().GetInventory().FindItem(item);
-			_itemInfo = ((dKCHDHMLKHN == null) ? item : dKCHDHMLKHN.GetCurrentUpgradeItem());
+			UserItem userItem = ListSF.GetRoster().GetInventory().FindItem(item);
+			_itemInfo = ((userItem == null) ? item : userItem.GetCurrentUpgradeItem());
 			set_MaxOpacity((item.ItemLevel <= ListSF.GetRoster().GetLevel()) ? 1f : 0.5f);
 			if (_lockIcon != null)
 			{
@@ -231,12 +231,12 @@ namespace Nekki.SF2.GUI.Shop
 			}
 			if (_jackdawIcon != null)
 			{
-				bool flag = dKCHDHMLKHN != null;
+				bool flag = userItem != null;
 				_jackdawIcon.gameObject.SetActive(flag && item.Type != "Seal");
 			}
 			if (_equppiedIcon != null)
 			{
-				bool active = dKCHDHMLKHN != null && dKCHDHMLKHN.GetIsEquipped();
+				bool active = userItem != null && userItem.GetIsEquipped();
 				_equppiedIcon.gameObject.SetActive(active);
 			}
 			bool active2 = _itemInfo.ItemLevel > 0;
@@ -333,12 +333,12 @@ namespace Nekki.SF2.GUI.Shop
 			SetItemInfo(_itemInfo);
 		}
 
-		public int CompareTo(ShopScrollItem NOLFMPDGCOC)
+		public int CompareTo(ShopScrollItem other)
 		{
 			int num = ((_itemInfo != null) ? _itemInfo.ItemLevel : 0);
-			int value = ((NOLFMPDGCOC._itemInfo != null) ? NOLFMPDGCOC._itemInfo.ItemLevel : 0);
+			int value = ((other._itemInfo != null) ? other._itemInfo.ItemLevel : 0);
 			int num2 = ((_itemInfo != null) ? _itemInfo.Index : 0);
-			int value2 = ((NOLFMPDGCOC._itemInfo == null) ? 1 : NOLFMPDGCOC._itemInfo.Index);
+			int value2 = ((other._itemInfo == null) ? 1 : other._itemInfo.Index);
 			int num3 = num.CompareTo(value);
 			if (num3 != 0)
 			{

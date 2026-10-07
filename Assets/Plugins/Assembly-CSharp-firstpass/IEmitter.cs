@@ -1,4 +1,4 @@
 public interface IEmitter
 {
-	void Emit(ParsingEvent KEAJCHAAIEP);
+	void Emit(ParsingEvent evt);
 }

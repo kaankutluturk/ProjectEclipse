@@ -53,12 +53,12 @@ public static class SceneManagerSF
 		initialized = value;
 	}
 
-	public static bool Init(ScreenType DAINBPONGAB)
+	public static bool Init(ScreenType screenType)
 	{
 		if (!GetIsInitialized())
 		{
 			set_IsInitialized(true);
-			if (DAINBPONGAB != ScreenType.ModulePreloader)
+			if (screenType != ScreenType.ModulePreloader)
 			{
 				Reset();
 				return false;
@@ -73,12 +73,12 @@ public static class SceneManagerSF
 		Load(ScreenType.ModulePreloader);
 	}
 
-	public static void Load(ScreenType MHOCFOODLLL)
+	public static void Load(ScreenType screenType)
 	{
-		if (MHOCFOODLLL != ScreenType.Loader)
+		if (screenType != ScreenType.Loader)
 		{
 			LoaderScene.set_PrevScene(GetCurrentScreen());
-			LoaderScene.set_NextScene(MHOCFOODLLL);
+			LoaderScene.set_NextScene(screenType);
 		}
 		SceneManager.LoadSceneAsync(1);
 	}

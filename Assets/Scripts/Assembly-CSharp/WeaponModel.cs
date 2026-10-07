@@ -20,7 +20,7 @@ public class WeaponModel : Model
 		return true;
 	}
 
-	public override bool PlayAnimation(InfoAnimation CMGIPKIPIPA, int AOJJBKLCHJO = 0, bool HHJGACBCGBP = false, int BADKABIKMBD = -1)
+	public override bool PlayAnimation(InfoAnimation animation, int direction = 0, bool isRelativeStart = false, int startFrame = -1)
 	{
 		bool flag = !hasPlayedAnimation;
 		if (!hasPlayedAnimation)
@@ -28,7 +28,7 @@ public class WeaponModel : Model
 			GetParentModel().NotifyRangedAttack(this);
 			hasPlayedAnimation = true;
 		}
-		bool result = base.PlayAnimation(CMGIPKIPIPA, AOJJBKLCHJO, HHJGACBCGBP, BADKABIKMBD);
+		bool result = base.PlayAnimation(animation, direction, isRelativeStart, startFrame);
 		if (flag)
 		{
 			GetAnimationModule().Render();

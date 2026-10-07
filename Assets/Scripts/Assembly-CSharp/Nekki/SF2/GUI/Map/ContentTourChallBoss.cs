@@ -53,25 +53,25 @@ namespace Nekki.SF2.GUI.Map
 			}
 		}
 
-		public void Init(Battle DPOOIONCEOA, FightList KOMGFJOCEDN)
+		public void Init(Battle battle, FightList fight)
 		{
-			_bricksPanel.Init(DPOOIONCEOA, KOMGFJOCEDN);
-			InitReplaysLabel(DPOOIONCEOA);
-			bool mMDLKOPCFLK = (DPOOIONCEOA.get_Type() != BattleType.FightBosses && DPOOIONCEOA.get_Type() != BattleType.FightBossesReplayable && DPOOIONCEOA.get_Type() != BattleType.FightFinalTitan) || !HasFinalRewardItem(KOMGFJOCEDN);
-			_prizePanel.Init(-1, mMDLKOPCFLK, KOMGFJOCEDN);
-			_difficultyPanel.gameObject.SetActive(DPOOIONCEOA.GetFightCount() != 0);
+			_bricksPanel.Init(battle, fight);
+			InitReplaysLabel(battle);
+			bool hideItems = (battle.get_Type() != BattleType.FightBosses && battle.get_Type() != BattleType.FightBossesReplayable && battle.get_Type() != BattleType.FightFinalTitan) || !HasFinalRewardItem(fight);
+			_prizePanel.Init(-1, hideItems, fight);
+			_difficultyPanel.gameObject.SetActive(battle.GetFightCount() != 0);
 			_difficultyPanel.GetComponent<CanvasGroup>().alpha = 1f;
-			_difficultyPanel.Init(GameUtils.CalculateFightDifficulty(KOMGFJOCEDN));
-			InitDescription(DPOOIONCEOA, KOMGFJOCEDN);
+			_difficultyPanel.Init(GameUtils.CalculateFightDifficulty(fight));
+			InitDescription(battle, fight);
 			BindTouchZoneClick();
 		}
 
-		private void InitDescription(Battle DPOOIONCEOA, FightList KOMGFJOCEDN)
+		private void InitDescription(Battle battle, FightList fight)
 		{
-			bool challenge = DPOOIONCEOA.get_Type() == BattleType.FightChallenge || DPOOIONCEOA.get_Type() == BattleType.FightReplayable;
-			string description = KOMGFJOCEDN != null ? KOMGFJOCEDN.GetDescription() : string.Empty;
-			if (string.IsNullOrEmpty(description)) description = DPOOIONCEOA.GetDescription();
-			hasDescription = challenge && !string.IsNullOrEmpty(description) && KOMGFJOCEDN != null && KOMGFJOCEDN.IsReplayAvailable();
+			bool challenge = battle.get_Type() == BattleType.FightChallenge || battle.get_Type() == BattleType.FightReplayable;
+			string description = fight != null ? fight.GetDescription() : string.Empty;
+			if (string.IsNullOrEmpty(description)) description = battle.GetDescription();
+			hasDescription = challenge && !string.IsNullOrEmpty(description) && fight != null && fight.IsReplayAvailable();
 			_lblDescription.gameObject.SetActive(hasDescription);
 			if (hasDescription) _lblDescription.SetAlias(description);
 			_challangeTouchZone.interactable = hasDescription;
@@ -88,13 +88,13 @@ namespace Nekki.SF2.GUI.Map
 			if (difficultyOpacity != null) difficultyOpacity.alpha = 1f - eased;
 		}
 
-		private void InitReplaysLabel(Battle DPOOIONCEOA)
+		private void InitReplaysLabel(Battle battle)
 		{
-			if (DPOOIONCEOA.get_Type() == BattleType.FightReplayable || DPOOIONCEOA.get_Type() == BattleType.FightBossesReplayable)
+			if (battle.get_Type() == BattleType.FightReplayable || battle.get_Type() == BattleType.FightBossesReplayable)
 			{
 				_replaysLabel.gameObject.SetActive(true);
-				BattleReplayable bKKPCBGAEHC = (BattleReplayable)DPOOIONCEOA;
-				_replaysLabel.set_text(Eclipse.UI.BattleInfoText.Replays(bKKPCBGAEHC));
+				BattleReplayable replayable = (BattleReplayable)battle;
+				_replaysLabel.set_text(Eclipse.UI.BattleInfoText.Replays(replayable));
 			}
 			else
 			{
@@ -102,37 +102,37 @@ namespace Nekki.SF2.GUI.Map
 			}
 		}
 
-		private bool HasFinalRewardItem(FightList KOMGFJOCEDN)
+		private bool HasFinalRewardItem(FightList fight)
 		{
-			if (KOMGFJOCEDN == null)
+			if (fight == null)
 			{
 				return false;
 			}
-			RewardStruct fDFKLPHBAHJ = KOMGFJOCEDN.GetRewards()[KOMGFJOCEDN.GetRewards().Count - 1];
-			int gNLOCMLBNHF = ListSF.GetRoster().GetLevel();
-			RewardPrize cMHHEHILIIH = fDFKLPHBAHJ.GetPrizeForLevel(gNLOCMLBNHF);
-			if (cMHHEHILIIH.items.Count == 0)
+			RewardStruct rewardStruct = fight.GetRewards()[fight.GetRewards().Count - 1];
+			int level = ListSF.GetRoster().GetLevel();
+			RewardPrize prize = rewardStruct.GetPrizeForLevel(level);
+			if (prize.items.Count == 0)
 			{
 				return false;
 			}
-			RewardItem cACJANFAJEC = cMHHEHILIIH.items[0];
-			if (!cACJANFAJEC.ShowReward)
+			RewardItem rewardItem = prize.items[0];
+			if (!rewardItem.ShowReward)
 			{
 				return false;
 			}
-			ItemInfo dJKEECEOCJB = ListSF.GetItems().GetItemByName(cACJANFAJEC.Name);
-			return dJKEECEOCJB != null;
+			ItemInfo itemInfo = ListSF.GetItems().GetItemByName(rewardItem.Name);
+			return itemInfo != null;
 		}
 
-		private void ResetFade(bool LFGNIIJJMIG)
+		private void ResetFade(bool descriptionVisible)
 		{
-			descriptionFade = (LFGNIIJJMIG ? 255 : 0);
-			difficultyFade = ((!LFGNIIJJMIG) ? 255 : 0);
+			descriptionFade = (descriptionVisible ? 255 : 0);
+			difficultyFade = ((!descriptionVisible) ? 255 : 0);
 			fadePauseFrames = MapGUI.ChallengeFade.DelayBeforeFade;
-			isDescriptionFading = LFGNIIJJMIG;
-			isDescriptionFadingIn = !LFGNIIJJMIG;
-			isDifficultyFading = !LFGNIIJJMIG;
-			isDifficultyFadingIn = LFGNIIJJMIG;
+			isDescriptionFading = descriptionVisible;
+			isDescriptionFadingIn = !descriptionVisible;
+			isDifficultyFading = !descriptionVisible;
+			isDifficultyFadingIn = descriptionVisible;
 		}
 
 		private bool IsFadeSpeedZero()

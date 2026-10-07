@@ -39,9 +39,9 @@ public class ProgressButton : SFButton
 		return percentage;
 	}
 
-	private void ApplyPercentage(float EJHLCDFHNPA)
+	private void ApplyPercentage(float newPercentage)
 	{
-		percentage = Mathf.Clamp(EJHLCDFHNPA, 0f, 100f);
+		percentage = Mathf.Clamp(newPercentage, 0f, 100f);
 		if (_picComplete != null)
 		{
 			if (percentage == 0f)
@@ -83,30 +83,30 @@ public class ProgressButton : SFButton
 		_picCircleProgressBar.fillAmount = _displayedFill;
 	}
 
-	public void SetPercentage(float EJHLCDFHNPA, float BFJBKLCLIHP)
+	public void SetPercentage(float newPercentage, float durationFrames)
 	{
-		float num = BFJBKLCLIHP / 60f;
+		float num = durationFrames / 60f;
 		KillTween();
-		EJHLCDFHNPA = Mathf.Clamp(EJHLCDFHNPA, 0f, 100f);
-		if (percentage == EJHLCDFHNPA)
+		newPercentage = Mathf.Clamp(newPercentage, 0f, 100f);
+		if (percentage == newPercentage)
 		{
 			return;
 		}
 		if (num == 0f)
 		{
-			ApplyPercentage(EJHLCDFHNPA);
+			ApplyPercentage(newPercentage);
 			return;
 		}
-		_tween = DOTween.To(() => percentage, (float DHDMNHCIPEH) =>
+		_tween = DOTween.To(() => percentage, (float animatedPercentage) =>
 		{
-			ApplyPercentage(DHDMNHCIPEH);
-		}, EJHLCDFHNPA, num);
+			ApplyPercentage(animatedPercentage);
+		}, newPercentage, num);
 	}
 
-	public void AddPercentage(float FOIPKLDNGDL)
+	public void AddPercentage(float addedPercentage)
 	{
 		KillTween();
-		ApplyPercentage(GetPercentage() + FOIPKLDNGDL);
+		ApplyPercentage(GetPercentage() + addedPercentage);
 	}
 
 	public void ResetPercentage()

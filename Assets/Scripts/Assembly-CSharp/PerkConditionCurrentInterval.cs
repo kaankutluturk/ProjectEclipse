@@ -19,24 +19,24 @@ public class PerkConditionCurrentInterval : PerkCondition
 		_intervalType = node.Attributes["Type"].GetStringOrDefault(string.Empty);
 	}
 
-	public override bool IsEqual(Model ACENLMONNPA, List<string> NIKHAICFGNM)
+	public override bool IsEqual(Model model, List<string> args)
 	{
-		Model fGCODGKLHED = ResolveTargetModel(ACENLMONNPA);
-		if (ACENLMONNPA == null)
+		Model targetModel = ResolveTargetModel(model);
+		if (model == null)
 		{
 			return false;
 		}
-		List<IntervalAnimation> list = fGCODGKLHED.GetIntervals();
-		IntervalAnimation.IntervalType nGAJJDIEDGF = IntervalAnimation.ParseIntervalType(_intervalType);
+		List<IntervalAnimation> list = targetModel.GetIntervals();
+		IntervalAnimation.IntervalType intervalType = IntervalAnimation.ParseIntervalType(_intervalType);
 		bool flag = _intervalName.Equals(string.Empty);
-		bool flag2 = nGAJJDIEDGF == IntervalAnimation.IntervalType.INTERVAL_NONE;
+		bool flag2 = intervalType == IntervalAnimation.IntervalType.INTERVAL_NONE;
 		foreach (IntervalAnimation item in list)
 		{
 			if (!flag && _intervalName.Equals(item.Name))
 			{
 				flag = true;
 			}
-			if (!flag2 && nGAJJDIEDGF == item.Type)
+			if (!flag2 && intervalType == item.Type)
 			{
 				flag2 = true;
 			}

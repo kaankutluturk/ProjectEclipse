@@ -23,16 +23,16 @@ internal class CRC
 		_value = uint.MaxValue;
 	}
 
-	public void UpdateByte(byte AAOIAEJJINO)
+	public void UpdateByte(byte byteValue)
 	{
-		_value = Table[(byte)_value ^ AAOIAEJJINO] ^ (_value >> 8);
+		_value = Table[(byte)_value ^ byteValue] ^ (_value >> 8);
 	}
 
-	public void Update(byte[] data, uint IPCOBJBKNAO, uint PEEOEOMEBFG)
+	public void Update(byte[] data, uint offset, uint size)
 	{
-		for (uint num = 0u; num < PEEOEOMEBFG; num++)
+		for (uint num = 0u; num < size; num++)
 		{
-			_value = Table[(byte)_value ^ data[IPCOBJBKNAO + num]] ^ (_value >> 8);
+			_value = Table[(byte)_value ^ data[offset + num]] ^ (_value >> 8);
 		}
 	}
 
@@ -41,15 +41,15 @@ internal class CRC
 		return _value ^ 0xFFFFFFFFu;
 	}
 
-	private static uint CalculateDigest(byte[] data, uint IPCOBJBKNAO, uint PEEOEOMEBFG)
+	private static uint CalculateDigest(byte[] data, uint offset, uint size)
 	{
-		CRC nEOAHLMJHKC = new CRC();
-		nEOAHLMJHKC.Update(data, IPCOBJBKNAO, PEEOEOMEBFG);
-		return nEOAHLMJHKC.GetDigest();
+		CRC crc = new CRC();
+		crc.Update(data, offset, size);
+		return crc.GetDigest();
 	}
 
-	private static bool VerifyDigest(uint MODPGIJPPMP, byte[] data, uint IPCOBJBKNAO, uint PEEOEOMEBFG)
+	private static bool VerifyDigest(uint digest, byte[] data, uint offset, uint size)
 	{
-		return CalculateDigest(data, IPCOBJBKNAO, PEEOEOMEBFG) == MODPGIJPPMP;
+		return CalculateDigest(data, offset, size) == digest;
 	}
 }

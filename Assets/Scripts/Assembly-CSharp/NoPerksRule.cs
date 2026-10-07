@@ -4,8 +4,8 @@ public class NoPerksRule : InFightRule
 {
 	protected string _name = string.Empty;
 
-	public NoPerksRule(XmlNode node, RuleAppliance EJPOJJKKICO)
-		: base(RuleType.RuleNoPerks, EJPOJJKKICO, node)
+	public NoPerksRule(XmlNode node, RuleAppliance appliance)
+		: base(RuleType.RuleNoPerks, appliance, node)
 	{
 		_name = node.Attributes["Name"].GetStringOrDefault(string.Empty);
 	}
@@ -17,11 +17,11 @@ public class NoPerksRule : InFightRule
 
 	public override InFightRule Copy()
 	{
-		InFightRule aAJIFBJLJOA = null;
-		RuleAppliance eJPOJJKKICO = GetAppliance();
-		XmlNode hKPPBKPJOEO = GetXmlSource().GetNode();
-		aAJIFBJLJOA = new NoPerksRule(hKPPBKPJOEO, eJPOJJKKICO);
-		aAJIFBJLJOA.IsRandom = IsRandom;
-		return aAJIFBJLJOA;
+		InFightRule copy = null;
+		RuleAppliance appliance = GetAppliance();
+		XmlNode ruleNode = GetXmlSource().GetNode();
+		copy = new NoPerksRule(ruleNode, appliance);
+		copy.IsRandom = IsRandom;
+		return copy;
 	}
 }

@@ -33,8 +33,8 @@ namespace Nekki.SF2.GUI.Common
 		protected override void Init()
 		{
 			base.Init();
-			PaymentStore aDEKACKLIJG = PaymentManager.GetStore();
-			aDEKACKLIJG.OnPurchaseCancelled = (Action<string>)Delegate.Combine(aDEKACKLIJG.OnPurchaseCancelled, new Action<string>(OnPurchaseDismissed));
+			PaymentStore store = PaymentManager.GetStore();
+			store.OnPurchaseCancelled = (Action<string>)Delegate.Combine(store.OnPurchaseCancelled, new Action<string>(OnPurchaseDismissed));
 			PaymentStore aDEKACKLIJG2 = PaymentManager.GetStore();
 			aDEKACKLIJG2.OnPurchaseSucceeded = (Action<string>)Delegate.Combine(aDEKACKLIJG2.OnPurchaseSucceeded, new Action<string>(OnPurchaseSucceeded));
 			PaymentStore aDEKACKLIJG3 = PaymentManager.GetStore();
@@ -58,8 +58,8 @@ namespace Nekki.SF2.GUI.Common
 			base.OnModuleShutdown();
 			if (PaymentManager.GetStore() != null)
 			{
-				PaymentStore aDEKACKLIJG = PaymentManager.GetStore();
-				aDEKACKLIJG.OnPurchaseCancelled = (Action<string>)Delegate.Remove(aDEKACKLIJG.OnPurchaseCancelled, new Action<string>(OnPurchaseDismissed));
+				PaymentStore store = PaymentManager.GetStore();
+				store.OnPurchaseCancelled = (Action<string>)Delegate.Remove(store.OnPurchaseCancelled, new Action<string>(OnPurchaseDismissed));
 				PaymentStore aDEKACKLIJG2 = PaymentManager.GetStore();
 				aDEKACKLIJG2.OnPurchaseSucceeded = (Action<string>)Delegate.Remove(aDEKACKLIJG2.OnPurchaseSucceeded, new Action<string>(OnPurchaseSucceeded));
 				PaymentStore aDEKACKLIJG3 = PaymentManager.GetStore();
@@ -77,10 +77,10 @@ namespace Nekki.SF2.GUI.Common
 			}
 		}
 
-		public void MakePurchase(ItemInfo FAKOMBAIFPP)
+		public void MakePurchase(ItemInfo item)
 		{
 			ShowBlocker();
-			PaymentManager.GetStore().PurchaseProduct(FAKOMBAIFPP.GetMarketId());
+			PaymentManager.GetStore().PurchaseProduct(item.GetMarketId());
 		}
 
 		public void RestorePurchases()
@@ -89,34 +89,34 @@ namespace Nekki.SF2.GUI.Common
 			PaymentManager.GetStore().RestorePurchases();
 		}
 
-		private void OnPurchaseDismissed(string FDKNIPNGFNF)
+		private void OnPurchaseDismissed(string productId)
 		{
 			HideBlocker();
 		}
 
-		private void OnPurchaseSucceeded(string FDKNIPNGFNF)
+		private void OnPurchaseSucceeded(string productId)
 		{
-			ItemInfo fAKOMBAIFPP = ListSF.FindItemByMarketId(FDKNIPNGFNF);
-			RaisePurchaseQuestEvent(QuestEvent.QuestEventType.QUEST_EVENT_PURCHASE, fAKOMBAIFPP);
+			ItemInfo item = ListSF.FindItemByMarketId(productId);
+			RaisePurchaseQuestEvent(QuestEvent.QuestEventType.QUEST_EVENT_PURCHASE, item);
 			HideBlocker();
 		}
 
-		private void OnPurchaseFailed(string FDKNIPNGFNF, PurchaseFailureReason ILDDNIBBANF)
+		private void OnPurchaseFailed(string productId, PurchaseFailureReason reason)
 		{
-			if (ILDDNIBBANF != PurchaseFailureReason.UserCancelled)
+			if (reason != PurchaseFailureReason.UserCancelled)
 			{
 				RaisePurchaseQuestEvent(QuestEvent.QuestEventType.QUEST_EVENT_PURCHASE_UNSUCCESSFUL, null, "Connection");
 			}
 			HideBlocker();
 		}
 
-		private void OnPurchaseUnsuccessful(string FDKNIPNGFNF)
+		private void OnPurchaseUnsuccessful(string productId)
 		{
 			RaisePurchaseQuestEvent(QuestEvent.QuestEventType.QUEST_EVENT_PURCHASE_UNSUCCESSFUL, null);
 			HideBlocker();
 		}
 
-		private void OnServerNoResponse(string FDKNIPNGFNF)
+		private void OnServerNoResponse(string productId)
 		{
 			RaisePurchaseQuestEvent(QuestEvent.QuestEventType.QUEST_EVENT_PURCHASE_UNSUCCESSFUL, null, "ServerNoResponse");
 			HideBlocker();
@@ -138,25 +138,25 @@ namespace Nekki.SF2.GUI.Common
 			_OnProductsUpdateEvent.Invoke();
 		}
 
-		private void RaisePurchaseQuestEvent(QuestEvent.QuestEventType p_event, ItemInfo FAKOMBAIFPP, string HEMPKKHDINJ = null)
+		private void RaisePurchaseQuestEvent(QuestEvent.QuestEventType p_event, ItemInfo item, string failureReason = null)
 		{
-			QuestParameters hHKLFIIBIFF = ListSF.GetInstance().GetQuestParameters();
-			FightIDS jLGLBLDPAAF = hHKLFIIBIFF.fightIds;
-			hHKLFIIBIFF.fightIds = FightIDS.Empty();
-			hHKLFIIBIFF.fightResult = string.Empty;
-			if (FAKOMBAIFPP != null)
+			QuestParameters questParameters = ListSF.GetInstance().GetQuestParameters();
+			FightIDS savedFightIds = questParameters.fightIds;
+			questParameters.fightIds = FightIDS.Empty();
+			questParameters.fightResult = string.Empty;
+			if (item != null)
 			{
-				hHKLFIIBIFF.purchasedItem = FAKOMBAIFPP;
+				questParameters.purchasedItem = item;
 			}
-			if (!string.IsNullOrEmpty(HEMPKKHDINJ))
+			if (!string.IsNullOrEmpty(failureReason))
 			{
-				hHKLFIIBIFF.purchaseFailureReason = HEMPKKHDINJ;
+				questParameters.purchaseFailureReason = failureReason;
 			}
 			if (ListSF.GetInstance().RaiseQuestEvent(p_event))
 			{
 				ListSF.GetInstance().RunQuestActions();
 			}
-			hHKLFIIBIFF.fightIds = jLGLBLDPAAF;
+			questParameters.fightIds = savedFightIds;
 		}
 
 		private void ShowBlocker()

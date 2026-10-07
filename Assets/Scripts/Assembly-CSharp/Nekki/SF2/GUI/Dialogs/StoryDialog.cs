@@ -110,27 +110,27 @@ namespace Nekki.SF2.GUI.Dialogs
 
 		public override void Init(object data)
 		{
-			string dIKEFIIPNBE = string.Empty;
+			string title = string.Empty;
 			if (data != null)
 			{
-				StoryDialogInfo gPJMLFBLDEF = (StoryDialogInfo)data;
-				dIKEFIIPNBE = gPJMLFBLDEF.Title;
-				portraitSpriteName = gPJMLFBLDEF.PortraitName;
-				showPortrait = gPJMLFBLDEF.ShowPortrait;
-				contents = gPJMLFBLDEF.Contents;
-				showCancelButton = gPJMLFBLDEF.ShowCancelButton;
-				storyOkButtonAlias = gPJMLFBLDEF.OkButtonText;
-				okButtonColor = gPJMLFBLDEF.OkButtonColor;
-				cancelButtonAlias = gPJMLFBLDEF.CancelButtonText;
-				cancelButtonColor = gPJMLFBLDEF.CancelButtonColor;
-				showAllContents = gPJMLFBLDEF.UseEdgeButtons;
-				if (gPJMLFBLDEF.Dlg != null)
+				StoryDialogInfo info = (StoryDialogInfo)data;
+				title = info.Title;
+				portraitSpriteName = info.PortraitName;
+				showPortrait = info.ShowPortrait;
+				contents = info.Contents;
+				showCancelButton = info.ShowCancelButton;
+				storyOkButtonAlias = info.OkButtonText;
+				okButtonColor = info.OkButtonColor;
+				cancelButtonAlias = info.CancelButtonText;
+				cancelButtonColor = info.CancelButtonColor;
+				showAllContents = info.UseEdgeButtons;
+				if (info.Dlg != null)
 				{
-					AddEventListener(0, gPJMLFBLDEF.Dlg);
+					AddEventListener(0, info.Dlg);
 				}
 			}
 			GlobalTimer.get_Instance().addEventListener(0, OnTimerTick);
-			base.Init(dIKEFIIPNBE, storyOkButtonAlias, cancelButtonAlias);
+			base.Init(title, storyOkButtonAlias, cancelButtonAlias);
 		}
 
 		private new void Start()
@@ -146,8 +146,8 @@ namespace Nekki.SF2.GUI.Dialogs
 
 		public override void Close(object data)
 		{
-			DialogCloseEvent iPJEOLNMLEH = DialogCloseEvent.OnPopupClose;
-			OnClose(iPJEOLNMLEH);
+			DialogCloseEvent closeEvent = DialogCloseEvent.OnPopupClose;
+			OnClose(closeEvent);
 		}
 
 		protected override void SetupContent()
@@ -187,7 +187,7 @@ namespace Nekki.SF2.GUI.Dialogs
 			_content.GetComponent<RectTransform>().sizeDelta = sizeDelta;
 		}
 
-		protected override void SetupFooter(FooterType HJNAHNICGMH)
+		protected override void SetupFooter(FooterType footer)
 		{
 			if (currentPageIndex + 1 < contents.Count)
 			{
@@ -207,9 +207,9 @@ namespace Nekki.SF2.GUI.Dialogs
 
 		protected virtual void ShowLastPageButtons()
 		{
-			FooterType kBDHPMOMJLL = FooterType.FOOTER_NONE;
-			kBDHPMOMJLL = ((!showCancelButton) ? FooterType.FOOTER_OK : FooterType.FOOTER_BOTH);
-			base.SetupFooter(kBDHPMOMJLL);
+			FooterType footer = FooterType.FOOTER_NONE;
+			footer = ((!showCancelButton) ? FooterType.FOOTER_OK : FooterType.FOOTER_BOTH);
+			base.SetupFooter(footer);
 			_btnOK.RemoveEventListener(2, OnClose);
 			_btnOK.RemoveEventListener(2, OnNextClicked);
 			_btnOK.AddEventListener(2, OnNextClicked);
@@ -223,10 +223,10 @@ namespace Nekki.SF2.GUI.Dialogs
 			ApplyPlatformLayout();
 		}
 
-		protected virtual void SetupPortrait(string LBBHPDDLLOK)
+		protected virtual void SetupPortrait(string portraitName)
 		{
-			string[] array = LBBHPDDLLOK.Split('|');
-			string[] array2 = LBBHPDDLLOK.Split('/');
+			string[] array = portraitName.Split('|');
+			string[] array2 = portraitName.Split('/');
 			string[] array3 = array2[array2.Length - 1].Split('.');
 			_portrait.set_TexturePath(SF2Paths.GetUsersUiPath());
 			// Eclipse mod dialogs pass qualified sprite IDs (owner:path); the legacy
@@ -243,49 +243,49 @@ namespace Nekki.SF2.GUI.Dialogs
 		protected virtual void PositionButtons()
 		{
 			float y = _bottomStripe.transform.localPosition.y;
-			float bAINMLLIKOL = y + 120f;
+			float localY = y + 120f;
 			if (_btnOK != null && _btnOK.gameObject.activeSelf)
 			{
 				float bAINMLLIKOL2 = 740f - _btnOK.GetComponent<RectTransform>().rect.width / 2f;
 				_btnOK.transform.SetLocalX(bAINMLLIKOL2);
-				_btnOK.transform.SetLocalY(bAINMLLIKOL);
+				_btnOK.transform.SetLocalY(localY);
 			}
 			if (_btnCancel != null && _btnCancel.gameObject.activeSelf)
 			{
 				float num = 0f;
-				TransformExtensions.SetLocalX(value: (!_btnOK.gameObject.activeSelf) ? ((1680f - _btnCancel.GetComponent<RectTransform>().rect.width) / 2f - 740f) : (_btnOK.transform.localPosition.x - 60f - (_btnOK.GetComponent<RectTransform>().rect.width + _btnCancel.GetComponent<RectTransform>().rect.width) / 2f), KGOIHPPNFGC: _btnCancel.transform);
-				_btnCancel.transform.SetLocalY(bAINMLLIKOL);
+				TransformExtensions.SetLocalX(value: (!_btnOK.gameObject.activeSelf) ? ((1680f - _btnCancel.GetComponent<RectTransform>().rect.width) / 2f - 740f) : (_btnOK.transform.localPosition.x - 60f - (_btnOK.GetComponent<RectTransform>().rect.width + _btnCancel.GetComponent<RectTransform>().rect.width) / 2f), transform: _btnCancel.transform);
+				_btnCancel.transform.SetLocalY(localY);
 			}
 		}
 
-		protected virtual void SetMessageKey(string LIOGIBJBHAH)
+		protected virtual void SetMessageKey(string key)
 		{
 			messageRefreshPending = true;
-			messageText = LocalizationManager.GetString(LIOGIBJBHAH);
+			messageText = LocalizationManager.GetString(key);
 			_timeLabel.gameObject.SetActive(false);
 		}
 
-		protected virtual void ShowContent(StoryDialogContent DMNBDBJNKME)
+		protected virtual void ShowContent(StoryDialogContent content)
 		{
-			SetupTextLabel(DMNBDBJNKME);
-			SetMessageKey(DMNBDBJNKME.Text);
+			SetupTextLabel(content);
+			SetMessageKey(content.Text);
 			if (_timerLabel != null)
 			{
 				_timerLabel.gameObject.SetActive(false);
 			}
 			int num = -1;
-			if (DMNBDBJNKME.ItemTimer != null)
+			if (content.ItemTimer != null)
 			{
-				num = textTimers.IndexOf(DMNBDBJNKME.ItemTimer);
+				num = textTimers.IndexOf(content.ItemTimer);
 				if (num == -1)
 				{
-					textTimers.Add(DMNBDBJNKME.ItemTimer);
-					_timerLabel = CreateTimerLabel(DMNBDBJNKME);
-					DMNBDBJNKME.ItemTimer.set_Label(_timerLabel);
-					DMNBDBJNKME.ItemTimer.Refresh();
+					textTimers.Add(content.ItemTimer);
+					_timerLabel = CreateTimerLabel(content);
+					content.ItemTimer.set_Label(_timerLabel);
+					content.ItemTimer.Refresh();
 					num = textTimers.Count - 1;
 				}
-				_timerLabel = DMNBDBJNKME.ItemTimer.GetLabel();
+				_timerLabel = content.ItemTimer.GetLabel();
 			}
 			else
 			{
@@ -303,23 +303,23 @@ namespace Nekki.SF2.GUI.Dialogs
 			if ((bool)_timerLabel && !flag)
 			{
 				_timerLabel.set_LabelFontSize(103);
-				_timerLabel.color = DMNBDBJNKME.ItemTimer.Color;
+				_timerLabel.color = content.ItemTimer.Color;
 				_timerLabel.tag = (1234 + num).ToString();
 				_timerLabel.transform.SetParent(_content.transform, false);
 			}
-			if (DMNBDBJNKME.CheckTimer)
+			if (content.CheckTimer)
 			{
-				StartTimer(DMNBDBJNKME);
+				StartTimer(content);
 			}
 		}
 
-		protected virtual void StartTimer(StoryDialogContent DMNBDBJNKME)
+		protected virtual void StartTimer(StoryDialogContent content)
 		{
 			isTimerActive = true;
-			_leftTime = DMNBDBJNKME.Timer;
-			timerContentId = DMNBDBJNKME.Id;
-			timerUserItem = DMNBDBJNKME.OwnedItem;
-			timerRecipe = DMNBDBJNKME.Recipe;
+			_leftTime = content.Timer;
+			timerContentId = content.Id;
+			timerUserItem = content.OwnedItem;
+			timerRecipe = content.Recipe;
 			if (_leftTime <= 0)
 			{
 				OnClose(timerContentId);
@@ -327,9 +327,9 @@ namespace Nekki.SF2.GUI.Dialogs
 			UpdateTimerLabel();
 		}
 
-		protected virtual void SetButton(string HCPNFPMHFCM)
+		protected virtual void SetButton(string alias)
 		{
-			defaultOkButtonAlias = HCPNFPMHFCM;
+			defaultOkButtonAlias = alias;
 			SetupButton(_btnOK, FooterType.FOOTER_OK);
 			_btnOK.RemoveEventListener(2, OnClose);
 			_btnOK.RemoveEventListener(2, OnNextClicked);
@@ -388,13 +388,13 @@ namespace Nekki.SF2.GUI.Dialogs
 			}
 		}
 
-		protected virtual void SetupTextLabel(StoryDialogContent DMNBDBJNKME)
+		protected virtual void SetupTextLabel(StoryDialogContent content)
 		{
 			_text.gameObject.SetActive(true);
 			_text.set_Alias(string.Empty);
 			_text.set_text(string.Empty);
 			_text.set_LabelFontSize(103);
-			_text.color = DMNBDBJNKME.FontColor;
+			_text.color = content.FontColor;
 			_text.alignment = TextAnchor.MiddleLeft;
 			_text.transform.SetLocalY(0f);
 			float x = ((!showPortrait) ? 1680 : 900);
@@ -468,8 +468,8 @@ namespace Nekki.SF2.GUI.Dialogs
 		{
 			if (!(_timeLabel == null) && isTimerActive)
 			{
-				bool aNLFBBLJMJH = true;
-				string timeString = TimerLabel.GetTimeString(_leftTime, true, true, true, aNLFBBLJMJH, ":", string.Empty, true, true, true, true, true, string.Empty, string.Empty, string.Empty);
+				bool showDays = true;
+				string timeString = TimerLabel.GetTimeString(_leftTime, true, true, true, showDays, ":", string.Empty, true, true, true, true, true, string.Empty, string.Empty, string.Empty);
 				_timeLabel.set_text(timeString);
 				_timeLabel.gameObject.SetActive(true);
 				if (!_text)
@@ -554,13 +554,13 @@ namespace Nekki.SF2.GUI.Dialogs
 			_footerTextsSprite.transform.SetLocalY(num4 - 60f);
 		}
 
-		protected override void SetupButton(LabelButton GAMILDJHFDB, FooterType MOPOCBKIKBI)
+		protected override void SetupButton(LabelButton button, FooterType footer)
 		{
-			GAMILDJHFDB.gameObject.SetActive(true);
+			button.gameObject.SetActive(true);
 			string alias = string.Empty;
 			int buttonId = 0;
 			LabelButton.ButtonColor color = LabelButton.ButtonColor.BUTTON_WHITE;
-			switch (MOPOCBKIKBI)
+			switch (footer)
 			{
 			case FooterType.FOOTER_CANCEL:
 				alias = cancelButtonAlias;
@@ -573,11 +573,11 @@ namespace Nekki.SF2.GUI.Dialogs
 				buttonId = 1;
 				break;
 			}
-			GAMILDJHFDB.SetColor(color);
-			GAMILDJHFDB.SetAlias(alias);
-			GAMILDJHFDB.ButtonId = buttonId;
-			GAMILDJHFDB.RemoveEventListener(2, OnClose);
-			GAMILDJHFDB.AddEventListener(2, OnClose);
+			button.SetColor(color);
+			button.SetAlias(alias);
+			button.ButtonId = buttonId;
+			button.RemoveEventListener(2, OnClose);
+			button.AddEventListener(2, OnClose);
 		}
 
 		protected virtual void BuildAllContents()
@@ -589,10 +589,10 @@ namespace Nekki.SF2.GUI.Dialogs
 			int i = 0;
 			for (int count = contents.Count; i < count; i++)
 			{
-				StoryDialogContent nJEPNCJLPPF = contents[i];
-				if (!nJEPNCJLPPF.CheckTimer)
+				StoryDialogContent content = contents[i];
+				if (!content.CheckTimer)
 				{
-					switch (nJEPNCJLPPF.Type)
+					switch (content.Type)
 					{
 					case StoryDialogContent.ContentType.CONTENT_TYPE_REGULAR:
 					{
@@ -601,20 +601,20 @@ namespace Nekki.SF2.GUI.Dialogs
 						labelAlias.set_LabelFontSize(103);
 						labelAlias.UseLabelLineSpacing = true;
 						labelAlias.set_LabelLineSpacing(0.7f);
-						labelAlias.color = nJEPNCJLPPF.FontColor;
+						labelAlias.color = content.FontColor;
 						labelAlias.alignment = TextAnchor.MiddleLeft;
 						labelAlias.alignByGeometry = true;
 						labelAlias.verticalOverflow = VerticalWrapMode.Overflow;
 						labelAlias.rectTransform.sizeDelta = new Vector2(x, 10f);
-						string text = LocalizationManager.GetString(nJEPNCJLPPF.Text);
-						bool flag = null != nJEPNCJLPPF.ItemTimer;
+						string text = LocalizationManager.GetString(content.Text);
+						bool flag = null != content.ItemTimer;
 						TimerLabel timerLabel = null;
 						if (flag)
 						{
-							textTimers.Add(nJEPNCJLPPF.ItemTimer);
-							timerLabel = CreateTimerLabel(nJEPNCJLPPF);
-							nJEPNCJLPPF.ItemTimer.set_Label(timerLabel);
-							nJEPNCJLPPF.ItemTimer.Refresh();
+							textTimers.Add(content.ItemTimer);
+							timerLabel = CreateTimerLabel(content);
+							content.ItemTimer.set_Label(timerLabel);
+							content.ItemTimer.Refresh();
 							timerLabel.transform.SetParent(_textsSprite.transform, false);
 							text += "<visible=0>00:00:00</>";
 						}
@@ -632,7 +632,7 @@ namespace Nekki.SF2.GUI.Dialogs
 						break;
 					}
 					case StoryDialogContent.ContentType.CONTENT_TYPE_PRICELINE:
-						priceLineContents.Add(nJEPNCJLPPF);
+						priceLineContents.Add(content);
 						break;
 					}
 				}
@@ -644,7 +644,7 @@ namespace Nekki.SF2.GUI.Dialogs
 					_timeLabel.set_LabelFontSize(103);
 					_timeLabel.gameObject.SetActive(false);
 					_timeLabel.transform.SetParent(_textsSprite.transform, false);
-					StartTimer(nJEPNCJLPPF);
+					StartTimer(content);
 					num -= _timeLabel.preferredHeight / 4f;
 					_timeLabel.transform.SetLocalY(num);
 					num -= _timeLabel.preferredHeight / 4f + 32.5f;
@@ -660,42 +660,42 @@ namespace Nekki.SF2.GUI.Dialogs
 			}
 		}
 
-		protected virtual TimerLabel CreateTimerLabel(StoryDialogContent DMNBDBJNKME)
+		protected virtual TimerLabel CreateTimerLabel(StoryDialogContent content)
 		{
 			GameObject gameObject = new GameObject("TimerLabel");
 			TimerLabel timerLabel = gameObject.AddComponent<TimerLabel>();
-			timerLabel.IsSeconds = DMNBDBJNKME.ItemTimer.IsSeconds;
-			timerLabel.IsMinutes = DMNBDBJNKME.ItemTimer.IsMinutes;
-			timerLabel.IsHours = DMNBDBJNKME.ItemTimer.IsHours;
-			timerLabel.IsDays = DMNBDBJNKME.ItemTimer.IsDays;
-			timerLabel.Delimiter = DMNBDBJNKME.ItemTimer.Delimiter;
-			timerLabel.DaysString = DMNBDBJNKME.ItemTimer.DaysString;
-			timerLabel.UseDaysDelimiter = DMNBDBJNKME.ItemTimer.UseDaysDelimiter;
-			timerLabel.IsSecondsZero = DMNBDBJNKME.ItemTimer.IsSecondsZero;
-			timerLabel.IsMinutesZero = DMNBDBJNKME.ItemTimer.IsMinutesZero;
-			timerLabel.IsHoursZero = DMNBDBJNKME.ItemTimer.IsHoursZero;
-			timerLabel.IsDaysZero = DMNBDBJNKME.ItemTimer.IsDaysZero;
+			timerLabel.IsSeconds = content.ItemTimer.IsSeconds;
+			timerLabel.IsMinutes = content.ItemTimer.IsMinutes;
+			timerLabel.IsHours = content.ItemTimer.IsHours;
+			timerLabel.IsDays = content.ItemTimer.IsDays;
+			timerLabel.Delimiter = content.ItemTimer.Delimiter;
+			timerLabel.DaysString = content.ItemTimer.DaysString;
+			timerLabel.UseDaysDelimiter = content.ItemTimer.UseDaysDelimiter;
+			timerLabel.IsSecondsZero = content.ItemTimer.IsSecondsZero;
+			timerLabel.IsMinutesZero = content.ItemTimer.IsMinutesZero;
+			timerLabel.IsHoursZero = content.ItemTimer.IsHoursZero;
+			timerLabel.IsDaysZero = content.ItemTimer.IsDaysZero;
 			timerLabel.set_LabelFontSize(103);
-			timerLabel.color = DMNBDBJNKME.ItemTimer.Color;
+			timerLabel.color = content.ItemTimer.Color;
 			return timerLabel;
 		}
 
-		protected List<string> ParseString(string IGGFGLLIGCG)
+		protected List<string> ParseString(string text)
 		{
-			int length = IGGFGLLIGCG.Length;
+			int length = text.Length;
 			int num = length;
 			string empty = string.Empty;
 			string empty2 = string.Empty;
 			for (int i = 110; i < length; i++)
 			{
-				if (IGGFGLLIGCG[i] == ' ')
+				if (text[i] == ' ')
 				{
 					num = i + 1;
 					break;
 				}
 			}
-			empty.Insert(0, IGGFGLLIGCG.Substring(0, num));
-			empty2.Insert(0, IGGFGLLIGCG.Substring(num));
+			empty.Insert(0, text.Substring(0, num));
+			empty2.Insert(0, text.Substring(num));
 			List<string> list = new List<string>();
 			list.Add(empty);
 			if (empty2 != string.Empty)

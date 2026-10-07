@@ -34,14 +34,14 @@ public class BackKeyManager : SFMonoBehaviour<object>
 		_instance = null;
 	}
 
-	public void AddBackKeyController(BackKeyController OJINMMFLEEB)
+	public void AddBackKeyController(BackKeyController controller)
 	{
-		controllers.AddIfNotExist(OJINMMFLEEB);
+		controllers.AddIfNotExist(controller);
 	}
 
-	public void RemoveBackKeyController(BackKeyController OJINMMFLEEB)
+	public void RemoveBackKeyController(BackKeyController controller)
 	{
-		controllers.Remove(OJINMMFLEEB);
+		controllers.Remove(controller);
 	}
 
 	public void Clear()

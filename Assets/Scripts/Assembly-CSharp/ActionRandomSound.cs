@@ -20,14 +20,14 @@ public class ActionRandomSound : ActionAnimation
 		return _Names.GetRandomElement();
 	}
 
-	public override void Visit(Model ACENLMONNPA)
+	public override void Visit(Model model)
 	{
-		ACENLMONNPA.StartAction(this);
+		model.StartAction(this);
 	}
 
-	public bool SameGender(string EMENABICHED)
+	public bool SameGender(string gender)
 	{
-		return _AnyGender || EMENABICHED == _Gender;
+		return _AnyGender || gender == _Gender;
 	}
 
 	protected override void Parse(XmlNode node)

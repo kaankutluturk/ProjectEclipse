@@ -37,11 +37,11 @@ public class PerkActionSetCooldown : PerkAction
 	{
 	}
 
-	public PerkActionSetCooldown(PerkActionSetCooldown NOLFMPDGCOC)
-		: base(NOLFMPDGCOC)
+	public PerkActionSetCooldown(PerkActionSetCooldown source)
+		: base(source)
 	{
-		set_Frames(NOLFMPDGCOC.GetCooldownFrames());
-		set_ButtonName(NOLFMPDGCOC.GetButtonName());
+		set_Frames(source.GetCooldownFrames());
+		set_ButtonName(source.GetButtonName());
 	}
 
 	public new int GetCooldownFrames()

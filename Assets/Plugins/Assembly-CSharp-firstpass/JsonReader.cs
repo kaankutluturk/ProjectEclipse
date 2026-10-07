@@ -107,8 +107,8 @@ public class JsonReader
 		PopulateParseTable();
 	}
 
-	public JsonReader(string HLCLNMCHIHP)
-		: this(new StringReader(HLCLNMCHIHP), true)
+	public JsonReader(string jsonText)
+		: this(new StringReader(jsonText), true)
 	{
 	}
 
@@ -117,7 +117,7 @@ public class JsonReader
 	{
 	}
 
-	private JsonReader(TextReader reader, bool MMDCAOBCJDE)
+	private JsonReader(TextReader reader, bool ownsReader)
 	{
 		if (reader == null)
 		{
@@ -134,7 +134,7 @@ public class JsonReader
 		end_of_json = false;
 		skip_non_members = true;
 		this.reader = reader;
-		reader_is_owned = MMDCAOBCJDE;
+		reader_is_owned = ownsReader;
 	}
 
 	public bool GetAllowComments()
@@ -229,14 +229,14 @@ public class JsonReader
 		TableAddCol(ParserToken.ValueRest, 93, 65554);
 	}
 
-	private static void TableAddCol(ParserToken IBAKGENOEPH, int JNCFMKPIAHB, params int[] HGDAGCFFKNJ)
+	private static void TableAddCol(ParserToken row, int column, params int[] symbols)
 	{
-		parse_table[(int)IBAKGENOEPH].Add(JNCFMKPIAHB, HGDAGCFFKNJ);
+		parse_table[(int)row].Add(column, symbols);
 	}
 
-	private static void TableAddRow(ParserToken HNBFMAKFJAM)
+	private static void TableAddRow(ParserToken row)
 	{
-		parse_table.Add((int)HNBFMAKFJAM, new Dictionary<int, int[]>());
+		parse_table.Add((int)row, new Dictionary<int, int[]>());
 	}
 
 	private void ProcessNumber(string number)
@@ -414,9 +414,9 @@ public class JsonReader
 			{
 				array = parse_table[current_symbol][current_input];
 			}
-			catch (KeyNotFoundException iADJLHGKHGL)
+			catch (KeyNotFoundException exception)
 			{
-				throw new JsonException((ParserToken)current_input, iADJLHGKHGL);
+				throw new JsonException((ParserToken)current_input, exception);
 			}
 			if (array[0] != 65554)
 			{

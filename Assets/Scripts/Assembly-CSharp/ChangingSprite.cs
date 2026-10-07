@@ -73,7 +73,7 @@ public class ChangingSprite
 		}
 	}
 
-	public ChangingSprite(SpriteEffectType LFLGCDNKNJI)
+	public ChangingSprite(SpriteEffectType effectType)
 	{
 		_elapsedFrames = 0f;
 		_speedX = 0f;
@@ -87,7 +87,7 @@ public class ChangingSprite
 		_pauseDuration = 0f;
 		_spriteOffsetX = 0f;
 		_spriteOffsetY = 0f;
-		_type = LFLGCDNKNJI;
+		_type = effectType;
 	}
 
 	public void SetPositionX(float value)
@@ -100,18 +100,18 @@ public class ChangingSprite
 		_positionY = value;
 	}
 
-	public virtual bool InitAtlasAnimation(string PMFEIPCHENB, string path, float time, float ILENLCMAMBH, float JMLAKAKDBBL, float FEIHFIPFNKF)
+	public virtual bool InitAtlasAnimation(string animationName, string path, float time, float animationOffset, float width, float height)
 	{
 		if (_type != SpriteEffectType.AtlasBased)
 		{
 			return false;
 		}
-		_animationOffset = ILENLCMAMBH;
-		SpriteObject = new GameObject(PMFEIPCHENB);
+		_animationOffset = animationOffset;
+		SpriteObject = new GameObject(animationName);
 		_animation = SpriteObject.AddComponent<CocosAnimation>();
-		if (!_animation.Init(path + PMFEIPCHENB, true))
+		if (!_animation.Init(path + animationName, true))
 		{
-			GameLog.Write("Anim NO " + path + PMFEIPCHENB);
+			GameLog.Write("Anim NO " + path + animationName);
 			return false;
 		}
 		_animation.SetFirstFrame();
@@ -119,31 +119,31 @@ public class ChangingSprite
 		_animationDuration = time * (float)_animation.get_TotalFrames() + 1f;
 		float x = _animation.get_AnimationData().GetFrames()[0].GetSourceSize().x;
 		float y = _animation.get_AnimationData().GetFrames()[0].GetSourceSize().y;
-		Vector3 localScale = new Vector3(JMLAKAKDBBL / x, FEIHFIPFNKF / y, 1f);
+		Vector3 localScale = new Vector3(width / x, height / y, 1f);
 		localScale.x = (float)Math.Round(localScale.x, 4, MidpointRounding.AwayFromZero);
 		localScale.y = (float)Math.Round(localScale.y, 4, MidpointRounding.AwayFromZero);
 		SpriteObject.transform.localScale = localScale;
 		return true;
 	}
 
-	public virtual void SetPause(float GCMMAPEFEBG)
+	public virtual void SetPause(float pauseDuration)
 	{
-		_pauseDuration = GCMMAPEFEBG;
+		_pauseDuration = pauseDuration;
 	}
 
-	public virtual void InitPicture(string GPNPNHFACPO, string ODMCNMJPHFJ, string GAKBMMOOGDB, CocosAnimationData.SpriteFrameCocos PIDBGGLFBCO, float JMLAKAKDBBL, float FEIHFIPFNKF)
+	public virtual void InitPicture(string assetDirectory, string spriteName, string atlasName, CocosAnimationData.SpriteFrameCocos frameData, float width, float height)
 	{
 		if (_type != SpriteEffectType.PictureBased)
 		{
 			return;
 		}
-		Sprite sprite = LocationSpriteCache.GetSprite(GPNPNHFACPO, ODMCNMJPHFJ, GAKBMMOOGDB);
+		Sprite sprite = LocationSpriteCache.GetSprite(assetDirectory, spriteName, atlasName);
 		if (sprite == null)
 		{
-			GameLog.Write("Pic: {0}", ODMCNMJPHFJ);
+			GameLog.Write("Pic: {0}", spriteName);
 			return;
 		}
-		SpriteObject = new GameObject(ODMCNMJPHFJ);
+		SpriteObject = new GameObject(spriteName);
 		SpriteRenderer spriteRenderer = SpriteObject.AddComponent<SpriteRenderer>();
 		spriteRenderer.sprite = sprite;
 		float num = sprite.rect.size.x;
@@ -151,19 +151,19 @@ public class ChangingSprite
 		_spriteOffsetX = 0f;
 		_spriteOffsetY = 0f;
 		bool flag = false;
-		if (PIDBGGLFBCO != null)
+		if (frameData != null)
 		{
-			flag = PIDBGGLFBCO.GetRotated();
-			_spriteOffsetX = PIDBGGLFBCO.GetOffset().x;
-			_spriteOffsetY = PIDBGGLFBCO.GetOffset().y;
+			flag = frameData.GetRotated();
+			_spriteOffsetX = frameData.GetOffset().x;
+			_spriteOffsetY = frameData.GetOffset().y;
 			if (flag)
 			{
 				float num3 = num;
 				num = num2;
 				num2 = num3;
 			}
-			num = ((!(PIDBGGLFBCO.GetSourceSize().x < num)) ? PIDBGGLFBCO.GetSourceSize().x : num);
-			num2 = ((!(PIDBGGLFBCO.GetSourceSize().y < num2)) ? PIDBGGLFBCO.GetSourceSize().y : num2);
+			num = ((!(frameData.GetSourceSize().x < num)) ? frameData.GetSourceSize().x : num);
+			num2 = ((!(frameData.GetSourceSize().y < num2)) ? frameData.GetSourceSize().y : num2);
 		}
 		Vector3 localPosition = SpriteObject.transform.localPosition;
 		SpriteObject.transform.localPosition = new Vector3(_spriteOffsetX, _spriteOffsetY, localPosition.z);
@@ -171,14 +171,14 @@ public class ChangingSprite
 		if (flag)
 		{
 			SpriteObject.transform.Rotate(0f, 0f, 90f);
-			vector = new Vector3(FEIHFIPFNKF / num2, JMLAKAKDBBL / num, 1f);
+			vector = new Vector3(height / num2, width / num, 1f);
 		}
 		else
 		{
-			vector = new Vector3(JMLAKAKDBBL / num, FEIHFIPFNKF / num2, 1f);
+			vector = new Vector3(width / num, height / num2, 1f);
 		}
 		// Location projection places the qualified asset directory in the first argument.
-		if (Eclipse.Modding.AssetId.TryParse(GPNPNHFACPO, out _))
+		if (Eclipse.Modding.AssetId.TryParse(assetDirectory, out _))
 		{
 			vector.x *= sprite.pixelsPerUnit;
 			vector.y *= sprite.pixelsPerUnit;
@@ -186,100 +186,100 @@ public class ChangingSprite
 		SpriteObject.transform.localScale = vector;
 	}
 
-	public virtual bool InitParticles(string JIPAAPBPNJM, float FNDOOJNDJDC, float GBCONNBABLL)
+	public virtual bool InitParticles(string resourcePath, float x, float y)
 	{
-		GameObject gameObject = Resources.Load<GameObject>(JIPAAPBPNJM);
+		GameObject gameObject = Resources.Load<GameObject>(resourcePath);
 		if (gameObject != null && gameObject != null)
 		{
 			GameObject gameObject2 = UnityEngine.Object.Instantiate(gameObject);
-			gameObject2.transform.localPosition = new Vector3(FNDOOJNDJDC, GBCONNBABLL, -0.1f);
+			gameObject2.transform.localPosition = new Vector3(x, y, -0.1f);
 			Particles = gameObject2.GetComponent<ParticleSystem>();
 			Particles.Pause();
 			return true;
 		}
-		GameLog.Write("Particles NO " + JIPAAPBPNJM);
-		GameObject gameObject3 = new GameObject("NO " + JIPAAPBPNJM);
+		GameLog.Write("Particles NO " + resourcePath);
+		GameObject gameObject3 = new GameObject("NO " + resourcePath);
 		Particles = gameObject3.AddComponent<ParticleSystem>();
-		gameObject3.transform.localPosition = new Vector3(FNDOOJNDJDC, GBCONNBABLL, -0.1f);
+		gameObject3.transform.localPosition = new Vector3(x, y, -0.1f);
 		return true;
 	}
 
-	public virtual bool InitParticlesExtended(string JIPAAPBPNJM, float FNDOOJNDJDC, float GBCONNBABLL, int HJAHHPHOMDO = 0, int JAJICKINNCP = 0, int FKFCKIDMFCP = 24)
+	public virtual bool InitParticlesExtended(string resourcePath, float x, float y, int firstOption = 0, int secondOption = 0, int thirdOption = 24)
 	{
 		return true;
 	}
 
-	public virtual void SetPosition(float DHDMNHCIPEH, float BGEEALIPKCC)
+	public virtual void SetPosition(float x, float y)
 	{
-		_positionX = DHDMNHCIPEH;
-		_positionY = BGEEALIPKCC;
+		_positionX = x;
+		_positionY = y;
 	}
 
-	public void AddOscillationXKeyframe(float GKIHFPFHKCI, float value, float JENJFNNFGLD)
+	public void AddOscillationXKeyframe(float period, float value, float ease)
 	{
-		_oscillationX.AddInterval(GKIHFPFHKCI, value, JENJFNNFGLD);
+		_oscillationX.AddInterval(period, value, ease);
 	}
 
-	public void SetOscillationXOffset(float IPCOBJBKNAO)
+	public void SetOscillationXOffset(float offset)
 	{
-		_oscillationX.AdvanceTime(IPCOBJBKNAO);
+		_oscillationX.AdvanceTime(offset);
 	}
 
-	public void AddOscillationYKeyframe(float GKIHFPFHKCI, float value, float JENJFNNFGLD)
+	public void AddOscillationYKeyframe(float period, float value, float ease)
 	{
-		_oscillationY.AddInterval(GKIHFPFHKCI, value, JENJFNNFGLD);
+		_oscillationY.AddInterval(period, value, ease);
 	}
 
-	public void SetOscillationYOffset(float IPCOBJBKNAO)
+	public void SetOscillationYOffset(float offset)
 	{
-		_oscillationY.AdvanceTime(IPCOBJBKNAO);
+		_oscillationY.AdvanceTime(offset);
 	}
 
-	public virtual void AddRotationKeyframe(float GKIHFPFHKCI, float value, float JENJFNNFGLD)
+	public virtual void AddRotationKeyframe(float period, float value, float ease)
 	{
-		_rotation.AddInterval(GKIHFPFHKCI, value, JENJFNNFGLD);
+		_rotation.AddInterval(period, value, ease);
 	}
 
-	public virtual void SetRotationOffset(float IPCOBJBKNAO)
+	public virtual void SetRotationOffset(float offset)
 	{
-		_rotation.AdvanceTime(IPCOBJBKNAO);
+		_rotation.AdvanceTime(offset);
 	}
 
-	public virtual void SetSpeed(float LKMBEJFMCHJ, float IAKJEEBPDBE)
+	public virtual void SetSpeed(float speedX, float speedY)
 	{
-		_speedX = LKMBEJFMCHJ;
-		_speedY = IAKJEEBPDBE;
+		_speedX = speedX;
+		_speedY = speedY;
 	}
 
-	public virtual void AddTransparencyKeyframe(float GKIHFPFHKCI, float value, float JENJFNNFGLD)
+	public virtual void AddTransparencyKeyframe(float period, float value, float ease)
 	{
 		value = Mathf.Max(0f, value);
 		value = Mathf.Min(100f, value);
-		_transparency.AddInterval(GKIHFPFHKCI, value, JENJFNNFGLD);
+		_transparency.AddInterval(period, value, ease);
 	}
 
-	public virtual void SetTransparencyOffset(float IPCOBJBKNAO)
+	public virtual void SetTransparencyOffset(float offset)
 	{
-		_transparency.AdvanceTime(IPCOBJBKNAO);
+		_transparency.AdvanceTime(offset);
 	}
 
-	public virtual void SetReappearX(float LHNCHOAEGEA, float KAEPJHHLLPK)
+	public virtual void SetReappearX(float min, float max)
 	{
 		_reappearX.state = true;
-		_reappearX.Min = LHNCHOAEGEA;
-		_reappearX.Max = KAEPJHHLLPK;
+		_reappearX.Min = min;
+		_reappearX.Max = max;
 	}
 
-	public virtual void SetReappearY(float LHNCHOAEGEA, float KAEPJHHLLPK)
+	public virtual void SetReappearY(float min, float max)
 	{
 		_reappearY.state = true;
-		_reappearY.Min = LHNCHOAEGEA;
-		_reappearY.Max = KAEPJHHLLPK;
+		_reappearY.Min = min;
+		_reappearY.Max = max;
 	}
 
-	public virtual void Render(float KBBLAECAAFG = 1f)
+	public virtual void Render(float timeScale = 1f)
 	{
-		float num = 1f / 60f * KBBLAECAAFG;
+		float num = 1f / 60f * timeScale;
 		if (_isFirstRender)
 		{
 			if (_type == SpriteEffectType.ParticleBased && Particles != null)
@@ -296,25 +296,25 @@ public class ChangingSprite
 			Particles.Simulate(Mathf.Max(0f, num), true, false);
 			return;
 		}
-		_elapsedFrames += KBBLAECAAFG;
+		_elapsedFrames += timeScale;
 		if (_type == SpriteEffectType.AtlasBased)
 		{
-			float num2 = UpdateAnimation(KBBLAECAAFG);
+			float num2 = UpdateAnimation(timeScale);
 			if (num2 > 0f)
 			{
 				_animation.Render(1f / 60f * num2);
 			}
 		}
 		_positionX += _speedX;
-		float kKMDAOEBJDJ = _positionX;
+		float currentX = _positionX;
 		_oscillationX.AdvanceTime(num);
-		kKMDAOEBJDJ += _oscillationX.GetCurrentValue();
+		currentX += _oscillationX.GetCurrentValue();
 		_positionY += _speedY;
-		float fLIBIFJKJOD = _positionY;
+		float currentY = _positionY;
 		_oscillationY.AdvanceTime(num);
-		fLIBIFJKJOD += _oscillationY.GetCurrentValue();
+		currentY += _oscillationY.GetCurrentValue();
 		Vector3 localPosition = SpriteObject.transform.localPosition;
-		SpriteObject.transform.localPosition = new Vector3(kKMDAOEBJDJ + _spriteOffsetX, fLIBIFJKJOD + _spriteOffsetY, localPosition.z);
+		SpriteObject.transform.localPosition = new Vector3(currentX + _spriteOffsetX, currentY + _spriteOffsetY, localPosition.z);
 		if (_rotation.HasIntervals())
 		{
 			_rotation.AdvanceTime(num);
@@ -331,24 +331,24 @@ public class ChangingSprite
 		}
 		if (_reappearX.state)
 		{
-			if (kKMDAOEBJDJ > _reappearX.Max)
+			if (currentX > _reappearX.Max)
 			{
-				_positionX = _reappearX.Min + (kKMDAOEBJDJ - _reappearX.Max);
+				_positionX = _reappearX.Min + (currentX - _reappearX.Max);
 			}
-			if (kKMDAOEBJDJ < _reappearX.Min)
+			if (currentX < _reappearX.Min)
 			{
-				_positionX = _reappearX.Max - (_reappearX.Min - kKMDAOEBJDJ);
+				_positionX = _reappearX.Max - (_reappearX.Min - currentX);
 			}
 		}
 		if (_reappearY.state)
 		{
-			if (fLIBIFJKJOD > _reappearY.Max)
+			if (currentY > _reappearY.Max)
 			{
-				_positionY = _reappearY.Min + (fLIBIFJKJOD - _reappearY.Max);
+				_positionY = _reappearY.Min + (currentY - _reappearY.Max);
 			}
-			if (fLIBIFJKJOD < _reappearY.Min)
+			if (currentY < _reappearY.Min)
 			{
-				_positionY = _reappearY.Max - (_reappearY.Min - fLIBIFJKJOD);
+				_positionY = _reappearY.Max - (_reappearY.Min - currentY);
 			}
 		}
 	}
@@ -357,37 +357,37 @@ public class ChangingSprite
 	{
 	}
 
-	private float UpdateAnimation(float HDJFIPHOLMP)
+	private float UpdateAnimation(float frames)
 	{
-		if (HDJFIPHOLMP > _animationDuration + _pauseDuration)
+		if (frames > _animationDuration + _pauseDuration)
 		{
-			HDJFIPHOLMP -= (float)(int)(HDJFIPHOLMP / (_animationDuration + _pauseDuration)) * (_animationDuration + _pauseDuration);
+			frames -= (float)(int)(frames / (_animationDuration + _pauseDuration)) * (_animationDuration + _pauseDuration);
 		}
 		if (_pauseElapsed == 0f)
 		{
-			_animationTime += HDJFIPHOLMP;
+			_animationTime += frames;
 			if (_animationTime < _animationDuration)
 			{
-				return HDJFIPHOLMP;
+				return frames;
 			}
 			_pauseElapsed += _animationTime - _animationDuration;
 			if (_pauseElapsed >= _pauseDuration)
 			{
-				float hDJFIPHOLMP = _pauseElapsed - _pauseDuration;
+				float remainingFrames = _pauseElapsed - _pauseDuration;
 				_animationTime = 0f;
 				_pauseElapsed = 0f;
-				return UpdateAnimation(hDJFIPHOLMP);
+				return UpdateAnimation(remainingFrames);
 			}
-			return _animationDuration - (_animationTime - HDJFIPHOLMP + 1E-05f);
+			return _animationDuration - (_animationTime - frames + 1E-05f);
 		}
-		_pauseElapsed += HDJFIPHOLMP;
+		_pauseElapsed += frames;
 		if (_pauseElapsed < _pauseDuration)
 		{
 			return 0f;
 		}
-		float mFOJNBJIJIB = _pauseElapsed;
+		float pauseFrames = _pauseElapsed;
 		_animationTime = 0f;
 		_pauseElapsed = 0f;
-		return UpdateAnimation(mFOJNBJIJIB - _pauseDuration);
+		return UpdateAnimation(pauseFrames - _pauseDuration);
 	}
 }

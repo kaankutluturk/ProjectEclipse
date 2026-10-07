@@ -4,19 +4,19 @@ public class QuestActionActivate : QuestAction
 {
 	private string targetActionId = string.Empty;
 
-	public override void Parse(XmlNode EPKLCPOEELO)
+	public override void Parse(XmlNode node)
 	{
-		base.Parse(EPKLCPOEELO);
-		targetActionId = EPKLCPOEELO.Attributes["ActionID"].GetStringOrDefault(string.Empty);
+		base.Parse(node);
+		targetActionId = node.Attributes["ActionID"].GetStringOrDefault(string.Empty);
 	}
 
-	public override void Execute(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters parameters)
 	{
-		base.Execute(GFIHPBCEEOB);
-		QuestParameters hHKLFIIBIFF = ListSF.GetInstance().GetQuestParameters();
-		hHKLFIIBIFF.actionId = new RosterQuest.QuestVariable(targetActionId, targetActionId);
+		base.Execute(parameters);
+		QuestParameters questParameters = ListSF.GetInstance().GetQuestParameters();
+		questParameters.actionId = new RosterQuest.QuestVariable(targetActionId, targetActionId);
 		ListSF.GetInstance().RaiseQuestEvent(QuestEvent.QuestEventType.QUEST_EVENT_ACTIVATE);
-		hHKLFIIBIFF.actionId = null;
+		questParameters.actionId = null;
 		FinishAction();
 	}
 }

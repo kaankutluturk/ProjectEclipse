@@ -43,10 +43,10 @@ public class DistanceVector
 		return cachedDistance;
 	}
 
-	public void UpdateNodes(ModelObject OECPEDPMKCD, bool EKBOGDKIHIH, ModelNode AECCPADGGPG, bool PHADJMAONJG, ModelObject MJCGOJBGFIE = null)
+	public void UpdateNodes(ModelObject rootModel, bool isPlayer, ModelNode pivotNode, bool isChildPoint, ModelObject childModel = null)
 	{
-		fromPoint.UpdateNode(OECPEDPMKCD, EKBOGDKIHIH, AECCPADGGPG, PHADJMAONJG, MJCGOJBGFIE);
-		toPoint.UpdateNode(OECPEDPMKCD, EKBOGDKIHIH, AECCPADGGPG, PHADJMAONJG, MJCGOJBGFIE);
+		fromPoint.UpdateNode(rootModel, isPlayer, pivotNode, isChildPoint, childModel);
+		toPoint.UpdateNode(rootModel, isPlayer, pivotNode, isChildPoint, childModel);
 	}
 
 	public void ClearChildPoints()

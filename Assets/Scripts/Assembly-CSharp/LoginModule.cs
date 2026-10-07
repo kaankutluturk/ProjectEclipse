@@ -21,8 +21,8 @@ public class LoginModule : LoadingModule
 				return;
 			}
 			GameUtils.NotifyApplicationStart();
-			NetworkController fDJHFPIFMIK = NetworkController.GetInstance();
-			fDJHFPIFMIK.OnLoginComplete = (Action<object>)Delegate.Combine(fDJHFPIFMIK.OnLoginComplete, new Action<object>(OnLoginComplete));
+			NetworkController networkController = NetworkController.GetInstance();
+			networkController.OnLoginComplete = (Action<object>)Delegate.Combine(networkController.OnLoginComplete, new Action<object>(OnLoginComplete));
 			ListSF.GetInstance().RestartServerAuthorization();
 			loginStarted = true;
 		}
@@ -30,8 +30,8 @@ public class LoginModule : LoadingModule
 
 	private void OnLoginComplete(object data)
 	{
-		NetworkController fDJHFPIFMIK = NetworkController.GetInstance();
-		fDJHFPIFMIK.OnLoginComplete = (Action<object>)Delegate.Remove(fDJHFPIFMIK.OnLoginComplete, new Action<object>(OnLoginComplete));
+		NetworkController networkController = NetworkController.GetInstance();
+		networkController.OnLoginComplete = (Action<object>)Delegate.Remove(networkController.OnLoginComplete, new Action<object>(OnLoginComplete));
 		GameUtils.IsLoginComplete = true;
 		isFinished = true;
 	}

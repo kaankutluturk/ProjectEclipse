@@ -56,11 +56,11 @@ public class ModelPhysics
 		}
 	}
 
-	public ModelPhysics(ModelObject OECPEDPMKCD)
+	public ModelPhysics(ModelObject modelObject)
 	{
 		wallLeftX = 0f;
 		wallRightX = 0f;
-		_ModelObject = OECPEDPMKCD;
+		_ModelObject = modelObject;
 		_IsPhysics = false;
 		_Frame = 0;
 		_Iterative = PhysicsController.GetIterativeProcess();
@@ -92,10 +92,10 @@ public class ModelPhysics
 		}
 	}
 
-	public void SetWallShift(float LHNCHOAEGEA, float KAEPJHHLLPK)
+	public void SetWallShift(float leftX, float rightX)
 	{
-		wallLeftX = LHNCHOAEGEA;
-		wallRightX = KAEPJHHLLPK;
+		wallLeftX = leftX;
+		wallRightX = rightX;
 	}
 
 	public float GetGravityStep()
@@ -103,14 +103,14 @@ public class ModelPhysics
 		return PhysicsController.GetGravity() / (float)(GameUtils.GetSlowMode() * GameUtils.GetSlowMode());
 	}
 
-	public void Start(List<string> NIKHAICFGNM)
+	public void Start(List<string> nodeNames)
 	{
 		_IsPhysics = true;
 		_Frame = 0;
 		_Names.Clear();
-		if (NIKHAICFGNM != null)
+		if (nodeNames != null)
 		{
-			_Names.AddRange(NIKHAICFGNM);
+			_Names.AddRange(nodeNames);
 		}
 		_ModelObject.RestoreDefaultPhysics();
 	}
@@ -126,37 +126,37 @@ public class ModelPhysics
 		bool flag = _ModelObject.IsShock();
 		List<ModelNode> list = _ModelObject.GetAllNodes();
 		List<ModelEdge> list2 = _ModelObject.GetAllEdges();
-		ModelNode lCDGOCIAIDK = null;
+		ModelNode node = null;
 		int count = list.Count;
 		for (int i = 0; i < count; i++)
 		{
-			lCDGOCIAIDK = list[i];
-			bool bAINMLLIKOL = lCDGOCIAIDK.IsNode() && !lCDGOCIAIDK.IsFixedAndIsNotNode() && (_IsPhysics || lCDGOCIAIDK.IsPhysics() || (flag && lCDGOCIAIDK.IsShock()));
-			lCDGOCIAIDK.SetPhysicsActive(bAINMLLIKOL);
+			node = list[i];
+			bool isPhysicsActive = node.IsNode() && !node.IsFixedAndIsNotNode() && (_IsPhysics || node.IsPhysics() || (flag && node.IsShock()));
+			node.SetPhysicsActive(isPhysicsActive);
 		}
 		for (int j = 0; j < _Iterative; j++)
 		{
-			ModelEdge nAKBKCDKEHF = null;
+			ModelEdge edge = null;
 			count = list2.Count;
 			for (int k = 0; k < count; k++)
 			{
-				nAKBKCDKEHF = list2[k];
-				if (!flag || !nAKBKCDKEHF.GetIsShock())
+				edge = list2[k];
+				if (!flag || !edge.GetIsShock())
 				{
-					IterativeLine(nAKBKCDKEHF);
+					IterativeLine(edge);
 				}
 			}
 		}
 	}
 
-	public void ChangeSpeed(float ELDDBMFEFIP)
+	public void ChangeSpeed(float speed)
 	{
 		List<ModelNode> list = _ModelObject.GetAllNodes();
 		foreach (ModelNode item in list)
 		{
 			if (!item.IsFixedAndIsNotNode() && (_IsPhysics || item.IsPhysics() || (_ModelObject.IsShock() && item.IsShock())))
 			{
-				item.ChangeSpeed(ELDDBMFEFIP);
+				item.ChangeSpeed(speed);
 			}
 		}
 	}
@@ -164,24 +164,24 @@ public class ModelPhysics
 	private void TimeStep()
 	{
 		List<ModelNode> list = _ModelObject.GetAllNodes();
-		ModelNode lCDGOCIAIDK = null;
+		ModelNode node = null;
 		for (int i = 0; i < list.Count; i++)
 		{
-			lCDGOCIAIDK = list[i];
-			if (!lCDGOCIAIDK.IsFixedAndIsNotNode() && (_IsPhysics || lCDGOCIAIDK.IsPhysics() || (_ModelObject.IsShock() && lCDGOCIAIDK.IsShock())))
+			node = list[i];
+			if (!node.IsFixedAndIsNotNode() && (_IsPhysics || node.IsPhysics() || (_ModelObject.IsShock() && node.IsShock())))
 			{
-				lCDGOCIAIDK.TimeStep(GetGravityStep());
+				node.TimeStep(GetGravityStep());
 			}
 		}
 	}
 
 	private void IterativeLine(ModelEdge Edge)
 	{
-		ModelNode lCDGOCIAIDK = Edge.GetStartNode();
+		ModelNode startNode = Edge.GetStartNode();
 		ModelNode lCDGOCIAIDK2 = Edge.GetEndNode();
-		if (lCDGOCIAIDK.IsPhysicsActive())
+		if (startNode.IsPhysicsActive())
 		{
-			IterativeNode(lCDGOCIAIDK);
+			IterativeNode(startNode);
 			if (lCDGOCIAIDK2.IsPhysicsActive())
 			{
 				IterativeNode(lCDGOCIAIDK2);
@@ -219,15 +219,15 @@ public class ModelPhysics
 	{
 		if (node.IsCollisible() && wallLeftX != wallRightX)
 		{
-			Vector3f eMAFACPEPDK = node.GetEnd();
+			Vector3f endPosition = node.GetEnd();
 			Vector3f eMAFACPEPDK2 = node.GetStart();
-			float num = eMAFACPEPDK2.GetX() - eMAFACPEPDK.GetX();
-			float num2 = eMAFACPEPDK2.GetZ() - eMAFACPEPDK.GetZ();
+			float num = eMAFACPEPDK2.GetX() - endPosition.GetX();
+			float num2 = eMAFACPEPDK2.GetZ() - endPosition.GetZ();
 			float num3 = num * num + num2 * num2;
 			float num4 = eMAFACPEPDK2.GetY() * _FrictionForce;
-			eMAFACPEPDK2.SetX(eMAFACPEPDK.GetX());
+			eMAFACPEPDK2.SetX(endPosition.GetX());
 			eMAFACPEPDK2.SetY(0f);
-			eMAFACPEPDK2.SetZ(eMAFACPEPDK.GetZ());
+			eMAFACPEPDK2.SetZ(endPosition.GetZ());
 			if (num4 * num4 < num3)
 			{
 				num4 = 1f - num4 / Mathf.Sqrt(num3);

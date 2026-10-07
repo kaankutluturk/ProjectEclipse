@@ -6,15 +6,15 @@ public sealed class ReadableAndWritablePropertiesTypeInspector : TypeInspectorSk
 {
 	private readonly ITypeInspector innerTypeDescriptor;
 
-	public ReadableAndWritablePropertiesTypeInspector(ITypeInspector CECGLIIIJJH)
+	public ReadableAndWritablePropertiesTypeInspector(ITypeInspector innerInspector)
 	{
-		innerTypeDescriptor = CECGLIIIJJH;
+		innerTypeDescriptor = innerInspector;
 	}
 
-	public override IEnumerable<IPropertyDescriptor> GetProperties(Type LFLGCDNKNJI, object EGJHGBCEPHO)
+	public override IEnumerable<IPropertyDescriptor> GetProperties(Type type, object container)
 	{
-		return from PIIEECCHMAC in innerTypeDescriptor.GetProperties(LFLGCDNKNJI, EGJHGBCEPHO)
-			where PIIEECCHMAC.GetCanWrite()
-			select PIIEECCHMAC;
+		return from property in innerTypeDescriptor.GetProperties(type, container)
+			where property.GetCanWrite()
+			select property;
 	}
 }

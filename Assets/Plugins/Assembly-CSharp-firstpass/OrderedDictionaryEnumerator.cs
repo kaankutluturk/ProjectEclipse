@@ -6,9 +6,9 @@ internal class OrderedDictionaryEnumerator : IEnumerator, IDictionaryEnumerator
 	private IEnumerator<KeyValuePair<string, JsonData>> listEnumerator;
 
 
-	public OrderedDictionaryEnumerator(IEnumerator<KeyValuePair<string, JsonData>> GEJJPNMHBJO)
+	public OrderedDictionaryEnumerator(IEnumerator<KeyValuePair<string, JsonData>> enumerator)
 	{
-		listEnumerator = GEJJPNMHBJO;
+		listEnumerator = enumerator;
 	}
 
 	public object Current

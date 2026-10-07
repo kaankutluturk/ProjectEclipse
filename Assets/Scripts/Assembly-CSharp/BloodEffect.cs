@@ -16,7 +16,7 @@ internal class BloodEffect
 
 	private FightTransformInterpolation _Interpolation;
 
-	public BloodEffect(Vector3f JLHLMAFLMFO)
+	public BloodEffect(Vector3f impulse)
 	{
 		_UnityObject = new GameObject("BloodEffect");
 		_Interpolation = _UnityObject.AddComponent<FightTransformInterpolation>();
@@ -29,20 +29,20 @@ internal class BloodEffect
 		int min2 = -60;
 		int max2 = 20;
 		float num = 200f;
-		velocity.SetX(JLHLMAFLMFO.GetX() / num + (float)UnityEngine.Random.Range(min, max) / 10f);
-		velocity.SetY(JLHLMAFLMFO.GetY() / num + (float)UnityEngine.Random.Range(min2, max2) / 10f);
+		velocity.SetX(impulse.GetX() / num + (float)UnityEngine.Random.Range(min, max) / 10f);
+		velocity.SetY(impulse.GetY() / num + (float)UnityEngine.Random.Range(min2, max2) / 10f);
 	}
 
-	public void CreateSprite(string ONEIGMLOGDC, Color OHJKNABLCMF)
+	public void CreateSprite(string spritePath, Color color)
 	{
 		SpriteRenderer spriteRenderer = _UnityObject.AddComponent<SpriteRenderer>();
-		spriteRenderer.sprite = ResourcesAndBundles.Load<Sprite>(ONEIGMLOGDC);
-		spriteRenderer.color = OHJKNABLCMF;
+		spriteRenderer.sprite = ResourcesAndBundles.Load<Sprite>(spritePath);
+		spriteRenderer.color = color;
 	}
 
-	public void SetParent(GameObject PKHKBAJOHHF)
+	public void SetParent(GameObject parent)
 	{
-		_UnityObject.transform.SetParent(PKHKBAJOHHF.transform, false);
+		_UnityObject.transform.SetParent(parent.transform, false);
 	}
 
 	public void Render()
@@ -50,8 +50,8 @@ internal class BloodEffect
 		Vector3 localPosition = _Interpolation.CurrentPosition;
 		localPosition.x += velocity.GetX();
 		localPosition.y += velocity.GetY();
-		Vector3f kKIKIDNALOL = velocity;
-		kKIKIDNALOL.SetY(kKIKIDNALOL.GetY() + 0.2f);
+		Vector3f currentVelocity = velocity;
+		currentVelocity.SetY(currentVelocity.GetY() + 0.2f);
 		int num = ((!(velocity.GetX() < 0f)) ? 1 : (-1));
 		float z = Mathf.Atan((0f - velocity.GetY()) / velocity.GetX()) / (float)Math.PI * 180f - 90f * (float)num + 180f;
 		Quaternion worldRotation = Quaternion.Euler(0f, 0f, z);
@@ -64,9 +64,9 @@ internal class BloodEffect
 		_Interpolation.Snap(new Vector3(NAAPALOFBCI.GetX(), NAAPALOFBCI.GetY(), 0f), _Interpolation.CurrentRotation);
 	}
 
-	public void SetScale(float JDCCBCNFENK)
+	public void SetScale(float scale)
 	{
-		_UnityObject.transform.localScale = new Vector3(JDCCBCNFENK, JDCCBCNFENK, JDCCBCNFENK);
+		_UnityObject.transform.localScale = new Vector3(scale, scale, scale);
 	}
 
 	public void Destroy()

@@ -1,1 +1,1 @@
-public delegate void OnWebSocketIncompleteFrameDelegate(WebSocket ILNFPNFEOCL, WebSocketFrameReader frame);
+public delegate void OnWebSocketIncompleteFrameDelegate(WebSocket webSocket, WebSocketFrameReader frame);

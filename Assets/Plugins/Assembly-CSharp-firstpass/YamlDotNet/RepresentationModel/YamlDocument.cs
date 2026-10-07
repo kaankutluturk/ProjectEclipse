@@ -14,11 +14,11 @@ namespace YamlDotNet.RepresentationModel
 
 			private readonly Dictionary<YamlNode, bool> visitedNodes = new Dictionary<YamlNode, bool>(new YamlNodeIdentityEqualityComparer());
 
-			public void AssignAnchors(YamlDocument DPMKHPJABAF)
+			public void AssignAnchors(YamlDocument document)
 			{
 				existingAnchors.Clear();
 				visitedNodes.Clear();
-				DPMKHPJABAF.Accept(this);
+				document.Accept(this);
 				Random random = new Random();
 				foreach (KeyValuePair<YamlNode, bool> item in visitedNodes)
 				{
@@ -59,14 +59,14 @@ namespace YamlDotNet.RepresentationModel
 				}
 			}
 
-			protected override void Visit(YamlScalarNode ADDIBOMFCNH)
+			protected override void Visit(YamlScalarNode scalar)
 			{
-				VisitNode(ADDIBOMFCNH);
+				VisitNode(scalar);
 			}
 
-			protected override void Visit(YamlMappingNode JPEFEBICPFI)
+			protected override void Visit(YamlMappingNode mapping)
 			{
-				VisitNode(JPEFEBICPFI);
+				VisitNode(mapping);
 			}
 
 			protected override void Visit(YamlSequenceNode sequence)
@@ -85,52 +85,52 @@ namespace YamlDotNet.RepresentationModel
 			}
 		}
 
-		public YamlDocument(YamlNode FFMAKDIFLAN)
+		public YamlDocument(YamlNode rootNode)
 		{
-			RootNode = FFMAKDIFLAN;
+			RootNode = rootNode;
 		}
 
-		public YamlDocument(string FFMAKDIFLAN)
+		public YamlDocument(string text)
 		{
-			RootNode = new YamlScalarNode(FFMAKDIFLAN);
+			RootNode = new YamlScalarNode(text);
 		}
 
-		internal YamlDocument(EventReader DNBFFLFBDOB)
+		internal YamlDocument(EventReader reader)
 		{
-			DocumentLoadingState jPGMAPEHLAB = new DocumentLoadingState();
-			DNBFFLFBDOB.Expect<DocumentStart>();
-			while (!DNBFFLFBDOB.Accept<DocumentEnd>())
+			DocumentLoadingState loadingState = new DocumentLoadingState();
+			reader.Expect<DocumentStart>();
+			while (!reader.Accept<DocumentEnd>())
 			{
-				RootNode = YamlNode.ParseNode(DNBFFLFBDOB, jPGMAPEHLAB);
+				RootNode = YamlNode.ParseNode(reader, loadingState);
 				if (RootNode is YamlAliasNode)
 				{
 					throw new YamlException();
 				}
 			}
-			jPGMAPEHLAB.ResolveAliases();
-			DNBFFLFBDOB.Expect<DocumentEnd>();
+			loadingState.ResolveAliases();
+			reader.Expect<DocumentEnd>();
 		}
 
 		private void AssignAnchors()
 		{
-			AnchorAssigningVisitor oMDIOFCAGOO = new AnchorAssigningVisitor();
-			oMDIOFCAGOO.AssignAnchors(this);
+			AnchorAssigningVisitor anchorVisitor = new AnchorAssigningVisitor();
+			anchorVisitor.AssignAnchors(this);
 		}
 
-		internal void Save(IEmitter NPIDIMCLNEM, bool EENMGCCBIHF = true)
+		internal void Save(IEmitter emitter, bool assignAnchors = true)
 		{
-			if (EENMGCCBIHF)
+			if (assignAnchors)
 			{
 				AssignAnchors();
 			}
-			NPIDIMCLNEM.Emit(new DocumentStart());
-			RootNode.Save(NPIDIMCLNEM, new EmitterState());
-			NPIDIMCLNEM.Emit(new DocumentEnd(false));
+			emitter.Emit(new DocumentStart());
+			RootNode.Save(emitter, new EmitterState());
+			emitter.Emit(new DocumentEnd(false));
 		}
 
-		public void Accept(IYamlVisitor NKECMANOOEM)
+		public void Accept(IYamlVisitor visitor)
 		{
-			NKECMANOOEM.Visit(this);
+			visitor.Visit(this);
 		}
 	}
 }

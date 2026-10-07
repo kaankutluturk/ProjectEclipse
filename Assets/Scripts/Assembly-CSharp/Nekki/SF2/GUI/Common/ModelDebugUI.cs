@@ -30,27 +30,27 @@ namespace Nekki.SF2.GUI.Common
 
 		private void Update()
 		{
-			global::Fight gDBOMJODDEA = global::Fight.GetCurrentFight();
-			if (gDBOMJODDEA == null)
+			global::Fight fight = global::Fight.GetCurrentFight();
+			if (fight == null)
 			{
 				return;
 			}
 			playerTextBuilder.Clear();
 			enemyTextBuilder.Clear();
-			List<Model> lNDLFINJHDB = gDBOMJODDEA.ActiveModels;
-			for (int i = 0; i < lNDLFINJHDB.Count; i++)
+			List<Model> models = fight.ActiveModels;
+			for (int i = 0; i < models.Count; i++)
 			{
-				Model fGCODGKLHED = lNDLFINJHDB[i];
-				StringBuilder stringBuilder = ((!fGCODGKLHED.IsPlayerModel()) ? enemyTextBuilder : playerTextBuilder);
-				if (fGCODGKLHED.Parameters.FightTactic != null && fGCODGKLHED.Parameters.FightTactic.get_Type() == Tactic.TacticType.TacticTabular)
+				Model model = models[i];
+				StringBuilder stringBuilder = ((!model.IsPlayerModel()) ? enemyTextBuilder : playerTextBuilder);
+				if (model.Parameters.FightTactic != null && model.Parameters.FightTactic.get_Type() == Tactic.TacticType.TacticTabular)
 				{
-					stringBuilder.Append(AiData.GetTacticsTableName(fGCODGKLHED.GetAi().get_ResultSource()));
+					stringBuilder.Append(AiData.GetTacticsTableName(model.GetAi().get_ResultSource()));
 					stringBuilder.Append("\n");
 				}
 			}
-			for (int j = 0; j < lNDLFINJHDB.Count; j++)
+			for (int j = 0; j < models.Count; j++)
 			{
-				Model fGCODGKLHED2 = lNDLFINJHDB[j];
+				Model fGCODGKLHED2 = models[j];
 				StringBuilder stringBuilder2 = ((!fGCODGKLHED2.IsPlayerModel()) ? enemyTextBuilder : playerTextBuilder);
 				stringBuilder2.Append(FormatModelAnimationInfo(fGCODGKLHED2));
 			}
@@ -66,15 +66,15 @@ namespace Nekki.SF2.GUI.Common
 			}
 		}
 
-		private static string FormatModelAnimationInfo(Model ACENLMONNPA)
+		private static string FormatModelAnimationInfo(Model model)
 		{
 			StringBuilder stringBuilder = new StringBuilder();
-			InfoAnimation pJAHIOELGGD = ACENLMONNPA.GetCurrentAnimation();
+			InfoAnimation animation = model.GetCurrentAnimation();
 			int num = -1;
-			if (ACENLMONNPA.IsInPhysics())
+			if (model.IsInPhysics())
 			{
-				num = ACENLMONNPA.GetPhysicsModule().GetFrame();
-				List<string> list = ACENLMONNPA.GetPhysicsNames();
+				num = model.GetPhysicsModule().GetFrame();
+				List<string> list = model.GetPhysicsNames();
 				int count = list.Count;
 				for (int i = 0; i < count; i++)
 				{
@@ -87,8 +87,8 @@ namespace Nekki.SF2.GUI.Common
 			}
 			else
 			{
-				stringBuilder.Append((pJAHIOELGGD == null) ? "----" : pJAHIOELGGD.Name);
-				num = ((pJAHIOELGGD == null) ? (-1) : ACENLMONNPA.GetAnimationModule().GetCurrentFrame());
+				stringBuilder.Append((animation == null) ? "----" : animation.Name);
+				num = ((animation == null) ? (-1) : model.GetAnimationModule().GetCurrentFrame());
 			}
 			stringBuilder.Append("    ");
 			if (num > -1)

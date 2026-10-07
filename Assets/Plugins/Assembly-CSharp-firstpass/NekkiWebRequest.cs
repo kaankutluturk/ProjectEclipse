@@ -168,9 +168,9 @@ public class NekkiWebRequest
 		}
 	}
 
-	public NekkiWebRequest(float DGDKHFPEHOG = 5f)
+	public NekkiWebRequest(float timeoutSeconds = 5f)
 	{
-		_timeout = DGDKHFPEHOG;
+		_timeout = timeoutSeconds;
 		Reset();
 	}
 
@@ -296,30 +296,30 @@ public class NekkiWebRequest
 		while ((object)action != action2);
 	}
 
-	public virtual void Send(string JJEOAIKCKAM, bool GHIGJJCMEDI)
+	public virtual void Send(string url, bool checkCertificate)
 	{
-		_checkCertificate = GHIGJJCMEDI;
-		Send(UnityWebRequest.Get(JJEOAIKCKAM));
+		_checkCertificate = checkCertificate;
+		Send(UnityWebRequest.Get(url));
 	}
 
-	public virtual void Send(string JJEOAIKCKAM, string MHAANIPLCJD, bool GHIGJJCMEDI)
+	public virtual void Send(string url, string postData, bool checkCertificate)
 	{
-		_checkCertificate = GHIGJJCMEDI;
-		Send(UnityWebRequest.PostWwwForm(JJEOAIKCKAM, MHAANIPLCJD));
+		_checkCertificate = checkCertificate;
+		Send(UnityWebRequest.PostWwwForm(url, postData));
 	}
 
-	public virtual void Send(string JJEOAIKCKAM, Dictionary<string, string> MHAANIPLCJD, bool GHIGJJCMEDI)
+	public virtual void Send(string url, Dictionary<string, string> formFields, bool checkCertificate)
 	{
-		_checkCertificate = GHIGJJCMEDI;
-		Send(UnityWebRequest.Post(JJEOAIKCKAM, MHAANIPLCJD));
+		_checkCertificate = checkCertificate;
+		Send(UnityWebRequest.Post(url, formFields));
 	}
 
-	private void Send(UnityWebRequest DLILAFJFLAI)
+	private void Send(UnityWebRequest webRequest)
 	{
-		_uri = new NekkiUri(DLILAFJFLAI.url);
+		_uri = new NekkiUri(webRequest.url);
 		_handler = CreateHandler(_uri);
 		_lastProgressTime = Time.realtimeSinceStartup;
-		_request = DLILAFJFLAI;
+		_request = webRequest;
 		if (NekkiUtils.IsEditorNotPlaying())
 		{
 			SendBlocking();
@@ -408,10 +408,10 @@ public class NekkiWebRequest
 		ClearCallbacks();
 	}
 
-	protected virtual void SendError(bool BALCNGAKGKN = false)
+	protected virtual void SendError(bool logAsError = false)
 	{
 		string text = "WebRequest Error " + GetUrl() + " " + GetError();
-		if (BALCNGAKGKN)
+		if (logAsError)
 		{
 			UnityEngine.Debug.LogError(text);
 		}
@@ -428,14 +428,14 @@ public class NekkiWebRequest
 		OnProgress.SafeInvoke(this);
 	}
 
-	protected virtual NekkiWebHandler CreateHandler(NekkiUri KJHNCLAJMLO)
+	protected virtual NekkiWebHandler CreateHandler(NekkiUri uri)
 	{
-		return new NekkiWebHandlerRequest(KJHNCLAJMLO);
+		return new NekkiWebHandlerRequest(uri);
 	}
 
-	public void Abort(bool CMBGKNNPACJ = false)
+	public void Abort(bool raiseError = false)
 	{
-		if (CMBGKNNPACJ)
+		if (raiseError)
 		{
 			SendError();
 		}

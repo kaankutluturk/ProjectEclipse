@@ -80,10 +80,10 @@ public class Segment3D
 	{
 	}
 
-	public Segment3D(Vector3f ILENLCMAMBH, Vector3f BFDAHEHCAGK)
+	public Segment3D(Vector3f startPoint, Vector3f endPoint)
 	{
-		start.Set(ILENLCMAMBH);
-		end.Set(BFDAHEHCAGK);
+		start.Set(startPoint);
+		end.Set(endPoint);
 	}
 
 	public Vector3f GetStart()
@@ -96,10 +96,10 @@ public class Segment3D
 		return end;
 	}
 
-	public void SetSegment3D(Segment3D LEFHAGAGOME)
+	public void SetSegment3D(Segment3D source)
 	{
-		SetStart(LEFHAGAGOME.start);
-		SetEnd(LEFHAGAGOME.end);
+		SetStart(source.start);
+		SetEnd(source.end);
 	}
 
 	public float GetLength()
@@ -147,38 +147,38 @@ public class Segment3D
 		return Vector3f.GetDivisionPoint3D(start, end, ratio);
 	}
 
-	public void GetDivisionPoint3D(Vector3f OEMALIFPGPO, float ratio)
+	public void GetDivisionPoint3D(Vector3f resultPoint, float ratio)
 	{
-		OEMALIFPGPO.Set(start.GetX() + (end.GetX() - start.GetX()) * ratio, start.GetY() + (end.GetY() - start.GetY()) * ratio, start.GetZ() + (end.GetZ() - start.GetZ()) * ratio);
+		resultPoint.Set(start.GetX() + (end.GetX() - start.GetX()) * ratio, start.GetY() + (end.GetY() - start.GetY()) * ratio, start.GetZ() + (end.GetZ() - start.GetZ()) * ratio);
 	}
 
-	public Vector2f GetClosestPointOnLine2D(Vector2f NAAPALOFBCI)
+	public Vector2f GetClosestPointOnLine2D(Vector2f point)
 	{
-		Vector2f hEJKLMNOLLG = new Vector2f(NAAPALOFBCI);
+		Vector2f offset = new Vector2f(point);
 		Vector2f hEJKLMNOLLG2 = new Vector2f(start);
 		Vector2f hEJKLMNOLLG3 = GetDirection2D();
-		hEJKLMNOLLG.SubtractXY(hEJKLMNOLLG2);
-		float num = hEJKLMNOLLG.DotProduct(hEJKLMNOLLG3);
+		offset.SubtractXY(hEJKLMNOLLG2);
+		float num = offset.DotProduct(hEJKLMNOLLG3);
 		float num2 = hEJKLMNOLLG3.DotProduct(hEJKLMNOLLG3);
-		float lIAILCGJBDK = ((num2 == 0f) ? 0f : (num / num2));
-		hEJKLMNOLLG3.Multiply(lIAILCGJBDK);
+		float projectionRatio = ((num2 == 0f) ? 0f : (num / num2));
+		hEJKLMNOLLG3.Multiply(projectionRatio);
 		hEJKLMNOLLG2.Add(hEJKLMNOLLG3);
 		return hEJKLMNOLLG2;
 	}
 
-	public float GetRatioFromEnd(Vector2f NAAPALOFBCI)
+	public float GetRatioFromEnd(Vector2f point)
 	{
 		float num = Vector2f.Distance2D(start, end);
 		if (num != 0f)
 		{
-			return Vector2f.Distance2D(end, NAAPALOFBCI) / num;
+			return Vector2f.Distance2D(end, point) / num;
 		}
 		return 0f;
 	}
 
-	public static bool TryGetIntersection2D(Segment3D JLIFFKIFOKM, Segment3D BCNKAGOKLCL, Vector3f ONGFADJKIBB)
+	public static bool TryGetIntersection2D(Segment3D segmentA, Segment3D segmentB, Vector3f intersection)
 	{
-		return Vector2f.TryGetSegmentIntersection(JLIFFKIFOKM.start, JLIFFKIFOKM.end, BCNKAGOKLCL.start, BCNKAGOKLCL.end, ONGFADJKIBB);
+		return Vector2f.TryGetSegmentIntersection(segmentA.start, segmentA.end, segmentB.start, segmentB.end, intersection);
 	}
 
 	public void SetStart(Vector3f value)

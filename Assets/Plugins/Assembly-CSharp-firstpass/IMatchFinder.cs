@@ -1,8 +1,8 @@
 internal interface IMatchFinder : IInWindowStream
 {
-	void Create(uint PGNMIJNBAAJ, uint JHKHNGLLCLK, uint CCKFKNACIIN, uint CDINDGLFPKA);
+	void Create(uint historySize, uint keepAddBufferBefore, uint matchMaxLen, uint keepAddBufferAfter);
 
-	uint GetMatches(uint[] PIPLHPNGIPF);
+	uint GetMatches(uint[] distances);
 
-	void Skip(uint OMEDGJMNGKE);
+	void Skip(uint count);
 }

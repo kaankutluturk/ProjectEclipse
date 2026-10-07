@@ -2,15 +2,15 @@ using System.Collections.Generic;
 
 public sealed class DefaultJsonEncoder : IJsonEncoder
 {
-	public string Encode(object AOMLCBHAJJH)
+	public string Encode(object obj)
 	{
-		return Json.Encode(AOMLCBHAJJH);
+		return Json.Encode(obj);
 	}
 
-	public IDictionary<string, object> DecodeMessage(string EMDHMHOKGFP)
+	public IDictionary<string, object> DecodeMessage(string message)
 	{
-		bool IBFAPIMOMBA = false;
-		IDictionary<string, object> dictionary = Json.Decode(EMDHMHOKGFP, ref IBFAPIMOMBA) as IDictionary<string, object>;
-		return (!IBFAPIMOMBA) ? null : dictionary;
+		bool success = false;
+		IDictionary<string, object> dictionary = Json.Decode(message, ref success) as IDictionary<string, object>;
+		return (!success) ? null : dictionary;
 	}
 }

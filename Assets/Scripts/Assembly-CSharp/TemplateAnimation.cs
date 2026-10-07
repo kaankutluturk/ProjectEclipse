@@ -20,10 +20,10 @@ public class TemplateAnimation
 		_Name = XmlUtils.ParseString(node.Attributes["Name"]);
 	}
 
-	public TemplateAnimation(InfoAnimation EDMCLHEOJGD)
+	public TemplateAnimation(InfoAnimation animation)
 	{
-		_Name = EDMCLHEOJGD.Name;
-		AddAnimation(EDMCLHEOJGD);
+		_Name = animation.Name;
+		AddAnimation(animation);
 	}
 
 	public string get_Name()
@@ -36,9 +36,9 @@ public class TemplateAnimation
 		return _animations;
 	}
 
-	public void AddAnimation(InfoAnimation DBOLBEOCEME)
+	public void AddAnimation(InfoAnimation animation)
 	{
-		_animations.AddIfNotExist(DBOLBEOCEME);
-		DBOLBEOCEME.AddTemplateName(_Name);
+		_animations.AddIfNotExist(animation);
+		animation.AddTemplateName(_Name);
 	}
 }

@@ -88,10 +88,10 @@ public class PerkItems
 		externalBasePerkNames.Clear();
 		foreach (XmlNode childNode in node.ChildNodes)
 		{
-			PerkInfoItem aCONCDFDNJH = new PerkInfoItem();
-			aCONCDFDNJH.Parse(childNode);
-			aCONCDFDNJH.IsClone = false;
-			basePerks.Add(aCONCDFDNJH);
+			PerkInfoItem basePerk = new PerkInfoItem();
+			basePerk.Parse(childNode);
+			basePerk.IsClone = false;
+			basePerks.Add(basePerk);
 		}
 	}
 
@@ -152,40 +152,40 @@ public class PerkItems
 			{
 				continue;
 			}
-			int gNLOCMLBNHF = childNode.Attributes["Level"].ParseInt();
-			string eMDJGBHIAIA = childNode.Attributes["Description"].GetStringOrDefault(string.Empty);
-			string cMGIPKIPIPA = childNode.Attributes["Move"].GetStringOrDefault(string.Empty);
-			PerkInfoItem aCONCDFDNJH = FindBasePerk(text);
-			if (aCONCDFDNJH == null)
+			int level = childNode.Attributes["Level"].ParseInt();
+			string descriptionKey = childNode.Attributes["Description"].GetStringOrDefault(string.Empty);
+			string moveName = childNode.Attributes["Move"].GetStringOrDefault(string.Empty);
+			PerkInfoItem basePerk = FindBasePerk(text);
+			if (basePerk == null)
 			{
 				continue;
 			}
 			if (childNode.ChildNodes.Count > 0)
 			{
-				PerkInfoItem aCONCDFDNJH2 = CloneIfOverridden(aCONCDFDNJH, childNode);
-				if (aCONCDFDNJH2 != aCONCDFDNJH)
+				PerkInfoItem aCONCDFDNJH2 = CloneIfOverridden(basePerk, childNode);
+				if (aCONCDFDNJH2 != basePerk)
 				{
-					AddProgressionVariant(aCONCDFDNJH2, gNLOCMLBNHF, eMDJGBHIAIA, cMGIPKIPIPA);
+					AddProgressionVariant(aCONCDFDNJH2, level, descriptionKey, moveName);
 				}
 				foreach (XmlNode childNode2 in childNode.ChildNodes)
 				{
 					if (childNode2.Name.Equals("UpgradeLevel"))
 					{
-						PerkInfoItem aEFFHJGMNFI = CreateUpgradeVariant(aCONCDFDNJH, childNode2);
-						AddProgressionVariant(aEFFHJGMNFI, gNLOCMLBNHF, eMDJGBHIAIA, cMGIPKIPIPA);
+						PerkInfoItem variantPerk = CreateUpgradeVariant(basePerk, childNode2);
+						AddProgressionVariant(variantPerk, level, descriptionKey, moveName);
 					}
 				}
 			}
 			else
 			{
-				AddProgressionVariant(aCONCDFDNJH, gNLOCMLBNHF, eMDJGBHIAIA, cMGIPKIPIPA);
+				AddProgressionVariant(basePerk, level, descriptionKey, moveName);
 			}
 		}
 	}
 
-	public void ParseUserPerks(XmlNode node, bool BBMAPFNKPBO = true, bool OPBAFPEJNNO = false)
+	public void ParseUserPerks(XmlNode node, bool clearExisting = true, bool replaceExisting = false)
 	{
-		if (BBMAPFNKPBO)
+		if (clearExisting)
 		{
 			userPerks.Clear();
 		}
@@ -197,64 +197,64 @@ public class PerkItems
 			{
 				continue;
 			}
-			string gOHIIMFFFJI = childNode.Attributes["Name"].GetStringOrDefault(string.Empty);
-			List<PerkInfoItem> list = GetProgressionVariants(gOHIIMFFFJI);
+			string perkName = childNode.Attributes["Name"].GetStringOrDefault(string.Empty);
+			List<PerkInfoItem> list = GetProgressionVariants(perkName);
 			foreach (PerkInfoItem item in list)
 			{
-				PerkInfoItem aCONCDFDNJH = item.Clone(xmlNode2, xmlNode3);
-				if (OPBAFPEJNNO)
+				PerkInfoItem userPerk = item.Clone(xmlNode2, xmlNode3);
+				if (replaceExisting)
 				{
-					RemoveUsersPerkByName(aCONCDFDNJH.Name);
+					RemoveUsersPerkByName(userPerk.Name);
 				}
-				userPerks.Add(aCONCDFDNJH);
+				userPerks.Add(userPerk);
 			}
 		}
 	}
 
 	private void RemoveUsersPerkByName(string name)
 	{
-		PerkInfoItem aCONCDFDNJH = userPerks.Find((PerkInfoItem DHDMNHCIPEH) => DHDMNHCIPEH.Name.Equals(name));
-		if (aCONCDFDNJH != null)
+		PerkInfoItem userPerk = userPerks.Find((PerkInfoItem entry) => entry.Name.Equals(name));
+		if (userPerk != null)
 		{
-			userPerks.Remove(aCONCDFDNJH);
+			userPerks.Remove(userPerk);
 		}
 	}
 
-	private void AddProgressionVariant(PerkInfoItem AEFFHJGMNFI, int GNLOCMLBNHF, string EMDJGBHIAIA, string CMGIPKIPIPA)
+	private void AddProgressionVariant(PerkInfoItem perk, int level, string descriptionKey, string moveName)
 	{
-		if (!string.IsNullOrEmpty(EMDJGBHIAIA))
+		if (!string.IsNullOrEmpty(descriptionKey))
 		{
-			AEFFHJGMNFI.DescriptionKey = EMDJGBHIAIA;
+			perk.DescriptionKey = descriptionKey;
 		}
-		AEFFHJGMNFI.IsHidden = false;
-		AEFFHJGMNFI.Level = GNLOCMLBNHF;
-		AEFFHJGMNFI.MoveName = CMGIPKIPIPA;
-		progressionPerks.Add(AEFFHJGMNFI);
+		perk.IsHidden = false;
+		perk.Level = level;
+		perk.MoveName = moveName;
+		progressionPerks.Add(perk);
 	}
 
-	private PerkInfoItem CloneIfOverridden(PerkInfoItem AEFFHJGMNFI, XmlNode node)
+	private PerkInfoItem CloneIfOverridden(PerkInfoItem perk, XmlNode node)
 	{
-		PerkInfoItem result = AEFFHJGMNFI;
+		PerkInfoItem result = perk;
 		XmlNode xmlNode = node["Set"];
 		XmlNode xmlNode2 = node["RatingEvaluation"];
 		if (xmlNode != null || xmlNode2 != null)
 		{
-			result = AEFFHJGMNFI.Clone(xmlNode, xmlNode2);
+			result = perk.Clone(xmlNode, xmlNode2);
 		}
 		return result;
 	}
 
-	private PerkInfoItem CreateUpgradeVariant(PerkInfoItem AEFFHJGMNFI, XmlNode node)
+	private PerkInfoItem CreateUpgradeVariant(PerkInfoItem basePerk, XmlNode node)
 	{
-		PerkInfoItem aCONCDFDNJH = AEFFHJGMNFI.Clone(node["Set"], node["RatingEvaluation"]);
+		PerkInfoItem upgradeVariant = basePerk.Clone(node["Set"], node["RatingEvaluation"]);
 		string text = node.Attributes["Description"].GetStringOrDefault(string.Empty);
-		int aKKLOMFOLNO = node.Attributes["Value"].ParseInt();
+		int upgradeLevel = node.Attributes["Value"].ParseInt();
 		if (!string.IsNullOrEmpty(text))
 		{
-			aCONCDFDNJH.DescriptionKey = text;
+			upgradeVariant.DescriptionKey = text;
 		}
-		aCONCDFDNJH.UpgradeLevel = aKKLOMFOLNO;
-		return aCONCDFDNJH;
+		upgradeVariant.UpgradeLevel = upgradeLevel;
+		return upgradeVariant;
 	}
 
 	public PerkInfoItem FindBasePerk(string name)
@@ -271,21 +271,21 @@ public class PerkItems
 
 	public PerkInfoItem FindUserPerk(string name)
 	{
-		return userPerks.Find((PerkInfoItem DHDMNHCIPEH) => DHDMNHCIPEH.Name.Equals(name));
+		return userPerks.Find((PerkInfoItem entry) => entry.Name.Equals(name));
 	}
 
 	public PerkInfoItem FindProgressionPerk(string name, int upgradeLevel = -1)
 	{
-		return progressionPerks.Find((PerkInfoItem DHDMNHCIPEH) =>
+		return progressionPerks.Find((PerkInfoItem entry) =>
 		{
-			bool flag = DHDMNHCIPEH.Name.Equals(name);
-			bool flag2 = upgradeLevel < 0 || DHDMNHCIPEH.UpgradeLevel == upgradeLevel;
+			bool flag = entry.Name.Equals(name);
+			bool flag2 = upgradeLevel < 0 || entry.UpgradeLevel == upgradeLevel;
 			return flag && flag2;
 		});
 	}
 
 	public List<PerkInfoItem> GetProgressionVariants(string name)
 	{
-		return progressionPerks.FindAll((PerkInfoItem DHDMNHCIPEH) => DHDMNHCIPEH.Name.Equals(name));
+		return progressionPerks.FindAll((PerkInfoItem entry) => entry.Name.Equals(name));
 	}
 }

@@ -30,8 +30,8 @@ public class BattlePeriodic : Battle
 		}
 	}
 
-	public BattlePeriodic(string LFLGCDNKNJI, Vector2 MGMMDGFPBLP, string name, string ADONPNOBBDE, string LHCFHAIDNDP, string EMDJGBHIAIA, ushort CDCJKJNGPOE, ushort MCDAHGPLLDO, string LOKLDPLAPOL, string PEMOECLNECD, string LPJNEDFCBOI, string PINIIFIOECE, string OAPKHNPPGHP, string IHBMPGKIBAN)
-		: base(LFLGCDNKNJI, MGMMDGFPBLP, name, ADONPNOBBDE, LHCFHAIDNDP, EMDJGBHIAIA, CDCJKJNGPOE, MCDAHGPLLDO, LOKLDPLAPOL, PEMOECLNECD, LPJNEDFCBOI, PINIIFIOECE, OAPKHNPPGHP, IHBMPGKIBAN)
+	public BattlePeriodic(string typeName, Vector2 MGMMDGFPBLP, string name, string iconName, string previewIcon, string description, ushort rewardDigits, ushort prizeBaseDigits, string alias, string title, string location, string music, string rewardImage, string showResistance)
+		: base(typeName, MGMMDGFPBLP, name, iconName, previewIcon, description, rewardDigits, prizeBaseDigits, alias, title, location, music, rewardImage, showResistance)
 	{
 		_battles.Add(this);
 	}
@@ -57,43 +57,43 @@ public class BattlePeriodic : Battle
 
 	protected void ApplyFightTime(long time)
 	{
-		FightList jDIPBIHBGPF = GetFirstOpenFight();
-		if (jDIPBIHBGPF == null)
+		FightList fightList = GetFirstOpenFight();
+		if (fightList == null)
 		{
 			Reset();
 			if (_fights.Count > 0)
 			{
-				jDIPBIHBGPF = _fights[0];
+				fightList = _fights[0];
 			}
 		}
-		if (jDIPBIHBGPF != null)
+		if (fightList != null)
 		{
-			Roster nKGLHEGIKKP = ListSF.GetRoster();
-			RosterFight pIGKOIFBOME = jDIPBIHBGPF.GetRosterFight();
-			if (pIGKOIFBOME == null)
+			Roster roster = ListSF.GetRoster();
+			RosterFight rosterFight = fightList.GetRosterFight();
+			if (rosterFight == null)
 			{
-				pIGKOIFBOME = nKGLHEGIKKP.CreateFight(jDIPBIHBGPF.FightId);
-				jDIPBIHBGPF.SetRosterFight(pIGKOIFBOME);
+				rosterFight = roster.CreateFight(fightList.FightId);
+				fightList.SetRosterFight(rosterFight);
 			}
-			pIGKOIFBOME.SetCompletionTimestamp(time);
+			rosterFight.SetCompletionTimestamp(time);
 			// The map's availability check reads elapsed runtime state, while the
 			// line above only persists the completion timestamp. Keep both in sync
 			// so a finished duel locks and displays its timer immediately.
-			pIGKOIFBOME.UpdateElapsedSinceCompletion(time);
+			rosterFight.UpdateElapsedSinceCompletion(time);
 			ListSF.GetInstance().RequestSave();
 		}
 	}
 
-	protected void ResetSingle(bool IKINMKHLDIB = true)
+	protected void ResetSingle(bool useLatestTimestamp = true)
 	{
 		long num = 0L;
 		foreach (FightList item in _fights)
 		{
 			item.Status = ConditionStatus.StatusOpen;
-			RosterFight pIGKOIFBOME = item.GetRosterFight();
-			if (pIGKOIFBOME != null && IKINMKHLDIB && pIGKOIFBOME.GetCompletionTimestamp() > num)
+			RosterFight rosterFight = item.GetRosterFight();
+			if (rosterFight != null && useLatestTimestamp && rosterFight.GetCompletionTimestamp() > num)
 			{
-				num = pIGKOIFBOME.GetCompletionTimestamp();
+				num = rosterFight.GetCompletionTimestamp();
 			}
 		}
 		foreach (FightList item2 in _fights)
@@ -117,9 +117,9 @@ public class BattlePeriodic : Battle
 		}
 	}
 
-	public override void AddFight(FightList KGKDKENMAOA, int index)
+	public override void AddFight(FightList fightList, int index)
 	{
-		base.AddFight(KGKDKENMAOA, index);
+		base.AddFight(fightList, index);
 		SetTime(GlobalTimer.get_GetTime());
 	}
 
@@ -137,13 +137,13 @@ public class BattlePeriodic : Battle
 		ListSF.GetRoster().SetPeriodicPlayTime(time);
 	}
 
-	public override void UpdateRosterFight(FightList KGKDKENMAOA, bool FFIBGBMOMPD)
+	public override void UpdateRosterFight(FightList fightList, bool createIfMissing)
 	{
 		int num = 0;
 		bool flag = false;
 		foreach (FightList item in _fights)
 		{
-			if (item == KGKDKENMAOA)
+			if (item == fightList)
 			{
 				flag = true;
 				break;
@@ -156,15 +156,15 @@ public class BattlePeriodic : Battle
 		}
 		else
 		{
-			KGKDKENMAOA.SetRosterFight(ListSF.LoadRosterFight(KGKDKENMAOA, FFIBGBMOMPD));
+			fightList.SetRosterFight(ListSF.LoadRosterFight(fightList, createIfMissing));
 		}
 	}
 
-	public static void Reset(bool IKINMKHLDIB = true)
+	public static void Reset(bool useLatestTimestamp = true)
 	{
 		foreach (BattlePeriodic item in _battles)
 		{
-			item.ResetSingle(IKINMKHLDIB);
+			item.ResetSingle(useLatestTimestamp);
 			item.SetTime(GlobalTimer.get_GetTime());
 		}
 		ListSF.GetRoster().SetPeriodicPlayTime(0L);
@@ -175,13 +175,13 @@ public class BattlePeriodic : Battle
 		}
 	}
 
-	public static void InitBattles(int BLGLACLODID, long ICBOBIILOFE)
+	public static void InitBattles(int battleIndex, long startTime)
 	{
-		_startTime = ICBOBIILOFE;
+		_startTime = startTime;
 		bool flag = false;
 		foreach (BattlePeriodic item in _battles)
 		{
-			item.ApplyFightTime(ICBOBIILOFE);
+			item.ApplyFightTime(startTime);
 			if (GameUtils.DailyDebugMode)
 			{
 				item.SetRepeatTime(GameUtils.DailyDebugTime);

@@ -15,16 +15,16 @@ public class PerkConditionHealth : PerkConditionMatchMinMax
 		minMax.Parse(node, this, GetPerk());
 	}
 
-	public override bool IsEqual(Model ACENLMONNPA, List<string> NIKHAICFGNM)
+	public override bool IsEqual(Model model, List<string> args)
 	{
-		Model fGCODGKLHED = ResolveTargetModel(ACENLMONNPA);
-		if (ACENLMONNPA == null)
+		Model targetModel = ResolveTargetModel(model);
+		if (model == null)
 		{
 			GameLog.Error("PerkConditionHealth::isEqual - model is null");
 			return false;
 		}
 		minMax.EvaluateFunctions();
-		float num = (ObscuredFloat)(fGCODGKLHED.Parameters.GetCurrentLife());
+		float num = (ObscuredFloat)(targetModel.Parameters.GetCurrentLife());
 		if (!minMax.GetMinUnbounded() && minMax.GetMinValue() > num)
 		{
 			return false;

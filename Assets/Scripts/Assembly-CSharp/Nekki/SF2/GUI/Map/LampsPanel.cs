@@ -79,11 +79,11 @@ namespace Nekki.SF2.GUI.Map
 			lampIndicators.Clear();
 		}
 
-		public void AddLamps(int JPCFOCCOIHL)
+		public void AddLamps(int lampCount)
 		{
 			float num = 0f;
-			float num2 = 68f * (float)JPCFOCCOIHL + 22f * (float)(JPCFOCCOIHL - 1);
-			for (int i = 0; i < JPCFOCCOIHL; i++)
+			float num2 = 68f * (float)lampCount + 22f * (float)(lampCount - 1);
+			for (int i = 0; i < lampCount; i++)
 			{
 				GameObject gameObject = Object.Instantiate(_lampButtonPrefab);
 				SFButton component = gameObject.GetComponent<SFButton>();
@@ -114,13 +114,13 @@ namespace Nekki.SF2.GUI.Map
 			return lampButtons;
 		}
 
-		public void SetCurrentZone(int index, string ABJMDKJHJCP)
+		public void SetCurrentZone(int index, string zoneAlias)
 		{
 			if (lampButtons.Count != 0)
 			{
 				_lampOn.transform.localPosition = lampButtons[index].transform.localPosition;
 				currentLampIndex = index;
-				_locationName.SetAlias(ABJMDKJHJCP);
+				_locationName.SetAlias(zoneAlias);
 			}
 		}
 
@@ -136,16 +136,16 @@ namespace Nekki.SF2.GUI.Map
 				flashPauseFrames--;
 				return;
 			}
-			int iEKAFNFKBNE = MapGUI.ZoneSwitchFade.MinOpacity;
-			int hPJHAIALGHN = MapGUI.ZoneSwitchFade.FadeSpeed;
-			if (hPJHAIALGHN <= 0)
+			int minOpacity = MapGUI.ZoneSwitchFade.MinOpacity;
+			int fadeFrames = MapGUI.ZoneSwitchFade.FadeSpeed;
+			if (fadeFrames <= 0)
 			{
 				return;
 			}
 			if (isLampFlashing)
 			{
 				ChangeLampOpacity(flashingLampButtons);
-				if (lampOpacity <= iEKAFNFKBNE && isLampFadingOut)
+				if (lampOpacity <= minOpacity && isLampFadingOut)
 				{
 					isIndicatorFlashing = true;
 				}
@@ -157,7 +157,7 @@ namespace Nekki.SF2.GUI.Map
 			if (isIndicatorFlashing)
 			{
 				ChangeLampIndicatorOpacity(flashingLampIndicators);
-				if (indicatorOpacity <= iEKAFNFKBNE && isIndicatorFadingOut)
+				if (indicatorOpacity <= minOpacity && isIndicatorFadingOut)
 				{
 					isLampFlashing = true;
 				}
@@ -168,13 +168,13 @@ namespace Nekki.SF2.GUI.Map
 			}
 		}
 
-		public void CheckOpenZones(List<ZoneScrollItem> LLOGFBNDHNF)
+		public void CheckOpenZones(List<ZoneScrollItem> zoneItems)
 		{
 			flashingLampButtons.Clear();
 			flashingLampIndicators.Clear();
-			for (int i = 0; i < LLOGFBNDHNF.Count; i++)
+			for (int i = 0; i < zoneItems.Count; i++)
 			{
-				Zone zone = LLOGFBNDHNF[i].get_Zone();
+				Zone zone = zoneItems[i].get_Zone();
 				if (!zone.GetIsStart())
 				{
 					if (!MapScene.IsZoneOpen(zone))
@@ -190,11 +190,11 @@ namespace Nekki.SF2.GUI.Map
 			}
 		}
 
-		public virtual void SetTouchEnabled(bool MINKNLEJMKF)
+		public virtual void SetTouchEnabled(bool isTouchEnabled)
 		{
 			foreach (Button item in lampButtons)
 			{
-				item.interactable = MINKNLEJMKF;
+				item.interactable = isTouchEnabled;
 			}
 		}
 
@@ -239,14 +239,14 @@ namespace Nekki.SF2.GUI.Map
 			CallEvent(0, (int)data);
 		}
 
-		private void ChangeLampOpacity(List<Button> BBHOCFECAEM)
+		private void ChangeLampOpacity(List<Button> lampButtons)
 		{
-			int hPJHAIALGHN = MapGUI.ZoneSwitchFade.FadeSpeed;
-			if (hPJHAIALGHN <= 0)
+			int fadeFrames = MapGUI.ZoneSwitchFade.FadeSpeed;
+			if (fadeFrames <= 0)
 			{
 				return;
 			}
-			int num = 255 / hPJHAIALGHN;
+			int num = 255 / fadeFrames;
 			if (isLampFadingOut)
 			{
 				lampOpacity -= num;
@@ -266,20 +266,20 @@ namespace Nekki.SF2.GUI.Map
 					flashPauseFrames = MapGUI.ZoneSwitchFade.DelayBeforeFade;
 				}
 			}
-			for (int i = 0; i < BBHOCFECAEM.Count; i++)
+			for (int i = 0; i < lampButtons.Count; i++)
 			{
-				BBHOCFECAEM[i].targetGraphic.SetAlpha(lampOpacity / 255);
+				lampButtons[i].targetGraphic.SetAlpha(lampOpacity / 255);
 			}
 		}
 
-		private void ChangeLampIndicatorOpacity(List<ResolutionImage> IBMGHIHLOHP)
+		private void ChangeLampIndicatorOpacity(List<ResolutionImage> indicatorImages)
 		{
-			int hPJHAIALGHN = MapGUI.ZoneSwitchFade.FadeSpeed;
-			if (hPJHAIALGHN <= 0)
+			int fadeFrames = MapGUI.ZoneSwitchFade.FadeSpeed;
+			if (fadeFrames <= 0)
 			{
 				return;
 			}
-			int num = 255 / hPJHAIALGHN;
+			int num = 255 / fadeFrames;
 			if (isIndicatorFadingOut)
 			{
 				indicatorOpacity -= num;
@@ -299,10 +299,10 @@ namespace Nekki.SF2.GUI.Map
 					flashPauseFrames = MapGUI.ZoneSwitchFade.DelayBeforeFade;
 				}
 			}
-			for (int i = 0; i < IBMGHIHLOHP.Count; i++)
+			for (int i = 0; i < indicatorImages.Count; i++)
 			{
-				IBMGHIHLOHP[i].gameObject.SetActive(true);
-				UIExtensions.SetAlpha(IBMGHIHLOHP[i], indicatorOpacity / 255);
+				indicatorImages[i].gameObject.SetActive(true);
+				UIExtensions.SetAlpha(indicatorImages[i], indicatorOpacity / 255);
 			}
 		}
 	}

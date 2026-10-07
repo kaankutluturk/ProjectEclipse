@@ -245,9 +245,9 @@ namespace Nekki.SF2.Core.Fights.Controller
 			return quadrantAngles;
 		}
 
-		private float GetSquaredMagnitude(Vector2 NAAPALOFBCI)
+		private float GetSquaredMagnitude(Vector2 vector)
 		{
-			return NAAPALOFBCI.x * NAAPALOFBCI.x + NAAPALOFBCI.y * NAAPALOFBCI.y;
+			return vector.x * vector.x + vector.y * vector.y;
 		}
 
 		public void TT()
@@ -305,10 +305,10 @@ namespace Nekki.SF2.Core.Fights.Controller
             }
         }
 
-        public void OnPointerDown(PointerEventData BHOLFGOGPCP)
+        public void OnPointerDown(PointerEventData eventData)
 		{
 			Vector2 localPoint;
-			RectTransformUtility.ScreenPointToLocalPointInRectangle(GetComponent<RectTransform>(), BHOLFGOGPCP.position, BHOLFGOGPCP.pressEventCamera, out localPoint);
+			RectTransformUtility.ScreenPointToLocalPointInRectangle(GetComponent<RectTransform>(), eventData.position, eventData.pressEventCamera, out localPoint);
 			float num = GetSquaredMagnitude(localPoint);
 			float accept = 1f + 2f * Eclipse.UI.BattleTouchControls.TouchLeniency;
 			if (num <= joystickRadiusSquared * accept * accept)
@@ -338,26 +338,26 @@ namespace Nekki.SF2.Core.Fights.Controller
 			}
 		}
 
-		public void OnDrag(PointerEventData BHOLFGOGPCP)
+		public void OnDrag(PointerEventData eventData)
 		{
 			Vector2 localPoint;
-			RectTransformUtility.ScreenPointToLocalPointInRectangle(GetComponent<RectTransform>(), BHOLFGOGPCP.position, BHOLFGOGPCP.pressEventCamera, out localPoint);
+			RectTransformUtility.ScreenPointToLocalPointInRectangle(GetComponent<RectTransform>(), eventData.position, eventData.pressEventCamera, out localPoint);
 			if (isRelativeTouch)
 			{
 				localPoint.x -= touchOrigin.x;
 				localPoint.y -= touchOrigin.y;
 			}
 			SetKnobPosition(localPoint);
-			FightCID eCHINOPKGGI = GetDirectionForPoint(localPoint);
-			if (currentDirection != eCHINOPKGGI)
+			FightCID direction = GetDirectionForPoint(localPoint);
+			if (currentDirection != direction)
 			{
 				DispatchStickEvent(StickEventType.OnStickEnd, currentDirection);
 			}
-			currentDirection = eCHINOPKGGI;
+			currentDirection = direction;
 			DispatchStickEvent(StickEventType.OnStickChange, currentDirection);
 		}
 
-		public void OnPointerUp(PointerEventData BHOLFGOGPCP)
+		public void OnPointerUp(PointerEventData eventData)
 		{
 			touching = false;
 			isRelativeTouch = false;
@@ -376,12 +376,12 @@ namespace Nekki.SF2.Core.Fights.Controller
 			_selectedController.transform.localPosition = DGEJJGMMODA;
 		}
 
-		private FightCID GetDirectionForPoint(Vector2 NAAPALOFBCI)
+		private FightCID GetDirectionForPoint(Vector2 point)
 		{
-			FightCID eCHINOPKGGI = FightCID.QuadrantZero;
-			float num = NAAPALOFBCI.x * halfAxisSectorCos + NAAPALOFBCI.y * halfAxisSectorSin;
-			float num2 = NAAPALOFBCI.y * halfAxisSectorCos - NAAPALOFBCI.x * halfAxisSectorSin;
-			if (GetSquaredMagnitude(NAAPALOFBCI) < safeRadiusSquared)
+			FightCID direction = FightCID.QuadrantZero;
+			float num = point.x * halfAxisSectorCos + point.y * halfAxisSectorSin;
+			float num2 = point.y * halfAxisSectorCos - point.x * halfAxisSectorSin;
+			if (GetSquaredMagnitude(point) < safeRadiusSquared)
 			{
 				return FightCID.QuadrantZero;
 			}
@@ -391,25 +391,25 @@ namespace Nekki.SF2.Core.Fights.Controller
 			float num4 = 0f;
 			if (flag && flag2)
 			{
-				eCHINOPKGGI = FightCID.QuadrantUp;
+				direction = FightCID.QuadrantUp;
 				num3 = Mathf.Abs(num);
 				num4 = Mathf.Abs(num2);
 			}
 			else if (flag && !flag2)
 			{
-				eCHINOPKGGI = FightCID.QuadrantUpForward;
+				direction = FightCID.QuadrantUpForward;
 				num3 = Mathf.Abs(num2);
 				num4 = Mathf.Abs(num);
 			}
 			else if (!flag && !flag2)
 			{
-				eCHINOPKGGI = FightCID.QuadrantForward;
+				direction = FightCID.QuadrantForward;
 				num3 = Mathf.Abs(num);
 				num4 = Mathf.Abs(num2);
 			}
 			else if (!flag && flag2)
 			{
-				eCHINOPKGGI = FightCID.QuadrantDownForward;
+				direction = FightCID.QuadrantDownForward;
 				num3 = Mathf.Abs(num2);
 				num4 = Mathf.Abs(num);
 			}
@@ -426,7 +426,7 @@ namespace Nekki.SF2.Core.Fights.Controller
 			{
 				flag3 = true;
 			}
-			switch (eCHINOPKGGI)
+			switch (direction)
 			{
 			case FightCID.QuadrantUp:
 				return (!flag3) ? FightCID.QuadrantUp : FightCID.QuadrantUpForward;
@@ -441,20 +441,20 @@ namespace Nekki.SF2.Core.Fights.Controller
 			}
 		}
 
-		private void SetPressedVisual(bool NMFDJAMAOHN)
+		private void SetPressedVisual(bool pressed)
 		{
-			_normalController.gameObject.SetActive(!NMFDJAMAOHN);
-			_selectedController.gameObject.SetActive(NMFDJAMAOHN);
-			_normalTexture.gameObject.SetActive(!NMFDJAMAOHN);
-			_selectedTexture.gameObject.SetActive(NMFDJAMAOHN);
+			_normalController.gameObject.SetActive(!pressed);
+			_selectedController.gameObject.SetActive(pressed);
+			_normalTexture.gameObject.SetActive(!pressed);
+			_selectedTexture.gameObject.SetActive(pressed);
 		}
 
-		private void DispatchStickEvent(StickEventType DOPHKKGNAEF, FightCID KJPGKHJNOMC)
+		private void DispatchStickEvent(StickEventType eventType, FightCID control)
 		{
-			FightControlEventData cBBEIGACPPD = new FightControlEventData();
-			cBBEIGACPPD.Index = 0;
-			cBBEIGACPPD.Control = KJPGKHJNOMC;
-			CallEvent((int)DOPHKKGNAEF, cBBEIGACPPD);
+			FightControlEventData eventData = new FightControlEventData();
+			eventData.Index = 0;
+			eventData.Control = control;
+			CallEvent((int)eventType, eventData);
 		}
 
 		private void BuildQuadrantAngles()
@@ -470,11 +470,11 @@ namespace Nekki.SF2.Core.Fights.Controller
 				}
 				else
 				{
-					global::Pair<float, float> cCKLNOPEKHO = quadrantAngles[i - 1];
-					num2 = cCKLNOPEKHO.Second;
+					global::Pair<float, float> anglePair = quadrantAngles[i - 1];
+					num2 = anglePair.Second;
 				}
-				float pOFHDGJAFMP = ((i % 2 != 0) ? (num2 + axisSectorRadians) : (num2 + diagonalSectorRadians));
-				global::Pair<float, float> item = new global::Pair<float, float>(num2, pOFHDGJAFMP);
+				float endAngle = ((i % 2 != 0) ? (num2 + axisSectorRadians) : (num2 + diagonalSectorRadians));
+				global::Pair<float, float> item = new global::Pair<float, float>(num2, endAngle);
 				quadrantAngles.Add(item);
 			}
 		}

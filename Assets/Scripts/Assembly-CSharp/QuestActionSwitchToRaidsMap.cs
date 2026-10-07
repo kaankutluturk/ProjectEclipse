@@ -3,9 +3,9 @@ using Nekki.SF2.GUI.Map;
 
 public class QuestActionSwitchToRaidsMap : QuestAction
 {
-	public override void Execute(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters parameters)
 	{
-		base.Execute(GFIHPBCEEOB);
+		base.Execute(parameters);
 		MapScene current = Scene<MapScene>.get_Current();
 		if (current != null)
 		{

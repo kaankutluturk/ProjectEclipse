@@ -2,5 +2,5 @@ using System;
 
 public interface IHeartbeat
 {
-	void OnHeartbeatUpdate(TimeSpan OJOKANCMPLG);
+	void OnHeartbeatUpdate(TimeSpan elapsed);
 }

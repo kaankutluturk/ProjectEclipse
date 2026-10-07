@@ -65,13 +65,13 @@ public class UserAchievements
 	public int CountCompletedAchievements()
 	{
 		int num = 0;
-		List<AchievCounter> mDNKEAFGAOB = GameUtils.AchievementDefinitions.Counters;
-		for (int i = 0; i < mDNKEAFGAOB.Count; i++)
+		List<AchievCounter> achievCounters = GameUtils.AchievementDefinitions.Counters;
+		for (int i = 0; i < achievCounters.Count; i++)
 		{
-			List<Achievement> fOICCCGPCMJ = mDNKEAFGAOB[i].Achievements;
-			for (int j = 0; j < fOICCCGPCMJ.Count; j++)
+			List<Achievement> counterAchievements = achievCounters[i].Achievements;
+			for (int j = 0; j < counterAchievements.Count; j++)
 			{
-				if (fOICCCGPCMJ[j].GetIsNew())
+				if (counterAchievements[j].GetIsNew())
 				{
 					num++;
 				}
@@ -125,25 +125,25 @@ public class UserAchievements
 
 	public void ApplyPendingCounters()
 	{
-		GameUtils.AchievementCounters oJNHPHEPFLI = GameUtils.ModeCounters;
+		GameUtils.AchievementCounters definitionCounters = GameUtils.ModeCounters;
 		bool flag = false;
 		List<string> list = new List<string>();
-		foreach (KeyValuePair<string, Counter> item in oJNHPHEPFLI.AllCounters)
+		foreach (KeyValuePair<string, Counter> item in definitionCounters.AllCounters)
 		{
 			Counter value = item.Value;
 			if (value.CompleteValue > 0)
 			{
 				list.Add(value.Name);
 				int num = 0;
-				RosterAchievCounter cKJBHGKBPPM = FindCounter(value.Name);
-				if (cKJBHGKBPPM != null)
+				RosterAchievCounter rosterCounter = FindCounter(value.Name);
+				if (rosterCounter != null)
 				{
-					num = cKJBHGKBPPM.GetCounter() + value.CompleteValue;
+					num = rosterCounter.GetCounter() + value.CompleteValue;
 					if (value.Type == "WinBattle")
 					{
 						num = ((num > 1) ? 1 : num);
 					}
-					cKJBHGKBPPM.set_Counter(num);
+					rosterCounter.set_Counter(num);
 					flag = true;
 				}
 				else
@@ -155,8 +155,8 @@ public class UserAchievements
 			}
 			value.ResetCompleteValue();
 		}
-		List<global::Pair<Achievement, int>> cIMGCGDDKCE = GameUtils.AchievementDefinitions.GetUnlockableAchievements(list);
-		GameUtils.UnlockAchievements(cIMGCGDDKCE);
+		List<global::Pair<Achievement, int>> pendingUnlocks = GameUtils.AchievementDefinitions.GetUnlockableAchievements(list);
+		GameUtils.UnlockAchievements(pendingUnlocks);
 		if (flag)
 		{
 			ListSF.GetRoster().RequestSave();
@@ -175,70 +175,70 @@ public class UserAchievements
 		return null;
 	}
 
-	public void SetAchievementRewardClaimed(RosterAchievement PGAGNLJABIE, bool POHFOGPKMMK, bool NLCCJEHMAOF = true)
+	public void SetAchievementRewardClaimed(RosterAchievement rosterAchievement, bool isClaimed, bool requestSave = true)
 	{
-		if (PGAGNLJABIE.GetReward() != POHFOGPKMMK)
+		if (rosterAchievement.GetReward() != isClaimed)
 		{
-			PGAGNLJABIE.set_Reward(POHFOGPKMMK);
-			if (NLCCJEHMAOF)
+			rosterAchievement.set_Reward(isClaimed);
+			if (requestSave)
 			{
 				ListSF.GetRoster().RequestSave();
 			}
 		}
 	}
 
-	public void UnlockAchievement(Achievement NCCHENOEPNF, bool POHFOGPKMMK = true, bool NLCCJEHMAOF = true)
+	public void UnlockAchievement(Achievement achievement, bool isClaimed = true, bool requestSave = true)
 	{
-		if (NCCHENOEPNF == null)
+		if (achievement == null)
 		{
 			return;
 		}
-		string mENAJEAJJBE = NCCHENOEPNF.Name;
+		string achievementName = achievement.Name;
 		for (int i = 0; i < achievements.Count; i++)
 		{
-			RosterAchievement pMGCOHHMIIC = achievements[i];
-			if (mENAJEAJJBE == pMGCOHHMIIC.get_Name())
+			RosterAchievement existingAchievement = achievements[i];
+			if (achievementName == existingAchievement.get_Name())
 			{
-				SetAchievementRewardClaimed(pMGCOHHMIIC, POHFOGPKMMK, NLCCJEHMAOF);
+				SetAchievementRewardClaimed(existingAchievement, isClaimed, requestSave);
 				return;
 			}
 		}
-		string jLEKBBJBLOE = "Achievement";
-		XmlNode hKPPBKPJOEO = achievementsNode.AppendElement(jLEKBBJBLOE);
-		RosterAchievement pMGCOHHMIIC2 = new RosterAchievement(hKPPBKPJOEO);
-		pMGCOHHMIIC2.set_Name(mENAJEAJJBE);
-		pMGCOHHMIIC2.set_Reward(POHFOGPKMMK);
-		AddRosterAchievement(pMGCOHHMIIC2, NCCHENOEPNF);
-		ArgsDict kEMMIFBFDPK = new ArgsDict();
-		kEMMIFBFDPK["name"] = mENAJEAJJBE;
-		StatisticsCollector.LogEvent(StatisticsEvent.EventType.Achievement, kEMMIFBFDPK);
-		if (NLCCJEHMAOF)
+		string achievementNodeName = "Achievement";
+		XmlNode achievementNode = achievementsNode.AppendElement(achievementNodeName);
+		RosterAchievement pMGCOHHMIIC2 = new RosterAchievement(achievementNode);
+		pMGCOHHMIIC2.set_Name(achievementName);
+		pMGCOHHMIIC2.set_Reward(isClaimed);
+		AddRosterAchievement(pMGCOHHMIIC2, achievement);
+		ArgsDict eventArgs = new ArgsDict();
+		eventArgs["name"] = achievementName;
+		StatisticsCollector.LogEvent(StatisticsEvent.EventType.Achievement, eventArgs);
+		if (requestSave)
 		{
 			ListSF.GetRoster().RequestSave();
 		}
 	}
 
-	public bool CreateRepostAchievement(string OGPJPGMBIHJ)
+	public bool CreateRepostAchievement(string achievementName)
 	{
 		for (int i = 0; i < repostAchievements.Count; i++)
 		{
-			RepostAchievement aFOGJMECGBG = repostAchievements[i];
-			if (aFOGJMECGBG.get_Name() == OGPJPGMBIHJ)
+			RepostAchievement repostAchievement = repostAchievements[i];
+			if (repostAchievement.get_Name() == achievementName)
 			{
 				return false;
 			}
 		}
-		repostAchievements.Add(new RepostAchievement(repostAchievementsNode, OGPJPGMBIHJ));
+		repostAchievements.Add(new RepostAchievement(repostAchievementsNode, achievementName));
 		return true;
 	}
 
-	public bool RemoveRepostAchievement(RepostAchievement NCCHENOEPNF)
+	public bool RemoveRepostAchievement(RepostAchievement repostAchievement)
 	{
 		int num = 0;
 		foreach (XmlNode childNode in repostAchievementsNode.ChildNodes)
 		{
 			string text = childNode.Attributes["Name"].GetStringOrDefault(string.Empty);
-			if (text == NCCHENOEPNF.get_Name())
+			if (text == repostAchievement.get_Name())
 			{
 				repostAchievementsNode.RemoveChild(childNode);
 				repostAchievements.RemoveAt(num);
@@ -249,12 +249,12 @@ public class UserAchievements
 		return false;
 	}
 
-	public void AddRepostAchievements(List<string> DODEADGDJCM)
+	public void AddRepostAchievements(List<string> achievementNames)
 	{
 		bool flag = false;
-		for (int i = 0; i < DODEADGDJCM.Count; i++)
+		for (int i = 0; i < achievementNames.Count; i++)
 		{
-			flag = CreateRepostAchievement(DODEADGDJCM[i]);
+			flag = CreateRepostAchievement(achievementNames[i]);
 		}
 		if (flag)
 		{
@@ -262,12 +262,12 @@ public class UserAchievements
 		}
 	}
 
-	public void RemoveRepostAchievements(List<RepostAchievement> MGNCKHDDHLE)
+	public void RemoveRepostAchievements(List<RepostAchievement> repostsToRemove)
 	{
 		bool flag = false;
-		for (int i = 0; i < MGNCKHDDHLE.Count; i++)
+		for (int i = 0; i < repostsToRemove.Count; i++)
 		{
-			flag = RemoveRepostAchievement(MGNCKHDDHLE[i]);
+			flag = RemoveRepostAchievement(repostsToRemove[i]);
 		}
 		if (flag)
 		{
@@ -293,22 +293,22 @@ public class UserAchievements
 
 	private void CreateRosterAchievCounter(string name, int value)
 	{
-		XmlNode hKPPBKPJOEO = countersNode.AppendElement("Counter");
-		RosterAchievCounter cKJBHGKBPPM = new RosterAchievCounter(hKPPBKPJOEO);
-		cKJBHGKBPPM.set_Name(name);
-		cKJBHGKBPPM.set_Counter(value);
-		counters.Add(cKJBHGKBPPM);
+		XmlNode counterNode = countersNode.AppendElement("Counter");
+		RosterAchievCounter rosterCounter = new RosterAchievCounter(counterNode);
+		rosterCounter.set_Name(name);
+		rosterCounter.set_Counter(value);
+		counters.Add(rosterCounter);
 	}
 
-	private void AddRosterAchievement(RosterAchievement BCIJIDMGJLC, Achievement NCCHENOEPNF = null)
+	private void AddRosterAchievement(RosterAchievement rosterAchievement, Achievement achievement = null)
 	{
-		Achievement jNPIOKEKMII = ((NCCHENOEPNF == null) ? GameUtils.AchievementDefinitions.GetAchievementByName(BCIJIDMGJLC.get_Name()) : NCCHENOEPNF);
-		if (jNPIOKEKMII != null)
+		Achievement achievementDefinition = ((achievement == null) ? GameUtils.AchievementDefinitions.GetAchievementByName(rosterAchievement.get_Name()) : achievement);
+		if (achievementDefinition != null)
 		{
-			jNPIOKEKMII.IsUnlocked = true;
-			jNPIOKEKMII.RewardClaimed = BCIJIDMGJLC.GetReward();
-			jNPIOKEKMII.SetIsNew(!BCIJIDMGJLC.GetReward());
+			achievementDefinition.IsUnlocked = true;
+			achievementDefinition.RewardClaimed = rosterAchievement.GetReward();
+			achievementDefinition.SetIsNew(!rosterAchievement.GetReward());
 		}
-		achievements.Add(BCIJIDMGJLC);
+		achievements.Add(rosterAchievement);
 	}
 }

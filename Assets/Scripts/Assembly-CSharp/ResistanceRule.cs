@@ -6,7 +6,7 @@ public class ResistanceRule : InFightRule
 
 	private int _resistanceValue;
 
-	public ResistanceRule(XmlNode node, RuleAppliance EJPOJJKKICO)
+	public ResistanceRule(XmlNode node, RuleAppliance appliance)
 		: base(RuleType.RuleResistance, RuleAppliance.ApplianceAll, node)
 	{
 		Parse(node);
@@ -36,11 +36,11 @@ public class ResistanceRule : InFightRule
 
 	public override InFightRule Copy()
 	{
-		InFightRule aAJIFBJLJOA = null;
-		RuleAppliance eJPOJJKKICO = GetAppliance();
-		XmlNode hKPPBKPJOEO = GetXmlSource().GetNode();
-		aAJIFBJLJOA = new ResistanceRule(hKPPBKPJOEO, eJPOJJKKICO);
-		aAJIFBJLJOA.IsRandom = IsRandom;
-		return aAJIFBJLJOA;
+		InFightRule copy = null;
+		RuleAppliance appliance = GetAppliance();
+		XmlNode node = GetXmlSource().GetNode();
+		copy = new ResistanceRule(node, appliance);
+		copy.IsRandom = IsRandom;
+		return copy;
 	}
 }

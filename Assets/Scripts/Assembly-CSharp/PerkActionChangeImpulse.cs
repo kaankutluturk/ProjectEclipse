@@ -55,12 +55,12 @@ public class PerkActionChangeImpulse : PerkAction
 		SetMultiplierZ(1f);
 	}
 
-	public PerkActionChangeImpulse(PerkActionChangeImpulse NOLFMPDGCOC)
-		: base(NOLFMPDGCOC)
+	public PerkActionChangeImpulse(PerkActionChangeImpulse source)
+		: base(source)
 	{
-		SetMultiplierX(NOLFMPDGCOC.GetMultiplierX());
-		SetMultiplierY(NOLFMPDGCOC.GetMultiplierY());
-		SetMultiplierZ(NOLFMPDGCOC.GetMultiplierZ());
+		SetMultiplierX(source.GetMultiplierX());
+		SetMultiplierY(source.GetMultiplierY());
+		SetMultiplierZ(source.GetMultiplierZ());
 	}
 
 	public float GetMultiplierX()

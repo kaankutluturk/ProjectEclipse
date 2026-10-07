@@ -10,34 +10,34 @@ public class EventDispatcher<T> : global::IEventDispatcher<T>
 		listeners = new Dictionary<int, Action<T>>();
 	}
 
-	public int AddEventListener(int name, Action<T> ODDEOFKLIAG)
+	public int AddEventListener(int name, Action<T> listener)
 	{
-		if (ODDEOFKLIAG == null)
+		if (listener == null)
 		{
 			return -1;
 		}
 		if (listeners.ContainsKey(name))
 		{
-			Dictionary<int, Action<T>> aPNNBCCKAJA;
+			Dictionary<int, Action<T>> table;
 			int key;
-			(aPNNBCCKAJA = listeners)[key = name] = (Action<T>)Delegate.Combine(aPNNBCCKAJA[key], ODDEOFKLIAG);
+			(table = listeners)[key = name] = (Action<T>)Delegate.Combine(table[key], listener);
 			return 0;
 		}
-		listeners.Add(name, ODDEOFKLIAG);
+		listeners.Add(name, listener);
 		return 1;
 	}
 
-	public int RemoveEventListener(int name, Action<T> ODDEOFKLIAG)
+	public int RemoveEventListener(int name, Action<T> listener)
 	{
-		if (ODDEOFKLIAG == null)
+		if (listener == null)
 		{
 			return -1;
 		}
 		if (listeners.ContainsKey(name))
 		{
-			Dictionary<int, Action<T>> aPNNBCCKAJA;
+			Dictionary<int, Action<T>> table;
 			int key;
-			(aPNNBCCKAJA = listeners)[key = name] = (Action<T>)Delegate.Remove(aPNNBCCKAJA[key], ODDEOFKLIAG);
+			(table = listeners)[key = name] = (Action<T>)Delegate.Remove(table[key], listener);
 			if (listeners[name] == null)
 			{
 				RemoveEvent(name);
@@ -59,11 +59,11 @@ public class EventDispatcher<T> : global::IEventDispatcher<T>
 		return 1;
 	}
 
-	public int CallEvent(int name, T EHCLMBADLKH)
+	public int CallEvent(int name, T eventArgs)
 	{
 		if (listeners.ContainsKey(name))
 		{
-			listeners[name](EHCLMBADLKH);
+			listeners[name](eventArgs);
 			return 0;
 		}
 		return 1;

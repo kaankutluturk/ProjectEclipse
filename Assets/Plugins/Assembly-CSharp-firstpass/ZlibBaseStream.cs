@@ -80,15 +80,15 @@ internal class ZlibBaseStream : Stream
 		}
 	}
 
-	public ZlibBaseStream(Stream ABJIEFMMIEK, ZlibCompressionMode HCCDFEPLGBA, ZlibCompressionLevel GNLOCMLBNHF, ZlibStreamFlavor CENOEIJNIAG, bool LOLBAGJKKPH)
+	public ZlibBaseStream(Stream stream, ZlibCompressionMode compressionMode, ZlibCompressionLevel compressionLevel, ZlibStreamFlavor flavor, bool leaveOpen)
 	{
 		_flushMode = FlushType.None;
-		_stream = ABJIEFMMIEK;
-		_leaveOpen = LOLBAGJKKPH;
-		_compressionMode = HCCDFEPLGBA;
-		_flavor = CENOEIJNIAG;
-		_level = GNLOCMLBNHF;
-		if (CENOEIJNIAG == ZlibStreamFlavor.GZIP)
+		_stream = stream;
+		_leaveOpen = leaveOpen;
+		_compressionMode = compressionMode;
+		_flavor = flavor;
+		_level = compressionLevel;
+		if (flavor == ZlibStreamFlavor.GZIP)
 		{
 			_crc = new CRC32();
 		}
@@ -136,11 +136,11 @@ internal class ZlibBaseStream : Stream
 		return _workingBuffer;
 	}
 
-	public override void Write(byte[] buffer, int IPCOBJBKNAO, int count)
+	public override void Write(byte[] buffer, int offset, int count)
 	{
 		if (_crc != null)
 		{
-			_crc.SlurpBlock(buffer, IPCOBJBKNAO, count);
+			_crc.SlurpBlock(buffer, offset, count);
 		}
 		if (_streamMode == StreamMode.Undefined)
 		{
@@ -155,7 +155,7 @@ internal class ZlibBaseStream : Stream
 			return;
 		}
 		GetCodec().InputBuffer = buffer;
-		_z.NextIn = IPCOBJBKNAO;
+		_z.NextIn = offset;
 		_z.AvailableBytesIn = count;
 		bool flag = false;
 		do
@@ -324,7 +324,7 @@ internal class ZlibBaseStream : Stream
 		}
 	}
 
-	public override long Seek(long IPCOBJBKNAO, SeekOrigin IKOOJMAOFOD)
+	public override long Seek(long offset, SeekOrigin origin)
 	{
 		throw new NotImplementedException();
 	}
@@ -409,7 +409,7 @@ internal class ZlibBaseStream : Stream
 		}
 	}
 
-	public override int Read(byte[] buffer, int IPCOBJBKNAO, int count)
+	public override int Read(byte[] buffer, int offset, int count)
 	{
 		if (_streamMode == StreamMode.Undefined)
 		{
@@ -448,17 +448,17 @@ internal class ZlibBaseStream : Stream
 		{
 			throw new ArgumentOutOfRangeException("count");
 		}
-		if (IPCOBJBKNAO < buffer.GetLowerBound(0))
+		if (offset < buffer.GetLowerBound(0))
 		{
 			throw new ArgumentOutOfRangeException("offset");
 		}
-		if (IPCOBJBKNAO + count > buffer.GetLength(0))
+		if (offset + count > buffer.GetLength(0))
 		{
 			throw new ArgumentOutOfRangeException("count");
 		}
 		int num = 0;
 		_z.OutputBuffer = buffer;
-		_z.NextOut = IPCOBJBKNAO;
+		_z.NextOut = offset;
 		_z.AvailableBytesOut = count;
 		_z.InputBuffer = GetWorkingBuffer();
 		do
@@ -500,7 +500,7 @@ internal class ZlibBaseStream : Stream
 		num = count - _z.AvailableBytesOut;
 		if (_crc != null)
 		{
-			_crc.SlurpBlock(buffer, IPCOBJBKNAO, num);
+			_crc.SlurpBlock(buffer, offset, num);
 		}
 		return num;
 	}
@@ -533,33 +533,33 @@ internal class ZlibBaseStream : Stream
 			return _stream.Length;
 		}
 	}
-	public static void CompressString(string JDCCBCNFENK, Stream ABKOBELCOIK)
+	public static void CompressString(string text, Stream compressor)
 	{
-		byte[] bytes = Encoding.UTF8.GetBytes(JDCCBCNFENK);
-		using (ABKOBELCOIK)
+		byte[] bytes = Encoding.UTF8.GetBytes(text);
+		using (compressor)
 		{
-			ABKOBELCOIK.Write(bytes, 0, bytes.Length);
+			compressor.Write(bytes, 0, bytes.Length);
 		}
 	}
 
-	public static void CompressBuffer(byte[] AAOIAEJJINO, Stream ABKOBELCOIK)
+	public static void CompressBuffer(byte[] data, Stream compressor)
 	{
-		using (ABKOBELCOIK)
+		using (compressor)
 		{
-			ABKOBELCOIK.Write(AAOIAEJJINO, 0, AAOIAEJJINO.Length);
+			compressor.Write(data, 0, data.Length);
 		}
 	}
 
-	public static string UncompressString(byte[] FCPABLANKDN, Stream INIMCIOFFCJ)
+	public static string UncompressString(byte[] compressedData, Stream decompressor)
 	{
 		byte[] array = new byte[1024];
 		Encoding uTF = Encoding.UTF8;
 		using (MemoryStream memoryStream = new MemoryStream())
 		{
-			using (INIMCIOFFCJ)
+			using (decompressor)
 			{
 				int count;
-				while ((count = INIMCIOFFCJ.Read(array, 0, array.Length)) != 0)
+				while ((count = decompressor.Read(array, 0, array.Length)) != 0)
 				{
 					memoryStream.Write(array, 0, count);
 				}
@@ -570,15 +570,15 @@ internal class ZlibBaseStream : Stream
 		}
 	}
 
-	public static byte[] UncompressBuffer(byte[] FCPABLANKDN, Stream INIMCIOFFCJ)
+	public static byte[] UncompressBuffer(byte[] compressedData, Stream decompressor)
 	{
 		byte[] array = new byte[1024];
 		using (MemoryStream memoryStream = new MemoryStream())
 		{
-			using (INIMCIOFFCJ)
+			using (decompressor)
 			{
 				int count;
-				while ((count = INIMCIOFFCJ.Read(array, 0, array.Length)) != 0)
+				while ((count = decompressor.Read(array, 0, array.Length)) != 0)
 				{
 					memoryStream.Write(array, 0, count);
 				}

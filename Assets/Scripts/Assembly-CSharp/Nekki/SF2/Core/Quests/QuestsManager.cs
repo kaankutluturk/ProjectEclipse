@@ -236,13 +236,13 @@ namespace Nekki.SF2.Core.Quests
 			return _isRunActions;
 		}
 
-		private bool IsQuestQueued(QuestStage DOKAIKMLLDK)
+		private bool IsQuestQueued(QuestStage quest)
 		{
-			if (DOKAIKMLLDK.allowDoubles)
+			if (quest.allowDoubles)
 			{
 				return false;
 			}
-			string text = DOKAIKMLLDK.get_Name();
+			string text = quest.get_Name();
 			foreach (QuestStage item in questQueue)
 			{
 				if (text.Equals(item.get_Name()))
@@ -255,13 +255,13 @@ namespace Nekki.SF2.Core.Quests
 
 		private void OnQuestComplete(object data)
 		{
-			QuestStage mLLKDGBEGJI = data as QuestStage;
-			if (mLLKDGBEGJI != null)
+			QuestStage quest = data as QuestStage;
+			if (quest != null)
 			{
-				mLLKDGBEGJI.RemoveEventListener(0, OnQuestComplete);
-				questQueue.RemoveAt(mLLKDGBEGJI.index);
-				UntrackQueuedQuest(mLLKDGBEGJI.index);
-				TrackEndedQuest(mLLKDGBEGJI.get_Name());
+				quest.RemoveEventListener(0, OnQuestComplete);
+				questQueue.RemoveAt(quest.index);
+				UntrackQueuedQuest(quest.index);
+				TrackEndedQuest(quest.get_Name());
 				ReindexQueue();
 				if (questQueue.Count > 0)
 				{
@@ -273,11 +273,11 @@ namespace Nekki.SF2.Core.Quests
 			}
 		}
 
-		private void TrackQueuedQuest(string IEEAOCEJHGK)
+		private void TrackQueuedQuest(string questName)
 		{
 			if (SystemProperties.IsDebug())
 			{
-				QuestsInQueue.Add(IEEAOCEJHGK);
+				QuestsInQueue.Add(questName);
 			}
 		}
 
@@ -289,11 +289,11 @@ namespace Nekki.SF2.Core.Quests
 			}
 		}
 
-		private void TrackEndedQuest(string IEEAOCEJHGK)
+		private void TrackEndedQuest(string questName)
 		{
 			if (SystemProperties.IsDebug())
 			{
-				QuestsEnded.Add(IEEAOCEJHGK);
+				QuestsEnded.Add(questName);
 				if (QuestsEnded.Count > QuestsEndedMaxCount)
 				{
 					QuestsEnded.RemoveAt(0);
@@ -317,219 +317,219 @@ namespace Nekki.SF2.Core.Quests
 			}
 		}
 
-		private void Add(QuestStage DOKAIKMLLDK)
+		private void Add(QuestStage quest)
 		{
-			if (DOKAIKMLLDK != null)
+			if (quest != null)
 			{
-				CrashBreadcrumbTracker.GetInstance().AddBreadcrumb(DOKAIKMLLDK.get_Name());
-				questQueue.Add(DOKAIKMLLDK);
-				TrackQueuedQuest(DOKAIKMLLDK.get_Name());
-				ScreenType iPKNDMINFMJ = Module.GetInstance().GetCurrentScreenType();
-				if (!runPending && !_isRunActions && iPKNDMINFMJ != ScreenType.ModuleFight)
+				CrashBreadcrumbTracker.GetInstance().AddBreadcrumb(quest.get_Name());
+				questQueue.Add(quest);
+				TrackQueuedQuest(quest.get_Name());
+				ScreenType screenType = Module.GetInstance().GetCurrentScreenType();
+				if (!runPending && !_isRunActions && screenType != ScreenType.ModuleFight)
 				{
 					runPending = true;
 				}
 			}
 		}
 
-		public void AddQuest(QuestStage PJEAMPLHPOH)
+		public void AddQuest(QuestStage quest)
 		{
-			if (PJEAMPLHPOH.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_FIGHT_ENTER))
+			if (quest.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_FIGHT_ENTER))
 			{
-				fightEnterQuests.Add(PJEAMPLHPOH);
+				fightEnterQuests.Add(quest);
 			}
-			if (PJEAMPLHPOH.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_FIGHT_END))
+			if (quest.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_FIGHT_END))
 			{
-				fightEndQuests.Add(PJEAMPLHPOH);
+				fightEndQuests.Add(quest);
 			}
-			if (PJEAMPLHPOH.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_RAID_FIGHT_ENTER))
+			if (quest.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_RAID_FIGHT_ENTER))
 			{
-				raidFightEnterQuests.Add(PJEAMPLHPOH);
+				raidFightEnterQuests.Add(quest);
 			}
-			if (PJEAMPLHPOH.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_RAID_FIGHT_END))
+			if (quest.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_RAID_FIGHT_END))
 			{
-				raidFightEndQuests.Add(PJEAMPLHPOH);
+				raidFightEndQuests.Add(quest);
 			}
-			if (PJEAMPLHPOH.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_LEVEL_UP))
+			if (quest.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_LEVEL_UP))
 			{
-				levelUpQuests.Add(PJEAMPLHPOH);
+				levelUpQuests.Add(quest);
 			}
-			if (PJEAMPLHPOH.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_GOT_ITEM))
+			if (quest.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_GOT_ITEM))
 			{
-				gotItemQuests.Add(PJEAMPLHPOH);
+				gotItemQuests.Add(quest);
 			}
-			if (PJEAMPLHPOH.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_DIALOG))
+			if (quest.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_DIALOG))
 			{
-				dialogQuests.Add(PJEAMPLHPOH);
+				dialogQuests.Add(quest);
 			}
-			if (PJEAMPLHPOH.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_SESSION))
+			if (quest.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_SESSION))
 			{
-				sessionQuests.Add(PJEAMPLHPOH);
+				sessionQuests.Add(quest);
 			}
-			if (PJEAMPLHPOH.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_ACTIVATE))
+			if (quest.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_ACTIVATE))
 			{
-				activateQuests.Add(PJEAMPLHPOH);
+				activateQuests.Add(quest);
 			}
-			if (PJEAMPLHPOH.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_PURCHASE))
+			if (quest.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_PURCHASE))
 			{
-				purchaseQuests.Add(PJEAMPLHPOH);
+				purchaseQuests.Add(quest);
 			}
-			if (PJEAMPLHPOH.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_PREPURCHASE))
+			if (quest.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_PREPURCHASE))
 			{
-				prePurchaseQuests.Add(PJEAMPLHPOH);
+				prePurchaseQuests.Add(quest);
 			}
-			if (PJEAMPLHPOH.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_LOGIN_FB))
+			if (quest.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_LOGIN_FB))
 			{
-				loginFbQuests.Add(PJEAMPLHPOH);
+				loginFbQuests.Add(quest);
 			}
-			if (PJEAMPLHPOH.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_DELIVERY))
+			if (quest.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_DELIVERY))
 			{
-				deliveryQuests.Add(PJEAMPLHPOH);
+				deliveryQuests.Add(quest);
 			}
-			if (PJEAMPLHPOH.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_ENERGY))
+			if (quest.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_ENERGY))
 			{
-				energyQuests.Add(PJEAMPLHPOH);
+				energyQuests.Add(quest);
 			}
-			if (PJEAMPLHPOH.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_SERVER_CURRENCY))
+			if (quest.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_SERVER_CURRENCY))
 			{
-				serverCurrencyQuests.Add(PJEAMPLHPOH);
+				serverCurrencyQuests.Add(quest);
 			}
-			if (PJEAMPLHPOH.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_LANGUAGE_SWITCH))
+			if (quest.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_LANGUAGE_SWITCH))
 			{
-				languageSwitchQuests.Add(PJEAMPLHPOH);
+				languageSwitchQuests.Add(quest);
 			}
-			if (PJEAMPLHPOH.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_FREE_SECTION_BUTTON))
+			if (quest.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_FREE_SECTION_BUTTON))
 			{
-				freeSectionButtonQuests.Add(PJEAMPLHPOH);
+				freeSectionButtonQuests.Add(quest);
 			}
-			if (PJEAMPLHPOH.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_START_APPLICATION))
+			if (quest.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_START_APPLICATION))
 			{
-				startApplicationQuests.Add(PJEAMPLHPOH);
+				startApplicationQuests.Add(quest);
 			}
-			if (PJEAMPLHPOH.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_CHANGE_TAB))
+			if (quest.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_CHANGE_TAB))
 			{
-				changeTabQuests.Add(PJEAMPLHPOH);
+				changeTabQuests.Add(quest);
 			}
-			if (PJEAMPLHPOH.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_PURCHASE_UNSUCCESSFUL))
+			if (quest.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_PURCHASE_UNSUCCESSFUL))
 			{
-				purchaseUnsuccessfulQuests.Add(PJEAMPLHPOH);
+				purchaseUnsuccessfulQuests.Add(quest);
 			}
-			if (PJEAMPLHPOH.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_STARTER_PACK_PRESS))
+			if (quest.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_STARTER_PACK_PRESS))
 			{
-				starterPackPressQuests.Add(PJEAMPLHPOH);
+				starterPackPressQuests.Add(quest);
 			}
-			if (PJEAMPLHPOH.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_ENERGY_BAR_PRESS))
+			if (quest.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_ENERGY_BAR_PRESS))
 			{
-				energyBarPressQuests.Add(PJEAMPLHPOH);
+				energyBarPressQuests.Add(quest);
 			}
-			if (PJEAMPLHPOH.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_VIDEO_BUTTON_PRESS))
+			if (quest.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_VIDEO_BUTTON_PRESS))
 			{
-				videoButtonPressQuests.Add(PJEAMPLHPOH);
+				videoButtonPressQuests.Add(quest);
 			}
-			if (PJEAMPLHPOH.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_TIMER_END))
+			if (quest.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_TIMER_END))
 			{
-				timerEndQuests.Add(PJEAMPLHPOH);
+				timerEndQuests.Add(quest);
 			}
-			if (PJEAMPLHPOH.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_MAP_BUTTON_PRESS))
+			if (quest.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_MAP_BUTTON_PRESS))
 			{
-				mapButtonPressQuests.Add(PJEAMPLHPOH);
+				mapButtonPressQuests.Add(quest);
 			}
-			if (PJEAMPLHPOH.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_RAID_MAP_BUTTON_PRESS))
+			if (quest.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_RAID_MAP_BUTTON_PRESS))
 			{
-				raidMapButtonPressQuests.Add(PJEAMPLHPOH);
+				raidMapButtonPressQuests.Add(quest);
 			}
-			if (PJEAMPLHPOH.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_ENCHANTMENT))
+			if (quest.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_ENCHANTMENT))
 			{
-				enchantmentQuests.Add(PJEAMPLHPOH);
+				enchantmentQuests.Add(quest);
 			}
-			if (PJEAMPLHPOH.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_ENCHANTMENT_UNSUCCESSFUL))
+			if (quest.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_ENCHANTMENT_UNSUCCESSFUL))
 			{
-				enchantmentUnsuccessfulQuests.Add(PJEAMPLHPOH);
+				enchantmentUnsuccessfulQuests.Add(quest);
 			}
-			if (PJEAMPLHPOH.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_ACTIVATE_PERK))
+			if (quest.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_ACTIVATE_PERK))
 			{
-				activatePerkQuests.Add(PJEAMPLHPOH);
+				activatePerkQuests.Add(quest);
 			}
-			if (PJEAMPLHPOH.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_DIACTIVATE_PERK))
+			if (quest.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_DIACTIVATE_PERK))
 			{
-				deactivatePerkQuests.Add(PJEAMPLHPOH);
+				deactivatePerkQuests.Add(quest);
 			}
-			if (PJEAMPLHPOH.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_BUY_SPIN_GEMS))
+			if (quest.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_BUY_SPIN_GEMS))
 			{
-				buySpinGemsQuests.Add(PJEAMPLHPOH);
+				buySpinGemsQuests.Add(quest);
 			}
-			if (PJEAMPLHPOH.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_RESET_ASCENSION))
+			if (quest.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_RESET_ASCENSION))
 			{
-				resetAscensionQuests.Add(PJEAMPLHPOH);
+				resetAscensionQuests.Add(quest);
 			}
-			if (PJEAMPLHPOH.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_SET_ITEM_ACQUIRED))
+			if (quest.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_SET_ITEM_ACQUIRED))
 			{
-				setItemAcquiredQuests.Add(PJEAMPLHPOH);
+				setItemAcquiredQuests.Add(quest);
 			}
-			if (PJEAMPLHPOH.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_DUEL_UNLOCKED))
+			if (quest.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_DUEL_UNLOCKED))
 			{
-				duelUnlockedQuests.Add(PJEAMPLHPOH);
+				duelUnlockedQuests.Add(quest);
 			}
-			if (PJEAMPLHPOH.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_RAID_OPEN))
+			if (quest.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_RAID_OPEN))
 			{
-				raidOpenQuests.Add(PJEAMPLHPOH);
+				raidOpenQuests.Add(quest);
 			}
-			if (PJEAMPLHPOH.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_RAID_ENTER))
+			if (quest.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_RAID_ENTER))
 			{
-				raidEnterQuests.Add(PJEAMPLHPOH);
+				raidEnterQuests.Add(quest);
 			}
-			if (PJEAMPLHPOH.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_RAID_END))
+			if (quest.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_RAID_END))
 			{
-				raidEndQuests.Add(PJEAMPLHPOH);
+				raidEndQuests.Add(quest);
 			}
-			if (PJEAMPLHPOH.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_BOSS_SHIELD_DESTR))
+			if (quest.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_BOSS_SHIELD_DESTR))
 			{
-				bossShieldDestroyedQuests.Add(PJEAMPLHPOH);
+				bossShieldDestroyedQuests.Add(quest);
 			}
-			if (PJEAMPLHPOH.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_RAID_LOGIN))
+			if (quest.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_RAID_LOGIN))
 			{
-				raidLoginQuests.Add(PJEAMPLHPOH);
+				raidLoginQuests.Add(quest);
 			}
-			if (PJEAMPLHPOH.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_SEAS_START_WITH_REST))
+			if (quest.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_SEAS_START_WITH_REST))
 			{
-				seasonStartWithRestQuests.Add(PJEAMPLHPOH);
+				seasonStartWithRestQuests.Add(quest);
 			}
-			if (PJEAMPLHPOH.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_SEAS_START_WITHOUT_REST))
+			if (quest.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_SEAS_START_WITHOUT_REST))
 			{
-				seasonStartWithoutRestQuests.Add(PJEAMPLHPOH);
+				seasonStartWithoutRestQuests.Add(quest);
 			}
-			if (PJEAMPLHPOH.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_DAILY_WINDOW_OPEN))
+			if (quest.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_DAILY_WINDOW_OPEN))
 			{
-				dailyWindowOpenQuests.Add(PJEAMPLHPOH);
+				dailyWindowOpenQuests.Add(quest);
 			}
-			if (PJEAMPLHPOH.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_LEADERBOARD_TAP))
+			if (quest.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_LEADERBOARD_TAP))
 			{
-				leaderboardTapQuests.Add(PJEAMPLHPOH);
+				leaderboardTapQuests.Add(quest);
 			}
-			if (PJEAMPLHPOH.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_SHOW_REWARDED_VIDEO))
+			if (quest.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_SHOW_REWARDED_VIDEO))
 			{
-				showRewardedVideoQuests.Add(PJEAMPLHPOH);
+				showRewardedVideoQuests.Add(quest);
 			}
-			if (PJEAMPLHPOH.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_LOGIN_END))
+			if (quest.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_LOGIN_END))
 			{
-				loginEndQuests.Add(PJEAMPLHPOH);
+				loginEndQuests.Add(quest);
 			}
-			if (PJEAMPLHPOH.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_RAID_MAP_ENTER)) EclipseRaidMapEnter.Add(PJEAMPLHPOH);
-            if (PJEAMPLHPOH.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_RAID_FLOOR_CHANGED)) EclipseRaidFloorChanged.Add(PJEAMPLHPOH);
-            if (PJEAMPLHPOH.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_SHOW_RAID_LOOT)) EclipseShowRaidLoot.Add(PJEAMPLHPOH);
-			if (PJEAMPLHPOH.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_SHOP_ENTER))
+			if (quest.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_RAID_MAP_ENTER)) EclipseRaidMapEnter.Add(quest);
+            if (quest.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_RAID_FLOOR_CHANGED)) EclipseRaidFloorChanged.Add(quest);
+            if (quest.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_SHOW_RAID_LOOT)) EclipseShowRaidLoot.Add(quest);
+			if (quest.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_SHOP_ENTER))
 			{
-				shopEnterQuests.Add(PJEAMPLHPOH);
+				shopEnterQuests.Add(quest);
 			}
-			if (PJEAMPLHPOH.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_SCENE_LOADED))
+			if (quest.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_SCENE_LOADED))
 			{
-				DevXmlSceneLoaded.Add(PJEAMPLHPOH);
+				DevXmlSceneLoaded.Add(quest);
 			}
-			if (PJEAMPLHPOH.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_SHOP_BUTTON_PRESS))
+			if (quest.IsEvent(QuestEvent.QuestEventType.QUEST_EVENT_SHOP_BUTTON_PRESS))
 			{
-				DevXmlShopButtonPress.Add(PJEAMPLHPOH);
+				DevXmlShopButtonPress.Add(quest);
 			}
-				allQuests.Add(PJEAMPLHPOH);
+				allQuests.Add(quest);
 			}
 
 			public void RemoveExternalQuest(QuestStage quest)
@@ -554,10 +554,10 @@ namespace Nekki.SF2.Core.Quests
 				ReindexQueue();
 			}
 
-			public bool ActionQuest(QuestEvent.QuestEventType MCGHIOHACBJ)
+			public bool ActionQuest(QuestEvent.QuestEventType eventType)
 		{
 			List<QuestStage> list = null;
-			switch (MCGHIOHACBJ)
+			switch (eventType)
 			{
             case QuestEvent.QuestEventType.QUEST_EVENT_RAID_MAP_ENTER: list = EclipseRaidMapEnter; break;
             case QuestEvent.QuestEventType.QUEST_EVENT_RAID_FLOOR_CHANGED: list = EclipseRaidFloorChanged; break;
@@ -707,7 +707,7 @@ namespace Nekki.SF2.Core.Quests
 				list = DevXmlShopButtonPress;
 				break;
 			default:
-				GameLog.Error(string.Format("{0},{1}", "Quest::actionQuest - unknown type: ", MCGHIOHACBJ));
+				GameLog.Error(string.Format("{0},{1}", "Quest::actionQuest - unknown type: ", eventType));
 				break;
 			}
 			bool flag = false;
@@ -732,23 +732,23 @@ namespace Nekki.SF2.Core.Quests
 			return flag;
 		}
 
-		public bool AddQuestToStek(string name, bool OBJGGIPDKDF)
+		public bool AddQuestToStek(string name, bool forceRun)
 		{
 			QuestStage questByName = GetQuestByName(name);
 			if (questByName != null)
 			{
-				return AddQuestToStek(questByName, OBJGGIPDKDF);
+				return AddQuestToStek(questByName, forceRun);
 			}
 			return false;
 		}
 
-		public bool AddQuestToStek(QuestStage DOKAIKMLLDK, bool OBJGGIPDKDF = false)
+		public bool AddQuestToStek(QuestStage quest, bool sortQueue = false)
 		{
-			if (DOKAIKMLLDK == null || IsEclipseSuppressed(DOKAIKMLLDK)) return false;
-			DOKAIKMLLDK.QueueForRun(QuestParameters);
-			DOKAIKMLLDK.index = questQueue.Count;
-			Add(DOKAIKMLLDK);
-			if (OBJGGIPDKDF)
+			if (quest == null || IsEclipseSuppressed(quest)) return false;
+			quest.QueueForRun(QuestParameters);
+			quest.index = questQueue.Count;
+			Add(quest);
+			if (sortQueue)
 			{
 				SortQueue();
 			}
@@ -793,13 +793,13 @@ namespace Nekki.SF2.Core.Quests
 			bool flag = false;
 			while (!flag && 0 < questQueue.Count)
 			{
-				QuestStage mLLKDGBEGJI = questQueue[0];
-				if (mLLKDGBEGJI != null)
+				QuestStage quest = questQueue[0];
+				if (quest != null)
 				{
-					mLLKDGBEGJI.AddEventListener(0, OnQuestComplete);
-					mLLKDGBEGJI.StartActions(mLLKDGBEGJI.EclipseQueuedParameters ?? QuestParameters, mLLKDGBEGJI.EclipseQueuedResume);
+					quest.AddEventListener(0, OnQuestComplete);
+					quest.StartActions(quest.EclipseQueuedParameters ?? QuestParameters, quest.EclipseQueuedResume);
 					flag = true;
-					CurrentQuestName = mLLKDGBEGJI.get_Name();
+					CurrentQuestName = quest.get_Name();
 				}
 				else
 				{
@@ -823,14 +823,14 @@ namespace Nekki.SF2.Core.Quests
 			}
 		}
 
-		public bool AddActionQuest(List<QuestStage> NKNMCOEBMNG)
+		public bool AddActionQuest(List<QuestStage> quests)
 		{
 			// Filter before restoring parameters or calling MHNEBBGMOLA: both touch
 			// native quest state. Never remove suppressed entries from the roster.
 			if (EclipseSuppressedQuests.Count != 0)
-				NKNMCOEBMNG = NKNMCOEBMNG.FindAll(quest => !IsEclipseSuppressed(quest));
-			if (NKNMCOEBMNG.Count == 0) return false;
-			foreach (QuestStage item in NKNMCOEBMNG)
+				quests = quests.FindAll(quest => !IsEclipseSuppressed(quest));
+			if (quests.Count == 0) return false;
+			foreach (QuestStage item in quests)
 			{
 				if (item.GetRosterQuest() != null && !IsQuestQueued(item))
 				{
@@ -864,23 +864,23 @@ namespace Nekki.SF2.Core.Quests
 			return questQueue.Count > 0;
 		}
 
-		public void ClearStack(List<string> NIKHAICFGNM = null)
+		public void ClearStack(List<string> groupNames = null)
 		{
-			RemoveAllButThis(NIKHAICFGNM);
+			RemoveAllButThis(groupNames);
 		}
 
-		public void RemoveAllButThis(List<string> NIKHAICFGNM = null)
+		public void RemoveAllButThis(List<string> groupNames = null)
 		{
 			for (int i = 0; i < questQueue.Count; i++)
 			{
-				QuestStage mLLKDGBEGJI = questQueue[i];
-				if (mLLKDGBEGJI.GetState() != QuestStage.QuestState.QUEST_ACTIONS && (NIKHAICFGNM == null || NIKHAICFGNM.Count == 0 || mLLKDGBEGJI.IsGroup(NIKHAICFGNM)))
+				QuestStage quest = questQueue[i];
+				if (quest.GetState() != QuestStage.QuestState.QUEST_ACTIONS && (groupNames == null || groupNames.Count == 0 || quest.IsGroup(groupNames)))
 				{
-					if (mLLKDGBEGJI.GetRosterQuest() != null)
+					if (quest.GetRosterQuest() != null)
 					{
-						mLLKDGBEGJI.GetRosterQuest().ClearParameters();
+						quest.GetRosterQuest().ClearParameters();
 					}
-					mLLKDGBEGJI.RemoveEventListener(0, OnQuestComplete);
+					quest.RemoveEventListener(0, OnQuestComplete);
 					questQueue.RemoveAt(i);
 					UntrackQueuedQuest(i);
 					i--;

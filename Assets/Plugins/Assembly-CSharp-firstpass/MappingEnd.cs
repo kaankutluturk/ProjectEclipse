@@ -10,8 +10,8 @@ public class MappingEnd : ParsingEvent
 		}
 	}
 
-	public MappingEnd(Mark ILENLCMAMBH, Mark PCLFFOBJJFO)
-		: base(ILENLCMAMBH, PCLFFOBJJFO)
+	public MappingEnd(Mark start, Mark end)
+		: base(start, end)
 	{
 	}
 
@@ -35,8 +35,8 @@ public class MappingEnd : ParsingEvent
 		return "Mapping end";
 	}
 
-	public override void Accept(IParsingEventVisitor NKECMANOOEM)
+	public override void Accept(IParsingEventVisitor visitor)
 	{
-		NKECMANOOEM.Visit(this);
+		visitor.Visit(this);
 	}
 }

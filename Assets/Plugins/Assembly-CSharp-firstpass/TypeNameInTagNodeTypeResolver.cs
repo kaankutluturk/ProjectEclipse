@@ -2,11 +2,11 @@ using System;
 
 public sealed class TypeNameInTagNodeTypeResolver : INodeTypeResolver
 {
-	bool INodeTypeResolver.Resolve(NodeEvent ABOEBNGCALL, ref Type PHOBEGPKAKH)
+	bool INodeTypeResolver.Resolve(NodeEvent nodeEvent, ref Type currentType)
 	{
-		if (!string.IsNullOrEmpty(ABOEBNGCALL.GetTag()))
+		if (!string.IsNullOrEmpty(nodeEvent.GetTag()))
 		{
-			PHOBEGPKAKH = Type.GetType(ABOEBNGCALL.GetTag().Substring(1), true);
+			currentType = Type.GetType(nodeEvent.GetTag().Substring(1), true);
 			return true;
 		}
 		return false;

@@ -2,8 +2,8 @@ public class PlistElementInteger : PlistElement
 {
 	public int value;
 
-	public PlistElementInteger(int AFIEJABPAKA)
+	public PlistElementInteger(int newValue)
 	{
-		value = AFIEJABPAKA;
+		value = newValue;
 	}
 }

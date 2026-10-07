@@ -260,9 +260,9 @@ public class LogRules
 		logPerks = value;
 	}
 
-	private bool ParseFlag(XmlNode node, bool AGADEMLBJGJ = false)
+	private bool ParseFlag(XmlNode node, bool defaultValue = false)
 	{
-		return (node == null) ? AGADEMLBJGJ : XmlUtils.ParseBool(node.Attributes[0], AGADEMLBJGJ);
+		return (node == null) ? defaultValue : XmlUtils.ParseBool(node.Attributes[0], defaultValue);
 	}
 
 	public void Parse(XmlNode node)
@@ -274,8 +274,8 @@ public class LogRules
 			SetLogQuests(ParseFlag(xmlNode));
 			if (GetLogQuests())
 			{
-				XmlNode hKPPBKPJOEO = xmlNode["Actions"];
-				SetLogQuestActions(ParseFlag(hKPPBKPJOEO));
+				XmlNode flagNode = xmlNode["Actions"];
+				SetLogQuestActions(ParseFlag(flagNode));
 			}
 			SetLogAnimations(ParseFlag(node["Animations"]));
 			SetLogTactics(ParseFlag(node["Tactics"]));

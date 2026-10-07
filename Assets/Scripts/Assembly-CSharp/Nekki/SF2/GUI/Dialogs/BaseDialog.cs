@@ -131,12 +131,12 @@ namespace Nekki.SF2.GUI.Dialogs
 			Init(string.Empty);
 		}
 
-		public virtual void Init(string DIKEFIIPNBE = "", string EHMEFCPIODJ = "OK", string EOCPGMKEEHK = "CANCEL", FooterType HJNAHNICGMH = FooterType.FOOTER_NONE)
+		public virtual void Init(string title = "", string okButtonAlias = "OK", string cancelAlias = "CANCEL", FooterType footer = FooterType.FOOTER_NONE)
 		{
-			titleAlias = DIKEFIIPNBE;
-			defaultOkButtonAlias = EHMEFCPIODJ;
-			cancelButtonAlias = EOCPGMKEEHK;
-			footerType = HJNAHNICGMH;
+			titleAlias = title;
+			defaultOkButtonAlias = okButtonAlias;
+			cancelButtonAlias = cancelAlias;
+			footerType = footer;
 			BackKeyManager.get_Instance().AddBackKeyController(this);
 		}
 
@@ -164,8 +164,8 @@ namespace Nekki.SF2.GUI.Dialogs
 
 		public virtual void Close(object data)
 		{
-			DialogCloseEvent iPJEOLNMLEH = DialogCloseEvent.OnPopupCloseOK;
-			OnClose(iPJEOLNMLEH);
+			DialogCloseEvent closeEvent = DialogCloseEvent.OnPopupCloseOK;
+			OnClose(closeEvent);
 		}
 
 		public virtual void OnClose(object data)
@@ -226,11 +226,11 @@ namespace Nekki.SF2.GUI.Dialogs
 			}
 		}
 
-		protected virtual void SetupFooter(FooterType HJNAHNICGMH)
+		protected virtual void SetupFooter(FooterType footer)
 		{
-			bool flag = HJNAHNICGMH == FooterType.FOOTER_BOTH;
+			bool flag = footer == FooterType.FOOTER_BOTH;
 			_btns.Clear();
-			if (flag || HJNAHNICGMH == FooterType.FOOTER_OK)
+			if (flag || footer == FooterType.FOOTER_OK)
 			{
 				SetupButton(_btnOK, FooterType.FOOTER_OK);
 				_btnOK.transform.SetLocalX((!flag) ? 0f : (_btnOK.get_rect().width / 2f + 32f));
@@ -240,7 +240,7 @@ namespace Nekki.SF2.GUI.Dialogs
 			{
 				_btnOK.gameObject.SetActive(false);
 			}
-			if (flag || HJNAHNICGMH == FooterType.FOOTER_CANCEL)
+			if (flag || footer == FooterType.FOOTER_CANCEL)
 			{
 				SetupButton(_btnCancel, FooterType.FOOTER_CANCEL);
 				_btnCancel.transform.SetLocalX((!flag) ? 0f : (0f - (_btnCancel.get_rect().width / 2f + 32f)));
@@ -262,13 +262,13 @@ namespace Nekki.SF2.GUI.Dialogs
 			}
 		}
 
-		protected virtual void SetupButton(LabelButton GAMILDJHFDB, FooterType MOPOCBKIKBI)
+		protected virtual void SetupButton(LabelButton button, FooterType footer)
 		{
-			GAMILDJHFDB.gameObject.SetActive(true);
+			button.gameObject.SetActive(true);
 			string alias = string.Empty;
 			int buttonId = 0;
 			LabelButton.ButtonColor color = LabelButton.ButtonColor.BUTTON_WHITE;
-			switch (MOPOCBKIKBI)
+			switch (footer)
 			{
 			case FooterType.FOOTER_CANCEL:
 				alias = cancelButtonAlias;
@@ -281,12 +281,12 @@ namespace Nekki.SF2.GUI.Dialogs
 				buttonId = 1;
 				break;
 			}
-			GAMILDJHFDB.SetColor(color);
-			GAMILDJHFDB.SetAlias(alias);
-			GAMILDJHFDB.ButtonId = buttonId;
-			GAMILDJHFDB.RemoveEventListener(2, OnClose);
-			GAMILDJHFDB.AddEventListener(2, OnClose);
-			GAMILDJHFDB.transform.SetLocalX(0f);
+			button.SetColor(color);
+			button.SetAlias(alias);
+			button.ButtonId = buttonId;
+			button.RemoveEventListener(2, OnClose);
+			button.AddEventListener(2, OnClose);
+			button.transform.SetLocalX(0f);
 		}
 
 		protected virtual void FitContentSize()
@@ -338,11 +338,11 @@ namespace Nekki.SF2.GUI.Dialogs
 			return Mathf.Clamp(value, 272f, 544f);
 		}
 
-		protected virtual void SetupHeader(string HCPNFPMHFCM)
+		protected virtual void SetupHeader(string headerAlias)
 		{
 			_header.set_LabelFontSize(152);
 			_header.color = Constants.DialogHeaderColor;
-			_header.set_Alias(HCPNFPMHFCM);
+			_header.set_Alias(headerAlias);
 			float x = _content.GetComponent<RectTransform>().rect.width - 120f;
 			_header.rectTransform.sizeDelta = new Vector2(x, _header.rectTransform.rect.height);
 			UpdateHeaderPosition();

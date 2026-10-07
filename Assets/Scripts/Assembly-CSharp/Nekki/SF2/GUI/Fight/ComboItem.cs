@@ -91,13 +91,13 @@ namespace Nekki.SF2.GUI.Fight
 			return base.transform as RectTransform;
 		}
 
-		public void Init(ComboTypes LFLGCDNKNJI, ScreenModel.ScreenSide NPEAOKLDJHA)
+		public void Init(ComboTypes type, ScreenModel.ScreenSide screenSide)
 		{
-			SetModelSide(NPEAOKLDJHA);
-			SetComboType(LFLGCDNKNJI);
+			SetModelSide(screenSide);
+			SetComboType(type);
 			if (_image != null)
 			{
-				_image.set_SpriteName(GetSpriteName(LFLGCDNKNJI));
+				_image.set_SpriteName(GetSpriteName(type));
 				_image.SetNativeSize();
 				LayoutElement component = _image.GetComponent<LayoutElement>();
 				component.minWidth = _image.rectTransform.rect.width;
@@ -105,16 +105,16 @@ namespace Nekki.SF2.GUI.Fight
 			}
 			if (_labelShadow != null)
 			{
-				_labelShadow.gameObject.SetActive(LFLGCDNKNJI == ComboTypes.TypeHotGroundTimer);
+				_labelShadow.gameObject.SetActive(type == ComboTypes.TypeHotGroundTimer);
 			}
 			if (_label != null)
 			{
-				if (LFLGCDNKNJI == ComboTypes.TypeHotGroundTimer)
+				if (type == ComboTypes.TypeHotGroundTimer)
 				{
 					_label.color = _labelColorHotground;
 					_label.set_LabelFontSize(_labelFontSizeHotground);
 				}
-				if (NPEAOKLDJHA == ScreenModel.ScreenSide.TYPE_LEFT)
+				if (screenSide == ScreenModel.ScreenSide.TYPE_LEFT)
 				{
 					_label.transform.SetAsLastSibling();
 				}
@@ -126,9 +126,9 @@ namespace Nekki.SF2.GUI.Fight
 			UpdateSize();
 		}
 
-		private string GetSpriteName(ComboTypes LFLGCDNKNJI)
+		private string GetSpriteName(ComboTypes type)
 		{
-			switch (LFLGCDNKNJI)
+			switch (type)
 			{
 			case ComboTypes.TypeFirstStrike:
 				return "FightUI.First_Strike";

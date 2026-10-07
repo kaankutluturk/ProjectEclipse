@@ -121,11 +121,11 @@ public class PaymentInfo
 		}
 	}
 
-	private PaymentInfo(string ODJCLFJHKFP, string BGMLFNGKDHI, string DNHKNDPBGNM)
+	private PaymentInfo(string initialProductId, string initialPaymentId, string initialReceipt)
 	{
-		productId = ODJCLFJHKFP;
-		paymentId = BGMLFNGKDHI;
-		receipt = DNHKNDPBGNM;
+		productId = initialProductId;
+		paymentId = initialPaymentId;
+		receipt = initialReceipt;
 	}
 
 	public bool GetIsVerified()
@@ -193,51 +193,51 @@ public class PaymentInfo
 		isCheating = value;
 	}
 
-	public static PaymentInfo CreateNotVerified(string ODJCLFJHKFP, string BGMLFNGKDHI, string DNHKNDPBGNM, string BGLGHEMMANM)
+	public static PaymentInfo CreateNotVerified(string productId, string paymentId, string receipt, string signature)
 	{
-		PaymentInfo jLDHCFFAIPK = new PaymentInfo(ODJCLFJHKFP, BGMLFNGKDHI, DNHKNDPBGNM);
-		jLDHCFFAIPK.signature = BGLGHEMMANM;
-		jLDHCFFAIPK.verificationState = VerificationState.NotVerified;
-		jLDHCFFAIPK.isConfirmed = false;
-		return jLDHCFFAIPK;
+		PaymentInfo paymentInfo = new PaymentInfo(productId, paymentId, receipt);
+		paymentInfo.signature = signature;
+		paymentInfo.verificationState = VerificationState.NotVerified;
+		paymentInfo.isConfirmed = false;
+		return paymentInfo;
 	}
 
-	public static PaymentInfo CreateVerified(string ODJCLFJHKFP, string BGMLFNGKDHI, string DNHKNDPBGNM, string BGLGHEMMANM, string PPJBKHKCONC)
+	public static PaymentInfo CreateVerified(string productId, string paymentId, string receipt, string signature, string purchaseDate)
 	{
-		PaymentInfo jLDHCFFAIPK = new PaymentInfo(ODJCLFJHKFP, BGMLFNGKDHI, DNHKNDPBGNM);
-		jLDHCFFAIPK.signature = BGLGHEMMANM;
-		jLDHCFFAIPK.purchaseDate = PPJBKHKCONC;
-		jLDHCFFAIPK.verificationState = VerificationState.Verified;
-		jLDHCFFAIPK.isConfirmed = false;
-		return jLDHCFFAIPK;
+		PaymentInfo paymentInfo = new PaymentInfo(productId, paymentId, receipt);
+		paymentInfo.signature = signature;
+		paymentInfo.purchaseDate = purchaseDate;
+		paymentInfo.verificationState = VerificationState.Verified;
+		paymentInfo.isConfirmed = false;
+		return paymentInfo;
 	}
 
-	public static PaymentInfo CreateVerifiedConfirmed(string ODJCLFJHKFP, string BGMLFNGKDHI, string DNHKNDPBGNM, string BGLGHEMMANM, string PPJBKHKCONC)
+	public static PaymentInfo CreateVerifiedConfirmed(string productId, string paymentId, string receipt, string signature, string purchaseDate)
 	{
-		PaymentInfo jLDHCFFAIPK = new PaymentInfo(ODJCLFJHKFP, BGMLFNGKDHI, DNHKNDPBGNM);
-		jLDHCFFAIPK.signature = BGLGHEMMANM;
-		jLDHCFFAIPK.purchaseDate = PPJBKHKCONC;
-		jLDHCFFAIPK.verificationState = VerificationState.Verified;
-		jLDHCFFAIPK.isConfirmed = true;
-		return jLDHCFFAIPK;
+		PaymentInfo paymentInfo = new PaymentInfo(productId, paymentId, receipt);
+		paymentInfo.signature = signature;
+		paymentInfo.purchaseDate = purchaseDate;
+		paymentInfo.verificationState = VerificationState.Verified;
+		paymentInfo.isConfirmed = true;
+		return paymentInfo;
 	}
 
-	public static PaymentInfo CreateNotVerifiedProcessed(string ODJCLFJHKFP, string BGMLFNGKDHI, string DNHKNDPBGNM, string BGLGHEMMANM)
+	public static PaymentInfo CreateNotVerifiedProcessed(string productId, string paymentId, string receipt, string signature)
 	{
-		PaymentInfo jLDHCFFAIPK = new PaymentInfo(ODJCLFJHKFP, BGMLFNGKDHI, DNHKNDPBGNM);
-		jLDHCFFAIPK.signature = BGLGHEMMANM;
-		jLDHCFFAIPK.verificationState = VerificationState.NotVerified;
-		jLDHCFFAIPK.isConfirmed = false;
-		return jLDHCFFAIPK;
+		PaymentInfo paymentInfo = new PaymentInfo(productId, paymentId, receipt);
+		paymentInfo.signature = signature;
+		paymentInfo.verificationState = VerificationState.NotVerified;
+		paymentInfo.isConfirmed = false;
+		return paymentInfo;
 	}
 
-	public static PaymentInfo CreateVerificationFailed(string ODJCLFJHKFP, string BGMLFNGKDHI, string DNHKNDPBGNM, string BGLGHEMMANM)
+	public static PaymentInfo CreateVerificationFailed(string productId, string paymentId, string receipt, string signature)
 	{
-		PaymentInfo jLDHCFFAIPK = new PaymentInfo(ODJCLFJHKFP, BGMLFNGKDHI, DNHKNDPBGNM);
-		jLDHCFFAIPK.signature = BGLGHEMMANM;
-		jLDHCFFAIPK.verificationState = VerificationState.Failed;
-		jLDHCFFAIPK.isConfirmed = false;
-		return jLDHCFFAIPK;
+		PaymentInfo paymentInfo = new PaymentInfo(productId, paymentId, receipt);
+		paymentInfo.signature = signature;
+		paymentInfo.verificationState = VerificationState.Failed;
+		paymentInfo.isConfirmed = false;
+		return paymentInfo;
 	}
 
 	public void MarkVerificationFailed()
@@ -262,8 +262,8 @@ public class PaymentInfo
 		return string.Format("[PaymentInfo: IsConfirmed={0}, ProductID={1}, PaymentID={2}, IsVerified={3}, IsVerificationFailed={4}, IsCheating={5}]", GetIsConfirmed(), GetProductId(), GetPaymentId(), GetIsVerified(), GetIsVerificationFailed(), GetIsCheating());
 	}
 
-	public static string FormatReceipt(string DNHKNDPBGNM)
+	public static string FormatReceipt(string receipt)
 	{
-		return DNHKNDPBGNM;
+		return receipt;
 	}
 }

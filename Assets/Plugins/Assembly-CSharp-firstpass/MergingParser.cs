@@ -10,63 +10,63 @@ public sealed class MergingParser : IParser
 	{
 		private ParsingEvent clonedEvent;
 
-		public ParsingEvent Clone(ParsingEvent FOPOKALJIIJ)
+		public ParsingEvent Clone(ParsingEvent parsingEvent)
 		{
-			FOPOKALJIIJ.Accept(this);
+			parsingEvent.Accept(this);
 			return clonedEvent;
 		}
 
-		void IParsingEventVisitor.Visit(AnchorAlias FOPOKALJIIJ)
+		void IParsingEventVisitor.Visit(AnchorAlias anchorAlias)
 		{
-			clonedEvent = new AnchorAlias(FOPOKALJIIJ.GetValue(), FOPOKALJIIJ.GetStart(), FOPOKALJIIJ.GetEnd());
+			clonedEvent = new AnchorAlias(anchorAlias.GetValue(), anchorAlias.GetStart(), anchorAlias.GetEnd());
 		}
 
-		void IParsingEventVisitor.Visit(StreamStart FOPOKALJIIJ)
-		{
-			throw new NotSupportedException();
-		}
-
-		void IParsingEventVisitor.Visit(StreamEndEvent FOPOKALJIIJ)
+		void IParsingEventVisitor.Visit(StreamStart streamStart)
 		{
 			throw new NotSupportedException();
 		}
 
-		void IParsingEventVisitor.Visit(DocumentStart FOPOKALJIIJ)
+		void IParsingEventVisitor.Visit(StreamEndEvent streamEnd)
 		{
 			throw new NotSupportedException();
 		}
 
-		void IParsingEventVisitor.Visit(DocumentEnd FOPOKALJIIJ)
+		void IParsingEventVisitor.Visit(DocumentStart documentStart)
 		{
 			throw new NotSupportedException();
 		}
 
-		void IParsingEventVisitor.Visit(Scalar FOPOKALJIIJ)
+		void IParsingEventVisitor.Visit(DocumentEnd documentEnd)
 		{
-			clonedEvent = new Scalar(null, FOPOKALJIIJ.GetTag(), FOPOKALJIIJ.GetValue(), FOPOKALJIIJ.GetStyle(), FOPOKALJIIJ.GetIsPlainImplicit(), FOPOKALJIIJ.GetIsQuotedImplicit(), FOPOKALJIIJ.GetStart(), FOPOKALJIIJ.GetEnd());
+			throw new NotSupportedException();
 		}
 
-		void IParsingEventVisitor.Visit(SequenceStart FOPOKALJIIJ)
+		void IParsingEventVisitor.Visit(Scalar scalar)
 		{
-			clonedEvent = new SequenceStart(null, FOPOKALJIIJ.GetTag(), FOPOKALJIIJ.GetIsImplicit(), FOPOKALJIIJ.GetStyle(), FOPOKALJIIJ.GetStart(), FOPOKALJIIJ.GetEnd());
+			clonedEvent = new Scalar(null, scalar.GetTag(), scalar.GetValue(), scalar.GetStyle(), scalar.GetIsPlainImplicit(), scalar.GetIsQuotedImplicit(), scalar.GetStart(), scalar.GetEnd());
 		}
 
-		void IParsingEventVisitor.Visit(SequenceEnd FOPOKALJIIJ)
+		void IParsingEventVisitor.Visit(SequenceStart sequenceStart)
 		{
-			clonedEvent = new SequenceEnd(FOPOKALJIIJ.GetStart(), FOPOKALJIIJ.GetEnd());
+			clonedEvent = new SequenceStart(null, sequenceStart.GetTag(), sequenceStart.GetIsImplicit(), sequenceStart.GetStyle(), sequenceStart.GetStart(), sequenceStart.GetEnd());
 		}
 
-		void IParsingEventVisitor.Visit(MappingStart FOPOKALJIIJ)
+		void IParsingEventVisitor.Visit(SequenceEnd sequenceEnd)
 		{
-			clonedEvent = new MappingStart(null, FOPOKALJIIJ.GetTag(), FOPOKALJIIJ.GetIsImplicit(), FOPOKALJIIJ.GetStyle(), FOPOKALJIIJ.GetStart(), FOPOKALJIIJ.GetEnd());
+			clonedEvent = new SequenceEnd(sequenceEnd.GetStart(), sequenceEnd.GetEnd());
 		}
 
-		void IParsingEventVisitor.Visit(MappingEnd FOPOKALJIIJ)
+		void IParsingEventVisitor.Visit(MappingStart mappingStart)
 		{
-			clonedEvent = new MappingEnd(FOPOKALJIIJ.GetStart(), FOPOKALJIIJ.GetEnd());
+			clonedEvent = new MappingStart(null, mappingStart.GetTag(), mappingStart.GetIsImplicit(), mappingStart.GetStyle(), mappingStart.GetStart(), mappingStart.GetEnd());
 		}
 
-		void IParsingEventVisitor.Visit(Comment FOPOKALJIIJ)
+		void IParsingEventVisitor.Visit(MappingEnd mappingEnd)
+		{
+			clonedEvent = new MappingEnd(mappingEnd.GetStart(), mappingEnd.GetEnd());
+		}
+
+		void IParsingEventVisitor.Visit(Comment comment)
 		{
 			throw new NotSupportedException();
 		}
@@ -93,9 +93,9 @@ public sealed class MergingParser : IParser
 		}
 	}
 
-	public MergingParser(IParser FIMPGLKJDKK)
+	public MergingParser(IParser parser)
 	{
-		innerParser = FIMPGLKJDKK;
+		innerParser = parser;
 	}
 
 	public ParsingEvent GetCurrent()
@@ -118,35 +118,35 @@ public sealed class MergingParser : IParser
 			}
 			for (int num = events.Count - 2; num >= 0; num--)
 			{
-				Scalar lEACOCDHICF = events[num] as Scalar;
-				if (lEACOCDHICF == null || !(lEACOCDHICF.GetValue() == "<<"))
+				Scalar scalar = events[num] as Scalar;
+				if (scalar == null || !(scalar.GetValue() == "<<"))
 				{
 					continue;
 				}
-				AnchorAlias mBEGNNDMDKH = events[num + 1] as AnchorAlias;
-				if (mBEGNNDMDKH != null)
+				AnchorAlias anchorAlias = events[num + 1] as AnchorAlias;
+				if (anchorAlias != null)
 				{
-					IEnumerable<ParsingEvent> collection = GetMappingEvents(mBEGNNDMDKH.GetValue());
+					IEnumerable<ParsingEvent> collection = GetMappingEvents(anchorAlias.GetValue());
 					events.RemoveRange(num, 2);
 					events.InsertRange(num, collection);
 					continue;
 				}
-				SequenceStart jODGINIKFJF = events[num + 1] as SequenceStart;
-				if (jODGINIKFJF != null)
+				SequenceStart sequenceStart = events[num + 1] as SequenceStart;
+				if (sequenceStart != null)
 				{
 					List<IEnumerable<ParsingEvent>> list = new List<IEnumerable<ParsingEvent>>();
 					bool flag = false;
 					for (int i = num + 2; i < events.Count; i++)
 					{
-						mBEGNNDMDKH = events[i] as AnchorAlias;
-						if (mBEGNNDMDKH != null)
+						anchorAlias = events[i] as AnchorAlias;
+						if (anchorAlias != null)
 						{
-							list.Add(GetMappingEvents(mBEGNNDMDKH.GetValue()));
+							list.Add(GetMappingEvents(anchorAlias.GetValue()));
 						}
 						else if (events[i] is SequenceEnd)
 						{
 							events.RemoveRange(num, i - num + 1);
-							events.InsertRange(num, list.SelectMany((IEnumerable<ParsingEvent> FOPOKALJIIJ) => FOPOKALJIIJ));
+							events.InsertRange(num, list.SelectMany((IEnumerable<ParsingEvent> mappingEvents) => mappingEvents));
 							flag = true;
 							break;
 						}
@@ -156,7 +156,7 @@ public sealed class MergingParser : IParser
 						continue;
 					}
 				}
-				throw new SemanticErrorException(lEACOCDHICF.GetStart(), lEACOCDHICF.GetEnd(), "Unrecognized merge key pattern");
+				throw new SemanticErrorException(scalar.GetStart(), scalar.GetEnd(), "Unrecognized merge key pattern");
 			}
 		}
 		int num2 = _currentIndex + 1;
@@ -171,13 +171,13 @@ public sealed class MergingParser : IParser
 
 	private IEnumerable<ParsingEvent> GetMappingEvents(string mappingAlias)
 	{
-		ParsingEventCloner PFCAJIFNHMC = new ParsingEventCloner();
+		ParsingEventCloner cloner = new ParsingEventCloner();
 		int nesting = 0;
-		return (from FOPOKALJIIJ in events.SkipWhile((ParsingEvent FOPOKALJIIJ) =>
+		return (from parsingEvent in events.SkipWhile((ParsingEvent parsingEvent) =>
 			{
-				MappingStart oGMPNFCPPDH = FOPOKALJIIJ as MappingStart;
-				return oGMPNFCPPDH == null || oGMPNFCPPDH.GetAnchor() != mappingAlias;
-			}).Skip(1).TakeWhile((ParsingEvent FOPOKALJIIJ) => (nesting += FOPOKALJIIJ.GetNestingIncrease()) >= 0)
-			select PFCAJIFNHMC.Clone(FOPOKALJIIJ)).ToList();
+				MappingStart mappingStart = parsingEvent as MappingStart;
+				return mappingStart == null || mappingStart.GetAnchor() != mappingAlias;
+			}).Skip(1).TakeWhile((ParsingEvent parsingEvent) => (nesting += parsingEvent.GetNestingIncrease()) >= 0)
+			select cloner.Clone(parsingEvent)).ToList();
 	}
 }

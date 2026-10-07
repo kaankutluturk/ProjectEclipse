@@ -96,24 +96,24 @@ internal class GZipCompressionStream : Stream
 		}
 	}
 
-	public GZipCompressionStream(Stream ABJIEFMMIEK, ZlibCompressionMode NMMPBADCFHK)
-		: this(ABJIEFMMIEK, NMMPBADCFHK, ZlibCompressionLevel.Default, false)
+	public GZipCompressionStream(Stream stream, ZlibCompressionMode mode)
+		: this(stream, mode, ZlibCompressionLevel.Default, false)
 	{
 	}
 
-	public GZipCompressionStream(Stream ABJIEFMMIEK, ZlibCompressionMode NMMPBADCFHK, ZlibCompressionLevel GNLOCMLBNHF)
-		: this(ABJIEFMMIEK, NMMPBADCFHK, GNLOCMLBNHF, false)
+	public GZipCompressionStream(Stream stream, ZlibCompressionMode mode, ZlibCompressionLevel level)
+		: this(stream, mode, level, false)
 	{
 	}
 
-	public GZipCompressionStream(Stream ABJIEFMMIEK, ZlibCompressionMode NMMPBADCFHK, bool LOLBAGJKKPH)
-		: this(ABJIEFMMIEK, NMMPBADCFHK, ZlibCompressionLevel.Default, LOLBAGJKKPH)
+	public GZipCompressionStream(Stream stream, ZlibCompressionMode mode, bool leaveOpen)
+		: this(stream, mode, ZlibCompressionLevel.Default, leaveOpen)
 	{
 	}
 
-	public GZipCompressionStream(Stream ABJIEFMMIEK, ZlibCompressionMode NMMPBADCFHK, ZlibCompressionLevel GNLOCMLBNHF, bool LOLBAGJKKPH)
+	public GZipCompressionStream(Stream stream, ZlibCompressionMode mode, ZlibCompressionLevel level, bool leaveOpen)
 	{
-		_baseStream = new ZlibBaseStream(ABJIEFMMIEK, NMMPBADCFHK, GNLOCMLBNHF, ZlibStreamFlavor.GZIP, LOLBAGJKKPH);
+		_baseStream = new ZlibBaseStream(stream, mode, level, ZlibStreamFlavor.GZIP, leaveOpen);
 	}
 
 	public string GetComment()
@@ -210,13 +210,13 @@ internal class GZipCompressionStream : Stream
 		return _baseStream._z.TotalBytesOut;
 	}
 
-	protected override void Dispose(bool KLCPNDHEBGP)
+	protected override void Dispose(bool disposing)
 	{
 		try
 		{
 			if (!_disposed)
 			{
-				if (KLCPNDHEBGP && _baseStream != null)
+				if (disposing && _baseStream != null)
 				{
 					_baseStream.Close();
 					_crc32 = _baseStream.GetCrc32();
@@ -226,7 +226,7 @@ internal class GZipCompressionStream : Stream
 		}
 		finally
 		{
-			base.Dispose(KLCPNDHEBGP);
+			base.Dispose(disposing);
 		}
 	}
 
@@ -267,7 +267,7 @@ internal class GZipCompressionStream : Stream
 		}
 		_baseStream.Flush();
 	}
-	public override int Read(byte[] buffer, int IPCOBJBKNAO, int count)
+	public override int Read(byte[] buffer, int offset, int count)
 	{
 		if (_disposed)
 		{
@@ -277,7 +277,7 @@ internal class GZipCompressionStream : Stream
 		{
 			throw new InvalidOperationException("Cannot Read after Writing.");
 		}
-		return _baseStream.Read(buffer, IPCOBJBKNAO, count);
+		return _baseStream.Read(buffer, offset, count);
 	}
 
 
@@ -308,7 +308,7 @@ internal class GZipCompressionStream : Stream
 		}
 	}
 
-	public override long Seek(long IPCOBJBKNAO, SeekOrigin IKOOJMAOFOD)
+	public override long Seek(long offset, SeekOrigin origin)
 	{
 		throw new NotImplementedException();
 	}
@@ -318,7 +318,7 @@ internal class GZipCompressionStream : Stream
 		throw new NotImplementedException();
 	}
 
-	public override void Write(byte[] buffer, int IPCOBJBKNAO, int count)
+	public override void Write(byte[] buffer, int offset, int count)
 	{
 		if (_disposed)
 		{
@@ -332,7 +332,7 @@ internal class GZipCompressionStream : Stream
 			}
 			_headerByteCount = EmitHeader();
 		}
-		_baseStream.Write(buffer, IPCOBJBKNAO, count);
+		_baseStream.Write(buffer, offset, count);
 	}
 
 	private int EmitHeader()
@@ -382,41 +382,41 @@ internal class GZipCompressionStream : Stream
 		return array3.Length;
 	}
 
-	public static byte[] CompressString(string JDCCBCNFENK)
+	public static byte[] CompressString(string text)
 	{
 		using (MemoryStream memoryStream = new MemoryStream())
 		{
-			Stream aBKOBELCOIK = new GZipCompressionStream(memoryStream, ZlibCompressionMode.Compress, ZlibCompressionLevel.BestCompression);
-			ZlibBaseStream.CompressString(JDCCBCNFENK, aBKOBELCOIK);
+			Stream compressor = new GZipCompressionStream(memoryStream, ZlibCompressionMode.Compress, ZlibCompressionLevel.BestCompression);
+			ZlibBaseStream.CompressString(text, compressor);
 			return memoryStream.ToArray();
 		}
 	}
 
-	public static byte[] CompressBuffer(byte[] AAOIAEJJINO)
+	public static byte[] CompressBuffer(byte[] buffer)
 	{
 		using (MemoryStream memoryStream = new MemoryStream())
 		{
-			Stream aBKOBELCOIK = new GZipCompressionStream(memoryStream, ZlibCompressionMode.Compress, ZlibCompressionLevel.BestCompression);
-			ZlibBaseStream.CompressBuffer(AAOIAEJJINO, aBKOBELCOIK);
+			Stream compressor = new GZipCompressionStream(memoryStream, ZlibCompressionMode.Compress, ZlibCompressionLevel.BestCompression);
+			ZlibBaseStream.CompressBuffer(buffer, compressor);
 			return memoryStream.ToArray();
 		}
 	}
 
-	public static string UncompressString(byte[] FCPABLANKDN)
+	public static string UncompressString(byte[] compressed)
 	{
-		using (MemoryStream aBJIEFMMIEK = new MemoryStream(FCPABLANKDN))
+		using (MemoryStream input = new MemoryStream(compressed))
 		{
-			Stream iNIMCIOFFCJ = new GZipCompressionStream(aBJIEFMMIEK, ZlibCompressionMode.Decompress);
-			return ZlibBaseStream.UncompressString(FCPABLANKDN, iNIMCIOFFCJ);
+			Stream decompressor = new GZipCompressionStream(input, ZlibCompressionMode.Decompress);
+			return ZlibBaseStream.UncompressString(compressed, decompressor);
 		}
 	}
 
-	public static byte[] UncompressBuffer(byte[] FCPABLANKDN)
+	public static byte[] UncompressBuffer(byte[] compressed)
 	{
-		using (MemoryStream aBJIEFMMIEK = new MemoryStream(FCPABLANKDN))
+		using (MemoryStream input = new MemoryStream(compressed))
 		{
-			Stream iNIMCIOFFCJ = new GZipCompressionStream(aBJIEFMMIEK, ZlibCompressionMode.Decompress);
-			return ZlibBaseStream.UncompressBuffer(FCPABLANKDN, iNIMCIOFFCJ);
+			Stream decompressor = new GZipCompressionStream(input, ZlibCompressionMode.Decompress);
+			return ZlibBaseStream.UncompressBuffer(compressed, decompressor);
 		}
 	}
 }

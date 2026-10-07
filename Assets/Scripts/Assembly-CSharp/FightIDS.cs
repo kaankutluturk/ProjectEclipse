@@ -37,19 +37,19 @@ public class FightIDS
 		Clear();
 	}
 
-	public FightIDS(string DIAIIPCBMFL)
+	public FightIDS(string idText)
 	{
-		SetFightIDSByString(DIAIIPCBMFL);
+		SetFightIDSByString(idText);
 	}
 
-	public FightIDS(FightIDS MMEJHKCKFDD)
+	public FightIDS(FightIDS other)
 	{
-		SetFightIDSByString(MMEJHKCKFDD.ToString());
+		SetFightIDSByString(other.ToString());
 	}
 
-	public FightIDS(string HLJKOKMKMLM, string DPOOIONCEOA, string fight)
+	public FightIDS(string zoneId, string battleId, string fight)
 	{
-		SetFightIDSByZBF(HLJKOKMKMLM, DPOOIONCEOA, fight);
+		SetFightIDSByZBF(zoneId, battleId, fight);
 	}
 
 	public string GetZone()
@@ -90,41 +90,41 @@ public class FightIDS
 		}
 	}
 
-	public void SetFightIDSByZBF(string HLJKOKMKMLM, string DPOOIONCEOA, string fight)
+	public void SetFightIDSByZBF(string zoneId, string battleId, string fight)
 	{
-		zone = ((HLJKOKMKMLM == null) ? string.Empty : HLJKOKMKMLM);
-		battle = ((DPOOIONCEOA == null) ? string.Empty : DPOOIONCEOA);
+		zone = ((zoneId == null) ? string.Empty : zoneId);
+		battle = ((battleId == null) ? string.Empty : battleId);
 		fightIdRaw = ((fight == null) ? string.Empty : fight);
 		UpdateFullId();
 	}
 
-	public bool Equals(string DIAIIPCBMFL)
+	public bool Equals(string idText)
 	{
-		return ToString() == DIAIIPCBMFL;
+		return ToString() == idText;
 	}
 
-	public bool Equals(FightIDS DIAIIPCBMFL)
+	public bool Equals(FightIDS other)
 	{
-		return Equals(DIAIIPCBMFL.ToString());
+		return Equals(other.ToString());
 	}
 
-	public bool Equals(string HLJKOKMKMLM, string DPOOIONCEOA, string fight)
+	public bool Equals(string zoneId, string battleId, string fight)
 	{
-		return HLJKOKMKMLM.Equals(zone) && DPOOIONCEOA.Equals(battle) && fight.Equals(fightIdRaw);
+		return zoneId.Equals(zone) && battleId.Equals(battle) && fight.Equals(fightIdRaw);
 	}
 
-	public bool EqualsZoneBattle(string DIAIIPCBMFL)
+	public bool EqualsZoneBattle(string zoneBattleText)
 	{
-		string[] array = DIAIIPCBMFL.Split('|');
+		string[] array = zoneBattleText.Split('|');
 		int num = array.Length;
-		string hLJKOKMKMLM = ((num <= 0) ? string.Empty : array[0]);
-		string dPOOIONCEOA = ((num <= 1) ? string.Empty : array[1]);
-		return EqualsZoneBattle(hLJKOKMKMLM, dPOOIONCEOA);
+		string zoneId = ((num <= 0) ? string.Empty : array[0]);
+		string battleId = ((num <= 1) ? string.Empty : array[1]);
+		return EqualsZoneBattle(zoneId, battleId);
 	}
 
-	public bool EqualsZoneBattle(string HLJKOKMKMLM, string DPOOIONCEOA)
+	public bool EqualsZoneBattle(string zoneId, string battleId)
 	{
-		return HLJKOKMKMLM.Equals(zone) && DPOOIONCEOA.Equals(battle);
+		return zoneId.Equals(zone) && battleId.Equals(battle);
 	}
 
 	public void Clear()
@@ -142,9 +142,9 @@ public class FightIDS
 
 	public static FightIDS Empty()
 	{
-		FightIDS mOCEDDJOAEB = new FightIDS();
-		mOCEDDJOAEB.Clear();
-		return mOCEDDJOAEB;
+		FightIDS empty = new FightIDS();
+		empty.Clear();
+		return empty;
 	}
 
 	private void UpdateFullId()

@@ -4,8 +4,8 @@ public class TacticRule : InFightRule
 {
 	private string _tacticName;
 
-	public TacticRule(XmlNode node, RuleAppliance EJPOJJKKICO = RuleAppliance.ApplianceOpponent)
-		: base(RuleType.RuleTactic, EJPOJJKKICO, node)
+	public TacticRule(XmlNode node, RuleAppliance ruleAppliance = RuleAppliance.ApplianceOpponent)
+		: base(RuleType.RuleTactic, ruleAppliance, node)
 	{
 		Parse(node);
 	}
@@ -22,11 +22,11 @@ public class TacticRule : InFightRule
 
 	public override InFightRule Copy()
 	{
-		InFightRule aAJIFBJLJOA = null;
-		RuleAppliance eJPOJJKKICO = GetAppliance();
-		XmlNode hKPPBKPJOEO = GetXmlSource().GetNode();
-		aAJIFBJLJOA = new TacticRule(hKPPBKPJOEO, eJPOJJKKICO);
-		aAJIFBJLJOA.IsRandom = IsRandom;
-		return aAJIFBJLJOA;
+		InFightRule copiedRule = null;
+		RuleAppliance ruleAppliance = GetAppliance();
+		XmlNode ruleNode = GetXmlSource().GetNode();
+		copiedRule = new TacticRule(ruleNode, ruleAppliance);
+		copiedRule.IsRandom = IsRandom;
+		return copiedRule;
 	}
 }

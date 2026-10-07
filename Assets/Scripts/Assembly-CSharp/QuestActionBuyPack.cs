@@ -8,24 +8,24 @@ public class QuestActionBuyPack : QuestAction
 
 	private QuestActionsSequence errorSequence = new QuestActionsSequence();
 
-	public override void Parse(XmlNode EPKLCPOEELO)
+	public override void Parse(XmlNode node)
 	{
-		base.Parse(EPKLCPOEELO);
-		_PackName = EPKLCPOEELO.Attributes["PackName"].GetStringOrDefault(string.Empty);
-		XmlNode ePKLCPOEELO = EPKLCPOEELO["Success"];
-		XmlNode ePKLCPOEELO2 = EPKLCPOEELO["Error"];
-		ParseSequenceWithUnlock(ePKLCPOEELO, successSequence, OnActionComplete);
+		base.Parse(node);
+		_PackName = node.Attributes["PackName"].GetStringOrDefault(string.Empty);
+		XmlNode successNode = node["Success"];
+		XmlNode ePKLCPOEELO2 = node["Error"];
+		ParseSequenceWithUnlock(successNode, successSequence, OnActionComplete);
 		ParseSequenceWithUnlock(ePKLCPOEELO2, errorSequence, OnActionComplete);
 	}
 
-	public override void Execute(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters parameters)
 	{
 		ResetSequences();
-		base.Execute(GFIHPBCEEOB);
-		ConditionExtension.CompareResult bMDEBHIHIAJ = new ConditionExtension.CompareResult();
-		QuestCondition kKDGLNECFHA = new QuestCondition();
-		kKDGLNECFHA.SetParameters(GFIHPBCEEOB);
-		kKDGLNECFHA.SetValue(_PackName, bMDEBHIHIAJ);
+		base.Execute(parameters);
+		ConditionExtension.CompareResult result = new ConditionExtension.CompareResult();
+		QuestCondition condition = new QuestCondition();
+		condition.SetParameters(parameters);
+		condition.SetValue(_PackName, result);
 	}
 
 	public override void ResetSequences()

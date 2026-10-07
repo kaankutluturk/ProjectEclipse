@@ -164,13 +164,13 @@ public class DefaultLogger : ILogger
 		formatEx = value;
 	}
 
-	public void Verbose(string HMHPCGBCNGI, string POOAFNBCFHM)
+	public void Verbose(string division, string message)
 	{
 		if (GetLevel() <= Loglevels.All)
 		{
 			try
 			{
-				AdvLog.Log(string.Format(GetFormatVerbose(), HMHPCGBCNGI, POOAFNBCFHM));
+				AdvLog.Log(string.Format(GetFormatVerbose(), division, message));
 			}
 			catch
 			{
@@ -178,13 +178,13 @@ public class DefaultLogger : ILogger
 		}
 	}
 
-	public void Information(string HMHPCGBCNGI, string EMBBNNBFODN)
+	public void Information(string division, string message)
 	{
 		if (GetLevel() <= Loglevels.Information)
 		{
 			try
 			{
-				AdvLog.Log(string.Format(GetFormatInfo(), HMHPCGBCNGI, EMBBNNBFODN));
+				AdvLog.Log(string.Format(GetFormatInfo(), division, message));
 			}
 			catch
 			{
@@ -192,13 +192,13 @@ public class DefaultLogger : ILogger
 		}
 	}
 
-	public void Warning(string HMHPCGBCNGI, string EPMNBLHHAHF)
+	public void Warning(string division, string message)
 	{
 		if (GetLevel() <= Loglevels.Warning)
 		{
 			try
 			{
-				AdvLog.LogWarning(string.Format(GetFormatWarn(), HMHPCGBCNGI, EPMNBLHHAHF));
+				AdvLog.LogWarning(string.Format(GetFormatWarn(), division, message));
 			}
 			catch
 			{
@@ -206,13 +206,13 @@ public class DefaultLogger : ILogger
 		}
 	}
 
-	public void Error(string HMHPCGBCNGI, string KEPBNIIECPN)
+	public void Error(string division, string message)
 	{
 		if (GetLevel() <= Loglevels.Error)
 		{
 			try
 			{
-				AdvLog.LogError(string.Format(GetFormatErr(), HMHPCGBCNGI, KEPBNIIECPN));
+				AdvLog.LogError(string.Format(GetFormatErr(), division, message));
 			}
 			catch
 			{
@@ -220,13 +220,13 @@ public class DefaultLogger : ILogger
 		}
 	}
 
-	public void Exception(string HMHPCGBCNGI, string CKEHOEGLMBM, Exception MPFFFAOGBJE)
+	public void Exception(string division, string message, Exception exception)
 	{
 		if (GetLevel() <= Loglevels.Exception)
 		{
 			try
 			{
-				AdvLog.LogError(string.Format(GetFormatEx(), HMHPCGBCNGI, CKEHOEGLMBM, (MPFFFAOGBJE == null) ? "null" : MPFFFAOGBJE.Message, (MPFFFAOGBJE == null) ? "null" : MPFFFAOGBJE.StackTrace));
+				AdvLog.LogError(string.Format(GetFormatEx(), division, message, (exception == null) ? "null" : exception.Message, (exception == null) ? "null" : exception.StackTrace));
 			}
 			catch
 			{

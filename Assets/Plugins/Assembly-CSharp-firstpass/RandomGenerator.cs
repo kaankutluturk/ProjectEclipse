@@ -6,9 +6,9 @@ public class RandomGenerator
 
 	private uint _seed;
 
-	public RandomGenerator(uint OKGKLCLEDFN)
+	public RandomGenerator(uint seed)
 	{
-		setSeed(OKGKLCLEDFN);
+		setSeed(seed);
 	}
 
 	public uint NextRandom()
@@ -22,16 +22,16 @@ public class RandomGenerator
 		return _seed;
 	}
 
-	public void setSeed(uint OKGKLCLEDFN)
+	public void setSeed(uint seed)
 	{
-		_seed = OKGKLCLEDFN;
-		_state = OKGKLCLEDFN;
+		_seed = seed;
+		_state = seed;
 	}
 
-	public uint randLCG(uint DGNDGHPMPJD)
+	public uint randLCG(uint current)
 	{
-		DGNDGHPMPJD = (DGNDGHPMPJD * 1103515245 + 12345) & 0x7FFFFFFF;
-		return DGNDGHPMPJD;
+		current = (current * 1103515245 + 12345) & 0x7FFFFFFF;
+		return current;
 	}
 
 	public static uint GetMaxValue()

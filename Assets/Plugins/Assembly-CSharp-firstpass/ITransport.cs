@@ -18,9 +18,9 @@ public interface ITransport
 
 	void Poll();
 
-	void Send(Packet NPKADBPBKIG);
+	void Send(Packet packet);
 
-	void Send(List<Packet> DPGGBKDLDJE);
+	void Send(List<Packet> packets);
 
 	void Close();
 }

@@ -242,24 +242,24 @@ internal sealed class InfTree
 
 	internal int[] x;
 
-	private int huft_build(int[] AAOIAEJJINO, int ENHNNLJLKCI, int HDKKKCDKFEE, int JDCCBCNFENK, int[] d, int[] FOPOKALJIIJ, int[] GNAONAPDDLD, int[] OFBGCEPCNOL, int[] JNNBEHPCCOB, int[] MNBNAEAJGCA, int[] AFIEJABPAKA)
+	private int huft_build(int[] lengths, int lengthsOffset, int codeCount, int simpleCodeCount, int[] d, int[] extraBits, int[] tableIndex, int[] bitsLimit, int[] huffmanTable, int[] tableUsed, int[] valueScratch)
 	{
 		int num = 0;
-		int num2 = HDKKKCDKFEE;
+		int num2 = codeCount;
 		do
 		{
-			BitLengthCounts[AAOIAEJJINO[ENHNNLJLKCI + num]]++;
+			BitLengthCounts[lengths[lengthsOffset + num]]++;
 			num++;
 			num2--;
 		}
 		while (num2 != 0);
-		if (BitLengthCounts[0] == HDKKKCDKFEE)
+		if (BitLengthCounts[0] == codeCount)
 		{
-			GNAONAPDDLD[0] = -1;
-			OFBGCEPCNOL[0] = 0;
+			tableIndex[0] = -1;
+			bitsLimit[0] = 0;
 			return 0;
 		}
-		int num3 = OFBGCEPCNOL[0];
+		int num3 = bitsLimit[0];
 		int i;
 		for (i = 1; i <= 15 && BitLengthCounts[i] == 0; i++)
 		{
@@ -279,7 +279,7 @@ internal sealed class InfTree
 		{
 			num3 = num2;
 		}
-		OFBGCEPCNOL[0] = num3;
+		bitsLimit[0] = num3;
 		int num5 = 1 << i;
 		while (i < num2)
 		{
@@ -308,14 +308,14 @@ internal sealed class InfTree
 		num = 0;
 		do
 		{
-			if ((i = AAOIAEJJINO[ENHNNLJLKCI + num]) != 0)
+			if ((i = lengths[lengthsOffset + num]) != 0)
 			{
-				AFIEJABPAKA[x[i]++] = num2;
+				valueScratch[x[i]++] = num2;
 			}
 			num++;
 		}
-		while (++num2 < HDKKKCDKFEE);
-		HDKKKCDKFEE = x[num4];
+		while (++num2 < codeCount);
+		codeCount = x[num4];
 		num2 = (x[0] = 0);
 		num = 0;
 		int num7 = -1;
@@ -348,12 +348,12 @@ internal sealed class InfTree
 						}
 					}
 					num10 = 1 << i;
-					if (MNBNAEAJGCA[0] + num10 > 1440)
+					if (tableUsed[0] + num10 > 1440)
 					{
 						return -3;
 					}
-					num9 = (u[num7] = MNBNAEAJGCA[0]);
-					MNBNAEAJGCA[0] += num10;
+					num9 = (u[num7] = tableUsed[0]);
+					tableUsed[0] += num10;
 					if (num7 != 0)
 					{
 						x[num7] = num2;
@@ -361,32 +361,32 @@ internal sealed class InfTree
 						TableEntryScratch[1] = (sbyte)num3;
 						i = SharedUtils.URShift(num2, num8 - num3);
 						TableEntryScratch[2] = num9 - u[num7 - 1] - i;
-						Array.Copy(TableEntryScratch, 0, JNNBEHPCCOB, (u[num7 - 1] + i) * 3, 3);
+						Array.Copy(TableEntryScratch, 0, huffmanTable, (u[num7 - 1] + i) * 3, 3);
 					}
 					else
 					{
-						GNAONAPDDLD[0] = num9;
+						tableIndex[0] = num9;
 					}
 				}
 				TableEntryScratch[1] = (sbyte)(j - num8);
-				if (num >= HDKKKCDKFEE)
+				if (num >= codeCount)
 				{
 					TableEntryScratch[0] = 192;
 				}
-				else if (AFIEJABPAKA[num] < JDCCBCNFENK)
+				else if (valueScratch[num] < simpleCodeCount)
 				{
-					TableEntryScratch[0] = (sbyte)((AFIEJABPAKA[num] >= 256) ? 96 : 0);
-					TableEntryScratch[2] = AFIEJABPAKA[num++];
+					TableEntryScratch[0] = (sbyte)((valueScratch[num] >= 256) ? 96 : 0);
+					TableEntryScratch[2] = valueScratch[num++];
 				}
 				else
 				{
-					TableEntryScratch[0] = (sbyte)(FOPOKALJIIJ[AFIEJABPAKA[num] - JDCCBCNFENK] + 16 + 64);
-					TableEntryScratch[2] = d[AFIEJABPAKA[num++] - JDCCBCNFENK];
+					TableEntryScratch[0] = (sbyte)(extraBits[valueScratch[num] - simpleCodeCount] + 16 + 64);
+					TableEntryScratch[2] = d[valueScratch[num++] - simpleCodeCount];
 				}
 				num12 = 1 << j - num8;
 				for (i = SharedUtils.URShift(num2, num8); i < num10; i += num12)
 				{
-					Array.Copy(TableEntryScratch, 0, JNNBEHPCCOB, (num9 + i) * 3, 3);
+					Array.Copy(TableEntryScratch, 0, huffmanTable, (num9 + i) * 3, 3);
 				}
 				i = 1 << j - 1;
 				while ((num2 & i) != 0)
@@ -407,37 +407,37 @@ internal sealed class InfTree
 		return (num5 != 0 && num4 != 1) ? (-5) : 0;
 	}
 
-	internal int inflate_trees_bits(int[] ILHDJDNPFKH, int[] KKFMKNCBLDC, int[] ILPHPGNPGAE, int[] JNNBEHPCCOB, ZlibCodec LKPCKJOLJDO)
+	internal int inflate_trees_bits(int[] codeLengths, int[] bitLengthBits, int[] tableIndex, int[] huffmanTable, ZlibCodec codec)
 	{
 		initWorkArea(19);
 		hn[0] = 0;
-		int num = huft_build(ILHDJDNPFKH, 0, 19, 19, null, null, ILPHPGNPGAE, KKFMKNCBLDC, JNNBEHPCCOB, hn, v);
+		int num = huft_build(codeLengths, 0, 19, 19, null, null, tableIndex, bitLengthBits, huffmanTable, hn, v);
 		if (num == -3)
 		{
-			LKPCKJOLJDO.Message = "oversubscribed dynamic bit lengths tree";
+			codec.Message = "oversubscribed dynamic bit lengths tree";
 		}
-		else if (num == -5 || KKFMKNCBLDC[0] == 0)
+		else if (num == -5 || bitLengthBits[0] == 0)
 		{
-			LKPCKJOLJDO.Message = "incomplete dynamic bit lengths tree";
+			codec.Message = "incomplete dynamic bit lengths tree";
 			num = -3;
 		}
 		return num;
 	}
 
-	internal int inflate_trees_dynamic(int BIFPNHEPFNI, int FIOKFKIJFNF, int[] ILHDJDNPFKH, int[] GGEJHHHGPKN, int[] NBHIKILKMED, int[] AEFHBJIMPHM, int[] GICLKGGKJAG, int[] JNNBEHPCCOB, ZlibCodec LKPCKJOLJDO)
+	internal int inflate_trees_dynamic(int literalCount, int distanceCount, int[] codeLengths, int[] literalBits, int[] distanceBits, int[] literalTable, int[] distanceTable, int[] huffmanTable, ZlibCodec codec)
 	{
 		initWorkArea(288);
 		hn[0] = 0;
-		int num = huft_build(ILHDJDNPFKH, 0, BIFPNHEPFNI, 257, cplens, cplext, AEFHBJIMPHM, GGEJHHHGPKN, JNNBEHPCCOB, hn, v);
-		if (num != 0 || GGEJHHHGPKN[0] == 0)
+		int num = huft_build(codeLengths, 0, literalCount, 257, cplens, cplext, literalTable, literalBits, huffmanTable, hn, v);
+		if (num != 0 || literalBits[0] == 0)
 		{
 			switch (num)
 			{
 			case -3:
-				LKPCKJOLJDO.Message = "oversubscribed literal/length tree";
+				codec.Message = "oversubscribed literal/length tree";
 				break;
 			default:
-				LKPCKJOLJDO.Message = "incomplete literal/length tree";
+				codec.Message = "incomplete literal/length tree";
 				num = -3;
 				break;
 			case -4:
@@ -446,20 +446,20 @@ internal sealed class InfTree
 			return num;
 		}
 		initWorkArea(288);
-		num = huft_build(ILHDJDNPFKH, BIFPNHEPFNI, FIOKFKIJFNF, 0, cpdist, cpdext, GICLKGGKJAG, NBHIKILKMED, JNNBEHPCCOB, hn, v);
-		if (num != 0 || (NBHIKILKMED[0] == 0 && BIFPNHEPFNI > 257))
+		num = huft_build(codeLengths, literalCount, distanceCount, 0, cpdist, cpdext, distanceTable, distanceBits, huffmanTable, hn, v);
+		if (num != 0 || (distanceBits[0] == 0 && literalCount > 257))
 		{
 			switch (num)
 			{
 			case -3:
-				LKPCKJOLJDO.Message = "oversubscribed distance tree";
+				codec.Message = "oversubscribed distance tree";
 				break;
 			case -5:
-				LKPCKJOLJDO.Message = "incomplete distance tree";
+				codec.Message = "incomplete distance tree";
 				num = -3;
 				break;
 			default:
-				LKPCKJOLJDO.Message = "empty distance tree with lengths";
+				codec.Message = "empty distance tree with lengths";
 				num = -3;
 				break;
 			case -4:
@@ -470,32 +470,32 @@ internal sealed class InfTree
 		return 0;
 	}
 
-	internal static int inflate_trees_fixed(int[] GGEJHHHGPKN, int[] NBHIKILKMED, int[][] AEFHBJIMPHM, int[][] GICLKGGKJAG, ZlibCodec LKPCKJOLJDO)
+	internal static int inflate_trees_fixed(int[] literalBits, int[] distanceBits, int[][] literalTable, int[][] distanceTable, ZlibCodec codec)
 	{
-		GGEJHHHGPKN[0] = 9;
-		NBHIKILKMED[0] = 5;
-		AEFHBJIMPHM[0] = fixed_tl;
-		GICLKGGKJAG[0] = fixed_td;
+		literalBits[0] = 9;
+		distanceBits[0] = 5;
+		literalTable[0] = fixed_tl;
+		distanceTable[0] = fixed_td;
 		return 0;
 	}
 
-	private void initWorkArea(int IJFMGIJHHGE)
+	private void initWorkArea(int workAreaSize)
 	{
 		if (hn == null)
 		{
 			hn = new int[1];
-			v = new int[IJFMGIJHHGE];
+			v = new int[workAreaSize];
 			BitLengthCounts = new int[16];
 			TableEntryScratch = new int[3];
 			u = new int[15];
 			x = new int[16];
 			return;
 		}
-		if (v.Length < IJFMGIJHHGE)
+		if (v.Length < workAreaSize)
 		{
-			v = new int[IJFMGIJHHGE];
+			v = new int[workAreaSize];
 		}
-		Array.Clear(v, 0, IJFMGIJHHGE);
+		Array.Clear(v, 0, workAreaSize);
 		Array.Clear(BitLengthCounts, 0, 16);
 		TableEntryScratch[0] = 0;
 		TableEntryScratch[1] = 0;

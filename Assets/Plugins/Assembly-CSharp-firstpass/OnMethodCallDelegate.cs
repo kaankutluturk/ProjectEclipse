@@ -1,1 +1,1 @@
-public delegate void OnMethodCallDelegate(Hub CGFIJCNNCKP, string FJLOLCPJACB, params object[] LKIOKGCNKHE);
+public delegate void OnMethodCallDelegate(Hub hub, string method, params object[] args);

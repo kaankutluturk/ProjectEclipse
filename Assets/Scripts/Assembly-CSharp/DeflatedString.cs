@@ -15,14 +15,14 @@ public class DeflatedString
 		return _Node;
 	}
 
-	public static string NodeToString(XmlNode node, int FCOACAMEHOE = 0)
+	public static string NodeToString(XmlNode node, int indentation = 0)
 	{
 		using (StringWriter stringWriter = new StringWriter())
 		{
 			using (XmlTextWriter xmlTextWriter = new XmlTextWriter(stringWriter))
 			{
 				xmlTextWriter.Formatting = Formatting.Indented;
-				xmlTextWriter.Indentation = FCOACAMEHOE;
+				xmlTextWriter.Indentation = indentation;
 				node.WriteTo(xmlTextWriter);
 			}
 			return stringWriter.ToString();

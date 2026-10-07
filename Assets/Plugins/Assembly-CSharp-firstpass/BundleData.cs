@@ -12,20 +12,20 @@ public class BundleData
 
 	public string[] Dependencies;
 
-	public BundleData(string HDPBNCNCMOH, Dictionary<string, string> ILLOMIIOHEH, string[] PPGKJCOMHAA)
+	public BundleData(string hash, Dictionary<string, string> labels, string[] dependencies)
 	{
-		Hash = HDPBNCNCMOH;
-		Labels = ILLOMIIOHEH;
-		Dependencies = PPGKJCOMHAA;
+		Hash = hash;
+		Labels = labels;
+		Dependencies = dependencies;
 		Available = false;
 	}
 
-	public bool IsSupportedForValue(int PPBIPCKMFKB)
+	public bool IsSupportedForValue(int intValue)
 	{
 		return true;
 	}
 
-	public bool IsAllowedForValue(int EILBNEKNAMO)
+	public bool IsAllowedForValue(int intValue)
 	{
 		return true;
 	}

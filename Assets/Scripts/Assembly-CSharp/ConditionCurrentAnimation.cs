@@ -43,11 +43,11 @@ public class ConditionCurrentAnimation : ConditionAnimation
 		return (!IsNot) ? flag : (!flag);
 	}
 
-	private static bool IsNames(List<string> NIKHAICFGNM, List<string> MGNOPLPBOHC)
+	private static bool IsNames(List<string> names, List<string> candidateNames)
 	{
-		foreach (string item in NIKHAICFGNM)
+		foreach (string item in names)
 		{
-			foreach (string item2 in MGNOPLPBOHC)
+			foreach (string item2 in candidateNames)
 			{
 				if (item == item2)
 				{
@@ -58,9 +58,9 @@ public class ConditionCurrentAnimation : ConditionAnimation
 		return false;
 	}
 
-	private static bool IsNames(string name, List<string> MGNOPLPBOHC)
+	private static bool IsNames(string name, List<string> candidateNames)
 	{
-		foreach (string item in MGNOPLPBOHC)
+		foreach (string item in candidateNames)
 		{
 			if (name == item)
 			{

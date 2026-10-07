@@ -13,11 +13,11 @@ namespace Nekki.SF2.GUI.Profile
 		[SerializeField]
 		private GameObject _bottomLine;
 
-		public void Init(bool CAAHFHBHAIC, bool IKNHLPGLLKB, bool ABNOAAMEBFJ)
+		public void Init(bool hasTwoPerks, bool isFirst, bool isLast)
 		{
-			_linesForTwoPerks.gameObject.SetActive(CAAHFHBHAIC);
-			_topLine.gameObject.SetActive(!IKNHLPGLLKB);
-			_bottomLine.gameObject.SetActive(!ABNOAAMEBFJ);
+			_linesForTwoPerks.gameObject.SetActive(hasTwoPerks);
+			_topLine.gameObject.SetActive(!isFirst);
+			_bottomLine.gameObject.SetActive(!isLast);
 		}
 
 		private void Start()

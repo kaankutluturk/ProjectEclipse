@@ -6,16 +6,16 @@ public class NekkiRandom
 {
 	private RandomGenerator generator;
 
-	public NekkiRandom(uint OKGKLCLEDFN)
+	public NekkiRandom(uint seed)
 	{
-		generator = new RandomGenerator(OKGKLCLEDFN);
+		generator = new RandomGenerator(seed);
 	}
 
 	public NekkiRandom()
 	{
 		generator = new RandomGenerator(0u);
-		uint oKGKLCLEDFN = (uint)DateTime.UtcNow.Ticks;
-		generator.setSeed(oKGKLCLEDFN);
+		uint seed = (uint)DateTime.UtcNow.Ticks;
+		generator.setSeed(seed);
 	}
 
 	public uint GetRandMax()
@@ -28,9 +28,9 @@ public class NekkiRandom
 		return generator.NextRandom();
 	}
 
-	public void setSeed(uint OKGKLCLEDFN)
+	public void setSeed(uint seed)
 	{
-		generator.setSeed(OKGKLCLEDFN);
+		generator.setSeed(seed);
 	}
 
 	public uint GetSeed()
@@ -43,65 +43,65 @@ public class NekkiRandom
 		return (float)NextRaw() / (float)GetRandMax() + (float)NextRaw() / (float)GetRandMax() / (float)GetRandMax();
 	}
 
-	public float randomFloat(float KAEPJHHLLPK)
+	public float randomFloat(float max)
 	{
-		return randomFloat() * KAEPJHHLLPK;
+		return randomFloat() * max;
 	}
 
-	public float randomFloat(float LHNCHOAEGEA, float KAEPJHHLLPK)
+	public float randomFloat(float min, float max)
 	{
-		return LHNCHOAEGEA + randomFloat(KAEPJHHLLPK - LHNCHOAEGEA);
+		return min + randomFloat(max - min);
 	}
 
-	public uint randomInt(uint KAEPJHHLLPK)
+	public uint randomInt(uint max)
 	{
-		return (uint)((float)KAEPJHHLLPK * randomFloat());
+		return (uint)((float)max * randomFloat());
 	}
 
-	public uint randomInt(uint LHNCHOAEGEA, uint KAEPJHHLLPK)
+	public uint randomInt(uint min, uint max)
 	{
-		return LHNCHOAEGEA + randomInt(KAEPJHHLLPK - LHNCHOAEGEA);
+		return min + randomInt(max - min);
 	}
 
-	public bool randomChance(float AMBMJABLPFE, float BCCEJBCHNHC = 100f)
+	public bool randomChance(float chance, float outOf = 100f)
 	{
-		return randomFloat(BCCEJBCHNHC) < AMBMJABLPFE;
+		return randomFloat(outOf) < chance;
 	}
 
-	public string randomString(int AEPODKHKPDF, string GBLKDKHFKFL = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+	public string randomString(int charCount, string characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 	{
-		uint length = (uint)GBLKDKHFKFL.Length;
+		uint length = (uint)characters.Length;
 		StringBuilder stringBuilder = new StringBuilder();
-		for (int i = 0; i < AEPODKHKPDF; i++)
+		for (int i = 0; i < charCount; i++)
 		{
-			stringBuilder.Append(GBLKDKHFKFL[(int)randomInt(length)]);
+			stringBuilder.Append(characters[(int)randomInt(length)]);
 		}
 		return stringBuilder.ToString();
 	}
 
-	public void ShuffleList<T>(List<T> OMKIGJOLJJE)
+	public void ShuffleList<T>(List<T> list)
 	{
-		int num = OMKIGJOLJJE.Count;
+		int num = list.Count;
 		while (num > 1)
 		{
 			num--;
 			int index = (int)randomInt(0u, (uint)num);
-			T value = OMKIGJOLJJE[index];
-			OMKIGJOLJJE[index] = OMKIGJOLJJE[num];
-			OMKIGJOLJJE[num] = value;
+			T value = list[index];
+			list[index] = list[num];
+			list[num] = value;
 		}
 	}
 
-	public void ShuffleArray<T>(T[] AALGCAPHOED)
+	public void ShuffleArray<T>(T[] array)
 	{
-		int num = AALGCAPHOED.Length;
+		int num = array.Length;
 		while (num > 1)
 		{
 			num--;
 			int num2 = (int)randomInt(0u, (uint)num);
-			T val = AALGCAPHOED[num2];
-			AALGCAPHOED[num2] = AALGCAPHOED[num];
-			AALGCAPHOED[num] = val;
+			T val = array[num2];
+			array[num2] = array[num];
+			array[num] = val;
 		}
 	}
 }

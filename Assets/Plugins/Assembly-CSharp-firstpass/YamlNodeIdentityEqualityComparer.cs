@@ -3,13 +3,13 @@ using YamlDotNet.RepresentationModel;
 
 public sealed class YamlNodeIdentityEqualityComparer : IEqualityComparer<YamlNode>
 {
-	public bool Equals(YamlNode DHDMNHCIPEH, YamlNode BGEEALIPKCC)
+	public bool Equals(YamlNode y, YamlNode x)
 	{
-		return object.ReferenceEquals(DHDMNHCIPEH, BGEEALIPKCC);
+		return object.ReferenceEquals(y, x);
 	}
 
-	public int GetHashCode(YamlNode AOMLCBHAJJH)
+	public int GetHashCode(YamlNode obj)
 	{
-		return AOMLCBHAJJH.GetHashCode();
+		return obj.GetHashCode();
 	}
 }

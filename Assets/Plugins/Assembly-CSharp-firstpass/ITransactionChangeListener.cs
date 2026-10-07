@@ -1,4 +1,4 @@
 public interface ITransactionChangeListener
 {
-	void OnTransactionsChanged(bool AJAJBBKANGD);
+	void OnTransactionsChanged(bool hasChanges);
 }

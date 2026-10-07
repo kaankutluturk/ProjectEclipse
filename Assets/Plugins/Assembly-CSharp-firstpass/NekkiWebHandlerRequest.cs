@@ -4,16 +4,16 @@ public class NekkiWebHandlerRequest : NekkiWebHandler
 {
 	private readonly List<byte> _buffer;
 
-	public NekkiWebHandlerRequest(NekkiUri IACLKBNEBDM)
-		: base(IACLKBNEBDM)
+	public NekkiWebHandlerRequest(NekkiUri uri)
+		: base(uri)
 	{
 		_buffer = new List<byte>();
 	}
 
-	protected override void OnDataReceived(byte[] data, int IAFIGGBIKOD, int HIGBAHGOFIJ)
+	protected override void OnDataReceived(byte[] data, int offset, int length)
 	{
-		_buffer.Capacity += HIGBAHGOFIJ;
-		for (int i = 0; i < HIGBAHGOFIJ; i++)
+		_buffer.Capacity += length;
+		for (int i = 0; i < length; i++)
 		{
 			_buffer.Add(data[i]);
 		}

@@ -24,19 +24,19 @@ public sealed class ObjectDescriptor : IObjectDescriptor
 		}
 	}
 
-	public ObjectDescriptor(object value, Type LFLGCDNKNJI, Type FGDJAEMHFKC)
+	public ObjectDescriptor(object value, Type type, Type staticType)
 	{
 		set_Value(value);
-		if (LFLGCDNKNJI == null)
+		if (type == null)
 		{
 			throw new ArgumentNullException("type");
 		}
-		set_Type(LFLGCDNKNJI);
-		if (FGDJAEMHFKC == null)
+		set_Type(type);
+		if (staticType == null)
 		{
 			throw new ArgumentNullException("staticType");
 		}
-		SetStaticType(FGDJAEMHFKC);
+		SetStaticType(staticType);
 	}
 
 	object IObjectDescriptor.Value

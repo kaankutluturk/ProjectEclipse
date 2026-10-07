@@ -61,220 +61,220 @@ public class FightResult
 			Lottery = null;
 		}
 
-		public void AddReward(Rewardable POHFOGPKMMK)
+		public void AddReward(Rewardable reward)
 		{
-			if (POHFOGPKMMK != null)
+			if (reward != null)
 			{
-				switch (POHFOGPKMMK.Kind)
+				switch (reward.Kind)
 				{
 				case Rewardable.RewardKind.REWARD_ITEM:
 				{
-					RewardItem jJBPBGKBEED = (RewardItem)POHFOGPKMMK;
-					AddReward(jJBPBGKBEED);
+					RewardItem rewardItem = (RewardItem)reward;
+					AddReward(rewardItem);
 					break;
 				}
 				case Rewardable.RewardKind.REWARD_MONEY:
 				{
-					RewardMoney mNEDNJMBHMF = (RewardMoney)POHFOGPKMMK;
-					AddReward(mNEDNJMBHMF);
+					RewardMoney rewardMoney = (RewardMoney)reward;
+					AddReward(rewardMoney);
 					break;
 				}
 				case Rewardable.RewardKind.REWARD_CURRENCY:
 				{
-					RewardCurrency oIPIAAJCEOO = (RewardCurrency)POHFOGPKMMK;
-					AddReward(oIPIAAJCEOO);
+					RewardCurrency rewardCurrency = (RewardCurrency)reward;
+					AddReward(rewardCurrency);
 					break;
 				}
 				case Rewardable.RewardKind.REWARD_RESISTANCE:
 				{
-					RewardResistance gBKBCEGJNLA = (RewardResistance)POHFOGPKMMK;
-					AddReward(gBKBCEGJNLA);
+					RewardResistance rewardResistance = (RewardResistance)reward;
+					AddReward(rewardResistance);
 					break;
 				}
 				case Rewardable.RewardKind.REWARD_LOTTERY:
 				{
-					RewardLottery mIPHAMDMKJB = (RewardLottery)POHFOGPKMMK;
-					AddReward(mIPHAMDMKJB);
+					RewardLottery rewardLottery = (RewardLottery)reward;
+					AddReward(rewardLottery);
 					break;
 				}
 				}
 			}
 		}
 
-		public void AddReward(RewardMoney MNEDNJMBHMF)
+		public void AddReward(RewardMoney reward)
 		{
-			Money += MNEDNJMBHMF.GetValue();
+			Money += reward.GetValue();
 		}
 
-		public void AddReward(RewardCurrency OIPIAAJCEOO)
+		public void AddReward(RewardCurrency reward)
 		{
-			if (OIPIAAJCEOO == null)
+			if (reward == null)
 			{
 				return;
 			}
-			GameCurrency cJJOFMHLFFM = GameUtils.GameCurrencies.GetCurrencyByName(OIPIAAJCEOO.Name);
-			if (cJJOFMHLFFM == null)
+			GameCurrency currency = GameUtils.GameCurrencies.GetCurrencyByName(reward.Name);
+			if (currency == null)
 			{
 				return;
 			}
 			foreach (CurrencyGrant item in Currencies)
 			{
-				if (item.Currency.Currency == cJJOFMHLFFM)
+				if (item.Currency.Currency == currency)
 				{
 					int num = (ObscuredInt)(item.Currency.Count);
-					num += OIPIAAJCEOO.RollAmount();
+					num += reward.RollAmount();
 					item.Currency.Count = (ObscuredInt)(num);
 					return;
 				}
 			}
-			int num2 = OIPIAAJCEOO.RollAmount();
+			int num2 = reward.RollAmount();
 			if (num2 > 0)
 			{
-				CurrencyStruct nAKKNKPJNHB = new CurrencyStruct(cJJOFMHLFFM, num2);
-				CurrencyGrant nFBOLAJJIAD = new CurrencyGrant();
-				nFBOLAJJIAD.Currency = nAKKNKPJNHB;
-				nFBOLAJJIAD.IsDrop = OIPIAAJCEOO.IsDrop;
-				Currencies.Add(nFBOLAJJIAD);
+				CurrencyStruct currencyStruct = new CurrencyStruct(currency, num2);
+				CurrencyGrant grant = new CurrencyGrant();
+				grant.Currency = currencyStruct;
+				grant.IsDrop = reward.IsDrop;
+				Currencies.Add(grant);
 			}
 		}
 
-		public void AddReward(RewardResistance GBKBCEGJNLA)
+		public void AddReward(RewardResistance reward)
 		{
-			if (GBKBCEGJNLA == null)
+			if (reward == null)
 			{
 				return;
 			}
-			GameResistance oOJJEOFENBJ = GameUtils.GameResistances.GetResistanceByName(GBKBCEGJNLA.Name);
-			if (oOJJEOFENBJ == null)
+			GameResistance resistance = GameUtils.GameResistances.GetResistanceByName(reward.Name);
+			if (resistance == null)
 			{
 				return;
 			}
 			foreach (ResistanceGrant item in Resistances)
 			{
-				if (item.Resistance.resistance == oOJJEOFENBJ)
+				if (item.Resistance.resistance == resistance)
 				{
 					int num = (ObscuredInt)(item.Resistance.Count);
-					num += GBKBCEGJNLA.Value;
+					num += reward.Value;
 					item.Resistance.Count = (ObscuredInt)(num);
 					return;
 				}
 			}
-			int iOHAOMLJECE = GBKBCEGJNLA.Value;
-			if (iOHAOMLJECE > 0)
+			int amount = reward.Value;
+			if (amount > 0)
 			{
-				ResistanceStruct jIDLBLPFAAE = new ResistanceStruct(oOJJEOFENBJ, iOHAOMLJECE);
-				ResistanceGrant oLJIFHLGHNM = new ResistanceGrant();
-				oLJIFHLGHNM.Resistance = jIDLBLPFAAE;
-				oLJIFHLGHNM.IsDrop = GBKBCEGJNLA.IsDrop;
-				Resistances.Add(oLJIFHLGHNM);
+				ResistanceStruct resistanceStruct = new ResistanceStruct(resistance, amount);
+				ResistanceGrant grant = new ResistanceGrant();
+				grant.Resistance = resistanceStruct;
+				grant.IsDrop = reward.IsDrop;
+				Resistances.Add(grant);
 			}
 		}
 
-		public void AddReward(RewardLottery MIPHAMDMKJB)
+		public void AddReward(RewardLottery reward)
 		{
-			if (MIPHAMDMKJB != null)
+			if (reward != null)
 			{
 				if (Lottery == null)
 				{
-					Lottery = MIPHAMDMKJB.CloneForRewardComposition();
+					Lottery = reward.CloneForRewardComposition();
 				}
 				else
 				{
-					Lottery.slots.AddRange(MIPHAMDMKJB.slots);
+					Lottery.slots.AddRange(reward.slots);
 				}
 			}
 		}
 
-		public void AddReward(RewardItem JJBPBGKBEED)
+		public void AddReward(RewardItem reward)
 		{
-			if (JJBPBGKBEED == null)
+			if (reward == null)
 			{
 				return;
 			}
-			UserItem dKCHDHMLKHN = ListSF.GetRoster().GetInventory().FindItem(JJBPBGKBEED.Name);
+			UserItem ownedItem = ListSF.GetRoster().GetInventory().FindItem(reward.Name);
 			Eclipse.Modding.DefinitionId rewardId;
-			bool repeatableModConsumable = Eclipse.Modding.DefinitionId.TryParse(JJBPBGKBEED.Name, out rewardId) &&
+			bool repeatableModConsumable = Eclipse.Modding.DefinitionId.TryParse(reward.Name, out rewardId) &&
 				rewardId.Namespace.Value != "core" && rewardId.Category == "items" &&
-				ListSF.GetItems().GetItemByName(JJBPBGKBEED.Name)?.Type == "Consumable";
-			if (dKCHDHMLKHN != null && !repeatableModConsumable)
+				ListSF.GetItems().GetItemByName(reward.Name)?.Type == "Consumable";
+			if (ownedItem != null && !repeatableModConsumable)
 			{
 				return;
 			}
-			ItemInfo dJKEECEOCJB = ListSF.GetItems().GetItemByName(JJBPBGKBEED.Name);
-			if (dJKEECEOCJB == null)
+			ItemInfo itemInfo = ListSF.GetItems().GetItemByName(reward.Name);
+			if (itemInfo == null)
 			{
 				return;
 			}
-			bool configuredRewardGrant = JJBPBGKBEED.HasEclipseGrantConfiguration;
+			bool configuredRewardGrant = reward.HasEclipseGrantConfiguration;
 			if (configuredRewardGrant)
 			{
 				int playerLevelSnapshot = ListSF.GetRoster().Level;
 				RewardItem configuredReward;
 				string configurationError;
-				if (!Eclipse.Modding.ModRuntime.TryConfigureRewardGrant(JJBPBGKBEED, playerLevelSnapshot,
+				if (!Eclipse.Modding.ModRuntime.TryConfigureRewardGrant(reward, playerLevelSnapshot,
 					out configuredReward, out configurationError))
 				{
-					UnityEngine.Debug.LogWarning("[ModReward] Skipping configured item reward '" + JJBPBGKBEED.Name +
+					UnityEngine.Debug.LogWarning("[ModReward] Skipping configured item reward '" + reward.Name +
 						"': " + configurationError);
 					return;
 				}
-				JJBPBGKBEED = configuredReward;
+				reward = configuredReward;
 			}
-			int requestedLevel = JJBPBGKBEED.EvaluateLevel();
+			int requestedLevel = reward.EvaluateLevel();
 			int num = requestedLevel <= 0 ? ListSF.GetRoster().GetLevel() : requestedLevel;
 			ItemInfo dJKEECEOCJB2 = null;
-			if (dJKEECEOCJB.ItemLevel == num)
+			if (itemInfo.ItemLevel == num)
 			{
-				dJKEECEOCJB2 = dJKEECEOCJB;
+				dJKEECEOCJB2 = itemInfo;
 			}
 			else
 			{
-				ItemInfo dJKEECEOCJB3 = dJKEECEOCJB.GetUpdateItemByLevel(num, false);
+				ItemInfo dJKEECEOCJB3 = itemInfo.GetUpdateItemByLevel(num, false);
 				if (dJKEECEOCJB3 == null && configuredRewardGrant)
 				{
-					UnityEngine.Debug.LogWarning("[ModReward] Skipping configured item reward '" + JJBPBGKBEED.Name +
+					UnityEngine.Debug.LogWarning("[ModReward] Skipping configured item reward '" + reward.Name +
 						"': exact level " + num + " is unavailable.");
 					return;
 				}
-				dJKEECEOCJB2 = ((dJKEECEOCJB3 == null) ? dJKEECEOCJB : dJKEECEOCJB3);
+				dJKEECEOCJB2 = ((dJKEECEOCJB3 == null) ? itemInfo : dJKEECEOCJB3);
 			}
-			if (!string.IsNullOrEmpty(JJBPBGKBEED.UpgradeLevelExpression))
+			if (!string.IsNullOrEmpty(reward.UpgradeLevelExpression))
 			{
-				int upgradeLevel = JJBPBGKBEED.EvaluateUpgradeLevel();
+				int upgradeLevel = reward.EvaluateUpgradeLevel();
 				if (upgradeLevel < 0)
-					throw new System.InvalidOperationException("Negative reward upgrade level: " + JJBPBGKBEED.Name);
+					throw new System.InvalidOperationException("Negative reward upgrade level: " + reward.Name);
 				// The native quest grant uses this encoded-level lookup, not an ordinal.
-				dJKEECEOCJB2 = dJKEECEOCJB.GetUpgradeItemAtOrAboveUpgradeLevel(upgradeLevel);
+				dJKEECEOCJB2 = itemInfo.GetUpgradeItemAtOrAboveUpgradeLevel(upgradeLevel);
 				if (dJKEECEOCJB2 == null)
-					throw new System.InvalidOperationException("Reward upgrade level is unavailable: " + JJBPBGKBEED.Name + " / " + upgradeLevel);
+					throw new System.InvalidOperationException("Reward upgrade level is unavailable: " + reward.Name + " / " + upgradeLevel);
 			}
-			else if (JJBPBGKBEED.UpgradeNumber != 0)
+			else if (reward.UpgradeNumber != 0)
 			{
 				List<UpgradeData> list = dJKEECEOCJB2.GetUpgrades(true, dJKEECEOCJB2.ItemLevel);
 				uint count = (uint)list.Count;
 				if (count != 0)
 				{
-					uint num2 = JJBPBGKBEED.UpgradeNumber;
+					uint num2 = reward.UpgradeNumber;
 					if (count - 1 < num2)
 					{
 						num2 = count - 1;
 					}
-					dJKEECEOCJB2 = dJKEECEOCJB.CreateUpgradedItem(list[(int)num2]);
+					dJKEECEOCJB2 = itemInfo.CreateUpgradedItem(list[(int)num2]);
 				}
 			}
-			ItemGrant lJFFIBFBGID = new ItemGrant();
-			lJFFIBFBGID.Item = dJKEECEOCJB2;
-			lJFFIBFBGID.RewardSource = JJBPBGKBEED;
-			lJFFIBFBGID.IsDrop = JJBPBGKBEED.IsDrop;
-			Items.Add(lJFFIBFBGID);
+			ItemGrant grant = new ItemGrant();
+			grant.Item = dJKEECEOCJB2;
+			grant.RewardSource = reward;
+			grant.IsDrop = reward.IsDrop;
+			Items.Add(grant);
 		}
 
-		public List<ItemInfo> GetItems(bool NLDNIHHPEFI = false)
+		public List<ItemInfo> GetItems(bool dropsOnly = false)
 		{
 			List<ItemInfo> list = new List<ItemInfo>();
 			foreach (ItemGrant item in Items)
 			{
-				if (!NLDNIHHPEFI || item.IsDrop)
+				if (!dropsOnly || item.IsDrop)
 				{
 					list.Add(item.Item);
 				}
@@ -282,12 +282,12 @@ public class FightResult
 			return list;
 		}
 
-		public List<CurrencyStruct> GetCurrencies(bool NLDNIHHPEFI = false)
+		public List<CurrencyStruct> GetCurrencies(bool dropsOnly = false)
 		{
 			List<CurrencyStruct> list = new List<CurrencyStruct>();
 			foreach (CurrencyGrant item in Currencies)
 			{
-				if (!NLDNIHHPEFI || item.IsDrop)
+				if (!dropsOnly || item.IsDrop)
 				{
 					list.Add(item.Currency);
 				}
@@ -295,12 +295,12 @@ public class FightResult
 			return list;
 		}
 
-		public List<ResistanceStruct> GetResistances(bool NLDNIHHPEFI = false)
+		public List<ResistanceStruct> GetResistances(bool dropsOnly = false)
 		{
 			List<ResistanceStruct> list = new List<ResistanceStruct>();
 			foreach (ResistanceGrant item in Resistances)
 			{
-				if (!NLDNIHHPEFI || item.IsDrop)
+				if (!dropsOnly || item.IsDrop)
 				{
 					list.Add(item.Resistance);
 				}
@@ -346,11 +346,11 @@ public class FightResult
 
 	public FightList FightDefinition;
 
-	public void RecordPrizeStatistics(long BLOOFMGLMHP, long GICNLBOICGP, float KNDKJANLIDI, float BHGNKHIKGOG, float FKHKEHICPAH, float IFCOPPPDOCD, float LMKJOMKPOAM, float OJIPBDBMLLO, List<float> JGANMCPMMLN)
+	public void RecordPrizeStatistics(long baseBonus, long baseGold, float experience, float perfectFactor, float firstStrikeFactor, float headShotFactor, float comboFactor, float shockFactor, List<float> styleFactors)
 	{
 		if (PlayerStatistics != null)
 		{
-			PlayerStatistics.AddPrizes(BLOOFMGLMHP, GICNLBOICGP, (long)KNDKJANLIDI, BHGNKHIKGOG, FKHKEHICPAH, IFCOPPPDOCD, LMKJOMKPOAM, OJIPBDBMLLO, JGANMCPMMLN);
+			PlayerStatistics.AddPrizes(baseBonus, baseGold, (long)experience, perfectFactor, firstStrikeFactor, headShotFactor, comboFactor, shockFactor, styleFactors);
 		}
 	}
 
@@ -379,67 +379,67 @@ public class FightResult
 		return GameOverType == GameOverTypes.GAME_OVER_RAID_ROUND_TIMEOUT;
 	}
 
-	public void CalculateRewards(RewardStruct LGDIIADDFLH, ComboStatistic AIOMDIAFHGB, ComboStatistic MOJHPBGGNAH, FightList KGKDKENMAOA)
+	public void CalculateRewards(RewardStruct rewardStruct, ComboStatistic playerStatistics, ComboStatistic opponentStatistics, FightList fightList)
 	{
-		if (LGDIIADDFLH == null)
+		if (rewardStruct == null)
 		{
-			this.PlayerStatistics = AIOMDIAFHGB;
-			this.OpponentStatistics = MOJHPBGGNAH;
+			this.PlayerStatistics = playerStatistics;
+			this.OpponentStatistics = opponentStatistics;
 			return;
 		}
 		Prize.Clear();
-		Reward lOELDGJGPIF = ((!ListSF.GetRoster().IsEclipseMode()) ? LGDIIADDFLH.NormalModeReward : LGDIIADDFLH.EclipseModeReward);
-		bool bLBDMKNOJEJ = true;
-		Roster nKGLHEGIKKP = ListSF.GetRoster();
-		if ((ObscuredFloat)(LGDIIADDFLH.CommonReward.GetPrizeForLevel(nKGLHEGIKKP.GetLevel()).prizeBase) > 0f || (lOELDGJGPIF != null && (ObscuredFloat)(lOELDGJGPIF.GetPrizeForLevel(nKGLHEGIKKP.GetLevel()).prizeBase) > 0f) || KGKDKENMAOA.PrizeBase > 0f)
+		Reward modeReward = ((!ListSF.GetRoster().IsEclipseMode()) ? rewardStruct.NormalModeReward : rewardStruct.EclipseModeReward);
+		bool noPrizeBase = true;
+		Roster roster = ListSF.GetRoster();
+		if ((ObscuredFloat)(rewardStruct.CommonReward.GetPrizeForLevel(roster.GetLevel()).prizeBase) > 0f || (modeReward != null && (ObscuredFloat)(modeReward.GetPrizeForLevel(roster.GetLevel()).prizeBase) > 0f) || fightList.PrizeBase > 0f)
 		{
-			bLBDMKNOJEJ = false;
+			noPrizeBase = false;
 		}
-		ApplyReward(LGDIIADDFLH.CommonReward, KGKDKENMAOA.PrizeBase, AIOMDIAFHGB, MOJHPBGGNAH, bLBDMKNOJEJ);
-		ApplyReward(lOELDGJGPIF, KGKDKENMAOA.PrizeBase, AIOMDIAFHGB, MOJHPBGGNAH, bLBDMKNOJEJ);
+		ApplyReward(rewardStruct.CommonReward, fightList.PrizeBase, playerStatistics, opponentStatistics, noPrizeBase);
+		ApplyReward(modeReward, fightList.PrizeBase, playerStatistics, opponentStatistics, noPrizeBase);
 	}
 
-	public void ApplyReward(Reward POHFOGPKMMK, float prizeBase, ComboStatistic ODOJIOOGLJM, ComboStatistic IHNEOCGCCJO, bool BLBDMKNOJEJ)
+	public void ApplyReward(Reward reward, float prizeBase, ComboStatistic playerStatistics, ComboStatistic opponentStatistics, bool noPrizeBase)
 	{
-		if (POHFOGPKMMK == null)
+		if (reward == null)
 		{
 			return;
 		}
-		Roster nKGLHEGIKKP = ListSF.GetRoster();
-		RewardPrize cMHHEHILIIH = POHFOGPKMMK.GetPrizeForLevel(nKGLHEGIKKP.GetLevel());
-		float num = (ObscuredUInt)((POHFOGPKMMK == null) ? (ObscuredUInt)(0u) : cMHHEHILIIH.exp);
+		Roster roster = ListSF.GetRoster();
+		RewardPrize prize = reward.GetPrizeForLevel(roster.GetLevel());
+		float num = (ObscuredUInt)((reward == null) ? (ObscuredUInt)(0u) : prize.exp);
 		ExpReward += num;
-		PlayerStatistics = ODOJIOOGLJM;
-		OpponentStatistics = IHNEOCGCCJO;
-		long num2 = (ObscuredLong)((POHFOGPKMMK == null) ? (ObscuredLong)(0L) : cMHHEHILIIH.money);
-		float kNDKJANLIDI = (ObscuredLong)((POHFOGPKMMK == null) ? (ObscuredLong)(0L) : cMHHEHILIIH.bonus);
+		PlayerStatistics = playerStatistics;
+		OpponentStatistics = opponentStatistics;
+		long num2 = (ObscuredLong)((reward == null) ? (ObscuredLong)(0L) : prize.money);
+		float bonus = (ObscuredLong)((reward == null) ? (ObscuredLong)(0L) : prize.bonus);
 		float num3 = 0f;
-		num3 = ((POHFOGPKMMK != null && (ObscuredFloat)(cMHHEHILIIH.prizeBase) > 0f) ? (float)(ObscuredFloat)(cMHHEHILIIH.prizeBase) : ((prizeBase >= 0f) ? prizeBase : ((!BLBDMKNOJEJ) ? 0f : Mathf.Ceil((float)num2 * GameUtils.RewardsPrizeSettings.DefaultPrizeBaseFactor))));
-		RecordPrizeStatistics((long)num3, num2, kNDKJANLIDI, GameUtils.RewardsPrizeSettings.PerfectFactor, GameUtils.RewardsPrizeSettings.FirstStrikeFactor, GameUtils.RewardsPrizeSettings.HeadShotFactor, GameUtils.RewardsPrizeSettings.ComboCountFactor, GameUtils.RewardsPrizeSettings.ShockFactor, GameUtils.RewardsPrizeSettings.Styles);
+		num3 = ((reward != null && (ObscuredFloat)(prize.prizeBase) > 0f) ? (float)(ObscuredFloat)(prize.prizeBase) : ((prizeBase >= 0f) ? prizeBase : ((!noPrizeBase) ? 0f : Mathf.Ceil((float)num2 * GameUtils.RewardsPrizeSettings.DefaultPrizeBaseFactor))));
+		RecordPrizeStatistics((long)num3, num2, bonus, GameUtils.RewardsPrizeSettings.PerfectFactor, GameUtils.RewardsPrizeSettings.FirstStrikeFactor, GameUtils.RewardsPrizeSettings.HeadShotFactor, GameUtils.RewardsPrizeSettings.ComboCountFactor, GameUtils.RewardsPrizeSettings.ShockFactor, GameUtils.RewardsPrizeSettings.Styles);
 		Prize.Money = GetComboMoneyReward();
 		Prize.Bonus = GetComboBonusReward();
-		Prize.exp += (ObscuredUInt)(cMHHEHILIIH.exp);
-		foreach (RewardMoney item in cMHHEHILIIH.moneyRewards)
+		Prize.exp += (ObscuredUInt)(prize.exp);
+		foreach (RewardMoney item in prize.moneyRewards)
 		{
 			Prize.AddReward(item);
 		}
-		foreach (RewardCurrency item2 in cMHHEHILIIH.currencyRewards)
+		foreach (RewardCurrency item2 in prize.currencyRewards)
 		{
 			Prize.AddReward(item2);
 		}
-		foreach (RewardResistance item3 in cMHHEHILIIH.resistanceRewards)
+		foreach (RewardResistance item3 in prize.resistanceRewards)
 		{
 			Prize.AddReward(item3);
 		}
-		if (cMHHEHILIIH.lottery != null)
+		if (prize.lottery != null)
 		{
-			Prize.AddReward(cMHHEHILIIH.lottery);
+			Prize.AddReward(prize.lottery);
 		}
-		foreach (RewardItem item4 in cMHHEHILIIH.items)
+		foreach (RewardItem item4 in prize.items)
 		{
 			Prize.AddReward(item4);
 		}
-		foreach (RewardChoice item5 in cMHHEHILIIH.choices)
+		foreach (RewardChoice item5 in prize.choices)
 		{
 			Prize.AddReward(item5.ChooseRandomReward());
 		}

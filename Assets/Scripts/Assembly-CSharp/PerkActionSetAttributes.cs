@@ -23,10 +23,10 @@ public class PerkActionSetAttributes : PerkActionModificator
 	{
 	}
 
-	public PerkActionSetAttributes(PerkActionSetAttributes NOLFMPDGCOC)
-		: base(NOLFMPDGCOC)
+	public PerkActionSetAttributes(PerkActionSetAttributes source)
+		: base(source)
 	{
-		SetAttributes(NOLFMPDGCOC.GetAttributes());
+		SetAttributes(source.GetAttributes());
 	}
 
 	public Dictionary<string, FunctionExtension> GetAttributes()
@@ -50,13 +50,13 @@ public class PerkActionSetAttributes : PerkActionModificator
 			if (xmlAttribute != null)
 			{
 				string key = item.get_Name();
-				string bLLCOEAOJGF = xmlAttribute.GetStringOrDefault(string.Empty);
-				FunctionExtension oPIFBDJNMKD = new FunctionExtension();
-				oPIFBDJNMKD.Parse(bLLCOEAOJGF);
-				oPIFBDJNMKD.SetFunctionCallback(GetPerk().EvaluateFunctionCallback);
-				oPIFBDJNMKD.SetVariableCallback(GetPerk().OnFunctionPreCallback);
-				oPIFBDJNMKD.set_Target(this);
-				GetAttributes()[key] = oPIFBDJNMKD;
+				string expression = xmlAttribute.GetStringOrDefault(string.Empty);
+				FunctionExtension functionExtension = new FunctionExtension();
+				functionExtension.Parse(expression);
+				functionExtension.SetFunctionCallback(GetPerk().EvaluateFunctionCallback);
+				functionExtension.SetVariableCallback(GetPerk().OnFunctionPreCallback);
+				functionExtension.set_Target(this);
+				GetAttributes()[key] = functionExtension;
 			}
 		}
 	}

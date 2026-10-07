@@ -52,12 +52,12 @@ public class PerkActionShowIcon : PerkActionModificator
 	{
 	}
 
-	public PerkActionShowIcon(PerkActionShowIcon NOLFMPDGCOC)
-		: base(NOLFMPDGCOC)
+	public PerkActionShowIcon(PerkActionShowIcon source)
+		: base(source)
 	{
-		set_Image(NOLFMPDGCOC.GetImage());
-		set_ShowExpiration(NOLFMPDGCOC.GetShowExpiration());
-		set_ExpirationVer(NOLFMPDGCOC.GetExpirationVer());
+		set_Image(source.GetImage());
+		set_ShowExpiration(source.GetShowExpiration());
+		set_ExpirationVer(source.GetExpirationVer());
 	}
 
 	public string GetImage()

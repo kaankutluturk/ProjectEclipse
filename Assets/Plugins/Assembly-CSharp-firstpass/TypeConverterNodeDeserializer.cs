@@ -6,24 +6,24 @@ public sealed class TypeConverterNodeDeserializer : INodeDeserializer
 {
 	private readonly IEnumerable<IYamlTypeConverter> converters;
 
-	public TypeConverterNodeDeserializer(IEnumerable<IYamlTypeConverter> JNONHBMNKDK)
+	public TypeConverterNodeDeserializer(IEnumerable<IYamlTypeConverter> typeConverters)
 	{
-		if (JNONHBMNKDK == null)
+		if (typeConverters == null)
 		{
 			throw new ArgumentNullException("converters");
 		}
-		this.converters = JNONHBMNKDK;
+		this.converters = typeConverters;
 	}
 
-	bool INodeDeserializer.Deserialize(EventReader reader, Type MBLGNMBFHBI, Func<EventReader, Type, object> IJBAEAEDMCC, out object value)
+	bool INodeDeserializer.Deserialize(EventReader reader, Type type, Func<EventReader, Type, object> nestedObjectDeserializer, out object value)
 	{
-		IYamlTypeConverter bLNPLLKJFLC = converters.FirstOrDefault((IYamlTypeConverter ILHDJDNPFKH) => ILHDJDNPFKH.Accepts(MBLGNMBFHBI));
-		if (bLNPLLKJFLC == null)
+		IYamlTypeConverter matchingConverter = converters.FirstOrDefault((IYamlTypeConverter converter) => converter.Accepts(type));
+		if (matchingConverter == null)
 		{
 			value = null;
 			return false;
 		}
-		value = bLNPLLKJFLC.ReadYaml(reader.GetParser(), MBLGNMBFHBI);
+		value = matchingConverter.ReadYaml(reader.GetParser(), type);
 		return true;
 	}
 }

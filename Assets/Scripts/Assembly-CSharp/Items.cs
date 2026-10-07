@@ -219,9 +219,9 @@ public class Items
 	public int GetNewItemsCount()
 	{
 		int count = 0;
-		allItems.ForEach((ItemInfo DHDMNHCIPEH) =>
+		allItems.ForEach((ItemInfo itemInfo) =>
 		{
-			if (!DHDMNHCIPEH.Type.Equals("Seal") && DHDMNHCIPEH.GetIsNew())
+			if (!itemInfo.Type.Equals("Seal") && itemInfo.GetIsNew())
 			{
 				count++;
 			}
@@ -229,15 +229,15 @@ public class Items
 		return count;
 	}
 
-	public int GetCountNewItemsByType(string LFLGCDNKNJI)
+	public int GetCountNewItemsByType(string itemType)
 	{
-		return allItems.FindAll((ItemInfo DHDMNHCIPEH) => DHDMNHCIPEH.Type.Equals(LFLGCDNKNJI) && DHDMNHCIPEH.GetIsNew()).Count;
+		return allItems.FindAll((ItemInfo candidate) => candidate.Type.Equals(itemType) && candidate.GetIsNew()).Count;
 	}
 
 	// best guess for name
 	public ItemInfo GetItemByName(string name)
 	{
-		ItemInfo item = allItems.Find((ItemInfo DHDMNHCIPEH) => DHDMNHCIPEH.Name.Equals(name));
+		ItemInfo item = allItems.Find((ItemInfo candidate) => candidate.Name.Equals(name));
 		if (item != null) return item;
 		Eclipse.Modding.DefinitionId id;
 		Eclipse.Modding.ItemDefinition definition;
@@ -256,9 +256,9 @@ public class Items
 		return null;
 	}
 
-	public List<ItemInfo> GetItemsByType(string LFLGCDNKNJI)
+	public List<ItemInfo> GetItemsByType(string itemType)
 	{
-		switch (LFLGCDNKNJI)
+		switch (itemType)
 		{
 		case "Weapon":
 			return GetWeapons();
@@ -283,13 +283,13 @@ public class Items
 		}
 	}
 
-	public List<ItemInfo> GetItemsByMarketId(string FDKNIPNGFNF)
+	public List<ItemInfo> GetItemsByMarketId(string marketId)
 	{
 		List<ItemInfo> list = new List<ItemInfo>();
 		int i = 0;
 		for (int count = allItems.Count; i < count; i++)
 		{
-			if (allItems[i].GetMarketId() == FDKNIPNGFNF)
+			if (allItems[i].GetMarketId() == marketId)
 			{
 				list.Add(allItems[i]);
 			}
@@ -297,23 +297,23 @@ public class Items
 		return list;
 	}
 
-	private ItemInfo ParseItem(XmlNode node, int JDEHLOMDDOH)
+	private ItemInfo ParseItem(XmlNode node, int index)
 	{
-		ItemInfo dJKEECEOCJB = new ItemInfo(node);
-		dJKEECEOCJB.NodeXML = node.CloneNode(true);
+		ItemInfo itemInfo = new ItemInfo(node);
+		itemInfo.NodeXML = node.CloneNode(true);
 		XmlNode xmlNode = node["Upgrades"];
 		if (xmlNode != null)
 		{
-			string lFLGCDNKNJI = xmlNode.Attributes["Template"].GetStringOrDefault(string.Empty);
+			string templateName = xmlNode.Attributes["Template"].GetStringOrDefault(string.Empty);
 			foreach (XmlNode item in xmlNode)
 			{
-				UpgradeData iFOFMGAKHEP = new UpgradeData(item, lFLGCDNKNJI);
-				dJKEECEOCJB.AddLocalUpgrade(iFOFMGAKHEP);
+				UpgradeData upgradeData = new UpgradeData(item, templateName);
+				itemInfo.AddLocalUpgrade(upgradeData);
 			}
 		}
-		dJKEECEOCJB.SortLocalUpgrades();
-		dJKEECEOCJB.Index = JDEHLOMDDOH;
-		return dJKEECEOCJB;
+		itemInfo.SortLocalUpgrades();
+		itemInfo.Index = index;
+		return itemInfo;
 	}
 
 	// Eclipse-owned mod content is validated before reaching this recovered container.
@@ -384,23 +384,23 @@ public class Items
 	{
 		foreach (XmlNode childNode in node.ChildNodes)
 		{
-			UpgradeDataContainer aKHJNNDCKMK = new UpgradeDataContainer();
-			aKHJNNDCKMK.Type = childNode.Attributes["Name"].GetStringOrDefault(string.Empty);
+			UpgradeDataContainer upgradeContainer = new UpgradeDataContainer();
+			upgradeContainer.Type = childNode.Attributes["Name"].GetStringOrDefault(string.Empty);
 			foreach (XmlNode childNode2 in childNode.ChildNodes)
 			{
-				UpgradeData item = new UpgradeData(childNode2, aKHJNNDCKMK.Type);
-				aKHJNNDCKMK.Upgrades.Add(item);
+				UpgradeData item = new UpgradeData(childNode2, upgradeContainer.Type);
+				upgradeContainer.Upgrades.Add(item);
 			}
-			upgradeContainers.Add(aKHJNNDCKMK);
+			upgradeContainers.Add(upgradeContainer);
 		}
 	}
 
 	// best guess for name
-	public UpgradeDataContainer GetUpgradeDataContainerByName(string LFLGCDNKNJI)
+	public UpgradeDataContainer GetUpgradeDataContainerByName(string containerName)
 	{
 		foreach (UpgradeDataContainer item in upgradeContainers)
 		{
-			if (item.Type.Equals(LFLGCDNKNJI))
+			if (item.Type.Equals(containerName))
 			{
 				return item;
 			}
@@ -417,43 +417,43 @@ public class Items
 			GameLog.Error("Items.ParseItems xmlDocument == null");
 			return;
 		}
-		XmlNode hKPPBKPJOEO = xmlDocument["List"]["UpgradeList"];
-		ParseUpgradeList(hKPPBKPJOEO);
+		XmlNode upgradeListNode = xmlDocument["List"]["UpgradeList"];
+		ParseUpgradeList(upgradeListNode);
 		XmlNode xmlNode = xmlDocument["List"]["Items"];
 		int num = 0;
 		foreach (XmlNode childNode in xmlNode.ChildNodes)
 		{
-			ItemInfo dJKEECEOCJB = ParseItem(childNode, num);
-			GetAllItems().Add(dJKEECEOCJB);
+			ItemInfo itemInfo = ParseItem(childNode, num);
+			GetAllItems().Add(itemInfo);
 			num++;
-			switch (dJKEECEOCJB.Type)
+			switch (itemInfo.Type)
 			{
 			case "Weapon":
-				GetWeapons().Add(dJKEECEOCJB);
+				GetWeapons().Add(itemInfo);
 				break;
 			case "Armor":
-				GetArmors().Add(dJKEECEOCJB);
+				GetArmors().Add(itemInfo);
 				break;
 			case "Helm":
-				GetHelms().Add(dJKEECEOCJB);
+				GetHelms().Add(itemInfo);
 				break;
 			case "Ranged":
-				GetRangedWeapons().Add(dJKEECEOCJB);
+				GetRangedWeapons().Add(itemInfo);
 				break;
 			case "Magic":
-				GetMagicItems().Add(dJKEECEOCJB);
+				GetMagicItems().Add(itemInfo);
 				break;
 			case "RealMoneyItem":
-				GetRealMoneyItems().Add(dJKEECEOCJB);
+				GetRealMoneyItems().Add(itemInfo);
 				break;
 			case "Consumable":
-				GetConsumables().Add(dJKEECEOCJB);
+				GetConsumables().Add(itemInfo);
 				break;
 			case "Free":
-				GetFreeItems().Add(dJKEECEOCJB);
+				GetFreeItems().Add(itemInfo);
 				break;
 			case "Seal":
-				GetSeals().Add(dJKEECEOCJB);
+				GetSeals().Add(itemInfo);
 				break;
 			}
 		}
@@ -472,27 +472,27 @@ public class Items
 		}
 	}
 
-	public void SetNewAddItem(string OHCGEEEKEJH, bool value, int OMHDLKNHNMJ)
+	public void SetNewAddItem(string itemName, bool value, int itemLevel)
 	{
-		SetNewAddItem(GetItemByName(OHCGEEEKEJH), value, OMHDLKNHNMJ);
+		SetNewAddItem(GetItemByName(itemName), value, itemLevel);
 	}
 
-	public void SetNewAddItem(ItemInfo item, bool value, int OMHDLKNHNMJ)
+	public void SetNewAddItem(ItemInfo item, bool value, int itemLevel)
 	{
 		bool flag = item.GroupId == string.Empty || ListSF.GetRoster().HasShopLock(item.GroupId);
-		bool flag2 = OMHDLKNHNMJ == item.ItemLevel;
+		bool flag2 = itemLevel == item.ItemLevel;
 		if (!item.IsHidden() && flag && flag2)
 		{
 			item.SetIsNew(value);
 		}
 	}
 
-	public void ClearNewFlagsForGroup(string EADBPKMABML)
+	public void ClearNewFlagsForGroup(string groupId)
 	{
 		List<ItemInfo> list = GetAllItems();
 		foreach (ItemInfo item in list)
 		{
-			if (item.IsShopVisible && item.GetIsNew() && item.GroupId == EADBPKMABML)
+			if (item.IsShopVisible && item.GetIsNew() && item.GroupId == groupId)
 			{
 				item.SetIsNew(false);
 			}
@@ -514,38 +514,38 @@ public class Items
 		return list.ToArray();
 	}
 
-	public void ApplyStoreProducts(Product[] OCMDJBDPLJK)
+	public void ApplyStoreProducts(Product[] products)
 	{
-		if (OCMDJBDPLJK != null && OCMDJBDPLJK.Length != 0)
+		if (products != null && products.Length != 0)
 		{
-			List<ItemInfo> gBBJICINGDF = GetProductItems();
-			foreach (Product pANEMFIIOGB in OCMDJBDPLJK)
+			List<ItemInfo> productItems = GetProductItems();
+			foreach (Product product in products)
 			{
-				ApplyStoreProduct(pANEMFIIOGB, gBBJICINGDF);
+				ApplyStoreProduct(product, productItems);
 			}
 		}
 	}
 
-	private void ApplyStoreProduct(Product PANEMFIIOGB, List<ItemInfo> GBBJICINGDF)
+	private void ApplyStoreProduct(Product product, List<ItemInfo> productItems)
 	{
-		foreach (ItemInfo item in GBBJICINGDF)
+		foreach (ItemInfo item in productItems)
 		{
-			if (item.GetMarketId() == PANEMFIIOGB.definition.id)
+			if (item.GetMarketId() == product.definition.id)
 			{
-				item.ApplyProductMetadata(PANEMFIIOGB.metadata);
+				item.ApplyProductMetadata(product.metadata);
 			}
 		}
 	}
 
 	public void RandomizeObscuredVars()
 	{
-		GetAllItems().ForEach((ItemInfo DHDMNHCIPEH) =>
+		GetAllItems().ForEach((ItemInfo itemInfo) =>
 		{
-			DHDMNHCIPEH.RandomizeObscuredVars();
+			itemInfo.RandomizeObscuredVars();
 		});
-		GetUpgradeContainers().ForEach((UpgradeDataContainer DHDMNHCIPEH) =>
+		GetUpgradeContainers().ForEach((UpgradeDataContainer container) =>
 		{
-			DHDMNHCIPEH.RandomizeObscuredVars();
+			container.RandomizeObscuredVars();
 		});
 	}
 }

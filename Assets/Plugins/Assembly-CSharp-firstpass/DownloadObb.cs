@@ -24,9 +24,9 @@ public class DownloadObb : MonoBehaviour
 		}
 	}
 
-	private void LoadFirstLevel(string NEPOLDCKNJL)
+	private void LoadFirstLevel(string message)
 	{
-		AdvLog.LogWarning(NEPOLDCKNJL);
+		AdvLog.LogWarning(message);
 		Application.LoadLevel(1);
 	}
 }

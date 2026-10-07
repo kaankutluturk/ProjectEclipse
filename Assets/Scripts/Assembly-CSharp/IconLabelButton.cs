@@ -20,14 +20,14 @@ public class IconLabelButton : LabelButton
 		return _icon;
 	}
 
-	public override void SetOpacity(float KGJALFLDIBG)
+	public override void SetOpacity(float newOpacity)
 	{
 		if (_icon != null)
 		{
 			Color color = _icon.color;
-			color.a = KGJALFLDIBG;
+			color.a = newOpacity;
 			_icon.color = color;
 		}
-		base.SetOpacity(KGJALFLDIBG);
+		base.SetOpacity(newOpacity);
 	}
 }

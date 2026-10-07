@@ -127,10 +127,10 @@ namespace Nekki.SF2.GUI
 
 		public virtual void Reload(object data)
 		{
-			ScreenType iPKNDMINFMJ = Module.GetInstance().GetCurrentScreenType();
+			ScreenType screenType = Module.GetInstance().GetCurrentScreenType();
 		}
 
-		public virtual Sprite GetVisualObject(VisualObjectType NBLGANHBAEH)
+		public virtual Sprite GetVisualObject(VisualObjectType visualObjectType)
 		{
 			return null;
 		}

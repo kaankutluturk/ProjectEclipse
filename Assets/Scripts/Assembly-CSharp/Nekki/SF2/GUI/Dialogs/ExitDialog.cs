@@ -33,9 +33,9 @@ namespace Nekki.SF2.GUI.Dialogs
 		{
 			if (data != null)
 			{
-				ExitDialogData gBAEHLPNDAC = (ExitDialogData)data;
-				isFightExit = gBAEHLPNDAC.IsInFight;
-				exitCallback = gBAEHLPNDAC.Dlg;
+				ExitDialogData exitData = (ExitDialogData)data;
+				isFightExit = exitData.IsInFight;
+				exitCallback = exitData.Dlg;
 				if (isFightExit)
 				{
 					IsPausing = false;
@@ -60,9 +60,9 @@ namespace Nekki.SF2.GUI.Dialogs
 			_text.set_Alias((!isFightExit) ? "dlgExitMessage" : "dlgExitFightMessage");
 		}
 
-		protected override void SetupFooter(FooterType HJNAHNICGMH)
+		protected override void SetupFooter(FooterType footer)
 		{
-			base.SetupFooter(HJNAHNICGMH);
+			base.SetupFooter(footer);
 			_btnOK.RemoveAllEventListener();
 			_btnOK.AddEventListener(2, OnExitConfirmed);
 		}

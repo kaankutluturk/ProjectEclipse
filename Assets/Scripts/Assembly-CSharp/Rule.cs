@@ -100,9 +100,9 @@ public class Rule : global::EventDispatcher<object>
 		}
 	}
 
-	public Rule(RuleType LFLGCDNKNJI, XmlNode node)
+	public Rule(RuleType ruleType, XmlNode node)
 	{
-		_type = LFLGCDNKNJI;
+		_type = ruleType;
 		set_Active(true);
 		appliesToAllRounds = true;
 		ParentRule = null;
@@ -115,18 +115,18 @@ public class Rule : global::EventDispatcher<object>
 		ParseEclipseMode(node);
 	}
 
-	public Rule(Rule HNBFMAKFJAM)
+	public Rule(Rule source)
 	{
-		_type = HNBFMAKFJAM._type;
-		set_Active(HNBFMAKFJAM.GetActive());
-		appliesToAllRounds = HNBFMAKFJAM.appliesToAllRounds;
-		ParentRule = HNBFMAKFJAM.ParentRule;
-		IsRandom = HNBFMAKFJAM.IsRandom;
-		ModeFilter = HNBFMAKFJAM.ModeFilter;
-		MinLevel = HNBFMAKFJAM.MinLevel;
-		MaxLevel = HNBFMAKFJAM.MaxLevel;
-		_rounds = HNBFMAKFJAM._rounds;
-		xmlSource = HNBFMAKFJAM.xmlSource;
+		_type = source._type;
+		set_Active(source.GetActive());
+		appliesToAllRounds = source.appliesToAllRounds;
+		ParentRule = source.ParentRule;
+		IsRandom = source.IsRandom;
+		ModeFilter = source.ModeFilter;
+		MinLevel = source.MinLevel;
+		MaxLevel = source.MaxLevel;
+		_rounds = source._rounds;
+		xmlSource = source.xmlSource;
 	}
 
 	public DeflatedString GetXmlSource()
@@ -185,15 +185,15 @@ public class Rule : global::EventDispatcher<object>
 		return IsLevelInRange();
 	}
 
-	protected bool IsLevelInRange(int MHNCENBCECJ)
+	protected bool IsLevelInRange(int level)
 	{
-		return MHNCENBCECJ >= MinLevel && MHNCENBCECJ <= MaxLevel;
+		return level >= MinLevel && level <= MaxLevel;
 	}
 
 	protected bool IsLevelInRange()
 	{
-		int mHNCENBCECJ = ListSF.GetRoster().GetLevel();
-		return IsLevelInRange(mHNCENBCECJ);
+		int playerLevel = ListSF.GetRoster().GetLevel();
+		return IsLevelInRange(playerLevel);
 	}
 
 	protected virtual void Parse(XmlNode node)
@@ -204,11 +204,11 @@ public class Rule : global::EventDispatcher<object>
 
 	protected void ParseRounds(XmlNode node)
 	{
-		XmlAttribute cJBEMNNNHDM = node.Attributes["Round"];
-		if (!cJBEMNNNHDM.Empty())
+		XmlAttribute roundsAttribute = node.Attributes["Round"];
+		if (!roundsAttribute.Empty())
 		{
 			appliesToAllRounds = false;
-			string text = cJBEMNNNHDM.GetStringOrDefault(string.Empty);
+			string text = roundsAttribute.GetStringOrDefault(string.Empty);
 			string[] array = text.Split('|');
 			string[] array2 = array;
 			foreach (string value in array2)

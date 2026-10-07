@@ -80,9 +80,9 @@ namespace Nekki.SF2.GUI.Menu
 
 		private Tween _tween;
 
-		public void Init(ScrollOrientation LFLGCDNKNJI = ScrollOrientation.Vertical)
+		public void Init(ScrollOrientation orientation = ScrollOrientation.Vertical)
 		{
-			_type = LFLGCDNKNJI;
+			_type = orientation;
 			expandedLength = GetCurrentLength();
 			allowRolling = true;
 			IsOpen = false;
@@ -106,18 +106,18 @@ namespace Nekki.SF2.GUI.Menu
 			AnimateToLength(0f, _Duration);
 		}
 
-		private void AnimateToLength(float GGAIEIDOEAD, float _Duration)
+		private void AnimateToLength(float targetLength, float _Duration)
 		{
 			KillTween();
 			if (_Duration <= 0f)
 			{
-				SetLength(GGAIEIDOEAD);
+				SetLength(targetLength);
 				return;
 			}
-			_tween = DOTween.To(() => GetCurrentLength(), (float ECHIHNECKFK) =>
+			_tween = DOTween.To(() => GetCurrentLength(), (float currentLength) =>
 			{
-				SetLength(ECHIHNECKFK);
-			}, GGAIEIDOEAD, _Duration);
+				SetLength(currentLength);
+			}, targetLength, _Duration);
 		}
 
 		public bool IsExpanded()
@@ -125,9 +125,9 @@ namespace Nekki.SF2.GUI.Menu
 			return isExpanded;
 		}
 
-		public void SetOutsideTouchProperties(bool NEHLEJGGCIE)
+		public void SetOutsideTouchProperties(bool closeOnOutsideClick)
 		{
-			closeOnBackgroundClick = NEHLEJGGCIE;
+			closeOnBackgroundClick = closeOnOutsideClick;
 		}
 
 		public float GetCurrentLength()
@@ -158,21 +158,21 @@ namespace Nekki.SF2.GUI.Menu
 		{
 		}
 
-		private void SetLength(float BDBOAEGELMC)
+		private void SetLength(float length)
 		{
-			if (BDBOAEGELMC < 0f)
+			if (length < 0f)
 			{
-				BDBOAEGELMC = 0f;
+				length = 0f;
 			}
-			bool flag = BDBOAEGELMC == 0f;
-			bool flag2 = Mathf.Abs(BDBOAEGELMC) == Mathf.Abs(expandedLength);
+			bool flag = length == 0f;
+			bool flag2 = Mathf.Abs(length) == Mathf.Abs(expandedLength);
 			if (_type == ScrollOrientation.Vertical)
 			{
-				base.gameObject.GetComponent<RectTransform>().sizeDelta = new Vector2(base.gameObject.GetComponent<RectTransform>().rect.width, BDBOAEGELMC);
+				base.gameObject.GetComponent<RectTransform>().sizeDelta = new Vector2(base.gameObject.GetComponent<RectTransform>().rect.width, length);
 			}
 			else
 			{
-				base.gameObject.GetComponent<RectTransform>().sizeDelta = new Vector2(BDBOAEGELMC, base.gameObject.GetComponent<RectTransform>().rect.height);
+				base.gameObject.GetComponent<RectTransform>().sizeDelta = new Vector2(length, base.gameObject.GetComponent<RectTransform>().rect.height);
 			}
 			UpdateBackgroundAlpha();
 			if (flag && CurScrollState != ScrollState.ScrollClose)
@@ -229,15 +229,15 @@ namespace Nekki.SF2.GUI.Menu
 			}
 		}
 
-		private bool IsTouchOnWheel(Vector2 DGEJJGMMODA)
+		private bool IsTouchOnWheel(Vector2 touchPosition)
 		{
 			return true;
 		}
 
-		public void OnBeginDrag(PointerEventData BHOLFGOGPCP)
+		public void OnBeginDrag(PointerEventData eventData)
 		{
 			Vector2 localPoint;
-			RectTransformUtility.ScreenPointToLocalPointInRectangle(GetComponent<RectTransform>(), BHOLFGOGPCP.position, BHOLFGOGPCP.pressEventCamera, out localPoint);
+			RectTransformUtility.ScreenPointToLocalPointInRectangle(GetComponent<RectTransform>(), eventData.position, eventData.pressEventCamera, out localPoint);
 			if (allowRolling || IsTouchOnWheel(localPoint))
 			{
 				_touchPoint = localPoint;
@@ -247,10 +247,10 @@ namespace Nekki.SF2.GUI.Menu
 			}
 		}
 
-		public void OnDrag(PointerEventData BHOLFGOGPCP)
+		public void OnDrag(PointerEventData eventData)
 		{
 			Vector2 localPoint;
-			RectTransformUtility.ScreenPointToLocalPointInRectangle(GetComponent<RectTransform>(), BHOLFGOGPCP.position, BHOLFGOGPCP.pressEventCamera, out localPoint);
+			RectTransformUtility.ScreenPointToLocalPointInRectangle(GetComponent<RectTransform>(), eventData.position, eventData.pressEventCamera, out localPoint);
 			if (isDragging)
 			{
 				float num = _touchPoint.x - localPoint.x;
@@ -261,20 +261,20 @@ namespace Nekki.SF2.GUI.Menu
 			}
 		}
 
-		public void OnEndDrag(PointerEventData BHOLFGOGPCP)
+		public void OnEndDrag(PointerEventData eventData)
 		{
 			isDragging = false;
 			float num = ((!isExpanded) ? GetCurrentLength() : (expandedLength - GetCurrentLength()));
 			bool flag = num > expandedLength * dragThresholdPercent / 100f;
 			bool flag2 = isExpanded != flag;
-			float dFNBHOEGAHO = ((!flag2) ? GetCurrentLength() : (expandedLength - GetCurrentLength())) / expandedLength * 0.3f;
+			float tweenDuration = ((!flag2) ? GetCurrentLength() : (expandedLength - GetCurrentLength())) / expandedLength * 0.3f;
 			if (flag2)
 			{
-				Expand(dFNBHOEGAHO);
+				Expand(tweenDuration);
 			}
 			else
 			{
-				Collapse(dFNBHOEGAHO);
+				Collapse(tweenDuration);
 			}
 		}
 

@@ -12,15 +12,15 @@ public class OutBuffer
 
 	private ulong m_ProcessedSize;
 
-	public OutBuffer(uint KOGACKBGCFP)
+	public OutBuffer(uint bufferSize)
 	{
-		m_Buffer = new byte[KOGACKBGCFP];
-		m_BufferSize = KOGACKBGCFP;
+		m_Buffer = new byte[bufferSize];
+		m_BufferSize = bufferSize;
 	}
 
-	public void SetStream(Stream ABJIEFMMIEK)
+	public void SetStream(Stream stream)
 	{
-		m_Stream = ABJIEFMMIEK;
+		m_Stream = stream;
 	}
 
 	public void FlushStream()
@@ -44,9 +44,9 @@ public class OutBuffer
 		m_Pos = 0u;
 	}
 
-	public void WriteByte(byte AAOIAEJJINO)
+	public void WriteByte(byte byteValue)
 	{
-		m_Buffer[m_Pos++] = AAOIAEJJINO;
+		m_Buffer[m_Pos++] = byteValue;
 		if (m_Pos >= m_BufferSize)
 		{
 			FlushData();

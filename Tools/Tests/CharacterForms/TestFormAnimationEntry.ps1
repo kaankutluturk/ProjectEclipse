@@ -20,7 +20,7 @@ $delay+=[regex]::Match($modelSource,'(?ms)^\tpublic bool HasPendingAnimation\(.*
 $delay+=[regex]::Match($modelSource,'(?ms)^\tpublic InfoAnimation GetPendingAnimation\(.*?^\t\}').Value
 # Execute the exact readiness prefix through SetFactors. The remainder of native
 # AI decision selection is outside this fixture and is not copied or simulated.
-$readiness=[regex]::Match($aiSource,'(?s)\tpublic InfoAnimation Render\(Model.*?TacticFactors fJCBLOKOBBD = SetFactors\(FNKFIMEDNLP\);').Value
+$readiness=[regex]::Match($aiSource,'(?s)\tpublic InfoAnimation Render\(Model.*?TacticFactors factors = SetFactors\(enemy\);').Value
 $observation=[regex]::Match($aiSource,'(?ms)^\tpublic void StartAnimationEnemy\(.*?^\t\}').Value
 $observation+=[regex]::Match($aiSource,'(?ms)^\tpublic void StartAnimationBot\(.*?^\t\}').Value
 $observation+=[regex]::Match($aiSource,'(?ms)^\tprivate bool get_IsEnabled\(.*?^\t\}').Value
@@ -191,7 +191,7 @@ class TacticFactors {
 }
 class ModelAi {
     AI_READINESS_PREFIX
-        return fJCBLOKOBBD.Selected;
+        return factors.Selected;
     }
     AI_OBSERVATION_METHODS
     readonly Model _Model;readonly ModelAnimation _ModelAnimation;readonly ModelParameters parameters;

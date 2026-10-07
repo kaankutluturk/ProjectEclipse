@@ -11,9 +11,9 @@ public class ActionCreateModel : ActionAnimation
 
 		public List<CopyItemInfo> CopyItems;
 
-		public ActionStruct(string OLAAAIPEBBF, List<CopyItemInfo> _items, string _name = "")
+		public ActionStruct(string itemType, List<CopyItemInfo> _items, string _name = "")
 		{
-			ItemType = OLAAAIPEBBF;
+			ItemType = itemType;
 			ModelName = _name;
 			CopyItems = _items;
 		}
@@ -80,9 +80,9 @@ public class ActionCreateModel : ActionAnimation
 		return _CopyItems;
 	}
 
-	public override void Visit(Model ACENLMONNPA)
+	public override void Visit(Model model)
 	{
-		ACENLMONNPA.StartAction(this);
+		model.StartAction(this);
 	}
 
 	protected override void Parse(XmlNode node)

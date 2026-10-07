@@ -5,69 +5,69 @@ public sealed class NonGenericDictionaryNodeDeserializer : INodeDeserializer
 {
 	private readonly IObjectFactory objectFactory;
 
-	public NonGenericDictionaryNodeDeserializer(IObjectFactory EJPHFDCKCCE)
+	public NonGenericDictionaryNodeDeserializer(IObjectFactory factory)
 	{
-		objectFactory = EJPHFDCKCCE;
+		objectFactory = factory;
 	}
 
-	bool INodeDeserializer.Deserialize(EventReader reader, Type MBLGNMBFHBI, Func<EventReader, Type, object> IJBAEAEDMCC, out object value)
+	bool INodeDeserializer.Deserialize(EventReader reader, Type expectedType, Func<EventReader, Type, object> nestedObjectDeserializer, out object value)
 	{
-		if (!typeof(IDictionary).IsAssignableFrom(MBLGNMBFHBI))
+		if (!typeof(IDictionary).IsAssignableFrom(expectedType))
 		{
 			value = false;
 			return false;
 		}
 		reader.Expect<MappingStart>();
-		IDictionary dictionary = (IDictionary)objectFactory.Create(MBLGNMBFHBI);
+		IDictionary dictionary = (IDictionary)objectFactory.Create(expectedType);
 		while (!reader.Accept<MappingEnd>())
 		{
-			object KGBGENDIMBC = IJBAEAEDMCC(reader, typeof(object));
-			IValuePromise aGAMFLELGLG = KGBGENDIMBC as IValuePromise;
-			object EJMKBJGNOOB = IJBAEAEDMCC(reader, typeof(object));
-			IValuePromise aGAMFLELGLG2 = EJMKBJGNOOB as IValuePromise;
-			if (aGAMFLELGLG == null)
+			object key = nestedObjectDeserializer(reader, typeof(object));
+			IValuePromise keyPromise = key as IValuePromise;
+			object entryValue = nestedObjectDeserializer(reader, typeof(object));
+			IValuePromise aGAMFLELGLG2 = entryValue as IValuePromise;
+			if (keyPromise == null)
 			{
 				if (aGAMFLELGLG2 == null)
 				{
-					dictionary.Add(KGBGENDIMBC, EJMKBJGNOOB);
+					dictionary.Add(key, entryValue);
 					continue;
 				}
-				aGAMFLELGLG2.add_ValueAvailable((object AFIEJABPAKA) =>
+				aGAMFLELGLG2.add_ValueAvailable((object resolvedValue) =>
 				{
-					dictionary.Add(KGBGENDIMBC, AFIEJABPAKA);
+					dictionary.Add(key, resolvedValue);
 				});
 				continue;
 			}
 			if (aGAMFLELGLG2 == null)
 			{
-				aGAMFLELGLG.add_ValueAvailable((object AFIEJABPAKA) =>
+				keyPromise.add_ValueAvailable((object resolvedValue) =>
 				{
-					dictionary.Add(AFIEJABPAKA, EJMKBJGNOOB);
+					dictionary.Add(resolvedValue, entryValue);
 				});
 				continue;
 			}
 			bool hasFirstPart = false;
-			aGAMFLELGLG.add_ValueAvailable((object AFIEJABPAKA) =>
+			keyPromise.add_ValueAvailable((object resolvedValue) =>
 			{
 				if (hasFirstPart)
 				{
-					dictionary.Add(AFIEJABPAKA, EJMKBJGNOOB);
+					dictionary.Add(resolvedValue, entryValue);
 				}
 				else
 				{
-					KGBGENDIMBC = AFIEJABPAKA;
+					key = resolvedValue;
 					hasFirstPart = true;
 				}
 			});
-			aGAMFLELGLG2.add_ValueAvailable((object AFIEJABPAKA) =>
+			aGAMFLELGLG2.add_ValueAvailable((object resolvedValue) =>
 			{
 				if (hasFirstPart)
 				{
-					dictionary.Add(KGBGENDIMBC, AFIEJABPAKA);
+					dictionary.Add(key, resolvedValue);
 				}
 				else
 				{
-					EJMKBJGNOOB = AFIEJABPAKA;
+					entryValue = resolvedValue;
 					hasFirstPart = true;
 				}
 			});

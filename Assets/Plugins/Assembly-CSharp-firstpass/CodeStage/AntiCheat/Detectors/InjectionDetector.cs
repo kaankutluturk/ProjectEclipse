@@ -18,10 +18,10 @@ namespace CodeStage.AntiCheat.Detectors
 
 			public readonly int[] hashes;
 
-			public AllowedAssembly(string name, int[] DEACEHPECDK)
+			public AllowedAssembly(string name, int[] assemblyHashes)
 			{
 				this.name = name;
-				this.hashes = DEACEHPECDK;
+				this.hashes = assemblyHashes;
 			}
 		}
 
@@ -137,7 +137,7 @@ namespace CodeStage.AntiCheat.Detectors
 			instancesInScene--;
 		}
 
-		private void OnSceneLoaded(Scene MHOCFOODLLL, LoadSceneMode NMMPBADCFHK)
+		private void OnSceneLoaded(Scene scene, LoadSceneMode loadMode)
 		{
 			OnLevelLoadedCallback();
 		}
@@ -240,9 +240,9 @@ namespace CodeStage.AntiCheat.Detectors
 			}
 		}
 
-		private void OnNewAssemblyLoaded(object ABONPDBPJBA, AssemblyLoadEventArgs LKIOKGCNKHE)
+		private void OnNewAssemblyLoaded(object sender, AssemblyLoadEventArgs loadEventArgs)
 		{
-			if (!AssemblyAllowed(LKIOKGCNKHE.LoadedAssembly))
+			if (!AssemblyAllowed(loadEventArgs.LoadedAssembly))
 			{
 				OnCheatingDetected();
 			}
@@ -259,9 +259,9 @@ namespace CodeStage.AntiCheat.Detectors
 			else
 			{
 				Assembly[] array = assemblies;
-				foreach (Assembly eHKCIGHDNMI in array)
+				foreach (Assembly assembly in array)
 				{
-					if (!AssemblyAllowed(eHKCIGHDNMI))
+					if (!AssemblyAllowed(assembly))
 					{
 						result = true;
 						break;
@@ -271,15 +271,15 @@ namespace CodeStage.AntiCheat.Detectors
 			return result;
 		}
 
-		private bool AssemblyAllowed(Assembly EHKCIGHDNMI)
+		private bool AssemblyAllowed(Assembly assembly)
 		{
-			string text = EHKCIGHDNMI.GetName().Name;
-			int value = GetAssemblyHash(EHKCIGHDNMI);
+			string text = assembly.GetName().Name;
+			int value = GetAssemblyHash(assembly);
 			bool result = false;
 			for (int i = 0; i < allowedAssemblies.Length; i++)
 			{
-				AllowedAssembly fCBAKCJACOA = allowedAssemblies[i];
-				if (fCBAKCJACOA.name == text && Array.IndexOf(fCBAKCJACOA.hashes, value) != -1)
+				AllowedAssembly allowedAssembly = allowedAssemblies[i];
+				if (allowedAssembly.name == text && Array.IndexOf(allowedAssembly.hashes, value) != -1)
 				{
 					result = true;
 					break;
@@ -303,19 +303,19 @@ namespace CodeStage.AntiCheat.Detectors
 			allowedAssemblies = new AllowedAssembly[num];
 			for (int i = 0; i < num; i++)
 			{
-				string bAINMLLIKOL = binaryReader.ReadString();
-				bAINMLLIKOL = ObscuredString.EncryptDecrypt(bAINMLLIKOL, "Elina");
-				string[] array = bAINMLLIKOL.Split(separator, StringSplitOptions.RemoveEmptyEntries);
+				string allowedAssembliesText = binaryReader.ReadString();
+				allowedAssembliesText = ObscuredString.EncryptDecrypt(allowedAssembliesText, "Elina");
+				string[] array = allowedAssembliesText.Split(separator, StringSplitOptions.RemoveEmptyEntries);
 				int num2 = array.Length;
 				if (num2 > 1)
 				{
-					string gOHIIMFFFJI = array[0];
+					string assemblyName = array[0];
 					int[] array2 = new int[num2 - 1];
 					for (int j = 1; j < num2; j++)
 					{
 						array2[j - 1] = int.Parse(array[j]);
 					}
-					allowedAssemblies[i] = new AllowedAssembly(gOHIIMFFFJI, array2);
+					allowedAssemblies[i] = new AllowedAssembly(assemblyName, array2);
 					continue;
 				}
 				signaturesAreNotGenuine = true;
@@ -333,9 +333,9 @@ namespace CodeStage.AntiCheat.Detectors
 			}
 		}
 
-		private int GetAssemblyHash(Assembly EHKCIGHDNMI)
+		private int GetAssemblyHash(Assembly assembly)
 		{
-			AssemblyName assemblyName = EHKCIGHDNMI.GetName();
+			AssemblyName assemblyName = assembly.GetName();
 			byte[] publicKeyToken = assemblyName.GetPublicKeyToken();
 			string text = ((publicKeyToken.Length < 8) ? assemblyName.Name : (assemblyName.Name + PublicKeyTokenToString(publicKeyToken)));
 			int num = 0;
@@ -351,12 +351,12 @@ namespace CodeStage.AntiCheat.Detectors
 			return num + (num << 15);
 		}
 
-		private string PublicKeyTokenToString(byte[] KPAMPCLHCEN)
+		private string PublicKeyTokenToString(byte[] token)
 		{
 			string text = string.Empty;
 			for (int i = 0; i < 8; i++)
 			{
-				text += hexTable[KPAMPCLHCEN[i]];
+				text += hexTable[token[i]];
 			}
 			return text;
 		}

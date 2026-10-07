@@ -78,9 +78,9 @@ namespace Nekki.SF2.GUI
 			return UIModule.GetModule<T>();
 		}
 
-		public UIModule GetModuleByName(string JLEKBBJBLOE)
+		public UIModule GetModuleByName(string moduleName)
 		{
-			return UIModule.GetModuleByName(JLEKBBJBLOE);
+			return UIModule.GetModuleByName(moduleName);
 		}
 
 		public List<UIModule> ActiveModule()
@@ -91,13 +91,13 @@ namespace Nekki.SF2.GUI
 			return list;
 		}
 
-		protected static void CollectActiveModules(List<UIModule> NGGBNMCECLM, List<UIModule> AMKKLMOONEP)
+		protected static void CollectActiveModules(List<UIModule> allModules, List<UIModule> activeModules)
 		{
-			for (int i = 0; i < NGGBNMCECLM.Count; i++)
+			for (int i = 0; i < allModules.Count; i++)
 			{
-				if (NGGBNMCECLM[i].gameObject.activeSelf)
+				if (allModules[i].gameObject.activeSelf)
 				{
-					AMKKLMOONEP.Add(NGGBNMCECLM[i]);
+					activeModules.Add(allModules[i]);
 				}
 			}
 		}

@@ -70,18 +70,18 @@ namespace Nekki.Audio
 			_source.mute = value;
 		}
 
-		internal void Init(Chanel PBJGAIDJFAG, PlayCommand NJOJDALGNKG, AudioClip PIKHEAGHOKB)
+		internal void Init(Chanel parentChanel, PlayCommand command, AudioClip clip)
 		{
-			_command = NJOJDALGNKG;
+			_command = command;
 			if (!_source)
 			{
 				_source = base.gameObject.AddComponent<AudioSource>();
 				_source.spatialBlend = 0f;
 			}
-			_source.clip = PIKHEAGHOKB;
-			_source.loop = NJOJDALGNKG.GetLoop();
-			_source.volume = PBJGAIDJFAG.GetMasterVolume() * NJOJDALGNKG.GetVolume();
-			_parent = PBJGAIDJFAG;
+			_source.clip = clip;
+			_source.loop = command.GetLoop();
+			_source.volume = parentChanel.GetMasterVolume() * command.GetVolume();
+			_parent = parentChanel;
 			SetIsPaused(false);
 			_wasPlaying = false;
 			_source.Play();
@@ -111,11 +111,11 @@ namespace Nekki.Audio
 			}
 		}
 
-		public void Stop(bool BJIOMMPCLEA = false)
+		public void Stop(bool fadeOut = false)
 		{
 			if ((bool)_source)
 			{
-				if (!BJIOMMPCLEA)
+				if (!fadeOut)
 				{
 					_source.Stop();
 					SetIsPaused(false);

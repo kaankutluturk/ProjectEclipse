@@ -16,75 +16,75 @@ public sealed class ScalarNodeDeserializer : INodeDeserializer
 		NumberDecimalDigits = 99
 	};
 
-	bool INodeDeserializer.Deserialize(EventReader reader, Type MBLGNMBFHBI, Func<EventReader, Type, object> IJBAEAEDMCC, out object value)
+	bool INodeDeserializer.Deserialize(EventReader reader, Type expectedType, Func<EventReader, Type, object> nestedObjectDeserializer, out object value)
 	{
-		Scalar lEACOCDHICF = reader.Allow<Scalar>();
-		if (lEACOCDHICF == null)
+		Scalar scalar = reader.Allow<Scalar>();
+		if (scalar == null)
 		{
 			value = null;
 			return false;
 		}
-		if (MBLGNMBFHBI.IsEnumCheck())
+		if (expectedType.IsEnumCheck())
 		{
-			value = Enum.Parse(MBLGNMBFHBI, lEACOCDHICF.GetValue());
+			value = Enum.Parse(expectedType, scalar.GetValue());
 		}
 		else
 		{
-			switch (MBLGNMBFHBI.GetTypeCode())
+			switch (expectedType.GetTypeCode())
 			{
 			case TypeCode.Boolean:
-				value = bool.Parse(lEACOCDHICF.GetValue());
+				value = bool.Parse(scalar.GetValue());
 				break;
 			case TypeCode.Byte:
-				value = byte.Parse(lEACOCDHICF.GetValue(), numberFormat);
+				value = byte.Parse(scalar.GetValue(), numberFormat);
 				break;
 			case TypeCode.Int16:
-				value = short.Parse(lEACOCDHICF.GetValue(), numberFormat);
+				value = short.Parse(scalar.GetValue(), numberFormat);
 				break;
 			case TypeCode.Int32:
-				value = int.Parse(lEACOCDHICF.GetValue(), numberFormat);
+				value = int.Parse(scalar.GetValue(), numberFormat);
 				break;
 			case TypeCode.Int64:
-				value = long.Parse(lEACOCDHICF.GetValue(), numberFormat);
+				value = long.Parse(scalar.GetValue(), numberFormat);
 				break;
 			case TypeCode.SByte:
-				value = sbyte.Parse(lEACOCDHICF.GetValue(), numberFormat);
+				value = sbyte.Parse(scalar.GetValue(), numberFormat);
 				break;
 			case TypeCode.UInt16:
-				value = ushort.Parse(lEACOCDHICF.GetValue(), numberFormat);
+				value = ushort.Parse(scalar.GetValue(), numberFormat);
 				break;
 			case TypeCode.UInt32:
-				value = uint.Parse(lEACOCDHICF.GetValue(), numberFormat);
+				value = uint.Parse(scalar.GetValue(), numberFormat);
 				break;
 			case TypeCode.UInt64:
-				value = ulong.Parse(lEACOCDHICF.GetValue(), numberFormat);
+				value = ulong.Parse(scalar.GetValue(), numberFormat);
 				break;
 			case TypeCode.Single:
-				value = float.Parse(lEACOCDHICF.GetValue(), numberFormat);
+				value = float.Parse(scalar.GetValue(), numberFormat);
 				break;
 			case TypeCode.Double:
-				value = double.Parse(lEACOCDHICF.GetValue(), numberFormat);
+				value = double.Parse(scalar.GetValue(), numberFormat);
 				break;
 			case TypeCode.Decimal:
-				value = decimal.Parse(lEACOCDHICF.GetValue(), numberFormat);
+				value = decimal.Parse(scalar.GetValue(), numberFormat);
 				break;
 			case TypeCode.String:
-				value = lEACOCDHICF.GetValue();
+				value = scalar.GetValue();
 				break;
 			case TypeCode.Char:
-				value = lEACOCDHICF.GetValue()[0];
+				value = scalar.GetValue()[0];
 				break;
 			case TypeCode.DateTime:
-				value = DateTime.Parse(lEACOCDHICF.GetValue(), CultureInfo.InvariantCulture);
+				value = DateTime.Parse(scalar.GetValue(), CultureInfo.InvariantCulture);
 				break;
 			default:
-				if (MBLGNMBFHBI == typeof(object))
+				if (expectedType == typeof(object))
 				{
-					value = lEACOCDHICF.GetValue();
+					value = scalar.GetValue();
 				}
 				else
 				{
-					value = TypeConverterHelper.ChangeType(lEACOCDHICF.GetValue(), MBLGNMBFHBI);
+					value = TypeConverterHelper.ChangeType(scalar.GetValue(), expectedType);
 				}
 				break;
 			}

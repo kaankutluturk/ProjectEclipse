@@ -10,8 +10,8 @@ namespace YamlDotNet.Core.Tokens
 		{
 		}
 
-		public BlockMappingStart(Mark ILENLCMAMBH, Mark PCLFFOBJJFO)
-			: base(ILENLCMAMBH, PCLFFOBJJFO)
+		public BlockMappingStart(Mark startMark, Mark endMark)
+			: base(startMark, endMark)
 		{
 		}
 	}

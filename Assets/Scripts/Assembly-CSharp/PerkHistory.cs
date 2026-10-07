@@ -10,15 +10,15 @@ public class PerkHistory
 
 		public int Level;
 
-		public Perk(string name, int GNLOCMLBNHF)
+		public Perk(string name, int level)
 		{
 			Name = name;
-			Level = GNLOCMLBNHF;
+			Level = level;
 		}
 
-		public int CompareTo(Perk NOLFMPDGCOC)
+		public int CompareTo(Perk other)
 		{
-			return Level.CompareTo(NOLFMPDGCOC.Level);
+			return Level.CompareTo(other.Level);
 		}
 	}
 
@@ -33,18 +33,18 @@ public class PerkHistory
 		}
 		foreach (XmlNode item in node)
 		{
-			string gOHIIMFFFJI = item.Attributes["Perk"].GetStringOrDefault();
-			int gNLOCMLBNHF = item.Attributes["Value"].ParseInt();
-			Perks.Add(new Perk(gOHIIMFFFJI, gNLOCMLBNHF));
+			string perkName = item.Attributes["Perk"].GetStringOrDefault();
+			int level = item.Attributes["Value"].ParseInt();
+			Perks.Add(new Perk(perkName, level));
 		}
 		Perks.Sort();
 	}
 
-	public Perk FindPerkByLevel(int GNLOCMLBNHF)
+	public Perk FindPerkByLevel(int level)
 	{
 		foreach (Perk item in Perks)
 		{
-			if (item.Level == GNLOCMLBNHF)
+			if (item.Level == level)
 			{
 				return item;
 			}
@@ -52,21 +52,21 @@ public class PerkHistory
 		return null;
 	}
 
-	private bool IsExistPerkWithLevel(int GNLOCMLBNHF)
+	private bool IsExistPerkWithLevel(int level)
 	{
-		return FindPerkByLevel(GNLOCMLBNHF) != null;
+		return FindPerkByLevel(level) != null;
 	}
 
-	public Perk AddPerk(string name, int GNLOCMLBNHF)
+	public Perk AddPerk(string name, int level)
 	{
-		if (IsExistPerkWithLevel(GNLOCMLBNHF) || name == string.Empty)
+		if (IsExistPerkWithLevel(level) || name == string.Empty)
 		{
 			return null;
 		}
-		Perk hNHILOOIIMO = new Perk(name, GNLOCMLBNHF);
-		Perks.Add(hNHILOOIIMO);
-		ListSF.GetRoster().GetPerks().SavePerkHistoryEntry(hNHILOOIIMO);
+		Perk perkEntry = new Perk(name, level);
+		Perks.Add(perkEntry);
+		ListSF.GetRoster().GetPerks().SavePerkHistoryEntry(perkEntry);
 		ListSF.GetInstance().RequestSave();
-		return hNHILOOIIMO;
+		return perkEntry;
 	}
 }

@@ -35,16 +35,16 @@ public sealed class Credentials
 		}
 	}
 
-	public Credentials(string IFCOOFDKDGL, string AODNGDGJCMD)
-		: this(AuthenticationTypes.Unknown, IFCOOFDKDGL, AODNGDGJCMD)
+	public Credentials(string userName, string password)
+		: this(AuthenticationTypes.Unknown, userName, password)
 	{
 	}
 
-	public Credentials(AuthenticationTypes LFLGCDNKNJI, string IFCOOFDKDGL, string AODNGDGJCMD)
+	public Credentials(AuthenticationTypes type, string userName, string password)
 	{
-		set_Type(LFLGCDNKNJI);
-		SetUserName(IFCOOFDKDGL);
-		SetPassword(AODNGDGJCMD);
+		set_Type(type);
+		SetUserName(userName);
+		SetPassword(password);
 	}
 
 	public AuthenticationTypes get_Type()

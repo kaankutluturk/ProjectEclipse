@@ -58,10 +58,10 @@ public sealed class ReadablePropertiesTypeInspector : TypeInspectorSkeleton
 			}
 		}
 
-		public ReflectionPropertyDescriptor(PropertyInfo OOEBLPMKOIH, ITypeResolver CBMKGNIHPFO)
+		public ReflectionPropertyDescriptor(PropertyInfo info, ITypeResolver resolver)
 		{
-			_propertyInfo = OOEBLPMKOIH;
-			typeResolver = CBMKGNIHPFO;
+			_propertyInfo = info;
+			typeResolver = resolver;
 		}
 
 		public string get_Name()
@@ -113,29 +113,29 @@ public sealed class ReadablePropertiesTypeInspector : TypeInspectorSkeleton
 		public IObjectDescriptor Read(object target)
 		{
 			object value = _propertyInfo.GetValue(target, null);
-			Type lFLGCDNKNJI = GetTypeOverride() ?? typeResolver.Resolve(get_Type(), value);
-			return new ObjectDescriptor(value, lFLGCDNKNJI, get_Type());
+			Type resolvedType = GetTypeOverride() ?? typeResolver.Resolve(get_Type(), value);
+			return new ObjectDescriptor(value, resolvedType, get_Type());
 		}
 	}
 
 	private readonly ITypeResolver typeResolver;
 
-	public ReadablePropertiesTypeInspector(ITypeResolver CBMKGNIHPFO)
+	public ReadablePropertiesTypeInspector(ITypeResolver resolver)
 	{
-		if (CBMKGNIHPFO == null)
+		if (resolver == null)
 		{
 			throw new ArgumentNullException("typeResolver");
 		}
-		typeResolver = CBMKGNIHPFO;
+		typeResolver = resolver;
 	}
 
-	private static bool IsValidProperty(PropertyInfo JLCGLCLEGBD)
+	private static bool IsValidProperty(PropertyInfo property)
 	{
-		return JLCGLCLEGBD.CanRead && JLCGLCLEGBD.GetGetMethod().GetParameters().Length == 0;
+		return property.CanRead && property.GetGetMethod().GetParameters().Length == 0;
 	}
 
-	public override IEnumerable<IPropertyDescriptor> GetProperties(Type LFLGCDNKNJI, object EGJHGBCEPHO)
+	public override IEnumerable<IPropertyDescriptor> GetProperties(Type type, object container)
 	{
-		return LFLGCDNKNJI.GetPublicProperties().Where(IsValidProperty).Select((Func<PropertyInfo, IPropertyDescriptor>)((PropertyInfo PIIEECCHMAC) => new ReflectionPropertyDescriptor(PIIEECCHMAC, typeResolver)));
+		return type.GetPublicProperties().Where(IsValidProperty).Select((Func<PropertyInfo, IPropertyDescriptor>)((PropertyInfo property) => new ReflectionPropertyDescriptor(property, typeResolver)));
 	}
 }

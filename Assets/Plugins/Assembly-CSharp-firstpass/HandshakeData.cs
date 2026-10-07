@@ -85,9 +85,9 @@ public sealed class HandshakeData
 		}
 	}
 
-	public HandshakeData(SocketManager BJGMPDIKEJC)
+	public HandshakeData(SocketManager manager)
 	{
-		SetManager(BJGMPDIKEJC);
+		SetManager(manager);
 	}
 
 	public string GetSid()
@@ -152,9 +152,9 @@ public sealed class HandshakeData
 				null,
 				null
 			};
-			SocketManager mFANOMMMCFG = GetManager();
+			SocketManager socketManager = GetManager();
 			ulong num;
-			mFANOMMMCFG.set_RequestCounter((num = mFANOMMMCFG.GetRequestCounter()) + 1);
+			socketManager.set_RequestCounter((num = socketManager.GetRequestCounter()) + 1);
 			obj[3] = num;
 			obj[4] = GetManager().GetOptions().BuildQueryParams();
 			handshakeRequest = new HTTPRequest(new Uri(string.Format("{0}?EIO={1}&transport=polling&t={2}-{3}{4}&b64=true", obj)), OnHandshakeCallback);
@@ -175,25 +175,25 @@ public sealed class HandshakeData
 		OnError = null;
 	}
 
-	private void OnHandshakeCallback(HTTPRequest CGOIOKHEGOE, HTTPResponse BEIGFGCBICO)
+	private void OnHandshakeCallback(HTTPRequest request, HTTPResponse response)
 	{
 		handshakeRequest = null;
-		switch (CGOIOKHEGOE.GetState())
+		switch (request.GetState())
 		{
 		case HTTPRequestStates.Finished:
-			if (BEIGFGCBICO.GetIsSuccess())
+			if (response.GetIsSuccess())
 			{
-				HTTPManager.GetLogger().Information("HandshakeData", "Handshake data arrived: " + BEIGFGCBICO.GetDataAsText());
-				int num = BEIGFGCBICO.GetDataAsText().IndexOf("{");
+				HTTPManager.GetLogger().Information("HandshakeData", "Handshake data arrived: " + response.GetDataAsText());
+				int num = response.GetDataAsText().IndexOf("{");
 				if (num < 0)
 				{
-					RaiseOnError("Invalid handshake text: " + BEIGFGCBICO.GetDataAsText());
+					RaiseOnError("Invalid handshake text: " + response.GetDataAsText());
 					break;
 				}
-				HandshakeData pNAFNLKDFKD = Parse(BEIGFGCBICO.GetDataAsText().Substring(num));
-				if (pNAFNLKDFKD == null)
+				HandshakeData handshakeData = Parse(response.GetDataAsText().Substring(num));
+				if (handshakeData == null)
 				{
-					RaiseOnError("Parsing Handshake data failed: " + BEIGFGCBICO.GetDataAsText());
+					RaiseOnError("Parsing Handshake data failed: " + response.GetDataAsText());
 				}
 				else if (OnReceived != null)
 				{
@@ -203,42 +203,42 @@ public sealed class HandshakeData
 			}
 			else
 			{
-				RaiseOnError(string.Format("Handshake request finished Successfully, but the server sent an error. Status Code: {0}-{1} Message: {2} Uri: {3}", BEIGFGCBICO.GetStatusCode(), BEIGFGCBICO.GetMessage(), BEIGFGCBICO.GetDataAsText(), CGOIOKHEGOE.GetCurrentUri()));
+				RaiseOnError(string.Format("Handshake request finished Successfully, but the server sent an error. Status Code: {0}-{1} Message: {2} Uri: {3}", response.GetStatusCode(), response.GetMessage(), response.GetDataAsText(), request.GetCurrentUri()));
 			}
 			break;
 		case HTTPRequestStates.Error:
-			RaiseOnError((CGOIOKHEGOE.GetException() == null) ? string.Empty : (CGOIOKHEGOE.GetException().Message + " " + CGOIOKHEGOE.GetException().StackTrace));
+			RaiseOnError((request.GetException() == null) ? string.Empty : (request.GetException().Message + " " + request.GetException().StackTrace));
 			break;
 		default:
-			RaiseOnError(CGOIOKHEGOE.GetState().ToString());
+			RaiseOnError(request.GetState().ToString());
 			break;
 		}
 	}
 
-	private void RaiseOnError(string KEPBNIIECPN)
+	private void RaiseOnError(string error)
 	{
-		HTTPManager.GetLogger().Error("HandshakeData", "Handshake request failed with error: " + KEPBNIIECPN);
+		HTTPManager.GetLogger().Error("HandshakeData", "Handshake request failed with error: " + error);
 		if (OnError != null)
 		{
-			OnError(this, KEPBNIIECPN);
+			OnError(this, error);
 			OnError = null;
 		}
 	}
 
-	private HandshakeData Parse(string IGGFGLLIGCG)
+	private HandshakeData Parse(string json)
 	{
-		bool IBFAPIMOMBA = false;
-		Dictionary<string, object> iOFHCAAOELD = Json.Decode(IGGFGLLIGCG, ref IBFAPIMOMBA) as Dictionary<string, object>;
-		if (!IBFAPIMOMBA)
+		bool success = false;
+		Dictionary<string, object> data = Json.Decode(json, ref success) as Dictionary<string, object>;
+		if (!success)
 		{
 			return null;
 		}
 		try
 		{
-			set_Sid(GetString(iOFHCAAOELD, "sid"));
-			set_Upgrades(GetStringList(iOFHCAAOELD, "upgrades"));
-			SetPingInterval(TimeSpan.FromMilliseconds(GetInt(iOFHCAAOELD, "pingInterval")));
-			SetPingTimeout(TimeSpan.FromMilliseconds(GetInt(iOFHCAAOELD, "pingTimeout")));
+			set_Sid(GetString(data, "sid"));
+			set_Upgrades(GetStringList(data, "upgrades"));
+			SetPingInterval(TimeSpan.FromMilliseconds(GetInt(data, "pingInterval")));
+			SetPingTimeout(TimeSpan.FromMilliseconds(GetInt(data, "pingTimeout")));
 			return this;
 		}
 		catch
@@ -247,24 +247,24 @@ public sealed class HandshakeData
 		}
 	}
 
-	private static object Get(Dictionary<string, object> IOFHCAAOELD, string KGBGENDIMBC)
+	private static object Get(Dictionary<string, object> data, string key)
 	{
 		object value;
-		if (!IOFHCAAOELD.TryGetValue(KGBGENDIMBC, out value))
+		if (!data.TryGetValue(key, out value))
 		{
-			throw new Exception(string.Format("Can't get {0} from Handshake data!", KGBGENDIMBC));
+			throw new Exception(string.Format("Can't get {0} from Handshake data!", key));
 		}
 		return value;
 	}
 
-	private static string GetString(Dictionary<string, object> IOFHCAAOELD, string KGBGENDIMBC)
+	private static string GetString(Dictionary<string, object> data, string key)
 	{
-		return Get(IOFHCAAOELD, KGBGENDIMBC) as string;
+		return Get(data, key) as string;
 	}
 
-	private static List<string> GetStringList(Dictionary<string, object> IOFHCAAOELD, string KGBGENDIMBC)
+	private static List<string> GetStringList(Dictionary<string, object> data, string key)
 	{
-		List<object> list = Get(IOFHCAAOELD, KGBGENDIMBC) as List<object>;
+		List<object> list = Get(data, key) as List<object>;
 		List<string> list2 = new List<string>(list.Count);
 		for (int i = 0; i < list.Count; i++)
 		{
@@ -277,8 +277,8 @@ public sealed class HandshakeData
 		return list2;
 	}
 
-	private static int GetInt(Dictionary<string, object> IOFHCAAOELD, string KGBGENDIMBC)
+	private static int GetInt(Dictionary<string, object> data, string key)
 	{
-		return (int)(double)Get(IOFHCAAOELD, KGBGENDIMBC);
+		return (int)(double)Get(data, key);
 	}
 }

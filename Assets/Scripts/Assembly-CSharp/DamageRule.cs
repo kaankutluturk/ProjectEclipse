@@ -4,8 +4,8 @@ public class DamageRule : InFightRule
 {
 	protected bool isNoDamage;
 
-	public DamageRule(XmlNode node, RuleAppliance EJPOJJKKICO, RuleType LFLGCDNKNJI)
-		: base(LFLGCDNKNJI, EJPOJJKKICO, node)
+	public DamageRule(XmlNode node, RuleAppliance ruleAppliance, RuleType ruleType)
+		: base(ruleType, ruleAppliance, node)
 	{
 		isNoDamage = false;
 		SubscribeEvent(FightEvent.DamageCheckEvent);
@@ -18,8 +18,8 @@ public class DamageRule : InFightRule
 
 	public override void InitRule(object data)
 	{
-		RuleInitData oIFPCFEGFOB = (RuleInitData)data;
-		Compare(oIFPCFEGFOB.FightData);
+		RuleInitData initData = (RuleInitData)data;
+		Compare(initData.FightData);
 	}
 
 	protected override bool CompareSingle(object data)
@@ -27,10 +27,10 @@ public class DamageRule : InFightRule
 		return false;
 	}
 
-	protected virtual bool CheckIsNoDamageChange(bool EGDPHJKMGAB)
+	protected virtual bool CheckIsNoDamageChange(bool noDamage)
 	{
-		bool result = isNoDamage != EGDPHJKMGAB;
-		isNoDamage = EGDPHJKMGAB;
+		bool result = isNoDamage != noDamage;
+		isNoDamage = noDamage;
 		return result;
 	}
 
@@ -48,11 +48,11 @@ public class DamageRule : InFightRule
 
 	public override InFightRule Copy()
 	{
-		InFightRule aAJIFBJLJOA = null;
-		RuleAppliance eJPOJJKKICO = GetAppliance();
-		XmlNode hKPPBKPJOEO = GetXmlSource().GetNode();
-		aAJIFBJLJOA = new DamageRule(hKPPBKPJOEO, eJPOJJKKICO, _type);
-		aAJIFBJLJOA.IsRandom = IsRandom;
-		return aAJIFBJLJOA;
+		InFightRule copy = null;
+		RuleAppliance ruleAppliance = GetAppliance();
+		XmlNode sourceNode = GetXmlSource().GetNode();
+		copy = new DamageRule(sourceNode, ruleAppliance, _type);
+		copy.IsRandom = IsRandom;
+		return copy;
 	}
 }

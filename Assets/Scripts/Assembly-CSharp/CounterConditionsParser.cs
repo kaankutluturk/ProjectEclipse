@@ -10,11 +10,11 @@ public static class CounterConditionsParser
 		return list;
 	}
 
-	public static void ParseConditions(XmlNode EBLIGDMALEA, List<ConditionCounter> DCJLKCFKCOM)
+	public static void ParseConditions(XmlNode node, List<ConditionCounter> conditions)
 	{
-		foreach (XmlNode childNode in EBLIGDMALEA.ChildNodes)
+		foreach (XmlNode childNode in node.ChildNodes)
 		{
-			DCJLKCFKCOM.Add(ParseCondition(childNode));
+			conditions.Add(ParseCondition(childNode));
 		}
 	}
 
@@ -33,9 +33,9 @@ public static class CounterConditionsParser
 		return null;
 	}
 
-	public static void ParseCompletionConditions(XmlNode EBLIGDMALEA, ConditionOperator FMFMOPOJBOH, ConditionOfCompletionInspector GLKOKIOFOMD)
+	public static void ParseCompletionConditions(XmlNode node, ConditionOperator parentOperator, ConditionOfCompletionInspector inspector)
 	{
-		foreach (XmlNode childNode in EBLIGDMALEA.ChildNodes)
+		foreach (XmlNode childNode in node.ChildNodes)
 		{
 			string name = childNode.Name;
 			switch (name)
@@ -43,19 +43,19 @@ public static class CounterConditionsParser
 			case "Battle":
 			{
 				ConditionBattle ePJGLECOIBG2 = new ConditionBattle(childNode);
-				FMFMOPOJBOH.AddCondition(ePJGLECOIBG2);
+				parentOperator.AddCondition(ePJGLECOIBG2);
 				break;
 			}
 			case "Operator":
 			{
-				ConditionOperator ePJGLECOIBG = new ConditionOperator(childNode);
-				FMFMOPOJBOH.AddCondition(ePJGLECOIBG);
+				ConditionOperator childOperator = new ConditionOperator(childNode);
+				parentOperator.AddCondition(childOperator);
 				break;
 			}
 			case "WinBattle":
 			{
-				ConditionOfCompletionBattle iOFGGOCEIAM = new ConditionOfCompletionBattle(childNode);
-				GLKOKIOFOMD.AddCondition(iOFGGOCEIAM);
+				ConditionOfCompletionBattle winCondition = new ConditionOfCompletionBattle(childNode);
+				inspector.AddCondition(winCondition);
 				break;
 			}
 			default:

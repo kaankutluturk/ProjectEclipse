@@ -7,16 +7,16 @@ public class QuestActionWait : QuestAction
 
 	private int frames;
 
-	public override void Parse(XmlNode EPKLCPOEELO)
+	public override void Parse(XmlNode node)
 	{
-		base.Parse(EPKLCPOEELO);
-		frames = EPKLCPOEELO.Attributes["Frames"].ParseInt();
+		base.Parse(node);
+		frames = node.Attributes["Frames"].ParseInt();
 	}
 
-	public override void Execute(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters parameters)
 	{
 		ResetSequences();
-		base.Execute(GFIHPBCEEOB);
+		base.Execute(parameters);
 		ApplicationController.add_OnUpdate(OnEveryFrame);
 	}
 

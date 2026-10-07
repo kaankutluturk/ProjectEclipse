@@ -74,18 +74,18 @@ public class Capsule : Segment3D
 		}
 	}
 
-	public Capsule(Segment3D LEFHAGAGOME)
+	public Capsule(Segment3D segment)
 	{
-		SetStartReference(LEFHAGAGOME.GetStart());
-		SetEndReference(LEFHAGAGOME.GetEnd());
+		SetStartReference(segment.GetStart());
+		SetEndReference(segment.GetEnd());
 	}
 
-	public CapsuleRender CreateUI(Transform GLKEHHPBGKP)
+	public CapsuleRender CreateUI(Transform parent)
 	{
 		GameObject gameObject = new GameObject(_data.Name);
 		CapsuleRender capsuleRender = gameObject.AddComponent<CapsuleRender>();
 		capsuleRender.set_Base(this);
-		gameObject.transform.SetParent(GLKEHHPBGKP, false);
+		gameObject.transform.SetParent(parent, false);
 		return capsuleRender;
 	}
 
@@ -149,9 +149,9 @@ public class Capsule : Segment3D
 		_data.Margin2 = value;
 	}
 
-	private void ApplyMarginsToSegment(Segment3D OEMALIFPGPO)
+	private void ApplyMarginsToSegment(Segment3D segment)
 	{
-		OEMALIFPGPO.SetStart(GetDivisionPoint3D(_data.Margin1));
-		OEMALIFPGPO.SetEnd(GetDivisionPoint3D(1f - _data.Margin2));
+		segment.SetStart(GetDivisionPoint3D(_data.Margin1));
+		segment.SetEnd(GetDivisionPoint3D(1f - _data.Margin2));
 	}
 }

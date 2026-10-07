@@ -24,11 +24,11 @@ public class PerkConditionComparison : PerkConditionFunctionExtension
 		functionExtension.set_Target(this);
 	}
 
-	public override bool IsEqual(Model ACENLMONNPA, List<string> NIKHAICFGNM)
+	public override bool IsEqual(Model model, List<string> args)
 	{
-		base.IsEqual(ACENLMONNPA, NIKHAICFGNM);
-		FunctionResult dEIHAOLOPLC = functionExtension.Calculate();
-		int num = dEIHAOLOPLC.ToInt();
+		base.IsEqual(model, args);
+		FunctionResult functionResult = functionExtension.Calculate();
+		int num = functionResult.ToInt();
 		return num > 0;
 	}
 }

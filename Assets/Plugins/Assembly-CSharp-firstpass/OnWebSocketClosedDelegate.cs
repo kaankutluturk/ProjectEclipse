@@ -1,1 +1,1 @@
-public delegate void OnWebSocketClosedDelegate(WebSocket ILNFPNFEOCL, ushort KJPGKHJNOMC, string LIOGIBJBHAH);
+public delegate void OnWebSocketClosedDelegate(WebSocket webSocket, ushort code, string message);

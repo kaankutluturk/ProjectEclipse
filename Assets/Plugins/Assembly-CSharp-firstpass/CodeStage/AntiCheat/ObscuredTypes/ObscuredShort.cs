@@ -26,9 +26,9 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 			inited = true;
 		}
 
-		public static void SetNewCryptoKey(short CNOFJICCAHK)
+		public static void SetNewCryptoKey(short newKey)
 		{
-			cryptoKey = CNOFJICCAHK;
+			cryptoKey = newKey;
 		}
 
 		public static short EncryptDecrypt(short value)
@@ -36,13 +36,13 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 			return EncryptDecrypt(value, 0);
 		}
 
-		public static short EncryptDecrypt(short value, short KGBGENDIMBC)
+		public static short EncryptDecrypt(short value, short key)
 		{
-			if (KGBGENDIMBC == 0)
+			if (key == 0)
 			{
 				return (short)(value ^ cryptoKey);
 			}
-			return (short)(value ^ KGBGENDIMBC);
+			return (short)(value ^ key);
 		}
 
 		public void ApplyNewCryptoKey()
@@ -56,9 +56,9 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 
 		public void RandomizeCryptoKey()
 		{
-			short bAINMLLIKOL = InternalDecrypt();
+			short decrypted = InternalDecrypt();
 			currentCryptoKey = (short)UnityEngine.Random.Range(-32768, 32767);
-			hiddenValue = EncryptDecrypt(bAINMLLIKOL, currentCryptoKey);
+			hiddenValue = EncryptDecrypt(decrypted, currentCryptoKey);
 		}
 
 		public short GetEncrypted()
@@ -67,10 +67,10 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 			return hiddenValue;
 		}
 
-		public void SetEncrypted(short ANGFOBEKKKD)
+		public void SetEncrypted(short encrypted)
 		{
 			inited = true;
-			hiddenValue = ANGFOBEKKKD;
+			hiddenValue = encrypted;
 			if (ObscuredCheatingDetector.GetIsRunning())
 			{
 				fakeValue = InternalDecrypt();
@@ -110,45 +110,45 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 		}
 
 		[SpecialName]
-		public static ObscuredShort op_Increment(ObscuredShort NILNDHEKNLJ)
+		public static ObscuredShort op_Increment(ObscuredShort input)
 		{
-			short bAINMLLIKOL = (short)(NILNDHEKNLJ.InternalDecrypt() + 1);
-			NILNDHEKNLJ.hiddenValue = EncryptDecrypt(bAINMLLIKOL);
+			short newValue = (short)(input.InternalDecrypt() + 1);
+			input.hiddenValue = EncryptDecrypt(newValue);
 			if (ObscuredCheatingDetector.GetIsRunning())
 			{
-				NILNDHEKNLJ.fakeValue = bAINMLLIKOL;
+				input.fakeValue = newValue;
 			}
-			return NILNDHEKNLJ;
+			return input;
 		}
 
 		[SpecialName]
-		public static ObscuredShort op_Decrement(ObscuredShort NILNDHEKNLJ)
+		public static ObscuredShort op_Decrement(ObscuredShort input)
 		{
-			short bAINMLLIKOL = (short)(NILNDHEKNLJ.InternalDecrypt() - 1);
-			NILNDHEKNLJ.hiddenValue = EncryptDecrypt(bAINMLLIKOL);
+			short newValue = (short)(input.InternalDecrypt() - 1);
+			input.hiddenValue = EncryptDecrypt(newValue);
 			if (ObscuredCheatingDetector.GetIsRunning())
 			{
-				NILNDHEKNLJ.fakeValue = bAINMLLIKOL;
+				input.fakeValue = newValue;
 			}
-			return NILNDHEKNLJ;
+			return input;
 		}
 
-		public override bool Equals(object AOMLCBHAJJH)
+		public override bool Equals(object obj)
 		{
-			if (!(AOMLCBHAJJH is ObscuredShort))
+			if (!(obj is ObscuredShort))
 			{
 				return false;
 			}
-			return Equals((ObscuredShort)AOMLCBHAJJH);
+			return Equals((ObscuredShort)obj);
 		}
 
-		public bool Equals(ObscuredShort AOMLCBHAJJH)
+		public bool Equals(ObscuredShort other)
 		{
-			if (currentCryptoKey == AOMLCBHAJJH.currentCryptoKey)
+			if (currentCryptoKey == other.currentCryptoKey)
 			{
-				return hiddenValue == AOMLCBHAJJH.hiddenValue;
+				return hiddenValue == other.hiddenValue;
 			}
-			return EncryptDecrypt(hiddenValue, currentCryptoKey) == EncryptDecrypt(AOMLCBHAJJH.hiddenValue, AOMLCBHAJJH.currentCryptoKey);
+			return EncryptDecrypt(hiddenValue, currentCryptoKey) == EncryptDecrypt(other.hiddenValue, other.currentCryptoKey);
 		}
 
 		public override string ToString()
@@ -156,9 +156,9 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 			return InternalDecrypt().ToString();
 		}
 
-		public string ToString(string LBOHOKIBHOH)
+		public string ToString(string format)
 		{
-			return InternalDecrypt().ToString(LBOHOKIBHOH);
+			return InternalDecrypt().ToString(format);
 		}
 
 		public override int GetHashCode()
@@ -166,14 +166,14 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 			return InternalDecrypt().GetHashCode();
 		}
 
-		public string ToString(IFormatProvider EEGMFLOPLLH)
+		public string ToString(IFormatProvider provider)
 		{
-			return InternalDecrypt().ToString(EEGMFLOPLLH);
+			return InternalDecrypt().ToString(provider);
 		}
 
-		public string ToString(string LBOHOKIBHOH, IFormatProvider EEGMFLOPLLH)
+		public string ToString(string format, IFormatProvider provider)
 		{
-			return InternalDecrypt().ToString(LBOHOKIBHOH, EEGMFLOPLLH);
+			return InternalDecrypt().ToString(format, provider);
 		}
 	}
 }

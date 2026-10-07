@@ -36,9 +36,9 @@ namespace Nekki.SF2.GUI.Shop
 			return _baseScrollContent;
 		}
 
-		public void Init(BaseScrollContent KHDHFALCAEJ)
+		public void Init(BaseScrollContent content)
 		{
-			_baseScrollContent = KHDHFALCAEJ;
+			_baseScrollContent = content;
 			if (_itemsScroll != null)
 			{
 				_baseScrollContent.transform.SetParent(_itemsScroll.transform, false);
@@ -56,11 +56,11 @@ namespace Nekki.SF2.GUI.Shop
 			}
 		}
 
-		public void SetItems(List<BaseScrollItem> HELFDCAIJNE)
+		public void SetItems(List<BaseScrollItem> items)
 		{
 			if (_baseScrollContent != null)
 			{
-				_baseScrollContent.SetItems(HELFDCAIJNE);
+				_baseScrollContent.SetItems(items);
 			}
 		}
 

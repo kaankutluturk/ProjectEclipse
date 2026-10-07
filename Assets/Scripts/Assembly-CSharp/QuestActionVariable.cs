@@ -6,36 +6,36 @@ public class QuestActionVariable : QuestAction
 
 	private string _value = string.Empty;
 
-	public override void Parse(XmlNode EPKLCPOEELO)
+	public override void Parse(XmlNode node)
 	{
-		base.Parse(EPKLCPOEELO);
-		_name = EPKLCPOEELO.Attributes["Name"].GetStringOrDefault(string.Empty);
-		_value = EPKLCPOEELO.Attributes["Value"].GetStringOrDefault(string.Empty);
+		base.Parse(node);
+		_name = node.Attributes["Name"].GetStringOrDefault(string.Empty);
+		_value = node.Attributes["Value"].GetStringOrDefault(string.Empty);
 	}
 
-	public override void Execute(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters parameters)
 	{
-		base.Execute(GFIHPBCEEOB);
-		ApplyVariable(GFIHPBCEEOB);
+		base.Execute(parameters);
+		ApplyVariable(parameters);
 		FinishAction();
 	}
 
-	public void ApplyVariable(QuestParameters JCICKLIMBEF)
+	public void ApplyVariable(QuestParameters parameters)
 	{
-		ConditionExtension.CompareResult lNIDLHOIHIM = new ConditionExtension.CompareResult();
-		QuestCondition kKDGLNECFHA = new QuestCondition();
-		kKDGLNECFHA.SetParameters(JCICKLIMBEF);
-		string bAINMLLIKOL = string.Empty;
+		ConditionExtension.CompareResult result = new ConditionExtension.CompareResult();
+		QuestCondition condition = new QuestCondition();
+		condition.SetParameters(parameters);
+		string variableValue = string.Empty;
 		if (!string.IsNullOrEmpty(_value))
 		{
-			kKDGLNECFHA.SetValue(_value, lNIDLHOIHIM);
-			bAINMLLIKOL = lNIDLHOIHIM.ToString();
+			condition.SetValue(_value, result);
+			variableValue = result.ToString();
 		}
-		lNIDLHOIHIM.Clear();
-		kKDGLNECFHA.SetValue(_name, lNIDLHOIHIM);
-		string gOHIIMFFFJI = lNIDLHOIHIM.ToString();
-		Roster nKGLHEGIKKP = ListSF.GetRoster();
-		nKGLHEGIKKP.SetQuestVariable(gOHIIMFFFJI, bAINMLLIKOL);
+		result.Clear();
+		condition.SetValue(_name, result);
+		string variableName = result.ToString();
+		Roster roster = ListSF.GetRoster();
+		roster.SetQuestVariable(variableName, variableValue);
 		ListSF.GetInstance().RequestSave();
 	}
 }

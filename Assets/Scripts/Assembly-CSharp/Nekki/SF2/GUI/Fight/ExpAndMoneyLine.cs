@@ -30,12 +30,12 @@ namespace Nekki.SF2.GUI.Fight
 
 		private bool needShowExpAndMoney;
 
-		public void Init(long exp, long GBGNFPNCGED)
+		public void Init(long exp, long money)
 		{
 			needShowExpAndMoney = true;
 			targetExp = exp;
 			displayedExp = 0L;
-			targetMoney = GBGNFPNCGED;
+			targetMoney = money;
 			displayedMoney = 0L;
 			if (moneyCount != null)
 			{
@@ -58,7 +58,7 @@ namespace Nekki.SF2.GUI.Fight
 			}
 		}
 
-		public void VisibleExpAndMoney(bool KFIECNIMAOA)
+		public void VisibleExpAndMoney(bool visible)
 		{
 			NumberFormatInfo numberFormatInfo = new NumberFormatInfo();
 			numberFormatInfo.NumberGroupSeparator = " ";
@@ -66,12 +66,12 @@ namespace Nekki.SF2.GUI.Fight
 			if (exp != null)
 			{
 				exp.SetText(displayedExp.ToString("N0", numberFormatInfo2));
-				exp.gameObject.SetActive(KFIECNIMAOA);
+				exp.gameObject.SetActive(visible);
 			}
 			if (moneyCount != null)
 			{
 				moneyCount.SetText(displayedMoney.ToString("N0", numberFormatInfo2));
-				moneyCount.gameObject.SetActive(KFIECNIMAOA);
+				moneyCount.gameObject.SetActive(visible);
 			}
 		}
 
@@ -84,15 +84,15 @@ namespace Nekki.SF2.GUI.Fight
 			sequence = DOTween.Sequence();
 			if (moneyCount != null && exp != null)
 			{
-				Tweener t = DOTween.To(() => displayedMoney, (long DHDMNHCIPEH) =>
+				Tweener t = DOTween.To(() => displayedMoney, (long money) =>
 				{
-					displayedMoney = DHDMNHCIPEH;
+					displayedMoney = money;
 					moneyCount.SetText(displayedMoney.ToString("N0", f));
 				}, targetMoney, moneyAddTime);
 				sequence.Append(t);
-				Tweener t2 = DOTween.To(() => displayedExp, (long DHDMNHCIPEH) =>
+				Tweener t2 = DOTween.To(() => displayedExp, (long expValue) =>
 				{
-					displayedExp = DHDMNHCIPEH;
+					displayedExp = expValue;
 					exp.SetText(displayedExp.ToString("N0", f));
 				}, targetExp, moneyAddTime);
 				sequence.Join(t2);
@@ -107,14 +107,14 @@ namespace Nekki.SF2.GUI.Fight
 			}
 		}
 
-		public void AddListener(UnityAction ODDEOFKLIAG)
+		public void AddListener(UnityAction listener)
 		{
-			endEvent.AddListener(ODDEOFKLIAG);
+			endEvent.AddListener(listener);
 		}
 
-		public void RemoveListener(UnityAction ODDEOFKLIAG)
+		public void RemoveListener(UnityAction listener)
 		{
-			endEvent.RemoveListener(ODDEOFKLIAG);
+			endEvent.RemoveListener(listener);
 		}
 
 		public void FinishAnimation()

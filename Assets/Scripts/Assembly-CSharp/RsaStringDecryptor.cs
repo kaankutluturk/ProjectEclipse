@@ -38,44 +38,44 @@ public class RsaStringDecryptor
 		nField = new BigInteger(array);
 	}
 
-	private static string TrimLeadingZerosToString(byte[] AAOIAEJJINO)
+	private static string TrimLeadingZerosToString(byte[] data)
 	{
 		int i;
-		for (i = 0; i < AAOIAEJJINO.Length && AAOIAEJJINO[i] == 0; i++)
+		for (i = 0; i < data.Length && data[i] == 0; i++)
 		{
 		}
-		if (i != AAOIAEJJINO.Length)
+		if (i != data.Length)
 		{
-			byte[] array = new byte[AAOIAEJJINO.Length - i];
-			Buffer.BlockCopy(AAOIAEJJINO, i, array, 0, AAOIAEJJINO.Length - i);
+			byte[] array = new byte[data.Length - i];
+			Buffer.BlockCopy(data, i, array, 0, data.Length - i);
 			return Encoding.UTF8.GetString(array);
 		}
 		return string.Empty;
 	}
 
-	public static string Decrypt(byte[] KPAMPCLHCEN, bool KKJCGBFKBGD)
+	public static string Decrypt(byte[] encryptedData, bool stripQuotes)
 	{
-		if (KPAMPCLHCEN.Length == blockLengthField)
+		if (encryptedData.Length == blockLengthField)
 		{
-			BigInteger bigInteger = new BigInteger(KPAMPCLHCEN);
+			BigInteger bigInteger = new BigInteger(encryptedData);
 			byte[] bytes = bigInteger.ModPow(exponentField, nField).GetBytes();
 			string text = TrimLeadingZerosToString(bytes);
-			if (KKJCGBFKBGD)
+			if (stripQuotes)
 			{
 				return text.Substring(1, text.Length - 2);
 			}
 			return text;
 		}
 		StringBuilder stringBuilder = new StringBuilder();
-		for (int i = 0; i < KPAMPCLHCEN.Length / blockLengthField; i++)
+		for (int i = 0; i < encryptedData.Length / blockLengthField; i++)
 		{
 			byte[] array = new byte[blockLengthField];
-			Buffer.BlockCopy(KPAMPCLHCEN, i * blockLengthField, array, 0, blockLengthField);
+			Buffer.BlockCopy(encryptedData, i * blockLengthField, array, 0, blockLengthField);
 			BigInteger bigInteger2 = new BigInteger(array);
 			byte[] bytes2 = bigInteger2.ModPow(exponentField, nField).GetBytes();
 			stringBuilder.Append(TrimLeadingZerosToString(bytes2));
 		}
-		if (KKJCGBFKBGD)
+		if (stripQuotes)
 		{
 			string text2 = stringBuilder.ToString();
 			return text2.Substring(1, text2.Length - 2);

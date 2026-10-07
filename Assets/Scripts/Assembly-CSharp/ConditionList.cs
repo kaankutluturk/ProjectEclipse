@@ -47,28 +47,28 @@ public class ConditionList : ConditionAnimation
 		return (!IsNot) ? flag : (!flag);
 	}
 
-	public bool EvaluateWithModel(ModelConditions conditions, Model ACENLMONNPA = null, EventAnimation DOANBADPBGH = null)
+	public bool EvaluateWithModel(ModelConditions conditions, Model model = null, EventAnimation eventAnimation = null)
 	{
-		bool flag = EvaluateConditions(conditions, ACENLMONNPA, DOANBADPBGH);
+		bool flag = EvaluateConditions(conditions, model, eventAnimation);
 		return (!IsNot) ? flag : (!flag);
 	}
 
-	private bool EvaluateConditions(ModelConditions conditions, Model ACENLMONNPA = null, EventAnimation DOANBADPBGH = null)
+	private bool EvaluateConditions(ModelConditions conditions, Model model = null, EventAnimation eventAnimation = null)
 	{
 		foreach (ConditionAnimation item in _conditions)
 		{
 			bool flag = false;
-			if (item.Type == ConditionType.EVENT && ACENLMONNPA != null)
+			if (item.Type == ConditionType.EVENT && model != null)
 			{
-				ModelType.ModelTargetType lFLGCDNKNJI = item.GetTargetModelType();
-				Model fGCODGKLHED = item.ResolveTargetModel(ACENLMONNPA, lFLGCDNKNJI);
-				ModelConditions dGJJDPIAEAO = fGCODGKLHED.GetConditions();
-				if (DOANBADPBGH != null)
+				ModelType.ModelTargetType targetType = item.GetTargetModelType();
+				Model targetModel = item.ResolveTargetModel(model, targetType);
+				ModelConditions targetConditions = targetModel.GetConditions();
+				if (eventAnimation != null)
 				{
-					dGJJDPIAEAO.CurrentEvent = DOANBADPBGH;
-					DOANBADPBGH.Conditions = dGJJDPIAEAO;
+					targetConditions.CurrentEvent = eventAnimation;
+					eventAnimation.Conditions = targetConditions;
 				}
-				flag = item.IsEqual(dGJJDPIAEAO);
+				flag = item.IsEqual(targetConditions);
 			}
 			else
 			{

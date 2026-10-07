@@ -84,19 +84,19 @@ namespace CodeStage.AntiCheat.Detectors
 			StartDetection(callback, GetOrCreate().interval);
 		}
 
-		public static void StartDetection(UnityAction callback, float CHCGJBLDPML)
+		public static void StartDetection(UnityAction callback, float checkInterval)
 		{
-			StartDetection(callback, CHCGJBLDPML, GetOrCreate().maxFalsePositives);
+			StartDetection(callback, checkInterval, GetOrCreate().maxFalsePositives);
 		}
 
-		public static void StartDetection(UnityAction callback, float CHCGJBLDPML, byte JKBEIPOFGCI)
+		public static void StartDetection(UnityAction callback, float checkInterval, byte allowedFalsePositives)
 		{
-			StartDetection(callback, CHCGJBLDPML, JKBEIPOFGCI, GetOrCreate().coolDown);
+			StartDetection(callback, checkInterval, allowedFalsePositives, GetOrCreate().coolDown);
 		}
 
-		public static void StartDetection(UnityAction callback, float CHCGJBLDPML, byte JKBEIPOFGCI, int CCCBHICMMJP)
+		public static void StartDetection(UnityAction callback, float checkInterval, byte allowedFalsePositives, int coolDownValue)
 		{
-			GetOrCreate().StartDetectionInternal(callback, CHCGJBLDPML, JKBEIPOFGCI, CCCBHICMMJP);
+			GetOrCreate().StartDetectionInternal(callback, checkInterval, allowedFalsePositives, coolDownValue);
 		}
 
 		public static void StopDetection()
@@ -155,7 +155,7 @@ namespace CodeStage.AntiCheat.Detectors
 			instancesInScene--;
 		}
 
-		private void OnSceneLoaded(Scene MHOCFOODLLL, LoadSceneMode NMMPBADCFHK)
+		private void OnSceneLoaded(Scene scene, LoadSceneMode loadMode)
 		{
 			OnLevelLoadedCallback();
 		}
@@ -175,9 +175,9 @@ namespace CodeStage.AntiCheat.Detectors
 			}
 		}
 
-		private void OnApplicationPause(bool KCANPMPILKI)
+		private void OnApplicationPause(bool pauseStatus)
 		{
-			if (!KCANPMPILKI)
+			if (!pauseStatus)
 			{
 				ResetStartTicks();
 			}
@@ -227,7 +227,7 @@ namespace CodeStage.AntiCheat.Detectors
 			prevIntervalTicks = ticks;
 		}
 
-		private void StartDetectionInternal(UnityAction callback, float DHMGICLCNNA, byte BKMJNLEIGGG, int KBLLGDNEAMO)
+		private void StartDetectionInternal(UnityAction callback, float checkInterval, byte allowedFalsePositives, int coolDownValue)
 		{
 			if (isRunning)
 			{
@@ -250,9 +250,9 @@ namespace CodeStage.AntiCheat.Detectors
 				return;
 			}
 			detectionAction = callback;
-			interval = DHMGICLCNNA;
-			maxFalsePositives = BKMJNLEIGGG;
-			coolDown = KBLLGDNEAMO;
+			interval = checkInterval;
+			maxFalsePositives = allowedFalsePositives;
+			coolDown = coolDownValue;
 			ResetStartTicks();
 			currentFalsePositives = 0;
 			currentCooldownShots = 0;

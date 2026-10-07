@@ -689,56 +689,56 @@ public sealed class HTTPRequest : IEnumerator<HTTPRequest>, IDisposable, IEnumer
 		}
 	}
 
-	public HTTPRequest(Uri KJHNCLAJMLO)
-		: this(KJHNCLAJMLO, HTTPMethods.Get, HTTPManager.GetKeepAliveDefaultValue(), HTTPManager.GetIsCachingDisabled(), null)
+	public HTTPRequest(Uri uri)
+		: this(uri, HTTPMethods.Get, HTTPManager.GetKeepAliveDefaultValue(), HTTPManager.GetIsCachingDisabled(), null)
 	{
 	}
 
-	public HTTPRequest(Uri KJHNCLAJMLO, OnRequestFinishedDelegate callback)
-		: this(KJHNCLAJMLO, HTTPMethods.Get, HTTPManager.GetKeepAliveDefaultValue(), HTTPManager.GetIsCachingDisabled(), callback)
+	public HTTPRequest(Uri uri, OnRequestFinishedDelegate callback)
+		: this(uri, HTTPMethods.Get, HTTPManager.GetKeepAliveDefaultValue(), HTTPManager.GetIsCachingDisabled(), callback)
 	{
 	}
 
-	public HTTPRequest(Uri KJHNCLAJMLO, bool LLLAPINJJIJ, OnRequestFinishedDelegate callback)
-		: this(KJHNCLAJMLO, HTTPMethods.Get, LLLAPINJJIJ, HTTPManager.GetIsCachingDisabled(), callback)
+	public HTTPRequest(Uri uri, bool isKeepAlive, OnRequestFinishedDelegate callback)
+		: this(uri, HTTPMethods.Get, isKeepAlive, HTTPManager.GetIsCachingDisabled(), callback)
 	{
 	}
 
-	public HTTPRequest(Uri KJHNCLAJMLO, bool LLLAPINJJIJ, bool JNCJAGIBJFL, OnRequestFinishedDelegate callback)
-		: this(KJHNCLAJMLO, HTTPMethods.Get, LLLAPINJJIJ, JNCJAGIBJFL, callback)
+	public HTTPRequest(Uri uri, bool isKeepAlive, bool disableCache, OnRequestFinishedDelegate callback)
+		: this(uri, HTTPMethods.Get, isKeepAlive, disableCache, callback)
 	{
 	}
 
-	public HTTPRequest(Uri KJHNCLAJMLO, HTTPMethods AMFJIGAEHLD)
-		: this(KJHNCLAJMLO, AMFJIGAEHLD, HTTPManager.GetKeepAliveDefaultValue(), HTTPManager.GetIsCachingDisabled() || AMFJIGAEHLD != HTTPMethods.Get, null)
+	public HTTPRequest(Uri uri, HTTPMethods methodType)
+		: this(uri, methodType, HTTPManager.GetKeepAliveDefaultValue(), HTTPManager.GetIsCachingDisabled() || methodType != HTTPMethods.Get, null)
 	{
 	}
 
-	public HTTPRequest(Uri KJHNCLAJMLO, HTTPMethods AMFJIGAEHLD, OnRequestFinishedDelegate callback)
-		: this(KJHNCLAJMLO, AMFJIGAEHLD, HTTPManager.GetKeepAliveDefaultValue(), HTTPManager.GetIsCachingDisabled() || AMFJIGAEHLD != HTTPMethods.Get, callback)
+	public HTTPRequest(Uri uri, HTTPMethods methodType, OnRequestFinishedDelegate callback)
+		: this(uri, methodType, HTTPManager.GetKeepAliveDefaultValue(), HTTPManager.GetIsCachingDisabled() || methodType != HTTPMethods.Get, callback)
 	{
 	}
 
-	public HTTPRequest(Uri KJHNCLAJMLO, HTTPMethods AMFJIGAEHLD, bool LLLAPINJJIJ, OnRequestFinishedDelegate callback)
-		: this(KJHNCLAJMLO, AMFJIGAEHLD, LLLAPINJJIJ, HTTPManager.GetIsCachingDisabled() || AMFJIGAEHLD != HTTPMethods.Get, callback)
+	public HTTPRequest(Uri uri, HTTPMethods methodType, bool isKeepAlive, OnRequestFinishedDelegate callback)
+		: this(uri, methodType, isKeepAlive, HTTPManager.GetIsCachingDisabled() || methodType != HTTPMethods.Get, callback)
 	{
 	}
 
-	public HTTPRequest(Uri KJHNCLAJMLO, HTTPMethods AMFJIGAEHLD, bool LLLAPINJJIJ, bool JNCJAGIBJFL, OnRequestFinishedDelegate callback)
+	public HTTPRequest(Uri uri, HTTPMethods methodType, bool isKeepAlive, bool disableCache, OnRequestFinishedDelegate callback)
 	{
-		set_Uri(KJHNCLAJMLO);
-		SetMethodType(AMFJIGAEHLD);
-		SetIsKeepAlive(LLLAPINJJIJ);
-		SetDisableCache(JNCJAGIBJFL);
+		set_Uri(uri);
+		SetMethodType(methodType);
+		SetIsKeepAlive(isKeepAlive);
+		SetDisableCache(disableCache);
 		SetCallback(callback);
 		SetStreamFragmentSize(4096);
-		SetDisableRetry(AMFJIGAEHLD == HTTPMethods.Post);
+		SetDisableRetry(methodType == HTTPMethods.Post);
 		SetMaxRedirects(int.MaxValue);
 		SetRedirectCount(0);
 		SetIsCookiesEnabled(HTTPManager.GetIsCookiesEnabled());
-		int bAINMLLIKOL = 0;
-		SetDownloadLength(bAINMLLIKOL);
-		SetDownloaded(bAINMLLIKOL);
+		int initialValue = 0;
+		SetDownloadLength(initialValue);
+		SetDownloaded(initialValue);
 		SetDownloadProgressChanged(false);
 		set_State(HTTPRequestStates.Initial);
 		SetConnectTimeout(HTTPManager.GetConnectTimeout());
@@ -1235,48 +1235,48 @@ public sealed class HTTPRequest : IEnumerator<HTTPRequest>, IDisposable, IEnumer
 		headers = value;
 	}
 
-	public void AddField(string LKABGPANBMH, string value)
+	public void AddField(string fieldName, string value)
 	{
-		AddField(LKABGPANBMH, value, Encoding.UTF8);
+		AddField(fieldName, value, Encoding.UTF8);
 	}
 
-	public void AddField(string LKABGPANBMH, string value, Encoding FOPOKALJIIJ)
-	{
-		if (fieldCollector == null)
-		{
-			fieldCollector = new HTTPFormBase();
-		}
-		fieldCollector.AddField(LKABGPANBMH, value, FOPOKALJIIJ);
-	}
-
-	public void AddBinaryData(string LKABGPANBMH, byte[] DMNBDBJNKME)
-	{
-		AddBinaryData(LKABGPANBMH, DMNBDBJNKME, null, null);
-	}
-
-	public void AddBinaryData(string LKABGPANBMH, byte[] DMNBDBJNKME, string PMFEIPCHENB)
-	{
-		AddBinaryData(LKABGPANBMH, DMNBDBJNKME, PMFEIPCHENB, null);
-	}
-
-	public void AddBinaryData(string LKABGPANBMH, byte[] DMNBDBJNKME, string PMFEIPCHENB, string KIDMMGJIEHJ)
+	public void AddField(string fieldName, string value, Encoding encoding)
 	{
 		if (fieldCollector == null)
 		{
 			fieldCollector = new HTTPFormBase();
 		}
-		fieldCollector.AddBinaryData(LKABGPANBMH, DMNBDBJNKME, PMFEIPCHENB, KIDMMGJIEHJ);
+		fieldCollector.AddField(fieldName, value, encoding);
 	}
 
-	public void SetFields(WWWForm GHLEOIMGGMO)
+	public void AddBinaryData(string fieldName, byte[] data)
+	{
+		AddBinaryData(fieldName, data, null, null);
+	}
+
+	public void AddBinaryData(string fieldName, byte[] data, string fileName)
+	{
+		AddBinaryData(fieldName, data, fileName, null);
+	}
+
+	public void AddBinaryData(string fieldName, byte[] data, string fileName, string mimeType)
+	{
+		if (fieldCollector == null)
+		{
+			fieldCollector = new HTTPFormBase();
+		}
+		fieldCollector.AddBinaryData(fieldName, data, fileName, mimeType);
+	}
+
+	public void SetFields(WWWForm wwwForm)
 	{
 		SetFormUsage(HTTPFormUsage.Unity);
-		formImpl = new UnityForm(GHLEOIMGGMO);
+		formImpl = new UnityForm(wwwForm);
 	}
 
-	public void SetForm(HTTPFormBase HOELLMLEBAK)
+	public void SetForm(HTTPFormBase form)
 	{
-		formImpl = HOELLMLEBAK;
+		formImpl = form;
 	}
 
 	public void ClearForm()
@@ -1396,17 +1396,17 @@ public sealed class HTTPRequest : IEnumerator<HTTPRequest>, IDisposable, IEnumer
 		}
 	}
 
-	public void SetRangeHeader(int DAENDDKBFGP)
+	public void SetRangeHeader(int firstBytePos)
 	{
-		SetHeader("Range", string.Format("bytes={0}-", DAENDDKBFGP));
+		SetHeader("Range", string.Format("bytes={0}-", firstBytePos));
 	}
 
-	public void SetRangeHeader(int DAENDDKBFGP, int PBKEPECFHCK)
+	public void SetRangeHeader(int firstBytePos, int lastBytePos)
 	{
-		SetHeader("Range", string.Format("bytes={0}-{1}", DAENDDKBFGP, PBKEPECFHCK));
+		SetHeader("Range", string.Format("bytes={0}-{1}", firstBytePos, lastBytePos));
 	}
 
-	private void SendHeaders(BinaryWriter ABJIEFMMIEK)
+	private void SendHeaders(BinaryWriter writer)
 	{
 		if (!HasHeader("Host"))
 		{
@@ -1476,10 +1476,10 @@ public sealed class HTTPRequest : IEnumerator<HTTPRequest>, IDisposable, IEnumer
 			case AuthenticationTypes.Unknown:
 			case AuthenticationTypes.Digest:
 			{
-				Digest kHNAPCOOAEF = DigestStore.Get(GetProxy().GetAddress());
-				if (kHNAPCOOAEF != null)
+				Digest proxyDigest = DigestStore.Get(GetProxy().GetAddress());
+				if (proxyDigest != null)
 				{
-					string text = kHNAPCOOAEF.GenerateResponseHeader(this, GetProxy().GetCredentials());
+					string text = proxyDigest.GenerateResponseHeader(this, GetProxy().GetCredentials());
 					if (!string.IsNullOrEmpty(text))
 					{
 						SetHeader("Proxy-Authorization", text);
@@ -1521,15 +1521,15 @@ public sealed class HTTPRequest : IEnumerator<HTTPRequest>, IDisposable, IEnumer
 		{
 			for (int i = 0; i < customCookies.Count; i++)
 			{
-				Cookie NINHECJLKDH = customCookies[i];
-				int num2 = list.FindIndex((Cookie ILHDJDNPFKH) => ILHDJDNPFKH.get_Name().Equals(NINHECJLKDH.get_Name()));
+				Cookie customCookie = customCookies[i];
+				int num2 = list.FindIndex((Cookie cookie) => cookie.get_Name().Equals(customCookie.get_Name()));
 				if (num2 >= 0)
 				{
-					list[num2] = NINHECJLKDH;
+					list[num2] = customCookie;
 				}
 				else
 				{
-					list.Add(NINHECJLKDH);
+					list.Add(customCookie);
 				}
 			}
 		}
@@ -1538,10 +1538,10 @@ public sealed class HTTPRequest : IEnumerator<HTTPRequest>, IDisposable, IEnumer
 			bool flag = true;
 			string text3 = string.Empty;
 			bool flag2 = HTTPProtocolFactory.IsSecureProtocol(GetCurrentUri());
-			SupportedProtocols oBBKIBFJEMI = HTTPProtocolFactory.GetProtocolFromUri(GetCurrentUri());
+			SupportedProtocols protocol = HTTPProtocolFactory.GetProtocolFromUri(GetCurrentUri());
 			foreach (Cookie item in list)
 			{
-				if ((!item.GetIsSecure() || (item.GetIsSecure() && flag2)) && (!item.GetIsHttpOnly() || (item.GetIsHttpOnly() && oBBKIBFJEMI == SupportedProtocols.HTTP)))
+				if ((!item.GetIsSecure() || (item.GetIsSecure() && flag2)) && (!item.GetIsHttpOnly() || (item.GetIsHttpOnly() && protocol == SupportedProtocols.HTTP)))
 				{
 					if (!flag)
 					{
@@ -1562,9 +1562,9 @@ public sealed class HTTPRequest : IEnumerator<HTTPRequest>, IDisposable, IEnumer
 			byte[] buffer = (item2.Key + ": ").GetASCIIBytes();
 			for (int num3 = 0; num3 < item2.Value.Count; num3++)
 			{
-				ABJIEFMMIEK.Write(buffer);
-				ABJIEFMMIEK.Write(item2.Value[num3].GetASCIIBytes());
-				ABJIEFMMIEK.Write(EOL);
+				writer.Write(buffer);
+				writer.Write(item2.Value[num3].GetASCIIBytes());
+				writer.Write(EOL);
 			}
 		}
 	}
@@ -1573,9 +1573,9 @@ public sealed class HTTPRequest : IEnumerator<HTTPRequest>, IDisposable, IEnumer
 	{
 		using (MemoryStream memoryStream = new MemoryStream())
 		{
-			using (BinaryWriter aBJIEFMMIEK = new BinaryWriter(memoryStream))
+			using (BinaryWriter writer = new BinaryWriter(memoryStream))
 			{
-				SendHeaders(aBJIEFMMIEK);
+				SendHeaders(writer);
 				return memoryStream.ToArray().AsciiToString();
 			}
 		}
@@ -1598,11 +1598,11 @@ public sealed class HTTPRequest : IEnumerator<HTTPRequest>, IDisposable, IEnumer
 		return null;
 	}
 
-	internal void SendOutTo(Stream ABJIEFMMIEK)
+	internal void SendOutTo(Stream outputStream)
 	{
 		try
 		{
-			BinaryWriter binaryWriter = new BinaryWriter(ABJIEFMMIEK);
+			BinaryWriter binaryWriter = new BinaryWriter(outputStream);
 			string text = string.Format("{0} {1} HTTP/1.1", MethodNames[(uint)GetMethodType()], (!GetHasProxy() || !GetProxy().GetSendWholeUri()) ? GetCurrentUri().PathAndQuery : GetCurrentUri().OriginalString);
 			if (HTTPManager.GetLogger().GetLevel() <= Loglevels.Information)
 			{
@@ -1690,9 +1690,9 @@ public sealed class HTTPRequest : IEnumerator<HTTPRequest>, IDisposable, IEnumer
 				OnUpgraded(this, GetResponse());
 			}
 		}
-		catch (Exception mPFFFAOGBJE)
+		catch (Exception ex)
 		{
-			HTTPManager.GetLogger().Exception("HTTPRequest", "UpgradeCallback", mPFFFAOGBJE);
+			HTTPManager.GetLogger().Exception("HTTPRequest", "UpgradeCallback", ex);
 		}
 	}
 
@@ -1705,17 +1705,17 @@ public sealed class HTTPRequest : IEnumerator<HTTPRequest>, IDisposable, IEnumer
 				GetCallback()(this, GetResponse());
 			}
 		}
-		catch (Exception mPFFFAOGBJE)
+		catch (Exception ex)
 		{
-			HTTPManager.GetLogger().Exception("HTTPRequest", "CallCallback", mPFFFAOGBJE);
+			HTTPManager.GetLogger().Exception("HTTPRequest", "CallCallback", ex);
 		}
 	}
 
-	internal bool CallOnBeforeRedirection(Uri JJCEFGDNEEO)
+	internal bool CallOnBeforeRedirection(Uri redirectUri)
 	{
 		if (onBeforeRedirection != null)
 		{
-			return onBeforeRedirection(this, GetResponse(), JJCEFGDNEEO);
+			return onBeforeRedirection(this, GetResponse(), redirectUri);
 		}
 		return true;
 	}
@@ -1736,11 +1736,11 @@ public sealed class HTTPRequest : IEnumerator<HTTPRequest>, IDisposable, IEnumer
 		}
 	}
 
-	internal bool CallCustomCertificationValidator(X509Certificate DBCFDLIJOBD, X509Chain GCONPBMJDFL)
+	internal bool CallCustomCertificationValidator(X509Certificate certificate, X509Chain chain)
 	{
 		if (CustomCertificationValidator != null)
 		{
-			return CustomCertificationValidator(this, DBCFDLIJOBD, GCONPBMJDFL);
+			return CustomCertificationValidator(this, certificate, chain);
 		}
 		return true;
 	}
@@ -1759,8 +1759,8 @@ public sealed class HTTPRequest : IEnumerator<HTTPRequest>, IDisposable, IEnumer
 				HTTPManager.GetLogger().Warning("HTTPRequest", string.Format("Abort - Already in a state({0}) where no Abort required!", GetState().ToString()));
 				return;
 			}
-			HTTPConnection hPNEPPBEKGG = HTTPManager.GetConnectionWith(this);
-			if (hPNEPPBEKGG == null)
+			HTTPConnection connection = HTTPManager.GetConnectionWith(this);
+			if (connection == null)
 			{
 				if (!HTTPManager.RemoveFromQueue(this))
 				{
@@ -1774,7 +1774,7 @@ public sealed class HTTPRequest : IEnumerator<HTTPRequest>, IDisposable, IEnumer
 				{
 					GetResponse().Dispose();
 				}
-				hPNEPPBEKGG.Abort(HTTPConnectionStates.AbortRequested);
+				connection.Abort(HTTPConnectionStates.AbortRequested);
 			}
 		}
 	}

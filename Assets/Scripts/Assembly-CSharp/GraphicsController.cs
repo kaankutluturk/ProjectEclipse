@@ -14,9 +14,9 @@ public static class GraphicsController
 	{
 		UnityEngine.PlayerPrefs.SetInt("Eclipse.LargeControls", value ? 1 : 0);
 		UnityEngine.PlayerPrefs.Save();
-		Roster nKGLHEGIKKP = ListSF.GetRoster();
-		if (nKGLHEGIKKP == null) return;
-		nKGLHEGIKKP.SessionSettings("ControllerScale", value.ToString());
+		Roster roster = ListSF.GetRoster();
+		if (roster == null) return;
+		roster.SessionSettings("ControllerScale", value.ToString());
 		ListSF.GetInstance().RequestSave();
 	}
 
@@ -34,9 +34,9 @@ public static class GraphicsController
 		{
 			return SystemProperties.GetQualityConditionName();
 		}
-		QualityOption.QualityLevel hPNJCDGIHLI = QualityOption.ParseQualityLevel(text);
+		QualityOption.QualityLevel savedLevel = QualityOption.ParseQualityLevel(text);
 		QualityOption.QualityLevel hPNJCDGIHLI2 = QualityOption.ParseQualityLevel(SystemProperties.GetQualityConditionName());
-		if (hPNJCDGIHLI <= hPNJCDGIHLI2)
+		if (savedLevel <= hPNJCDGIHLI2)
 		{
 			return text;
 		}
@@ -71,21 +71,21 @@ public static class GraphicsController
 		return flag;
 	}
 
-	public static string GetNextGraphicsQuality(string HEPNIDFNHBA)
+	public static string GetNextGraphicsQuality(string currentCondition)
 	{
 		string text = SystemProperties.GetQualityConditionName();
-		string text2 = QualityOption.GetNextQualityCondition(HEPNIDFNHBA, text);
+		string text2 = QualityOption.GetNextQualityCondition(currentCondition, text);
 		if (QualityOption.CompareQualityCondition(text2, text))
 		{
-			return HEPNIDFNHBA;
+			return currentCondition;
 		}
 		return text2;
 	}
 
 	public static void ToggleLocationResolution()
 	{
-		SystemProperties.PathType bAINMLLIKOL = ((GetLocationResolution() == SystemProperties.PathType.PATH_SMALL) ? SystemProperties.PathType.PATH_BIG : SystemProperties.PathType.PATH_SMALL);
-		SetLocationResolution(bAINMLLIKOL);
+		SystemProperties.PathType newResolution = ((GetLocationResolution() == SystemProperties.PathType.PATH_SMALL) ? SystemProperties.PathType.PATH_BIG : SystemProperties.PathType.PATH_SMALL);
+		SetLocationResolution(newResolution);
 	}
 
 	public static void SetLocationResolution(SystemProperties.PathType value)
@@ -99,8 +99,8 @@ public static class GraphicsController
 
 	public static SystemProperties.PathType GetLocationResolution()
 	{
-		string bAINMLLIKOL = LoadLocationResolutionSetting();
-		return ParseLocationResolution(bAINMLLIKOL);
+		string resolutionSetting = LoadLocationResolutionSetting();
+		return ParseLocationResolution(resolutionSetting);
 	}
 
 	public static SystemProperties.PathType ParseLocationResolution(string value)
@@ -136,39 +136,39 @@ public static class GraphicsController
 		if (UnityEngine.PlayerPrefs.HasKey("Eclipse.LargeControls"))
 			return UnityEngine.PlayerPrefs.GetInt("Eclipse.LargeControls") != 0;
 		bool result = !SystemProperties.IsTabletDevice();
-		Roster nKGLHEGIKKP = ListSF.GetRoster();
-		if (nKGLHEGIKKP != null && nKGLHEGIKKP.HasSessionSetting("ControllerScale"))
+		Roster roster = ListSF.GetRoster();
+		if (roster != null && roster.HasSessionSetting("ControllerScale"))
 		{
-			result = nKGLHEGIKKP.GetSettingsXML("ControllerScale") == "True" || nKGLHEGIKKP.GetSettingsXML("ControllerScale") == "1";
+			result = roster.GetSettingsXML("ControllerScale") == "True" || roster.GetSettingsXML("ControllerScale") == "1";
 		}
 		return result;
 	}
 
 	private static string LoadQualityConditionSetting()
 	{
-		Roster nKGLHEGIKKP = ListSF.GetRoster();
-		if (!nKGLHEGIKKP.HasSessionSetting("QualityCondition"))
+		Roster roster = ListSF.GetRoster();
+		if (!roster.HasSessionSetting("QualityCondition"))
 		{
 			SetQualityCondition(SystemProperties.GetQualityConditionName());
 		}
-		return nKGLHEGIKKP.GetSettingsXML("QualityCondition");
+		return roster.GetSettingsXML("QualityCondition");
 	}
 
 	private static void SaveLocationResolution(string value)
 	{
-		Roster nKGLHEGIKKP = ListSF.GetRoster();
-		nKGLHEGIKKP.SessionSettings("LocationResolution", value);
+		Roster roster = ListSF.GetRoster();
+		roster.SessionSettings("LocationResolution", value);
 		ListSF.GetInstance().RequestSave();
 	}
 
 	private static string LoadLocationResolutionSetting()
 	{
-		Roster nKGLHEGIKKP = ListSF.GetRoster();
-		if (!nKGLHEGIKKP.HasSessionSetting("LocationResolution"))
+		Roster roster = ListSF.GetRoster();
+		if (!roster.HasSessionSetting("LocationResolution"))
 		{
-			string bAINMLLIKOL = LocationResolutionToString(SystemProperties.GetLocationPathType());
-			SaveLocationResolution(bAINMLLIKOL);
+			string defaultResolution = LocationResolutionToString(SystemProperties.GetLocationPathType());
+			SaveLocationResolution(defaultResolution);
 		}
-		return nKGLHEGIKKP.GetSettingsXML("LocationResolution");
+		return roster.GetSettingsXML("LocationResolution");
 	}
 }

@@ -1,1 +1,1 @@
-internal delegate object ImporterFunc(object NILNDHEKNLJ);
+internal delegate object ImporterFunc(object input);

@@ -39,7 +39,7 @@ public static class Program {
 dotnet run --project (Join-Path $fixture 'Activity.csproj')
 if ($LASTEXITCODE -ne 0) { throw 'Native combat activity fixture failed.' }
 $fight = Get-Content -Raw -Encoding UTF8 (Join-Path $root 'Assets/Scripts/Assembly-CSharp/Fight.cs')
-$styleUpdate=$fight.IndexOf('fGCODGKLHED.OnStyleChanged(kNBKAELNFDD')
+$styleUpdate=$fight.IndexOf('model.OnStyleChanged(styleIndex')
 $styleNotify=$fight.IndexOf('ModCombatActivityEvent.StyleChange(', $styleUpdate)
 $styleRule=$fight.IndexOf('CheckFightRules(FightEvent.CrazyEvent', $styleNotify)
 if ($styleUpdate -lt 0 -or $styleNotify -le $styleUpdate -or $styleRule -le $styleNotify) { throw 'Style notification moved outside its documented boundary.' }

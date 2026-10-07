@@ -41,7 +41,7 @@ public class EffectsContainer
 		return effectsRunning;
 	}
 
-	public void init(float GBNPHCHGKDO)
+	public void init(float scale)
 	{
 		EnsureRunning();
 	}
@@ -65,19 +65,19 @@ public class EffectsContainer
 		effectsRunning.UpdateEffects();
 	}
 
-	public void StartEffect(ActionEffect IBODMPMJELJ)
+	public void StartEffect(ActionEffect action)
 	{
-		effectsRunning.StartEffect(IBODMPMJELJ, IBODMPMJELJ.get_Model());
+		effectsRunning.StartEffect(action, action.get_Model());
 	}
 
-	public void StopEffect(ActionStopEffect IBODMPMJELJ)
+	public void StopEffect(ActionStopEffect action)
 	{
-		effectsRunning.StopEffect(IBODMPMJELJ, IBODMPMJELJ.get_Model());
+		effectsRunning.StopEffect(action, action.get_Model());
 	}
 
-	public void StopFollowEffect(ActionStopFollowEffect IBODMPMJELJ)
+	public void StopFollowEffect(ActionStopFollowEffect action)
 	{
-		effectsRunning.stopFollowEffect(IBODMPMJELJ, IBODMPMJELJ.get_Model());
+		effectsRunning.stopFollowEffect(action, action.get_Model());
 	}
 
 	public void RemoveAllEffects()

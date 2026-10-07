@@ -1,8 +1,8 @@
 public class QuestActionRecount : QuestAction
 {
-	public override void Execute(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters parameters)
 	{
-		base.Execute(GFIHPBCEEOB);
+		base.Execute(parameters);
 		GameUtils.RecountAchievements();
 		FinishAction();
 	}

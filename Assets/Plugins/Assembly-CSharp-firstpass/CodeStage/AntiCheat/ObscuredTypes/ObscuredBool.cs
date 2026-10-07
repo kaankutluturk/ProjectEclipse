@@ -34,9 +34,9 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 			inited = true;
 		}
 
-		public static void SetNewCryptoKey(byte CNOFJICCAHK)
+		public static void SetNewCryptoKey(byte newKey)
 		{
-			cryptoKey = CNOFJICCAHK;
+			cryptoKey = newKey;
 		}
 
 		public static int Encrypt(bool value)
@@ -44,14 +44,14 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 			return Encrypt(value, 0);
 		}
 
-		public static int Encrypt(bool value, byte KGBGENDIMBC)
+		public static int Encrypt(bool value, byte key)
 		{
-			if (KGBGENDIMBC == 0)
+			if (key == 0)
 			{
-				KGBGENDIMBC = cryptoKey;
+				key = cryptoKey;
 			}
 			int num = ((!value) ? 181 : 213);
-			return num ^ KGBGENDIMBC;
+			return num ^ key;
 		}
 
 		public static bool Decrypt(int value)
@@ -59,13 +59,13 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 			return Decrypt(value, 0);
 		}
 
-		public static bool Decrypt(int value, byte KGBGENDIMBC)
+		public static bool Decrypt(int value, byte key)
 		{
-			if (KGBGENDIMBC == 0)
+			if (key == 0)
 			{
-				KGBGENDIMBC = cryptoKey;
+				key = cryptoKey;
 			}
-			value ^= KGBGENDIMBC;
+			value ^= key;
 			return value != 181;
 		}
 
@@ -80,9 +80,9 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 
 		public void RandomizeCryptoKey()
 		{
-			bool bAINMLLIKOL = InternalDecrypt();
+			bool decrypted = InternalDecrypt();
 			currentCryptoKey = (byte)UnityEngine.Random.Range(0, 255);
-			hiddenValue = Encrypt(bAINMLLIKOL, currentCryptoKey);
+			hiddenValue = Encrypt(decrypted, currentCryptoKey);
 		}
 
 		public int GetEncrypted()
@@ -91,10 +91,10 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 			return hiddenValue;
 		}
 
-		public void SetEncrypted(int ANGFOBEKKKD)
+		public void SetEncrypted(int encrypted)
 		{
 			inited = true;
-			hiddenValue = ANGFOBEKKKD;
+			hiddenValue = encrypted;
 			if (ObscuredCheatingDetector.GetIsRunning())
 			{
 				fakeValue = InternalDecrypt();
@@ -138,22 +138,22 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 			return value.InternalDecrypt();
 		}
 
-		public override bool Equals(object AOMLCBHAJJH)
+		public override bool Equals(object obj)
 		{
-			if (!(AOMLCBHAJJH is ObscuredBool))
+			if (!(obj is ObscuredBool))
 			{
 				return false;
 			}
-			return Equals((ObscuredBool)AOMLCBHAJJH);
+			return Equals((ObscuredBool)obj);
 		}
 
-		public bool Equals(ObscuredBool AOMLCBHAJJH)
+		public bool Equals(ObscuredBool other)
 		{
-			if (currentCryptoKey == AOMLCBHAJJH.currentCryptoKey)
+			if (currentCryptoKey == other.currentCryptoKey)
 			{
-				return hiddenValue == AOMLCBHAJJH.hiddenValue;
+				return hiddenValue == other.hiddenValue;
 			}
-			return Decrypt(hiddenValue, currentCryptoKey) == Decrypt(AOMLCBHAJJH.hiddenValue, AOMLCBHAJJH.currentCryptoKey);
+			return Decrypt(hiddenValue, currentCryptoKey) == Decrypt(other.hiddenValue, other.currentCryptoKey);
 		}
 
 		public override int GetHashCode()

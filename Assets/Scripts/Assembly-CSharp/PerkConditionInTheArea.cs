@@ -7,13 +7,13 @@ public class PerkConditionInTheArea : PerkCondition
 		set_Type(PerkConditionType.CONDITION_IN_THE_AREA);
 	}
 
-	public override bool IsEqual(Model ACENLMONNPA, List<string> NIKHAICFGNM)
+	public override bool IsEqual(Model model, List<string> args)
 	{
-		Model fGCODGKLHED = ResolveTargetModel(ACENLMONNPA);
-		if (ACENLMONNPA == null)
+		Model targetModel = ResolveTargetModel(model);
+		if (model == null)
 		{
 			return false;
 		}
-		return fGCODGKLHED.IsInsideArea();
+		return targetModel.IsInsideArea();
 	}
 }

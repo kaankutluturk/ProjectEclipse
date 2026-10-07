@@ -6,25 +6,25 @@ public sealed class DefaultExclusiveObjectGraphVisitor : ChainedObjectGraphVisit
 {
 	private static readonly IEqualityComparer<object> _objectComparer = EqualityComparer<object>.Default;
 
-	public DefaultExclusiveObjectGraphVisitor(IObjectGraphVisitor GDMFLLGPLNO)
-		: base(GDMFLLGPLNO)
+	public DefaultExclusiveObjectGraphVisitor(IObjectGraphVisitor visitor)
+		: base(visitor)
 	{
 	}
 
-	private static object GetDefault(Type LFLGCDNKNJI)
+	private static object GetDefault(Type type)
 	{
-		return (!LFLGCDNKNJI.IsValueTypeCheck()) ? null : Activator.CreateInstance(LFLGCDNKNJI);
+		return (!type.IsValueTypeCheck()) ? null : Activator.CreateInstance(type);
 	}
 
-	public override bool EnterMapping(IObjectDescriptor KGBGENDIMBC, IObjectDescriptor value)
+	public override bool EnterMapping(IObjectDescriptor key, IObjectDescriptor value)
 	{
-		return !_objectComparer.Equals(value, GetDefault(value.get_Type())) && base.EnterMapping(KGBGENDIMBC, value);
+		return !_objectComparer.Equals(value, GetDefault(value.get_Type())) && base.EnterMapping(key, value);
 	}
 
-	public override bool EnterMapping(IPropertyDescriptor KGBGENDIMBC, IObjectDescriptor value)
+	public override bool EnterMapping(IPropertyDescriptor key, IObjectDescriptor value)
 	{
-		DefaultValueAttribute defaultValueAttribute = KGBGENDIMBC.GetCustomAttribute<DefaultValueAttribute>();
-		object y = ((defaultValueAttribute == null) ? GetDefault(KGBGENDIMBC.get_Type()) : defaultValueAttribute.Value);
-		return !_objectComparer.Equals(value.GetValue(), y) && base.EnterMapping(KGBGENDIMBC, value);
+		DefaultValueAttribute defaultValueAttribute = key.GetCustomAttribute<DefaultValueAttribute>();
+		object y = ((defaultValueAttribute == null) ? GetDefault(key.get_Type()) : defaultValueAttribute.Value);
+		return !_objectComparer.Equals(value.GetValue(), y) && base.EnterMapping(key, value);
 	}
 }

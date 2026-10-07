@@ -10,23 +10,23 @@ namespace YamlDotNet.Core
 		{
 		}
 
-		public AnchorNotFoundException(string LIOGIBJBHAH)
-			: base(LIOGIBJBHAH)
+		public AnchorNotFoundException(string message)
+			: base(message)
 		{
 		}
 
-		public AnchorNotFoundException(Mark ILENLCMAMBH, Mark PCLFFOBJJFO, string LIOGIBJBHAH)
-			: base(ILENLCMAMBH, PCLFFOBJJFO, LIOGIBJBHAH)
+		public AnchorNotFoundException(Mark startMark, Mark endMark, string message)
+			: base(startMark, endMark, message)
 		{
 		}
 
-		public AnchorNotFoundException(string LIOGIBJBHAH, Exception LEPEAKBGHLB)
-			: base(LIOGIBJBHAH, LEPEAKBGHLB)
+		public AnchorNotFoundException(string message, Exception innerException)
+			: base(message, innerException)
 		{
 		}
 
-		protected AnchorNotFoundException(SerializationInfo EMBBNNBFODN, StreamingContext PDCAHMPCPOC)
-			: base(EMBBNNBFODN, PDCAHMPCPOC)
+		protected AnchorNotFoundException(SerializationInfo info, StreamingContext context)
+			: base(info, context)
 		{
 		}
 	}

@@ -61,27 +61,27 @@ public sealed class LargeFileDownloadSample : MonoBehaviour
 
 	private void StartDownload()
 	{
-		request = new HTTPRequest(new Uri("http://ipv4.download.thinkbroadband.com/100MB.zip"), (HTTPRequest CGOIOKHEGOE, HTTPResponse BEIGFGCBICO) =>
+		request = new HTTPRequest(new Uri("http://ipv4.download.thinkbroadband.com/100MB.zip"), (HTTPRequest httpRequest, HTTPResponse httpResponse) =>
 		{
-			switch (CGOIOKHEGOE.GetState())
+			switch (httpRequest.GetState())
 			{
 			case HTTPRequestStates.Processing:
 				if (!PlayerPrefs.HasKey("DownloadLength"))
 				{
-					string text = BEIGFGCBICO.GetFirstHeaderValue("content-length");
+					string text = httpResponse.GetFirstHeaderValue("content-length");
 					if (!string.IsNullOrEmpty(text))
 					{
 						PlayerPrefs.SetInt("DownloadLength", int.Parse(text));
 					}
 				}
-				ProcessFragments(BEIGFGCBICO.GetStreamedFragments());
+				ProcessFragments(httpResponse.GetStreamedFragments());
 				status = "Processing";
 				break;
 			case HTTPRequestStates.Finished:
-				if (BEIGFGCBICO.GetIsSuccess())
+				if (httpResponse.GetIsSuccess())
 				{
-					ProcessFragments(BEIGFGCBICO.GetStreamedFragments());
-					if (BEIGFGCBICO.GetIsStreamingFinished())
+					ProcessFragments(httpResponse.GetStreamedFragments());
+					if (httpResponse.GetIsStreamingFinished())
 					{
 						status = "Streaming finished!";
 						PlayerPrefs.DeleteKey("DownloadProgress");
@@ -95,13 +95,13 @@ public sealed class LargeFileDownloadSample : MonoBehaviour
 				}
 				else
 				{
-					status = string.Format("Request finished Successfully, but the server sent an error. Status Code: {0}-{1} Message: {2}", BEIGFGCBICO.GetStatusCode(), BEIGFGCBICO.GetMessage(), BEIGFGCBICO.GetDataAsText());
+					status = string.Format("Request finished Successfully, but the server sent an error. Status Code: {0}-{1} Message: {2}", httpResponse.GetStatusCode(), httpResponse.GetMessage(), httpResponse.GetDataAsText());
 					AdvLog.LogWarning(status);
 					request = null;
 				}
 				break;
 			case HTTPRequestStates.Error:
-				status = "Request Finished with Error! " + ((CGOIOKHEGOE.GetException() == null) ? "No Exception" : (CGOIOKHEGOE.GetException().Message + "\n" + CGOIOKHEGOE.GetException().StackTrace));
+				status = "Request Finished with Error! " + ((httpRequest.GetException() == null) ? "No Exception" : (httpRequest.GetException().Message + "\n" + httpRequest.GetException().StackTrace));
 				AdvLog.LogError(status);
 				request = null;
 				break;
@@ -136,13 +136,13 @@ public sealed class LargeFileDownloadSample : MonoBehaviour
 		request.Send();
 	}
 
-	private void ProcessFragments(List<byte[]> DAGGODDBKDD)
+	private void ProcessFragments(List<byte[]> fragments)
 	{
-		if (DAGGODDBKDD != null && DAGGODDBKDD.Count > 0)
+		if (fragments != null && fragments.Count > 0)
 		{
-			for (int i = 0; i < DAGGODDBKDD.Count; i++)
+			for (int i = 0; i < fragments.Count; i++)
 			{
-				int value = PlayerPrefs.GetInt("DownloadProgress") + DAGGODDBKDD[i].Length;
+				int value = PlayerPrefs.GetInt("DownloadProgress") + fragments[i].Length;
 				PlayerPrefs.SetInt("DownloadProgress", value);
 			}
 			PlayerPrefs.Save();

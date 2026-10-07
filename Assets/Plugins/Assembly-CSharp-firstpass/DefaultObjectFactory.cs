@@ -23,20 +23,20 @@ public sealed class DefaultObjectFactory : IObjectFactory
 		}
 	};
 
-	public object Create(Type LFLGCDNKNJI)
+	public object Create(Type type)
 	{
 		Type value;
-		if (LFLGCDNKNJI.IsInterfaceCheck() && defaultInterfaceImplementations.TryGetValue(LFLGCDNKNJI.GetGenericTypeDefinition(), out value))
+		if (type.IsInterfaceCheck() && defaultInterfaceImplementations.TryGetValue(type.GetGenericTypeDefinition(), out value))
 		{
-			LFLGCDNKNJI = value.MakeGenericType(LFLGCDNKNJI.GetGenericArguments());
+			type = value.MakeGenericType(type.GetGenericArguments());
 		}
 		try
 		{
-			return Activator.CreateInstance(LFLGCDNKNJI);
+			return Activator.CreateInstance(type);
 		}
 		catch (Exception innerException)
 		{
-			string message = string.Format("Failed to create an instance of type '{0}'.", LFLGCDNKNJI);
+			string message = string.Format("Failed to create an instance of type '{0}'.", type);
 			throw new InvalidOperationException(message, innerException);
 		}
 	}

@@ -1,6 +1,6 @@
 public interface IYamlSerializable
 {
-	void ReadYaml(IParser BPGMNGAJMKK);
+	void ReadYaml(IParser parser);
 
-	void WriteYaml(IEmitter NPIDIMCLNEM);
+	void WriteYaml(IEmitter emitter);
 }

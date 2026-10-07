@@ -52,14 +52,14 @@ public abstract class GameCenterAbstract
 
 	public abstract void ResetAchievements();
 
-	public abstract void UnlockAchievement(string OKNNNLIPODI);
+	public abstract void UnlockAchievement(string achievementId);
 
-	public abstract void ReportAchievementProgress(string HMDBGGEMICE, double EPFBHJBNIHK);
+	public abstract void ReportAchievementProgress(string achievementId, double progress);
 
 	public abstract string GetUserId();
 
-	protected void Log(string DMKMNOINKFC)
+	protected void Log(string message)
 	{
-		Debug.Log(DMKMNOINKFC);
+		Debug.Log(message);
 	}
 }

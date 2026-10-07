@@ -46,10 +46,10 @@ public class NekkiWebHandler : DownloadHandlerScript
 		}
 	}
 
-	public NekkiWebHandler(NekkiUri IACLKBNEBDM)
+	public NekkiWebHandler(NekkiUri uri)
 		: base(new byte[8192])
 	{
-		_uri = IACLKBNEBDM;
+		_uri = uri;
 		_isDone = false;
 		_downloadedBytes = 0;
 		_totalBytes = 0;
@@ -86,20 +86,20 @@ public class NekkiWebHandler : DownloadHandlerScript
 		CompleteContent();
 	}
 
-	protected override void ReceiveContentLength(int HDIIBKGCCNB)
+	protected override void ReceiveContentLength(int contentLength)
 	{
-		_totalBytes = HDIIBKGCCNB;
+		_totalBytes = contentLength;
 		OnContentLength(_totalBytes);
 	}
 
-	protected override bool ReceiveData(byte[] data, int HIGBAHGOFIJ)
+	protected override bool ReceiveData(byte[] data, int length)
 	{
 		if (_aborted || data == null || data.Length < 1)
 		{
 			return false;
 		}
-		OnDataReceived(data, _downloadedBytes, HIGBAHGOFIJ);
-		_downloadedBytes += HIGBAHGOFIJ;
+		OnDataReceived(data, _downloadedBytes, length);
+		_downloadedBytes += length;
 		return true;
 	}
 
@@ -115,11 +115,11 @@ public class NekkiWebHandler : DownloadHandlerScript
 		return (_downloadedBytes <= 0) ? 0f : ((float)GetTotalBytes() / (float)_downloadedBytes);
 	}
 
-	protected virtual void OnContentLength(int HDIIBKGCCNB)
+	protected virtual void OnContentLength(int contentLength)
 	{
 	}
 
-	protected virtual void OnDataReceived(byte[] data, int IAFIGGBIKOD, int HIGBAHGOFIJ)
+	protected virtual void OnDataReceived(byte[] data, int offset, int length)
 	{
 	}
 

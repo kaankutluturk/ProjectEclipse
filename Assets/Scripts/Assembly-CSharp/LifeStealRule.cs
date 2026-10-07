@@ -6,8 +6,8 @@ public class LifeStealRule : InFightRule
 
 	private float lastLifeStolen;
 
-	public LifeStealRule(XmlNode node, RuleAppliance EJPOJJKKICO)
-		: base(RuleType.RuleLifeSteal, EJPOJJKKICO, node)
+	public LifeStealRule(XmlNode node, RuleAppliance ruleAppliance)
+		: base(RuleType.RuleLifeSteal, ruleAppliance, node)
 	{
 		lastLifeStolen = 0f;
 		SubscribeEvent(FightEvent.StrikeEvent);
@@ -22,11 +22,11 @@ public class LifeStealRule : InFightRule
 
 	protected override bool CompareSingle(object data)
 	{
-		FightData hCPJJKMNMCE = (FightData)data;
-		FightEvent kOJNCHKPLLN = hCPJJKMNMCE.FightEventType;
-		if (kOJNCHKPLLN == FightEvent.StrikeEvent)
+		FightData fightData = (FightData)data;
+		FightEvent fightEvent = fightData.FightEventType;
+		if (fightEvent == FightEvent.StrikeEvent)
 		{
-			lastLifeStolen = hCPJJKMNMCE.DamageDealt * damagePart;
+			lastLifeStolen = fightData.DamageDealt * damagePart;
 			return lastLifeStolen != 0f;
 		}
 		return false;
@@ -40,11 +40,11 @@ public class LifeStealRule : InFightRule
 
 	public override InFightRule Copy()
 	{
-		InFightRule aAJIFBJLJOA = null;
-		RuleAppliance eJPOJJKKICO = GetAppliance();
-		XmlNode hKPPBKPJOEO = GetXmlSource().GetNode();
-		aAJIFBJLJOA = new LifeStealRule(hKPPBKPJOEO, eJPOJJKKICO);
-		aAJIFBJLJOA.IsRandom = IsRandom;
-		return aAJIFBJLJOA;
+		InFightRule copy = null;
+		RuleAppliance ruleAppliance = GetAppliance();
+		XmlNode sourceNode = GetXmlSource().GetNode();
+		copy = new LifeStealRule(sourceNode, ruleAppliance);
+		copy.IsRandom = IsRandom;
+		return copy;
 	}
 }

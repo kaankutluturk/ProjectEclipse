@@ -37,44 +37,44 @@ namespace Nekki.Yaml
 			}
 		}
 
-		public Scalar(string HODKINDOEGD, YamlScalarNode DJMPIGLOHBC)
+		public Scalar(string nodeKey, YamlScalarNode scalarNode)
 		{
 			base.typeNode = "Scalar";
-			base.key = HODKINDOEGD;
-			base.value = DJMPIGLOHBC;
+			base.key = nodeKey;
+			base.value = scalarNode;
 			_scalar = (YamlScalarNode)base.value;
 		}
 
-		public Scalar(string HODKINDOEGD, string NFICJMLCGEO)
+		public Scalar(string nodeKey, string textValue)
 		{
 			base.typeNode = "Scalar";
-			base.key = HODKINDOEGD;
-			base.value = new YamlScalarNode(NFICJMLCGEO);
+			base.key = nodeKey;
+			base.value = new YamlScalarNode(textValue);
 			_scalar = (YamlScalarNode)base.value;
 		}
 
 		public static void AddTextUpdateHandler(TextUpdateHandler value)
 		{
-			TextUpdateHandler gALGMABOBDE = TextUpdate;
+			TextUpdateHandler currentHandler = TextUpdate;
 			TextUpdateHandler gALGMABOBDE2;
 			do
 			{
-				gALGMABOBDE2 = gALGMABOBDE;
-				gALGMABOBDE = Interlocked.CompareExchange(ref TextUpdate, (TextUpdateHandler)Delegate.Combine(gALGMABOBDE2, value), gALGMABOBDE);
+				gALGMABOBDE2 = currentHandler;
+				currentHandler = Interlocked.CompareExchange(ref TextUpdate, (TextUpdateHandler)Delegate.Combine(gALGMABOBDE2, value), currentHandler);
 			}
-			while ((object)gALGMABOBDE != gALGMABOBDE2);
+			while ((object)currentHandler != gALGMABOBDE2);
 		}
 
 		public static void RemoveTextUpdateHandler(TextUpdateHandler value)
 		{
-			TextUpdateHandler gALGMABOBDE = TextUpdate;
+			TextUpdateHandler currentHandler = TextUpdate;
 			TextUpdateHandler gALGMABOBDE2;
 			do
 			{
-				gALGMABOBDE2 = gALGMABOBDE;
-				gALGMABOBDE = Interlocked.CompareExchange(ref TextUpdate, (TextUpdateHandler)Delegate.Remove(gALGMABOBDE2, value), gALGMABOBDE);
+				gALGMABOBDE2 = currentHandler;
+				currentHandler = Interlocked.CompareExchange(ref TextUpdate, (TextUpdateHandler)Delegate.Remove(gALGMABOBDE2, value), currentHandler);
 			}
-			while ((object)gALGMABOBDE != gALGMABOBDE2);
+			while ((object)currentHandler != gALGMABOBDE2);
 		}
 
 		private static void RaiseTextUpdate()
@@ -86,9 +86,9 @@ namespace Nekki.Yaml
 			}
 		}
 
-		public void SetText(string NFICJMLCGEO)
+		public void SetText(string textValue)
 		{
-			_scalar.Value = NFICJMLCGEO;
+			_scalar.Value = textValue;
 			RaiseTextUpdate();
 		}
 

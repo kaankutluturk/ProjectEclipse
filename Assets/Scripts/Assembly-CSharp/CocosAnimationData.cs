@@ -111,11 +111,11 @@ public class CocosAnimationData
 			_Sprite = value;
 		}
 
-		public void SetFrame(string LIAILCGJBDK)
+		public void SetFrame(string frameText)
 		{
-			int num = LIAILCGJBDK.IndexOf('}');
-			string[] array = LIAILCGJBDK.Substring(2, num - 2).Split(',');
-			string[] array2 = LIAILCGJBDK.Substring(num + 3, LIAILCGJBDK.Length - (num + 5)).Split(',');
+			int num = frameText.IndexOf('}');
+			string[] array = frameText.Substring(2, num - 2).Split(',');
+			string[] array2 = frameText.Substring(num + 3, frameText.Length - (num + 5)).Split(',');
 			_frameRect = new FrameRect();
 			_frameRect.X = int.Parse(array[0]);
 			_frameRect.Y = int.Parse(array[1]);
@@ -128,9 +128,9 @@ public class CocosAnimationData
 			return _offset;
 		}
 
-		public void SetOffset(string LIAILCGJBDK)
+		public void SetOffset(string offsetText)
 		{
-			_offset = ParseVector(LIAILCGJBDK);
+			_offset = ParseVector(offsetText);
 		}
 
 		public void set_Rotated(bool value)
@@ -148,9 +148,9 @@ public class CocosAnimationData
 			return _sourceSize;
 		}
 
-		public void SetSourceSize(string LIAILCGJBDK)
+		public void SetSourceSize(string sizeText)
 		{
-			_sourceSize = ParseVector(LIAILCGJBDK);
+			_sourceSize = ParseVector(sizeText);
 		}
 
 		private static Vector2 ParseVector(string value)
@@ -194,10 +194,10 @@ public class CocosAnimationData
 		}
 	}
 
-	private CocosAnimationData(XmlDocument GPIBAMAMGKD, string ONEIGMLOGDC)
+	private CocosAnimationData(XmlDocument document, string resourcePath)
 	{
-		_Path = ONEIGMLOGDC.ToLower();
-		XmlNode xmlNode = GPIBAMAMGKD["plist"]["dict"];
+		_Path = resourcePath.ToLower();
+		XmlNode xmlNode = document["plist"]["dict"];
 		string text = null;
 		foreach (XmlNode childNode in xmlNode.ChildNodes)
 		{
@@ -245,45 +245,45 @@ public class CocosAnimationData
 		_cache.Clear();
 	}
 
-	public static CocosAnimationData Create(string ONEIGMLOGDC, bool MPMHHEMGHOJ = false)
+	public static CocosAnimationData Create(string resourcePath, bool forceResource = false)
 	{
-		ONEIGMLOGDC = ResolveCompatibilityEffect(ONEIGMLOGDC);
-		if (_cache.ContainsKey(ONEIGMLOGDC))
+		resourcePath = ResolveCompatibilityEffect(resourcePath);
+		if (_cache.ContainsKey(resourcePath))
 		{
-			return _cache[ONEIGMLOGDC];
+			return _cache[resourcePath];
 		}
-		XmlDocument xmlDocument = XmlUtils.OpenXMLDocument(ONEIGMLOGDC, string.Empty, MPMHHEMGHOJ ? XmlUtils.XmlSourceMode.ForcedResourced : XmlUtils.XmlSourceMode.Normal);
+		XmlDocument xmlDocument = XmlUtils.OpenXMLDocument(resourcePath, string.Empty, forceResource ? XmlUtils.XmlSourceMode.ForcedResourced : XmlUtils.XmlSourceMode.Normal);
 		if (xmlDocument == null)
 		{
 			return null;
 		}
-		CocosAnimationData nIHINKFPFLM = new CocosAnimationData(xmlDocument, ONEIGMLOGDC);
-		_cache.Add(ONEIGMLOGDC, nIHINKFPFLM);
-		return nIHINKFPFLM;
+		CocosAnimationData animationData = new CocosAnimationData(xmlDocument, resourcePath);
+		_cache.Add(resourcePath, animationData);
+		return animationData;
 	}
 
-	private void ParseFrames(XmlNode OPPGGBFCIJA, List<SpriteFrameCocos> GFIODDEBNHM)
+	private void ParseFrames(XmlNode framesNode, List<SpriteFrameCocos> frames)
 	{
-		string jLEKBBJBLOE = null;
-		foreach (XmlNode childNode in OPPGGBFCIJA.ChildNodes)
+		string frameName = null;
+		foreach (XmlNode childNode in framesNode.ChildNodes)
 		{
 			if (childNode.Name == "key")
 			{
-				jLEKBBJBLOE = childNode.FirstChild.Value;
+				frameName = childNode.FirstChild.Value;
 			}
 			else
 			{
-				GFIODDEBNHM.Add(ParseFrame(childNode, jLEKBBJBLOE));
+				frames.Add(ParseFrame(childNode, frameName));
 			}
 		}
 	}
 
-	private SpriteFrameCocos ParseFrame(XmlNode EBBAHEDDHFO, string JLEKBBJBLOE)
+	private SpriteFrameCocos ParseFrame(XmlNode frameNode, string frameName)
 	{
-		SpriteFrameCocos pBAHNJDFMBO = new SpriteFrameCocos();
-		pBAHNJDFMBO.set_Name(JLEKBBJBLOE.Replace(".png", string.Empty));
+		SpriteFrameCocos spriteFrame = new SpriteFrameCocos();
+		spriteFrame.set_Name(frameName.Replace(".png", string.Empty));
 		string text = null;
-		foreach (XmlNode childNode in EBBAHEDDHFO.ChildNodes)
+		foreach (XmlNode childNode in frameNode.ChildNodes)
 		{
 			if (childNode.Name == "key")
 			{
@@ -293,28 +293,28 @@ public class CocosAnimationData
 			switch (text)
 			{
 			case "frame":
-				pBAHNJDFMBO.SetFrame(childNode.FirstChild.Value);
+				spriteFrame.SetFrame(childNode.FirstChild.Value);
 				break;
 			case "offset":
-				pBAHNJDFMBO.SetOffset(childNode.FirstChild.Value);
+				spriteFrame.SetOffset(childNode.FirstChild.Value);
 				break;
 			case "rotated":
-				pBAHNJDFMBO.set_Rotated(childNode.Name == "true");
+				spriteFrame.set_Rotated(childNode.Name == "true");
 				break;
 			case "sourceSize":
-				pBAHNJDFMBO.SetSourceSize(childNode.FirstChild.Value);
+				spriteFrame.SetSourceSize(childNode.FirstChild.Value);
 				break;
 			}
 		}
-		pBAHNJDFMBO.ValidateFrameSize();
-		return pBAHNJDFMBO;
+		spriteFrame.ValidateFrameSize();
+		return spriteFrame;
 	}
 
 	public void LoadSprites()
 	{
 		int num = _Path.IndexOf("resources");
-		string oNEIGMLOGDC = ((num != -1) ? _Path.Substring(num) : _Path).Replace("_xml", string.Empty).Replace(".xml", string.Empty);
-		Sprite[] array = ResourcesAndBundles.LoadAllAssets<Sprite>(oNEIGMLOGDC);
+		string resourcePath = ((num != -1) ? _Path.Substring(num) : _Path).Replace("_xml", string.Empty).Replace(".xml", string.Empty);
+		Sprite[] array = ResourcesAndBundles.LoadAllAssets<Sprite>(resourcePath);
 		Dictionary<string, Sprite> dictionary = new Dictionary<string, Sprite>();
 		for (int i = 0; i < array.Length; i++)
 		{
@@ -324,8 +324,8 @@ public class CocosAnimationData
 			}
 		}
 
-		int num2 = oNEIGMLOGDC.LastIndexOf('/');
-		string text = (num2 >= 0) ? oNEIGMLOGDC.Substring(0, num2 + 1) : string.Empty;
+		int num2 = resourcePath.LastIndexOf('/');
+		string text = (num2 >= 0) ? resourcePath.Substring(0, num2 + 1) : string.Empty;
 		for (int j = 0; j < _Frames.Count; j++)
 		{
 			Sprite value;

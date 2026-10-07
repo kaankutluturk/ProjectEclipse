@@ -73,26 +73,26 @@ public class NekkiLog : MonoBehaviour
 		return Path.Combine(_directory, GetFileName());
 	}
 
-	public static void Init(string KOBDDMHGOPJ, string PMFEIPCHENB, bool DHFCJMJBFDP, bool AJDGNMMKEBE, bool AODCELGDHPO, LogLevel JJAFNMOOCKJ)
+	public static void Init(string directory, string fileName, bool captureUnityLog, bool dateInFileName, bool writeTimestamps, LogLevel minLevel)
 	{
 		if ((bool)_instance)
 		{
 			_instance.Write();
 		}
-		_directory = KOBDDMHGOPJ.TrimEnd('/').TrimEnd('\\');
-		_minLevel = JJAFNMOOCKJ;
-		_dateInFileName = AJDGNMMKEBE;
-		_writeTimestamps = AODCELGDHPO;
-		_captureUnityLog = DHFCJMJBFDP;
-		if (!string.IsNullOrEmpty(PMFEIPCHENB))
+		_directory = directory.TrimEnd('/').TrimEnd('\\');
+		_minLevel = minLevel;
+		_dateInFileName = dateInFileName;
+		_writeTimestamps = writeTimestamps;
+		_captureUnityLog = captureUnityLog;
+		if (!string.IsNullOrEmpty(fileName))
 		{
-			_fileName = PMFEIPCHENB;
+			_fileName = fileName;
 		}
 		EnsureInstance();
 		_notInitialized = false;
-		if (!Directory.Exists(KOBDDMHGOPJ))
+		if (!Directory.Exists(directory))
 		{
-			Directory.CreateDirectory(KOBDDMHGOPJ);
+			Directory.CreateDirectory(directory);
 		}
 		FileInfo fileInfo = new FileInfo(GetFilePath());
 		if (!fileInfo.Exists)
@@ -126,26 +126,26 @@ public class NekkiLog : MonoBehaviour
 		StartCoroutine(WriteLoop());
 	}
 
-	private static void _unityLogCallback(string IOFGGOCEIAM, string HHLCHHIFDCM, LogType LFLGCDNKNJI)
+	private static void _unityLogCallback(string condition, string stackTrace, LogType type)
 	{
 		if (_captureUnityLog)
 		{
-			switch (LFLGCDNKNJI)
+			switch (type)
 			{
 			case LogType.Error:
-				Error(IOFGGOCEIAM, HHLCHHIFDCM);
+				Error(condition, stackTrace);
 				break;
 			case LogType.Assert:
-				Assert(IOFGGOCEIAM, HHLCHHIFDCM);
+				Assert(condition, stackTrace);
 				break;
 			case LogType.Warning:
-				Warning(IOFGGOCEIAM, HHLCHHIFDCM);
+				Warning(condition, stackTrace);
 				break;
 			case LogType.Log:
-				Log(IOFGGOCEIAM, HHLCHHIFDCM);
+				Log(condition, stackTrace);
 				break;
 			case LogType.Exception:
-				LogException(IOFGGOCEIAM, HHLCHHIFDCM);
+				LogException(condition, stackTrace);
 				break;
 			}
 		}
@@ -159,34 +159,34 @@ public class NekkiLog : MonoBehaviour
 		}
 	}
 
-	public static void Log(object LIOGIBJBHAH, string HHLCHHIFDCM = null)
+	public static void Log(object message, string stackTrace = null)
 	{
-		AppendEntry(LogLevel.Log, LIOGIBJBHAH, HHLCHHIFDCM);
+		AppendEntry(LogLevel.Log, message, stackTrace);
 	}
 
-	public static void Warning(object LIOGIBJBHAH, string HHLCHHIFDCM = null)
+	public static void Warning(object message, string stackTrace = null)
 	{
-		AppendEntry(LogLevel.Warning, LIOGIBJBHAH, HHLCHHIFDCM);
+		AppendEntry(LogLevel.Warning, message, stackTrace);
 	}
 
-	public static void Error(object LIOGIBJBHAH, string HHLCHHIFDCM = null)
+	public static void Error(object message, string stackTrace = null)
 	{
-		AppendEntry(LogLevel.Error, LIOGIBJBHAH, HHLCHHIFDCM);
+		AppendEntry(LogLevel.Error, message, stackTrace);
 	}
 
-	public static void Exception(Exception MPFFFAOGBJE)
+	public static void Exception(Exception exception)
 	{
-		AppendEntry(LogLevel.Exception, MPFFFAOGBJE.Message, MPFFFAOGBJE.StackTrace);
+		AppendEntry(LogLevel.Exception, exception.Message, exception.StackTrace);
 	}
 
-	private static void LogException(object LIOGIBJBHAH, string HHLCHHIFDCM)
+	private static void LogException(object message, string stackTrace)
 	{
-		AppendEntry(LogLevel.Exception, LIOGIBJBHAH, HHLCHHIFDCM);
+		AppendEntry(LogLevel.Exception, message, stackTrace);
 	}
 
-	public static void Assert(object LIOGIBJBHAH, string HHLCHHIFDCM = null)
+	public static void Assert(object message, string stackTrace = null)
 	{
-		AppendEntry(LogLevel.Assert, LIOGIBJBHAH, HHLCHHIFDCM);
+		AppendEntry(LogLevel.Assert, message, stackTrace);
 	}
 
 	public static void Stop()
@@ -195,28 +195,28 @@ public class NekkiLog : MonoBehaviour
 		_notInitialized = true;
 	}
 
-	private static string FormatEntry(LogLevel GNLOCMLBNHF, object IOFGGOCEIAM, string HHLCHHIFDCM = null)
+	private static string FormatEntry(LogLevel level, object message, string stackTrace = null)
 	{
-		object obj = ((!string.IsNullOrEmpty(HHLCHHIFDCM)) ? string.Format("{0} at: {1}", IOFGGOCEIAM, HHLCHHIFDCM) : IOFGGOCEIAM);
+		object obj = ((!string.IsNullOrEmpty(stackTrace)) ? string.Format("{0} at: {1}", message, stackTrace) : message);
 		if (!_writeTimestamps)
 		{
 			return string.Format("{0}\n", obj);
 		}
-		return string.Format("[{3}] [{0}:{1}:{2}] {4}\n", _now.Hour.ToString("00"), _now.Minute.ToString("00"), _now.Second.ToString("00"), GNLOCMLBNHF, obj);
+		return string.Format("[{3}] [{0}:{1}:{2}] {4}\n", _now.Hour.ToString("00"), _now.Minute.ToString("00"), _now.Second.ToString("00"), level, obj);
 	}
 
-	private static void AppendEntry(LogLevel GNLOCMLBNHF, object LIOGIBJBHAH, string HHLCHHIFDCM = null)
+	private static void AppendEntry(LogLevel level, object message, string stackTrace = null)
 	{
 		if (_notInitialized)
 		{
 			AdvLog.LogWarning("you must init log system first!");
 		}
-		else if ((int)GNLOCMLBNHF >= (int)_minLevel)
+		else if ((int)level >= (int)_minLevel)
 		{
 			EnsureInstance();
 			lock (LOCKER)
 			{
-				_items.Append(FormatEntry(GNLOCMLBNHF, LIOGIBJBHAH, HHLCHHIFDCM));
+				_items.Append(FormatEntry(level, message, stackTrace));
 			}
 		}
 	}

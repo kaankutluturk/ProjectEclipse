@@ -4,7 +4,7 @@ using System.Diagnostics;
 
 public static class ConsoleDatabase
 {
-	public delegate string CommandFunction(params string[] LKIOKGCNKHE);
+	public delegate string CommandFunction(params string[] arguments);
 
 	private class CommandData
 	{
@@ -38,10 +38,10 @@ public static class ConsoleDatabase
 			}
 		}
 
-		public CommandData(CommandFunction MHAEIBNCMPL, bool DLEJFILIEGL)
+		public CommandData(CommandFunction handler, bool ignoreCase)
 		{
-			SetHandler(MHAEIBNCMPL);
-			set_IgnoreCase(DLEJFILIEGL);
+			SetHandler(handler);
+			set_IgnoreCase(ignoreCase);
 		}
 
 		public CommandFunction GetHandler()
@@ -77,32 +77,32 @@ public static class ConsoleDatabase
 		return _commands.ContainsKey(name) && _commands[name] != null;
 	}
 
-	public static string ExecuteCommand(string LEKEGLMDAHA)
+	public static string ExecuteCommand(string commandLine)
 	{
-		if (!string.IsNullOrEmpty(LEKEGLMDAHA))
+		if (!string.IsNullOrEmpty(commandLine))
 		{
-			LEKEGLMDAHA = LEKEGLMDAHA.Trim(' ');
-			int num = ((!LEKEGLMDAHA.Contains(" ")) ? LEKEGLMDAHA.Length : LEKEGLMDAHA.IndexOf(" ", StringComparison.Ordinal));
-			string text = LEKEGLMDAHA.Substring(0, num).ToLower();
-			LEKEGLMDAHA = LEKEGLMDAHA.Remove(0, num);
-			LEKEGLMDAHA = LEKEGLMDAHA.Trim(' ');
+			commandLine = commandLine.Trim(' ');
+			int num = ((!commandLine.Contains(" ")) ? commandLine.Length : commandLine.IndexOf(" ", StringComparison.Ordinal));
+			string text = commandLine.Substring(0, num).ToLower();
+			commandLine = commandLine.Remove(0, num);
+			commandLine = commandLine.Trim(' ');
 			if (HasCommand(text))
 			{
-				CommandData kHGKFJFOEBE = _commands[text];
-				if (kHGKFJFOEBE.GetIgnoreCase())
+				CommandData command = _commands[text];
+				if (command.GetIgnoreCase())
 				{
-					LEKEGLMDAHA = LEKEGLMDAHA.ToLower();
+					commandLine = commandLine.ToLower();
 				}
-				string[] lKIOKGCNKHE = LEKEGLMDAHA.Split(_ArgsSeparators, StringSplitOptions.RemoveEmptyEntries);
-				return kHGKFJFOEBE.GetHandler()(lKIOKGCNKHE);
+				string[] arguments = commandLine.Split(_ArgsSeparators, StringSplitOptions.RemoveEmptyEntries);
+				return command.GetHandler()(arguments);
 			}
 		}
 		return "Unknown command!";
 	}
 
-	public static void RegisterCommand(string name, CommandFunction LEPDMLGJCKI, bool DLEJFILIEGL = true)
+	public static void RegisterCommand(string name, CommandFunction handler, bool ignoreCase = true)
 	{
-		_commands[name.ToLower()] = new CommandData(LEPDMLGJCKI, DLEJFILIEGL);
+		_commands[name.ToLower()] = new CommandData(handler, ignoreCase);
 	}
 
 	public static void UnregisterCommand(string name)

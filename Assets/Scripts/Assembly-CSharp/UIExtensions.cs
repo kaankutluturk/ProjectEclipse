@@ -3,15 +3,15 @@ using UnityEngine.UI;
 
 public static class UIExtensions
 {
-	public static void SetAlpha(this Graphic AJDDOEIAJKB, float KGJALFLDIBG)
+	public static void SetAlpha(this Graphic graphic, float alpha)
 	{
-		Color color = AJDDOEIAJKB.color;
-		color.a = KGJALFLDIBG;
-		AJDDOEIAJKB.color = color;
+		Color color = graphic.color;
+		color.a = alpha;
+		graphic.color = color;
 	}
 
-	public static float GetAlpha(this Graphic AJDDOEIAJKB)
+	public static float GetAlpha(this Graphic graphic)
 	{
-		return AJDDOEIAJKB.color.a;
+		return graphic.color.a;
 	}
 }

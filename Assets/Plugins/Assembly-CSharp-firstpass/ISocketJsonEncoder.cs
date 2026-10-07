@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 public interface ISocketJsonEncoder
 {
-	List<object> Decode(string EMDHMHOKGFP);
+	List<object> Decode(string json);
 
-	string Encode(List<object> AOMLCBHAJJH);
+	string Encode(List<object> data);
 }

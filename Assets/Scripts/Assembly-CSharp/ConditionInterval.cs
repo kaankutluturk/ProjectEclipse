@@ -35,10 +35,10 @@ public class ConditionInterval : ConditionAnimation
 	public override bool IsEqual(ModelConditions conditions)
 	{
 		bool flag = false;
-		List<IntervalAnimation> cAANBJEPGAA = conditions.Intervals;
-		if (cAANBJEPGAA != null)
+		List<IntervalAnimation> intervals = conditions.Intervals;
+		if (intervals != null)
 		{
-			foreach (IntervalAnimation item in cAANBJEPGAA)
+			foreach (IntervalAnimation item in intervals)
 			{
 				if ((_intervalType == IntervalAnimation.IntervalType.INTERVAL_NONE || _intervalType == item.Type) && (_Name == string.Empty || item.Name == _Name))
 				{

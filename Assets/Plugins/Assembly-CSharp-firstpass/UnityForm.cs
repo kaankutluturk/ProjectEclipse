@@ -22,9 +22,9 @@ public sealed class UnityForm : HTTPFormBase
 	{
 	}
 
-	public UnityForm(WWWForm HOELLMLEBAK)
+	public UnityForm(WWWForm form)
 	{
-		set_Form(HOELLMLEBAK);
+		set_Form(form);
 	}
 
 	public WWWForm GetForm()
@@ -37,9 +37,9 @@ public sealed class UnityForm : HTTPFormBase
 		form = value;
 	}
 
-	public override void CopyFrom(HTTPFormBase KHGIIFDIHHA)
+	public override void CopyFrom(HTTPFormBase source)
 	{
-		SetFields(KHGIIFDIHHA.GetFields());
+		SetFields(source.GetFields());
 		SetIsChanged(true);
 		if (GetForm() != null)
 		{
@@ -52,27 +52,27 @@ public sealed class UnityForm : HTTPFormBase
 		}
 		for (int i = 0; i < GetFields().Count; i++)
 		{
-			HTTPFieldData iIMHHCDGJOL = GetFields()[i];
-			if (string.IsNullOrEmpty(iIMHHCDGJOL.GetText()) && iIMHHCDGJOL.GetBinary() != null)
+			HTTPFieldData field = GetFields()[i];
+			if (string.IsNullOrEmpty(field.GetText()) && field.GetBinary() != null)
 			{
-				GetForm().AddBinaryData(iIMHHCDGJOL.get_Name(), iIMHHCDGJOL.GetBinary(), iIMHHCDGJOL.GetFileName(), iIMHHCDGJOL.GetMimeType());
+				GetForm().AddBinaryData(field.get_Name(), field.GetBinary(), field.GetFileName(), field.GetMimeType());
 			}
 			else
 			{
-				GetForm().AddField(iIMHHCDGJOL.get_Name(), iIMHHCDGJOL.GetText(), iIMHHCDGJOL.GetEncoding());
+				GetForm().AddField(field.get_Name(), field.GetText(), field.GetEncoding());
 			}
 		}
 	}
 
-	public override void PrepareRequest(HTTPRequest ONOCIELLAPL)
+	public override void PrepareRequest(HTTPRequest request)
 	{
 		if (GetForm().headers.ContainsKey("Content-Type"))
 		{
-			ONOCIELLAPL.SetHeader("Content-Type", GetForm().headers["Content-Type"]);
+			request.SetHeader("Content-Type", GetForm().headers["Content-Type"]);
 		}
 		else
 		{
-			ONOCIELLAPL.SetHeader("Content-Type", "application/x-www-form-urlencoded");
+			request.SetHeader("Content-Type", "application/x-www-form-urlencoded");
 		}
 	}
 

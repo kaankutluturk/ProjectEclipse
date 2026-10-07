@@ -4,43 +4,43 @@ using UnityEngine;
 
 public static class NativeExtensions
 {
-	public static void SafeInvoke(this Action IBODMPMJELJ)
+	public static void SafeInvoke(this Action action)
 	{
-		if (IBODMPMJELJ != null)
+		if (action != null)
 		{
-			IBODMPMJELJ();
+			action();
 		}
 	}
 
-	public static void SafeInvoke<T>(this Action<T> IBODMPMJELJ, T value)
+	public static void SafeInvoke<T>(this Action<T> action, T value)
 	{
-		if (IBODMPMJELJ != null)
+		if (action != null)
 		{
-			IBODMPMJELJ(value);
+			action(value);
 		}
 	}
 
-	public static string DescribeInvocationList<T>(this Action<T> IBODMPMJELJ)
+	public static string DescribeInvocationList<T>(this Action<T> action)
 	{
-		return "(" + IBODMPMJELJ.GetInvocationList().Length + " total) " + string.Join(", ", (from d in IBODMPMJELJ.GetInvocationList()
+		return "(" + action.GetInvocationList().Length + " total) " + string.Join(", ", (from d in action.GetInvocationList()
 			select d.Method.Name).ToArray());
 	}
 
-	public static bool IsEmpty<T>(this Action<T> IBODMPMJELJ)
+	public static bool IsEmpty<T>(this Action<T> action)
 	{
-		return IBODMPMJELJ == null || IBODMPMJELJ.GetInvocationList().Length == 0;
+		return action == null || action.GetInvocationList().Length == 0;
 	}
 
-	public static float MillisecondsToSeconds(this float FINAMGBHHDL)
+	public static float MillisecondsToSeconds(this float milliseconds)
 	{
-		return FINAMGBHHDL / 1000f;
+		return milliseconds / 1000f;
 	}
 
-	public static bool IsEqual(this int number, Enum FOPOKALJIIJ)
+	public static bool IsEqual(this int number, Enum enumValue)
 	{
 		try
 		{
-			return number == Convert.ToInt32(FOPOKALJIIJ);
+			return number == Convert.ToInt32(enumValue);
 		}
 		catch (Exception message)
 		{

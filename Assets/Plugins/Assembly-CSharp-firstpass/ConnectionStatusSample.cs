@@ -52,38 +52,38 @@ internal sealed class ConnectionStatusSample : MonoBehaviour
 		});
 	}
 
-	private void OnNonHubMessage(Connection BJGMPDIKEJC, object data)
+	private void OnNonHubMessage(Connection connection, object data)
 	{
 		messages.Add("[Server Message] " + data.ToString());
 	}
 
-	private void OnStateChanged(Connection BJGMPDIKEJC, ConnectionStates JOBAGBFMMFP, ConnectionStates MPJEMGJIBBD)
+	private void OnStateChanged(Connection connection, ConnectionStates oldState, ConnectionStates newState)
 	{
-		messages.Add(string.Format("[State Change] {0} => {1}", JOBAGBFMMFP, MPJEMGJIBBD));
+		messages.Add(string.Format("[State Change] {0} => {1}", oldState, newState));
 	}
 
-	private void OnError(Connection BJGMPDIKEJC, string JDONBAPIJCG)
+	private void OnError(Connection connection, string error)
 	{
-		messages.Add("[Error] " + JDONBAPIJCG);
+		messages.Add("[Error] " + error);
 	}
 
-	private void OnStatusHubMethod(Hub CGFIJCNNCKP, string FJLOLCPJACB, params object[] LKIOKGCNKHE)
+	private void OnStatusHubMethod(Hub hub, string method, params object[] args)
 	{
-		string arg = ((LKIOKGCNKHE.Length <= 0) ? string.Empty : (LKIOKGCNKHE[0] as string));
-		string arg2 = ((LKIOKGCNKHE.Length <= 1) ? string.Empty : LKIOKGCNKHE[1].ToString());
-		switch (FJLOLCPJACB)
+		string arg = ((args.Length <= 0) ? string.Empty : (args[0] as string));
+		string arg2 = ((args.Length <= 1) ? string.Empty : args[1].ToString());
+		switch (method)
 		{
 		case "joined":
-			messages.Add(string.Format("[{0}] {1} joined at {2}", CGFIJCNNCKP.get_Name(), arg, arg2));
+			messages.Add(string.Format("[{0}] {1} joined at {2}", hub.get_Name(), arg, arg2));
 			break;
 		case "rejoined":
-			messages.Add(string.Format("[{0}] {1} reconnected at {2}", CGFIJCNNCKP.get_Name(), arg, arg2));
+			messages.Add(string.Format("[{0}] {1} reconnected at {2}", hub.get_Name(), arg, arg2));
 			break;
 		case "leave":
-			messages.Add(string.Format("[{0}] {1} leaved at {2}", CGFIJCNNCKP.get_Name(), arg, arg2));
+			messages.Add(string.Format("[{0}] {1} leaved at {2}", hub.get_Name(), arg, arg2));
 			break;
 		default:
-			messages.Add(string.Format("[{0}] {1}", CGFIJCNNCKP.get_Name(), FJLOLCPJACB));
+			messages.Add(string.Format("[{0}] {1}", hub.get_Name(), method));
 			break;
 		}
 	}

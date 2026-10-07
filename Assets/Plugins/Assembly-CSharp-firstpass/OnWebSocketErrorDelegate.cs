@@ -1,3 +1,3 @@
 using System;
 
-public delegate void OnWebSocketErrorDelegate(WebSocket ILNFPNFEOCL, Exception MPFFFAOGBJE);
+public delegate void OnWebSocketErrorDelegate(WebSocket webSocket, Exception exception);

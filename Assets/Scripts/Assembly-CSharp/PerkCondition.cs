@@ -46,7 +46,7 @@ public abstract class PerkCondition : PerkObject
 		_type = value;
 	}
 
-	public static List<PerkCondition> Create(XmlNode node, PerkInfoItem AEFFHJGMNFI)
+	public static List<PerkCondition> Create(XmlNode node, PerkInfoItem perk)
 	{
 		List<PerkCondition> list = new List<PerkCondition>();
 		if (node == null)
@@ -55,88 +55,88 @@ public abstract class PerkCondition : PerkObject
 		}
 		foreach (XmlNode childNode in node.ChildNodes)
 		{
-			PerkCondition iDJILNODHAD = null;
+			PerkCondition condition = null;
 			string name = childNode.Name;
 			if (FunctionExtension.ParseCompareType(name) != FunctionExtension.CompareType.COMPARE_NONE)
 			{
-				iDJILNODHAD = new PerkConditionComparison();
+				condition = new PerkConditionComparison();
 			}
 			else
 			{
 				switch (name)
 				{
 				case "Random":
-					iDJILNODHAD = new PerkConditionRandom();
+					condition = new PerkConditionRandom();
 					break;
 				case "Style":
-					iDJILNODHAD = new PerkConditionStyle();
+					condition = new PerkConditionStyle();
 					break;
 				case "Combo":
-					iDJILNODHAD = new PerkConditionCombo();
+					condition = new PerkConditionCombo();
 					break;
 				case "RoundStage":
 				case "RoundStageStart":
-					iDJILNODHAD = new PerkConditionRoundStage();
+					condition = new PerkConditionRoundStage();
 					break;
 				case "CurrentAnimation":
-					iDJILNODHAD = new PerkConditionCurrentAnimation();
+					condition = new PerkConditionCurrentAnimation();
 					break;
 				case "CurrentInterval":
-					iDJILNODHAD = new PerkConditionCurrentInterval();
+					condition = new PerkConditionCurrentInterval();
 					break;
 				case "Health":
-					iDJILNODHAD = new PerkConditionHealth();
+					condition = new PerkConditionHealth();
 					break;
 				case "Item":
-					iDJILNODHAD = new PerkConditionItem();
+					condition = new PerkConditionItem();
 					break;
 				case "Round":
-					iDJILNODHAD = new PerkConditionRound();
+					condition = new PerkConditionRound();
 					break;
 				case "Bullets":
-					iDJILNODHAD = new PerkConditionBullets();
+					condition = new PerkConditionBullets();
 					break;
 				case "MagicCharge":
-					iDJILNODHAD = new PerkConditionMagicCharge();
+					condition = new PerkConditionMagicCharge();
 					break;
 				case "ModExists":
-					iDJILNODHAD = new PerkConditionModExists();
+					condition = new PerkConditionModExists();
 					break;
 				case "Pain":
-					iDJILNODHAD = new PerkConditionPain();
+					condition = new PerkConditionPain();
 					break;
 				case "Operator":
-					iDJILNODHAD = new PerkConditionOperator();
+					condition = new PerkConditionOperator();
 					break;
 				case "InTheArea":
-					iDJILNODHAD = new PerkConditionInTheArea();
+					condition = new PerkConditionInTheArea();
 					break;
 				case "PerkStart":
-					iDJILNODHAD = new PerkConditionPerkStart(AEFFHJGMNFI.Name, false);
+					condition = new PerkConditionPerkStart(perk.Name, false);
 					break;
 				}
 			}
-			if (iDJILNODHAD != null)
+			if (condition != null)
 			{
-				iDJILNODHAD.SetPerk(AEFFHJGMNFI);
-				iDJILNODHAD.Parse(childNode);
-				list.Add(iDJILNODHAD);
+				condition.SetPerk(perk);
+				condition.Parse(childNode);
+				list.Add(condition);
 			}
 		}
 		return list;
 	}
 
-	public abstract bool IsEqual(Model ACENLMONNPA, List<string> NIKHAICFGNM);
+	public abstract bool IsEqual(Model model, List<string> args);
 
-	protected Model ResolveTargetModel(Model ACENLMONNPA)
+	protected Model ResolveTargetModel(Model model)
 	{
 		if (TargetPlayer == PlayerType.PLAYER_ME)
 		{
-			return ACENLMONNPA;
+			return model;
 		}
 		if (TargetPlayer == PlayerType.PLAYER_ENEMY)
 		{
-			return ACENLMONNPA.GetCombatTarget();
+			return model.GetCombatTarget();
 		}
 		return null;
 	}

@@ -14,8 +14,8 @@ public class ConditionBattle : ConditionCounter
 
 	public override bool IsEqual(CounterConditions conditions)
 	{
-		bool dCJLKCFKCOM = conditions.BattleType == _battleType;
-		return IsNotCompare(dCJLKCFKCOM);
+		bool isMatch = conditions.BattleType == _battleType;
+		return IsNotCompare(isMatch);
 	}
 
 	public override void Initialize()

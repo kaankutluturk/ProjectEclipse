@@ -47,17 +47,17 @@ public class CoroutineManager : MonoBehaviour
 			}
 		}
 
-		public CoroutineEntry(IEnumerator BBMAOMICECF)
+		public CoroutineEntry(IEnumerator routine)
 		{
-			set_Routine(BBMAOMICECF);
+			set_Routine(routine);
 			set_IsRunning(true);
-			_Coroutines.Add(BBMAOMICECF, this);
+			_Coroutines.Add(routine, this);
 		}
 
-		public static CoroutineEntry Find(IEnumerator BBMAOMICECF)
+		public static CoroutineEntry Find(IEnumerator routine)
 		{
 			CoroutineEntry value = null;
-			_Coroutines.TryGetValue(BBMAOMICECF, out value);
+			_Coroutines.TryGetValue(routine, out value);
 			return value;
 		}
 
@@ -111,7 +111,7 @@ public class CoroutineManager : MonoBehaviour
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 	private bool _isPaused;
 
-	public static CoroutineManager BLOOLFFMKFI
+	public static CoroutineManager Instance
 	{
 		get
 		{
@@ -151,34 +151,34 @@ public class CoroutineManager : MonoBehaviour
 		_isPaused = value;
 	}
 
-	public void StartRoutine(IEnumerator BBMAOMICECF)
+	public void StartRoutine(IEnumerator routine)
 	{
-		CoroutineEntry cCCLFIBGGDD = new CoroutineEntry(BBMAOMICECF);
-		StartCoroutine(RunRoutine(cCCLFIBGGDD));
+		CoroutineEntry entry = new CoroutineEntry(routine);
+		StartCoroutine(RunRoutine(entry));
 	}
 
-	public void StopRoutine(IEnumerator BBMAOMICECF)
+	public void StopRoutine(IEnumerator routine)
 	{
-		CoroutineEntry lEPFPPAGHCO = CoroutineEntry.Find(BBMAOMICECF);
-		if (lEPFPPAGHCO != null)
+		CoroutineEntry entry = CoroutineEntry.Find(routine);
+		if (entry != null)
 		{
-			lEPFPPAGHCO.Stop();
+			entry.Stop();
 		}
-		StopCoroutine(BBMAOMICECF);
+		StopCoroutine(routine);
 	}
 
-	private IEnumerator RunRoutine(CoroutineEntry CCCLFIBGGDD)
+	private IEnumerator RunRoutine(CoroutineEntry entry)
 	{
 		yield return null;
-		while (CCCLFIBGGDD.GetIsRunning())
+		while (entry.GetIsRunning())
 		{
 			if (get_IsPaused())
 			{
 				yield return null;
 			}
-			else if (CCCLFIBGGDD.MoveNext())
+			else if (entry.MoveNext())
 			{
-				yield return CCCLFIBGGDD.GetCurrent();
+				yield return entry.GetCurrent();
 			}
 		}
 	}
@@ -188,8 +188,8 @@ public class CoroutineManager : MonoBehaviour
 		SetIsPaused(false);
 	}
 
-	private void OnApplicationPause(bool OIBJJLBCEHA)
+	private void OnApplicationPause(bool paused)
 	{
-		SetIsPaused(OIBJJLBCEHA);
+		SetIsPaused(paused);
 	}
 }

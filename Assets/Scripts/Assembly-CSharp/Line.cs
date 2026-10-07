@@ -6,7 +6,7 @@ public interface Line
 
 	void FinishAnimation();
 
-	void AddListener(UnityAction ODDEOFKLIAG);
+	void AddListener(UnityAction listener);
 
-	void RemoveListener(UnityAction ODDEOFKLIAG);
+	void RemoveListener(UnityAction listener);
 }

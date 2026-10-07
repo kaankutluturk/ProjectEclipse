@@ -35,9 +35,9 @@ namespace Nekki.SF2.GUI.Map
 
 		private static int scrollFrameCounter = 360;
 
-		public void Init(long GBGNFPNCGED, long PAGGOKFIEOP, RewardPrize DPIIJICBGGA, float HOJOKAOLMGN, float AHKNBOHOOOK, int CFMPJLLNCFF)
+		public void Init(long money, long rubies, RewardPrize prize, float width, float iconHeight, int fontSize)
 		{
-			float jPDGMJHNKPK = 1f;
+			float moneyScale = 1f;
 			float jPDGMJHNKPK2 = 1f;
 			foreach (BattlePrizeElement item in prizeElements)
 			{
@@ -45,49 +45,49 @@ namespace Nekki.SF2.GUI.Map
 			}
 			prizeElements.Clear();
 			_itemIcon.gameObject.SetActive(false);
-			maxWidth = HOJOKAOLMGN;
-			itemIconHeight = AHKNBOHOOOK;
-			string aDONPNOBBDE = "MiscSprites.ruby";
+			maxWidth = width;
+			itemIconHeight = iconHeight;
+			string rubyIcon = "MiscSprites.ruby";
 			string aDONPNOBBDE2 = ListSF.GetRoster().GetCoinIcon();
 			totalContentWidth = 0f;
-			if (GBGNFPNCGED > 0)
+			if (money > 0)
 			{
 				BattlePrizeElement component = Object.Instantiate(_prizeElemPrefab).GetComponent<BattlePrizeElement>();
-				component.Init(aDONPNOBBDE2, GBGNFPNCGED, CFMPJLLNCFF, jPDGMJHNKPK);
+				component.Init(aDONPNOBBDE2, money, fontSize, moneyScale);
 				AddPrizeElement(component);
 			}
-			if (PAGGOKFIEOP > 0)
+			if (rubies > 0)
 			{
 				BattlePrizeElement component2 = Object.Instantiate(_prizeElemPrefab).GetComponent<BattlePrizeElement>();
-				component2.Init(aDONPNOBBDE, PAGGOKFIEOP, CFMPJLLNCFF, jPDGMJHNKPK2);
+				component2.Init(rubyIcon, rubies, fontSize, jPDGMJHNKPK2);
 				AddPrizeElement(component2);
 			}
-			foreach (RewardCurrency item2 in DPIIJICBGGA.currencyRewards)
+			foreach (RewardCurrency item2 in prize.currencyRewards)
 			{
 				if (item2.ShowReward)
 				{
-					GameCurrency cJJOFMHLFFM = GameUtils.GameCurrencies.GetCurrencyByName(item2.Name);
-					if (cJJOFMHLFFM != null)
+					GameCurrency currency = GameUtils.GameCurrencies.GetCurrencyByName(item2.Name);
+					if (currency != null)
 					{
-						string mJBPMLCLMFN = cJJOFMHLFFM.Icon;
-						long bAINMLLIKOL = item2.GetMinimumAmount();
+						string currencyIcon = currency.Icon;
+						long amount = item2.GetMinimumAmount();
 						BattlePrizeElement component3 = Object.Instantiate(_prizeElemPrefab).GetComponent<BattlePrizeElement>();
-						component3.Init(mJBPMLCLMFN, bAINMLLIKOL, CFMPJLLNCFF);
+						component3.Init(currencyIcon, amount, fontSize);
 						AddPrizeElement(component3);
 					}
 				}
 			}
-			foreach (RewardResistance item3 in DPIIJICBGGA.resistanceRewards)
+			foreach (RewardResistance item3 in prize.resistanceRewards)
 			{
 				if (item3.ShowReward)
 				{
-					GameResistance oOJJEOFENBJ = GameUtils.GameResistances.GetResistanceByName(item3.Name);
-					if (oOJJEOFENBJ != null)
+					GameResistance resistance = GameUtils.GameResistances.GetResistanceByName(item3.Name);
+					if (resistance != null)
 					{
-						string aDONPNOBBDE3 = oOJJEOFENBJ.GetIcon();
+						string aDONPNOBBDE3 = resistance.GetIcon();
 						long bAINMLLIKOL2 = item3.Value;
 						BattlePrizeElement component4 = Object.Instantiate(_prizeElemPrefab).GetComponent<BattlePrizeElement>();
-						component4.Init(aDONPNOBBDE3, bAINMLLIKOL2, CFMPJLLNCFF);
+						component4.Init(aDONPNOBBDE3, bAINMLLIKOL2, fontSize);
 						AddPrizeElement(component4);
 					}
 				}
@@ -95,24 +95,24 @@ namespace Nekki.SF2.GUI.Map
 			_layoutGroup.spacing = _spacing;
 			_layoutGroup.GetComponent<RectTransform>().sizeDelta = new Vector2(totalContentWidth, _layoutGroup.GetComponent<RectTransform>().sizeDelta.y);
 			UpdateScrollState();
-			foreach (RewardItem item4 in DPIIJICBGGA.items)
+			foreach (RewardItem item4 in prize.items)
 			{
 				if (item4.ShowReward)
 				{
-					ItemInfo dJKEECEOCJB = ListSF.GetItems().GetItemByName(item4.Name);
-					UserItem dKCHDHMLKHN = ListSF.GetRoster().GetInventory().FindItem(dJKEECEOCJB);
-					if (dKCHDHMLKHN == null)
+					ItemInfo itemInfo = ListSF.GetItems().GetItemByName(item4.Name);
+					UserItem userItem = ListSF.GetRoster().GetInventory().FindItem(itemInfo);
+					if (userItem == null)
 					{
-						AddItem(dJKEECEOCJB);
+						AddItem(itemInfo);
 						break;
 					}
 				}
 			}
 		}
 
-		public void AddItem(ItemInfo PJDAGCBPLJE)
+		public void AddItem(ItemInfo itemInfo)
 		{
-			if (PJDAGCBPLJE.Type == "Seal")
+			if (itemInfo.Type == "Seal")
 			{
 				_itemIcon.set_TexturePath(SF2Paths.GetUsersUiPath());
 			}
@@ -120,7 +120,7 @@ namespace Nekki.SF2.GUI.Map
 			{
 				_itemIcon.set_TexturePath(SF2Paths.GetItemsUiPath());
 			}
-			_itemIcon.set_SpriteName(PJDAGCBPLJE.FileName);
+			_itemIcon.set_SpriteName(itemInfo.FileName);
 			_itemIcon.gameObject.SetActive(true);
 			_itemIcon.preserveAspect = true;
 			foreach (BattlePrizeElement item in prizeElements)
@@ -138,14 +138,14 @@ namespace Nekki.SF2.GUI.Map
 			}
 		}
 
-		private void AddPrizeElement(BattlePrizeElement DGNDGHPMPJD)
+		private void AddPrizeElement(BattlePrizeElement prizeElement)
 		{
-			if (DGNDGHPMPJD != null)
+			if (prizeElement != null)
 			{
-				totalContentWidth += DGNDGHPMPJD.GetComponent<LayoutElement>().preferredWidth;
+				totalContentWidth += prizeElement.GetComponent<LayoutElement>().preferredWidth;
 				totalContentWidth += _spacing;
-				DGNDGHPMPJD.transform.SetParent(_layoutGroup.transform, false);
-				prizeElements.Add(DGNDGHPMPJD);
+				prizeElement.transform.SetParent(_layoutGroup.transform, false);
+				prizeElements.Add(prizeElement);
 			}
 		}
 
@@ -161,12 +161,12 @@ namespace Nekki.SF2.GUI.Map
 		private void ScrollPrizes()
 		{
 			scrollFrameCounter++;
-			float mNADIKCPPIG = MapGUI.RewardLineOscillation.OscillationPeriod;
-			float mIFFMBOIAGC = MapGUI.RewardLineOscillation.OscillationFactor;
+			float period = MapGUI.RewardLineOscillation.OscillationPeriod;
+			float factor = MapGUI.RewardLineOscillation.OscillationFactor;
 			float num = _layoutGroup.GetComponent<RectTransform>().rect.width - GetComponent<RectTransform>().rect.width;
-			float num2 = num / (2f * mNADIKCPPIG);
-			float bAINMLLIKOL = num2 * mNADIKCPPIG * Mathf.Cos(mIFFMBOIAGC * (float)scrollFrameCounter);
-			_layoutGroup.transform.SetLocalX(bAINMLLIKOL);
+			float num2 = num / (2f * period);
+			float offsetX = num2 * period * Mathf.Cos(factor * (float)scrollFrameCounter);
+			_layoutGroup.transform.SetLocalX(offsetX);
 		}
 	}
 }

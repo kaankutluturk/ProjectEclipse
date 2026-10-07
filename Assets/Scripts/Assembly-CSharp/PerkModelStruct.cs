@@ -459,27 +459,27 @@ public class PerkModelStruct
 		areaExitTriggers = value;
 	}
 
-	public void RemovePerk(PerkInfoItem AEFFHJGMNFI)
+	public void RemovePerk(PerkInfoItem perk)
 	{
 		foreach (PerkData item in GetPerkDataList())
 		{
-			if (item.PerkInfo == AEFFHJGMNFI)
+			if (item.PerkInfo == perk)
 			{
 				GetPerkDataList().Remove(item);
 				break;
 			}
 		}
-		foreach (PerkTrigger item2 in AEFFHJGMNFI.GetTriggers())
+		foreach (PerkTrigger item2 in perk.GetTriggers())
 		{
 			RemoveTriggerFromEvents(item2);
 		}
 	}
 
-	public PerkData FindPerkData(PerkInfoItem AEFFHJGMNFI)
+	public PerkData FindPerkData(PerkInfoItem perk)
 	{
 		foreach (PerkData item in GetPerkDataList())
 		{
-			if (item.PerkInfo == AEFFHJGMNFI)
+			if (item.PerkInfo == perk)
 			{
 				return item;
 			}
@@ -487,9 +487,9 @@ public class PerkModelStruct
 		return null;
 	}
 
-	public List<PerkTrigger> GetTriggersForEvent(PerkEvent.PerkEventType LFLGCDNKNJI)
+	public List<PerkTrigger> GetTriggersForEvent(PerkEvent.PerkEventType eventType)
 	{
-		switch (LFLGCDNKNJI)
+		switch (eventType)
 		{
 		case PerkEvent.PerkEventType.EVENT_COMBO:
 			return GetComboTriggers();
@@ -524,20 +524,20 @@ public class PerkModelStruct
 		}
 	}
 
-	public void RemoveTriggerFromEvents(PerkTrigger CPBHKJFPFJB)
+	public void RemoveTriggerFromEvents(PerkTrigger trigger)
 	{
-		foreach (PerkEvent item in CPBHKJFPFJB.GetEvents())
+		foreach (PerkEvent item in trigger.GetEvents())
 		{
 			List<PerkTrigger> list = GetTriggersForEvent(item.get_Type());
-			list.Remove(CPBHKJFPFJB);
+			list.Remove(trigger);
 		}
 	}
 
-	public void SetPerkEnabled(PerkInfoItem AEFFHJGMNFI, bool value)
+	public void SetPerkEnabled(PerkInfoItem perk, bool value)
 	{
 		foreach (PerkData item in GetPerkDataList())
 		{
-			if (item.PerkInfo == AEFFHJGMNFI)
+			if (item.PerkInfo == perk)
 			{
 				item.Enabled = value;
 				break;

@@ -186,10 +186,10 @@ public sealed class MultiMessage : IServerMessage
 		foreach (object item in enumerable)
 		{
 			IDictionary<string, object> dictionary2 = item as IDictionary<string, object>;
-			IServerMessage bNGPAAAKBOP = null;
-			bNGPAAAKBOP = ((dictionary2 == null) ? new DataMessage() : ((!dictionary2.ContainsKey("H")) ? ((!dictionary2.ContainsKey("I")) ? ((IServerMessage)new DataMessage()) : ((IServerMessage)new ProgressMessage())) : new MethodCallMessage()));
-			bNGPAAAKBOP.Parse(item);
-			GetData().Add(bNGPAAAKBOP);
+			IServerMessage message = null;
+			message = ((dictionary2 == null) ? new DataMessage() : ((!dictionary2.ContainsKey("H")) ? ((!dictionary2.ContainsKey("I")) ? ((IServerMessage)new DataMessage()) : ((IServerMessage)new ProgressMessage())) : new MethodCallMessage()));
+			message.Parse(item);
+			GetData().Add(message);
 		}
 	}
 }

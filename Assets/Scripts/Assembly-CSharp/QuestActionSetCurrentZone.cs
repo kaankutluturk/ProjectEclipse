@@ -4,20 +4,20 @@ public class QuestActionSetCurrentZone : QuestAction
 {
 	private string zoneNameExpression = string.Empty;
 
-	public override void Parse(XmlNode EPKLCPOEELO)
+	public override void Parse(XmlNode node)
 	{
-		base.Parse(EPKLCPOEELO);
-		zoneNameExpression = EPKLCPOEELO.Attributes["Name"].GetStringOrDefault(string.Empty);
+		base.Parse(node);
+		zoneNameExpression = node.Attributes["Name"].GetStringOrDefault(string.Empty);
 	}
 
-	public override void Execute(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters parameters)
 	{
-		base.Execute(GFIHPBCEEOB);
-		QuestCondition kKDGLNECFHA = new QuestCondition();
-		kKDGLNECFHA.SetParameters(GFIHPBCEEOB);
-		ConditionExtension.CompareResult lNIDLHOIHIM = new ConditionExtension.CompareResult();
-		kKDGLNECFHA.SetValue(zoneNameExpression, lNIDLHOIHIM);
-		ListSF.GetRoster().SetCurrentZone(lNIDLHOIHIM.ToString());
+		base.Execute(parameters);
+		QuestCondition condition = new QuestCondition();
+		condition.SetParameters(parameters);
+		ConditionExtension.CompareResult result = new ConditionExtension.CompareResult();
+		condition.SetValue(zoneNameExpression, result);
+		ListSF.GetRoster().SetCurrentZone(result.ToString());
 		FinishAction();
 	}
 }

@@ -1,1 +1,1 @@
-public delegate TValue TypedImporterFunc<TJson, TValue>(TJson NILNDHEKNLJ);
+public delegate TValue TypedImporterFunc<TJson, TValue>(TJson jsonValue);

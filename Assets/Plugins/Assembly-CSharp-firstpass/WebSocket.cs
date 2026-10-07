@@ -74,38 +74,38 @@ public sealed class WebSocket
 		}
 	}
 
-	public WebSocket(Uri KJHNCLAJMLO)
-		: this(KJHNCLAJMLO, string.Empty, string.Empty)
+	public WebSocket(Uri uri)
+		: this(uri, string.Empty, string.Empty)
 	{
 	}
 
-	public WebSocket(Uri KJHNCLAJMLO, string IKOOJMAOFOD, string ENLHAIGCCBO = "")
+	public WebSocket(Uri uri, string origin, string protocol = "")
 	{
 		set_PingFrequency(1000);
-		if (KJHNCLAJMLO.Port == -1)
+		if (uri.Port == -1)
 		{
-			KJHNCLAJMLO = new Uri(KJHNCLAJMLO.Scheme + "://" + KJHNCLAJMLO.Host + ":" + ((!KJHNCLAJMLO.Scheme.Equals("wss", StringComparison.OrdinalIgnoreCase)) ? "80" : "443") + KJHNCLAJMLO.PathAndQuery);
+			uri = new Uri(uri.Scheme + "://" + uri.Host + ":" + ((!uri.Scheme.Equals("wss", StringComparison.OrdinalIgnoreCase)) ? "80" : "443") + uri.PathAndQuery);
 		}
-		SetInternalRequest(new HTTPRequest(KJHNCLAJMLO, OnInternalRequestCallback));
+		SetInternalRequest(new HTTPRequest(uri, OnInternalRequestCallback));
 		GetInternalRequest().OnUpgraded = OnInternalRequestUpgraded;
-		GetInternalRequest().SetHeader("Host", KJHNCLAJMLO.Host + ":" + KJHNCLAJMLO.Port);
+		GetInternalRequest().SetHeader("Host", uri.Host + ":" + uri.Port);
 		GetInternalRequest().SetHeader("Upgrade", "websocket");
 		GetInternalRequest().SetHeader("Connection", "keep-alive, Upgrade");
 		GetInternalRequest().SetHeader("Sec-WebSocket-Key", GetSecKey(new object[4]
 		{
 			this,
 			GetInternalRequest(),
-			KJHNCLAJMLO,
+			uri,
 			new object()
 		}));
-		if (!string.IsNullOrEmpty(IKOOJMAOFOD))
+		if (!string.IsNullOrEmpty(origin))
 		{
-			GetInternalRequest().SetHeader("Origin", IKOOJMAOFOD);
+			GetInternalRequest().SetHeader("Origin", origin);
 		}
 		GetInternalRequest().SetHeader("Sec-WebSocket-Version", "13");
-		if (!string.IsNullOrEmpty(ENLHAIGCCBO))
+		if (!string.IsNullOrEmpty(protocol))
 		{
-			GetInternalRequest().SetHeader("Sec-WebSocket-Protocol", ENLHAIGCCBO);
+			GetInternalRequest().SetHeader("Sec-WebSocket-Protocol", protocol);
 		}
 		GetInternalRequest().SetHeader("Cache-Control", "no-cache");
 		GetInternalRequest().SetHeader("Pragma", "no-cache");
@@ -151,23 +151,23 @@ public sealed class WebSocket
 		pingFrequency = value;
 	}
 
-	private void OnInternalRequestCallback(HTTPRequest CGOIOKHEGOE, HTTPResponse BEIGFGCBICO)
+	private void OnInternalRequestCallback(HTTPRequest request, HTTPResponse response)
 	{
 		string empty = string.Empty;
-		switch (CGOIOKHEGOE.GetState())
+		switch (request.GetState())
 		{
 		default:
 			return;
 		case HTTPRequestStates.Finished:
-			if (BEIGFGCBICO.GetIsSuccess() || BEIGFGCBICO.GetStatusCode() == 101)
+			if (response.GetIsSuccess() || response.GetStatusCode() == 101)
 			{
-				HTTPManager.GetLogger().Information("WebSocket", string.Format("Request finished. Status Code: {0} Message: {1}", BEIGFGCBICO.GetStatusCode().ToString(), BEIGFGCBICO.GetMessage()));
+				HTTPManager.GetLogger().Information("WebSocket", string.Format("Request finished. Status Code: {0} Message: {1}", response.GetStatusCode().ToString(), response.GetMessage()));
 				return;
 			}
-			empty = string.Format("Request Finished Successfully, but the server sent an error. Status Code: {0}-{1} Message: {2}", BEIGFGCBICO.GetStatusCode(), BEIGFGCBICO.GetMessage(), BEIGFGCBICO.GetDataAsText());
+			empty = string.Format("Request Finished Successfully, but the server sent an error. Status Code: {0}-{1} Message: {2}", response.GetStatusCode(), response.GetMessage(), response.GetDataAsText());
 			break;
 		case HTTPRequestStates.Error:
-			empty = "Request Finished with Error! " + ((CGOIOKHEGOE.GetException() == null) ? string.Empty : ("Exception: " + CGOIOKHEGOE.GetException().Message + CGOIOKHEGOE.GetException().StackTrace));
+			empty = "Request Finished with Error! " + ((request.GetException() == null) ? string.Empty : ("Exception: " + request.GetException().Message + request.GetException().StackTrace));
 			break;
 		case HTTPRequestStates.Aborted:
 			empty = "Request Aborted!";
@@ -181,7 +181,7 @@ public sealed class WebSocket
 		}
 		if (OnError != null)
 		{
-			OnError(this, CGOIOKHEGOE.GetException());
+			OnError(this, request.GetException());
 		}
 		if (OnErrorDesc != null)
 		{
@@ -193,23 +193,23 @@ public sealed class WebSocket
 		}
 	}
 
-	private void OnInternalRequestUpgraded(HTTPRequest CGOIOKHEGOE, HTTPResponse BEIGFGCBICO)
+	private void OnInternalRequestUpgraded(HTTPRequest request, HTTPResponse response)
 	{
-		webSocket = BEIGFGCBICO as WebSocketResponse;
+		webSocket = response as WebSocketResponse;
 		if (webSocket == null)
 		{
 			if (OnError != null)
 			{
-				OnError(this, CGOIOKHEGOE.GetException());
+				OnError(this, request.GetException());
 			}
 			if (OnErrorDesc != null)
 			{
-				string nEPOLDCKNJL = string.Empty;
-				if (CGOIOKHEGOE.GetException() != null)
+				string errorDescription = string.Empty;
+				if (request.GetException() != null)
 				{
-					nEPOLDCKNJL = CGOIOKHEGOE.GetException().Message + " " + CGOIOKHEGOE.GetException().StackTrace;
+					errorDescription = request.GetException().Message + " " + request.GetException().StackTrace;
 				}
-				OnErrorDesc(this, nEPOLDCKNJL);
+				OnErrorDesc(this, errorDescription);
 			}
 			return;
 		}
@@ -219,35 +219,35 @@ public sealed class WebSocket
 			{
 				OnOpen(this);
 			}
-			catch (Exception mPFFFAOGBJE)
+			catch (Exception exception)
 			{
-				HTTPManager.GetLogger().Exception("WebSocket", "OnOpen", mPFFFAOGBJE);
+				HTTPManager.GetLogger().Exception("WebSocket", "OnOpen", exception);
 			}
 		}
-		webSocket.OnText = (WebSocketResponse IIBIPJJLEGJ, string CKEHOEGLMBM) =>
+		webSocket.OnText = (WebSocketResponse response, string message) =>
 		{
 			if (OnMessage != null)
 			{
-				OnMessage(this, CKEHOEGLMBM);
+				OnMessage(this, message);
 			}
 		};
-		webSocket.OnBinary = (WebSocketResponse IIBIPJJLEGJ, byte[] DOEJIOEKACH) =>
+		webSocket.OnBinary = (WebSocketResponse response, byte[] data) =>
 		{
 			if (OnBinary != null)
 			{
-				OnBinary(this, DOEJIOEKACH);
+				OnBinary(this, data);
 			}
 		};
-		webSocket.OnClosed = (WebSocketResponse IIBIPJJLEGJ, ushort KJPGKHJNOMC, string CKEHOEGLMBM) =>
+		webSocket.OnClosed = (WebSocketResponse response, ushort code, string message) =>
 		{
 			if (OnClosed != null)
 			{
-				OnClosed(this, KJPGKHJNOMC, CKEHOEGLMBM);
+				OnClosed(this, code, message);
 			}
 		};
 		if (OnIncompleteFrame != null)
 		{
-			webSocket.OnIncompleteFrame = (WebSocketResponse IIBIPJJLEGJ, WebSocketFrameReader frame) =>
+			webSocket.OnIncompleteFrame = (WebSocketResponse response, WebSocketFrameReader frame) =>
 			{
 				if (OnIncompleteFrame != null)
 				{
@@ -271,11 +271,11 @@ public sealed class WebSocket
 		}
 	}
 
-	public void Send(string LIOGIBJBHAH)
+	public void Send(string message)
 	{
 		if (GetIsOpen())
 		{
-			webSocket.Send(LIOGIBJBHAH);
+			webSocket.Send(message);
 		}
 	}
 
@@ -287,11 +287,11 @@ public sealed class WebSocket
 		}
 	}
 
-	public void Send(byte[] buffer, ulong IPCOBJBKNAO, ulong count)
+	public void Send(byte[] buffer, ulong offset, ulong count)
 	{
 		if (GetIsOpen())
 		{
-			webSocket.Send(buffer, IPCOBJBKNAO, count);
+			webSocket.Send(buffer, offset, count);
 		}
 	}
 
@@ -311,21 +311,21 @@ public sealed class WebSocket
 		}
 	}
 
-	public void Close(ushort KJPGKHJNOMC, string LIOGIBJBHAH)
+	public void Close(ushort code, string message)
 	{
 		if (GetIsOpen())
 		{
-			webSocket.Close(KJPGKHJNOMC, LIOGIBJBHAH);
+			webSocket.Close(code, message);
 		}
 	}
 
-	private string GetSecKey(object[] IOFHCAAOELD)
+	private string GetSecKey(object[] parts)
 	{
 		byte[] array = new byte[16];
 		int num = 0;
-		for (int i = 0; i < IOFHCAAOELD.Length; i++)
+		for (int i = 0; i < parts.Length; i++)
 		{
-			byte[] bytes = BitConverter.GetBytes(IOFHCAAOELD[i].GetHashCode());
+			byte[] bytes = BitConverter.GetBytes(parts[i].GetHashCode());
 			for (int j = 0; j < bytes.Length; j++)
 			{
 				if (num >= array.Length)

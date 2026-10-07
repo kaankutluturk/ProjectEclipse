@@ -29,8 +29,8 @@ namespace Nekki.SF2.GUI
 			if (!(GBIOHMNNEJI == null))
 			{
 				string texturePath = ResolutionImage.GetTexturePath(GBIOHMNNEJI);
-				string jGIGOMLGLPN = GBIOHMNNEJI.name;
-				GBIOHMNNEJI = ResolutionImage.GetSprite(texturePath, jGIGOMLGLPN);
+				string spriteName = GBIOHMNNEJI.name;
+				GBIOHMNNEJI = ResolutionImage.GetSprite(texturePath, spriteName);
 			}
 		}
 
@@ -42,10 +42,10 @@ namespace Nekki.SF2.GUI
 			base.spriteState = spriteState;
 		}
 
-		public void SetDisabledSprite(string texturePath, string JGIGOMLGLPN)
+		public void SetDisabledSprite(string texturePath, string spriteName)
 		{
 			SpriteState spriteState = base.spriteState;
-			spriteState.disabledSprite = ResolutionImage.GetSprite(texturePath, JGIGOMLGLPN);
+			spriteState.disabledSprite = ResolutionImage.GetSprite(texturePath, spriteName);
 			base.spriteState = spriteState;
 		}
 
@@ -57,10 +57,10 @@ namespace Nekki.SF2.GUI
 			base.spriteState = spriteState;
 		}
 
-		public void SetHighlightedSprite(string texturePath, string JGIGOMLGLPN)
+		public void SetHighlightedSprite(string texturePath, string spriteName)
 		{
 			SpriteState spriteState = base.spriteState;
-			spriteState.highlightedSprite = ResolutionImage.GetSprite(texturePath, JGIGOMLGLPN);
+			spriteState.highlightedSprite = ResolutionImage.GetSprite(texturePath, spriteName);
 			base.spriteState = spriteState;
 		}
 
@@ -72,18 +72,18 @@ namespace Nekki.SF2.GUI
 			base.spriteState = spriteState;
 		}
 
-		public void SetPressedSprite(string texturePath, string JGIGOMLGLPN)
+		public void SetPressedSprite(string texturePath, string spriteName)
 		{
 			SpriteState spriteState = base.spriteState;
-			spriteState.pressedSprite = ResolutionImage.GetSprite(texturePath, JGIGOMLGLPN);
+			spriteState.pressedSprite = ResolutionImage.GetSprite(texturePath, spriteName);
 			base.spriteState = spriteState;
 		}
 
-		public void SetNormalSprite(string texturePath, string JGIGOMLGLPN)
+		public void SetNormalSprite(string texturePath, string spriteName)
 		{
 			ResolutionImage resolutionImage = base.targetGraphic as ResolutionImage;
 			resolutionImage.set_TexturePath(texturePath);
-			resolutionImage.set_SpriteName(JGIGOMLGLPN);
+			resolutionImage.set_SpriteName(spriteName);
 		}
 	}
 }

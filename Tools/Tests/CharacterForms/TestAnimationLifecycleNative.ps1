@@ -8,7 +8,7 @@ $methods = $source.Substring($start, $end - $start)
 foreach ($kind in @('Start','End')) {
     $hook = $source.IndexOf('public void OnAnimation' + $kind + '(object data)')
     $native = $source.IndexOf('PerkEvent.PerkEventType.EVENT_ANIMATION_' + $kind.ToUpperInvariant() + ', true);', $hook)
-    $notify = $source.IndexOf('NotifyEclipseAnimation(oJDOHGBGPFK.SourceModel, value, ModEffectEvent.Animation' + $kind + ');', $native)
+    $notify = $source.IndexOf('NotifyEclipseAnimation(eventModel.SourceModel, value, ModEffectEvent.Animation' + $kind + ');', $native)
     if ($hook -lt 0 -or $native -le $hook -or $notify -le $native -or ($notify-$native) -gt 160) {
         throw 'Lifecycle hook must immediately follow native perk notification.'
     }

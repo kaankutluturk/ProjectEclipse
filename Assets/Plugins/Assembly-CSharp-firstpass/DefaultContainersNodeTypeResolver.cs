@@ -3,18 +3,18 @@ using System.Collections.Generic;
 
 public sealed class DefaultContainersNodeTypeResolver : INodeTypeResolver
 {
-	bool INodeTypeResolver.Resolve(NodeEvent ABOEBNGCALL, ref Type PHOBEGPKAKH)
+	bool INodeTypeResolver.Resolve(NodeEvent nodeEvent, ref Type currentType)
 	{
-		if (PHOBEGPKAKH == typeof(object))
+		if (currentType == typeof(object))
 		{
-			if (ABOEBNGCALL is SequenceStart)
+			if (nodeEvent is SequenceStart)
 			{
-				PHOBEGPKAKH = typeof(List<object>);
+				currentType = typeof(List<object>);
 				return true;
 			}
-			if (ABOEBNGCALL is MappingStart)
+			if (nodeEvent is MappingStart)
 			{
-				PHOBEGPKAKH = typeof(Dictionary<object, object>);
+				currentType = typeof(Dictionary<object, object>);
 				return true;
 			}
 		}

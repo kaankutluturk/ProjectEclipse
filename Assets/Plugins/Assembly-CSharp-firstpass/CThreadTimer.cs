@@ -19,13 +19,13 @@ public class CThreadTimer
 		}
 	}
 
-	public CThreadTimer(TimerElapsedCallback callback, float CPEBIEHDNIO, bool LGFKGJFHHCH)
+	public CThreadTimer(TimerElapsedCallback callback, float interval, bool autoReset)
 	{
 		elapsedCallback = (TimerElapsedCallback)Delegate.Combine(elapsedCallback, callback);
 		_myTimer = new Timer();
 		_myTimer.Elapsed += OnTimerElapsed;
-		_myTimer.Interval = CPEBIEHDNIO;
-		if (LGFKGJFHHCH)
+		_myTimer.Interval = interval;
+		if (autoReset)
 		{
 			this.StartTimer();
 		}
@@ -42,10 +42,10 @@ public class CThreadTimer
 		_myTimer.Start();
 	}
 
-	public void StartTimer(float CPEBIEHDNIO)
+	public void StartTimer(float interval)
 	{
 		_completed = false;
-		_myTimer.Interval = CPEBIEHDNIO;
+		_myTimer.Interval = interval;
 		_myTimer.Start();
 	}
 
@@ -67,7 +67,7 @@ public class CThreadTimer
 		return !_completed;
 	}
 
-	private void OnTimerElapsed(object BBNKIBKPBLO, ElapsedEventArgs FOPOKALJIIJ)
+	private void OnTimerElapsed(object sender, ElapsedEventArgs eventArgs)
 	{
 		_completed = false;
 		elapsedCallback();

@@ -29,96 +29,96 @@ public class QuestActionShowMapButton : QuestAction
 
 	private float _anchorMaxX = 0.5f;
 
-	public override void Parse(XmlNode EPKLCPOEELO)
+	public override void Parse(XmlNode node)
 	{
-		base.Parse(EPKLCPOEELO);
-		_name = EPKLCPOEELO.Attributes["Name"].GetStringOrDefault(string.Empty);
-		imageExpression = EPKLCPOEELO.Attributes["Image"].GetStringOrDefault(string.Empty);
-		timerExpression = EPKLCPOEELO.Attributes["Timer"].GetStringOrDefault(string.Empty);
-		_AutoPosition = EPKLCPOEELO.Attributes["X"] == null || EPKLCPOEELO.Attributes["Y"] == null;
-		xExpression = EPKLCPOEELO.Attributes["X"].GetStringOrDefault(string.Empty);
-		yExpression = EPKLCPOEELO.Attributes["Y"].GetStringOrDefault(string.Empty);
-		_type = EPKLCPOEELO.Attributes["Type"].GetStringOrDefault(string.Empty);
-		Atlas = EPKLCPOEELO.Attributes["Atlas"].GetStringOrDefault(string.Empty);
-		speedExpression = EPKLCPOEELO.Attributes["Speed"].GetStringOrDefault(string.Empty);
-		pauseExpression = EPKLCPOEELO.Attributes["Pause"].GetStringOrDefault(string.Empty);
-		showTypeExpression = EPKLCPOEELO.Attributes["ShowType"].GetStringOrDefault("Both");
-		_anchorMinX = EPKLCPOEELO.Attributes["AnchorMinX"].ParseFloat(0.5f);
-		_anchorMaxX = EPKLCPOEELO.Attributes["AnchorMaxX"].ParseFloat(_anchorMinX);
+		base.Parse(node);
+		_name = node.Attributes["Name"].GetStringOrDefault(string.Empty);
+		imageExpression = node.Attributes["Image"].GetStringOrDefault(string.Empty);
+		timerExpression = node.Attributes["Timer"].GetStringOrDefault(string.Empty);
+		_AutoPosition = node.Attributes["X"] == null || node.Attributes["Y"] == null;
+		xExpression = node.Attributes["X"].GetStringOrDefault(string.Empty);
+		yExpression = node.Attributes["Y"].GetStringOrDefault(string.Empty);
+		_type = node.Attributes["Type"].GetStringOrDefault(string.Empty);
+		Atlas = node.Attributes["Atlas"].GetStringOrDefault(string.Empty);
+		speedExpression = node.Attributes["Speed"].GetStringOrDefault(string.Empty);
+		pauseExpression = node.Attributes["Pause"].GetStringOrDefault(string.Empty);
+		showTypeExpression = node.Attributes["ShowType"].GetStringOrDefault("Both");
+		_anchorMinX = node.Attributes["AnchorMinX"].ParseFloat(0.5f);
+		_anchorMaxX = node.Attributes["AnchorMaxX"].ParseFloat(_anchorMinX);
 	}
 
-	public override void Execute(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters parameters)
 	{
-		base.Execute(GFIHPBCEEOB);
+		base.Execute(parameters);
 		string name = string.Empty;
-		string KHPKDMGDMAB = string.Empty;
+		string imageName = string.Empty;
 		string timer = string.Empty;
-		string LFLGCDNKNJI = string.Empty;
-		string NBHBEJFPFBN = string.Empty;
-		string CACHHLONJII = string.Empty;
-		float ALCFJHNPDGL = 0f;
-		float KCANPMPILKI = 0f;
+		string buttonType = string.Empty;
+		string atlasName = string.Empty;
+		string showType = string.Empty;
+		float speed = 0f;
+		float pause = 0f;
 		Vector3 AJMBPDGKMAF = default(Vector3);
-		GetValues(ref name, ref KHPKDMGDMAB, ref timer, ref LFLGCDNKNJI, ref NBHBEJFPFBN, ref ALCFJHNPDGL, ref KCANPMPILKI, ref AJMBPDGKMAF, ref CACHHLONJII);
-		MapButtonInfo dJDNMAOEFBD = new MapButtonInfo(name, KHPKDMGDMAB, timer, AJMBPDGKMAF, _AutoPosition, NBHBEJFPFBN, LFLGCDNKNJI, ALCFJHNPDGL, KCANPMPILKI, CACHHLONJII, _anchorMinX, _anchorMaxX);
-		MapButtonController.GetInstance().AddButton(dJDNMAOEFBD);
+		GetValues(ref name, ref imageName, ref timer, ref buttonType, ref atlasName, ref speed, ref pause, ref AJMBPDGKMAF, ref showType);
+		MapButtonInfo buttonInfo = new MapButtonInfo(name, imageName, timer, AJMBPDGKMAF, _AutoPosition, atlasName, buttonType, speed, pause, showType, _anchorMinX, _anchorMaxX);
+		MapButtonController.GetInstance().AddButton(buttonInfo);
 		FinishAction();
 	}
 
-	private void GetValues(ref string name, ref string KHPKDMGDMAB, ref string timer, ref string LFLGCDNKNJI, ref string NBHBEJFPFBN, ref float ALCFJHNPDGL, ref float KCANPMPILKI, ref Vector3 AJMBPDGKMAF, ref string CACHHLONJII)
+	private void GetValues(ref string name, ref string imageName, ref string timer, ref string buttonType, ref string atlasName, ref float speed, ref float pause, ref Vector3 AJMBPDGKMAF, ref string showType)
 	{
-		ConditionExtension.CompareResult lNIDLHOIHIM = new ConditionExtension.CompareResult();
-		QuestCondition kKDGLNECFHA = new QuestCondition();
-		kKDGLNECFHA.SetParameters(Parameters);
-		kKDGLNECFHA.SetValue(_name, lNIDLHOIHIM);
-		name = lNIDLHOIHIM.ToString();
-		lNIDLHOIHIM.Clear();
-		kKDGLNECFHA.SetValue(imageExpression, lNIDLHOIHIM);
-		KHPKDMGDMAB = lNIDLHOIHIM.ToString();
-		lNIDLHOIHIM.Clear();
+		ConditionExtension.CompareResult result = new ConditionExtension.CompareResult();
+		QuestCondition condition = new QuestCondition();
+		condition.SetParameters(Parameters);
+		condition.SetValue(_name, result);
+		name = result.ToString();
+		result.Clear();
+		condition.SetValue(imageExpression, result);
+		imageName = result.ToString();
+		result.Clear();
 		if (!string.IsNullOrEmpty(timerExpression))
 		{
-			kKDGLNECFHA.SetValue(timerExpression, lNIDLHOIHIM);
-			timer = lNIDLHOIHIM.ToString();
+			condition.SetValue(timerExpression, result);
+			timer = result.ToString();
 		}
-		lNIDLHOIHIM.Clear();
+		result.Clear();
 		if (!string.IsNullOrEmpty(_type))
 		{
-			kKDGLNECFHA.SetValue(_type, lNIDLHOIHIM);
-			LFLGCDNKNJI = lNIDLHOIHIM.ToString();
+			condition.SetValue(_type, result);
+			buttonType = result.ToString();
 		}
-		lNIDLHOIHIM.Clear();
+		result.Clear();
 		if (!string.IsNullOrEmpty(Atlas))
 		{
-			kKDGLNECFHA.SetValue(Atlas, lNIDLHOIHIM);
-			NBHBEJFPFBN = lNIDLHOIHIM.ToString();
+			condition.SetValue(Atlas, result);
+			atlasName = result.ToString();
 		}
-		lNIDLHOIHIM.Clear();
+		result.Clear();
 		if (!string.IsNullOrEmpty(speedExpression))
 		{
-			kKDGLNECFHA.SetValue(speedExpression, lNIDLHOIHIM);
-			ALCFJHNPDGL = ((!lNIDLHOIHIM.IsNumber()) ? 0f : ((float)lNIDLHOIHIM.resultNumber));
+			condition.SetValue(speedExpression, result);
+			speed = ((!result.IsNumber()) ? 0f : ((float)result.resultNumber));
 		}
-		lNIDLHOIHIM.Clear();
+		result.Clear();
 		if (!string.IsNullOrEmpty(pauseExpression))
 		{
-			kKDGLNECFHA.SetValue(pauseExpression, lNIDLHOIHIM);
-			KCANPMPILKI = ((!lNIDLHOIHIM.IsNumber()) ? 0f : ((float)lNIDLHOIHIM.resultNumber));
+			condition.SetValue(pauseExpression, result);
+			pause = ((!result.IsNumber()) ? 0f : ((float)result.resultNumber));
 		}
-		lNIDLHOIHIM.Clear();
+		result.Clear();
 		if (!string.IsNullOrEmpty(xExpression))
 		{
-			kKDGLNECFHA.SetValue(xExpression, lNIDLHOIHIM);
-			AJMBPDGKMAF.x = ((!lNIDLHOIHIM.IsNumber()) ? 0f : ((float)lNIDLHOIHIM.resultNumber));
+			condition.SetValue(xExpression, result);
+			AJMBPDGKMAF.x = ((!result.IsNumber()) ? 0f : ((float)result.resultNumber));
 		}
-		lNIDLHOIHIM.Clear();
+		result.Clear();
 		if (!string.IsNullOrEmpty(yExpression))
 		{
-			kKDGLNECFHA.SetValue(yExpression, lNIDLHOIHIM);
-			AJMBPDGKMAF.y = ((!lNIDLHOIHIM.IsNumber()) ? 0f : ((float)lNIDLHOIHIM.resultNumber));
+			condition.SetValue(yExpression, result);
+			AJMBPDGKMAF.y = ((!result.IsNumber()) ? 0f : ((float)result.resultNumber));
 		}
-		lNIDLHOIHIM.Clear();
-		kKDGLNECFHA.SetValue(showTypeExpression, lNIDLHOIHIM);
-		CACHHLONJII = lNIDLHOIHIM.ToString();
+		result.Clear();
+		condition.SetValue(showTypeExpression, result);
+		showType = result.ToString();
 	}
 }

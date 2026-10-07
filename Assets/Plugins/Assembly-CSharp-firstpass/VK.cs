@@ -28,22 +28,22 @@ public class VK : ISocialNetwork
 		}
 	}
 
-	public void Init(SocialWrapper JEMGDGKGMAJ)
+	public void Init(SocialWrapper socialWrapper)
 	{
-		_wrap = JEMGDGKGMAJ;
+		_wrap = socialWrapper;
 	}
 
-	public void GetUser(string AOKMNKOIMHI)
+	public void GetUser(string userId)
 	{
 		if (!_wrap.get_Initialized())
 		{
 			AdvLog.LogWarning("you must call Social.Init(..) method first");
 			return;
 		}
-		_wrap.RequestUsersInfo(new string[1] { AOKMNKOIMHI });
+		_wrap.RequestUsersInfo(new string[1] { userId });
 	}
 
-	public void GetUsers(string[] JAIEEFOCDAA)
+	public void GetUsers(string[] userIds)
 	{
 		if (!_wrap.get_Initialized())
 		{
@@ -51,7 +51,7 @@ public class VK : ISocialNetwork
 		}
 		else
 		{
-			_wrap.RequestUsersInfo(JAIEEFOCDAA);
+			_wrap.RequestUsersInfo(userIds);
 		}
 	}
 
@@ -115,7 +115,7 @@ public class VK : ISocialNetwork
 		}
 	}
 
-	public void PostToWall(string AOKMNKOIMHI, string LIOGIBJBHAH, string DMNBDBJNKME)
+	public void PostToWall(string userId, string message, string picture)
 	{
 		if (!_wrap.get_Initialized())
 		{
@@ -123,7 +123,7 @@ public class VK : ISocialNetwork
 		}
 		else
 		{
-			_wrap.RequestWallPost(AOKMNKOIMHI, LIOGIBJBHAH, DMNBDBJNKME);
+			_wrap.RequestWallPost(userId, message, picture);
 		}
 	}
 

@@ -6,33 +6,33 @@ public class JsonException : Exception
 	{
 	}
 
-	internal JsonException(ParserToken JLFCBDKNAGP)
-		: base(string.Format("Invalid token '{0}' in input string", JLFCBDKNAGP))
+	internal JsonException(ParserToken token)
+		: base(string.Format("Invalid token '{0}' in input string", token))
 	{
 	}
 
-	internal JsonException(ParserToken JLFCBDKNAGP, Exception IADJLHGKHGL)
-		: base(string.Format("Invalid token '{0}' in input string", JLFCBDKNAGP), IADJLHGKHGL)
+	internal JsonException(ParserToken token, Exception innerException)
+		: base(string.Format("Invalid token '{0}' in input string", token), innerException)
 	{
 	}
 
-	internal JsonException(int ILHDJDNPFKH)
-		: base(string.Format("Invalid character '{0}' in input string", (char)ILHDJDNPFKH))
+	internal JsonException(int character)
+		: base(string.Format("Invalid character '{0}' in input string", (char)character))
 	{
 	}
 
-	internal JsonException(int ILHDJDNPFKH, Exception IADJLHGKHGL)
-		: base(string.Format("Invalid character '{0}' in input string", (char)ILHDJDNPFKH), IADJLHGKHGL)
+	internal JsonException(int character, Exception innerException)
+		: base(string.Format("Invalid character '{0}' in input string", (char)character), innerException)
 	{
 	}
 
-	public JsonException(string LIOGIBJBHAH)
-		: base(LIOGIBJBHAH)
+	public JsonException(string message)
+		: base(message)
 	{
 	}
 
-	public JsonException(string LIOGIBJBHAH, Exception IADJLHGKHGL)
-		: base(LIOGIBJBHAH, IADJLHGKHGL)
+	public JsonException(string message, Exception innerException)
+		: base(message, innerException)
 	{
 	}
 }

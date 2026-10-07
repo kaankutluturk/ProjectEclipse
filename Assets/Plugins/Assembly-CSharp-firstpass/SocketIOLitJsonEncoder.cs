@@ -2,16 +2,16 @@ using System.Collections.Generic;
 
 public sealed class SocketIOLitJsonEncoder : ISocketJsonEncoder
 {
-	public List<object> Decode(string EMDHMHOKGFP)
+	public List<object> Decode(string json)
 	{
-		JsonReader iJIMLLIHKGN = new JsonReader(EMDHMHOKGFP);
-		return JsonMapper.ToObject<List<object>>(iJIMLLIHKGN);
+		JsonReader reader = new JsonReader(json);
+		return JsonMapper.ToObject<List<object>>(reader);
 	}
 
-	public string Encode(List<object> AOMLCBHAJJH)
+	public string Encode(List<object> arguments)
 	{
-		JsonWriter iGOCJFDLBMG = new JsonWriter();
-		JsonMapper.ToJson(AOMLCBHAJJH, iGOCJFDLBMG);
-		return iGOCJFDLBMG.ToString();
+		JsonWriter writer = new JsonWriter();
+		JsonMapper.ToJson(arguments, writer);
+		return writer.ToString();
 	}
 }

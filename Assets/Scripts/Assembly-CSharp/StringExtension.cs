@@ -16,77 +16,77 @@ public static class StringExtension
 		public static readonly ulong OffsetBasis64 = 14695981039346656037uL;
 	}
 
-	public static int ToInt(this string IGGFGLLIGCG, int AGADEMLBJGJ = 0)
+	public static int ToInt(this string text, int defaultValue = 0)
 	{
 		int result;
-		if (IGGFGLLIGCG != null && int.TryParse(IGGFGLLIGCG, out result))
+		if (text != null && int.TryParse(text, out result))
 		{
 			return result;
 		}
-		return AGADEMLBJGJ;
+		return defaultValue;
 	}
 
-	public static long ToLong(this string IGGFGLLIGCG, long AGADEMLBJGJ = 0L)
+	public static long ToLong(this string text, long defaultValue = 0L)
 	{
 		long result;
-		if (IGGFGLLIGCG != null && long.TryParse(IGGFGLLIGCG, out result))
+		if (text != null && long.TryParse(text, out result))
 		{
 			return result;
 		}
-		return AGADEMLBJGJ;
+		return defaultValue;
 	}
 
-	public static float ToFloat(this string IGGFGLLIGCG, float AGADEMLBJGJ = 0f)
+	public static float ToFloat(this string text, float defaultValue = 0f)
 	{
 		float result;
-		if (IGGFGLLIGCG != null && float.TryParse(IGGFGLLIGCG, out result))
+		if (text != null && float.TryParse(text, out result))
 		{
 			return result;
 		}
-		return AGADEMLBJGJ;
+		return defaultValue;
 	}
 
-	public static double ToDouble(this string IGGFGLLIGCG, double AGADEMLBJGJ = 0.0)
+	public static double ToDouble(this string text, double defaultValue = 0.0)
 	{
 		double result;
-		if (IGGFGLLIGCG != null && double.TryParse(IGGFGLLIGCG, out result))
+		if (text != null && double.TryParse(text, out result))
 		{
 			return result;
 		}
-		return AGADEMLBJGJ;
+		return defaultValue;
 	}
 
-	public static T ToEnum<T>(this string LIAILCGJBDK)
+	public static T ToEnum<T>(this string text)
 	{
-		return LIAILCGJBDK.ToEnum((T)Enum.GetValues(typeof(T)).GetValue(0));
+		return text.ToEnum((T)Enum.GetValues(typeof(T)).GetValue(0));
 	}
 
-	public static T ToEnum<T>(this string LIAILCGJBDK, T JEALBOJLKFM)
+	public static T ToEnum<T>(this string text, T defaultValue)
 	{
 		try
 		{
-			return (T)Enum.Parse(typeof(T), LIAILCGJBDK, true);
+			return (T)Enum.Parse(typeof(T), text, true);
 		}
 		catch
 		{
-			return JEALBOJLKFM;
+			return defaultValue;
 		}
 	}
 
-	public static string DoubleStrToIntegerStr(this string EKCJOMMPCJJ)
+	public static string DoubleStrToIntegerStr(this string encoded)
 	{
-		byte[] bytes = Convert.FromBase64String(EKCJOMMPCJJ);
+		byte[] bytes = Convert.FromBase64String(encoded);
 		return Encoding.UTF8.GetString(bytes);
 	}
 
-	public static uint GetFnv1aHash(this string EMIAKCGJNHP, bool HHOEINLMDAB = false)
+	public static uint GetFnv1aHash(this string text, bool useTwoBytes = false)
 	{
-		IEnumerable<byte> enumerable = ((!HHOEINLMDAB) ? EMIAKCGJNHP.ToCharArray().Select(Convert.ToByte) : (from ILHDJDNPFKH in EMIAKCGJNHP.ToCharArray()
+		IEnumerable<byte> enumerable = ((!useTwoBytes) ? text.ToCharArray().Select(Convert.ToByte) : (from character in text.ToCharArray()
 			select new byte[2]
 			{
-				(byte)(ILHDJDNPFKH - (byte)ILHDJDNPFKH >> 8),
-				(byte)ILHDJDNPFKH
-			}).SelectMany((byte[] ILHDJDNPFKH) => ILHDJDNPFKH));
+				(byte)(character - (byte)character >> 8),
+				(byte)character
+			}).SelectMany((byte[] charBytes) => charBytes));
 		uint num = FnvConstants.OffsetBasis32;
 		foreach (byte item in enumerable)
 		{

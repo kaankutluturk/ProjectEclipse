@@ -9,22 +9,22 @@ public sealed class HeartbeatManager
 
 	private DateTime LastUpdate = DateTime.MinValue;
 
-	public void Subscribe(IHeartbeat JJACIFLDCAE)
+	public void Subscribe(IHeartbeat heartbeat)
 	{
 		lock (heartbeats)
 		{
-			if (!heartbeats.Contains(JJACIFLDCAE))
+			if (!heartbeats.Contains(heartbeat))
 			{
-				heartbeats.Add(JJACIFLDCAE);
+				heartbeats.Add(heartbeat);
 			}
 		}
 	}
 
-	public void Unsubscribe(IHeartbeat JJACIFLDCAE)
+	public void Unsubscribe(IHeartbeat heartbeat)
 	{
 		lock (heartbeats)
 		{
-			heartbeats.Remove(JJACIFLDCAE);
+			heartbeats.Remove(heartbeat);
 		}
 	}
 
@@ -35,7 +35,7 @@ public sealed class HeartbeatManager
 			LastUpdate = DateTime.UtcNow;
 			return;
 		}
-		TimeSpan oJOKANCMPLG = DateTime.UtcNow - LastUpdate;
+		TimeSpan elapsed = DateTime.UtcNow - LastUpdate;
 		LastUpdate = DateTime.UtcNow;
 		int num = 0;
 		lock (heartbeats)
@@ -51,7 +51,7 @@ public sealed class HeartbeatManager
 		{
 			try
 			{
-				updateArray[i].OnHeartbeatUpdate(oJOKANCMPLG);
+				updateArray[i].OnHeartbeatUpdate(elapsed);
 			}
 			catch
 			{

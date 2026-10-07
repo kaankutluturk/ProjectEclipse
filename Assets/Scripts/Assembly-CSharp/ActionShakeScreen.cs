@@ -23,9 +23,9 @@ public class ActionShakeScreen : ActionAnimation
 		return _Effect;
 	}
 
-	public override void Visit(Model ACENLMONNPA)
+	public override void Visit(Model model)
 	{
-		ACENLMONNPA.StartAction(this);
+		model.StartAction(this);
 	}
 
 	protected override void Parse(XmlNode node)

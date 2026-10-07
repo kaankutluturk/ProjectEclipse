@@ -18,11 +18,11 @@ public sealed class PollingTransport : PostSendTransportBase, IHeartbeat
 		}
 	}
 
-	public PollingTransport(Connection MDGFGCDPGFI)
-		: base("longPolling", MDGFGCDPGFI)
+	public PollingTransport(Connection connection)
+		: base("longPolling", connection)
 	{
 		LastPoll = DateTime.MinValue;
-		PollTimeout = MDGFGCDPGFI.GetNegotiationResult().GetConnectionTimeout() + TimeSpan.FromSeconds(10.0);
+		PollTimeout = connection.GetNegotiationResult().GetConnectionTimeout() + TimeSpan.FromSeconds(10.0);
 	}
 
 	public override bool GetSupportsKeepAlive()
@@ -42,10 +42,10 @@ public sealed class PollingTransport : PostSendTransportBase, IHeartbeat
 		{
 			set_State(TransportStates.Connecting);
 		}
-		SignalRRequestType lFLGCDNKNJI = ((GetState() != TransportStates.Reconnecting) ? SignalRRequestType.Connect : SignalRRequestType.Reconnect);
-		HTTPRequest iPLGNIDJDCF = new HTTPRequest(GetConnection().BuildUri(lFLGCDNKNJI, this), HTTPMethods.Get, true, true, OnConnectRequestFinished);
-		GetConnection().PrepareRequest(iPLGNIDJDCF, lFLGCDNKNJI);
-		iPLGNIDJDCF.Send();
+		SignalRRequestType requestType = ((GetState() != TransportStates.Reconnecting) ? SignalRRequestType.Connect : SignalRRequestType.Reconnect);
+		HTTPRequest request = new HTTPRequest(GetConnection().BuildUri(requestType, this), HTTPMethods.Get, true, true, OnConnectRequestFinished);
+		GetConnection().PrepareRequest(request, requestType);
+		request.Send();
 	}
 
 	public override void Stop()
@@ -69,34 +69,34 @@ public sealed class PollingTransport : PostSendTransportBase, IHeartbeat
 		HTTPManager.GetHeartbeats().Unsubscribe(this);
 	}
 
-	private void OnConnectRequestFinished(HTTPRequest CGOIOKHEGOE, HTTPResponse BEIGFGCBICO)
+	private void OnConnectRequestFinished(HTTPRequest request, HTTPResponse response)
 	{
 		string text = string.Empty;
-		switch (CGOIOKHEGOE.GetState())
+		switch (request.GetState())
 		{
 		case HTTPRequestStates.Finished:
-			if (BEIGFGCBICO.GetIsSuccess())
+			if (response.GetIsSuccess())
 			{
-				HTTPManager.GetLogger().Information("Transport - " + get_Name(), "Connect - Request Finished Successfully! " + BEIGFGCBICO.GetDataAsText());
+				HTTPManager.GetLogger().Information("Transport - " + get_Name(), "Connect - Request Finished Successfully! " + response.GetDataAsText());
 				OnConnected();
-				IServerMessage bNGPAAAKBOP = TransportBase.Parse(GetConnection().GetJsonEncoder(), BEIGFGCBICO.GetDataAsText());
-				if (bNGPAAAKBOP != null)
+				IServerMessage serverMessage = TransportBase.Parse(GetConnection().GetJsonEncoder(), response.GetDataAsText());
+				if (serverMessage != null)
 				{
-					GetConnection().OnMessage(bNGPAAAKBOP);
-					MultiMessage eIKBBLMECNO = bNGPAAAKBOP as MultiMessage;
-					if (eIKBBLMECNO != null && eIKBBLMECNO.GetPollDelay().HasValue)
+					GetConnection().OnMessage(serverMessage);
+					MultiMessage multiMessage = serverMessage as MultiMessage;
+					if (multiMessage != null && multiMessage.GetPollDelay().HasValue)
 					{
-						PollDelay = eIKBBLMECNO.GetPollDelay().Value;
+						PollDelay = multiMessage.GetPollDelay().Value;
 					}
 				}
 			}
 			else
 			{
-				text = string.Format("Connect - Request Finished Successfully, but the server sent an error. Status Code: {0}-{1} Message: {2}", BEIGFGCBICO.GetStatusCode(), BEIGFGCBICO.GetMessage(), BEIGFGCBICO.GetDataAsText());
+				text = string.Format("Connect - Request Finished Successfully, but the server sent an error. Status Code: {0}-{1} Message: {2}", response.GetStatusCode(), response.GetMessage(), response.GetDataAsText());
 			}
 			break;
 		case HTTPRequestStates.Error:
-			text = "Connect - Request Finished with Error! " + ((CGOIOKHEGOE.GetException() == null) ? "No Exception" : (CGOIOKHEGOE.GetException().Message + "\n" + CGOIOKHEGOE.GetException().StackTrace));
+			text = "Connect - Request Finished with Error! " + ((request.GetException() == null) ? "No Exception" : (request.GetException().Message + "\n" + request.GetException().StackTrace));
 			break;
 		case HTTPRequestStates.Aborted:
 			text = "Connect - Request Aborted!";
@@ -114,40 +114,40 @@ public sealed class PollingTransport : PostSendTransportBase, IHeartbeat
 		}
 	}
 
-	private void OnPollRequestFinished(HTTPRequest CGOIOKHEGOE, HTTPResponse BEIGFGCBICO)
+	private void OnPollRequestFinished(HTTPRequest request, HTTPResponse response)
 	{
-		if (CGOIOKHEGOE.GetState() == HTTPRequestStates.Aborted)
+		if (request.GetState() == HTTPRequestStates.Aborted)
 		{
 			HTTPManager.GetLogger().Warning("Transport - " + get_Name(), "Poll - Request Aborted!");
 			return;
 		}
 		pollRequest = null;
 		string text = string.Empty;
-		switch (CGOIOKHEGOE.GetState())
+		switch (request.GetState())
 		{
 		case HTTPRequestStates.Finished:
-			if (BEIGFGCBICO.GetIsSuccess())
+			if (response.GetIsSuccess())
 			{
-				HTTPManager.GetLogger().Information("Transport - " + get_Name(), "Poll - Request Finished Successfully! " + BEIGFGCBICO.GetDataAsText());
-				IServerMessage bNGPAAAKBOP = TransportBase.Parse(GetConnection().GetJsonEncoder(), BEIGFGCBICO.GetDataAsText());
-				if (bNGPAAAKBOP != null)
+				HTTPManager.GetLogger().Information("Transport - " + get_Name(), "Poll - Request Finished Successfully! " + response.GetDataAsText());
+				IServerMessage serverMessage = TransportBase.Parse(GetConnection().GetJsonEncoder(), response.GetDataAsText());
+				if (serverMessage != null)
 				{
-					GetConnection().OnMessage(bNGPAAAKBOP);
-					MultiMessage eIKBBLMECNO = bNGPAAAKBOP as MultiMessage;
-					if (eIKBBLMECNO != null && eIKBBLMECNO.GetPollDelay().HasValue)
+					GetConnection().OnMessage(serverMessage);
+					MultiMessage multiMessage = serverMessage as MultiMessage;
+					if (multiMessage != null && multiMessage.GetPollDelay().HasValue)
 					{
-						PollDelay = eIKBBLMECNO.GetPollDelay().Value;
+						PollDelay = multiMessage.GetPollDelay().Value;
 					}
 					LastPoll = DateTime.UtcNow;
 				}
 			}
 			else
 			{
-				text = string.Format("Poll - Request Finished Successfully, but the server sent an error. Status Code: {0}-{1} Message: {2}", BEIGFGCBICO.GetStatusCode(), BEIGFGCBICO.GetMessage(), BEIGFGCBICO.GetDataAsText());
+				text = string.Format("Poll - Request Finished Successfully, but the server sent an error. Status Code: {0}-{1} Message: {2}", response.GetStatusCode(), response.GetMessage(), response.GetDataAsText());
 			}
 			break;
 		case HTTPRequestStates.Error:
-			text = "Poll - Request Finished with Error! " + ((CGOIOKHEGOE.GetException() == null) ? "No Exception" : (CGOIOKHEGOE.GetException().Message + "\n" + CGOIOKHEGOE.GetException().StackTrace));
+			text = "Poll - Request Finished with Error! " + ((request.GetException() == null) ? "No Exception" : (request.GetException().Message + "\n" + request.GetException().StackTrace));
 			break;
 		case HTTPRequestStates.ConnectionTimedOut:
 			text = "Poll - Connection Timed Out!";
@@ -170,10 +170,10 @@ public sealed class PollingTransport : PostSendTransportBase, IHeartbeat
 		pollRequest.Send();
 	}
 
-	void IHeartbeat.OnHeartbeatUpdate(TimeSpan OJOKANCMPLG)
+	void IHeartbeat.OnHeartbeatUpdate(TimeSpan delta)
 	{
-		TransportStates lJLKMCGDKJK = GetState();
-		if (lJLKMCGDKJK == TransportStates.Started && pollRequest == null && DateTime.UtcNow >= LastPoll + PollDelay + GetConnection().GetNegotiationResult().GetLongPollDelay())
+		TransportStates transportState = GetState();
+		if (transportState == TransportStates.Started && pollRequest == null && DateTime.UtcNow >= LastPoll + PollDelay + GetConnection().GetNegotiationResult().GetLongPollDelay())
 		{
 			Poll();
 		}

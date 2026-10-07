@@ -13,26 +13,26 @@ public class QuestActionChangeTab : QuestAction
 
 	protected ScreenType _ScreenType = ScreenType.ModuleNone;
 
-	public override void Parse(XmlNode EPKLCPOEELO)
+	public override void Parse(XmlNode node)
 	{
-		base.Parse(EPKLCPOEELO);
-		tabExpression = EPKLCPOEELO.Attributes["Tab"].GetStringOrDefault(string.Empty);
-		focusExpression = EPKLCPOEELO.Attributes["Focus"].GetStringOrDefault(string.Empty);
+		base.Parse(node);
+		tabExpression = node.Attributes["Tab"].GetStringOrDefault(string.Empty);
+		focusExpression = node.Attributes["Focus"].GetStringOrDefault(string.Empty);
 	}
 
-	public override void Execute(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters parameters)
 	{
-		base.Execute(GFIHPBCEEOB);
+		base.Execute(parameters);
 		string empty = string.Empty;
-		ConditionExtension.CompareResult lNIDLHOIHIM = new ConditionExtension.CompareResult();
-		QuestCondition kKDGLNECFHA = new QuestCondition();
-		kKDGLNECFHA.SetParameters(GFIHPBCEEOB);
-		kKDGLNECFHA.SetValue(tabExpression, lNIDLHOIHIM);
-		empty = lNIDLHOIHIM.ToString();
+		ConditionExtension.CompareResult result = new ConditionExtension.CompareResult();
+		QuestCondition condition = new QuestCondition();
+		condition.SetParameters(parameters);
+		condition.SetValue(tabExpression, result);
+		empty = result.ToString();
 		_TabType = ParseTabType(empty);
 		_ScreenType = GetScreenForTab(_TabType);
-		ScreenType iPKNDMINFMJ = Module.GetInstance().GetCurrentScreenType();
-		if (iPKNDMINFMJ == _ScreenType)
+		ScreenType currentScreen = Module.GetInstance().GetCurrentScreenType();
+		if (currentScreen == _ScreenType)
 		{
 			switch (_ScreenType)
 			{
@@ -106,9 +106,9 @@ public class QuestActionChangeTab : QuestAction
 		Module.GetInstance().RemoveEventListener(1, OnModuleChanged);
 	}
 
-	protected SliderType ParseTabType(string PMJGENGKNPA)
+	protected SliderType ParseTabType(string tabName)
 	{
-		switch (PMJGENGKNPA)
+		switch (tabName)
 		{
 		case "Weapon":
 			return SliderType.SliderWeapon;

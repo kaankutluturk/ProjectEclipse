@@ -20,13 +20,13 @@ namespace Nekki.SF2.GUI.Profile
 			achievSubItem.AddEventListener(12, Scene<ProfileScene>.get_Current().OnAchievementRewardTake);
 		}
 
-		public void Init(Achievement PGAGNLJABIE, int EPJGLECOIBG, int IBAKGENOEPH)
+		public void Init(Achievement achievement, int currentValue, int cellIndex)
 		{
 			Clear();
 			BindSubItem();
-			string kHPKDMGDMAB = PGAGNLJABIE.GetIconName();
-			int oKNNNLIPODI = 30000 + IBAKGENOEPH * 10;
-			achievSubItem.Init(kHPKDMGDMAB, PGAGNLJABIE.Name, PGAGNLJABIE.Description, PGAGNLJABIE.CounterValue, EPJGLECOIBG, oKNNNLIPODI, PGAGNLJABIE);
+			string iconName = achievement.GetIconName();
+			int buttonId = 30000 + cellIndex * 10;
+			achievSubItem.Init(iconName, achievement.Name, achievement.Description, achievement.CounterValue, currentValue, buttonId, achievement);
 			Scene<ProfileScene>.get_Current().SubItems.Add(achievSubItem);
 		}
 

@@ -366,13 +366,13 @@ public static class SF2Paths
 		}
 	}
 
-	public static string ResolveWritablePath(string ONEIGMLOGDC)
+	public static string ResolveWritablePath(string path)
 	{
-		if (ONEIGMLOGDC.Contains(WritableDataRoot))
+		if (path.Contains(WritableDataRoot))
 		{
-			return ONEIGMLOGDC;
+			return path;
 		}
-		return string.Format("{0}/{1}", WritableDataRoot, ONEIGMLOGDC);
+		return string.Format("{0}/{1}", WritableDataRoot, path);
 	}
 
 	public static void ResetBundlesDirectory()

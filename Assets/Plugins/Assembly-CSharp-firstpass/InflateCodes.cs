@@ -54,30 +54,30 @@ internal sealed class InflateCodes
 	{
 	}
 
-	internal void Init(int GGEJHHHGPKN, int NBHIKILKMED, int[] AEFHBJIMPHM, int HLDNDJKELJE, int[] GICLKGGKJAG, int KMKIMJDIKHC)
+	internal void Init(int literalBits, int distanceBits, int[] literalTable, int literalTableIndex, int[] distanceTable, int distanceTableIndex)
 	{
 		mode = 0;
-		lbits = (byte)GGEJHHHGPKN;
-		dbits = (byte)NBHIKILKMED;
-		ltree = AEFHBJIMPHM;
-		ltree_index = HLDNDJKELJE;
-		dtree = GICLKGGKJAG;
-		dtree_index = KMKIMJDIKHC;
+		lbits = (byte)literalBits;
+		dbits = (byte)distanceBits;
+		ltree = literalTable;
+		ltree_index = literalTableIndex;
+		dtree = distanceTable;
+		dtree_index = distanceTableIndex;
 		tree = null;
 	}
 
-	internal int Process(InflateBlocks CGKHDGJKOMG, int BOPODEAIEBJ)
+	internal int Process(InflateBlocks blocks, int result)
 	{
 		int num = 0;
 		int num2 = 0;
 		int num3 = 0;
-		ZlibCodec cJMKCEHHMCH = CGKHDGJKOMG._codec;
-		num3 = cJMKCEHHMCH.NextIn;
-		int num4 = cJMKCEHHMCH.AvailableBytesIn;
-		num = CGKHDGJKOMG.bitb;
-		num2 = CGKHDGJKOMG.bitk;
-		int num5 = CGKHDGJKOMG.writeAt;
-		int num6 = ((num5 >= CGKHDGJKOMG.readAt) ? (CGKHDGJKOMG.end - num5) : (CGKHDGJKOMG.readAt - num5 - 1));
+		ZlibCodec codec = blocks._codec;
+		num3 = codec.NextIn;
+		int num4 = codec.AvailableBytesIn;
+		num = blocks.bitb;
+		num2 = blocks.bitk;
+		int num5 = blocks.writeAt;
+		int num6 = ((num5 >= blocks.readAt) ? (blocks.end - num5) : (blocks.readAt - num5 - 1));
 		while (true)
 		{
 			switch (mode)
@@ -85,22 +85,22 @@ internal sealed class InflateCodes
 			case 0:
 				if (num6 >= 258 && num4 >= 10)
 				{
-					CGKHDGJKOMG.bitb = num;
-					CGKHDGJKOMG.bitk = num2;
-					cJMKCEHHMCH.AvailableBytesIn = num4;
-					cJMKCEHHMCH.TotalBytesIn += num3 - cJMKCEHHMCH.NextIn;
-					cJMKCEHHMCH.NextIn = num3;
-					CGKHDGJKOMG.writeAt = num5;
-					BOPODEAIEBJ = InflateFast(lbits, dbits, ltree, ltree_index, dtree, dtree_index, CGKHDGJKOMG, cJMKCEHHMCH);
-					num3 = cJMKCEHHMCH.NextIn;
-					num4 = cJMKCEHHMCH.AvailableBytesIn;
-					num = CGKHDGJKOMG.bitb;
-					num2 = CGKHDGJKOMG.bitk;
-					num5 = CGKHDGJKOMG.writeAt;
-					num6 = ((num5 >= CGKHDGJKOMG.readAt) ? (CGKHDGJKOMG.end - num5) : (CGKHDGJKOMG.readAt - num5 - 1));
-					if (BOPODEAIEBJ != 0)
+					blocks.bitb = num;
+					blocks.bitk = num2;
+					codec.AvailableBytesIn = num4;
+					codec.TotalBytesIn += num3 - codec.NextIn;
+					codec.NextIn = num3;
+					blocks.writeAt = num5;
+					result = InflateFast(lbits, dbits, ltree, ltree_index, dtree, dtree_index, blocks, codec);
+					num3 = codec.NextIn;
+					num4 = codec.AvailableBytesIn;
+					num = blocks.bitb;
+					num2 = blocks.bitk;
+					num5 = blocks.writeAt;
+					num6 = ((num5 >= blocks.readAt) ? (blocks.end - num5) : (blocks.readAt - num5 - 1));
+					if (result != 0)
 					{
-						mode = ((BOPODEAIEBJ != 1) ? 9 : 7);
+						mode = ((result != 1) ? 9 : 7);
 						break;
 					}
 				}
@@ -111,25 +111,25 @@ internal sealed class InflateCodes
 				goto case 1;
 			case 1:
 			{
-				int aCLJBJJAENG;
-				for (aCLJBJJAENG = need; num2 < aCLJBJJAENG; num2 += 8)
+				int bitsNeeded;
+				for (bitsNeeded = need; num2 < bitsNeeded; num2 += 8)
 				{
 					if (num4 != 0)
 					{
-						BOPODEAIEBJ = 0;
+						result = 0;
 						num4--;
-						num |= (cJMKCEHHMCH.InputBuffer[num3++] & 0xFF) << num2;
+						num |= (codec.InputBuffer[num3++] & 0xFF) << num2;
 						continue;
 					}
-					CGKHDGJKOMG.bitb = num;
-					CGKHDGJKOMG.bitk = num2;
-					cJMKCEHHMCH.AvailableBytesIn = num4;
-					cJMKCEHHMCH.TotalBytesIn += num3 - cJMKCEHHMCH.NextIn;
-					cJMKCEHHMCH.NextIn = num3;
-					CGKHDGJKOMG.writeAt = num5;
-					return CGKHDGJKOMG.Flush(BOPODEAIEBJ);
+					blocks.bitb = num;
+					blocks.bitk = num2;
+					codec.AvailableBytesIn = num4;
+					codec.TotalBytesIn += num3 - codec.NextIn;
+					codec.NextIn = num3;
+					blocks.writeAt = num5;
+					return blocks.Flush(result);
 				}
-				int num7 = (tree_index + (num & InternalInflateConstants.InflateMask[aCLJBJJAENG])) * 3;
+				int num7 = (tree_index + (num & InternalInflateConstants.InflateMask[bitsNeeded])) * 3;
 				num >>= tree[num7 + 1];
 				num2 -= tree[num7 + 1];
 				int num8 = tree[num7];
@@ -158,39 +158,39 @@ internal sealed class InflateCodes
 					break;
 				}
 				mode = 9;
-				cJMKCEHHMCH.Message = "invalid literal/length code";
-				BOPODEAIEBJ = -3;
-				CGKHDGJKOMG.bitb = num;
-				CGKHDGJKOMG.bitk = num2;
-				cJMKCEHHMCH.AvailableBytesIn = num4;
-				cJMKCEHHMCH.TotalBytesIn += num3 - cJMKCEHHMCH.NextIn;
-				cJMKCEHHMCH.NextIn = num3;
-				CGKHDGJKOMG.writeAt = num5;
-				return CGKHDGJKOMG.Flush(BOPODEAIEBJ);
+				codec.Message = "invalid literal/length code";
+				result = -3;
+				blocks.bitb = num;
+				blocks.bitk = num2;
+				codec.AvailableBytesIn = num4;
+				codec.TotalBytesIn += num3 - codec.NextIn;
+				codec.NextIn = num3;
+				blocks.writeAt = num5;
+				return blocks.Flush(result);
 			}
 			case 2:
 			{
-				int aCLJBJJAENG;
-				for (aCLJBJJAENG = bitsToGet; num2 < aCLJBJJAENG; num2 += 8)
+				int bitsNeeded;
+				for (bitsNeeded = bitsToGet; num2 < bitsNeeded; num2 += 8)
 				{
 					if (num4 != 0)
 					{
-						BOPODEAIEBJ = 0;
+						result = 0;
 						num4--;
-						num |= (cJMKCEHHMCH.InputBuffer[num3++] & 0xFF) << num2;
+						num |= (codec.InputBuffer[num3++] & 0xFF) << num2;
 						continue;
 					}
-					CGKHDGJKOMG.bitb = num;
-					CGKHDGJKOMG.bitk = num2;
-					cJMKCEHHMCH.AvailableBytesIn = num4;
-					cJMKCEHHMCH.TotalBytesIn += num3 - cJMKCEHHMCH.NextIn;
-					cJMKCEHHMCH.NextIn = num3;
-					CGKHDGJKOMG.writeAt = num5;
-					return CGKHDGJKOMG.Flush(BOPODEAIEBJ);
+					blocks.bitb = num;
+					blocks.bitk = num2;
+					codec.AvailableBytesIn = num4;
+					codec.TotalBytesIn += num3 - codec.NextIn;
+					codec.NextIn = num3;
+					blocks.writeAt = num5;
+					return blocks.Flush(result);
 				}
-				len += num & InternalInflateConstants.InflateMask[aCLJBJJAENG];
-				num >>= aCLJBJJAENG;
-				num2 -= aCLJBJJAENG;
+				len += num & InternalInflateConstants.InflateMask[bitsNeeded];
+				num >>= bitsNeeded;
+				num2 -= bitsNeeded;
 				need = dbits;
 				tree = dtree;
 				tree_index = dtree_index;
@@ -199,25 +199,25 @@ internal sealed class InflateCodes
 			}
 			case 3:
 			{
-				int aCLJBJJAENG;
-				for (aCLJBJJAENG = need; num2 < aCLJBJJAENG; num2 += 8)
+				int bitsNeeded;
+				for (bitsNeeded = need; num2 < bitsNeeded; num2 += 8)
 				{
 					if (num4 != 0)
 					{
-						BOPODEAIEBJ = 0;
+						result = 0;
 						num4--;
-						num |= (cJMKCEHHMCH.InputBuffer[num3++] & 0xFF) << num2;
+						num |= (codec.InputBuffer[num3++] & 0xFF) << num2;
 						continue;
 					}
-					CGKHDGJKOMG.bitb = num;
-					CGKHDGJKOMG.bitk = num2;
-					cJMKCEHHMCH.AvailableBytesIn = num4;
-					cJMKCEHHMCH.TotalBytesIn += num3 - cJMKCEHHMCH.NextIn;
-					cJMKCEHHMCH.NextIn = num3;
-					CGKHDGJKOMG.writeAt = num5;
-					return CGKHDGJKOMG.Flush(BOPODEAIEBJ);
+					blocks.bitb = num;
+					blocks.bitk = num2;
+					codec.AvailableBytesIn = num4;
+					codec.TotalBytesIn += num3 - codec.NextIn;
+					codec.NextIn = num3;
+					blocks.writeAt = num5;
+					return blocks.Flush(result);
 				}
-				int num7 = (tree_index + (num & InternalInflateConstants.InflateMask[aCLJBJJAENG])) * 3;
+				int num7 = (tree_index + (num & InternalInflateConstants.InflateMask[bitsNeeded])) * 3;
 				num >>= tree[num7 + 1];
 				num2 -= tree[num7 + 1];
 				int num8 = tree[num7];
@@ -235,83 +235,83 @@ internal sealed class InflateCodes
 					break;
 				}
 				mode = 9;
-				cJMKCEHHMCH.Message = "invalid distance code";
-				BOPODEAIEBJ = -3;
-				CGKHDGJKOMG.bitb = num;
-				CGKHDGJKOMG.bitk = num2;
-				cJMKCEHHMCH.AvailableBytesIn = num4;
-				cJMKCEHHMCH.TotalBytesIn += num3 - cJMKCEHHMCH.NextIn;
-				cJMKCEHHMCH.NextIn = num3;
-				CGKHDGJKOMG.writeAt = num5;
-				return CGKHDGJKOMG.Flush(BOPODEAIEBJ);
+				codec.Message = "invalid distance code";
+				result = -3;
+				blocks.bitb = num;
+				blocks.bitk = num2;
+				codec.AvailableBytesIn = num4;
+				codec.TotalBytesIn += num3 - codec.NextIn;
+				codec.NextIn = num3;
+				blocks.writeAt = num5;
+				return blocks.Flush(result);
 			}
 			case 4:
 			{
-				int aCLJBJJAENG;
-				for (aCLJBJJAENG = bitsToGet; num2 < aCLJBJJAENG; num2 += 8)
+				int bitsNeeded;
+				for (bitsNeeded = bitsToGet; num2 < bitsNeeded; num2 += 8)
 				{
 					if (num4 != 0)
 					{
-						BOPODEAIEBJ = 0;
+						result = 0;
 						num4--;
-						num |= (cJMKCEHHMCH.InputBuffer[num3++] & 0xFF) << num2;
+						num |= (codec.InputBuffer[num3++] & 0xFF) << num2;
 						continue;
 					}
-					CGKHDGJKOMG.bitb = num;
-					CGKHDGJKOMG.bitk = num2;
-					cJMKCEHHMCH.AvailableBytesIn = num4;
-					cJMKCEHHMCH.TotalBytesIn += num3 - cJMKCEHHMCH.NextIn;
-					cJMKCEHHMCH.NextIn = num3;
-					CGKHDGJKOMG.writeAt = num5;
-					return CGKHDGJKOMG.Flush(BOPODEAIEBJ);
+					blocks.bitb = num;
+					blocks.bitk = num2;
+					codec.AvailableBytesIn = num4;
+					codec.TotalBytesIn += num3 - codec.NextIn;
+					codec.NextIn = num3;
+					blocks.writeAt = num5;
+					return blocks.Flush(result);
 				}
-				dist += num & InternalInflateConstants.InflateMask[aCLJBJJAENG];
-				num >>= aCLJBJJAENG;
-				num2 -= aCLJBJJAENG;
+				dist += num & InternalInflateConstants.InflateMask[bitsNeeded];
+				num >>= bitsNeeded;
+				num2 -= bitsNeeded;
 				mode = 5;
 				goto case 5;
 			}
 			case 5:
 			{
 				int i;
-				for (i = num5 - dist; i < 0; i += CGKHDGJKOMG.end)
+				for (i = num5 - dist; i < 0; i += blocks.end)
 				{
 				}
 				while (len != 0)
 				{
 					if (num6 == 0)
 					{
-						if (num5 == CGKHDGJKOMG.end && CGKHDGJKOMG.readAt != 0)
+						if (num5 == blocks.end && blocks.readAt != 0)
 						{
 							num5 = 0;
-							num6 = ((num5 >= CGKHDGJKOMG.readAt) ? (CGKHDGJKOMG.end - num5) : (CGKHDGJKOMG.readAt - num5 - 1));
+							num6 = ((num5 >= blocks.readAt) ? (blocks.end - num5) : (blocks.readAt - num5 - 1));
 						}
 						if (num6 == 0)
 						{
-							CGKHDGJKOMG.writeAt = num5;
-							BOPODEAIEBJ = CGKHDGJKOMG.Flush(BOPODEAIEBJ);
-							num5 = CGKHDGJKOMG.writeAt;
-							num6 = ((num5 >= CGKHDGJKOMG.readAt) ? (CGKHDGJKOMG.end - num5) : (CGKHDGJKOMG.readAt - num5 - 1));
-							if (num5 == CGKHDGJKOMG.end && CGKHDGJKOMG.readAt != 0)
+							blocks.writeAt = num5;
+							result = blocks.Flush(result);
+							num5 = blocks.writeAt;
+							num6 = ((num5 >= blocks.readAt) ? (blocks.end - num5) : (blocks.readAt - num5 - 1));
+							if (num5 == blocks.end && blocks.readAt != 0)
 							{
 								num5 = 0;
-								num6 = ((num5 >= CGKHDGJKOMG.readAt) ? (CGKHDGJKOMG.end - num5) : (CGKHDGJKOMG.readAt - num5 - 1));
+								num6 = ((num5 >= blocks.readAt) ? (blocks.end - num5) : (blocks.readAt - num5 - 1));
 							}
 							if (num6 == 0)
 							{
-								CGKHDGJKOMG.bitb = num;
-								CGKHDGJKOMG.bitk = num2;
-								cJMKCEHHMCH.AvailableBytesIn = num4;
-								cJMKCEHHMCH.TotalBytesIn += num3 - cJMKCEHHMCH.NextIn;
-								cJMKCEHHMCH.NextIn = num3;
-								CGKHDGJKOMG.writeAt = num5;
-								return CGKHDGJKOMG.Flush(BOPODEAIEBJ);
+								blocks.bitb = num;
+								blocks.bitk = num2;
+								codec.AvailableBytesIn = num4;
+								codec.TotalBytesIn += num3 - codec.NextIn;
+								codec.NextIn = num3;
+								blocks.writeAt = num5;
+								return blocks.Flush(result);
 							}
 						}
 					}
-					CGKHDGJKOMG.window[num5++] = CGKHDGJKOMG.window[i++];
+					blocks.window[num5++] = blocks.window[i++];
 					num6--;
-					if (i == CGKHDGJKOMG.end)
+					if (i == blocks.end)
 					{
 						i = 0;
 					}
@@ -323,36 +323,36 @@ internal sealed class InflateCodes
 			case 6:
 				if (num6 == 0)
 				{
-					if (num5 == CGKHDGJKOMG.end && CGKHDGJKOMG.readAt != 0)
+					if (num5 == blocks.end && blocks.readAt != 0)
 					{
 						num5 = 0;
-						num6 = ((num5 >= CGKHDGJKOMG.readAt) ? (CGKHDGJKOMG.end - num5) : (CGKHDGJKOMG.readAt - num5 - 1));
+						num6 = ((num5 >= blocks.readAt) ? (blocks.end - num5) : (blocks.readAt - num5 - 1));
 					}
 					if (num6 == 0)
 					{
-						CGKHDGJKOMG.writeAt = num5;
-						BOPODEAIEBJ = CGKHDGJKOMG.Flush(BOPODEAIEBJ);
-						num5 = CGKHDGJKOMG.writeAt;
-						num6 = ((num5 >= CGKHDGJKOMG.readAt) ? (CGKHDGJKOMG.end - num5) : (CGKHDGJKOMG.readAt - num5 - 1));
-						if (num5 == CGKHDGJKOMG.end && CGKHDGJKOMG.readAt != 0)
+						blocks.writeAt = num5;
+						result = blocks.Flush(result);
+						num5 = blocks.writeAt;
+						num6 = ((num5 >= blocks.readAt) ? (blocks.end - num5) : (blocks.readAt - num5 - 1));
+						if (num5 == blocks.end && blocks.readAt != 0)
 						{
 							num5 = 0;
-							num6 = ((num5 >= CGKHDGJKOMG.readAt) ? (CGKHDGJKOMG.end - num5) : (CGKHDGJKOMG.readAt - num5 - 1));
+							num6 = ((num5 >= blocks.readAt) ? (blocks.end - num5) : (blocks.readAt - num5 - 1));
 						}
 						if (num6 == 0)
 						{
-							CGKHDGJKOMG.bitb = num;
-							CGKHDGJKOMG.bitk = num2;
-							cJMKCEHHMCH.AvailableBytesIn = num4;
-							cJMKCEHHMCH.TotalBytesIn += num3 - cJMKCEHHMCH.NextIn;
-							cJMKCEHHMCH.NextIn = num3;
-							CGKHDGJKOMG.writeAt = num5;
-							return CGKHDGJKOMG.Flush(BOPODEAIEBJ);
+							blocks.bitb = num;
+							blocks.bitk = num2;
+							codec.AvailableBytesIn = num4;
+							codec.TotalBytesIn += num3 - codec.NextIn;
+							codec.NextIn = num3;
+							blocks.writeAt = num5;
+							return blocks.Flush(result);
 						}
 					}
 				}
-				BOPODEAIEBJ = 0;
-				CGKHDGJKOMG.window[num5++] = (byte)lit;
+				result = 0;
+				blocks.window[num5++] = (byte)lit;
 				num6--;
 				mode = 0;
 				break;
@@ -363,83 +363,83 @@ internal sealed class InflateCodes
 					num4++;
 					num3--;
 				}
-				CGKHDGJKOMG.writeAt = num5;
-				BOPODEAIEBJ = CGKHDGJKOMG.Flush(BOPODEAIEBJ);
-				num5 = CGKHDGJKOMG.writeAt;
-				num6 = ((num5 >= CGKHDGJKOMG.readAt) ? (CGKHDGJKOMG.end - num5) : (CGKHDGJKOMG.readAt - num5 - 1));
-				if (CGKHDGJKOMG.readAt != CGKHDGJKOMG.writeAt)
+				blocks.writeAt = num5;
+				result = blocks.Flush(result);
+				num5 = blocks.writeAt;
+				num6 = ((num5 >= blocks.readAt) ? (blocks.end - num5) : (blocks.readAt - num5 - 1));
+				if (blocks.readAt != blocks.writeAt)
 				{
-					CGKHDGJKOMG.bitb = num;
-					CGKHDGJKOMG.bitk = num2;
-					cJMKCEHHMCH.AvailableBytesIn = num4;
-					cJMKCEHHMCH.TotalBytesIn += num3 - cJMKCEHHMCH.NextIn;
-					cJMKCEHHMCH.NextIn = num3;
-					CGKHDGJKOMG.writeAt = num5;
-					return CGKHDGJKOMG.Flush(BOPODEAIEBJ);
+					blocks.bitb = num;
+					blocks.bitk = num2;
+					codec.AvailableBytesIn = num4;
+					codec.TotalBytesIn += num3 - codec.NextIn;
+					codec.NextIn = num3;
+					blocks.writeAt = num5;
+					return blocks.Flush(result);
 				}
 				mode = 8;
 				goto case 8;
 			case 8:
-				BOPODEAIEBJ = 1;
-				CGKHDGJKOMG.bitb = num;
-				CGKHDGJKOMG.bitk = num2;
-				cJMKCEHHMCH.AvailableBytesIn = num4;
-				cJMKCEHHMCH.TotalBytesIn += num3 - cJMKCEHHMCH.NextIn;
-				cJMKCEHHMCH.NextIn = num3;
-				CGKHDGJKOMG.writeAt = num5;
-				return CGKHDGJKOMG.Flush(BOPODEAIEBJ);
+				result = 1;
+				blocks.bitb = num;
+				blocks.bitk = num2;
+				codec.AvailableBytesIn = num4;
+				codec.TotalBytesIn += num3 - codec.NextIn;
+				codec.NextIn = num3;
+				blocks.writeAt = num5;
+				return blocks.Flush(result);
 			case 9:
-				BOPODEAIEBJ = -3;
-				CGKHDGJKOMG.bitb = num;
-				CGKHDGJKOMG.bitk = num2;
-				cJMKCEHHMCH.AvailableBytesIn = num4;
-				cJMKCEHHMCH.TotalBytesIn += num3 - cJMKCEHHMCH.NextIn;
-				cJMKCEHHMCH.NextIn = num3;
-				CGKHDGJKOMG.writeAt = num5;
-				return CGKHDGJKOMG.Flush(BOPODEAIEBJ);
+				result = -3;
+				blocks.bitb = num;
+				blocks.bitk = num2;
+				codec.AvailableBytesIn = num4;
+				codec.TotalBytesIn += num3 - codec.NextIn;
+				codec.NextIn = num3;
+				blocks.writeAt = num5;
+				return blocks.Flush(result);
 			default:
-				BOPODEAIEBJ = -2;
-				CGKHDGJKOMG.bitb = num;
-				CGKHDGJKOMG.bitk = num2;
-				cJMKCEHHMCH.AvailableBytesIn = num4;
-				cJMKCEHHMCH.TotalBytesIn += num3 - cJMKCEHHMCH.NextIn;
-				cJMKCEHHMCH.NextIn = num3;
-				CGKHDGJKOMG.writeAt = num5;
-				return CGKHDGJKOMG.Flush(BOPODEAIEBJ);
+				result = -2;
+				blocks.bitb = num;
+				blocks.bitk = num2;
+				codec.AvailableBytesIn = num4;
+				codec.TotalBytesIn += num3 - codec.NextIn;
+				codec.NextIn = num3;
+				blocks.writeAt = num5;
+				return blocks.Flush(result);
 			}
 		}
 	}
 
-	internal int InflateFast(int GGEJHHHGPKN, int NBHIKILKMED, int[] AEFHBJIMPHM, int HLDNDJKELJE, int[] GICLKGGKJAG, int KMKIMJDIKHC, InflateBlocks JDCCBCNFENK, ZlibCodec LKPCKJOLJDO)
+	internal int InflateFast(int literalBits, int distanceBits, int[] literalTable, int literalTableIndex, int[] distanceTable, int distanceTableIndex, InflateBlocks blocks, ZlibCodec codec)
 	{
-		int lMIPBGGILEJ = LKPCKJOLJDO.NextIn;
-		int num = LKPCKJOLJDO.AvailableBytesIn;
-		int num2 = JDCCBCNFENK.bitb;
-		int num3 = JDCCBCNFENK.bitk;
-		int num4 = JDCCBCNFENK.writeAt;
-		int num5 = ((num4 >= JDCCBCNFENK.readAt) ? (JDCCBCNFENK.end - num4) : (JDCCBCNFENK.readAt - num4 - 1));
-		int num6 = InternalInflateConstants.InflateMask[GGEJHHHGPKN];
-		int num7 = InternalInflateConstants.InflateMask[NBHIKILKMED];
+		int inputIndex = codec.NextIn;
+		int num = codec.AvailableBytesIn;
+		int num2 = blocks.bitb;
+		int num3 = blocks.bitk;
+		int num4 = blocks.writeAt;
+		int num5 = ((num4 >= blocks.readAt) ? (blocks.end - num4) : (blocks.readAt - num4 - 1));
+		int num6 = InternalInflateConstants.InflateMask[literalBits];
+		int num7 = InternalInflateConstants.InflateMask[distanceBits];
 		int num12;
 		while (true)
 		{
 			if (num3 < 20)
 			{
 				num--;
-				num2 |= (LKPCKJOLJDO.InputBuffer[lMIPBGGILEJ++] & 0xFF) << num3;
+				num2 |= (codec.InputBuffer[inputIndex++] & 0xFF) << num3;
 				num3 += 8;
 				continue;
 			}
 			int num8 = num2 & num6;
-			int[] array = AEFHBJIMPHM;
-			int num9 = HLDNDJKELJE;
+			int[] array = literalTable;
+			int num9 = literalTableIndex;
 			int num10 = (num9 + num8) * 3;
 			int num11;
 			if ((num11 = array[num10]) == 0)
 			{
 				num2 >>= array[num10 + 1];
 				num3 -= array[num10 + 1];
-				JDCCBCNFENK.window[num4++] = (byte)array[num10 + 2];
+				blocks.window[num4++] = (byte)array[num10 + 2];
 				num5--;
 			}
 			else
@@ -456,11 +456,11 @@ internal sealed class InflateCodes
 						for (num3 -= num11; num3 < 15; num3 += 8)
 						{
 							num--;
-							num2 |= (LKPCKJOLJDO.InputBuffer[lMIPBGGILEJ++] & 0xFF) << num3;
+							num2 |= (codec.InputBuffer[inputIndex++] & 0xFF) << num3;
 						}
 						num8 = num2 & num7;
-						array = GICLKGGKJAG;
-						num9 = KMKIMJDIKHC;
+						array = distanceTable;
+						num9 = distanceTableIndex;
 						num10 = (num9 + num8) * 3;
 						num11 = array[num10];
 						while (true)
@@ -479,24 +479,24 @@ internal sealed class InflateCodes
 								num11 = array[num10];
 								continue;
 							}
-							LKPCKJOLJDO.Message = "invalid distance code";
-							num12 = LKPCKJOLJDO.AvailableBytesIn - num;
+							codec.Message = "invalid distance code";
+							num12 = codec.AvailableBytesIn - num;
 							num12 = ((num3 >> 3 >= num12) ? num12 : (num3 >> 3));
 							num += num12;
-							lMIPBGGILEJ -= num12;
+							inputIndex -= num12;
 							num3 -= num12 << 3;
-							JDCCBCNFENK.bitb = num2;
-							JDCCBCNFENK.bitk = num3;
-							LKPCKJOLJDO.AvailableBytesIn = num;
-							LKPCKJOLJDO.TotalBytesIn += lMIPBGGILEJ - LKPCKJOLJDO.NextIn;
-							LKPCKJOLJDO.NextIn = lMIPBGGILEJ;
-							JDCCBCNFENK.writeAt = num4;
+							blocks.bitb = num2;
+							blocks.bitk = num3;
+							codec.AvailableBytesIn = num;
+							codec.TotalBytesIn += inputIndex - codec.NextIn;
+							codec.NextIn = inputIndex;
+							blocks.writeAt = num4;
 							return -3;
 						}
 						for (num11 &= 0xF; num3 < num11; num3 += 8)
 						{
 							num--;
-							num2 |= (LKPCKJOLJDO.InputBuffer[lMIPBGGILEJ++] & 0xFF) << num3;
+							num2 |= (codec.InputBuffer[inputIndex++] & 0xFF) << num3;
 						}
 						int num13 = array[num10 + 2] + (num2 & InternalInflateConstants.InflateMask[num11]);
 						num2 >>= num11;
@@ -508,13 +508,13 @@ internal sealed class InflateCodes
 							num14 = num4 - num13;
 							if (num4 - num14 > 0 && 2 > num4 - num14)
 							{
-								JDCCBCNFENK.window[num4++] = JDCCBCNFENK.window[num14++];
-								JDCCBCNFENK.window[num4++] = JDCCBCNFENK.window[num14++];
+								blocks.window[num4++] = blocks.window[num14++];
+								blocks.window[num4++] = blocks.window[num14++];
 								num12 -= 2;
 							}
 							else
 							{
-								Array.Copy(JDCCBCNFENK.window, num14, JDCCBCNFENK.window, num4, 2);
+								Array.Copy(blocks.window, num14, blocks.window, num4, 2);
 								num4 += 2;
 								num14 += 2;
 								num12 -= 2;
@@ -525,10 +525,10 @@ internal sealed class InflateCodes
 							num14 = num4 - num13;
 							do
 							{
-								num14 += JDCCBCNFENK.end;
+								num14 += blocks.end;
 							}
 							while (num14 < 0);
-							num11 = JDCCBCNFENK.end - num14;
+							num11 = blocks.end - num14;
 							if (num12 > num11)
 							{
 								num12 -= num11;
@@ -536,13 +536,13 @@ internal sealed class InflateCodes
 								{
 									do
 									{
-										JDCCBCNFENK.window[num4++] = JDCCBCNFENK.window[num14++];
+										blocks.window[num4++] = blocks.window[num14++];
 									}
 									while (--num11 != 0);
 								}
 								else
 								{
-									Array.Copy(JDCCBCNFENK.window, num14, JDCCBCNFENK.window, num4, num11);
+									Array.Copy(blocks.window, num14, blocks.window, num4, num11);
 									num4 += num11;
 									num14 += num11;
 									num11 = 0;
@@ -554,12 +554,12 @@ internal sealed class InflateCodes
 						{
 							do
 							{
-								JDCCBCNFENK.window[num4++] = JDCCBCNFENK.window[num14++];
+								blocks.window[num4++] = blocks.window[num14++];
 							}
 							while (--num12 != 0);
 							break;
 						}
-						Array.Copy(JDCCBCNFENK.window, num14, JDCCBCNFENK.window, num4, num12);
+						Array.Copy(blocks.window, num14, blocks.window, num4, num12);
 						num4 += num12;
 						num14 += num12;
 						num12 = 0;
@@ -574,7 +574,7 @@ internal sealed class InflateCodes
 						{
 							num2 >>= array[num10 + 1];
 							num3 -= array[num10 + 1];
-							JDCCBCNFENK.window[num4++] = (byte)array[num10 + 2];
+							blocks.window[num4++] = (byte)array[num10 + 2];
 							num5--;
 							break;
 						}
@@ -582,31 +582,31 @@ internal sealed class InflateCodes
 					}
 					if ((num11 & 0x20) != 0)
 					{
-						num12 = LKPCKJOLJDO.AvailableBytesIn - num;
+						num12 = codec.AvailableBytesIn - num;
 						num12 = ((num3 >> 3 >= num12) ? num12 : (num3 >> 3));
 						num += num12;
-						lMIPBGGILEJ -= num12;
+						inputIndex -= num12;
 						num3 -= num12 << 3;
-						JDCCBCNFENK.bitb = num2;
-						JDCCBCNFENK.bitk = num3;
-						LKPCKJOLJDO.AvailableBytesIn = num;
-						LKPCKJOLJDO.TotalBytesIn += lMIPBGGILEJ - LKPCKJOLJDO.NextIn;
-						LKPCKJOLJDO.NextIn = lMIPBGGILEJ;
-						JDCCBCNFENK.writeAt = num4;
+						blocks.bitb = num2;
+						blocks.bitk = num3;
+						codec.AvailableBytesIn = num;
+						codec.TotalBytesIn += inputIndex - codec.NextIn;
+						codec.NextIn = inputIndex;
+						blocks.writeAt = num4;
 						return 1;
 					}
-					LKPCKJOLJDO.Message = "invalid literal/length code";
-					num12 = LKPCKJOLJDO.AvailableBytesIn - num;
+					codec.Message = "invalid literal/length code";
+					num12 = codec.AvailableBytesIn - num;
 					num12 = ((num3 >> 3 >= num12) ? num12 : (num3 >> 3));
 					num += num12;
-					lMIPBGGILEJ -= num12;
+					inputIndex -= num12;
 					num3 -= num12 << 3;
-					JDCCBCNFENK.bitb = num2;
-					JDCCBCNFENK.bitk = num3;
-					LKPCKJOLJDO.AvailableBytesIn = num;
-					LKPCKJOLJDO.TotalBytesIn += lMIPBGGILEJ - LKPCKJOLJDO.NextIn;
-					LKPCKJOLJDO.NextIn = lMIPBGGILEJ;
-					JDCCBCNFENK.writeAt = num4;
+					blocks.bitb = num2;
+					blocks.bitk = num3;
+					codec.AvailableBytesIn = num;
+					codec.TotalBytesIn += inputIndex - codec.NextIn;
+					codec.NextIn = inputIndex;
+					blocks.writeAt = num4;
 					return -3;
 				}
 			}
@@ -615,17 +615,17 @@ internal sealed class InflateCodes
 				break;
 			}
 		}
-		num12 = LKPCKJOLJDO.AvailableBytesIn - num;
+		num12 = codec.AvailableBytesIn - num;
 		num12 = ((num3 >> 3 >= num12) ? num12 : (num3 >> 3));
 		num += num12;
-		lMIPBGGILEJ -= num12;
+		inputIndex -= num12;
 		num3 -= num12 << 3;
-		JDCCBCNFENK.bitb = num2;
-		JDCCBCNFENK.bitk = num3;
-		LKPCKJOLJDO.AvailableBytesIn = num;
-		LKPCKJOLJDO.TotalBytesIn += lMIPBGGILEJ - LKPCKJOLJDO.NextIn;
-		LKPCKJOLJDO.NextIn = lMIPBGGILEJ;
-		JDCCBCNFENK.writeAt = num4;
+		blocks.bitb = num2;
+		blocks.bitk = num3;
+		codec.AvailableBytesIn = num;
+		codec.TotalBytesIn += inputIndex - codec.NextIn;
+		codec.NextIn = inputIndex;
+		blocks.writeAt = num4;
 		return 0;
 	}
 }

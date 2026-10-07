@@ -33,17 +33,17 @@ namespace Nekki.Social
 			}
 		}
 
-		public static void GetAvatar(UserInfo EMBBNNBFODN, Action<string, Texture> onDone)
+		public static void GetAvatar(UserInfo userInfo, Action<string, Texture> onDone)
 		{
 			Init();
-			if (_avatars.ContainsKey(EMBBNNBFODN.GetUserId()))
+			if (_avatars.ContainsKey(userInfo.GetUserId()))
 			{
-				onDone(EMBBNNBFODN.GetUserId(), _avatars[EMBBNNBFODN.GetUserId()]);
+				onDone(userInfo.GetUserId(), _avatars[userInfo.GetUserId()]);
 				return;
 			}
-			_requests.Add(EMBBNNBFODN.GetUserId(), new AvatarRequest
+			_requests.Add(userInfo.GetUserId(), new AvatarRequest
 			{
-				Info = EMBBNNBFODN,
+				Info = userInfo,
 				OnDone = onDone
 			});
 		}

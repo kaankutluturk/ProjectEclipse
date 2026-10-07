@@ -32,16 +32,16 @@ public class QuestActionForeach : QuestAction
 
 	private ForeachType foreachType;
 
-	public override void Parse(XmlNode EPKLCPOEELO)
+	public override void Parse(XmlNode node)
 	{
-		base.Parse(EPKLCPOEELO);
-		foreachType = GetType(EPKLCPOEELO.Attributes["Type"].GetStringOrDefault(string.Empty));
-		name = EPKLCPOEELO.Attributes["Name"].GetStringOrDefault(string.Empty);
+		base.Parse(node);
+		foreachType = GetType(node.Attributes["Type"].GetStringOrDefault(string.Empty));
+		name = node.Attributes["Name"].GetStringOrDefault(string.Empty);
 	}
 
-	public override void Execute(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters parameters)
 	{
-		base.Execute(GFIHPBCEEOB);
+		base.Execute(parameters);
 		if (ListSF.GetInstance().IsEclipseQuestSuppressed(name))
 		{
 			FinishAction();
@@ -49,7 +49,7 @@ public class QuestActionForeach : QuestAction
 		}
 		index = -1;
 		nodeCount = 0;
-		questParameters = GFIHPBCEEOB;
+		questParameters = parameters;
 		bodyStage = ListSF.GetInstance().GetQuestByName(name);
 		nodes.Clear();
 		switch (foreachType)
@@ -96,18 +96,18 @@ public class QuestActionForeach : QuestAction
 		{
 			if (foreachType == ForeachType.FOREACH_DELIVERY_ITEMS || foreachType == ForeachType.FOREACH_DELIVERY_UPGRADES)
 			{
-				Roster nKGLHEGIKKP = ListSF.GetRoster();
-				nKGLHEGIKKP.GetInventory().ItemDelivered.RemoveListener(OnDeliveryItemAdded);
+				Roster roster = ListSF.GetRoster();
+				roster.GetInventory().ItemDelivered.RemoveListener(OnDeliveryItemAdded);
 				switch (foreachType)
 				{
 				case ForeachType.FOREACH_DELIVERY_ITEMS:
-					nKGLHEGIKKP.GetInventory().GetDeliveredItems().Clear();
+					roster.GetInventory().GetDeliveredItems().Clear();
 					break;
 				case ForeachType.FOREACH_DELIVERY_UPGRADES:
-					nKGLHEGIKKP.GetInventory().GetDeliveredUpgrades().Clear();
+					roster.GetInventory().GetDeliveredUpgrades().Clear();
 					break;
 				case ForeachType.FOREACH_DELIVERY_ENCHANTMENTS:
-					nKGLHEGIKKP.GetInventory().DeliveredRecipes.Clear();
+					roster.GetInventory().DeliveredRecipes.Clear();
 					break;
 				}
 			}
@@ -137,8 +137,8 @@ public class QuestActionForeach : QuestAction
 
 	private void OnQuestComplete(object data)
 	{
-		QuestStage mLLKDGBEGJI = (QuestStage)data;
-		mLLKDGBEGJI.RemoveEventListener(1, OnQuestComplete);
+		QuestStage stage = (QuestStage)data;
+		stage.RemoveEventListener(1, OnQuestComplete);
 		continueLoop = true;
 		if (!isLooping)
 		{
@@ -155,15 +155,15 @@ public class QuestActionForeach : QuestAction
 		}
 	}
 
-	private void RunDeliveryItems(bool EIOPLHKAEPK)
+	private void RunDeliveryItems(bool useUpgrades)
 	{
-		Roster nKGLHEGIKKP = ListSF.GetRoster();
-		List<UserItem> list = ((!EIOPLHKAEPK) ? nKGLHEGIKKP.GetInventory().GetDeliveredItems() : nKGLHEGIKKP.GetInventory().GetDeliveredUpgrades());
+		Roster roster = ListSF.GetRoster();
+		List<UserItem> list = ((!useUpgrades) ? roster.GetInventory().GetDeliveredItems() : roster.GetInventory().GetDeliveredUpgrades());
 		foreach (UserItem item in list)
 		{
 			nodes.Add(item.get_Name());
 		}
-		nKGLHEGIKKP.GetInventory().ItemDelivered.AddListener(OnDeliveryItemAdded);
+		roster.GetInventory().ItemDelivered.AddListener(OnDeliveryItemAdded);
 	}
 
 	private void CollectPaidItems()
@@ -181,13 +181,13 @@ public class QuestActionForeach : QuestAction
 
 	private void CollectDeliveryEnchantments()
 	{
-		Roster nKGLHEGIKKP = ListSF.GetRoster();
-		List<RecipeItemInfo> lFADKPKKFMP = nKGLHEGIKKP.GetInventory().DeliveredRecipes;
-		foreach (RecipeItemInfo item in lFADKPKKFMP)
+		Roster roster = ListSF.GetRoster();
+		List<RecipeItemInfo> deliveredRecipes = roster.GetInventory().DeliveredRecipes;
+		foreach (RecipeItemInfo item in deliveredRecipes)
 		{
 			nodes.Add(item.ToString());
 		}
-		nKGLHEGIKKP.AddEventListener(1, OnDeliveryEnchantmentAdded);
+		roster.AddEventListener(1, OnDeliveryEnchantmentAdded);
 	}
 
 	private void CollectBattles()
@@ -203,10 +203,10 @@ public class QuestActionForeach : QuestAction
 	{
 		if (data != null)
 		{
-			UserItem dKCHDHMLKHN = (UserItem)data;
-			if ((foreachType == ForeachType.FOREACH_DELIVERY_ITEMS && !dKCHDHMLKHN.GetIsUpgrade()) || (foreachType == ForeachType.FOREACH_DELIVERY_UPGRADES && dKCHDHMLKHN.GetIsUpgrade()))
+			UserItem userItem = (UserItem)data;
+			if ((foreachType == ForeachType.FOREACH_DELIVERY_ITEMS && !userItem.GetIsUpgrade()) || (foreachType == ForeachType.FOREACH_DELIVERY_UPGRADES && userItem.GetIsUpgrade()))
 			{
-				nodes.Add(dKCHDHMLKHN.get_Name());
+				nodes.Add(userItem.get_Name());
 			}
 			nodeCount = nodes.Count;
 		}
@@ -216,10 +216,10 @@ public class QuestActionForeach : QuestAction
 	{
 		if (data != null)
 		{
-			RecipeItemInfo bNJOCBKNPMG = (RecipeItemInfo)data;
+			RecipeItemInfo recipeItem = (RecipeItemInfo)data;
 			if (foreachType == ForeachType.FOREACH_DELIVERY_ENCHANTMENTS)
 			{
-				nodes.Add(bNJOCBKNPMG.ToString());
+				nodes.Add(recipeItem.ToString());
 				nodeCount = nodes.Count;
 			}
 		}

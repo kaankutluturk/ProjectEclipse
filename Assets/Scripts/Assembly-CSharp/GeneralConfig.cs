@@ -131,47 +131,47 @@ public class GeneralConfig
 		return _Instance;
 	}
 
-	public void LoadConfig(string path, Action<bool> callback, Action<object> IPDNNACNOEN, List<DownloadPack> DEJEBFLAOIB, int HCCLKJOCHGP, int INGCPFFHBOG)
+	public void LoadConfig(string path, Action<bool> callback, Action<object> onProgress, List<DownloadPack> packList, int timeoutSeconds, int reserved)
 	{
 		_Callback = callback;
-		progressCallback = IPDNNACNOEN;
-		pendingItems = DEJEBFLAOIB;
-		downloadTimeout = HCCLKJOCHGP;
-		reservedParam = INGCPFFHBOG;
+		progressCallback = onProgress;
+		pendingItems = packList;
+		downloadTimeout = timeoutSeconds;
+		reservedParam = reserved;
 		if (string.IsNullOrEmpty(path))
 		{
 			InvokeCallback();
 			return;
 		}
 		string arg = NekkiMath.randomInt(1000000).ToString();
-		string mGPGDPOOCBK = string.Format("{0}?{1}", path, arg);
-		ServerProvider.get_Instance().DownloadFile(mGPGDPOOCBK, OnLoadConfig, null, downloadTimeout);
+		string requestUrl = string.Format("{0}?{1}", path, arg);
+		ServerProvider.get_Instance().DownloadFile(requestUrl, OnLoadConfig, null, downloadTimeout);
 	}
 
-	private void OnLoadConfig(byte[] data, string JDONBAPIJCG, string BEPKJNKCKPH)
+	private void OnLoadConfig(byte[] data, string error, string sourceUrl)
 	{
-		if (string.IsNullOrEmpty(JDONBAPIJCG) && data != null)
+		if (string.IsNullOrEmpty(error) && data != null)
 		{
 			File.WriteAllBytes(SF2Paths.GetWritableGameDataPath() + "/config_cdn.xml", data);
 		}
 		else
 		{
-			if (JDONBAPIJCG == "offline build")
+			if (error == "offline build")
 			{
 				UnityEngine.Debug.LogWarning("[Config] Offline build; using the recovered local config.");
 			}
 			else
 			{
-				GameLog.Error("[Config]: failed to download config because " + JDONBAPIJCG);
+				GameLog.Error("[Config]: failed to download config because " + error);
 			}
 		}
 		Parse(true);
 	}
 
-	private bool Parse(bool EJGPPDALIOJ)
+	private bool Parse(bool loadFromFile)
 	{
 		bool flag = true;
-		if (EJGPPDALIOJ)
+		if (loadFromFile)
 		{
 			configDocument = XmlUtils.OpenXMLDocument(SF2Paths.GetWritableGameDataPath(), "/config_cdn.xml", XmlUtils.XmlSourceMode.ForcedExternal);
 			if (configDocument == null)
@@ -229,51 +229,51 @@ public class GeneralConfig
 		InvokeCallback();
 	}
 
-	private void ParsePlatform(XmlNode GLCBJNIIPDG)
+	private void ParsePlatform(XmlNode node)
 	{
 		platformName = "unknown";
-		foreach (XmlNode childNode in GLCBJNIIPDG.ChildNodes)
+		foreach (XmlNode childNode in node.ChildNodes)
 		{
-			int bAINMLLIKOL = childNode.Attributes["PlatformID"].ParseInt();
-			if (CheckPlatform(bAINMLLIKOL))
+			int platformId = childNode.Attributes["PlatformID"].ParseInt();
+			if (CheckPlatform(platformId))
 			{
 				platformName = childNode.Attributes["Name"].GetStringOrDefault(platformName);
 			}
 		}
 	}
 
-	private void ParseVersions(XmlNode BPDFMKIGEKF)
+	private void ParseVersions(XmlNode node)
 	{
-		bool oDHPOJMNFIN = false;
-		VersionContainer aAOIAEJJINO = SystemProperties.GetVersion();
-		foreach (XmlNode childNode in BPDFMKIGEKF.ChildNodes)
+		bool versionSupported = false;
+		VersionContainer currentVersion = SystemProperties.GetVersion();
+		foreach (XmlNode childNode in node.ChildNodes)
 		{
-			int bAINMLLIKOL = childNode.Attributes["PlatformID"].ParseInt();
-			if (CheckPlatform(bAINMLLIKOL))
+			int platformId = childNode.Attributes["PlatformID"].ParseInt();
+			if (CheckPlatform(platformId))
 			{
-				VersionContainer pAMHFPMEPCH = new VersionContainer();
-				pAMHFPMEPCH.SetVersion(childNode.Attributes["Version"].GetStringOrDefault());
-				if (VersionContainer.IsGreater(pAMHFPMEPCH, aAOIAEJJINO))
+				VersionContainer configVersion = new VersionContainer();
+				configVersion.SetVersion(childNode.Attributes["Version"].GetStringOrDefault());
+				if (VersionContainer.IsGreater(configVersion, currentVersion))
 				{
-					oDHPOJMNFIN = true;
+					versionSupported = true;
 					break;
 				}
 			}
 		}
-		isVersionSupported = oDHPOJMNFIN;
+		isVersionSupported = versionSupported;
 	}
 
 	private void ParseSettings(XmlNode node)
 	{
-		XmlNode aIDFCDDECJB = node["time"];
+		XmlNode urlNode = node["time"];
 		XmlNode aIDFCDDECJB2 = node["dumps"];
 		XmlNode aIDFCDDECJB3 = node["server"];
-		KeyValuePair<string, string> hFCAPMDHLJN = ParseUrlPair(aIDFCDDECJB);
+		KeyValuePair<string, string> urlPair = ParseUrlPair(urlNode);
 		KeyValuePair<string, string> hFCAPMDHLJN2 = ParseUrlPair(aIDFCDDECJB2);
 		KeyValuePair<string, string> hFCAPMDHLJN3 = ParseUrlPair(aIDFCDDECJB3);
-		if (!IsEmptyPair(hFCAPMDHLJN))
+		if (!IsEmptyPair(urlPair))
 		{
-			ServerProvider.set_TimeServerURL(hFCAPMDHLJN.Value);
+			ServerProvider.set_TimeServerURL(urlPair.Value);
 		}
 		if (!IsEmptyPair(hFCAPMDHLJN2))
 		{
@@ -285,8 +285,8 @@ public class GeneralConfig
 			ServerProvider.set_PutURL(hFCAPMDHLJN3.Key);
 			ServerProvider.set_GetURL(hFCAPMDHLJN3.Value);
 		}
-		XmlNode hKPPBKPJOEO = node["verification"];
-		ParseVerification(hKPPBKPJOEO);
+		XmlNode verificationNode = node["verification"];
+		ParseVerification(verificationNode);
 		XmlNode hKPPBKPJOEO2 = node["ledger"];
 		ParseLedger(hKPPBKPJOEO2);
 	}
@@ -321,10 +321,10 @@ public class GeneralConfig
 		}
 	}
 
-	private void ParsePackGroup(XmlNode MEEAKLDGLDF)
+	private void ParsePackGroup(XmlNode node)
 	{
 		Dictionary<string, List<XmlNode>> dictionary = new Dictionary<string, List<XmlNode>>();
-		foreach (XmlNode childNode in MEEAKLDGLDF.ChildNodes)
+		foreach (XmlNode childNode in node.ChildNodes)
 		{
 			string key = childNode.Attributes["Name"].GetStringOrDefault(string.Empty);
 			if (!dictionary.ContainsKey(key))
@@ -341,51 +341,51 @@ public class GeneralConfig
 			XmlNode xmlNode2 = xmlDocument.CreateNode(XmlNodeType.Element, "TmpNode", null);
 			foreach (XmlNode item2 in value)
 			{
-				int bAINMLLIKOL = item2.Attributes["PlatformID"].ParseInt();
-				if (CheckPlatform(bAINMLLIKOL))
+				int platformId = item2.Attributes["PlatformID"].ParseInt();
+				if (CheckPlatform(platformId))
 				{
 					xmlNode2.AppendImportedClone(item2);
 				}
 			}
 			XmlNode xmlNode3 = ClosestVersion(xmlNode2);
 			string text = ((xmlNode3 == null) ? null : xmlNode3.Attributes["Url"].GetStringOrDefault());
-			string pEEOEOMEBFG = ((xmlNode3 == null) ? null : xmlNode3.Attributes["Size"].GetStringOrDefault());
-			bool lCDCAKLKHMI = xmlNode3 != null && xmlNode3.Attributes["Reload"].ParseBool();
-			string hDPBNCNCMOH = ((xmlNode3 == null) ? null : xmlNode3.Attributes["Hash"].GetStringOrDefault());
-			bool aHDLCJFCJMJ = xmlNode3 != null && xmlNode3.Attributes["Attach"].ParseBool();
+			string size = ((xmlNode3 == null) ? null : xmlNode3.Attributes["Size"].GetStringOrDefault());
+			bool reload = xmlNode3 != null && xmlNode3.Attributes["Reload"].ParseBool();
+			string hash = ((xmlNode3 == null) ? null : xmlNode3.Attributes["Hash"].GetStringOrDefault());
+			bool attach = xmlNode3 != null && xmlNode3.Attributes["Attach"].ParseBool();
 			if (!string.IsNullOrEmpty(text))
 			{
-				DownloadPacks.AddPack(key2, text, pEEOEOMEBFG, lCDCAKLKHMI, hDPBNCNCMOH, aHDLCJFCJMJ);
+				DownloadPacks.AddPack(key2, text, size, reload, hash, attach);
 			}
 		}
 	}
 
-	private XmlNode ClosestVersion(XmlNode nodes, bool DFOOHEFGEBG = false, bool MGMDADDKPMP = false)
+	private XmlNode ClosestVersion(XmlNode nodes, bool exactMatch = false, bool checkPlatform = false)
 	{
 		XmlNode result = null;
-		VersionContainer aAOIAEJJINO = new VersionContainer();
-		VersionContainer pAMHFPMEPCH = SystemProperties.GetVersion();
+		VersionContainer bestVersion = new VersionContainer();
+		VersionContainer currentVersion = SystemProperties.GetVersion();
 		foreach (XmlNode childNode in nodes.ChildNodes)
 		{
-			if (MGMDADDKPMP)
+			if (checkPlatform)
 			{
-				int bAINMLLIKOL = childNode.Attributes["PlatformID"].ParseInt();
-				if (!CheckPlatform(bAINMLLIKOL))
+				int platformId = childNode.Attributes["PlatformID"].ParseInt();
+				if (!CheckPlatform(platformId))
 				{
 					continue;
 				}
 			}
 			VersionContainer pAMHFPMEPCH2 = new VersionContainer();
 			pAMHFPMEPCH2.SetVersion(childNode.Attributes["MinVersion"].GetStringOrDefault());
-			if (!DFOOHEFGEBG)
+			if (!exactMatch)
 			{
-				if (VersionContainer.IsGreaterOrEqual(pAMHFPMEPCH2, aAOIAEJJINO) && VersionContainer.IsLessOrEqual(pAMHFPMEPCH2, pAMHFPMEPCH))
+				if (VersionContainer.IsGreaterOrEqual(pAMHFPMEPCH2, bestVersion) && VersionContainer.IsLessOrEqual(pAMHFPMEPCH2, currentVersion))
 				{
-					aAOIAEJJINO = pAMHFPMEPCH2;
+					bestVersion = pAMHFPMEPCH2;
 					result = childNode;
 				}
 			}
-			else if (VersionContainer.IsEqual(pAMHFPMEPCH, pAMHFPMEPCH2))
+			else if (VersionContainer.IsEqual(currentVersion, pAMHFPMEPCH2))
 			{
 				result = childNode;
 				break;
@@ -401,24 +401,24 @@ public class GeneralConfig
 		}
 	}
 
-	private bool ParseNewsForLocale(XmlNode MEEAKLDGLDF, string EADIFEPJKJK)
+	private bool ParseNewsForLocale(XmlNode node, string locale)
 	{
 		bool result = false;
-		VersionContainer lHBNIMGFKIB = SystemProperties.GetVersion();
-		foreach (XmlNode childNode in MEEAKLDGLDF.ChildNodes)
+		VersionContainer currentVersion = SystemProperties.GetVersion();
+		foreach (XmlNode childNode in node.ChildNodes)
 		{
 			if (childNode.Name != "item")
 			{
 				continue;
 			}
-			int bAINMLLIKOL = childNode.Attributes["PlatformID"].ParseInt();
-			if (!CheckPlatform(bAINMLLIKOL) || !IsOkLocale(childNode.Attributes["LangID"].GetStringOrDefault(), EADIFEPJKJK))
+			int platformId = childNode.Attributes["PlatformID"].ParseInt();
+			if (!CheckPlatform(platformId) || !IsOkLocale(childNode.Attributes["LangID"].GetStringOrDefault(), locale))
 			{
 				continue;
 			}
-			VersionContainer pAMHFPMEPCH = new VersionContainer();
-			pAMHFPMEPCH.SetVersion(childNode.Attributes["MinVersion"].GetStringOrDefault());
-			if (VersionContainer.IsLess(lHBNIMGFKIB, pAMHFPMEPCH))
+			VersionContainer minVersion = new VersionContainer();
+			minVersion.SetVersion(childNode.Attributes["MinVersion"].GetStringOrDefault());
+			if (VersionContainer.IsLess(currentVersion, minVersion))
 			{
 				continue;
 			}
@@ -430,17 +430,17 @@ public class GeneralConfig
 				num2 += SystemProperties.GetUtcOffsetSeconds();
 				if (num2 <= 0 || num2 >= GlobalTimer.get_LocalTimeUTC())
 				{
-					string pEMOECLNECD = childNode.Attributes["Title"].GetStringOrDefault(string.Empty);
-					string gOHIIMFFFJI = childNode.Attributes["Name"].GetStringOrDefault(string.Empty);
-					string bEPKJNKCKPH = childNode.Attributes["Url"].GetStringOrDefault(string.Empty);
-					string mDDOAGNHAHE = childNode.Attributes["ImageURL"].GetStringOrDefault(string.Empty);
-					int oKNNNLIPODI = childNode.Attributes["ID"].ParseInt();
-					bool eIKKPDKMMHK = childNode.Attributes["GoShop"].ParseBool();
-					string kINPMPFPFHD = childNode.Attributes["RedirectShop"].GetStringOrDefault(string.Empty);
-					string eJENJNPEDOH = childNode.Attributes["SpenderTypeID"].GetStringOrDefault(string.Empty);
-					bool hNJDHGDLLPD = childNode.Attributes["Active"].ParseBool();
-					List<NewsButton> hJNAHNICGMH = ParseNewsButtons(childNode);
-					CurrentNews.AddOrReplaceItem(gOHIIMFFFJI, bEPKJNKCKPH, mDDOAGNHAHE, oKNNNLIPODI, hNJDHGDLLPD, num2, hJNAHNICGMH, pEMOECLNECD, eIKKPDKMMHK, kINPMPFPFHD, eJENJNPEDOH);
+					string title = childNode.Attributes["Title"].GetStringOrDefault(string.Empty);
+					string name = childNode.Attributes["Name"].GetStringOrDefault(string.Empty);
+					string url = childNode.Attributes["Url"].GetStringOrDefault(string.Empty);
+					string imageUrl = childNode.Attributes["ImageURL"].GetStringOrDefault(string.Empty);
+					int id = childNode.Attributes["ID"].ParseInt();
+					bool goShop = childNode.Attributes["GoShop"].ParseBool();
+					string redirectShop = childNode.Attributes["RedirectShop"].GetStringOrDefault(string.Empty);
+					string spenderTypeId = childNode.Attributes["SpenderTypeID"].GetStringOrDefault(string.Empty);
+					bool isActive = childNode.Attributes["Active"].ParseBool();
+					List<NewsButton> buttons = ParseNewsButtons(childNode);
+					CurrentNews.AddOrReplaceItem(name, url, imageUrl, id, isActive, num2, buttons, title, goShop, redirectShop, spenderTypeId);
 					result = true;
 				}
 			}
@@ -448,36 +448,36 @@ public class GeneralConfig
 		return result;
 	}
 
-	private List<NewsButton> ParseNewsButtons(XmlNode MEEAKLDGLDF)
+	private List<NewsButton> ParseNewsButtons(XmlNode node)
 	{
 		List<NewsButton> list = new List<NewsButton>();
-		foreach (XmlNode item in MEEAKLDGLDF)
+		foreach (XmlNode item in node)
 		{
-			NewsButton fBKMFDJBJIB = new NewsButton();
-			fBKMFDJBJIB.LabelAliasName = item.Attributes["Text"].GetStringOrDefault(string.Empty);
-			fBKMFDJBJIB.Color = LabelButton.GetBtnColor(item.Attributes["Color"].GetStringOrDefault(string.Empty));
-			fBKMFDJBJIB.Url = item.Attributes["Url"].GetStringOrDefault(string.Empty);
-			fBKMFDJBJIB.GoShop = item.Attributes["GoShop"].ParseBool();
-			fBKMFDJBJIB.BuyItem = item.Attributes["BuyItem"].ParseBool();
-			fBKMFDJBJIB.RedirectShop = item.Attributes["RedirectShop"].GetStringOrDefault(string.Empty);
-			list.Add(fBKMFDJBJIB);
+			NewsButton button = new NewsButton();
+			button.LabelAliasName = item.Attributes["Text"].GetStringOrDefault(string.Empty);
+			button.Color = LabelButton.GetBtnColor(item.Attributes["Color"].GetStringOrDefault(string.Empty));
+			button.Url = item.Attributes["Url"].GetStringOrDefault(string.Empty);
+			button.GoShop = item.Attributes["GoShop"].ParseBool();
+			button.BuyItem = item.Attributes["BuyItem"].ParseBool();
+			button.RedirectShop = item.Attributes["RedirectShop"].GetStringOrDefault(string.Empty);
+			list.Add(button);
 		}
 		return list;
 	}
 
-	private bool IsEmptyPair(KeyValuePair<string, string> HFCAPMDHLJN)
+	private bool IsEmptyPair(KeyValuePair<string, string> pair)
 	{
-		return string.IsNullOrEmpty(HFCAPMDHLJN.Key) && string.IsNullOrEmpty(HFCAPMDHLJN.Value);
+		return string.IsNullOrEmpty(pair.Key) && string.IsNullOrEmpty(pair.Value);
 	}
 
-	private KeyValuePair<string, string> ParseUrlPair(XmlNode AIDFCDDECJB)
+	private KeyValuePair<string, string> ParseUrlPair(XmlNode node)
 	{
 		string key = null;
 		string value = null;
-		foreach (XmlNode childNode in AIDFCDDECJB.ChildNodes)
+		foreach (XmlNode childNode in node.ChildNodes)
 		{
-			int bAINMLLIKOL = childNode.Attributes["PlatformID"].ParseInt();
-			if (CheckPlatform(bAINMLLIKOL))
+			int platformId = childNode.Attributes["PlatformID"].ParseInt();
+			if (CheckPlatform(platformId))
 			{
 				key = childNode.Attributes["PutUrl"].GetStringOrDefault(string.Empty);
 				value = childNode.Attributes["GetUrl"].GetStringOrDefault(string.Empty);
@@ -496,7 +496,7 @@ public class GeneralConfig
 		}
 	}
 
-	private void ParsePricesForLocale(XmlNode node, string EADIFEPJKJK)
+	private void ParsePricesForLocale(XmlNode node, string locale)
 	{
 		foreach (XmlNode childNode in node.ChildNodes)
 		{
@@ -504,75 +504,75 @@ public class GeneralConfig
 			{
 				continue;
 			}
-			PricesData bEOLBLGJCKA = ParsePriceNode(childNode);
-			if (!string.IsNullOrEmpty(bEOLBLGJCKA.Locale) && !IsOkLocale(bEOLBLGJCKA.Locale, EADIFEPJKJK))
+			PricesData priceData = ParsePriceNode(childNode);
+			if (!string.IsNullOrEmpty(priceData.Locale) && !IsOkLocale(priceData.Locale, locale))
 			{
 				continue;
 			}
-			PricesData bEOLBLGJCKA2 = Prices.FindByProductId(bEOLBLGJCKA.ProductId);
+			PricesData bEOLBLGJCKA2 = Prices.FindByProductId(priceData.ProductId);
 			if (bEOLBLGJCKA2 == null)
 			{
-				Prices.GetPrices().Add(bEOLBLGJCKA);
+				Prices.GetPrices().Add(priceData);
 				continue;
 			}
-			bool flag = bEOLBLGJCKA.GroupId == bEOLBLGJCKA2.GroupId;
-			bool flag2 = bEOLBLGJCKA.SpenderTypeId == bEOLBLGJCKA2.SpenderTypeId || string.IsNullOrEmpty(bEOLBLGJCKA2.SpenderTypeId);
+			bool flag = priceData.GroupId == bEOLBLGJCKA2.GroupId;
+			bool flag2 = priceData.SpenderTypeId == bEOLBLGJCKA2.SpenderTypeId || string.IsNullOrEmpty(bEOLBLGJCKA2.SpenderTypeId);
 			if (flag && flag2)
 			{
 				if (string.IsNullOrEmpty(bEOLBLGJCKA2.Locale))
 				{
 					Prices.GetPrices().Remove(bEOLBLGJCKA2);
-					Prices.GetPrices().Add(bEOLBLGJCKA);
+					Prices.GetPrices().Add(priceData);
 				}
 			}
 			else
 			{
-				Prices.GetPrices().Add(bEOLBLGJCKA);
+				Prices.GetPrices().Add(priceData);
 			}
 		}
 	}
 
 	private PricesData ParsePriceNode(XmlNode node)
 	{
-		PricesData bEOLBLGJCKA = new PricesData();
-		bEOLBLGJCKA.ProductId = node.Attributes["ProductID"].GetStringOrDefault();
-		bEOLBLGJCKA.NewProductId = node.Attributes["NewProductID"].GetStringOrDefault();
-		bEOLBLGJCKA.Amount = node.Attributes["Amount"].ParseLong(0L);
-		bEOLBLGJCKA.NewAmount = node.Attributes["NewAmount"].ParseLong(0L);
-		bEOLBLGJCKA.AddAmount = node.Attributes["AddAmount"].ParseLong(0L);
-		bEOLBLGJCKA.NewAddAmount = node.Attributes["NewAddAmount"].ParseLong(0L);
-		bEOLBLGJCKA.Price = node.Attributes["Price"].GetStringOrDefault();
-		bEOLBLGJCKA.NewPrice = node.Attributes["NewPrice"].GetStringOrDefault();
-		bEOLBLGJCKA.Currency = node.Attributes["Currency"].ParseInt();
-		bEOLBLGJCKA.AddCurrency = node.Attributes["AddCurrency"].GetStringOrDefault();
-		bEOLBLGJCKA.name = node.Attributes["Name"].GetStringOrDefault();
-		bEOLBLGJCKA.StartDate = node.Attributes["StartDate"].ParseInt();
-		bEOLBLGJCKA.EndDate = node.Attributes["EndDate"].ParseInt();
-		bEOLBLGJCKA.Sign = node.Attributes["Sign"].GetStringOrDefault();
-		bEOLBLGJCKA.SignCode = node.Attributes["SignCode"].GetStringOrDefault("USD");
-		bEOLBLGJCKA.Label = node.Attributes["Label"].GetStringOrDefault(string.Empty);
-		bEOLBLGJCKA.GroupId = node.Attributes["GroupID"].GetStringOrDefault(string.Empty);
-		bEOLBLGJCKA.AddPercent = node.Attributes["AddPercent"].ParseInt();
-		bEOLBLGJCKA.Locale = node.Attributes["Locale"].GetStringOrDefault(string.Empty);
-		bEOLBLGJCKA.Focus = node.Attributes["Focus"].ParseBool();
-		bEOLBLGJCKA.MobileOperator = node.Attributes["MobileOperator"].GetStringOrDefault(string.Empty);
-		bEOLBLGJCKA.SpenderTypeId = node.Attributes["SpenderTypeID"].GetStringOrDefault(string.Empty);
-		PricesData bEOLBLGJCKA2 = bEOLBLGJCKA;
+		PricesData priceData = new PricesData();
+		priceData.ProductId = node.Attributes["ProductID"].GetStringOrDefault();
+		priceData.NewProductId = node.Attributes["NewProductID"].GetStringOrDefault();
+		priceData.Amount = node.Attributes["Amount"].ParseLong(0L);
+		priceData.NewAmount = node.Attributes["NewAmount"].ParseLong(0L);
+		priceData.AddAmount = node.Attributes["AddAmount"].ParseLong(0L);
+		priceData.NewAddAmount = node.Attributes["NewAddAmount"].ParseLong(0L);
+		priceData.Price = node.Attributes["Price"].GetStringOrDefault();
+		priceData.NewPrice = node.Attributes["NewPrice"].GetStringOrDefault();
+		priceData.Currency = node.Attributes["Currency"].ParseInt();
+		priceData.AddCurrency = node.Attributes["AddCurrency"].GetStringOrDefault();
+		priceData.name = node.Attributes["Name"].GetStringOrDefault();
+		priceData.StartDate = node.Attributes["StartDate"].ParseInt();
+		priceData.EndDate = node.Attributes["EndDate"].ParseInt();
+		priceData.Sign = node.Attributes["Sign"].GetStringOrDefault();
+		priceData.SignCode = node.Attributes["SignCode"].GetStringOrDefault("USD");
+		priceData.Label = node.Attributes["Label"].GetStringOrDefault(string.Empty);
+		priceData.GroupId = node.Attributes["GroupID"].GetStringOrDefault(string.Empty);
+		priceData.AddPercent = node.Attributes["AddPercent"].ParseInt();
+		priceData.Locale = node.Attributes["Locale"].GetStringOrDefault(string.Empty);
+		priceData.Focus = node.Attributes["Focus"].ParseBool();
+		priceData.MobileOperator = node.Attributes["MobileOperator"].GetStringOrDefault(string.Empty);
+		priceData.SpenderTypeId = node.Attributes["SpenderTypeID"].GetStringOrDefault(string.Empty);
+		PricesData bEOLBLGJCKA2 = priceData;
 		bEOLBLGJCKA2.IsConsumable = node.Attributes["ProductType"].ParseInt(1) != 2;
 		return bEOLBLGJCKA2;
 	}
 
-	private bool IsOkLocale(string EOMNCDDELLB, string CNGMIFIJKDB)
+	private bool IsOkLocale(string localeList, string locale)
 	{
-		if (string.IsNullOrEmpty(EOMNCDDELLB) && string.IsNullOrEmpty(CNGMIFIJKDB))
+		if (string.IsNullOrEmpty(localeList) && string.IsNullOrEmpty(locale))
 		{
 			return true;
 		}
-		string[] array = EOMNCDDELLB.Split('|');
+		string[] array = localeList.Split('|');
 		string[] array2 = array;
 		foreach (string text in array2)
 		{
-			if (text == CNGMIFIJKDB)
+			if (text == locale)
 			{
 				return true;
 			}

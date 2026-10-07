@@ -84,19 +84,19 @@ public class QuestActionDialog : QuestAction
 
 	private QuestParameters runParameters;
 
-	public override void Parse(XmlNode EPKLCPOEELO)
+	public override void Parse(XmlNode node)
 	{
-		base.Parse(EPKLCPOEELO);
-		title = EPKLCPOEELO.Attributes["Title"].GetStringOrDefault(string.Empty);
-		image += EPKLCPOEELO.Attributes["Image"].GetStringOrDefault(string.Empty);
-		itemIcon = EPKLCPOEELO.Attributes["ItemIcon"].GetStringOrDefault(string.Empty);
-		itemBefore = EPKLCPOEELO.Attributes["ItemBefore"].GetStringOrDefault(string.Empty);
-		itemAfter = EPKLCPOEELO.Attributes["ItemAfter"].GetStringOrDefault(string.Empty);
-		dialogType = EPKLCPOEELO.Attributes["Type"].GetStringOrDefault("Regular");
-		ignoreBack = EPKLCPOEELO.Attributes["IgnoreBack"].ParseBool();
-		isMirrored = EPKLCPOEELO.Attributes["Mirrored"].ParseBool();
-		readTime = EPKLCPOEELO.Attributes["ReadTime"].ParseFloat(BasicGUI.GetNotificationDefaultReadTime());
-		foreach (XmlNode childNode in EPKLCPOEELO.ChildNodes)
+		base.Parse(node);
+		title = node.Attributes["Title"].GetStringOrDefault(string.Empty);
+		image += node.Attributes["Image"].GetStringOrDefault(string.Empty);
+		itemIcon = node.Attributes["ItemIcon"].GetStringOrDefault(string.Empty);
+		itemBefore = node.Attributes["ItemBefore"].GetStringOrDefault(string.Empty);
+		itemAfter = node.Attributes["ItemAfter"].GetStringOrDefault(string.Empty);
+		dialogType = node.Attributes["Type"].GetStringOrDefault("Regular");
+		ignoreBack = node.Attributes["IgnoreBack"].ParseBool();
+		isMirrored = node.Attributes["Mirrored"].ParseBool();
+		readTime = node.Attributes["ReadTime"].ParseFloat(BasicGUI.GetNotificationDefaultReadTime());
+		foreach (XmlNode childNode in node.ChildNodes)
 		{
 			switch (childNode.Name)
 			{
@@ -121,39 +121,39 @@ public class QuestActionDialog : QuestAction
 		}
 	}
 
-	public override void Execute(QuestParameters JCICKLIMBEF)
+	public override void Execute(QuestParameters parameters)
 	{
 		ResetSequences();
-		base.Execute(JCICKLIMBEF);
-		runParameters = JCICKLIMBEF;
+		base.Execute(parameters);
+		runParameters = parameters;
 		isButtonHandled = false;
-		float lDHEHCLPMOK = GetFightDifficulty();
+		float difficulty = GetFightDifficulty();
 		Action<object> action = OnButtonPressed;
-		string pMDPPGNJAFE = ((leftButton == null) ? "dlgStoryNegative" : leftButton.Text);
+		string buttonText = ((leftButton == null) ? "dlgStoryNegative" : leftButton.Text);
 		string pMDPPGNJAFE2 = ((rightButton == null) ? "dlgStoryPositive" : rightButton.Text);
 		string pMDPPGNJAFE3 = ((middleButton == null) ? "dlgButtonFight" : middleButton.Text);
-		pMDPPGNJAFE = QuestTextResolver.ResolveText(pMDPPGNJAFE, JCICKLIMBEF);
-		pMDPPGNJAFE2 = QuestTextResolver.ResolveText(pMDPPGNJAFE2, JCICKLIMBEF);
-		pMDPPGNJAFE3 = QuestTextResolver.ResolveText(pMDPPGNJAFE3, JCICKLIMBEF);
-		LabelButton.ButtonColor fBMGEHJPPIK = ((leftButton == null || !(leftButton.Color != string.Empty)) ? LabelButton.GetBtnColor("Red") : LabelButton.GetBtnColor(leftButton.Color));
+		buttonText = QuestTextResolver.ResolveText(buttonText, parameters);
+		pMDPPGNJAFE2 = QuestTextResolver.ResolveText(pMDPPGNJAFE2, parameters);
+		pMDPPGNJAFE3 = QuestTextResolver.ResolveText(pMDPPGNJAFE3, parameters);
+		LabelButton.ButtonColor buttonColor = ((leftButton == null || !(leftButton.Color != string.Empty)) ? LabelButton.GetBtnColor("Red") : LabelButton.GetBtnColor(leftButton.Color));
 		LabelButton.ButtonColor fBMGEHJPPIK2 = ((rightButton == null || !(rightButton.Color != string.Empty)) ? LabelButton.GetBtnColor("Beige") : LabelButton.GetBtnColor(rightButton.Color));
-		LabelButton.ButtonColor nFDONPAIONH = ((middleButton == null || !(middleButton.Color != string.Empty)) ? LabelButton.GetBtnColor("Beige") : LabelButton.GetBtnColor(middleButton.Color));
+		LabelButton.ButtonColor middleButtonColor = ((middleButton == null || !(middleButton.Color != string.Empty)) ? LabelButton.GetBtnColor("Beige") : LabelButton.GetBtnColor(middleButton.Color));
 		string text = ((rightButton == null) ? string.Empty : pMDPPGNJAFE2);
-		string text2 = ((leftButton == null) ? string.Empty : pMDPPGNJAFE);
-		string bFNHNNFIBNM = ((middleButton == null) ? string.Empty : pMDPPGNJAFE3);
-		ConditionExtension.CompareResult lNIDLHOIHIM = new ConditionExtension.CompareResult();
-		QuestCondition kKDGLNECFHA = new QuestCondition();
-		kKDGLNECFHA.SetParameters(JCICKLIMBEF);
-		kKDGLNECFHA.SetValue(title, lNIDLHOIHIM);
-		string text3 = QuestTextResolver.ResolveText(lNIDLHOIHIM.resultSTR, JCICKLIMBEF);
-		kKDGLNECFHA.SetValue(image, lNIDLHOIHIM);
-		string iBBAMMHHBFE = lNIDLHOIHIM.resultSTR;
+		string text2 = ((leftButton == null) ? string.Empty : buttonText);
+		string middleButtonText = ((middleButton == null) ? string.Empty : pMDPPGNJAFE3);
+		ConditionExtension.CompareResult result = new ConditionExtension.CompareResult();
+		QuestCondition condition = new QuestCondition();
+		condition.SetParameters(parameters);
+		condition.SetValue(title, result);
+		string text3 = QuestTextResolver.ResolveText(result.resultSTR, parameters);
+		condition.SetValue(image, result);
+		string imageName = result.resultSTR;
 		string empty = string.Empty;
-		if (!iBBAMMHHBFE.Contains("/"))
+		if (!imageName.Contains("/"))
 		{
 		}
-		empty += iBBAMMHHBFE;
-		if (!iBBAMMHHBFE.Contains("."))
+		empty += imageName;
+		if (!imageName.Contains("."))
 		{
 			empty += ".png";
 		}
@@ -165,65 +165,65 @@ public class QuestActionDialog : QuestAction
 		List<StoryDialogContent> list = new List<StoryDialogContent>();
 		for (int i = 0; i < lines.Count; i++)
 		{
-			StoryDialogContent nJEPNCJLPPF = new StoryDialogContent(lines[i]);
-			if (nJEPNCJLPPF.ItemName != string.Empty)
+			StoryDialogContent lineContent = new StoryDialogContent(lines[i]);
+			if (lineContent.ItemName != string.Empty)
 			{
-				kKDGLNECFHA.SetValue(nJEPNCJLPPF.ItemName, lNIDLHOIHIM);
-				nJEPNCJLPPF.ItemName = lNIDLHOIHIM.resultSTR;
+				condition.SetValue(lineContent.ItemName, result);
+				lineContent.ItemName = result.resultSTR;
 			}
-			if (nJEPNCJLPPF.EnchantmentName != string.Empty)
+			if (lineContent.EnchantmentName != string.Empty)
 			{
-				kKDGLNECFHA.SetValue(nJEPNCJLPPF.EnchantmentName, lNIDLHOIHIM);
-				nJEPNCJLPPF.EnchantmentName = lNIDLHOIHIM.resultSTR;
+				condition.SetValue(lineContent.EnchantmentName, result);
+				lineContent.EnchantmentName = result.resultSTR;
 			}
-			kKDGLNECFHA.SetValue(nJEPNCJLPPF.Text, lNIDLHOIHIM);
-			nJEPNCJLPPF.Text = lNIDLHOIHIM.ToString();
-			nJEPNCJLPPF.Text = QuestTextResolver.ResolveText(nJEPNCJLPPF.Text, JCICKLIMBEF);
-			list.Add(nJEPNCJLPPF);
+			condition.SetValue(lineContent.Text, result);
+			lineContent.Text = result.ToString();
+			lineContent.Text = QuestTextResolver.ResolveText(lineContent.Text, parameters);
+			list.Add(lineContent);
 		}
 		if (dialogType == "Regular")
 		{
-			baseDialog = DialogsOpener.OpenStoryDialog(empty, text3, list, action, pMDPPGNJAFE, leftButton != null && rightButton != null, pMDPPGNJAFE2, fBMGEHJPPIK2, fBMGEHJPPIK);
+			baseDialog = DialogsOpener.OpenStoryDialog(empty, text3, list, action, buttonText, leftButton != null && rightButton != null, pMDPPGNJAFE2, fBMGEHJPPIK2, buttonColor);
 		}
 		else if (dialogType == "Stranger")
 		{
-			baseDialog = DialogsOpener.OpenStrangerDialog(empty, text3, list, lDHEHCLPMOK, action, text, text2, bFNHNNFIBNM, fBMGEHJPPIK2, fBMGEHJPPIK, nFDONPAIONH, true, false, false, false, string.Empty);
+			baseDialog = DialogsOpener.OpenStrangerDialog(empty, text3, list, difficulty, action, text, text2, middleButtonText, fBMGEHJPPIK2, buttonColor, middleButtonColor, true, false, false, false, string.Empty);
 		}
 		else if (dialogType == "NoAvatar")
 		{
-			string dOEEIGAHKEN = ((checkBox == null) ? string.Empty : checkBox.Text);
-			bool ePHHGNKDPEG = false;
+			string checkBoxText = ((checkBox == null) ? string.Empty : checkBox.Text);
+			bool isCheckBoxChecked = false;
 			if (checkBox != null)
 			{
 				ConditionExtension.CompareResult lNIDLHOIHIM2 = new ConditionExtension.CompareResult();
 				QuestCondition kKDGLNECFHA2 = new QuestCondition();
-				kKDGLNECFHA2.SetParameters(JCICKLIMBEF);
+				kKDGLNECFHA2.SetParameters(parameters);
 				kKDGLNECFHA2.SetValue(checkBox.InitialValue, lNIDLHOIHIM2);
-				ePHHGNKDPEG = lNIDLHOIHIM2.resultNumber == 1.0;
+				isCheckBoxChecked = lNIDLHOIHIM2.resultNumber == 1.0;
 			}
-			bool lMAFOFCILBL = checkBox != null;
+			bool hasCheckBox = checkBox != null;
 			StoryDialogContent nJEPNCJLPPF2 = list[0];
-			string hCPNFPMHFCM = ((list.Count <= 0) ? string.Empty : QuestTextResolver.ResolveText(nJEPNCJLPPF2.Text, JCICKLIMBEF));
-			baseDialog = DialogsOpener.OpenSimpleDialog(text3, hCPNFPMHFCM, text, text2, action, fBMGEHJPPIK2, fBMGEHJPPIK, lMAFOFCILBL, ePHHGNKDPEG, dOEEIGAHKEN);
+			string firstLineText = ((list.Count <= 0) ? string.Empty : QuestTextResolver.ResolveText(nJEPNCJLPPF2.Text, parameters));
+			baseDialog = DialogsOpener.OpenSimpleDialog(text3, firstLineText, text, text2, action, fBMGEHJPPIK2, buttonColor, hasCheckBox, isCheckBoxChecked, checkBoxText);
 		}
 		else if (dialogType == "ThreeButtons")
 		{
-			baseDialog = DialogsOpener.OpenStrangerDialog(empty, text3, list, 0f, action, text, text2, bFNHNNFIBNM, fBMGEHJPPIK2, fBMGEHJPPIK, nFDONPAIONH, false, false, false, false, string.Empty);
+			baseDialog = DialogsOpener.OpenStrangerDialog(empty, text3, list, 0f, action, text, text2, middleButtonText, fBMGEHJPPIK2, buttonColor, middleButtonColor, false, false, false, false, string.Empty);
 		}
 		else if (dialogType == "Multiline")
 		{
-			string iAHHOEJJJHP = ((checkBox == null) ? string.Empty : checkBox.Text);
-			bool cJJBDGPDOFF = false;
+			string multilineCheckBoxText = ((checkBox == null) ? string.Empty : checkBox.Text);
+			bool isMultilineChecked = false;
 			if (checkBox != null)
 			{
 				ConditionExtension.CompareResult lNIDLHOIHIM3 = new ConditionExtension.CompareResult();
 				QuestCondition kKDGLNECFHA3 = new QuestCondition();
-				kKDGLNECFHA3.SetParameters(JCICKLIMBEF);
+				kKDGLNECFHA3.SetParameters(parameters);
 				kKDGLNECFHA3.SetValue(checkBox.InitialValue, lNIDLHOIHIM3);
-				cJJBDGPDOFF = lNIDLHOIHIM3.resultNumber == 1.0;
+				isMultilineChecked = lNIDLHOIHIM3.resultNumber == 1.0;
 			}
-			bool nKPIIFBDEIB = checkBox != null;
-			baseDialog = DialogsOpener.OpenStrangerDialog(empty, text3, list, 0f, action, text, text2, bFNHNNFIBNM, fBMGEHJPPIK2, fBMGEHJPPIK, nFDONPAIONH, false, true, nKPIIFBDEIB, cJJBDGPDOFF, iAHHOEJJJHP);
+			bool hasMultilineCheckBox = checkBox != null;
+			baseDialog = DialogsOpener.OpenStrangerDialog(empty, text3, list, 0f, action, text, text2, middleButtonText, fBMGEHJPPIK2, buttonColor, middleButtonColor, false, true, hasMultilineCheckBox, isMultilineChecked, multilineCheckBoxText);
 		}
 		else if (dialogType == "Notification")
 		{
@@ -261,24 +261,24 @@ public class QuestActionDialog : QuestAction
 		ResetCheckBoxSequences();
 	}
 
-	private void ParseLine(XmlNode EPKLCPOEELO)
+	private void ParseLine(XmlNode node)
 	{
-		StoryDialogContent nJEPNCJLPPF = new StoryDialogContent(string.Empty, string.Empty, string.Empty, string.Empty);
-		nJEPNCJLPPF.Text = EPKLCPOEELO.Attributes["Text"].GetStringOrDefault(string.Empty);
-		nJEPNCJLPPF.ButtonText = EPKLCPOEELO.Attributes["ButtonText"].GetStringOrDefault(string.Empty);
-		nJEPNCJLPPF.FontName = EPKLCPOEELO.Attributes["FontName"].GetStringOrDefault(string.Empty);
-		nJEPNCJLPPF.ItemName = EPKLCPOEELO.Attributes["Item"].GetStringOrDefault(string.Empty);
-		nJEPNCJLPPF.EnchantmentName = EPKLCPOEELO.Attributes["Enchantment"].GetStringOrDefault(string.Empty);
-		string name = EPKLCPOEELO.Name;
+		StoryDialogContent lineContent = new StoryDialogContent(string.Empty, string.Empty, string.Empty, string.Empty);
+		lineContent.Text = node.Attributes["Text"].GetStringOrDefault(string.Empty);
+		lineContent.ButtonText = node.Attributes["ButtonText"].GetStringOrDefault(string.Empty);
+		lineContent.FontName = node.Attributes["FontName"].GetStringOrDefault(string.Empty);
+		lineContent.ItemName = node.Attributes["Item"].GetStringOrDefault(string.Empty);
+		lineContent.EnchantmentName = node.Attributes["Enchantment"].GetStringOrDefault(string.Empty);
+		string name = node.Name;
 		if (name == "PriceLine")
 		{
-			nJEPNCJLPPF.Type = StoryDialogContent.ContentType.CONTENT_TYPE_PRICELINE;
+			lineContent.Type = StoryDialogContent.ContentType.CONTENT_TYPE_PRICELINE;
 		}
 		else
 		{
-			nJEPNCJLPPF.Type = StoryDialogContent.ContentType.CONTENT_TYPE_REGULAR;
+			lineContent.Type = StoryDialogContent.ContentType.CONTENT_TYPE_REGULAR;
 		}
-		string text = EPKLCPOEELO.Attributes["TextColor"].GetStringOrDefault(string.Empty);
+		string text = node.Attributes["TextColor"].GetStringOrDefault(string.Empty);
 		text = text.Replace("0x", string.Empty);
 		text = text.Replace("#", string.Empty);
 		if (text.Length == 8)
@@ -287,66 +287,66 @@ public class QuestActionDialog : QuestAction
 			byte g = byte.Parse(text.Substring(2, 2), NumberStyles.HexNumber);
 			byte b = byte.Parse(text.Substring(4, 2), NumberStyles.HexNumber);
 			byte a = byte.Parse(text.Substring(6, 2), NumberStyles.HexNumber);
-			nJEPNCJLPPF.FontColor = new Color32(r, g, b, a);
+			lineContent.FontColor = new Color32(r, g, b, a);
 		}
-		foreach (XmlNode childNode in EPKLCPOEELO.ChildNodes)
+		foreach (XmlNode childNode in node.ChildNodes)
 		{
 			if (childNode.Name == "Timer")
 			{
-				nJEPNCJLPPF.ItemTimer = CreateTextTimer(childNode, nJEPNCJLPPF.FontName);
+				lineContent.ItemTimer = CreateTextTimer(childNode, lineContent.FontName);
 			}
 		}
-		if (nJEPNCJLPPF.ItemName != null || nJEPNCJLPPF.EnchantmentName != null)
+		if (lineContent.ItemName != null || lineContent.EnchantmentName != null)
 		{
-			LineActionBinding cLNIMHCJIAL = new LineActionBinding();
-			cLNIMHCJIAL.Actions.AddEventListener(1, OnActionComplete);
-			cLNIMHCJIAL.Id = timersID++;
-			nJEPNCJLPPF.Id = cLNIMHCJIAL.Id;
-			foreach (XmlNode childNode2 in EPKLCPOEELO.ChildNodes)
+			LineActionBinding lineBinding = new LineActionBinding();
+			lineBinding.Actions.AddEventListener(1, OnActionComplete);
+			lineBinding.Id = timersID++;
+			lineContent.Id = lineBinding.Id;
+			foreach (XmlNode childNode2 in node.ChildNodes)
 			{
-				QuestAction mBAAKHELFKL = QuestAction.GetClassActionByName(childNode2.Name);
-				mBAAKHELFKL.QuestName = QuestName;
-				mBAAKHELFKL.Parse(childNode2);
-				cLNIMHCJIAL.Actions.AddAction(mBAAKHELFKL);
+				QuestAction childAction = QuestAction.GetClassActionByName(childNode2.Name);
+				childAction.QuestName = QuestName;
+				childAction.Parse(childNode2);
+				lineBinding.Actions.AddAction(childAction);
 			}
-			lineActions.Add(cLNIMHCJIAL);
+			lineActions.Add(lineBinding);
 		}
-		lines.Add(nJEPNCJLPPF);
+		lines.Add(lineContent);
 	}
 
-	private void ParseButton(XmlNode EPKLCPOEELO)
+	private void ParseButton(XmlNode node)
 	{
-		string text = EPKLCPOEELO.Attributes["Type"].GetStringOrDefault(string.Empty);
-		string gGDJIPKMKFC = EPKLCPOEELO.Attributes["Text"].GetStringOrDefault(string.Empty);
-		string mDADHHOFCNG = EPKLCPOEELO.Attributes["Color"].GetStringOrDefault(string.Empty);
-		DialogButton fFIBFAFPEGF = null;
+		string text = node.Attributes["Type"].GetStringOrDefault(string.Empty);
+		string buttonText = node.Attributes["Text"].GetStringOrDefault(string.Empty);
+		string buttonColor = node.Attributes["Color"].GetStringOrDefault(string.Empty);
+		DialogButton button = null;
 		switch (text)
 		{
 		case "Left":
 			leftButton = new DialogButton();
 			leftButton.Type = DialogButtonType.BUTTON_TYPE_LEFT;
-			fFIBFAFPEGF = leftButton;
+			button = leftButton;
 			break;
 		case "Right":
 			rightButton = new DialogButton();
 			rightButton.Type = DialogButtonType.BUTTON_TYPE_RIGHT;
-			fFIBFAFPEGF = rightButton;
+			button = rightButton;
 			break;
 		case "Middle":
 			middleButton = new DialogButton();
 			middleButton.Type = DialogButtonType.BUTTON_TYPE_MIDDLE;
-			fFIBFAFPEGF = middleButton;
+			button = middleButton;
 			break;
 		default:
 			GameLog.Error("Strange typeName %s", text);
 			break;
 		}
-		if (fFIBFAFPEGF != null)
+		if (button != null)
 		{
-			fFIBFAFPEGF.Text = gGDJIPKMKFC;
-			fFIBFAFPEGF.Color = mDADHHOFCNG;
-			fFIBFAFPEGF.Actions.AddEventListener(1, OnActionComplete);
-			ParseActionSequence(EPKLCPOEELO, fFIBFAFPEGF.Actions);
+			button.Text = buttonText;
+			button.Color = buttonColor;
+			button.Actions.AddEventListener(1, OnActionComplete);
+			ParseActionSequence(node, button.Actions);
 		}
 		else
 		{
@@ -354,17 +354,17 @@ public class QuestActionDialog : QuestAction
 		}
 	}
 
-	private void ParseDifficultyOf(XmlNode EPKLCPOEELO)
+	private void ParseDifficultyOf(XmlNode node)
 	{
-		fightExpression = EPKLCPOEELO.Attributes["Fight"].GetStringOrDefault(string.Empty);
+		fightExpression = node.Attributes["Fight"].GetStringOrDefault(string.Empty);
 	}
 
-	private void ParseCheckBox(XmlNode EPKLCPOEELO)
+	private void ParseCheckBox(XmlNode node)
 	{
 		checkBox = new DialogCheckBox();
-		checkBox.InitialValue = EPKLCPOEELO.Attributes["InitialValue"].GetStringOrDefault(string.Empty);
-		checkBox.Text = EPKLCPOEELO.Attributes["Text"].GetStringOrDefault(string.Empty);
-		foreach (XmlNode childNode in EPKLCPOEELO.ChildNodes)
+		checkBox.InitialValue = node.Attributes["InitialValue"].GetStringOrDefault(string.Empty);
+		checkBox.Text = node.Attributes["Text"].GetStringOrDefault(string.Empty);
+		foreach (XmlNode childNode in node.ChildNodes)
 		{
 			string name = childNode.Name;
 			if (name == "On")
@@ -378,37 +378,37 @@ public class QuestActionDialog : QuestAction
 		}
 	}
 
-	private TextTimer CreateTextTimer(XmlNode node, string IFHPLGGBDPM)
+	private TextTimer CreateTextTimer(XmlNode node, string fontName)
 	{
 		string text = node.Attributes["Name"].GetStringOrDefault(string.Empty);
-		TextTimer dKPAACCMAPO = new TextTimer();
-		dKPAACCMAPO.Color = Constants.DialogHeaderColor;
+		TextTimer textTimer = new TextTimer();
+		textTimer.Color = Constants.DialogHeaderColor;
 		switch (text)
 		{
 		case "EnergyRefillTimer":
-			dKPAACCMAPO.Delegate = ListSF.GetInstance().UpdateEnergyRefillTimer;
+			textTimer.Delegate = ListSF.GetInstance().UpdateEnergyRefillTimer;
 			break;
 		case "DuelAccessibilityTimer":
-			dKPAACCMAPO.Delegate = ListSF.GetInstance().UpdateDuelAccessibilityTimer;
+			textTimer.Delegate = ListSF.GetInstance().UpdateDuelAccessibilityTimer;
 			break;
 		case "DeliveryTimer":
 		{
-			dKPAACCMAPO.Delegate = ListSF.GetInstance().UpdateDeliveryTimer;
-			string gOHIIMFFFJI = node.Attributes["Item"].GetStringOrDefault(string.Empty);
-			UserItem bAINMLLIKOL = ListSF.GetUserItem(gOHIIMFFFJI);
-			dKPAACCMAPO.set_Data(bAINMLLIKOL);
+			textTimer.Delegate = ListSF.GetInstance().UpdateDeliveryTimer;
+			string itemName = node.Attributes["Item"].GetStringOrDefault(string.Empty);
+			UserItem userItem = ListSF.GetUserItem(itemName);
+			textTimer.set_Data(userItem);
 			break;
 		}
 		case "StarterPackTimer":
-			dKPAACCMAPO.Delegate = ListSF.GetInstance().UpdateStartPackTimer;
+			textTimer.Delegate = ListSF.GetInstance().UpdateStartPackTimer;
 			break;
 		default:
-			dKPAACCMAPO.Delegate = ListSF.GetInstance().UpdateCustomRosterTimer;
-			dKPAACCMAPO.set_Data(text);
+			textTimer.Delegate = ListSF.GetInstance().UpdateCustomRosterTimer;
+			textTimer.set_Data(text);
 			break;
 		}
-		dKPAACCMAPO.set_Label(null);
-		return dKPAACCMAPO;
+		textTimer.set_Label(null);
+		return textTimer;
 	}
 
 	private void ResetCheckBoxSequences()
@@ -425,18 +425,18 @@ public class QuestActionDialog : QuestAction
 		float result = -1f;
 		if (fightExpression != string.Empty)
 		{
-			ConditionExtension.CompareResult lNIDLHOIHIM = new ConditionExtension.CompareResult();
-			QuestCondition kKDGLNECFHA = new QuestCondition();
-			kKDGLNECFHA.SetParameters(runParameters);
-			kKDGLNECFHA.SetValue(fightExpression, lNIDLHOIHIM);
-			FightIDS mOCEDDJOAEB = new FightIDS();
-			mOCEDDJOAEB.SetFightIDSByString(lNIDLHOIHIM.resultSTR);
-			FightList jDIPBIHBGPF = ListSF.GetFightById(mOCEDDJOAEB);
-			if (jDIPBIHBGPF != null)
+			ConditionExtension.CompareResult valueResult = new ConditionExtension.CompareResult();
+			QuestCondition condition = new QuestCondition();
+			condition.SetParameters(runParameters);
+			condition.SetValue(fightExpression, valueResult);
+			FightIDS fightIds = new FightIDS();
+			fightIds.SetFightIDSByString(valueResult.resultSTR);
+			FightList fight = ListSF.GetFightById(fightIds);
+			if (fight != null)
 			{
-				List<ModelParameters> list = GameUtils.CreateOpponentParameters(jDIPBIHBGPF.GetOpponents());
-				ModelParameters aCENLMONNPA = GameUtils.GetPlayerModelParameters();
-				result = jDIPBIHBGPF.CalculateDifficultyVsLastOpponent(aCENLMONNPA, list);
+				List<ModelParameters> list = GameUtils.CreateOpponentParameters(fight.GetOpponents());
+				ModelParameters playerParameters = GameUtils.GetPlayerModelParameters();
+				result = fight.CalculateDifficultyVsLastOpponent(playerParameters, list);
 				list.Clear();
 			}
 		}
@@ -488,10 +488,10 @@ public class QuestActionDialog : QuestAction
 			}
 			for (int i = 0; i < lineActions.Count; i++)
 			{
-				LineActionBinding cLNIMHCJIAL = lineActions[i];
-				if (cLNIMHCJIAL.Id == num)
+				LineActionBinding lineBinding = lineActions[i];
+				if (lineBinding.Id == num)
 				{
-					cLNIMHCJIAL.Actions.Run(runParameters);
+					lineBinding.Actions.Run(runParameters);
 					break;
 				}
 			}
@@ -503,15 +503,15 @@ public class QuestActionDialog : QuestAction
 		FinishAction();
 	}
 
-	protected virtual void ParseActionSequence(XmlNode EPKLCPOEELO, QuestActionsSequence AFENHJFICNN)
+	protected virtual void ParseActionSequence(XmlNode node, QuestActionsSequence sequence)
 	{
-		foreach (XmlNode childNode in EPKLCPOEELO.ChildNodes)
+		foreach (XmlNode childNode in node.ChildNodes)
 		{
 			string name = childNode.Name;
-			QuestAction mBAAKHELFKL = QuestAction.GetClassActionByName(name);
-			mBAAKHELFKL.QuestName = QuestName;
-			mBAAKHELFKL.Parse(childNode);
-			AFENHJFICNN.AddAction(mBAAKHELFKL);
+			QuestAction childAction = QuestAction.GetClassActionByName(name);
+			childAction.QuestName = QuestName;
+			childAction.Parse(childNode);
+			sequence.AddAction(childAction);
 		}
 	}
 }

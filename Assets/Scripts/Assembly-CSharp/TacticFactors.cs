@@ -28,33 +28,33 @@ public class TacticFactors
 
 	public ModelStatistics Statistics;
 
-	public TacticFactors(ModelStatistics PNEPMGPIEIH, int IIAALGOFJJJ, int CPOOPPKHFHB)
+	public TacticFactors(ModelStatistics statistics, int missileBullets, int magicBullets)
 	{
-		MissileBullets = IIAALGOFJJJ;
-		MagicBullets = CPOOPPKHFHB;
-		Statistics = PNEPMGPIEIH;
+		MissileBullets = missileBullets;
+		MagicBullets = magicBullets;
+		Statistics = statistics;
 	}
 
-	public TacticFactors(TacticFactors FJCBLOKOBBD)
+	public TacticFactors(TacticFactors source)
 	{
-		CopyFrom(FJCBLOKOBBD);
+		CopyFrom(source);
 	}
 
-	public void CopyFrom(TacticFactors JFMALLHPPMH)
+	public void CopyFrom(TacticFactors source)
 	{
-		FactorsCount = JFMALLHPPMH.FactorsCount;
-		Damage = JFMALLHPPMH.Damage;
-		Health = JFMALLHPPMH.Health;
-		EnemyHealth = JFMALLHPPMH.EnemyHealth;
-		AnimationFrames = JFMALLHPPMH.AnimationFrames;
-		MissileBullets = JFMALLHPPMH.MissileBullets;
-		MagicBullets = JFMALLHPPMH.MagicBullets;
-		ExtraCount = JFMALLHPPMH.ExtraCount;
-		Hits = JFMALLHPPMH.Hits;
-		Statistics = JFMALLHPPMH.Statistics;
-		ChildFrames = JFMALLHPPMH.ChildFrames;
-		Distance = JFMALLHPPMH.Distance;
-		CurrentAnimation = JFMALLHPPMH.CurrentAnimation;
-		EnemyCurrentAnimation = JFMALLHPPMH.EnemyCurrentAnimation;
+		FactorsCount = source.FactorsCount;
+		Damage = source.Damage;
+		Health = source.Health;
+		EnemyHealth = source.EnemyHealth;
+		AnimationFrames = source.AnimationFrames;
+		MissileBullets = source.MissileBullets;
+		MagicBullets = source.MagicBullets;
+		ExtraCount = source.ExtraCount;
+		Hits = source.Hits;
+		Statistics = source.Statistics;
+		ChildFrames = source.ChildFrames;
+		Distance = source.Distance;
+		CurrentAnimation = source.CurrentAnimation;
+		EnemyCurrentAnimation = source.EnemyCurrentAnimation;
 	}
 }

@@ -21,13 +21,13 @@ public class TacticalTable
 		return FirstFrameIndex + IntervalList.Count - 1;
 	}
 
-	private static void Load(string PMFEIPCHENB)
+	private static void Load(string path)
 	{
 	}
 
-	public Intervals GetFrameByFrameIndex(int FMNGLKIGFNA)
+	public Intervals GetFrameByFrameIndex(int frameIndex)
 	{
-		int num = GetArrayIndexByFrameIndex(FMNGLKIGFNA);
+		int num = GetArrayIndexByFrameIndex(frameIndex);
 		if (-1 < num)
 		{
 			return IntervalList[num];
@@ -35,9 +35,9 @@ public class TacticalTable
 		return null;
 	}
 
-	public int GetArrayIndexByFrameIndex(int FMNGLKIGFNA)
+	public int GetArrayIndexByFrameIndex(int frameIndex)
 	{
-		int num = FMNGLKIGFNA - FirstFrameIndex;
+		int num = frameIndex - FirstFrameIndex;
 		if (num < IntervalList.Count)
 		{
 			return num;

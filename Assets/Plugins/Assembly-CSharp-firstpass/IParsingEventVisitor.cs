@@ -1,24 +1,24 @@
 public interface IParsingEventVisitor
 {
-	void Visit(AnchorAlias FOPOKALJIIJ);
+	void Visit(AnchorAlias anchorAlias);
 
-	void Visit(StreamStart FOPOKALJIIJ);
+	void Visit(StreamStart streamStart);
 
-	void Visit(StreamEndEvent FOPOKALJIIJ);
+	void Visit(StreamEndEvent streamEnd);
 
-	void Visit(DocumentStart FOPOKALJIIJ);
+	void Visit(DocumentStart documentStart);
 
-	void Visit(DocumentEnd FOPOKALJIIJ);
+	void Visit(DocumentEnd documentEnd);
 
-	void Visit(Scalar FOPOKALJIIJ);
+	void Visit(Scalar scalar);
 
-	void Visit(SequenceStart FOPOKALJIIJ);
+	void Visit(SequenceStart sequenceStart);
 
-	void Visit(SequenceEnd FOPOKALJIIJ);
+	void Visit(SequenceEnd sequenceEnd);
 
-	void Visit(MappingStart FOPOKALJIIJ);
+	void Visit(MappingStart mappingStart);
 
-	void Visit(MappingEnd FOPOKALJIIJ);
+	void Visit(MappingEnd mappingEnd);
 
-	void Visit(Comment FOPOKALJIIJ);
+	void Visit(Comment comment);
 }

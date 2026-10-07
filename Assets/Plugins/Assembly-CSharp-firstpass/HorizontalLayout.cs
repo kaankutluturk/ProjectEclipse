@@ -3,9 +3,9 @@ using UnityEngine;
 
 internal class HorizontalLayout : IDisposable
 {
-	public HorizontalLayout(params GUILayoutOption[] LHONCAIFCAF)
+	public HorizontalLayout(params GUILayoutOption[] options)
 	{
-		GUILayout.BeginHorizontal(LHONCAIFCAF);
+		GUILayout.BeginHorizontal(options);
 	}
 
 	public void Dispose()

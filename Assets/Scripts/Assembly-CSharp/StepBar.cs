@@ -29,18 +29,18 @@ public class StepBar : ProgressBar
 		return GetPercentIndex(value);
 	}
 
-	public void SetPercent(List<int> ONDOPPJBEEF)
+	public void SetPercent(List<int> percentValues)
 	{
-		_percentValues = ONDOPPJBEEF;
+		_percentValues = percentValues;
 		SetValue(0);
 	}
 
-	public int GetPercentIndex(float AMBMJABLPFE)
+	public int GetPercentIndex(float percent)
 	{
 		int num = 0;
 		foreach (int item in _percentValues)
 		{
-			if ((float)item == AMBMJABLPFE)
+			if ((float)item == percent)
 			{
 				return num;
 			}

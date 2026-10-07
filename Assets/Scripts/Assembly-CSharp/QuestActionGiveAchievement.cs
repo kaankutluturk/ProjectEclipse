@@ -4,16 +4,16 @@ public class QuestActionGiveAchievement : QuestAction
 {
 	private string achievementName = string.Empty;
 
-	public override void Parse(XmlNode EPKLCPOEELO)
+	public override void Parse(XmlNode node)
 	{
-		base.Parse(EPKLCPOEELO);
-		achievementName = EPKLCPOEELO.Attributes["Name"].GetStringOrDefault();
+		base.Parse(node);
+		achievementName = node.Attributes["Name"].GetStringOrDefault();
 	}
 
-	public override void Execute(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters parameters)
 	{
-		base.Execute(GFIHPBCEEOB);
-		Achievement jNPIOKEKMII = GameUtils.GiveAchievement(achievementName);
+		base.Execute(parameters);
+		Achievement achievement = GameUtils.GiveAchievement(achievementName);
 		FinishAction();
 	}
 }

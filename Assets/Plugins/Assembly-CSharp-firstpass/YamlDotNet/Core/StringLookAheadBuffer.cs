@@ -30,9 +30,9 @@ namespace YamlDotNet.Core
 			value = value;
 		}
 
-		public char Peek(int IPCOBJBKNAO)
+		public char Peek(int offset)
 		{
-			int num = Position + IPCOBJBKNAO;
+			int num = Position + offset;
 			return (!IsOutside(num)) ? value[num] : '\0';
 		}
 
@@ -41,13 +41,13 @@ namespace YamlDotNet.Core
 			return index >= value.Length;
 		}
 
-		public void Skip(int BDBOAEGELMC)
+		public void Skip(int length)
 		{
-			if (BDBOAEGELMC < 0)
+			if (length < 0)
 			{
 				throw new ArgumentOutOfRangeException("length", "The length must be positive.");
 			}
-			Position += BDBOAEGELMC;
+			Position += length;
 		}
 	}
 }

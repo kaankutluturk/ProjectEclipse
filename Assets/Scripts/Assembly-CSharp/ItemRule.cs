@@ -34,14 +34,14 @@ public class ItemRule : Rule
 		}
 	}
 
-	public ItemRule(XmlNode node, bool NPBEDEFLCAE = true)
+	public ItemRule(XmlNode node, bool shouldParseItem = true)
 		: base(RuleType.RuleItem, node)
 	{
 		item = null;
 		noAttributeChange = false;
 		isEquipRequirement = false;
 		appliance = RuleAppliance.AppliancePlayer;
-		if (NPBEDEFLCAE)
+		if (shouldParseItem)
 		{
 			ParseItem(node);
 		}
@@ -66,26 +66,26 @@ public class ItemRule : Rule
 
 	public override bool Compare(object data)
 	{
-		UserItem dKCHDHMLKHN = data as UserItem;
-		if (dKCHDHMLKHN == null)
+		UserItem userItem = data as UserItem;
+		if (userItem == null)
 		{
 			return true;
 		}
-		ItemInfo dJKEECEOCJB = item.GetInfo();
-		ItemInfo dJKEECEOCJB2 = dKCHDHMLKHN.GetInfo();
-		if (dJKEECEOCJB.Name != string.Empty && dJKEECEOCJB.Name == dJKEECEOCJB2.Name)
+		ItemInfo ruleItemInfo = item.GetInfo();
+		ItemInfo dJKEECEOCJB2 = userItem.GetInfo();
+		if (ruleItemInfo.Name != string.Empty && ruleItemInfo.Name == dJKEECEOCJB2.Name)
 		{
 			return false;
 		}
-		if (dJKEECEOCJB.Type != string.Empty && dJKEECEOCJB.Type == dJKEECEOCJB2.Type)
+		if (ruleItemInfo.Type != string.Empty && ruleItemInfo.Type == dJKEECEOCJB2.Type)
 		{
 			return false;
 		}
-		if (dJKEECEOCJB.SubType != string.Empty && dJKEECEOCJB.SubType == dJKEECEOCJB2.SubType)
+		if (ruleItemInfo.SubType != string.Empty && ruleItemInfo.SubType == dJKEECEOCJB2.SubType)
 		{
 			return false;
 		}
-		int num = ((dKCHDHMLKHN.GetCurrentUpgradeItem() == null) ? dJKEECEOCJB2.ItemLevel : dKCHDHMLKHN.GetCurrentUpgradeItem().ItemLevel);
+		int num = ((userItem.GetCurrentUpgradeItem() == null) ? dJKEECEOCJB2.ItemLevel : userItem.GetCurrentUpgradeItem().ItemLevel);
 		if (item.GetUpgradeLevel() > num)
 		{
 			return false;
@@ -131,33 +131,33 @@ public class ItemRule : Rule
 		return equipped.ItemLevel >= item.GetUpgradeLevel();
 	}
 
-	public void SetAppliance(RuleAppliance IGFNCCEHFEK)
+	public void SetAppliance(RuleAppliance ruleAppliance)
 	{
-		appliance = IGFNCCEHFEK;
+		appliance = ruleAppliance;
 	}
 
 	protected void ParseAppliance(XmlNode node)
 	{
-		RuleAppliance bJHBHKKHENM = RuleAppliance.AppliancePlayer;
+		RuleAppliance parsedAppliance = RuleAppliance.AppliancePlayer;
 		switch (node.Attributes["ApplyTo"].GetStringOrDefault(string.Empty))
 		{
 		case "Player":
-			bJHBHKKHENM = RuleAppliance.AppliancePlayer;
+			parsedAppliance = RuleAppliance.AppliancePlayer;
 			break;
 		case "Bot":
-			bJHBHKKHENM = RuleAppliance.ApplianceOpponent;
+			parsedAppliance = RuleAppliance.ApplianceOpponent;
 			break;
 		case "All":
-			bJHBHKKHENM = RuleAppliance.ApplianceAll;
+			parsedAppliance = RuleAppliance.ApplianceAll;
 			break;
 		}
-		appliance = bJHBHKKHENM;
+		appliance = parsedAppliance;
 	}
 
 	protected virtual void ParseItem(XmlNode node)
 	{
-		ItemInfo dJKEECEOCJB = new ItemInfo(node);
-		item = new UserItem(node, dJKEECEOCJB.Name, false, 1, node.Attributes["MinLevel"].ParseInt(), 0L, 0);
-		item.SetInfo(dJKEECEOCJB);
+		ItemInfo itemInfo = new ItemInfo(node);
+		item = new UserItem(node, itemInfo.Name, false, 1, node.Attributes["MinLevel"].ParseInt(), 0L, 0);
+		item.SetInfo(itemInfo);
 	}
 }

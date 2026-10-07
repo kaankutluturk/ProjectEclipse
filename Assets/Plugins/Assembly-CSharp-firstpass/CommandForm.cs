@@ -4,9 +4,9 @@ public class CommandForm
 
 	public bool PostStringMode;
 
-	public CommandForm(string FBEJCDFPDLD, bool AGJCCDAJOKN)
+	public CommandForm(string idString, bool postStringMode)
 	{
-		IDString = FBEJCDFPDLD;
-		PostStringMode = AGJCCDAJOKN;
+		IDString = idString;
+		PostStringMode = postStringMode;
 	}
 }

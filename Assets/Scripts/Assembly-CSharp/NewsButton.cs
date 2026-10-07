@@ -16,13 +16,13 @@ public class NewsButton
 	{
 	}
 
-	public NewsButton(NewsButton AOMLCBHAJJH)
+	public NewsButton(NewsButton source)
 	{
-		LabelAliasName = AOMLCBHAJJH.LabelAliasName;
-		Color = AOMLCBHAJJH.Color;
-		Url = AOMLCBHAJJH.Url;
-		RedirectShop = AOMLCBHAJJH.RedirectShop;
-		GoShop = AOMLCBHAJJH.GoShop;
-		BuyItem = AOMLCBHAJJH.BuyItem;
+		LabelAliasName = source.LabelAliasName;
+		Color = source.Color;
+		Url = source.Url;
+		RedirectShop = source.RedirectShop;
+		GoShop = source.GoShop;
+		BuyItem = source.BuyItem;
 	}
 }

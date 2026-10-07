@@ -120,12 +120,12 @@ namespace UIFigures
 			_EndColor = new Color(value.r, value.g, value.b, value.a);
 		}
 
-		protected override void OnPopulateMesh(VertexHelper DHJBOKKAOJK)
+		protected override void OnPopulateMesh(VertexHelper vertexHelper)
 		{
-			base.OnPopulateMesh(DHJBOKKAOJK);
-			Vector2 gIAEPIIIMDH = (_LowerLeft + _UpperRight) * 0.5f;
-			Vector2 lPEMPCEJFIN = new Vector2(base.rectTransform.rect.width, base.rectTransform.rect.height) * 0.5f;
-			DrawFunctions.DrawArcBorder(DHJBOKKAOJK, gIAEPIIIMDH, lPEMPCEJFIN, _Width, _To, _From, _Segments, color, (!_UseEndColor) ? color : _EndColor);
+			base.OnPopulateMesh(vertexHelper);
+			Vector2 center = (_LowerLeft + _UpperRight) * 0.5f;
+			Vector2 halfSize = new Vector2(base.rectTransform.rect.width, base.rectTransform.rect.height) * 0.5f;
+			DrawFunctions.DrawArcBorder(vertexHelper, center, halfSize, _Width, _To, _From, _Segments, color, (!_UseEndColor) ? color : _EndColor);
 		}
 	}
 }

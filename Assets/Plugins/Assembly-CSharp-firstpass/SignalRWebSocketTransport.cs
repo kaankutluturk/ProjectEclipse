@@ -12,8 +12,8 @@ public sealed class SignalRWebSocketTransport : TransportBase
 		}
 	}
 
-	public SignalRWebSocketTransport(Connection MDGFGCDPGFI)
-		: base("webSockets", MDGFGCDPGFI)
+	public SignalRWebSocketTransport(Connection connection)
+		: base("webSockets", connection)
 	{
 	}
 
@@ -38,26 +38,26 @@ public sealed class SignalRWebSocketTransport : TransportBase
 		{
 			set_State(TransportStates.Connecting);
 		}
-		SignalRRequestType lFLGCDNKNJI = ((GetState() != TransportStates.Reconnecting) ? SignalRRequestType.Connect : SignalRRequestType.Reconnect);
-		Uri kJHNCLAJMLO = GetConnection().BuildUri(lFLGCDNKNJI, this);
-		wSocket = new WebSocket(kJHNCLAJMLO);
-		WebSocket gPDLJHEAEDF = wSocket;
-		gPDLJHEAEDF.OnOpen = (OnWebSocketOpenDelegate)Delegate.Combine(gPDLJHEAEDF.OnOpen, new OnWebSocketOpenDelegate(WSocket_OnOpen));
+		SignalRRequestType requestType = ((GetState() != TransportStates.Reconnecting) ? SignalRRequestType.Connect : SignalRRequestType.Reconnect);
+		Uri uri = GetConnection().BuildUri(requestType, this);
+		wSocket = new WebSocket(uri);
+		WebSocket webSocket = wSocket;
+		webSocket.OnOpen = (OnWebSocketOpenDelegate)Delegate.Combine(webSocket.OnOpen, new OnWebSocketOpenDelegate(WSocket_OnOpen));
 		WebSocket gPDLJHEAEDF2 = wSocket;
 		gPDLJHEAEDF2.OnMessage = (OnWebSocketMessageDelegate)Delegate.Combine(gPDLJHEAEDF2.OnMessage, new OnWebSocketMessageDelegate(WSocket_OnMessage));
 		WebSocket gPDLJHEAEDF3 = wSocket;
 		gPDLJHEAEDF3.OnClosed = (OnWebSocketClosedDelegate)Delegate.Combine(gPDLJHEAEDF3.OnClosed, new OnWebSocketClosedDelegate(WSocket_OnClosed));
 		WebSocket gPDLJHEAEDF4 = wSocket;
 		gPDLJHEAEDF4.OnErrorDesc = (OnWebSocketErrorDescriptionDelegate)Delegate.Combine(gPDLJHEAEDF4.OnErrorDesc, new OnWebSocketErrorDescriptionDelegate(WSocket_OnError));
-		GetConnection().PrepareRequest(wSocket.GetInternalRequest(), lFLGCDNKNJI);
+		GetConnection().PrepareRequest(wSocket.GetInternalRequest(), requestType);
 		wSocket.OpenWebSocket();
 	}
 
-	protected override void SendImpl(string EMDHMHOKGFP)
+	protected override void SendImpl(string payload)
 	{
 		if (wSocket != null && wSocket.GetIsOpen())
 		{
-			wSocket.Send(EMDHMHOKGFP);
+			wSocket.Send(payload);
 		}
 	}
 
@@ -87,32 +87,32 @@ public sealed class SignalRWebSocketTransport : TransportBase
 		}
 	}
 
-	private void WSocket_OnOpen(WebSocket ILNFPNFEOCL)
+	private void WSocket_OnOpen(WebSocket webSocket)
 	{
-		if (ILNFPNFEOCL == wSocket)
+		if (webSocket == wSocket)
 		{
 			HTTPManager.GetLogger().Information("WebSocketTransport", "WSocket_OnOpen");
 			OnConnected();
 		}
 	}
 
-	private void WSocket_OnMessage(WebSocket ILNFPNFEOCL, string LIOGIBJBHAH)
+	private void WSocket_OnMessage(WebSocket webSocket, string message)
 	{
-		if (ILNFPNFEOCL == wSocket)
+		if (webSocket == wSocket)
 		{
-			IServerMessage bNGPAAAKBOP = TransportBase.Parse(GetConnection().GetJsonEncoder(), LIOGIBJBHAH);
-			if (bNGPAAAKBOP != null)
+			IServerMessage serverMessage = TransportBase.Parse(GetConnection().GetJsonEncoder(), message);
+			if (serverMessage != null)
 			{
-				GetConnection().OnMessage(bNGPAAAKBOP);
+				GetConnection().OnMessage(serverMessage);
 			}
 		}
 	}
 
-	private void WSocket_OnClosed(WebSocket ILNFPNFEOCL, ushort KJPGKHJNOMC, string LIOGIBJBHAH)
+	private void WSocket_OnClosed(WebSocket webSocket, ushort code, string message)
 	{
-		if (ILNFPNFEOCL == wSocket)
+		if (webSocket == wSocket)
 		{
-			string text = KJPGKHJNOMC + " : " + LIOGIBJBHAH;
+			string text = code + " : " + message;
 			HTTPManager.GetLogger().Information("WebSocketTransport", "WSocket_OnClosed " + text);
 			if (GetState() == TransportStates.Closing)
 			{
@@ -125,17 +125,17 @@ public sealed class SignalRWebSocketTransport : TransportBase
 		}
 	}
 
-	private void WSocket_OnError(WebSocket ILNFPNFEOCL, string NEPOLDCKNJL)
+	private void WSocket_OnError(WebSocket webSocket, string error)
 	{
-		if (ILNFPNFEOCL == wSocket)
+		if (webSocket == wSocket)
 		{
 			if (GetState() == TransportStates.Closing || GetState() == TransportStates.Closed)
 			{
 				AbortFinished();
 				return;
 			}
-			HTTPManager.GetLogger().Error("WebSocketTransport", "WSocket_OnError " + NEPOLDCKNJL);
-			GetConnection().Error(NEPOLDCKNJL);
+			HTTPManager.GetLogger().Error("WebSocketTransport", "WSocket_OnError " + error);
+			GetConnection().Error(error);
 		}
 	}
 }

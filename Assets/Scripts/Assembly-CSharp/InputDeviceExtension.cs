@@ -1,41 +1,41 @@
 public static class InputDeviceExtension
 {
-	public static bool CanOrderDelivery(ItemInfo item, UserItem NDMCFNGEPOA)
+	public static bool CanOrderDelivery(ItemInfo item, UserItem userItem)
 	{
 		if (item == null)
 		{
 			return false;
 		}
-		if (NDMCFNGEPOA == null && item.DeliveryTime > 0)
+		if (userItem == null && item.DeliveryTime > 0)
 		{
 			return true;
 		}
 		return false;
 	}
 
-	public static bool IsDeliveryInProgress(ItemInfo item, UserItem NDMCFNGEPOA)
+	public static bool IsDeliveryInProgress(ItemInfo item, UserItem userItem)
 	{
-		return NDMCFNGEPOA != null && NDMCFNGEPOA.GetDeliveryTimestamp() > 0;
+		return userItem != null && userItem.GetDeliveryTimestamp() > 0;
 	}
 
-	public static bool CanUpgradeItem(ItemInfo item, UserItem NDMCFNGEPOA)
+	public static bool CanUpgradeItem(ItemInfo item, UserItem userItem)
 	{
-		if (NDMCFNGEPOA == null)
+		if (userItem == null)
 		{
 			return false;
 		}
-		return NDMCFNGEPOA.GetHasUpgrades() && !NDMCFNGEPOA.GetIsMaxUpgrade();
+		return userItem.GetHasUpgrades() && !userItem.GetIsMaxUpgrade();
 	}
 
-	public static void GetOwnedAndEquippedState(ref bool PNKJLPDJOJF, ref bool CBDBANOPFDM, ItemInfo item)
+	public static void GetOwnedAndEquippedState(ref bool isOwned, ref bool isEquipped, ItemInfo item)
 	{
 		if (item != null)
 		{
-			UserItem dKCHDHMLKHN = ListSF.GetRoster().GetInventory().FindItem(item);
-			if (dKCHDHMLKHN != null)
+			UserItem userItem = ListSF.GetRoster().GetInventory().FindItem(item);
+			if (userItem != null)
 			{
-				PNKJLPDJOJF = true;
-				CBDBANOPFDM = dKCHDHMLKHN.GetIsEquipped();
+				isOwned = true;
+				isEquipped = userItem.GetIsEquipped();
 			}
 		}
 	}

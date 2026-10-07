@@ -16,15 +16,15 @@ public class PerkConditionRoundStage : PerkCondition
 		_roundStage = GetRoundStage(node.Attributes["Name"].GetStringOrDefault(string.Empty));
 	}
 
-	public override bool IsEqual(Model ACENLMONNPA, List<string> NIKHAICFGNM)
+	public override bool IsEqual(Model model, List<string> args)
 	{
-		Model fGCODGKLHED = ResolveTargetModel(ACENLMONNPA);
-		if (ACENLMONNPA == null)
+		Model targetModel = ResolveTargetModel(model);
+		if (model == null)
 		{
 			return false;
 		}
-		int jMHJDHLBHLK = fGCODGKLHED.RoundStage;
-		if (_roundStage != 0 && _roundStage != jMHJDHLBHLK)
+		int currentRoundStage = targetModel.RoundStage;
+		if (_roundStage != 0 && _roundStage != currentRoundStage)
 		{
 			return false;
 		}

@@ -30,10 +30,10 @@ public abstract class ParsingEvent
 		}
 	}
 
-	internal ParsingEvent(Mark ILENLCMAMBH, Mark PCLFFOBJJFO)
+	internal ParsingEvent(Mark startMark, Mark endMark)
 	{
-		this.start = ILENLCMAMBH;
-		this.end = PCLFFOBJJFO;
+		this.start = startMark;
+		this.end = endMark;
 	}
 
 	public virtual int GetNestingIncrease()
@@ -53,5 +53,5 @@ public abstract class ParsingEvent
 		return end;
 	}
 
-	public abstract void Accept(IParsingEventVisitor NKECMANOOEM);
+	public abstract void Accept(IParsingEventVisitor visitor);
 }

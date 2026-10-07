@@ -11,9 +11,9 @@ public static class ModelType
 		MODEL_OTHER_CHILD = 6
 	}
 
-	public static ModelTargetType ParseTargetType(string LFLGCDNKNJI)
+	public static ModelTargetType ParseTargetType(string typeName)
 	{
-		switch (LFLGCDNKNJI)
+		switch (typeName)
 		{
 		case "Me":
 			return ModelTargetType.MODEL_THIS;
@@ -30,7 +30,7 @@ public static class ModelType
 		case "EnemyChild":
 			return ModelTargetType.MODEL_OTHER_CHILD;
 		default:
-			GameLog.Error("ModelType - parseType - unknownType: " + LFLGCDNKNJI);
+			GameLog.Error("ModelType - parseType - unknownType: " + typeName);
 			return ModelTargetType.MODEL_NULL;
 		}
 	}

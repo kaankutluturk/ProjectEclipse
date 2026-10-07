@@ -373,18 +373,18 @@ namespace Nekki.SF2.GUI.Fight
 			return get_TotalFrames() - get_CurrentFrames();
 		}
 
-		public void Init(PerksStage.ActionPerk IBODMPMJELJ)
+		public void Init(PerksStage.ActionPerk actionPerk)
 		{
-			SetAction(IBODMPMJELJ);
-			set_Name(IBODMPMJELJ.IconPath);
+			SetAction(actionPerk);
+			set_Name(actionPerk.IconPath);
 			set_Show(true);
 			SetOpacityChanging(true);
 			SetHidden(false);
 			set_NeedDelete(false);
 			SetIconOpacity(0f);
 			SetExpirationOpacity(PerkGUI.GetExpirationOpacity());
-			set_ShowExpiration(IBODMPMJELJ.ShowExpiration);
-			SetEclipseStackCount(IBODMPMJELJ.EclipseStackCount);
+			set_ShowExpiration(actionPerk.ShowExpiration);
+			SetEclipseStackCount(actionPerk.EclipseStackCount);
 			RectTransform rectTransform = base.transform as RectTransform;
 			if (rectTransform == null)
 			{
@@ -392,7 +392,7 @@ namespace Nekki.SF2.GUI.Fight
 			}
 			if (_icon != null)
 			{
-				_icon.set_SpriteName(IBODMPMJELJ.IconPath);
+				_icon.set_SpriteName(actionPerk.IconPath);
 				_icon.SetNativeSize();
 				_icon.set_Alpha(0f);
 				rectTransform.sizeDelta = _icon.rectTransform.sizeDelta;
@@ -567,13 +567,13 @@ namespace Nekki.SF2.GUI.Fight
 			UnityEngine.Object.Destroy(base.gameObject);
 		}
 
-		public int CompareTo(ActivePerkItem NOLFMPDGCOC)
+		public int CompareTo(ActivePerkItem other)
 		{
-			if (NOLFMPDGCOC == null)
+			if (other == null)
 			{
 				return 1;
 			}
-			return get_FramesToEnd().CompareTo(NOLFMPDGCOC.get_FramesToEnd());
+			return get_FramesToEnd().CompareTo(other.get_FramesToEnd());
 		}
 	}
 }

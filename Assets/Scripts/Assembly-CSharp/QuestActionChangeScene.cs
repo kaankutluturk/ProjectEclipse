@@ -4,24 +4,24 @@ public class QuestActionChangeScene : QuestAction
 {
 	private string _Destination = string.Empty;
 
-	public override void Parse(XmlNode EPKLCPOEELO)
+	public override void Parse(XmlNode node)
 	{
-		base.Parse(EPKLCPOEELO);
-		_Destination = EPKLCPOEELO.Attributes["Destination"].GetStringOrDefault(string.Empty);
+		base.Parse(node);
+		_Destination = node.Attributes["Destination"].GetStringOrDefault(string.Empty);
 	}
 
-	public override void Execute(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters parameters)
 	{
-		base.Execute(GFIHPBCEEOB);
+		base.Execute(parameters);
 		string empty = string.Empty;
-		ConditionExtension.CompareResult lNIDLHOIHIM = new ConditionExtension.CompareResult();
-		QuestCondition kKDGLNECFHA = new QuestCondition();
-		kKDGLNECFHA.SetParameters(GFIHPBCEEOB);
-		kKDGLNECFHA.SetValue(_Destination, lNIDLHOIHIM);
-		empty = lNIDLHOIHIM.ToString();
+		ConditionExtension.CompareResult result = new ConditionExtension.CompareResult();
+		QuestCondition condition = new QuestCondition();
+		condition.SetParameters(parameters);
+		condition.SetValue(_Destination, result);
+		empty = result.ToString();
 		Module.GetInstance().AddEventListener(1, OnModuleChanged);
-		ScreenType kAHMHPNJBGI = Module.ParseScreenType(empty);
-		ChangeToScreen(kAHMHPNJBGI);
+		ScreenType screenType = Module.ParseScreenType(empty);
+		ChangeToScreen(screenType);
 	}
 
 	private void OnModuleChanged(object data)
@@ -30,19 +30,19 @@ public class QuestActionChangeScene : QuestAction
 		Module.GetInstance().RemoveEventListener(1, OnModuleChanged);
 	}
 
-	private void ChangeToScreen(ScreenType KAHMHPNJBGI)
+	private void ChangeToScreen(ScreenType targetScreen)
 	{
-		ScreenType iPKNDMINFMJ = Module.GetInstance().GetCurrentScreenType();
+		ScreenType currentScreen = Module.GetInstance().GetCurrentScreenType();
 		bool flag = false;
-		bool flag2 = KAHMHPNJBGI == iPKNDMINFMJ;
-		bool flag3 = KAHMHPNJBGI != ScreenType.ModuleFight;
+		bool flag2 = targetScreen == currentScreen;
+		bool flag3 = targetScreen != ScreenType.ModuleFight;
 		if (flag2)
 		{
 			flag = true;
 		}
 		else if (flag3)
 		{
-			flag = !Module.OpenScreen(KAHMHPNJBGI);
+			flag = !Module.OpenScreen(targetScreen);
 		}
 		else
 		{

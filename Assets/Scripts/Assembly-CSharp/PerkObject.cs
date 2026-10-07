@@ -26,11 +26,11 @@ public class PerkObject
 	{
 	}
 
-	public PerkObject(PerkObject NOLFMPDGCOC)
+	public PerkObject(PerkObject source)
 	{
-		IsNot = NOLFMPDGCOC.IsNot;
-		TargetPlayer = NOLFMPDGCOC.TargetPlayer;
-		SetPerk(NOLFMPDGCOC.GetPerk());
+		IsNot = source.IsNot;
+		TargetPlayer = source.TargetPlayer;
+		SetPerk(source.GetPerk());
 	}
 
 	public PerkInfoItem GetPerk()

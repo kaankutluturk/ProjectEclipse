@@ -162,11 +162,11 @@ foreach ($case in @(@('EnergyballStart','EnergyBall','MAGIC_ENERGY_BALL'),@('Ice
 # IntervalAttack/Model/ModelAnimation objects. Only unrelated AI, collision,
 # damage and event dispatch are excluded from this focused hit-path fixture.
 $modelSource = Get-Content -Raw (Join-Path $projectPath 'Assets/Scripts/Assembly-CSharp/Model.cs')
-$blockBranch = [regex]::Match($modelSource, '(?ms)^\t\tif \(hFIIPNLCIEE\.GetIgnoresBlock\(\)\)\r?\n\t\t\{.*?^\t\t\}')
+$blockBranch = [regex]::Match($modelSource, '(?ms)^\t\tif \(intervalAttack\.GetIgnoresBlock\(\)\)\r?\n\t\t\{.*?^\t\t\}')
 Assert-True $blockBranch.Success 'Cannot find strike block-bypass branch'
 $blockSource = @'
 public static class ProjectileBlockTest {
-    public static bool Resolve(Model defender, IntervalAttack hFIIPNLCIEE) {
+    public static bool Resolve(Model defender, IntervalAttack intervalAttack) {
 /* BLOCK */
         return defender.IsBlocking();
     }

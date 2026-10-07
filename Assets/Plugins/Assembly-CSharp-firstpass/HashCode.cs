@@ -1,7 +1,7 @@
 internal static class HashCode
 {
-	public static int CombineHashCodes(int PKKJJLDNHAC, int AKJPBJPEDCF)
+	public static int CombineHashCodes(int hash1, int hash2)
 	{
-		return ((PKKJJLDNHAC << 5) + PKKJJLDNHAC) ^ AKJPBJPEDCF;
+		return ((hash1 << 5) + hash1) ^ hash2;
 	}
 }

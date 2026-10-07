@@ -41,22 +41,22 @@ public class Vector2f
 		}
 	}
 
-	public Vector2f(Vector2f PALAIICCALN)
+	public Vector2f(Vector2f source)
 	{
-		X = PALAIICCALN.GetX();
-		Y = PALAIICCALN.GetY();
+		X = source.GetX();
+		Y = source.GetY();
 	}
 
-	public Vector2f(float LHNJJFDIJKK = 0f, float FFFHIOALHGM = 0f)
+	public Vector2f(float x = 0f, float y = 0f)
 	{
-		X = LHNJJFDIJKK;
-		Y = FFFHIOALHGM;
+		X = x;
+		Y = y;
 	}
 
-	public Vector2f(Vector3f PMEFNGKHLII)
+	public Vector2f(Vector3f source)
 	{
-		X = PMEFNGKHLII.GetX();
-		Y = PMEFNGKHLII.GetY();
+		X = source.GetX();
+		Y = source.GetY();
 	}
 
 	public float GetX()
@@ -80,81 +80,81 @@ public class Vector2f
 	}
 
 	[SpecialName]
-	public static Vector2f op_Subtraction(Vector2f GIIIFLBEONP, Vector2f OIFPGODHFGH)
+	public static Vector2f op_Subtraction(Vector2f left, Vector2f right)
 	{
-		return new Vector2f(GIIIFLBEONP.GetX() - OIFPGODHFGH.GetX(), GIIIFLBEONP.GetY() - OIFPGODHFGH.GetY());
+		return new Vector2f(left.GetX() - right.GetX(), left.GetY() - right.GetY());
 	}
 
 	[SpecialName]
-	public static Vector2f op_Addition(Vector2f GIIIFLBEONP, Vector2f OIFPGODHFGH)
+	public static Vector2f op_Addition(Vector2f left, Vector2f right)
 	{
-		return new Vector2f(GIIIFLBEONP.GetX() + OIFPGODHFGH.GetX(), GIIIFLBEONP.GetY() + OIFPGODHFGH.GetY());
+		return new Vector2f(left.GetX() + right.GetX(), left.GetY() + right.GetY());
 	}
 
 	[SpecialName]
-	public static bool op_Equality(Vector2f GIIIFLBEONP, Vector2f OIFPGODHFGH)
+	public static bool op_Equality(Vector2f left, Vector2f right)
 	{
-		if (object.ReferenceEquals(GIIIFLBEONP, OIFPGODHFGH))
+		if (object.ReferenceEquals(left, right))
 		{
 			return true;
 		}
-		if (object.ReferenceEquals(GIIIFLBEONP, null) || object.ReferenceEquals(OIFPGODHFGH, null))
+		if (object.ReferenceEquals(left, null) || object.ReferenceEquals(right, null))
 		{
 			return false;
 		}
-		return GIIIFLBEONP.GetX() == OIFPGODHFGH.GetX() && GIIIFLBEONP.GetY() == OIFPGODHFGH.GetY();
+		return left.GetX() == right.GetX() && left.GetY() == right.GetY();
 	}
 
 	[SpecialName]
-	public static bool op_Inequality(Vector2f GIIIFLBEONP, Vector2f OIFPGODHFGH)
+	public static bool op_Inequality(Vector2f left, Vector2f right)
 	{
-		return !op_Equality(GIIIFLBEONP, OIFPGODHFGH);
+		return !op_Equality(left, right);
 	}
 
 	[SpecialName]
-	public static Vector3 op_Implicit(Vector2f BEHOPOPCJGB)
+	public static Vector3 op_Implicit(Vector2f vector)
 	{
-		return new Vector3(BEHOPOPCJGB.GetX(), BEHOPOPCJGB.GetY(), 0f);
+		return new Vector3(vector.GetX(), vector.GetY(), 0f);
 	}
 
-	public Vector2f Add(Vector2f PALAIICCALN)
+	public Vector2f Add(Vector2f other)
 	{
-		X += PALAIICCALN.GetX();
-		Y += PALAIICCALN.GetY();
+		X += other.GetX();
+		Y += other.GetY();
 		return this;
 	}
 
-	public Vector2f Add(float LHNJJFDIJKK, float FFFHIOALHGM)
+	public Vector2f Add(float x, float y)
 	{
-		X += LHNJJFDIJKK;
-		Y += FFFHIOALHGM;
+		X += x;
+		Y += y;
 		return this;
 	}
 
-	public Vector2f SubtractXY(Vector2f PALAIICCALN)
+	public Vector2f SubtractXY(Vector2f other)
 	{
-		X -= PALAIICCALN.GetX();
-		Y -= PALAIICCALN.GetY();
+		X -= other.GetX();
+		Y -= other.GetY();
 		return this;
 	}
 
-	public Vector2f Multiply(float LIAILCGJBDK)
+	public Vector2f Multiply(float scalar)
 	{
-		X *= LIAILCGJBDK;
-		Y *= LIAILCGJBDK;
+		X *= scalar;
+		Y *= scalar;
 		return this;
 	}
 
-	public void Set(Vector2f PALAIICCALN)
+	public void Set(Vector2f source)
 	{
-		X = PALAIICCALN.GetX();
-		Y = PALAIICCALN.GetY();
+		X = source.GetX();
+		Y = source.GetY();
 	}
 
-	public void Round(int CFCPPNJKNAL)
+	public void Round(int multiplier)
 	{
-		X = Round(X, CFCPPNJKNAL);
-		Y = Round(Y, CFCPPNJKNAL);
+		X = Round(X, multiplier);
+		Y = Round(Y, multiplier);
 	}
 
 	public void RoundToInteger()
@@ -163,9 +163,9 @@ public class Vector2f
 		Y = Round(Y, 1f);
 	}
 
-	public float DotProduct(Vector2f PIFPKKNEAID)
+	public float DotProduct(Vector2f other)
 	{
-		return X * PIFPKKNEAID.GetX() + Y * PIFPKKNEAID.GetY();
+		return X * other.GetX() + Y * other.GetY();
 	}
 
 	public string GetFormattedValue()
@@ -178,33 +178,33 @@ public class Vector2f
 		return string.Format("[Point: X={0}, Y={1}]", GetX(), GetY());
 	}
 
-	public static float Round(float Value, float JMLMHGAMNKN)
+	public static float Round(float Value, float multiplier)
 	{
-		return Mathf.Floor(Value * JMLMHGAMNKN + 0.5f) / JMLMHGAMNKN;
+		return Mathf.Floor(Value * multiplier + 0.5f) / multiplier;
 	}
 
-	public static float Distance2D(Vector3f AMNCLCPADOO, Vector3f IFIOLDFCLIE)
+	public static float Distance2D(Vector3f pointA, Vector3f pointB)
 	{
-		return Mathf.Sqrt((AMNCLCPADOO.GetX() - IFIOLDFCLIE.GetX()) * (AMNCLCPADOO.GetX() - IFIOLDFCLIE.GetX()) + (AMNCLCPADOO.GetY() - IFIOLDFCLIE.GetY()) * (AMNCLCPADOO.GetY() - IFIOLDFCLIE.GetY()));
+		return Mathf.Sqrt((pointA.GetX() - pointB.GetX()) * (pointA.GetX() - pointB.GetX()) + (pointA.GetY() - pointB.GetY()) * (pointA.GetY() - pointB.GetY()));
 	}
 
-	public static float Distance2D(Vector3f AMNCLCPADOO, Vector2f IFIOLDFCLIE)
+	public static float Distance2D(Vector3f pointA, Vector2f pointB)
 	{
-		return Mathf.Sqrt((AMNCLCPADOO.GetX() - IFIOLDFCLIE.GetX()) * (AMNCLCPADOO.GetX() - IFIOLDFCLIE.GetX()) + (AMNCLCPADOO.GetY() - IFIOLDFCLIE.GetY()) * (AMNCLCPADOO.GetY() - IFIOLDFCLIE.GetY()));
+		return Mathf.Sqrt((pointA.GetX() - pointB.GetX()) * (pointA.GetX() - pointB.GetX()) + (pointA.GetY() - pointB.GetY()) * (pointA.GetY() - pointB.GetY()));
 	}
 
-	public static bool TryGetSegmentIntersection(Vector3f IEKADOOKFKG, Vector3f LDKCOIHONPG, Vector3f AOOIPCJPALH, Vector3f IGMCGOFHHCJ, Vector3f DCJLKCFKCOM)
+	public static bool TryGetSegmentIntersection(Vector3f segmentAStart, Vector3f segmentAEnd, Vector3f segmentBStart, Vector3f segmentBEnd, Vector3f intersection)
 	{
-		if ((IEKADOOKFKG.GetX() == LDKCOIHONPG.GetX() && IEKADOOKFKG.GetY() == LDKCOIHONPG.GetY()) || (AOOIPCJPALH.GetX() == IGMCGOFHHCJ.GetX() && AOOIPCJPALH.GetY() == IGMCGOFHHCJ.GetY()))
+		if ((segmentAStart.GetX() == segmentAEnd.GetX() && segmentAStart.GetY() == segmentAEnd.GetY()) || (segmentBStart.GetX() == segmentBEnd.GetX() && segmentBStart.GetY() == segmentBEnd.GetY()))
 		{
 			return false;
 		}
-		float num = LDKCOIHONPG.GetX() - IEKADOOKFKG.GetX();
-		float num2 = LDKCOIHONPG.GetY() - IEKADOOKFKG.GetY();
-		float num3 = IGMCGOFHHCJ.GetX() - AOOIPCJPALH.GetX();
-		float num4 = IGMCGOFHHCJ.GetY() - AOOIPCJPALH.GetY();
-		float num5 = IEKADOOKFKG.GetX() - AOOIPCJPALH.GetX();
-		float num6 = IEKADOOKFKG.GetY() - AOOIPCJPALH.GetY();
+		float num = segmentAEnd.GetX() - segmentAStart.GetX();
+		float num2 = segmentAEnd.GetY() - segmentAStart.GetY();
+		float num3 = segmentBEnd.GetX() - segmentBStart.GetX();
+		float num4 = segmentBEnd.GetY() - segmentBStart.GetY();
+		float num5 = segmentAStart.GetX() - segmentBStart.GetX();
+		float num6 = segmentAStart.GetY() - segmentBStart.GetY();
 		float num7 = num4 * num - num3 * num2;
 		float num8 = num3 * num6 - num4 * num5;
 		float num9 = num * num6 - num2 * num5;
@@ -216,51 +216,51 @@ public class Vector2f
 			}
 			float num10;
 			float num11;
-			if (IEKADOOKFKG.GetX() < LDKCOIHONPG.GetX())
+			if (segmentAStart.GetX() < segmentAEnd.GetX())
 			{
-				num10 = IEKADOOKFKG.GetX();
-				num11 = LDKCOIHONPG.GetX();
+				num10 = segmentAStart.GetX();
+				num11 = segmentAEnd.GetX();
 			}
 			else
 			{
-				num10 = LDKCOIHONPG.GetX();
-				num11 = IEKADOOKFKG.GetX();
+				num10 = segmentAEnd.GetX();
+				num11 = segmentAStart.GetX();
 			}
 			float num12;
 			float num13;
-			if (AOOIPCJPALH.GetX() < IGMCGOFHHCJ.GetX())
+			if (segmentBStart.GetX() < segmentBEnd.GetX())
 			{
-				num12 = AOOIPCJPALH.GetX();
-				num13 = IGMCGOFHHCJ.GetX();
+				num12 = segmentBStart.GetX();
+				num13 = segmentBEnd.GetX();
 			}
 			else
 			{
-				num12 = IGMCGOFHHCJ.GetX();
-				num13 = AOOIPCJPALH.GetX();
+				num12 = segmentBEnd.GetX();
+				num13 = segmentBStart.GetX();
 			}
 			if (num10 > num13 || num12 > num11)
 			{
 				return false;
 			}
-			if (IEKADOOKFKG.GetY() < LDKCOIHONPG.GetY())
+			if (segmentAStart.GetY() < segmentAEnd.GetY())
 			{
-				num10 = IEKADOOKFKG.GetY();
-				num11 = LDKCOIHONPG.GetY();
+				num10 = segmentAStart.GetY();
+				num11 = segmentAEnd.GetY();
 			}
 			else
 			{
-				num10 = LDKCOIHONPG.GetY();
-				num11 = IEKADOOKFKG.GetY();
+				num10 = segmentAEnd.GetY();
+				num11 = segmentAStart.GetY();
 			}
-			if (AOOIPCJPALH.GetY() < IGMCGOFHHCJ.GetY())
+			if (segmentBStart.GetY() < segmentBEnd.GetY())
 			{
-				num12 = AOOIPCJPALH.GetY();
-				num13 = IGMCGOFHHCJ.GetY();
+				num12 = segmentBStart.GetY();
+				num13 = segmentBEnd.GetY();
 			}
 			else
 			{
-				num12 = IGMCGOFHHCJ.GetY();
-				num13 = AOOIPCJPALH.GetY();
+				num12 = segmentBEnd.GetY();
+				num13 = segmentBStart.GetY();
 			}
 			if (num10 > num13 || num12 > num11)
 			{
@@ -272,40 +272,40 @@ public class Vector2f
 		num9 /= num7;
 		if (num8 >= 0f && num8 <= 1f && num9 >= 0f && num9 <= 1f)
 		{
-			DCJLKCFKCOM.SetX(IEKADOOKFKG.GetX() + num8 * (LDKCOIHONPG.GetX() - IEKADOOKFKG.GetX()));
-			DCJLKCFKCOM.SetY(IEKADOOKFKG.GetY() + num8 * (LDKCOIHONPG.GetY() - IEKADOOKFKG.GetY()));
+			intersection.SetX(segmentAStart.GetX() + num8 * (segmentAEnd.GetX() - segmentAStart.GetX()));
+			intersection.SetY(segmentAStart.GetY() + num8 * (segmentAEnd.GetY() - segmentAStart.GetY()));
 			return true;
 		}
 		return false;
 	}
 
-	public static void BuildEquationLine(Vector3f MLGFPMDKOHD, Vector3f DMMNCDKPCCI, EquationLine EGKHHBMCGMK)
+	public static void BuildEquationLine(Vector3f start, Vector3f end, EquationLine equationLine)
 	{
-		float num = Distance2D(MLGFPMDKOHD, DMMNCDKPCCI);
-		EGKHHBMCGMK.A = (MLGFPMDKOHD.GetY() - DMMNCDKPCCI.GetY()) / num;
-		EGKHHBMCGMK.CoefficientB = (DMMNCDKPCCI.GetX() - MLGFPMDKOHD.GetX()) / num;
-		EGKHHBMCGMK.ConstantC = 0f - (EGKHHBMCGMK.A * MLGFPMDKOHD.GetX() + EGKHHBMCGMK.CoefficientB * MLGFPMDKOHD.GetY());
+		float num = Distance2D(start, end);
+		equationLine.A = (start.GetY() - end.GetY()) / num;
+		equationLine.CoefficientB = (end.GetX() - start.GetX()) / num;
+		equationLine.ConstantC = 0f - (equationLine.A * start.GetX() + equationLine.CoefficientB * start.GetY());
 	}
 
-	public static EquationLine BuildEquationLine(Vector3f MLGFPMDKOHD, Vector3f DMMNCDKPCCI)
+	public static EquationLine BuildEquationLine(Vector3f start, Vector3f end)
 	{
-		EquationLine kEDCEHBPOIM = new EquationLine();
-		BuildEquationLine(MLGFPMDKOHD, DMMNCDKPCCI, kEDCEHBPOIM);
-		return kEDCEHBPOIM;
+		EquationLine equationLine = new EquationLine();
+		BuildEquationLine(start, end, equationLine);
+		return equationLine;
 	}
 
-	public static bool TryIntersectSegments(Vector3f IEKADOOKFKG, Vector3f LDKCOIHONPG, Vector3f AOOIPCJPALH, Vector3f IGMCGOFHHCJ, Vector3f DCJLKCFKCOM)
+	public static bool TryIntersectSegments(Vector3f segmentAStart, Vector3f segmentAEnd, Vector3f segmentBStart, Vector3f segmentBEnd, Vector3f intersection)
 	{
-		if ((IEKADOOKFKG.GetX() == LDKCOIHONPG.GetX() && IEKADOOKFKG.GetY() == LDKCOIHONPG.GetY()) || (AOOIPCJPALH.GetX() == IGMCGOFHHCJ.GetX() && AOOIPCJPALH.GetY() == IGMCGOFHHCJ.GetY()))
+		if ((segmentAStart.GetX() == segmentAEnd.GetX() && segmentAStart.GetY() == segmentAEnd.GetY()) || (segmentBStart.GetX() == segmentBEnd.GetX() && segmentBStart.GetY() == segmentBEnd.GetY()))
 		{
 			return false;
 		}
-		float num = LDKCOIHONPG.GetX() - IEKADOOKFKG.GetX();
-		float num2 = LDKCOIHONPG.GetY() - IEKADOOKFKG.GetY();
-		float num3 = IGMCGOFHHCJ.GetX() - AOOIPCJPALH.GetX();
-		float num4 = IGMCGOFHHCJ.GetY() - AOOIPCJPALH.GetY();
-		float num5 = IEKADOOKFKG.GetX() - AOOIPCJPALH.GetX();
-		float num6 = IEKADOOKFKG.GetY() - AOOIPCJPALH.GetY();
+		float num = segmentAEnd.GetX() - segmentAStart.GetX();
+		float num2 = segmentAEnd.GetY() - segmentAStart.GetY();
+		float num3 = segmentBEnd.GetX() - segmentBStart.GetX();
+		float num4 = segmentBEnd.GetY() - segmentBStart.GetY();
+		float num5 = segmentAStart.GetX() - segmentBStart.GetX();
+		float num6 = segmentAStart.GetY() - segmentBStart.GetY();
 		float num7 = num4 * num - num3 * num2;
 		float num8 = num3 * num6 - num4 * num5;
 		float num9 = num * num6 - num2 * num5;
@@ -317,51 +317,51 @@ public class Vector2f
 			}
 			float num10;
 			float num11;
-			if (IEKADOOKFKG.GetX() < LDKCOIHONPG.GetX())
+			if (segmentAStart.GetX() < segmentAEnd.GetX())
 			{
-				num10 = IEKADOOKFKG.GetX();
-				num11 = LDKCOIHONPG.GetX();
+				num10 = segmentAStart.GetX();
+				num11 = segmentAEnd.GetX();
 			}
 			else
 			{
-				num10 = LDKCOIHONPG.GetX();
-				num11 = IEKADOOKFKG.GetX();
+				num10 = segmentAEnd.GetX();
+				num11 = segmentAStart.GetX();
 			}
 			float num12;
 			float num13;
-			if (AOOIPCJPALH.GetX() < IGMCGOFHHCJ.GetX())
+			if (segmentBStart.GetX() < segmentBEnd.GetX())
 			{
-				num12 = AOOIPCJPALH.GetX();
-				num13 = IGMCGOFHHCJ.GetX();
+				num12 = segmentBStart.GetX();
+				num13 = segmentBEnd.GetX();
 			}
 			else
 			{
-				num12 = IGMCGOFHHCJ.GetX();
-				num13 = AOOIPCJPALH.GetX();
+				num12 = segmentBEnd.GetX();
+				num13 = segmentBStart.GetX();
 			}
 			if (num10 > num13 || num12 > num11)
 			{
 				return false;
 			}
-			if (IEKADOOKFKG.GetY() < LDKCOIHONPG.GetY())
+			if (segmentAStart.GetY() < segmentAEnd.GetY())
 			{
-				num10 = IEKADOOKFKG.GetY();
-				num11 = LDKCOIHONPG.GetY();
+				num10 = segmentAStart.GetY();
+				num11 = segmentAEnd.GetY();
 			}
 			else
 			{
-				num10 = LDKCOIHONPG.GetY();
-				num11 = IEKADOOKFKG.GetY();
+				num10 = segmentAEnd.GetY();
+				num11 = segmentAStart.GetY();
 			}
-			if (AOOIPCJPALH.GetY() < IGMCGOFHHCJ.GetY())
+			if (segmentBStart.GetY() < segmentBEnd.GetY())
 			{
-				num12 = AOOIPCJPALH.GetY();
-				num13 = IGMCGOFHHCJ.GetY();
+				num12 = segmentBStart.GetY();
+				num13 = segmentBEnd.GetY();
 			}
 			else
 			{
-				num12 = IGMCGOFHHCJ.GetY();
-				num13 = AOOIPCJPALH.GetY();
+				num12 = segmentBEnd.GetY();
+				num13 = segmentBStart.GetY();
 			}
 			if (num10 > num13 || num12 > num11)
 			{
@@ -373,98 +373,98 @@ public class Vector2f
 		num9 /= num7;
 		if (num8 >= 0f && num8 <= 1f && num9 >= 0f && num9 <= 1f)
 		{
-			DCJLKCFKCOM.SetX(IEKADOOKFKG.GetX() + num8 * (LDKCOIHONPG.GetX() - IEKADOOKFKG.GetX()));
-			DCJLKCFKCOM.SetY(IEKADOOKFKG.GetY() + num8 * (LDKCOIHONPG.GetY() - IEKADOOKFKG.GetY()));
+			intersection.SetX(segmentAStart.GetX() + num8 * (segmentAEnd.GetX() - segmentAStart.GetX()));
+			intersection.SetY(segmentAStart.GetY() + num8 * (segmentAEnd.GetY() - segmentAStart.GetY()));
 			return true;
 		}
 		return false;
 	}
 
-	public static bool IsDistanceStrike(float OIOMNNFMDOO, float JBLFLFOGDFI, EquationLine EGKHHBMCGMK, Vector3f NAAPALOFBCI, Vector3f _base, Vector3f ILENLCMAMBH, Vector3f PCLFFOBJJFO)
+	public static bool IsDistanceStrike(float signedDistance, float radius, EquationLine equationLine, Vector3f point, Vector3f _base, Vector3f segmentStart, Vector3f segmentEnd)
 	{
-		if (Mathf.Abs(OIOMNNFMDOO) <= JBLFLFOGDFI)
+		if (Mathf.Abs(signedDistance) <= radius)
 		{
-			_base.SetX(NAAPALOFBCI.GetX() - OIOMNNFMDOO * EGKHHBMCGMK.A);
-			_base.SetY(NAAPALOFBCI.GetY() - OIOMNNFMDOO * EGKHHBMCGMK.CoefficientB);
-			return (((PCLFFOBJJFO.GetX() <= _base.GetX() && _base.GetX() <= ILENLCMAMBH.GetX()) || (ILENLCMAMBH.GetX() <= _base.GetX() && _base.GetX() <= PCLFFOBJJFO.GetX())) && ((PCLFFOBJJFO.GetY() <= _base.GetY() && _base.GetY() <= ILENLCMAMBH.GetY()) || (ILENLCMAMBH.GetY() <= _base.GetY() && _base.GetY() <= PCLFFOBJJFO.GetY()))) || (NAAPALOFBCI.GetX() - ILENLCMAMBH.GetX()) * (NAAPALOFBCI.GetX() - ILENLCMAMBH.GetX()) + (NAAPALOFBCI.GetY() - ILENLCMAMBH.GetY()) * (NAAPALOFBCI.GetY() - ILENLCMAMBH.GetY()) <= JBLFLFOGDFI * JBLFLFOGDFI || (NAAPALOFBCI.GetX() - PCLFFOBJJFO.GetX()) * (NAAPALOFBCI.GetX() - PCLFFOBJJFO.GetX()) + (NAAPALOFBCI.GetY() - PCLFFOBJJFO.GetY()) * (NAAPALOFBCI.GetY() - PCLFFOBJJFO.GetY()) <= JBLFLFOGDFI * JBLFLFOGDFI;
+			_base.SetX(point.GetX() - signedDistance * equationLine.A);
+			_base.SetY(point.GetY() - signedDistance * equationLine.CoefficientB);
+			return (((segmentEnd.GetX() <= _base.GetX() && _base.GetX() <= segmentStart.GetX()) || (segmentStart.GetX() <= _base.GetX() && _base.GetX() <= segmentEnd.GetX())) && ((segmentEnd.GetY() <= _base.GetY() && _base.GetY() <= segmentStart.GetY()) || (segmentStart.GetY() <= _base.GetY() && _base.GetY() <= segmentEnd.GetY()))) || (point.GetX() - segmentStart.GetX()) * (point.GetX() - segmentStart.GetX()) + (point.GetY() - segmentStart.GetY()) * (point.GetY() - segmentStart.GetY()) <= radius * radius || (point.GetX() - segmentEnd.GetX()) * (point.GetX() - segmentEnd.GetX()) + (point.GetY() - segmentEnd.GetY()) * (point.GetY() - segmentEnd.GetY()) <= radius * radius;
 		}
 		return false;
 	}
 
-	public static bool TryIntersectThickSegments(Vector3f HICHONIJHKL, Vector3f LNPFHLPCLOP, float KLDFJGIKIHG, Vector3f NMAJNHKJJEM, Vector3f ONNJMGGPHEL, float MGCKDDGGCBI, Vector3f DNJCFHNICBH, Vector3f LOFMLNLKFLB, EquationLine JHMHDMOADMA, EquationLine GIMOMPLMEJH)
+	public static bool TryIntersectThickSegments(Vector3f segmentAStart, Vector3f segmentAEnd, float radiusA, Vector3f segmentBStart, Vector3f segmentBEnd, float radiusB, Vector3f intersection, Vector3f basePoint, EquationLine cachedLineA, EquationLine cachedLineB)
 	{
-		float num = KLDFJGIKIHG + MGCKDDGGCBI;
+		float num = radiusA + radiusB;
 		if (num == 0f)
 		{
-			if (TryIntersectSegments(NMAJNHKJJEM, ONNJMGGPHEL, HICHONIJHKL, LNPFHLPCLOP, DNJCFHNICBH))
+			if (TryIntersectSegments(segmentBStart, segmentBEnd, segmentAStart, segmentAEnd, intersection))
 			{
-				LOFMLNLKFLB.Set(DNJCFHNICBH);
+				basePoint.Set(intersection);
 				return true;
 			}
 			return false;
 		}
-		EquationLine kEDCEHBPOIM = ((GIMOMPLMEJH == null) ? BuildEquationLine(NMAJNHKJJEM, ONNJMGGPHEL) : GIMOMPLMEJH);
-		float num2 = kEDCEHBPOIM.A * HICHONIJHKL.GetX() + kEDCEHBPOIM.CoefficientB * HICHONIJHKL.GetY() + kEDCEHBPOIM.ConstantC;
-		float num3 = kEDCEHBPOIM.A * LNPFHLPCLOP.GetX() + kEDCEHBPOIM.CoefficientB * LNPFHLPCLOP.GetY() + kEDCEHBPOIM.ConstantC;
+		EquationLine lineB = ((cachedLineB == null) ? BuildEquationLine(segmentBStart, segmentBEnd) : cachedLineB);
+		float num2 = lineB.A * segmentAStart.GetX() + lineB.CoefficientB * segmentAStart.GetY() + lineB.ConstantC;
+		float num3 = lineB.A * segmentAEnd.GetX() + lineB.CoefficientB * segmentAEnd.GetY() + lineB.ConstantC;
 		if (0f <= num2 * num3 && num < Mathf.Abs(num2) && num < Mathf.Abs(num3))
 		{
 			return false;
 		}
-		EquationLine kEDCEHBPOIM2 = ((JHMHDMOADMA == null) ? BuildEquationLine(HICHONIJHKL, LNPFHLPCLOP) : JHMHDMOADMA);
-		float num4 = kEDCEHBPOIM2.A * NMAJNHKJJEM.GetX() + kEDCEHBPOIM2.CoefficientB * NMAJNHKJJEM.GetY() + kEDCEHBPOIM2.ConstantC;
-		float num5 = kEDCEHBPOIM2.A * ONNJMGGPHEL.GetX() + kEDCEHBPOIM2.CoefficientB * ONNJMGGPHEL.GetY() + kEDCEHBPOIM2.ConstantC;
+		EquationLine kEDCEHBPOIM2 = ((cachedLineA == null) ? BuildEquationLine(segmentAStart, segmentAEnd) : cachedLineA);
+		float num4 = kEDCEHBPOIM2.A * segmentBStart.GetX() + kEDCEHBPOIM2.CoefficientB * segmentBStart.GetY() + kEDCEHBPOIM2.ConstantC;
+		float num5 = kEDCEHBPOIM2.A * segmentBEnd.GetX() + kEDCEHBPOIM2.CoefficientB * segmentBEnd.GetY() + kEDCEHBPOIM2.ConstantC;
 		if (0f <= num4 * num5 && num < Mathf.Abs(num4) && num < Mathf.Abs(num5))
 		{
 			return false;
 		}
 		if (num4 * num5 < 0f && num2 * num3 < 0f)
 		{
-			float lIAILCGJBDK = num4 / (num4 - num5);
-			DNJCFHNICBH.Set(Vector3f.op_Subtraction(ONNJMGGPHEL, NMAJNHKJJEM));
-			DNJCFHNICBH.Multiply(lIAILCGJBDK);
-			DNJCFHNICBH.Add(NMAJNHKJJEM);
-			LOFMLNLKFLB.Set(DNJCFHNICBH);
+			float interpolation = num4 / (num4 - num5);
+			intersection.Set(Vector3f.op_Subtraction(segmentBEnd, segmentBStart));
+			intersection.Multiply(interpolation);
+			intersection.Add(segmentBStart);
+			basePoint.Set(intersection);
 			return true;
 		}
-		if (IsDistanceStrike(num2, num, kEDCEHBPOIM, HICHONIJHKL, LOFMLNLKFLB, NMAJNHKJJEM, ONNJMGGPHEL))
+		if (IsDistanceStrike(num2, num, lineB, segmentAStart, basePoint, segmentBStart, segmentBEnd))
 		{
-			DNJCFHNICBH.Set(HICHONIJHKL);
+			intersection.Set(segmentAStart);
 			return true;
 		}
-		if (IsDistanceStrike(num3, num, kEDCEHBPOIM, LNPFHLPCLOP, LOFMLNLKFLB, NMAJNHKJJEM, ONNJMGGPHEL))
+		if (IsDistanceStrike(num3, num, lineB, segmentAEnd, basePoint, segmentBStart, segmentBEnd))
 		{
-			DNJCFHNICBH.Set(LNPFHLPCLOP);
+			intersection.Set(segmentAEnd);
 			return true;
 		}
-		if (IsDistanceStrike(num4, num, kEDCEHBPOIM2, NMAJNHKJJEM, LOFMLNLKFLB, HICHONIJHKL, LNPFHLPCLOP))
+		if (IsDistanceStrike(num4, num, kEDCEHBPOIM2, segmentBStart, basePoint, segmentAStart, segmentAEnd))
 		{
-			DNJCFHNICBH.Set(NMAJNHKJJEM);
-			LOFMLNLKFLB.Set(NMAJNHKJJEM);
+			intersection.Set(segmentBStart);
+			basePoint.Set(segmentBStart);
 			return true;
 		}
-		if (IsDistanceStrike(num5, num, kEDCEHBPOIM2, ONNJMGGPHEL, LOFMLNLKFLB, HICHONIJHKL, LNPFHLPCLOP))
+		if (IsDistanceStrike(num5, num, kEDCEHBPOIM2, segmentBEnd, basePoint, segmentAStart, segmentAEnd))
 		{
-			DNJCFHNICBH.Set(ONNJMGGPHEL);
-			LOFMLNLKFLB.Set(ONNJMGGPHEL);
+			intersection.Set(segmentBEnd);
+			basePoint.Set(segmentBEnd);
 			return true;
 		}
 		return false;
 	}
 
-	public static float DistanceSquared2D(Vector2f LHBNIMGFKIB, Vector2f AAOIAEJJINO)
+	public static float DistanceSquared2D(Vector2f pointA, Vector2f pointB)
 	{
-		return (AAOIAEJJINO.GetX() - LHBNIMGFKIB.GetX()) * (AAOIAEJJINO.GetX() - LHBNIMGFKIB.GetX()) + (AAOIAEJJINO.GetY() - LHBNIMGFKIB.GetY()) * (AAOIAEJJINO.GetY() - LHBNIMGFKIB.GetY());
+		return (pointB.GetX() - pointA.GetX()) * (pointB.GetX() - pointA.GetX()) + (pointB.GetY() - pointA.GetY()) * (pointB.GetY() - pointA.GetY());
 	}
 
-	public static float GetAngle2DDegreeSigned(Vector2f LHBNIMGFKIB, Vector2f AAOIAEJJINO)
+	public static float GetAngle2DDegreeSigned(Vector2f first, Vector2f second)
 	{
-		return GetAngle2DRadianSigned(LHBNIMGFKIB, AAOIAEJJINO) * 57.29578f;
+		return GetAngle2DRadianSigned(first, second) * 57.29578f;
 	}
 
-	public static float GetAngle2DRadianSigned(Vector2f LHBNIMGFKIB, Vector2f AAOIAEJJINO)
+	public static float GetAngle2DRadianSigned(Vector2f first, Vector2f second)
 	{
-		float num = LHBNIMGFKIB.X * AAOIAEJJINO.Y - LHBNIMGFKIB.Y * AAOIAEJJINO.X;
-		float num2 = LHBNIMGFKIB.X * AAOIAEJJINO.X + LHBNIMGFKIB.Y * AAOIAEJJINO.Y;
+		float num = first.X * second.Y - first.Y * second.X;
+		float num2 = first.X * second.X + first.Y * second.Y;
 		float num3 = 1f / Mathf.Sqrt(num * num + num2 * num2);
 		return Mathf.Atan2(num * num3, num2 * num3);
 	}

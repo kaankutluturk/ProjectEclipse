@@ -1,8 +1,8 @@
 public class QuestActionRestartApplication : QuestAction
 {
-	public override void Execute(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters parameters)
 	{
-		base.Execute(GFIHPBCEEOB);
+		base.Execute(parameters);
 		ListSF.GetInstance().OnAuthenticate(true);
 		FinishAction();
 		GameUtils.ResetScenes();

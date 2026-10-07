@@ -49,20 +49,20 @@ internal class DemoHub : Hub
 		On("fromArbitraryCode", FromArbitraryCode);
 	}
 
-	public void ReportProgress(string EHCLMBADLKH)
+	public void ReportProgress(string jobName)
 	{
-		Call("reportProgress", OnLongRunningJob_Done, null, OnLongRunningJob_Progress, EHCLMBADLKH);
+		Call("reportProgress", OnLongRunningJob_Done, null, OnLongRunningJob_Progress, jobName);
 	}
 
-	public void OnLongRunningJob_Progress(Hub CGFIJCNNCKP, ClientMessage JBEJKCPHFJP, ProgressMessage progress)
+	public void OnLongRunningJob_Progress(Hub hub, ClientMessage clientMessage, ProgressMessage progress)
 	{
 		longRunningJobProgress = (float)progress.GetProgress();
 		longRunningJobStatus = progress.GetProgress() + "%";
 	}
 
-	public void OnLongRunningJob_Done(Hub CGFIJCNNCKP, ClientMessage BKNEELNMDHH, ResultMessage DCJLKCFKCOM)
+	public void OnLongRunningJob_Done(Hub hub, ClientMessage clientMessage, ResultMessage resultMessage)
 	{
-		longRunningJobStatus = DCJLKCFKCOM.GetReturnValue().ToString();
+		longRunningJobStatus = resultMessage.GetReturnValue().ToString();
 		MultipleCalls();
 	}
 
@@ -76,14 +76,14 @@ internal class DemoHub : Hub
 		Call("dynamicTask", OnDynamicTask_Done, OnDynamicTask_Failed);
 	}
 
-	private void OnDynamicTask_Failed(Hub CGFIJCNNCKP, ClientMessage BKNEELNMDHH, FailureMessage DCJLKCFKCOM)
+	private void OnDynamicTask_Failed(Hub hub, ClientMessage clientMessage, FailureMessage failureMessage)
 	{
-		dynamicTaskResult = string.Format("The dynamic task failed :( {0}", DCJLKCFKCOM.GetErrorMessage());
+		dynamicTaskResult = string.Format("The dynamic task failed :( {0}", failureMessage.GetErrorMessage());
 	}
 
-	private void OnDynamicTask_Done(Hub CGFIJCNNCKP, ClientMessage BKNEELNMDHH, ResultMessage DCJLKCFKCOM)
+	private void OnDynamicTask_Done(Hub hub, ClientMessage clientMessage, ResultMessage resultMessage)
 	{
-		dynamicTaskResult = string.Format("The dynamic task! {0}", DCJLKCFKCOM.GetReturnValue());
+		dynamicTaskResult = string.Format("The dynamic task! {0}", resultMessage.GetReturnValue());
 	}
 
 	public void AddToGroups()
@@ -93,66 +93,66 @@ internal class DemoHub : Hub
 
 	public void GetValue()
 	{
-		Call("getValue", (Hub CGFIJCNNCKP, ClientMessage CKEHOEGLMBM, ResultMessage DCJLKCFKCOM) =>
+		Call("getValue", (Hub hub, ClientMessage clientMessage, ResultMessage resultMessage) =>
 		{
-			genericTaskResult = string.Format("The value is {0} after 5 seconds", DCJLKCFKCOM.GetReturnValue());
+			genericTaskResult = string.Format("The value is {0} after 5 seconds", resultMessage.GetReturnValue());
 		});
 	}
 
 	public void TaskWithException()
 	{
-		Call("taskWithException", null, (Hub CGFIJCNNCKP, ClientMessage CKEHOEGLMBM, FailureMessage JDONBAPIJCG) =>
+		Call("taskWithException", null, (Hub hub, ClientMessage clientMessage, FailureMessage failureMessage) =>
 		{
-			taskWithExceptionResult = string.Format("Error: {0}", JDONBAPIJCG.GetErrorMessage());
+			taskWithExceptionResult = string.Format("Error: {0}", failureMessage.GetErrorMessage());
 		});
 	}
 
 	public void GenericTaskWithException()
 	{
-		Call("genericTaskWithException", null, (Hub CGFIJCNNCKP, ClientMessage CKEHOEGLMBM, FailureMessage JDONBAPIJCG) =>
+		Call("genericTaskWithException", null, (Hub hub, ClientMessage clientMessage, FailureMessage failureMessage) =>
 		{
-			genericTaskWithExceptionResult = string.Format("Error: {0}", JDONBAPIJCG.GetErrorMessage());
+			genericTaskWithExceptionResult = string.Format("Error: {0}", failureMessage.GetErrorMessage());
 		});
 	}
 
 	public void SynchronousException()
 	{
-		Call("synchronousException", null, (Hub CGFIJCNNCKP, ClientMessage CKEHOEGLMBM, FailureMessage JDONBAPIJCG) =>
+		Call("synchronousException", null, (Hub hub, ClientMessage clientMessage, FailureMessage failureMessage) =>
 		{
-			synchronousExceptionResult = string.Format("Error: {0}", JDONBAPIJCG.GetErrorMessage());
+			synchronousExceptionResult = string.Format("Error: {0}", failureMessage.GetErrorMessage());
 		});
 	}
 
-	public void PassingDynamicComplex(object FAFBDKBGDNM)
+	public void PassingDynamicComplex(object person)
 	{
-		Call("passingDynamicComplex", (Hub CGFIJCNNCKP, ClientMessage CKEHOEGLMBM, ResultMessage DCJLKCFKCOM) =>
+		Call("passingDynamicComplex", (Hub hub, ClientMessage clientMessage, ResultMessage resultMessage) =>
 		{
-			invokingHubMethodWithDynamicResult = string.Format("The person's age is {0}", DCJLKCFKCOM.GetReturnValue());
-		}, FAFBDKBGDNM);
+			invokingHubMethodWithDynamicResult = string.Format("The person's age is {0}", resultMessage.GetReturnValue());
+		}, person);
 	}
 
-	public void SimpleArray(int[] HFPDMGAEJJE)
+	public void SimpleArray(int[] values)
 	{
-		Call("simpleArray", (Hub CGFIJCNNCKP, ClientMessage CKEHOEGLMBM, ResultMessage DCJLKCFKCOM) =>
+		Call("simpleArray", (Hub hub, ClientMessage clientMessage, ResultMessage resultMessage) =>
 		{
 			simpleArrayResult = "Simple array works!";
-		}, HFPDMGAEJJE);
+		}, values);
 	}
 
-	public void ComplexType(object FAFBDKBGDNM)
+	public void ComplexType(object person)
 	{
-		Call("complexType", (Hub CGFIJCNNCKP, ClientMessage CKEHOEGLMBM, ResultMessage DCJLKCFKCOM) =>
+		Call("complexType", (Hub hub, ClientMessage clientMessage, ResultMessage resultMessage) =>
 		{
 			complexTypeResult = string.Format("Complex Type -> {0}", ((IHub)this).HubConnection.GetJsonEncoder().Encode(GetState()["person"]));
-		}, FAFBDKBGDNM);
+		}, person);
 	}
 
-	public void ComplexArray(object[] OEOJFDNOEAO)
+	public void ComplexArray(object[] persons)
 	{
-		Call("ComplexArray", (Hub CGFIJCNNCKP, ClientMessage CKEHOEGLMBM, ResultMessage DCJLKCFKCOM) =>
+		Call("ComplexArray", (Hub hub, ClientMessage clientMessage, ResultMessage resultMessage) =>
 		{
 			complexArrayResult = "Complex Array Works!";
-		}, new object[1] { OEOJFDNOEAO });
+		}, new object[1] { persons });
 	}
 
 	public void Overload()
@@ -160,7 +160,7 @@ internal class DemoHub : Hub
 		Call("Overload", OnVoidOverload_Done);
 	}
 
-	private void OnVoidOverload_Done(Hub CGFIJCNNCKP, ClientMessage BKNEELNMDHH, ResultMessage DCJLKCFKCOM)
+	private void OnVoidOverload_Done(Hub hub, ClientMessage clientMessage, ResultMessage resultMessage)
 	{
 		voidOverloadResult = "Void Overload called";
 		Overload(101);
@@ -171,22 +171,22 @@ internal class DemoHub : Hub
 		Call("Overload", OnIntOverload_Done, number);
 	}
 
-	private void OnIntOverload_Done(Hub CGFIJCNNCKP, ClientMessage BKNEELNMDHH, ResultMessage DCJLKCFKCOM)
+	private void OnIntOverload_Done(Hub hub, ClientMessage clientMessage, ResultMessage resultMessage)
 	{
-		intOverloadResult = string.Format("Overload with return value called => {0}", DCJLKCFKCOM.GetReturnValue().ToString());
+		intOverloadResult = string.Format("Overload with return value called => {0}", resultMessage.GetReturnValue().ToString());
 	}
 
 	public void ReadStateValue()
 	{
-		Call("readStateValue", (Hub CGFIJCNNCKP, ClientMessage CKEHOEGLMBM, ResultMessage DCJLKCFKCOM) =>
+		Call("readStateValue", (Hub hub, ClientMessage clientMessage, ResultMessage resultMessage) =>
 		{
-			readStateResult = string.Format("Read some state! => {0}", DCJLKCFKCOM.GetReturnValue());
+			readStateResult = string.Format("Read some state! => {0}", resultMessage.GetReturnValue());
 		});
 	}
 
 	public void PlainTask()
 	{
-		Call("plainTask", (Hub CGFIJCNNCKP, ClientMessage CKEHOEGLMBM, ResultMessage DCJLKCFKCOM) =>
+		Call("plainTask", (Hub hub, ClientMessage clientMessage, ResultMessage resultMessage) =>
 		{
 			plainTaskResult = "Plain Task Result";
 		});
@@ -194,18 +194,18 @@ internal class DemoHub : Hub
 
 	public void GenericTaskWithContinueWith()
 	{
-		Call("genericTaskWithContinueWith", (Hub CGFIJCNNCKP, ClientMessage CKEHOEGLMBM, ResultMessage DCJLKCFKCOM) =>
+		Call("genericTaskWithContinueWith", (Hub hub, ClientMessage clientMessage, ResultMessage resultMessage) =>
 		{
-			genericTaskWithContinueWithResult = DCJLKCFKCOM.GetReturnValue().ToString();
+			genericTaskWithContinueWithResult = resultMessage.GetReturnValue().ToString();
 		});
 	}
 
-	private void FromArbitraryCode(Hub CGFIJCNNCKP, MethodCallMessage BOPGDKGIGHM)
+	private void FromArbitraryCode(Hub hub, MethodCallMessage methodCall)
 	{
-		fromArbitraryCodeResult = BOPGDKGIGHM.GetArguments()[0] as string;
+		fromArbitraryCodeResult = methodCall.GetArguments()[0] as string;
 	}
 
-	private void GroupAdded(Hub CGFIJCNNCKP, MethodCallMessage BOPGDKGIGHM)
+	private void GroupAdded(Hub hub, MethodCallMessage methodCall)
 	{
 		if (!string.IsNullOrEmpty(groupAddedResult))
 		{
@@ -217,14 +217,14 @@ internal class DemoHub : Hub
 		}
 	}
 
-	private void Signal(Hub CGFIJCNNCKP, MethodCallMessage BOPGDKGIGHM)
+	private void Signal(Hub hub, MethodCallMessage methodCall)
 	{
-		dynamicTaskResult = string.Format("The dynamic task! {0}", BOPGDKGIGHM.GetArguments()[0]);
+		dynamicTaskResult = string.Format("The dynamic task! {0}", methodCall.GetArguments()[0]);
 	}
 
-	private void Invoke(Hub CGFIJCNNCKP, MethodCallMessage BOPGDKGIGHM)
+	private void Invoke(Hub hub, MethodCallMessage methodCall)
 	{
-		invokeResults.Add(string.Format("{0} client state index -> {1}", BOPGDKGIGHM.GetArguments()[0], GetState()["index"]));
+		invokeResults.Add(string.Format("{0} client state index -> {1}", methodCall.GetArguments()[0], GetState()["index"]));
 	}
 
 	public void Draw()

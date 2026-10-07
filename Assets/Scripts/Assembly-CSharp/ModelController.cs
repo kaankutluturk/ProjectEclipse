@@ -54,10 +54,10 @@ public class ModelController : global::EventDispatcher<object>
 		keys.Capacity = 150;
 		for (int i = 0; i < 150; i++)
 		{
-			KeyInfo hFBBKFECOBD = new KeyInfo();
-			hFBBKFECOBD.KeyId = (hFBBKFECOBD.Index = i + 1);
-			hFBBKFECOBD.Press = false;
-			keys.Add(hFBBKFECOBD);
+			KeyInfo keyInfo = new KeyInfo();
+			keyInfo.KeyId = (keyInfo.Index = i + 1);
+			keyInfo.Press = false;
+			keys.Add(keyInfo);
 		}
 	}
 
@@ -114,14 +114,14 @@ public class ModelController : global::EventDispatcher<object>
 		}
 	}
 
-	public void OnPressAnyKey(int KJPGKHJNOMC)
+	public void OnPressAnyKey(int keyId)
 	{
-		KeyInfo hFBBKFECOBD = GetKey(KJPGKHJNOMC);
-		if (hFBBKFECOBD != null && !hFBBKFECOBD.Press)
+		KeyInfo keyInfo = GetKey(keyId);
+		if (keyInfo != null && !keyInfo.Press)
 		{
-			hFBBKFECOBD.Press = true;
+			keyInfo.Press = true;
 			pressAgeCounter = 0;
-			currentKeyData.StarterKeys.Add(hFBBKFECOBD.Index);
+			currentKeyData.StarterKeys.Add(keyInfo.Index);
 			while (currentKeyData.StarterKeys.Count > 2)
 			{
 				currentKeyData.StarterKeys.RemoveAt(0);
@@ -133,27 +133,27 @@ public class ModelController : global::EventDispatcher<object>
 		}
 	}
 
-	public void OnReleaseAnyKey(int KJPGKHJNOMC)
+	public void OnReleaseAnyKey(int keyId)
 	{
-		KeyInfo hFBBKFECOBD = GetKey(KJPGKHJNOMC);
-		if (hFBBKFECOBD == null)
+		KeyInfo keyInfo = GetKey(keyId);
+		if (keyInfo == null)
 		{
 			return;
 		}
-		hFBBKFECOBD.Press = false;
-		if (!currentKeyData.StarterKeys.Contains(hFBBKFECOBD.Index))
+		keyInfo.Press = false;
+		if (!currentKeyData.StarterKeys.Contains(keyInfo.Index))
 		{
-			int num = currentKeyData.AdditionalKeys.IndexOf(hFBBKFECOBD.Index);
-			if (currentKeyData.AdditionalKeys.Contains(hFBBKFECOBD.Index))
+			int num = currentKeyData.AdditionalKeys.IndexOf(keyInfo.Index);
+			if (currentKeyData.AdditionalKeys.Contains(keyInfo.Index))
 			{
-				currentKeyData.ReleaseKeys.Add(hFBBKFECOBD.Index);
-				currentKeyData.AdditionalKeys.Remove(hFBBKFECOBD.Index);
+				currentKeyData.ReleaseKeys.Add(keyInfo.Index);
+				currentKeyData.AdditionalKeys.Remove(keyInfo.Index);
 				CallKeyReleased();
 			}
 		}
 	}
 
-	public KeyData GetKeyDataBySign(int AOJJBKLCHJO)
+	public KeyData GetKeyDataBySign(int sign)
 	{
 		keyDataSnapshot.Set(currentKeyData);
 		return keyDataSnapshot;
@@ -169,11 +169,11 @@ public class ModelController : global::EventDispatcher<object>
 		CallEvent(1, currentKeyData);
 	}
 
-	private KeyInfo GetKey(int HDKKKCDKFEE)
+	private KeyInfo GetKey(int keyId)
 	{
 		foreach (KeyInfo item in keys)
 		{
-			if (item.KeyId == HDKKKCDKFEE)
+			if (item.KeyId == keyId)
 			{
 				return item;
 			}
@@ -193,15 +193,15 @@ public class ModelController : global::EventDispatcher<object>
 		}
 	}
 
-	private KeyData.PressType GetPressType(List<int> AKFEAJDLIKF, List<int> LFKEMJBCMFL)
+	private KeyData.PressType GetPressType(List<int> starterKeys, List<int> additionalKeys)
 	{
-		if (AKFEAJDLIKF.Count == 1)
+		if (starterKeys.Count == 1)
 		{
 			return KeyData.PressType.BOTH;
 		}
-		foreach (int item in AKFEAJDLIKF)
+		foreach (int item in starterKeys)
 		{
-			foreach (int item2 in LFKEMJBCMFL)
+			foreach (int item2 in additionalKeys)
 			{
 				if (item == item2)
 				{

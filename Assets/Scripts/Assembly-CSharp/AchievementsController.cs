@@ -9,89 +9,89 @@ public class AchievementsController : ITableViewDataSource, ITableViewDelegate
 
 	private List<global::Pair<Achievement, int>> displayedAchievements = new List<global::Pair<Achievement, int>>();
 
-	public AchievementsController(TableView OIDFBEAABBA, GameObject CGLPIDAECLH)
+	public AchievementsController(TableView table, GameObject cellPrefab)
 	{
-		tableView = OIDFBEAABBA;
+		tableView = table;
 		RebuildAchievementList();
-		OIDFBEAABBA.set_CellPrefab(CGLPIDAECLH);
-		OIDFBEAABBA.Init(this, this);
+		table.set_CellPrefab(cellPrefab);
+		table.Init(this, this);
 	}
 
-	public int NumberOfRowsInTableView(TableView OIDFBEAABBA)
+	public int NumberOfRowsInTableView(TableView table)
 	{
 		return displayedAchievements.Count;
 	}
 
-	public float SizeForRowInTableView(TableView OIDFBEAABBA, int IBAKGENOEPH)
+	public float SizeForRowInTableView(TableView table, int row)
 	{
 		return 268f;
 	}
 
-	public TableViewCell CellForRowInTableView(TableView OIDFBEAABBA, int IBAKGENOEPH)
+	public TableViewCell CellForRowInTableView(TableView table, int row)
 	{
-		Achievement lLHEDBIEHAA = displayedAchievements[IBAKGENOEPH].First;
-		TableViewCell tableViewCell = OIDFBEAABBA.ReusableCellForRow(IBAKGENOEPH);
+		Achievement achievement = displayedAchievements[row].First;
+		TableViewCell tableViewCell = table.ReusableCellForRow(row);
 		AchievementCell component = tableViewCell.GetComponent<AchievementCell>();
-		component.Init(lLHEDBIEHAA, displayedAchievements[IBAKGENOEPH].Second, IBAKGENOEPH);
+		component.Init(achievement, displayedAchievements[row].Second, row);
 		return tableViewCell;
 	}
 
-	public void TableViewDidHighlightCellForRow(TableView OIDFBEAABBA, int IBAKGENOEPH)
+	public void TableViewDidHighlightCellForRow(TableView table, int row)
 	{
 	}
 
-	public void TableViewDidSelectCellForRow(TableView OIDFBEAABBA, int IBAKGENOEPH)
+	public void TableViewDidSelectCellForRow(TableView table, int row)
 	{
-		tableView.ScrollToCell(IBAKGENOEPH, 0.5f);
+		tableView.ScrollToCell(row, 0.5f);
 	}
 
 	private void RebuildAchievementList()
 	{
 		displayedAchievements.Clear();
-		List<AchievCounter> mDNKEAFGAOB = GameUtils.AchievementDefinitions.Counters;
+		List<AchievCounter> counterDefinitions = GameUtils.AchievementDefinitions.Counters;
 		List<RosterAchievCounter> list = new List<RosterAchievCounter>(ListSF.GetRoster().GetAchievements().GetCounters());
-		List<RosterAchievement> eOJAMHMPKAJ = ListSF.GetRoster().GetAchievements().GetAchievements();
-		for (int i = 0; i < mDNKEAFGAOB.Count; i++)
+		List<RosterAchievement> rosterAchievements = ListSF.GetRoster().GetAchievements().GetAchievements();
+		for (int i = 0; i < counterDefinitions.Count; i++)
 		{
-			string mENAJEAJJBE = mDNKEAFGAOB[i].Name;
-			int ePJGLECOIBG = 0;
-			List<Achievement> pGAGNLJABIE = new List<Achievement>(mDNKEAFGAOB[i].Achievements);
+			string counterName = counterDefinitions[i].Name;
+			int counterValue = 0;
+			List<Achievement> counterAchievements = new List<Achievement>(counterDefinitions[i].Achievements);
 			for (int j = 0; j < list.Count; j++)
 			{
-				RosterAchievCounter cKJBHGKBPPM = list[j];
-				if (mENAJEAJJBE == cKJBHGKBPPM.get_Name())
+				RosterAchievCounter rosterCounter = list[j];
+				if (counterName == rosterCounter.get_Name())
 				{
-					ePJGLECOIBG = cKJBHGKBPPM.GetCounter();
+					counterValue = rosterCounter.GetCounter();
 					list.RemoveAt(j);
 					break;
 				}
 			}
-			AddCounterAchievements(pGAGNLJABIE, eOJAMHMPKAJ, ePJGLECOIBG);
+			AddCounterAchievements(counterAchievements, rosterAchievements, counterValue);
 		}
 	}
 
-	private void AddCounterAchievements(List<Achievement> PGAGNLJABIE, List<RosterAchievement> EOJAMHMPKAJ, int EPJGLECOIBG)
+	private void AddCounterAchievements(List<Achievement> counterAchievements, List<RosterAchievement> rosterAchievements, int counterValue)
 	{
-		for (int i = 0; i < EOJAMHMPKAJ.Count; i++)
+		for (int i = 0; i < rosterAchievements.Count; i++)
 		{
-			string text = EOJAMHMPKAJ[i].get_Name();
-			for (int j = 0; j < PGAGNLJABIE.Count; j++)
+			string text = rosterAchievements[i].get_Name();
+			for (int j = 0; j < counterAchievements.Count; j++)
 			{
-				Achievement jNPIOKEKMII = PGAGNLJABIE[j];
-				if ((!jNPIOKEKMII.IsHidden || jNPIOKEKMII.IsUnlocked) && text == jNPIOKEKMII.Name)
+				Achievement achievement = counterAchievements[j];
+				if ((!achievement.IsHidden || achievement.IsUnlocked) && text == achievement.Name)
 				{
-					displayedAchievements.Add(new global::Pair<Achievement, int>(jNPIOKEKMII, jNPIOKEKMII.CounterValue));
-					PGAGNLJABIE.RemoveAt(j);
+					displayedAchievements.Add(new global::Pair<Achievement, int>(achievement, achievement.CounterValue));
+					counterAchievements.RemoveAt(j);
 					break;
 				}
 			}
 		}
-		for (int k = 0; k < PGAGNLJABIE.Count; k++)
+		for (int k = 0; k < counterAchievements.Count; k++)
 		{
-			if (!PGAGNLJABIE[k].IsHidden || PGAGNLJABIE[k].IsUnlocked)
+			if (!counterAchievements[k].IsHidden || counterAchievements[k].IsUnlocked)
 			{
-				displayedAchievements.Add(new global::Pair<Achievement, int>(PGAGNLJABIE[k], EPJGLECOIBG));
-				if (EPJGLECOIBG < PGAGNLJABIE[k].CounterValue)
+				displayedAchievements.Add(new global::Pair<Achievement, int>(counterAchievements[k], counterValue));
+				if (counterValue < counterAchievements[k].CounterValue)
 				{
 					break;
 				}
@@ -128,14 +128,14 @@ public class AchievementsController : ITableViewDataSource, ITableViewDelegate
 		}
 	}
 
-	public void ScrollToAchievement(string OGPJPGMBIHJ)
+	public void ScrollToAchievement(string achievementName)
 	{
 		int num = -1;
 		int i = 0;
 		for (int count = displayedAchievements.Count; i < count; i++)
 		{
-			string mENAJEAJJBE = displayedAchievements[i].First.Name;
-			if (mENAJEAJJBE == OGPJPGMBIHJ)
+			string currentName = displayedAchievements[i].First.Name;
+			if (currentName == achievementName)
 			{
 				num = i;
 				break;

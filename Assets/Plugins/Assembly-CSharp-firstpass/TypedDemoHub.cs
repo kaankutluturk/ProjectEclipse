@@ -12,17 +12,17 @@ internal class TypedDemoHub : Hub
 		On("Echo", Echo);
 	}
 
-	private void Echo(Hub CGFIJCNNCKP, MethodCallMessage BOPGDKGIGHM)
+	private void Echo(Hub hub, MethodCallMessage message)
 	{
-		typedEchoClientResult = string.Format("{0} #{1} triggered!", BOPGDKGIGHM.GetArguments()[0], BOPGDKGIGHM.GetArguments()[1]);
+		typedEchoClientResult = string.Format("{0} #{1} triggered!", message.GetArguments()[0], message.GetArguments()[1]);
 	}
 
-	public void Echo(string CKEHOEGLMBM)
+	public void Echo(string text)
 	{
-		Call("echo", OnEchoDone, CKEHOEGLMBM);
+		Call("echo", OnEchoDone, text);
 	}
 
-	private void OnEchoDone(Hub CGFIJCNNCKP, ClientMessage BKNEELNMDHH, ResultMessage DCJLKCFKCOM)
+	private void OnEchoDone(Hub hub, ClientMessage originalMessage, ResultMessage resultMessage)
 	{
 		typedEchoResult = "TypedDemoHub.Echo(string message) invoked!";
 	}

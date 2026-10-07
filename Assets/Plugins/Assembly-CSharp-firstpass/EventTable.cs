@@ -20,9 +20,9 @@ internal sealed class EventTable
 		}
 	}
 
-	public EventTable(Socket JLEACANCMJF)
+	public EventTable(Socket socket)
 	{
-		SetOwnerSocket(JLEACANCMJF);
+		SetOwnerSocket(socket);
 	}
 
 	private Socket GetOwnerSocket()
@@ -35,33 +35,33 @@ internal sealed class EventTable
 		socket = value;
 	}
 
-	public void Register(string DOPHKKGNAEF, SocketIOCallback callback, bool ONOLLCMDGBO, bool EJDLINOJJIF)
+	public void Register(string eventName, SocketIOCallback callback, bool onlyOnce, bool autoDecodePayload)
 	{
 		List<EventDescriptor> value;
-		if (!Table.TryGetValue(DOPHKKGNAEF, out value))
+		if (!Table.TryGetValue(eventName, out value))
 		{
-			Table.Add(DOPHKKGNAEF, value = new List<EventDescriptor>(1));
+			Table.Add(eventName, value = new List<EventDescriptor>(1));
 		}
-		EventDescriptor lBIMLJMCENN = value.Find((EventDescriptor d) => d.GetOnlyOnce() == ONOLLCMDGBO && d.GetAutoDecodePayload() == EJDLINOJJIF);
-		if (lBIMLJMCENN == null)
+		EventDescriptor descriptor = value.Find((EventDescriptor d) => d.GetOnlyOnce() == onlyOnce && d.GetAutoDecodePayload() == autoDecodePayload);
+		if (descriptor == null)
 		{
-			value.Add(new EventDescriptor(ONOLLCMDGBO, EJDLINOJJIF, callback));
+			value.Add(new EventDescriptor(onlyOnce, autoDecodePayload, callback));
 		}
 		else
 		{
-			lBIMLJMCENN.GetCallbacks().Add(callback);
+			descriptor.GetCallbacks().Add(callback);
 		}
 	}
 
-	public void Unregister(string DOPHKKGNAEF)
+	public void Unregister(string eventName)
 	{
-		Table.Remove(DOPHKKGNAEF);
+		Table.Remove(eventName);
 	}
 
-	public void Unregister(string DOPHKKGNAEF, SocketIOCallback callback)
+	public void Unregister(string eventName, SocketIOCallback callback)
 	{
 		List<EventDescriptor> value;
-		if (Table.TryGetValue(DOPHKKGNAEF, out value))
+		if (Table.TryGetValue(eventName, out value))
 		{
 			for (int i = 0; i < value.Count; i++)
 			{
@@ -70,44 +70,44 @@ internal sealed class EventTable
 		}
 	}
 
-	public void Call(string DOPHKKGNAEF, Packet NPKADBPBKIG, params object[] LKIOKGCNKHE)
+	public void Call(string eventName, Packet packet, params object[] args)
 	{
 		if (HTTPManager.GetLogger().GetLevel() <= Loglevels.All)
 		{
-			HTTPManager.GetLogger().Verbose("EventTable", "Call - " + DOPHKKGNAEF);
+			HTTPManager.GetLogger().Verbose("EventTable", "Call - " + eventName);
 		}
 		List<EventDescriptor> value;
-		if (Table.TryGetValue(DOPHKKGNAEF, out value))
+		if (Table.TryGetValue(eventName, out value))
 		{
 			for (int i = 0; i < value.Count; i++)
 			{
-				value[i].Call(GetOwnerSocket(), NPKADBPBKIG, LKIOKGCNKHE);
+				value[i].Call(GetOwnerSocket(), packet, args);
 			}
 		}
 	}
 
-	public void Call(Packet NPKADBPBKIG)
+	public void Call(Packet packet)
 	{
-		string text = NPKADBPBKIG.DecodeEventName();
-		string text2 = ((NPKADBPBKIG.GetSocketIOEvent() == SocketIOEventType.Unknown) ? EventNames.GetNameFor(NPKADBPBKIG.GetTransportEvent()) : EventNames.GetNameFor(NPKADBPBKIG.GetSocketIOEvent()));
-		object[] lKIOKGCNKHE = null;
+		string text = packet.DecodeEventName();
+		string text2 = ((packet.GetSocketIOEvent() == SocketIOEventType.Unknown) ? EventNames.GetNameFor(packet.GetTransportEvent()) : EventNames.GetNameFor(packet.GetSocketIOEvent()));
+		object[] args = null;
 		if (HasSubscriber(text) || HasSubscriber(text2))
 		{
-			if (NPKADBPBKIG.GetTransportEvent() == TransportEventTypes.Message && (NPKADBPBKIG.GetSocketIOEvent() == SocketIOEventType.Event || NPKADBPBKIG.GetSocketIOEvent() == SocketIOEventType.BinaryEvent) && IsAutoDecode(text))
+			if (packet.GetTransportEvent() == TransportEventTypes.Message && (packet.GetSocketIOEvent() == SocketIOEventType.Event || packet.GetSocketIOEvent() == SocketIOEventType.BinaryEvent) && IsAutoDecode(text))
 			{
-				lKIOKGCNKHE = NPKADBPBKIG.Decode(GetOwnerSocket().GetManager().GetEncoder());
+				args = packet.Decode(GetOwnerSocket().GetManager().GetEncoder());
 			}
 			if (!string.IsNullOrEmpty(text))
 			{
-				Call(text, NPKADBPBKIG, lKIOKGCNKHE);
+				Call(text, packet, args);
 			}
-			if (!NPKADBPBKIG.GetIsDecoded() && IsAutoDecode(text2))
+			if (!packet.GetIsDecoded() && IsAutoDecode(text2))
 			{
-				lKIOKGCNKHE = NPKADBPBKIG.Decode(GetOwnerSocket().GetManager().GetEncoder());
+				args = packet.Decode(GetOwnerSocket().GetManager().GetEncoder());
 			}
 			if (!string.IsNullOrEmpty(text2))
 			{
-				Call(text2, NPKADBPBKIG, lKIOKGCNKHE);
+				Call(text2, packet, args);
 			}
 		}
 	}
@@ -117,10 +117,10 @@ internal sealed class EventTable
 		Table.Clear();
 	}
 
-	private bool IsAutoDecode(string DOPHKKGNAEF)
+	private bool IsAutoDecode(string eventName)
 	{
 		List<EventDescriptor> value;
-		if (Table.TryGetValue(DOPHKKGNAEF, out value))
+		if (Table.TryGetValue(eventName, out value))
 		{
 			for (int i = 0; i < value.Count; i++)
 			{
@@ -133,8 +133,8 @@ internal sealed class EventTable
 		return false;
 	}
 
-	private bool HasSubscriber(string DOPHKKGNAEF)
+	private bool HasSubscriber(string eventName)
 	{
-		return Table.ContainsKey(DOPHKKGNAEF);
+		return Table.ContainsKey(eventName);
 	}
 }

@@ -16,9 +16,9 @@ public class EventReader
 		}
 	}
 
-	public EventReader(IParser BPGMNGAJMKK)
+	public EventReader(IParser parser)
 	{
-		this.parser = BPGMNGAJMKK;
+		this.parser = parser;
 		MoveNext();
 	}
 
@@ -32,8 +32,8 @@ public class EventReader
 		T val = Allow<T>();
 		if (val == null)
 		{
-			ParsingEvent jMKLCDAKEOG = parser.GetCurrent();
-			throw new YamlException(jMKLCDAKEOG.GetStart(), jMKLCDAKEOG.GetEnd(), string.Format(CultureInfo.InvariantCulture, "Expected '{0}', got '{1}' (at {2}).", typeof(T).Name, jMKLCDAKEOG.GetType().Name, jMKLCDAKEOG.GetStart()));
+			ParsingEvent currentEvent = parser.GetCurrent();
+			throw new YamlException(currentEvent.GetStart(), currentEvent.GetEnd(), string.Format(CultureInfo.InvariantCulture, "Expected '{0}', got '{1}' (at {2}).", typeof(T).Name, currentEvent.GetType().Name, currentEvent.GetStart()));
 		}
 		return val;
 	}

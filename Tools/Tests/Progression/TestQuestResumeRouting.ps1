@@ -10,7 +10,7 @@ function ReadMethod([string]$file,[string]$signature) {
 $runSource=Get-Content -Raw -LiteralPath (Join-Path $root 'Assets/Scripts/Assembly-CSharp/QuestAction.cs')
 $run=[regex]::Match($runSource,'(?ms)^public class QuestActionRun : QuestAction\r?\n\{.*?^\}')
 if (!$run.Success) { throw 'Run action not found' }
-$each=ReadMethod 'Assets/Scripts/Assembly-CSharp/QuestActionForeach.cs' 'public override void Execute(QuestParameters GFIHPBCEEOB)'
+$each=ReadMethod 'Assets/Scripts/Assembly-CSharp/QuestActionForeach.cs' 'public override void Execute(QuestParameters parameters)'
 $resume=ReadMethod 'Assets/Scripts/Assembly-CSharp/Roster.cs' 'public bool StartPendingQuests()'
 $fixture=@'
 using System;

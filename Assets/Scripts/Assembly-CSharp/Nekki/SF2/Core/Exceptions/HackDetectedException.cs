@@ -10,17 +10,17 @@ namespace Nekki.SF2.Core.Exceptions
 		{
 		}
 
-		public HackDetectedException(string LIOGIBJBHAH)
-			: base(LIOGIBJBHAH)
+		public HackDetectedException(string message)
+			: base(message)
 		{
 		}
 
-		public HackDetectedException(string LIOGIBJBHAH, Exception LEPEAKBGHLB)
-			: base(LIOGIBJBHAH, LEPEAKBGHLB)
+		public HackDetectedException(string message, Exception innerException)
+			: base(message, innerException)
 		{
 		}
 
-		public HackDetectedException(SerializationInfo EMBBNNBFODN, StreamingContext PDCAHMPCPOC)
+		public HackDetectedException(SerializationInfo info, StreamingContext context)
 		{
 		}
 	}

@@ -12,9 +12,9 @@ public class SendMeLog : MonoBehaviour
 
 	private static readonly StringBuilder Log = new StringBuilder();
 
-	public static void Init(string KCCCJAINPIG, float HBIAPEIOOHI = 0f)
+	public static void Init(string email, float duration = 0f)
 	{
-		_email = KCCCJAINPIG;
+		_email = email;
 		if (!_obj)
 		{
 			Application.logMessageReceived += HandleLogMessage;
@@ -22,18 +22,18 @@ public class SendMeLog : MonoBehaviour
 			_obj = new GameObject("_sendMeLog", typeof(SendMeLog));
 			Object.DontDestroyOnLoad(_obj);
 		}
-		if (HBIAPEIOOHI > 0.1f)
+		if (duration > 0.1f)
 		{
 			SendMeLog component = _obj.GetComponent<SendMeLog>();
-			component.StartCoroutine(component.StopAfterDelay(HBIAPEIOOHI));
+			component.StartCoroutine(component.StopAfterDelay(duration));
 		}
 	}
 
-	private static void HandleLogMessage(string IOFGGOCEIAM, string BPANNMHCGBC, LogType LFLGCDNKNJI)
+	private static void HandleLogMessage(string logString, string stackTrace, LogType logType)
 	{
 		if (_active)
 		{
-			Log.Append(string.Format("[{0}] {1}{2}\n", LFLGCDNKNJI, IOFGGOCEIAM, (!string.IsNullOrEmpty(BPANNMHCGBC)) ? string.Format(" ({0})", BPANNMHCGBC) : string.Empty));
+			Log.Append(string.Format("[{0}] {1}{2}\n", logType, logString, (!string.IsNullOrEmpty(stackTrace)) ? string.Format(" ({0})", stackTrace) : string.Empty));
 		}
 	}
 

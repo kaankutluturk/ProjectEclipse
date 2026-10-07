@@ -53,9 +53,9 @@ public class EnterScreen : MonoBehaviour
 		return UnityEngine.Object.Instantiate(original);
 	}
 
-	public void Init(List<KeyValuePair<string, int>> IGLEKOAILHD, Action ODDEOFKLIAG)
+	public void Init(List<KeyValuePair<string, int>> lines, Action completed)
 	{
-        InitLines(IGLEKOAILHD, ODDEOFKLIAG, false);
+        InitLines(lines, completed, false);
     }
 
     public void InitResolved(List<KeyValuePair<string, int>> lines, Action completed)
@@ -63,28 +63,28 @@ public class EnterScreen : MonoBehaviour
         InitLines(lines, completed, true);
     }
 
-    private void InitLines(List<KeyValuePair<string, int>> IGLEKOAILHD, Action ODDEOFKLIAG, bool resolved)
+    private void InitLines(List<KeyValuePair<string, int>> lines, Action completed, bool resolved)
 	{
-		_dlg = ODDEOFKLIAG;
+		_dlg = completed;
 		SetVisible(false);
 		CaptureMusicVolume();
 		SetForegroundAlpha(MIN_OPACITY);
-		if (_label != null && IGLEKOAILHD.Count > 0)
+		if (_label != null && lines.Count > 0)
 		{
-			SetLine(IGLEKOAILHD[0].Key, resolved);
+			SetLine(lines[0].Key, resolved);
 		}
 		DG.Tweening.Sequence sequence = DOTween.Sequence();
 		sequence.AppendInterval(0f);
-		foreach (KeyValuePair<string, int> MGPBPJOHMLH in IGLEKOAILHD)
+		foreach (KeyValuePair<string, int> line in lines)
 		{
 			sequence.AppendCallback(() =>
 			{
 				if (_label != null)
 				{
-					SetLine(MGPBPJOHMLH.Key, resolved);
+					SetLine(line.Key, resolved);
 				}
 			});
-			float interval = (float)MGPBPJOHMLH.Value / 60f;
+			float interval = (float)line.Value / 60f;
 			sequence.AppendInterval(interval);
 		}
 		DG.Tweening.Sequence t = MuteMusicSequence();
@@ -106,12 +106,12 @@ public class EnterScreen : MonoBehaviour
 		});
 	}
 
-	public void Init(string HCPNFPMHFCM, Action ODDEOFKLIAG)
+	public void Init(string alias, Action completed)
 	{
-		_dlg = ODDEOFKLIAG;
+		_dlg = completed;
 		if (_label != null)
 		{
-			_label.set_Alias(HCPNFPMHFCM);
+			_label.set_Alias(alias);
 		}
 		SetVisible(false);
 		CaptureMusicVolume();
@@ -138,9 +138,9 @@ public class EnterScreen : MonoBehaviour
 	public DG.Tweening.Sequence MuteMusicSequence()
 	{
 		DG.Tweening.Sequence sequence = DOTween.Sequence();
-		sequence.Append(DOTween.To(() => currentMusicVolume, (float DHDMNHCIPEH) =>
+		sequence.Append(DOTween.To(() => currentMusicVolume, (float volume) =>
 		{
-			currentMusicVolume = DHDMNHCIPEH;
+			currentMusicVolume = volume;
 			Sound.SetMusicVolume(currentMusicVolume);
 		}, 0f, fadeTime));
 		sequence.AppendCallback(() =>
@@ -233,12 +233,12 @@ public class EnterScreen : MonoBehaviour
 		}
 	}
 
-	private void SetForegroundAlpha(float KGJALFLDIBG)
+	private void SetForegroundAlpha(float alpha)
 	{
 		if (_foreground != null)
 		{
 			Color color = _foreground.color;
-			color.a = KGJALFLDIBG;
+			color.a = alpha;
 			_foreground.color = color;
 		}
 	}

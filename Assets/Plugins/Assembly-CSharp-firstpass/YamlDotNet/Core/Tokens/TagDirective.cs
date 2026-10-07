@@ -29,33 +29,33 @@ namespace YamlDotNet.Core.Tokens
 			}
 		}
 
-		public TagDirective(string FODGADCGDBH, string JMOHMLIGHHD)
-			: this(FODGADCGDBH, JMOHMLIGHHD, Mark.Empty, Mark.Empty)
+		public TagDirective(string tagHandle, string tagPrefix)
+			: this(tagHandle, tagPrefix, Mark.Empty, Mark.Empty)
 		{
 		}
 
-		public TagDirective(string FODGADCGDBH, string JMOHMLIGHHD, Mark ILENLCMAMBH, Mark PCLFFOBJJFO)
-			: base(ILENLCMAMBH, PCLFFOBJJFO)
+		public TagDirective(string tagHandle, string tagPrefix, Mark startMark, Mark endMark)
+			: base(startMark, endMark)
 		{
-			if (string.IsNullOrEmpty(FODGADCGDBH))
+			if (string.IsNullOrEmpty(tagHandle))
 			{
 				throw new ArgumentNullException("handle", "Tag handle must not be empty.");
 			}
-			if (!tagHandleValidator.IsMatch(FODGADCGDBH))
+			if (!tagHandleValidator.IsMatch(tagHandle))
 			{
 				throw new ArgumentException("Tag handle must start and end with '!' and contain alphanumerical characters only.", "handle");
 			}
-			handle = FODGADCGDBH;
-			if (string.IsNullOrEmpty(JMOHMLIGHHD))
+			handle = tagHandle;
+			if (string.IsNullOrEmpty(tagPrefix))
 			{
 				throw new ArgumentNullException("prefix", "Tag prefix must not be empty.");
 			}
-			prefix = JMOHMLIGHHD;
+			prefix = tagPrefix;
 		}
 
-		public override bool Equals(object AOMLCBHAJJH)
+		public override bool Equals(object obj)
 		{
-			TagDirective tagDirective = AOMLCBHAJJH as TagDirective;
+			TagDirective tagDirective = obj as TagDirective;
 			return tagDirective != null && handle.Equals(tagDirective.handle) && prefix.Equals(tagDirective.prefix);
 		}
 

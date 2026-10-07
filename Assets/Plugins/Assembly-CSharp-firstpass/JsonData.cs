@@ -112,32 +112,32 @@ public class JsonData : IEquatable<JsonData>, IDictionary, IList, IEnumerable, I
 		}
 	}
 
-	object IDictionary.this[object KGBGENDIMBC]
+	object IDictionary.this[object key]
 	{
 		get
 		{
-			return EnsureDictionary()[KGBGENDIMBC];
+			return EnsureDictionary()[key];
 		}
 		set
 		{
-			if (!(KGBGENDIMBC is string))
+			if (!(key is string))
 			{
 				throw new ArgumentException("The key has to be a string");
 			}
-			JsonData bAINMLLIKOL = ToJsonData(value);
-			set_Item((string)KGBGENDIMBC, bAINMLLIKOL);
+			JsonData jsonData = ToJsonData(value);
+			set_Item((string)key, jsonData);
 		}
 	}
 
 	// C# has no syntax for parameterized property 'IOrderedDictionary.Item'.
-	object IOrderedDictionary.get_Item(int OOPOEMNCCGH)
+	object IOrderedDictionary.get_Item(int index)
 	{
-		return LitJson_002EIOrderedDictionary_002Eget_Item(OOPOEMNCCGH);
+		return LitJson_002EIOrderedDictionary_002Eget_Item(index);
 	}
 
-	void IOrderedDictionary.set_Item(int OOPOEMNCCGH, object value)
+	void IOrderedDictionary.set_Item(int index, object value)
 	{
-		LitJson_002EIOrderedDictionary_002Eset_Item(OOPOEMNCCGH, value);
+		LitJson_002EIOrderedDictionary_002Eset_Item(index, value);
 	}
 
 	object IList.this[int index]
@@ -149,8 +149,8 @@ public class JsonData : IEquatable<JsonData>, IDictionary, IList, IEnumerable, I
 		set
 		{
 			EnsureList();
-			JsonData bAINMLLIKOL = ToJsonData(value);
-			set_Item(index, bAINMLLIKOL);
+			JsonData jsonData = ToJsonData(value);
+			set_Item(index, jsonData);
 		}
 	}
 
@@ -227,14 +227,14 @@ public class JsonData : IEquatable<JsonData>, IDictionary, IList, IEnumerable, I
 	}
 
 	// C# has no syntax for parameterized property 'DLKPBAJDHBO'.
-	public JsonData get_DLKPBAJDHBO(string FGGONFKCLMP)
+	public JsonData get_DLKPBAJDHBO(string key)
 	{
-		return get_Item(FGGONFKCLMP);
+		return get_Item(key);
 	}
 
-	public void set_DLKPBAJDHBO(string FGGONFKCLMP, JsonData value)
+	public void set_DLKPBAJDHBO(string key, JsonData value)
 	{
-		set_Item(FGGONFKCLMP, value);
+		set_Item(key, value);
 	}
 
 	// C# has no syntax for parameterized property 'DLKPBAJDHBO'.
@@ -262,10 +262,10 @@ public class JsonData : IEquatable<JsonData>, IDictionary, IList, IEnumerable, I
 	{
 	}
 
-	public JsonData(bool CIGMFMBICLJ)
+	public JsonData(bool boolValue)
 	{
 		type = JsonType.Boolean;
-		inst_boolean = CIGMFMBICLJ;
+		inst_boolean = boolValue;
 	}
 
 	public JsonData(double number)
@@ -286,45 +286,45 @@ public class JsonData : IEquatable<JsonData>, IDictionary, IList, IEnumerable, I
 		inst_long = number;
 	}
 
-	public JsonData(object AOMLCBHAJJH)
+	public JsonData(object obj)
 	{
-		if (AOMLCBHAJJH is bool)
+		if (obj is bool)
 		{
 			type = JsonType.Boolean;
-			inst_boolean = (bool)AOMLCBHAJJH;
+			inst_boolean = (bool)obj;
 			return;
 		}
-		if (AOMLCBHAJJH is double)
+		if (obj is double)
 		{
 			type = JsonType.Double;
-			inst_double = (double)AOMLCBHAJJH;
+			inst_double = (double)obj;
 			return;
 		}
-		if (AOMLCBHAJJH is int)
+		if (obj is int)
 		{
 			type = JsonType.Int;
-			inst_int = (int)AOMLCBHAJJH;
+			inst_int = (int)obj;
 			return;
 		}
-		if (AOMLCBHAJJH is long)
+		if (obj is long)
 		{
 			type = JsonType.Long;
-			inst_long = (long)AOMLCBHAJJH;
+			inst_long = (long)obj;
 			return;
 		}
-		if (AOMLCBHAJJH is string)
+		if (obj is string)
 		{
 			type = JsonType.String;
-			inst_string = (string)AOMLCBHAJJH;
+			inst_string = (string)obj;
 			return;
 		}
 		throw new ArgumentException("Unable to wrap the given object with JsonData");
 	}
 
-	public JsonData(string IGGFGLLIGCG)
+	public JsonData(string stringValue)
 	{
 		type = JsonType.String;
-		inst_string = IGGFGLLIGCG;
+		inst_string = stringValue;
 	}
 
 	public int GetCount()
@@ -408,37 +408,37 @@ public class JsonData : IEquatable<JsonData>, IDictionary, IList, IEnumerable, I
 		return GetIsString();
 	}
 
-	private object LitJson_002EIOrderedDictionary_002Eget_Item(int OOPOEMNCCGH)
+	private object LitJson_002EIOrderedDictionary_002Eget_Item(int index)
 	{
 		EnsureDictionary();
-		return object_list[OOPOEMNCCGH].Value;
+		return object_list[index].Value;
 	}
 
-	private void LitJson_002EIOrderedDictionary_002Eset_Item(int OOPOEMNCCGH, object value)
+	private void LitJson_002EIOrderedDictionary_002Eset_Item(int index, object value)
 	{
 		EnsureDictionary();
 		JsonData jsonData = ToJsonData(value);
-		KeyValuePair<string, JsonData> keyValuePair = object_list[OOPOEMNCCGH];
+		KeyValuePair<string, JsonData> keyValuePair = object_list[index];
 		inst_object[keyValuePair.Key] = jsonData;
 		KeyValuePair<string, JsonData> keyValuePair2 = new KeyValuePair<string, JsonData>(keyValuePair.Key, jsonData);
-		object_list[OOPOEMNCCGH] = keyValuePair2;
+		object_list[index] = keyValuePair2;
 	}
 
-	public JsonData get_Item(string FGGONFKCLMP)
+	public JsonData get_Item(string key)
 	{
 		EnsureDictionary();
-		return inst_object[FGGONFKCLMP];
+		return inst_object[key];
 	}
 
-	public void set_Item(string FGGONFKCLMP, JsonData value)
+	public void set_Item(string key, JsonData value)
 	{
 		EnsureDictionary();
-		KeyValuePair<string, JsonData> keyValuePair = new KeyValuePair<string, JsonData>(FGGONFKCLMP, value);
-		if (inst_object.ContainsKey(FGGONFKCLMP))
+		KeyValuePair<string, JsonData> keyValuePair = new KeyValuePair<string, JsonData>(key, value);
+		if (inst_object.ContainsKey(key))
 		{
 			for (int i = 0; i < object_list.Count; i++)
 			{
-				if (object_list[i].Key == FGGONFKCLMP)
+				if (object_list[i].Key == key)
 				{
 					object_list[i] = keyValuePair;
 					break;
@@ -449,7 +449,7 @@ public class JsonData : IEquatable<JsonData>, IDictionary, IList, IEnumerable, I
 		{
 			object_list.Add(keyValuePair);
 		}
-		inst_object[FGGONFKCLMP] = value;
+		inst_object[key] = value;
 		json = null;
 	}
 
@@ -555,16 +555,16 @@ public class JsonData : IEquatable<JsonData>, IDictionary, IList, IEnumerable, I
 		return data.inst_string;
 	}
 
-	void ICollection.CopyTo(Array HFPDMGAEJJE, int index)
+	void ICollection.CopyTo(Array array, int index)
 	{
-		EnsureCollection().CopyTo(HFPDMGAEJJE, index);
+		EnsureCollection().CopyTo(array, index);
 	}
 
-	void IDictionary.Add(object KGBGENDIMBC, object value)
+	void IDictionary.Add(object key, object value)
 	{
 		JsonData jsonData = ToJsonData(value);
-		EnsureDictionary().Add(KGBGENDIMBC, jsonData);
-		KeyValuePair<string, JsonData> item = new KeyValuePair<string, JsonData>((string)KGBGENDIMBC, jsonData);
+		EnsureDictionary().Add(key, jsonData);
+		KeyValuePair<string, JsonData> item = new KeyValuePair<string, JsonData>((string)key, jsonData);
 		object_list.Add(item);
 		json = null;
 	}
@@ -576,9 +576,9 @@ public class JsonData : IEquatable<JsonData>, IDictionary, IList, IEnumerable, I
 		json = null;
 	}
 
-	bool IDictionary.Contains(object KGBGENDIMBC)
+	bool IDictionary.Contains(object key)
 	{
-		return EnsureDictionary().Contains(KGBGENDIMBC);
+		return EnsureDictionary().Contains(key);
 	}
 
 	IDictionaryEnumerator IDictionary.GetEnumerator()
@@ -586,12 +586,12 @@ public class JsonData : IEquatable<JsonData>, IDictionary, IList, IEnumerable, I
 		return ((IOrderedDictionary)this).GetEnumerator();
 	}
 
-	void IDictionary.Remove(object KGBGENDIMBC)
+	void IDictionary.Remove(object key)
 	{
-		EnsureDictionary().Remove(KGBGENDIMBC);
+		EnsureDictionary().Remove(key);
 		for (int i = 0; i < object_list.Count; i++)
 		{
-			if (object_list[i].Key == (string)KGBGENDIMBC)
+			if (object_list[i].Key == (string)key)
 			{
 				object_list.RemoveAt(i);
 				break;
@@ -650,38 +650,38 @@ public class JsonData : IEquatable<JsonData>, IDictionary, IList, IEnumerable, I
 		return inst_string;
 	}
 
-	void IJsonWrapper.SetBoolean(bool PKHDLOGJKAD)
+	void IJsonWrapper.SetBoolean(bool boolValue)
 	{
 		type = JsonType.Boolean;
-		inst_boolean = PKHDLOGJKAD;
+		inst_boolean = boolValue;
 		json = null;
 	}
 
-	void IJsonWrapper.SetDouble(double PKHDLOGJKAD)
+	void IJsonWrapper.SetDouble(double doubleValue)
 	{
 		type = JsonType.Double;
-		inst_double = PKHDLOGJKAD;
+		inst_double = doubleValue;
 		json = null;
 	}
 
-	void IJsonWrapper.SetInt(int PKHDLOGJKAD)
+	void IJsonWrapper.SetInt(int intValue)
 	{
 		type = JsonType.Int;
-		inst_int = PKHDLOGJKAD;
+		inst_int = intValue;
 		json = null;
 	}
 
-	void IJsonWrapper.SetLong(long PKHDLOGJKAD)
+	void IJsonWrapper.SetLong(long longValue)
 	{
 		type = JsonType.Long;
-		inst_long = PKHDLOGJKAD;
+		inst_long = longValue;
 		json = null;
 	}
 
-	void IJsonWrapper.SetString(string PKHDLOGJKAD)
+	void IJsonWrapper.SetString(string stringValue)
 	{
 		type = JsonType.String;
-		inst_string = PKHDLOGJKAD;
+		inst_string = stringValue;
 		json = null;
 	}
 
@@ -740,20 +740,20 @@ public class JsonData : IEquatable<JsonData>, IDictionary, IList, IEnumerable, I
 		return new OrderedDictionaryEnumerator(object_list.GetEnumerator());
 	}
 
-	void IOrderedDictionary.Insert(int OOPOEMNCCGH, object KGBGENDIMBC, object value)
+	void IOrderedDictionary.Insert(int index, object key, object value)
 	{
-		string text = (string)KGBGENDIMBC;
-		JsonData eODAPIHAEAK = ToJsonData(value);
-		set_Item(text, eODAPIHAEAK);
-		KeyValuePair<string, JsonData> item = new KeyValuePair<string, JsonData>(text, eODAPIHAEAK);
-		object_list.Insert(OOPOEMNCCGH, item);
+		string text = (string)key;
+		JsonData jsonData = ToJsonData(value);
+		set_Item(text, jsonData);
+		KeyValuePair<string, JsonData> item = new KeyValuePair<string, JsonData>(text, jsonData);
+		object_list.Insert(index, item);
 	}
 
-	void IOrderedDictionary.RemoveAt(int OOPOEMNCCGH)
+	void IOrderedDictionary.RemoveAt(int index)
 	{
 		EnsureDictionary();
-		inst_object.Remove(object_list[OOPOEMNCCGH].Key);
-		object_list.RemoveAt(OOPOEMNCCGH);
+		inst_object.Remove(object_list[index].Key);
+		object_list.RemoveAt(index);
 	}
 
 	private ICollection EnsureCollection()
@@ -800,49 +800,49 @@ public class JsonData : IEquatable<JsonData>, IDictionary, IList, IEnumerable, I
 		return (IList)inst_array;
 	}
 
-	private JsonData ToJsonData(object AOMLCBHAJJH)
+	private JsonData ToJsonData(object obj)
 	{
-		if (AOMLCBHAJJH == null)
+		if (obj == null)
 		{
 			return null;
 		}
-		if (AOMLCBHAJJH is JsonData)
+		if (obj is JsonData)
 		{
-			return (JsonData)AOMLCBHAJJH;
+			return (JsonData)obj;
 		}
-		return new JsonData(AOMLCBHAJJH);
+		return new JsonData(obj);
 	}
 
-	private static void WriteJson(IJsonWrapper AOMLCBHAJJH, JsonWriter writer)
+	private static void WriteJson(IJsonWrapper wrapper, JsonWriter writer)
 	{
-		if (AOMLCBHAJJH == null)
+		if (wrapper == null)
 		{
 			writer.Write(null);
 		}
-		else if (AOMLCBHAJJH.GetIsString())
+		else if (wrapper.GetIsString())
 		{
-			writer.Write(AOMLCBHAJJH.GetString());
+			writer.Write(wrapper.GetString());
 		}
-		else if (AOMLCBHAJJH.GetIsBoolean())
+		else if (wrapper.GetIsBoolean())
 		{
-			writer.Write(AOMLCBHAJJH.GetBoolean());
+			writer.Write(wrapper.GetBoolean());
 		}
-		else if (AOMLCBHAJJH.GetIsDouble())
+		else if (wrapper.GetIsDouble())
 		{
-			writer.Write(AOMLCBHAJJH.GetDouble());
+			writer.Write(wrapper.GetDouble());
 		}
-		else if (AOMLCBHAJJH.GetIsInt())
+		else if (wrapper.GetIsInt())
 		{
-			writer.Write(AOMLCBHAJJH.GetInt());
+			writer.Write(wrapper.GetInt());
 		}
-		else if (AOMLCBHAJJH.GetIsLong())
+		else if (wrapper.GetIsLong())
 		{
-			writer.Write(AOMLCBHAJJH.GetLong());
+			writer.Write(wrapper.GetLong());
 		}
-		else if (AOMLCBHAJJH.GetIsArray())
+		else if (wrapper.GetIsArray())
 		{
 			writer.WriteArrayStart();
-			foreach (object item in (IEnumerable)AOMLCBHAJJH)
+			foreach (object item in (IEnumerable)wrapper)
 			{
 				WriteJson((JsonData)item, writer);
 			}
@@ -850,12 +850,12 @@ public class JsonData : IEquatable<JsonData>, IDictionary, IList, IEnumerable, I
 		}
 		else
 		{
-			if (!AOMLCBHAJJH.GetIsObject())
+			if (!wrapper.GetIsObject())
 			{
 				return;
 			}
 			writer.WriteObjectStart();
-			foreach (DictionaryEntry item2 in (IDictionary)AOMLCBHAJJH)
+			foreach (DictionaryEntry item2 in (IDictionary)wrapper)
 			{
 				writer.WritePropertyName((string)item2.Key);
 				WriteJson((JsonData)item2.Value, writer);
@@ -883,13 +883,13 @@ public class JsonData : IEquatable<JsonData>, IDictionary, IList, IEnumerable, I
 		}
 	}
 
-	public bool Equals(JsonData DHDMNHCIPEH)
+	public bool Equals(JsonData other)
 	{
-		if (DHDMNHCIPEH == null)
+		if (other == null)
 		{
 			return false;
 		}
-		if (DHDMNHCIPEH.type != type)
+		if (other.type != type)
 		{
 			return false;
 		}
@@ -898,19 +898,19 @@ public class JsonData : IEquatable<JsonData>, IDictionary, IList, IEnumerable, I
 		case JsonType.None:
 			return true;
 		case JsonType.Object:
-			return inst_object.Equals(DHDMNHCIPEH.inst_object);
+			return inst_object.Equals(other.inst_object);
 		case JsonType.Array:
-			return inst_array.Equals(DHDMNHCIPEH.inst_array);
+			return inst_array.Equals(other.inst_array);
 		case JsonType.String:
-			return inst_string.Equals(DHDMNHCIPEH.inst_string);
+			return inst_string.Equals(other.inst_string);
 		case JsonType.Int:
-			return inst_int.Equals(DHDMNHCIPEH.inst_int);
+			return inst_int.Equals(other.inst_int);
 		case JsonType.Long:
-			return inst_long.Equals(DHDMNHCIPEH.inst_long);
+			return inst_long.Equals(other.inst_long);
 		case JsonType.Double:
-			return inst_double.Equals(DHDMNHCIPEH.inst_double);
+			return inst_double.Equals(other.inst_double);
 		case JsonType.Boolean:
-			return inst_boolean.Equals(DHDMNHCIPEH.inst_boolean);
+			return inst_boolean.Equals(other.inst_boolean);
 		default:
 			return false;
 		}
@@ -921,11 +921,11 @@ public class JsonData : IEquatable<JsonData>, IDictionary, IList, IEnumerable, I
 		return type;
 	}
 
-	public void SetJsonType(JsonType LFLGCDNKNJI)
+	public void SetJsonType(JsonType jsonType)
 	{
-		if (this.type != LFLGCDNKNJI)
+		if (this.type != jsonType)
 		{
-			switch (LFLGCDNKNJI)
+			switch (jsonType)
 			{
 			case JsonType.Object:
 				inst_object = new Dictionary<string, JsonData>();
@@ -950,7 +950,7 @@ public class JsonData : IEquatable<JsonData>, IDictionary, IList, IEnumerable, I
 				inst_boolean = false;
 				break;
 			}
-			this.type = LFLGCDNKNJI;
+			this.type = jsonType;
 		}
 	}
 
@@ -961,19 +961,19 @@ public class JsonData : IEquatable<JsonData>, IDictionary, IList, IEnumerable, I
 			return json;
 		}
 		StringWriter stringWriter = new StringWriter();
-		JsonWriter iGOCJFDLBMG = new JsonWriter(stringWriter);
-		iGOCJFDLBMG.SetValidate(false);
-		WriteJson(this, iGOCJFDLBMG);
+		JsonWriter writer = new JsonWriter(stringWriter);
+		writer.SetValidate(false);
+		WriteJson(this, writer);
 		json = stringWriter.ToString();
 		return json;
 	}
 
 	public void ToJson(JsonWriter writer)
 	{
-		bool bAINMLLIKOL = writer.GetValidate();
+		bool previousValidate = writer.GetValidate();
 		writer.SetValidate(false);
 		WriteJson(this, writer);
-		writer.SetValidate(bAINMLLIKOL);
+		writer.SetValidate(previousValidate);
 	}
 
 	public override string ToString()

@@ -110,28 +110,28 @@ namespace Nekki.SF2.GUI.Fight
 			isPaused = value;
 		}
 
-		public void PreInit(FightList KGKDKENMAOA)
+		public void PreInit(FightList list)
 		{
-			customVersusIntro = KGKDKENMAOA is Eclipse.Multiplayer.LocalVersusMatch match &&
+			customVersusIntro = list is Eclipse.Multiplayer.LocalVersusMatch match &&
 				(match.Settings.Mode == Eclipse.Multiplayer.VersusMode.Local || match.Settings.Mode == Eclipse.Multiplayer.VersusMode.Online);
-			maxRounds = KGKDKENMAOA.RoundsToWin * KGKDKENMAOA.GetTotalOpponentRounds();
-			ruleDesc = KGKDKENMAOA.GetDescription();
+			maxRounds = list.RoundsToWin * list.GetTotalOpponentRounds();
+			ruleDesc = list.GetDescription();
 			set_Pause(false);
 		}
 
-		public void CreateVS(ModelParameters JCICKLIMBEF, List<ModelParameters> IDAAONBIBJM, int OBLEMIHLFII, bool PPIJJHJCGGB, bool GDLJMEJBGPO, bool IFMCDDIGOLD)
+		public void CreateVS(ModelParameters playerParameters, List<ModelParameters> enemies, int index, bool enemiesFlagValue, bool showEnemies, bool startVsImmediately)
 		{
-			fightSetup.playerModel = JCICKLIMBEF;
-			fightSetup.enemyModels = IDAAONBIBJM;
-			fightSetup.enemyIndex = OBLEMIHLFII;
-			this.enemiesFlag = PPIJJHJCGGB;
-			this.showEnemiesScreen = GDLJMEJBGPO;
-			if (IDAAONBIBJM.Count > 1 && GDLJMEJBGPO)
+			fightSetup.playerModel = playerParameters;
+			fightSetup.enemyModels = enemies;
+			fightSetup.enemyIndex = index;
+			this.enemiesFlag = enemiesFlagValue;
+			this.showEnemiesScreen = showEnemies;
+			if (enemies.Count > 1 && showEnemies)
 			{
-				CreateEnemiesScreen(IDAAONBIBJM, OBLEMIHLFII, this.enemiesFlag);
+				CreateEnemiesScreen(enemies, index, this.enemiesFlag);
 				return;
 			}
-			if (IFMCDDIGOLD)
+			if (startVsImmediately)
 			{
 				StartVS();
 				return;
@@ -140,7 +140,7 @@ namespace Nekki.SF2.GUI.Fight
 			StartScreen(0f);
 		}
 
-		public void CreateRound(int value, bool JMBAAPAPMGB = false)
+		public void CreateRound(int value, bool useMaxRounds = false)
 		{
 			ClearPictures();
 			Type = ScreenFightType.TYPE_INFO_ROUND;
@@ -152,7 +152,7 @@ namespace Nekki.SF2.GUI.Fight
 			}
 			if (round != null)
 			{
-				int num = ((!JMBAAPAPMGB) ? value : maxRounds);
+				int num = ((!useMaxRounds) ? value : maxRounds);
 				round.gameObject.SetActive(true);
 				round.set_text(num.ToString());
 			}
@@ -197,11 +197,11 @@ namespace Nekki.SF2.GUI.Fight
 			}
 		}
 
-		public void CreateWinner(bool MBDILDFLMBL)
+		public void CreateWinner(bool isPerfect)
 		{
 			ClearPictures();
-			Type = ((!MBDILDFLMBL) ? ScreenFightType.TYPE_INFO_COOL : ScreenFightType.TYPE_INFO_PERFECT);
-			string spriteName = ((!MBDILDFLMBL) ? "FightUI.great" : "FightUI.perfect");
+			Type = ((!isPerfect) ? ScreenFightType.TYPE_INFO_COOL : ScreenFightType.TYPE_INFO_PERFECT);
+			string spriteName = ((!isPerfect) ? "FightUI.great" : "FightUI.perfect");
 			if (image != null)
 			{
 				image.set_SpriteName(spriteName);
@@ -298,7 +298,7 @@ namespace Nekki.SF2.GUI.Fight
 			}
 		}
 
-		public void CreateEnemiesScreen(List<ModelParameters> IDAAONBIBJM, int index, bool PPIJJHJCGGB)
+		public void CreateEnemiesScreen(List<ModelParameters> enemies, int index, bool enemiesFlagValue)
 		{
 			Type = ScreenFightType.TYPE_INFO_ENEMIES;
 			if (enemiesScreenPrefab == null)
@@ -310,14 +310,14 @@ namespace Nekki.SF2.GUI.Fight
 			base.gameObject.SetActive(true);
 			enemiesScreen = Object.Instantiate(enemiesScreenPrefab).GetComponent<EnemiesScreen>();
 			enemiesScreen.transform.SetParent(base.transform, false);
-			enemiesScreen.Init(IDAAONBIBJM, index, PPIJJHJCGGB);
+			enemiesScreen.Init(enemies, index, enemiesFlagValue);
 			StartScreen(enemiesScreen.get_AnimationTime());
 			OnStopScreen.AddListener(OnEnemiesScreenStopped);
 		}
 
-		private void OnEnemiesScreenStopped(ScreenFightType MPBIEONNLIJ)
+		private void OnEnemiesScreenStopped(ScreenFightType screenType)
 		{
-			if (MPBIEONNLIJ == ScreenFightType.TYPE_INFO_ENEMIES)
+			if (screenType == ScreenFightType.TYPE_INFO_ENEMIES)
 			{
 				OnStopScreen.RemoveListener(OnEnemiesScreenStopped);
 				StartVS();
@@ -338,10 +338,10 @@ namespace Nekki.SF2.GUI.Fight
 			// Keep the established VS timer and stop event on the same simulation ticks
 			// for peers and saved replays, but let our persistent introduction own the art.
 			if (customVersusIntro) vsScreen.gameObject.SetActive(false);
-			ModelParameters kIKOGDEPGHB = null;
+			ModelParameters enemyParameters = null;
 			if (fightSetup.enemyModels.Count > fightSetup.enemyIndex)
 			{
-				kIKOGDEPGHB = fightSetup.enemyModels[fightSetup.enemyIndex];
+				enemyParameters = fightSetup.enemyModels[fightSetup.enemyIndex];
 			}
 			else
 			{
@@ -350,15 +350,15 @@ namespace Nekki.SF2.GUI.Fight
 					StartScreen(0f);
 					return;
 				}
-				kIKOGDEPGHB = fightSetup.enemyModels[0];
+				enemyParameters = fightSetup.enemyModels[0];
 			}
-			vsScreen.Init(fightSetup.playerModel, kIKOGDEPGHB);
+			vsScreen.Init(fightSetup.playerModel, enemyParameters);
 			StartScreen(vsScreen.get_AnimationTime());
 		}
 
-		private void StartScreen(float LLIJBPJPHEL)
+		private void StartScreen(float duration)
 		{
-			timer = LLIJBPJPHEL;
+			timer = duration;
 			bannerDuration = timer;
 			if (image != null && image.gameObject.activeSelf)
 			{

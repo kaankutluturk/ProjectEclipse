@@ -112,9 +112,9 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 			inited = true;
 		}
 
-		public static void SetNewCryptoKey(int CNOFJICCAHK)
+		public static void SetNewCryptoKey(int newKey)
 		{
-			cryptoKey = CNOFJICCAHK;
+			cryptoKey = newKey;
 		}
 
 		public static RawEncryptedVector2 Encrypt(Vector2 value)
@@ -122,15 +122,15 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 			return Encrypt(value, 0);
 		}
 
-		public static RawEncryptedVector2 Encrypt(Vector2 value, int KGBGENDIMBC)
+		public static RawEncryptedVector2 Encrypt(Vector2 value, int key)
 		{
-			if (KGBGENDIMBC == 0)
+			if (key == 0)
 			{
-				KGBGENDIMBC = cryptoKey;
+				key = cryptoKey;
 			}
 			RawEncryptedVector2 result = default(RawEncryptedVector2);
-			result.x = ObscuredFloat.Encrypt(value.x, KGBGENDIMBC);
-			result.y = ObscuredFloat.Encrypt(value.y, KGBGENDIMBC);
+			result.x = ObscuredFloat.Encrypt(value.x, key);
+			result.y = ObscuredFloat.Encrypt(value.y, key);
 			return result;
 		}
 
@@ -139,15 +139,15 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 			return Decrypt(value, 0);
 		}
 
-		public static Vector2 Decrypt(RawEncryptedVector2 value, int KGBGENDIMBC)
+		public static Vector2 Decrypt(RawEncryptedVector2 value, int key)
 		{
-			if (KGBGENDIMBC == 0)
+			if (key == 0)
 			{
-				KGBGENDIMBC = cryptoKey;
+				key = cryptoKey;
 			}
 			Vector2 result = default(Vector2);
-			result.x = ObscuredFloat.Decrypt(value.x, KGBGENDIMBC);
-			result.y = ObscuredFloat.Decrypt(value.y, KGBGENDIMBC);
+			result.x = ObscuredFloat.Decrypt(value.x, key);
+			result.y = ObscuredFloat.Decrypt(value.y, key);
 			return result;
 		}
 
@@ -162,9 +162,9 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 
 		public void RandomizeCryptoKey()
 		{
-			Vector2 bAINMLLIKOL = InternalDecrypt();
+			Vector2 decrypted = InternalDecrypt();
 			currentCryptoKey = UnityEngine.Random.Range(int.MinValue, int.MaxValue);
-			hiddenValue = Encrypt(bAINMLLIKOL, currentCryptoKey);
+			hiddenValue = Encrypt(decrypted, currentCryptoKey);
 		}
 
 		public RawEncryptedVector2 GetEncrypted()
@@ -173,10 +173,10 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 			return hiddenValue;
 		}
 
-		public void SetEncrypted(RawEncryptedVector2 ANGFOBEKKKD)
+		public void SetEncrypted(RawEncryptedVector2 encrypted)
 		{
 			inited = true;
-			hiddenValue = ANGFOBEKKKD;
+			hiddenValue = encrypted;
 			if (ObscuredCheatingDetector.GetIsRunning())
 			{
 				fakeValue = InternalDecrypt();
@@ -202,25 +202,25 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 			return vector;
 		}
 
-		private bool CompareVectorsWithTolerance(Vector2 DDDIMIIGCDI, Vector2 MIALLDMOOMA)
+		private bool CompareVectorsWithTolerance(Vector2 first, Vector2 second)
 		{
 			float vector2Epsilon = ObscuredCheatingDetector.get_Instance().vector2Epsilon;
-			return Math.Abs(DDDIMIIGCDI.x - MIALLDMOOMA.x) < vector2Epsilon && Math.Abs(DDDIMIIGCDI.y - MIALLDMOOMA.y) < vector2Epsilon;
+			return Math.Abs(first.x - second.x) < vector2Epsilon && Math.Abs(first.y - second.y) < vector2Epsilon;
 		}
 
-		private float InternalDecryptField(int ANGFOBEKKKD)
+		private float InternalDecryptField(int encrypted)
 		{
-			int kGBGENDIMBC = cryptoKey;
+			int key = cryptoKey;
 			if (currentCryptoKey != cryptoKey)
 			{
-				kGBGENDIMBC = currentCryptoKey;
+				key = currentCryptoKey;
 			}
-			return ObscuredFloat.Decrypt(ANGFOBEKKKD, kGBGENDIMBC);
+			return ObscuredFloat.Decrypt(encrypted, key);
 		}
 
-		private int InternalEncryptField(float ANGFOBEKKKD)
+		private int InternalEncryptField(float plain)
 		{
-			return ObscuredFloat.Encrypt(ANGFOBEKKKD, cryptoKey);
+			return ObscuredFloat.Encrypt(plain, cryptoKey);
 		}
 
 		public static implicit operator ObscuredVector2(Vector2 value)
@@ -254,9 +254,9 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 			return InternalDecrypt().ToString();
 		}
 
-		public string ToString(string LBOHOKIBHOH)
+		public string ToString(string format)
 		{
-			return InternalDecrypt().ToString(LBOHOKIBHOH);
+			return InternalDecrypt().ToString(format);
 		}
 	}
 }

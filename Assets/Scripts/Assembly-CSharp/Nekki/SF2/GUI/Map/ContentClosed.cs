@@ -13,9 +13,9 @@ namespace Nekki.SF2.GUI.Map
             _lblDescription.set_text(text);
         }
 
-		public void Init(string AJPALFBBGML)
+		public void Init(string description)
 		{
-			_lblDescription.SetAlias(AJPALFBBGML);
+			_lblDescription.SetAlias(description);
 		}
 	}
 }

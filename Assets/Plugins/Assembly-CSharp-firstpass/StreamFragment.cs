@@ -18,27 +18,27 @@ public sealed class StreamFragment : IYamlSerializable
 		return events;
 	}
 
-	void IYamlSerializable.ReadYaml(IParser BPGMNGAJMKK)
+	void IYamlSerializable.ReadYaml(IParser parser)
 	{
 		events.Clear();
 		int num = 0;
 		do
 		{
-			if (!BPGMNGAJMKK.MoveNext())
+			if (!parser.MoveNext())
 			{
 				throw new InvalidOperationException("The parser has reached the end before deserialization completed.");
 			}
-			events.Add(BPGMNGAJMKK.GetCurrent());
-			num += BPGMNGAJMKK.GetCurrent().GetNestingIncrease();
+			events.Add(parser.GetCurrent());
+			num += parser.GetCurrent().GetNestingIncrease();
 		}
 		while (num > 0);
 	}
 
-	void IYamlSerializable.WriteYaml(IEmitter NPIDIMCLNEM)
+	void IYamlSerializable.WriteYaml(IEmitter emitter)
 	{
 		foreach (ParsingEvent item in events)
 		{
-			NPIDIMCLNEM.Emit(item);
+			emitter.Emit(item);
 		}
 	}
 }

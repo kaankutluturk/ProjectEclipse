@@ -11,7 +11,7 @@ public interface IOrderedDictionary : IDictionary, IEnumerable, ICollection
 
 	new IDictionaryEnumerator GetEnumerator();
 
-	void Insert(int index, object KGBGENDIMBC, object value);
+	void Insert(int index, object key, object value);
 
 	void RemoveAt(int index);
 

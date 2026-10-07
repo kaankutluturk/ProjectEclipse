@@ -65,14 +65,14 @@ public class QuestEvent
 		eventType = ParseEventType(node.Name);
 	}
 
-	public bool IsEvent(QuestEventType LJICOHPCPKO)
+	public bool IsEvent(QuestEventType checkedType)
 	{
-		return LJICOHPCPKO == eventType;
+		return checkedType == eventType;
 	}
 
-	public static QuestEventType ParseEventType(string LFLGCDNKNJI)
+	public static QuestEventType ParseEventType(string eventName)
 	{
-		switch (LFLGCDNKNJI)
+		switch (eventName)
 		{
         case "RaidMapEnter": return QuestEventType.QUEST_EVENT_RAID_MAP_ENTER;
         case "RaidFloorChanged": return QuestEventType.QUEST_EVENT_RAID_FLOOR_CHANGED;
@@ -175,11 +175,11 @@ public class QuestEvent
 		case "ShopButtonPress":
 			return QuestEventType.QUEST_EVENT_SHOP_BUTTON_PRESS;
 		default:
-			if (Eclipse.Content.QuestCompatibility.IsDeferredQuestEvent(LFLGCDNKNJI))
+			if (Eclipse.Content.QuestCompatibility.IsDeferredQuestEvent(eventName))
 			{
 				return QuestEventType.QUEST_EVENT_NONE;
 			}
-			GameLog.Error(string.Format("{0} {1}", "Unknown event type: ", LFLGCDNKNJI));
+			GameLog.Error(string.Format("{0} {1}", "Unknown event type: ", eventName));
 			return QuestEventType.QUEST_EVENT_NONE;
 		}
 	}

@@ -71,9 +71,9 @@ public class AnimatedSprite : MonoBehaviour
 		_iterations = value;
 	}
 
-	public void SetFrames(Sprite[] DHOFFFHGIDL)
+	public void SetFrames(Sprite[] frames)
 	{
-		_Frames = new List<Sprite>(DHOFFFHGIDL);
+		_Frames = new List<Sprite>(frames);
 		_frameCount = _Frames.Count;
 		_IsWork = true;
 	}
@@ -88,11 +88,11 @@ public class AnimatedSprite : MonoBehaviour
 		_SpriteRender = base.gameObject.AddComponent<SpriteRenderer>();
 	}
 
-	public void Render(float PPOFNJGPHGP)
+	public void Render(float deltaTime)
 	{
 		if (_IsWork && !(_SpriteRender == null))
 		{
-			_elapsedTime += PPOFNJGPHGP;
+			_elapsedTime += deltaTime;
 			if (_elapsedTime >= _changeSpriteTime)
 			{
 				AdvanceFrame();
@@ -120,11 +120,11 @@ public class AnimatedSprite : MonoBehaviour
 		}
 	}
 
-	private void SetSpriteFrame(int DCHCFFFFLLK)
+	private void SetSpriteFrame(int frameIndex)
 	{
-		if (DCHCFFFFLLK < _frameCount)
+		if (frameIndex < _frameCount)
 		{
-			_SpriteRender.sprite = _Frames[DCHCFFFFLLK];
+			_SpriteRender.sprite = _Frames[frameIndex];
 		}
 	}
 }

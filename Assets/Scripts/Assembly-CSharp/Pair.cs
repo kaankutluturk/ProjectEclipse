@@ -4,10 +4,10 @@ public class Pair<T1, T2>
 
 	public T2 Second;
 
-	public Pair(T1 GBCLEDJAOBM, T2 POFHDGJAFMP)
+	public Pair(T1 first, T2 second)
 	{
-		First = GBCLEDJAOBM;
-		Second = POFHDGJAFMP;
+		First = first;
+		Second = second;
 	}
 
 	public override string ToString()

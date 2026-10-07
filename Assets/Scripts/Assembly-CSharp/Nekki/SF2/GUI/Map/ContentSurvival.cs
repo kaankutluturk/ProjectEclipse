@@ -27,9 +27,9 @@ namespace Nekki.SF2.GUI.Map
 
 		public const int SURVIVAL_LABEL_INTERMISSION_SIZE = 50;
 
-		public void Init(Battle DPOOIONCEOA)
+		public void Init(Battle battle)
 		{
-			List<FightList> list = DPOOIONCEOA.GetFights();
+			List<FightList> list = battle.GetFights();
 			_minLabel.gameObject.SetActive(list.Count > 0);
 			_maxLabel.gameObject.SetActive(list.Count > 0);
 			_survivalPrizeMin.gameObject.SetActive(list.Count > 0);
@@ -49,25 +49,25 @@ namespace Nekki.SF2.GUI.Map
 				GameLog.Error("Survival has no rewards");
 				return;
 			}
-			int gNLOCMLBNHF = ListSF.GetRoster().GetLevel();
-			RewardPrize cMHHEHILIIH = list2[1].GetPrizeForLevel(gNLOCMLBNHF);
-			RewardPrize cMHHEHILIIH2 = list2[list2.Count - 1].GetPrizeForLevel(gNLOCMLBNHF);
-			num = (ObscuredLong)(cMHHEHILIIH.bonus);
+			int level = ListSF.GetRoster().GetLevel();
+			RewardPrize minPrize = list2[1].GetPrizeForLevel(level);
+			RewardPrize cMHHEHILIIH2 = list2[list2.Count - 1].GetPrizeForLevel(level);
+			num = (ObscuredLong)(minPrize.bonus);
 			num2 = (ObscuredLong)(cMHHEHILIIH2.bonus);
-			num3 = (ObscuredLong)(cMHHEHILIIH.money);
+			num3 = (ObscuredLong)(minPrize.money);
 			num4 = (ObscuredLong)(cMHHEHILIIH2.money);
 			num3 = GameUtils.GetDenominatedValue(num3);
 			num4 = GameUtils.GetDenominatedValue(num4);
-			int cFMPJLLNCFF = 68;
-			if (DPOOIONCEOA.get_Type() == BattleType.FightBossesIntermission)
+			int fontSize = 68;
+			if (battle.get_Type() == BattleType.FightBossesIntermission)
 			{
-				cFMPJLLNCFF = 50;
+				fontSize = 50;
 			}
-			_survivalPrizeMin.Init(num3, num, cMHHEHILIIH, 0f, 100f, cFMPJLLNCFF);
-			_survivalPrizeMax.Init(num4, num2, cMHHEHILIIH2, 0f, 100f, cFMPJLLNCFF);
-			if (DPOOIONCEOA.get_Type() == BattleType.FightBossesIntermission)
+			_survivalPrizeMin.Init(num3, num, minPrize, 0f, 100f, fontSize);
+			_survivalPrizeMax.Init(num4, num2, cMHHEHILIIH2, 0f, 100f, fontSize);
+			if (battle.get_Type() == BattleType.FightBossesIntermission)
 			{
-				_lblDescription.SetAlias(DPOOIONCEOA.GetDescription());
+				_lblDescription.SetAlias(battle.GetDescription());
 			}
 		}
 	}

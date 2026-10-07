@@ -6,9 +6,9 @@ public class ExitDialogData
 
 	public Action<object> Dlg;
 
-	public ExitDialogData(bool FPLFLJDPMMC = false, Action<object> _dlg = null)
+	public ExitDialogData(bool isInFight = false, Action<object> _dlg = null)
 	{
-		IsInFight = FPLFLJDPMMC;
+		IsInFight = isInFight;
 		Dlg = _dlg;
 	}
 }

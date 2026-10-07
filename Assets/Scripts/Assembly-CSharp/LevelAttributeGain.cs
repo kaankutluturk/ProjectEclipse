@@ -10,8 +10,8 @@ public class LevelAttributeGain
 		foreach (XmlAttribute attribute in node.Attributes)
 		{
 			string name = attribute.Name;
-			int bAINMLLIKOL = XmlUtils.ParseInt(attribute);
-			Gains.Set(name, bAINMLLIKOL);
+			int gain = XmlUtils.ParseInt(attribute);
+			Gains.Set(name, gain);
 		}
 	}
 }

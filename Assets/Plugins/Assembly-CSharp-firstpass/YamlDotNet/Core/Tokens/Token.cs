@@ -25,10 +25,10 @@ namespace YamlDotNet.Core.Tokens
 			}
 		}
 
-		protected Token(Mark ILENLCMAMBH, Mark PCLFFOBJJFO)
+		protected Token(Mark startMark, Mark endMark)
 		{
-			start = ILENLCMAMBH;
-			end = PCLFFOBJJFO;
+			start = startMark;
+			end = endMark;
 		}
 	}
 }

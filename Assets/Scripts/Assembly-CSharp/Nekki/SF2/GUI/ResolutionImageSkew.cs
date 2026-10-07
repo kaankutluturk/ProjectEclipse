@@ -35,19 +35,19 @@ namespace Nekki.SF2.GUI
 			SetVerticesDirty();
 		}
 
-		protected override void OnPopulateMesh(VertexHelper DHJBOKKAOJK)
+		protected override void OnPopulateMesh(VertexHelper vertexHelper)
 		{
-			base.OnPopulateMesh(DHJBOKKAOJK);
-			Vector2 pEEOEOMEBFG = new Vector2(base.rectTransform.rect.width, base.rectTransform.rect.height);
-			Draw(DHJBOKKAOJK, pEEOEOMEBFG);
+			base.OnPopulateMesh(vertexHelper);
+			Vector2 size = new Vector2(base.rectTransform.rect.width, base.rectTransform.rect.height);
+			Draw(vertexHelper, size);
 		}
 
-		protected void Draw(VertexHelper DHJBOKKAOJK, Vector2 PEEOEOMEBFG)
+		protected void Draw(VertexHelper vertexHelper, Vector2 size)
 		{
 			float f = (float)Math.PI * _SkewAngle / 180f;
-			float num = PEEOEOMEBFG.y * Mathf.Tan(f);
+			float num = size.y * Mathf.Tan(f);
 			List<UIVertex> list = new List<UIVertex>();
-			DHJBOKKAOJK.GetUIVertexStream(list);
+			vertexHelper.GetUIVertexStream(list);
 			if (list.Count >= 6)
 			{
 				UIVertex value = list[0];
@@ -60,8 +60,8 @@ namespace Nekki.SF2.GUI
 				value.position.x -= num;
 				list[5] = value;
 			}
-			DHJBOKKAOJK.Clear();
-			DHJBOKKAOJK.AddUIVertexTriangleStream(list);
+			vertexHelper.Clear();
+			vertexHelper.AddUIVertexTriangleStream(list);
 		}
 	}
 }

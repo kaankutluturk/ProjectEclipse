@@ -48,9 +48,9 @@ namespace Nekki.SF2.GUI.Shop
 			}
 		}
 
-		public void ShowPerkHint(PerkInfoItem AEFFHJGMNFI, Vector2 MGMMDGFPBLP, Vector2 IPCOBJBKNAO, GameObject AOMLCBHAJJH)
+		public void ShowPerkHint(PerkInfoItem perkItem, Vector2 MGMMDGFPBLP, Vector2 hintOffset, GameObject AOMLCBHAJJH)
 		{
-			if (AEFFHJGMNFI == null || false || hintBox == null)
+			if (perkItem == null || false || hintBox == null)
 			{
 				return;
 			}
@@ -65,15 +65,15 @@ namespace Nekki.SF2.GUI.Shop
 			}
 				hintSource = AOMLCBHAJJH;
 				hintBox.gameObject.SetActive(true);
-				string title = AEFFHJGMNFI.Alias;
-				string description = AEFFHJGMNFI.ResolveDescriptionText(AEFFHJGMNFI.DescriptionKey);
+				string title = perkItem.Alias;
+				string description = perkItem.ResolveDescriptionText(perkItem.DescriptionKey);
 				// Public mod presentation belongs to the Eclipse definition, not to the
 				// recovered PerkInfoItem compatibility projection. Saved/cloned enchantment
 				// instances can carry legacy presentation metadata, so prefer the canonical
 				// registry keys for qualified external perks/enchantments.
 				string modTitle;
 				string modDescription;
-				if (ModRuntime.TryGetExternalEffectPresentation(AEFFHJGMNFI.Name, out modTitle, out modDescription))
+				if (ModRuntime.TryGetExternalEffectPresentation(perkItem.Name, out modTitle, out modDescription))
 				{
 					title = modTitle;
 					description = modDescription;
@@ -91,18 +91,18 @@ namespace Nekki.SF2.GUI.Shop
 			if (component != null)
 			{
 				Vector2 vector = new Vector2(0f, (0f - component.sizeDelta.y) * 0.5f);
-				Vector2 vector2 = MGMMDGFPBLP + IPCOBJBKNAO;
+				Vector2 vector2 = MGMMDGFPBLP + hintOffset;
 				vector2 = base.transform.InverseTransformPoint(vector2);
 				flag = Mathf.Abs((vector - vector2).y) < hintBox.get_RectTransform().sizeDelta.y;
 			}
 			if (flag)
 			{
-				hintBox.transform.position = MGMMDGFPBLP - IPCOBJBKNAO;
+				hintBox.transform.position = MGMMDGFPBLP - hintOffset;
 				hintBox.Flip();
 			}
 			else
 			{
-				hintBox.transform.position = MGMMDGFPBLP + IPCOBJBKNAO;
+				hintBox.transform.position = MGMMDGFPBLP + hintOffset;
 				hintBox.ResetFlip();
 			}
 			showingHint = true;

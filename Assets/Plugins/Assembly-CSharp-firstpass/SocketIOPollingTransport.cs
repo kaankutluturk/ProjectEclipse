@@ -48,9 +48,9 @@ internal sealed class SocketIOPollingTransport : ITransport
 		}
 	}
 
-	public SocketIOPollingTransport(SocketManager BJGMPDIKEJC)
+	public SocketIOPollingTransport(SocketManager socketManager)
 	{
-		SetManager(BJGMPDIKEJC);
+		SetManager(socketManager);
 	}
 
 	public SocketIOTransportState GetState()
@@ -89,17 +89,17 @@ internal sealed class SocketIOPollingTransport : ITransport
 			null,
 			null
 		};
-		SocketManager mFANOMMMCFG = GetManager();
+		SocketManager manager = GetManager();
 		ulong num;
-		mFANOMMMCFG.set_RequestCounter((num = mFANOMMMCFG.GetRequestCounter()) + 1);
+		manager.set_RequestCounter((num = manager.GetRequestCounter()) + 1);
 		num = num;
 		obj[3] = num.ToString();
 		obj[4] = GetManager().GetHandshake().GetSid();
 		obj[5] = (GetManager().GetOptions().GetQueryParamsOnlyForHandshake() ? string.Empty : GetManager().GetOptions().BuildQueryParams());
-		HTTPRequest iPLGNIDJDCF = new HTTPRequest(new Uri(string.Format("{0}?EIO={1}&transport=polling&t={2}-{3}&sid={4}{5}&b64=true", obj)), OnRequestFinished);
-		iPLGNIDJDCF.SetDisableCache(true);
-		iPLGNIDJDCF.SetDisableRetry(true);
-		iPLGNIDJDCF.Send();
+		HTTPRequest request = new HTTPRequest(new Uri(string.Format("{0}?EIO={1}&transport=polling&t={2}-{3}&sid={4}{5}&b64=true", obj)), OnRequestFinished);
+		request.SetDisableCache(true);
+		request.SetDisableRetry(true);
+		request.Send();
 		set_State(SocketIOTransportState.Opening);
 	}
 
@@ -111,12 +111,12 @@ internal sealed class SocketIOPollingTransport : ITransport
 		}
 	}
 
-	public void Send(Packet NPKADBPBKIG)
+	public void Send(Packet packet)
 	{
-		Send(new List<Packet> { NPKADBPBKIG });
+		Send(new List<Packet> { packet });
 	}
 
-	public void Send(List<Packet> DPGGBKDLDJE)
+	public void Send(List<Packet> packets)
 	{
 		if (GetState() != SocketIOTransportState.Open)
 		{
@@ -129,14 +129,14 @@ internal sealed class SocketIOPollingTransport : ITransport
 		byte[] array = null;
 		try
 		{
-			array = DPGGBKDLDJE[0].EncodeBinary();
-			for (int i = 1; i < DPGGBKDLDJE.Count; i++)
+			array = packets[0].EncodeBinary();
+			for (int i = 1; i < packets.Count; i++)
 			{
-				byte[] array2 = DPGGBKDLDJE[i].EncodeBinary();
+				byte[] array2 = packets[i].EncodeBinary();
 				Array.Resize(ref array, array.Length + array2.Length);
 				Array.Copy(array2, 0, array, array.Length - array2.Length, array2.Length);
 			}
-			DPGGBKDLDJE.Clear();
+			packets.Clear();
 		}
 		catch (Exception ex)
 		{
@@ -152,9 +152,9 @@ internal sealed class SocketIOPollingTransport : ITransport
 			null,
 			null
 		};
-		SocketManager mFANOMMMCFG = GetManager();
+		SocketManager manager = GetManager();
 		ulong num;
-		mFANOMMMCFG.set_RequestCounter((num = mFANOMMMCFG.GetRequestCounter()) + 1);
+		manager.set_RequestCounter((num = manager.GetRequestCounter()) + 1);
 		num = num;
 		obj[3] = num.ToString();
 		obj[4] = GetManager().GetHandshake().GetSid();
@@ -166,7 +166,7 @@ internal sealed class SocketIOPollingTransport : ITransport
 		lastRequest.Send();
 	}
 
-	private void OnRequestFinished(HTTPRequest CGOIOKHEGOE, HTTPResponse BEIGFGCBICO)
+	private void OnRequestFinished(HTTPRequest request, HTTPResponse response)
 	{
 		lastRequest = null;
 		if (GetState() == SocketIOTransportState.Closed)
@@ -174,31 +174,31 @@ internal sealed class SocketIOPollingTransport : ITransport
 			return;
 		}
 		string text = null;
-		switch (CGOIOKHEGOE.GetState())
+		switch (request.GetState())
 		{
 		case HTTPRequestStates.Finished:
 			if (HTTPManager.GetLogger().GetLevel() <= Loglevels.All)
 			{
-				HTTPManager.GetLogger().Verbose("PollingTransport", "OnRequestFinished: " + BEIGFGCBICO.GetDataAsText());
+				HTTPManager.GetLogger().Verbose("PollingTransport", "OnRequestFinished: " + response.GetDataAsText());
 			}
-			if (BEIGFGCBICO.GetIsSuccess())
+			if (response.GetIsSuccess())
 			{
-				ParseResponse(BEIGFGCBICO);
+				ParseResponse(response);
 				break;
 			}
-			text = string.Format("Polling - Request finished Successfully, but the server sent an error. Status Code: {0}-{1} Message: {2} Uri: {3}", BEIGFGCBICO.GetStatusCode(), BEIGFGCBICO.GetMessage(), BEIGFGCBICO.GetDataAsText(), CGOIOKHEGOE.GetCurrentUri());
+			text = string.Format("Polling - Request finished Successfully, but the server sent an error. Status Code: {0}-{1} Message: {2} Uri: {3}", response.GetStatusCode(), response.GetMessage(), response.GetDataAsText(), request.GetCurrentUri());
 			break;
 		case HTTPRequestStates.Error:
-			text = ((CGOIOKHEGOE.GetException() == null) ? "No Exception" : (CGOIOKHEGOE.GetException().Message + "\n" + CGOIOKHEGOE.GetException().StackTrace));
+			text = ((request.GetException() == null) ? "No Exception" : (request.GetException().Message + "\n" + request.GetException().StackTrace));
 			break;
 		case HTTPRequestStates.Aborted:
-			text = string.Format("Polling - Request({0}) Aborted!", CGOIOKHEGOE.GetCurrentUri());
+			text = string.Format("Polling - Request({0}) Aborted!", request.GetCurrentUri());
 			break;
 		case HTTPRequestStates.ConnectionTimedOut:
-			text = string.Format("Polling - Connection Timed Out! Uri: {0}", CGOIOKHEGOE.GetCurrentUri());
+			text = string.Format("Polling - Connection Timed Out! Uri: {0}", request.GetCurrentUri());
 			break;
 		case HTTPRequestStates.TimedOut:
-			text = string.Format("Polling - Processing the request({0}) Timed Out!", CGOIOKHEGOE.GetCurrentUri());
+			text = string.Format("Polling - Processing the request({0}) Timed Out!", request.GetCurrentUri());
 			break;
 		}
 		if (!string.IsNullOrEmpty(text))
@@ -220,9 +220,9 @@ internal sealed class SocketIOPollingTransport : ITransport
 				null,
 				null
 			};
-			SocketManager mFANOMMMCFG = GetManager();
+			SocketManager manager = GetManager();
 			ulong num;
-			mFANOMMMCFG.set_RequestCounter((num = mFANOMMMCFG.GetRequestCounter()) + 1);
+			manager.set_RequestCounter((num = manager.GetRequestCounter()) + 1);
 			num = num;
 			obj[3] = num.ToString();
 			obj[4] = GetManager().GetHandshake().GetSid();
@@ -234,7 +234,7 @@ internal sealed class SocketIOPollingTransport : ITransport
 		}
 	}
 
-	private void OnPollRequestFinished(HTTPRequest CGOIOKHEGOE, HTTPResponse BEIGFGCBICO)
+	private void OnPollRequestFinished(HTTPRequest request, HTTPResponse response)
 	{
 		pollRequest = null;
 		if (GetState() == SocketIOTransportState.Closed)
@@ -242,31 +242,31 @@ internal sealed class SocketIOPollingTransport : ITransport
 			return;
 		}
 		string text = null;
-		switch (CGOIOKHEGOE.GetState())
+		switch (request.GetState())
 		{
 		case HTTPRequestStates.Finished:
 			if (HTTPManager.GetLogger().GetLevel() <= Loglevels.All)
 			{
-				HTTPManager.GetLogger().Verbose("PollingTransport", "OnPollRequestFinished: " + BEIGFGCBICO.GetDataAsText());
+				HTTPManager.GetLogger().Verbose("PollingTransport", "OnPollRequestFinished: " + response.GetDataAsText());
 			}
-			if (BEIGFGCBICO.GetIsSuccess())
+			if (response.GetIsSuccess())
 			{
-				ParseResponse(BEIGFGCBICO);
+				ParseResponse(response);
 				break;
 			}
-			text = string.Format("Polling - Request finished Successfully, but the server sent an error. Status Code: {0}-{1} Message: {2} Uri: {3}", BEIGFGCBICO.GetStatusCode(), BEIGFGCBICO.GetMessage(), BEIGFGCBICO.GetDataAsText(), CGOIOKHEGOE.GetCurrentUri());
+			text = string.Format("Polling - Request finished Successfully, but the server sent an error. Status Code: {0}-{1} Message: {2} Uri: {3}", response.GetStatusCode(), response.GetMessage(), response.GetDataAsText(), request.GetCurrentUri());
 			break;
 		case HTTPRequestStates.Error:
-			text = ((CGOIOKHEGOE.GetException() == null) ? "No Exception" : (CGOIOKHEGOE.GetException().Message + "\n" + CGOIOKHEGOE.GetException().StackTrace));
+			text = ((request.GetException() == null) ? "No Exception" : (request.GetException().Message + "\n" + request.GetException().StackTrace));
 			break;
 		case HTTPRequestStates.Aborted:
-			text = string.Format("Polling - Request({0}) Aborted!", CGOIOKHEGOE.GetCurrentUri());
+			text = string.Format("Polling - Request({0}) Aborted!", request.GetCurrentUri());
 			break;
 		case HTTPRequestStates.ConnectionTimedOut:
-			text = string.Format("Polling - Connection Timed Out! Uri: {0}", CGOIOKHEGOE.GetCurrentUri());
+			text = string.Format("Polling - Connection Timed Out! Uri: {0}", request.GetCurrentUri());
 			break;
 		case HTTPRequestStates.TimedOut:
-			text = string.Format("Polling - Processing the request({0}) Timed Out!", CGOIOKHEGOE.GetCurrentUri());
+			text = string.Format("Polling - Processing the request({0}) Timed Out!", request.GetCurrentUri());
 			break;
 		}
 		if (!string.IsNullOrEmpty(text))
@@ -275,15 +275,15 @@ internal sealed class SocketIOPollingTransport : ITransport
 		}
 	}
 
-	private void OnPacket(Packet NPKADBPBKIG)
+	private void OnPacket(Packet packet)
 	{
-		if (NPKADBPBKIG.GetAttachmentCount() != 0 && !NPKADBPBKIG.GetHasAllAttachment())
+		if (packet.GetAttachmentCount() != 0 && !packet.GetHasAllAttachment())
 		{
-			packetWithAttachment = NPKADBPBKIG;
+			packetWithAttachment = packet;
 			return;
 		}
-		TransportEventTypes hJDLGPHLPNF = NPKADBPBKIG.GetTransportEvent();
-		if (hJDLGPHLPNF == TransportEventTypes.Message && NPKADBPBKIG.GetSocketIOEvent() == SocketIOEventType.Connect && GetState() == SocketIOTransportState.Opening)
+		TransportEventTypes transportEvent = packet.GetTransportEvent();
+		if (transportEvent == TransportEventTypes.Message && packet.GetSocketIOEvent() == SocketIOEventType.Connect && GetState() == SocketIOTransportState.Opening)
 		{
 			set_State(SocketIOTransportState.Open);
 			if (!((IManager)GetManager()).OnTransportConnected((ITransport)this))
@@ -291,18 +291,18 @@ internal sealed class SocketIOPollingTransport : ITransport
 				return;
 			}
 		}
-		((IManager)GetManager()).OnPacket(NPKADBPBKIG);
+		((IManager)GetManager()).OnPacket(packet);
 	}
 
-	private void ParseResponse(HTTPResponse BEIGFGCBICO)
+	private void ParseResponse(HTTPResponse response)
 	{
 		try
 		{
-			if (BEIGFGCBICO == null || BEIGFGCBICO.GetData() == null || BEIGFGCBICO.GetData().Length < 1)
+			if (response == null || response.GetData() == null || response.GetData().Length < 1)
 			{
 				return;
 			}
-			string text = BEIGFGCBICO.GetDataAsText();
+			string text = response.GetDataAsText();
 			if (text == "ok")
 			{
 				return;
@@ -315,10 +315,10 @@ internal sealed class SocketIOPollingTransport : ITransport
 				string text2 = text.Substring(++num, num3);
 				if (text2.Length > 2 && text2[0] == 'b' && text2[1] == '4')
 				{
-					byte[] jGMLAFOPBBC = Convert.FromBase64String(text2.Substring(2));
+					byte[] attachmentData = Convert.FromBase64String(text2.Substring(2));
 					if (packetWithAttachment != null)
 					{
-						packetWithAttachment.AddAttachmentFromServer(jGMLAFOPBBC, true);
+						packetWithAttachment.AddAttachmentFromServer(attachmentData, true);
 						if (packetWithAttachment.GetHasAllAttachment())
 						{
 							try
@@ -341,8 +341,8 @@ internal sealed class SocketIOPollingTransport : ITransport
 				{
 					try
 					{
-						Packet nPKADBPBKIG = new Packet(text2);
-						OnPacket(nPKADBPBKIG);
+						Packet packet = new Packet(text2);
+						OnPacket(packet);
 					}
 					catch (Exception ex2)
 					{

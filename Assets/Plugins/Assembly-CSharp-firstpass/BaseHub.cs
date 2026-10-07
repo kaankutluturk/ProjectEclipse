@@ -7,35 +7,35 @@ internal class BaseHub : Hub
 
 	private GUIMessageList messages = new GUIMessageList();
 
-	public BaseHub(string name, string PEMOECLNECD)
+	public BaseHub(string name, string title)
 		: base(name)
 	{
-		Title = PEMOECLNECD;
+		Title = title;
 		On("joined", OnJoined);
 		On("rejoined", OnRejoined);
 		On("left", OnLeft);
 		On("invoked", OnInvoked);
 	}
 
-	private void OnJoined(Hub CGFIJCNNCKP, MethodCallMessage BOPGDKGIGHM)
+	private void OnJoined(Hub hub, MethodCallMessage methodCall)
 	{
-		Dictionary<string, object> dictionary = BOPGDKGIGHM.GetArguments()[2] as Dictionary<string, object>;
-		messages.Add(string.Format("{0} joined at {1}\n\tIsAuthenticated: {2} IsAdmin: {3} UserName: {4}", BOPGDKGIGHM.GetArguments()[0], BOPGDKGIGHM.GetArguments()[1], dictionary["IsAuthenticated"], dictionary["IsAdmin"], dictionary["UserName"]));
+		Dictionary<string, object> dictionary = methodCall.GetArguments()[2] as Dictionary<string, object>;
+		messages.Add(string.Format("{0} joined at {1}\n\tIsAuthenticated: {2} IsAdmin: {3} UserName: {4}", methodCall.GetArguments()[0], methodCall.GetArguments()[1], dictionary["IsAuthenticated"], dictionary["IsAdmin"], dictionary["UserName"]));
 	}
 
-	private void OnRejoined(Hub CGFIJCNNCKP, MethodCallMessage BOPGDKGIGHM)
+	private void OnRejoined(Hub hub, MethodCallMessage methodCall)
 	{
-		messages.Add(string.Format("{0} reconnected at {1}", BOPGDKGIGHM.GetArguments()[0], BOPGDKGIGHM.GetArguments()[1]));
+		messages.Add(string.Format("{0} reconnected at {1}", methodCall.GetArguments()[0], methodCall.GetArguments()[1]));
 	}
 
-	private void OnLeft(Hub CGFIJCNNCKP, MethodCallMessage BOPGDKGIGHM)
+	private void OnLeft(Hub hub, MethodCallMessage methodCall)
 	{
-		messages.Add(string.Format("{0} left at {1}", BOPGDKGIGHM.GetArguments()[0], BOPGDKGIGHM.GetArguments()[1]));
+		messages.Add(string.Format("{0} left at {1}", methodCall.GetArguments()[0], methodCall.GetArguments()[1]));
 	}
 
-	private void OnInvoked(Hub CGFIJCNNCKP, MethodCallMessage BOPGDKGIGHM)
+	private void OnInvoked(Hub hub, MethodCallMessage methodCall)
 	{
-		messages.Add(string.Format("{0} invoked hub method at {1}", BOPGDKGIGHM.GetArguments()[0], BOPGDKGIGHM.GetArguments()[1]));
+		messages.Add(string.Format("{0} invoked hub method at {1}", methodCall.GetArguments()[0], methodCall.GetArguments()[1]));
 	}
 
 	public void InvokedFromClient()
@@ -43,14 +43,14 @@ internal class BaseHub : Hub
 		Call("invokedFromClient", OnInvokedFromClientSuccess, OnInvokedFromClientFailed);
 	}
 
-	private void OnInvokedFromClientSuccess(Hub CGFIJCNNCKP, ClientMessage BKNEELNMDHH, ResultMessage DCJLKCFKCOM)
+	private void OnInvokedFromClientSuccess(Hub hub, ClientMessage clientMessage, ResultMessage resultMessage)
 	{
-		AdvLog.Log(CGFIJCNNCKP.get_Name() + " invokedFromClient success!");
+		AdvLog.Log(hub.get_Name() + " invokedFromClient success!");
 	}
 
-	private void OnInvokedFromClientFailed(Hub CGFIJCNNCKP, ClientMessage BKNEELNMDHH, FailureMessage DCJLKCFKCOM)
+	private void OnInvokedFromClientFailed(Hub hub, ClientMessage clientMessage, FailureMessage failureMessage)
 	{
-		AdvLog.LogWarning(CGFIJCNNCKP.get_Name() + " " + DCJLKCFKCOM.GetErrorMessage());
+		AdvLog.LogWarning(hub.get_Name() + " " + failureMessage.GetErrorMessage());
 	}
 
 	public void Draw()

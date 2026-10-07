@@ -32,8 +32,8 @@ public sealed class SequenceStartEventInfo : ObjectEventInfo
 		}
 	}
 
-	public SequenceStartEventInfo(IObjectDescriptor BBNKIBKPBLO)
-		: base(BBNKIBKPBLO)
+	public SequenceStartEventInfo(IObjectDescriptor source)
+		: base(source)
 	{
 	}
 

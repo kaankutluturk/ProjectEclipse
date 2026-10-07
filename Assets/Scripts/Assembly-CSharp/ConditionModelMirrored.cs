@@ -7,18 +7,18 @@ public class ConditionModelMirrored : ConditionAnimation
 	{
 	}
 
-	public override bool IsEqual(Model ACENLMONNPA, InfoAnimation DBOLBEOCEME)
+	public override bool IsEqual(Model model, InfoAnimation animationInfo)
 	{
-		bool flag = GetIsMirrored(ACENLMONNPA, DBOLBEOCEME);
+		bool flag = GetIsMirrored(model, animationInfo);
 		return (!IsNot) ? flag : (!flag);
 	}
 
-	private bool GetIsMirrored(Model ACENLMONNPA, InfoAnimation DBOLBEOCEME)
+	private bool GetIsMirrored(Model model, InfoAnimation animationInfo)
 	{
-		ModelType.ModelTargetType oOFFOILONLO = _targetModelType;
-		if (oOFFOILONLO == ModelType.ModelTargetType.MODEL_THIS)
+		ModelType.ModelTargetType targetType = _targetModelType;
+		if (targetType == ModelType.ModelTargetType.MODEL_THIS)
 		{
-			return ModelAnimation.CalcIsMirror(ACENLMONNPA.GetBodyObject(), DBOLBEOCEME.GetMirrorNode().GetNodeName(), ACENLMONNPA.GetAnimationModule().GetSign(), DBOLBEOCEME.GetFirstFrameNodes(), false);
+			return ModelAnimation.CalcIsMirror(model.GetBodyObject(), animationInfo.GetMirrorNode().GetNodeName(), model.GetAnimationModule().GetSign(), animationInfo.GetFirstFrameNodes(), false);
 		}
 		GameLog.Error("ConditionModelMirrored: getMirror - wrong type: {0}", _targetModelType);
 		return false;

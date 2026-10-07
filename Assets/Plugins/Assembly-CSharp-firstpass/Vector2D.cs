@@ -2,19 +2,19 @@ using UnityEngine;
 
 public class Vector2D
 {
-	public static void BuildLineEquation(Vector2 MLGFPMDKOHD, Vector2 DMMNCDKPCCI, EquationLine EGKHHBMCGMK)
+	public static void BuildLineEquation(Vector2 pointA, Vector2 pointB, EquationLine equation)
 	{
-		float num = Vector2.Distance(MLGFPMDKOHD, DMMNCDKPCCI);
-		EGKHHBMCGMK.A = (MLGFPMDKOHD.y - DMMNCDKPCCI.y) / num;
-		EGKHHBMCGMK.CoefficientB = (DMMNCDKPCCI.x - MLGFPMDKOHD.x) / num;
-		EGKHHBMCGMK.ConstantC = 0f - (EGKHHBMCGMK.A * MLGFPMDKOHD.x + EGKHHBMCGMK.CoefficientB * MLGFPMDKOHD.y);
+		float num = Vector2.Distance(pointA, pointB);
+		equation.A = (pointA.y - pointB.y) / num;
+		equation.CoefficientB = (pointB.x - pointA.x) / num;
+		equation.ConstantC = 0f - (equation.A * pointA.x + equation.CoefficientB * pointA.y);
 	}
 
-	public static EquationLine BuildLineEquation(Vector2 MLGFPMDKOHD, Vector2 DMMNCDKPCCI)
+	public static EquationLine BuildLineEquation(Vector2 pointA, Vector2 pointB)
 	{
-		EquationLine kEDCEHBPOIM = null;
-		BuildLineEquation(MLGFPMDKOHD, DMMNCDKPCCI, kEDCEHBPOIM);
-		return kEDCEHBPOIM;
+		EquationLine equation = null;
+		BuildLineEquation(pointA, pointB, equation);
+		return equation;
 	}
 
 	private static float Abs(float value)
@@ -22,30 +22,30 @@ public class Vector2D
 		return (!(value < 0f)) ? value : (0f - value);
 	}
 
-	public static bool IntersectThickSegments(Vector2 HICHONIJHKL, Vector2 LNPFHLPCLOP, float KLDFJGIKIHG, Vector2 NMAJNHKJJEM, Vector2 ONNJMGGPHEL, float MGCKDDGGCBI, ref Vector2 DNJCFHNICBH, ref Vector2 LOFMLNLKFLB, EquationLine JHMHDMOADMA, EquationLine GIMOMPLMEJH)
+	public static bool IntersectThickSegments(Vector2 segmentAStart, Vector2 segmentAEnd, float thicknessA, Vector2 segmentBStart, Vector2 segmentBEnd, float thicknessB, ref Vector2 intersectionStart, ref Vector2 intersectionEnd, EquationLine segmentALine, EquationLine segmentBLine)
 	{
-		Vector2 vector = HICHONIJHKL;
-		Vector2 vector2 = LNPFHLPCLOP;
-		Vector2 vector3 = NMAJNHKJJEM;
-		Vector2 vector4 = ONNJMGGPHEL;
-		float num = KLDFJGIKIHG + MGCKDDGGCBI;
+		Vector2 vector = segmentAStart;
+		Vector2 vector2 = segmentAEnd;
+		Vector2 vector3 = segmentBStart;
+		Vector2 vector4 = segmentBEnd;
+		float num = thicknessA + thicknessB;
 		if (num == 0f)
 		{
-			if (SegmentIntersection(vector3, vector4, vector, vector2, DNJCFHNICBH))
+			if (SegmentIntersection(vector3, vector4, vector, vector2, intersectionStart))
 			{
-				LOFMLNLKFLB = DNJCFHNICBH;
+				intersectionEnd = intersectionStart;
 				return true;
 			}
 			return false;
 		}
-		EquationLine kEDCEHBPOIM = ((GIMOMPLMEJH == null) ? BuildLineEquation(NMAJNHKJJEM, ONNJMGGPHEL) : GIMOMPLMEJH);
-		float num2 = kEDCEHBPOIM.A * vector.x + kEDCEHBPOIM.CoefficientB * vector.y + kEDCEHBPOIM.ConstantC;
-		float num3 = kEDCEHBPOIM.A * vector2.x + kEDCEHBPOIM.CoefficientB * vector2.y + kEDCEHBPOIM.ConstantC;
+		EquationLine segmentBEquation = ((segmentBLine == null) ? BuildLineEquation(segmentBStart, segmentBEnd) : segmentBLine);
+		float num2 = segmentBEquation.A * vector.x + segmentBEquation.CoefficientB * vector.y + segmentBEquation.ConstantC;
+		float num3 = segmentBEquation.A * vector2.x + segmentBEquation.CoefficientB * vector2.y + segmentBEquation.ConstantC;
 		if (0f <= num2 * num3 && num < Abs(num2) && num < Abs(num3))
 		{
 			return false;
 		}
-		EquationLine kEDCEHBPOIM2 = ((JHMHDMOADMA == null) ? BuildLineEquation(HICHONIJHKL, LNPFHLPCLOP) : JHMHDMOADMA);
+		EquationLine kEDCEHBPOIM2 = ((segmentALine == null) ? BuildLineEquation(segmentAStart, segmentAEnd) : segmentALine);
 		float num4 = kEDCEHBPOIM2.A * vector3.x + kEDCEHBPOIM2.CoefficientB * vector3.y + kEDCEHBPOIM2.ConstantC;
 		float num5 = kEDCEHBPOIM2.A * vector4.x + kEDCEHBPOIM2.CoefficientB * vector4.y + kEDCEHBPOIM2.ConstantC;
 		if (0f <= num4 * num5 && num < Abs(num4) && num < Abs(num5))
@@ -55,60 +55,60 @@ public class Vector2D
 		if (num4 * num5 < 0f && num2 * num3 < 0f)
 		{
 			float num6 = num4 / (num4 - num5);
-			DNJCFHNICBH = vector4 - vector3;
-			DNJCFHNICBH *= num6;
-			DNJCFHNICBH += vector3;
-			LOFMLNLKFLB = DNJCFHNICBH;
+			intersectionStart = vector4 - vector3;
+			intersectionStart *= num6;
+			intersectionStart += vector3;
+			intersectionEnd = intersectionStart;
 			return true;
 		}
-		if (IsPointNearSegment(num2, num, kEDCEHBPOIM, vector, ref LOFMLNLKFLB, vector3, vector4))
+		if (IsPointNearSegment(num2, num, segmentBEquation, vector, ref intersectionEnd, vector3, vector4))
 		{
-			DNJCFHNICBH = vector;
+			intersectionStart = vector;
 			return true;
 		}
-		if (IsPointNearSegment(num3, num, kEDCEHBPOIM, vector2, ref LOFMLNLKFLB, vector3, vector4))
+		if (IsPointNearSegment(num3, num, segmentBEquation, vector2, ref intersectionEnd, vector3, vector4))
 		{
-			DNJCFHNICBH = vector2;
+			intersectionStart = vector2;
 			return true;
 		}
-		if (IsPointNearSegment(num4, num, kEDCEHBPOIM2, vector3, ref LOFMLNLKFLB, vector, vector2))
+		if (IsPointNearSegment(num4, num, kEDCEHBPOIM2, vector3, ref intersectionEnd, vector, vector2))
 		{
-			DNJCFHNICBH = vector3;
-			LOFMLNLKFLB = vector3;
+			intersectionStart = vector3;
+			intersectionEnd = vector3;
 			return true;
 		}
-		if (IsPointNearSegment(num5, num, kEDCEHBPOIM2, vector4, ref LOFMLNLKFLB, vector, vector2))
+		if (IsPointNearSegment(num5, num, kEDCEHBPOIM2, vector4, ref intersectionEnd, vector, vector2))
 		{
-			DNJCFHNICBH = vector4;
-			LOFMLNLKFLB = vector4;
+			intersectionStart = vector4;
+			intersectionEnd = vector4;
 			return true;
 		}
 		return false;
 	}
 
-	public static bool IsPointNearSegment(float OIOMNNFMDOO, float JBLFLFOGDFI, EquationLine EGKHHBMCGMK, Vector2 NAAPALOFBCI, ref Vector2 CIMNFFDLIJO, Vector2 ILENLCMAMBH, Vector2 PCLFFOBJJFO)
+	public static bool IsPointNearSegment(float signedDistance, float maxDistance, EquationLine line, Vector2 point, ref Vector2 projectedPoint, Vector2 segmentStart, Vector2 segmentEnd)
 	{
-		if (Abs(OIOMNNFMDOO) <= JBLFLFOGDFI)
+		if (Abs(signedDistance) <= maxDistance)
 		{
-			CIMNFFDLIJO.x = NAAPALOFBCI.x - OIOMNNFMDOO * EGKHHBMCGMK.A;
-			CIMNFFDLIJO.y = NAAPALOFBCI.y - OIOMNNFMDOO * EGKHHBMCGMK.CoefficientB;
-			return (((PCLFFOBJJFO.x <= CIMNFFDLIJO.x && CIMNFFDLIJO.x <= ILENLCMAMBH.x) || (ILENLCMAMBH.x <= CIMNFFDLIJO.x && CIMNFFDLIJO.x <= PCLFFOBJJFO.x)) && ((PCLFFOBJJFO.y <= CIMNFFDLIJO.y && CIMNFFDLIJO.y <= ILENLCMAMBH.y) || (ILENLCMAMBH.y <= CIMNFFDLIJO.y && CIMNFFDLIJO.y <= PCLFFOBJJFO.y))) || (NAAPALOFBCI.x - ILENLCMAMBH.x) * (NAAPALOFBCI.x - ILENLCMAMBH.x) + (NAAPALOFBCI.y - ILENLCMAMBH.y) * (NAAPALOFBCI.y - ILENLCMAMBH.y) <= JBLFLFOGDFI * JBLFLFOGDFI || (NAAPALOFBCI.x - PCLFFOBJJFO.x) * (NAAPALOFBCI.x - PCLFFOBJJFO.x) + (NAAPALOFBCI.y - PCLFFOBJJFO.y) * (NAAPALOFBCI.y - PCLFFOBJJFO.y) <= JBLFLFOGDFI * JBLFLFOGDFI;
+			projectedPoint.x = point.x - signedDistance * line.A;
+			projectedPoint.y = point.y - signedDistance * line.CoefficientB;
+			return (((segmentEnd.x <= projectedPoint.x && projectedPoint.x <= segmentStart.x) || (segmentStart.x <= projectedPoint.x && projectedPoint.x <= segmentEnd.x)) && ((segmentEnd.y <= projectedPoint.y && projectedPoint.y <= segmentStart.y) || (segmentStart.y <= projectedPoint.y && projectedPoint.y <= segmentEnd.y))) || (point.x - segmentStart.x) * (point.x - segmentStart.x) + (point.y - segmentStart.y) * (point.y - segmentStart.y) <= maxDistance * maxDistance || (point.x - segmentEnd.x) * (point.x - segmentEnd.x) + (point.y - segmentEnd.y) * (point.y - segmentEnd.y) <= maxDistance * maxDistance;
 		}
 		return false;
 	}
 
-	public static bool SegmentIntersection(Vector2 IEKADOOKFKG, Vector2 LDKCOIHONPG, Vector2 AOOIPCJPALH, Vector2 IGMCGOFHHCJ, Vector2 DCJLKCFKCOM)
+	public static bool SegmentIntersection(Vector2 segmentAStart, Vector2 segmentAEnd, Vector2 segmentBStart, Vector2 segmentBEnd, Vector2 intersection)
 	{
-		if ((IEKADOOKFKG.x == LDKCOIHONPG.x && IEKADOOKFKG.y == LDKCOIHONPG.y) || (AOOIPCJPALH.x == IGMCGOFHHCJ.x && AOOIPCJPALH.y == IGMCGOFHHCJ.y))
+		if ((segmentAStart.x == segmentAEnd.x && segmentAStart.y == segmentAEnd.y) || (segmentBStart.x == segmentBEnd.x && segmentBStart.y == segmentBEnd.y))
 		{
 			return false;
 		}
-		float num = LDKCOIHONPG.x - IEKADOOKFKG.x;
-		float num2 = LDKCOIHONPG.y - IEKADOOKFKG.y;
-		float num3 = IGMCGOFHHCJ.x - AOOIPCJPALH.x;
-		float num4 = IGMCGOFHHCJ.y - AOOIPCJPALH.y;
-		float num5 = IEKADOOKFKG.x - AOOIPCJPALH.x;
-		float num6 = IEKADOOKFKG.y - AOOIPCJPALH.y;
+		float num = segmentAEnd.x - segmentAStart.x;
+		float num2 = segmentAEnd.y - segmentAStart.y;
+		float num3 = segmentBEnd.x - segmentBStart.x;
+		float num4 = segmentBEnd.y - segmentBStart.y;
+		float num5 = segmentAStart.x - segmentBStart.x;
+		float num6 = segmentAStart.y - segmentBStart.y;
 		float num7 = num4 * num - num3 * num2;
 		float num8 = num3 * num6 - num4 * num5;
 		float num9 = num * num6 - num2 * num5;
@@ -120,51 +120,51 @@ public class Vector2D
 			}
 			float x;
 			float x2;
-			if (IEKADOOKFKG.x < LDKCOIHONPG.x)
+			if (segmentAStart.x < segmentAEnd.x)
 			{
-				x = IEKADOOKFKG.x;
-				x2 = LDKCOIHONPG.x;
+				x = segmentAStart.x;
+				x2 = segmentAEnd.x;
 			}
 			else
 			{
-				x = LDKCOIHONPG.x;
-				x2 = IEKADOOKFKG.x;
+				x = segmentAEnd.x;
+				x2 = segmentAStart.x;
 			}
 			float x3;
 			float x4;
-			if (AOOIPCJPALH.x < IGMCGOFHHCJ.x)
+			if (segmentBStart.x < segmentBEnd.x)
 			{
-				x3 = AOOIPCJPALH.x;
-				x4 = IGMCGOFHHCJ.x;
+				x3 = segmentBStart.x;
+				x4 = segmentBEnd.x;
 			}
 			else
 			{
-				x3 = IGMCGOFHHCJ.x;
-				x4 = AOOIPCJPALH.x;
+				x3 = segmentBEnd.x;
+				x4 = segmentBStart.x;
 			}
 			if (x > x4 || x3 > x2)
 			{
 				return false;
 			}
-			if (IEKADOOKFKG.y < LDKCOIHONPG.y)
+			if (segmentAStart.y < segmentAEnd.y)
 			{
-				x = IEKADOOKFKG.y;
-				x2 = LDKCOIHONPG.y;
+				x = segmentAStart.y;
+				x2 = segmentAEnd.y;
 			}
 			else
 			{
-				x = LDKCOIHONPG.y;
-				x2 = IEKADOOKFKG.y;
+				x = segmentAEnd.y;
+				x2 = segmentAStart.y;
 			}
-			if (AOOIPCJPALH.y < IGMCGOFHHCJ.y)
+			if (segmentBStart.y < segmentBEnd.y)
 			{
-				x3 = AOOIPCJPALH.y;
-				x4 = IGMCGOFHHCJ.y;
+				x3 = segmentBStart.y;
+				x4 = segmentBEnd.y;
 			}
 			else
 			{
-				x3 = IGMCGOFHHCJ.y;
-				x4 = AOOIPCJPALH.y;
+				x3 = segmentBEnd.y;
+				x4 = segmentBStart.y;
 			}
 			if (x > x4 || x3 > x2)
 			{
@@ -176,22 +176,22 @@ public class Vector2D
 		num9 /= num7;
 		if (num8 >= 0f && num8 <= 1f && num9 >= 0f && num9 <= 1f)
 		{
-			DCJLKCFKCOM.x = IEKADOOKFKG.x + num8 * (LDKCOIHONPG.x - IEKADOOKFKG.x);
-			DCJLKCFKCOM.y = IEKADOOKFKG.y + num8 * (LDKCOIHONPG.y - IEKADOOKFKG.y);
+			intersection.x = segmentAStart.x + num8 * (segmentAEnd.x - segmentAStart.x);
+			intersection.y = segmentAStart.y + num8 * (segmentAEnd.y - segmentAStart.y);
 			return true;
 		}
 		return false;
 	}
 
-	public static float GetAngle2DDegreeSigned(Vector2 KKIKIDNALOL, Vector3 NMADGDHJBGB)
+	public static float GetAngle2DDegreeSigned(Vector2 from, Vector3 to)
 	{
-		return GetAngle2DRadianSigned(KKIKIDNALOL, NMADGDHJBGB) * 57.29578f;
+		return GetAngle2DRadianSigned(from, to) * 57.29578f;
 	}
 
-	public static float GetAngle2DRadianSigned(Vector2 LHBNIMGFKIB, Vector2 AAOIAEJJINO)
+	public static float GetAngle2DRadianSigned(Vector2 from, Vector2 to)
 	{
-		float num = LHBNIMGFKIB.x * AAOIAEJJINO.y - LHBNIMGFKIB.y * AAOIAEJJINO.x;
-		float num2 = LHBNIMGFKIB.x * AAOIAEJJINO.x + LHBNIMGFKIB.y * AAOIAEJJINO.y;
+		float num = from.x * to.y - from.y * to.x;
+		float num2 = from.x * to.x + from.y * to.y;
 		float num3 = 1f / Mathf.Sqrt(num * num + num2 * num2);
 		return Mathf.Atan2(num * num3, num2 * num3);
 	}

@@ -38,9 +38,9 @@ namespace Nekki.SF2.GUI.Map
 			mapButtonInfo = value;
 		}
 
-		public void Init(MapButtonInfo DJDNMAOEFBD)
+		public void Init(MapButtonInfo buttonInfo)
 		{
-			SetMapButtonInfo(DJDNMAOEFBD);
+			SetMapButtonInfo(buttonInfo);
 			ApplyButtonLayout();
 			UpdateTimer();
 		}
@@ -89,8 +89,8 @@ namespace Nekki.SF2.GUI.Map
 		{
 			if (get_MapButtonInfo() != null && !(_timer == null))
 			{
-				RosterTimer fPNMILOHPMB = ((!string.IsNullOrEmpty(get_MapButtonInfo().Timer)) ? ListSF.GetRoster().GetTimerContainer().FindTimer(get_MapButtonInfo().Timer) : null);
-				bool flag = fPNMILOHPMB != null;
+				RosterTimer rosterTimer = ((!string.IsNullOrEmpty(get_MapButtonInfo().Timer)) ? ListSF.GetRoster().GetTimerContainer().FindTimer(get_MapButtonInfo().Timer) : null);
+				bool flag = rosterTimer != null;
 				if (flag)
 				{
 					_timer.set_DaysStringAlias("TimeDaysShort");
@@ -101,16 +101,16 @@ namespace Nekki.SF2.GUI.Map
 					_timer.IsDays = true;
 					_timer.IsDaysZero = false;
 					_timer.SegmentsDate = 2;
-					long num = fPNMILOHPMB.GetEndTimeSeconds();
+					long num = rosterTimer.GetEndTimeSeconds();
 					_timer.set_CurrentTime(num - ListSF.GetCurrentTime());
 				}
 				_timer.gameObject.SetActive(flag);
 			}
 		}
 
-		public override void OnPointerClick(PointerEventData BHOLFGOGPCP)
+		public override void OnPointerClick(PointerEventData eventData)
 		{
-			base.OnPointerClick(BHOLFGOGPCP);
+			base.OnPointerClick(eventData);
 			ActivateAction();
 		}
 
@@ -118,8 +118,8 @@ namespace Nekki.SF2.GUI.Map
 		{
 			if (get_MapButtonInfo() != null)
 			{
-				QuestParameters hHKLFIIBIFF = ListSF.GetInstance().GetQuestParameters();
-				hHKLFIIBIFF.buttonName = get_MapButtonInfo().Name;
+				QuestParameters questParameters = ListSF.GetInstance().GetQuestParameters();
+				questParameters.buttonName = get_MapButtonInfo().Name;
 				bool handled = ListSF.GetInstance().RaiseQuestEvent(QuestEvent.QuestEventType.QUEST_EVENT_MAP_BUTTON_PRESS);
 				if (get_MapButtonInfo().Name == "EclipseModeOn" || get_MapButtonInfo().Name == "EclipseModeOff")
 				{

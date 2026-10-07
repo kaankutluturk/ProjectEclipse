@@ -7,13 +7,13 @@ public class Crypto
 {
 	private static byte[] salt = Encoding.ASCII.GetBytes("o6806642kbM7c5");
 
-	public static string EncryptStringAES(string NOGCALGLPCH, string MGOACNLKMPB)
+	public static string EncryptStringAES(string plainText, string sharedSecret)
 	{
-		if (string.IsNullOrEmpty(NOGCALGLPCH))
+		if (string.IsNullOrEmpty(plainText))
 		{
 			throw new ArgumentNullException("plainText");
 		}
-		if (string.IsNullOrEmpty(MGOACNLKMPB))
+		if (string.IsNullOrEmpty(sharedSecret))
 		{
 			throw new ArgumentNullException("sharedSecret");
 		}
@@ -21,7 +21,7 @@ public class Crypto
 		RijndaelManaged rijndaelManaged = null;
 		try
 		{
-			Rfc2898DeriveBytes rfc2898DeriveBytes = new Rfc2898DeriveBytes(MGOACNLKMPB, salt);
+			Rfc2898DeriveBytes rfc2898DeriveBytes = new Rfc2898DeriveBytes(sharedSecret, salt);
 			rijndaelManaged = new RijndaelManaged();
 			rijndaelManaged.Key = rfc2898DeriveBytes.GetBytes(rijndaelManaged.KeySize / 8);
 			ICryptoTransform transform = rijndaelManaged.CreateEncryptor(rijndaelManaged.Key, rijndaelManaged.IV);
@@ -33,7 +33,7 @@ public class Crypto
 				{
 					using (StreamWriter streamWriter = new StreamWriter(stream))
 					{
-						streamWriter.Write(NOGCALGLPCH);
+						streamWriter.Write(plainText);
 					}
 				}
 				return Convert.ToBase64String(memoryStream.ToArray());
@@ -48,13 +48,13 @@ public class Crypto
 		}
 	}
 
-	public static string DecryptStringAES(string PKJCKPENLIN, string MGOACNLKMPB)
+	public static string DecryptStringAES(string cipherText, string sharedSecret)
 	{
-		if (string.IsNullOrEmpty(PKJCKPENLIN))
+		if (string.IsNullOrEmpty(cipherText))
 		{
 			throw new ArgumentNullException("cipherText");
 		}
-		if (string.IsNullOrEmpty(MGOACNLKMPB))
+		if (string.IsNullOrEmpty(sharedSecret))
 		{
 			throw new ArgumentNullException("sharedSecret");
 		}
@@ -62,8 +62,8 @@ public class Crypto
 		string text = null;
 		try
 		{
-			Rfc2898DeriveBytes rfc2898DeriveBytes = new Rfc2898DeriveBytes(MGOACNLKMPB, salt);
-			byte[] buffer = Convert.FromBase64String(PKJCKPENLIN);
+			Rfc2898DeriveBytes rfc2898DeriveBytes = new Rfc2898DeriveBytes(sharedSecret, salt);
+			byte[] buffer = Convert.FromBase64String(cipherText);
 			using (MemoryStream memoryStream = new MemoryStream(buffer))
 			{
 				rijndaelManaged = new RijndaelManaged();
@@ -88,15 +88,15 @@ public class Crypto
 		}
 	}
 
-	private static byte[] ReadByteArray(Stream JDCCBCNFENK)
+	private static byte[] ReadByteArray(Stream stream)
 	{
 		byte[] array = new byte[4];
-		if (JDCCBCNFENK.Read(array, 0, array.Length) != array.Length)
+		if (stream.Read(array, 0, array.Length) != array.Length)
 		{
 			throw new SystemException("Stream did not contain properly formatted byte array");
 		}
 		byte[] array2 = new byte[BitConverter.ToInt32(array, 0)];
-		if (JDCCBCNFENK.Read(array2, 0, array2.Length) != array2.Length)
+		if (stream.Read(array2, 0, array2.Length) != array2.Length)
 		{
 			throw new SystemException("Did not read byte array properly");
 		}

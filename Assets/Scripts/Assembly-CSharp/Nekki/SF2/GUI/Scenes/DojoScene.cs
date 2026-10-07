@@ -50,15 +50,15 @@ namespace Nekki.SF2.GUI.Scenes
 			base.Init(data);
 			paymentUi = GetModule<PaymentUI>();
 			_mainMenu.Init();
-			FightList jDIPBIHBGPF = ListSF.GetCurrentZone().FindBattlesByType(BattleType.FightNone)[0].GetFightByIndex(0);
-			jDIPBIHBGPF = GameUtils.GetFinalFight(jDIPBIHBGPF);
-			RosterFight pIGKOIFBOME = ListSF.GetRoster().FindSavedFightRecord(jDIPBIHBGPF.FightId);
-			if (pIGKOIFBOME == null)
+			FightList fightList = ListSF.GetCurrentZone().FindBattlesByType(BattleType.FightNone)[0].GetFightByIndex(0);
+			fightList = GameUtils.GetFinalFight(fightList);
+			RosterFight rosterFight = ListSF.GetRoster().FindSavedFightRecord(fightList.FightId);
+			if (rosterFight == null)
 			{
-				pIGKOIFBOME = ListSF.GetRoster().CreateFight(jDIPBIHBGPF.FightId);
+				rosterFight = ListSF.GetRoster().CreateFight(fightList.FightId);
 			}
-			jDIPBIHBGPF.SetRosterFight(pIGKOIFBOME);
-			fight = GameUtils.CreateFight(jDIPBIHBGPF, null, gameController);
+			fightList.SetRosterFight(rosterFight);
+			fight = GameUtils.CreateFight(fightList, null, gameController);
 		}
 
 		protected override void OnSceneClosed()

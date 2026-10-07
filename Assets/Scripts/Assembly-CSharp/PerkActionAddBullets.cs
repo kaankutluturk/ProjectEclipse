@@ -13,11 +13,11 @@ public class PerkActionAddBullets : PerkAction
 	{
 	}
 
-	public PerkActionAddBullets(PerkActionAddBullets NOLFMPDGCOC)
-		: base(NOLFMPDGCOC)
+	public PerkActionAddBullets(PerkActionAddBullets source)
+		: base(source)
 	{
-		set_BulletType(NOLFMPDGCOC.GetBulletType());
-		set_Value(NOLFMPDGCOC.GetValue());
+		set_BulletType(source.GetBulletType());
+		set_Value(source.GetValue());
 	}
 
 	public string GetBulletType()

@@ -41,9 +41,9 @@ namespace Nekki.SF2.GUI.Shop
 			}
 		}
 
-		private bool IsHiddenAttribute(WarriorAttribute FFLFOELEKIG)
+		private bool IsHiddenAttribute(WarriorAttribute attribute)
 		{
-			return FFLFOELEKIG.IsHidden || FFLFOELEKIG.IsShopHidden;
+			return attribute.IsHidden || attribute.IsShopHidden;
 		}
 
 		private void CreateItems()
@@ -63,43 +63,43 @@ namespace Nekki.SF2.GUI.Shop
 					ParameterScrollItem component = gameObject.GetComponent<ParameterScrollItem>();
 					if (component != null)
 					{
-						bool eIAKNKDEEKA = false;
-						int OEMALIFPGPO = 0;
-						_previewParameters.FinalAttributes.Get(item.get_Name(), ref OEMALIFPGPO);
+						bool isItemLimit = false;
+						int attributeValue = 0;
+						_previewParameters.FinalAttributes.Get(item.get_Name(), ref attributeValue);
 						component.gameObject.name = string.Format("ParameterScrollItem({0})", item.get_Name());
-						component.Init(item.get_Name(), item.IconName, OEMALIFPGPO, OEMALIFPGPO, eIAKNKDEEKA);
+						component.Init(item.get_Name(), item.IconName, attributeValue, attributeValue, isItemLimit);
 						_scrollItems.Add(component);
 					}
 				}
 			}
 		}
 
-		public void UpdateParameters(ItemInfo PJDAGCBPLJE)
+		public void UpdateParameters(ItemInfo itemInfo)
 		{
-			ApplyItemParameters(PJDAGCBPLJE, 0f);
+			ApplyItemParameters(itemInfo, 0f);
 		}
 
-		public void UpdateParametersWithDuration(ItemInfo PJDAGCBPLJE)
+		public void UpdateParametersWithDuration(ItemInfo itemInfo)
 		{
-			ApplyItemParameters(PJDAGCBPLJE, 2f);
+			ApplyItemParameters(itemInfo, 2f);
 		}
 
-		protected void ApplyItemParameters(ItemInfo PJDAGCBPLJE, float _Duration)
+		protected void ApplyItemParameters(ItemInfo itemInfo, float _Duration)
 		{
-			ModelParameters kIKOGDEPGHB = ListSF.GetRoster().get_Parameters();
-			kIKOGDEPGHB.CopyEquippedItemsTo(_equippedItems);
+			ModelParameters modelParameters = ListSF.GetRoster().get_Parameters();
+			modelParameters.CopyEquippedItemsTo(_equippedItems);
 			_previewParameters.SetEquippedItemsFrom(_equippedItems);
-			_previewParameters.SetItemByType(PJDAGCBPLJE.Type, PJDAGCBPLJE);
-			kIKOGDEPGHB.CalculateAttributes();
+			_previewParameters.SetItemByType(itemInfo.Type, itemInfo);
+			modelParameters.CalculateAttributes();
 			_previewParameters.CalculateAttributes();
 			foreach (ParameterScrollItem item in _scrollItems)
 			{
 				string attributeName = item.get_AttributeName();
-				int OEMALIFPGPO = 0;
-				kIKOGDEPGHB.FinalAttributes.Get(attributeName, ref OEMALIFPGPO);
+				int attributeValue = 0;
+				modelParameters.FinalAttributes.Get(attributeName, ref attributeValue);
 				int OEMALIFPGPO2 = 0;
 				_previewParameters.FinalAttributes.Get(attributeName, ref OEMALIFPGPO2);
-				item.SetValue(OEMALIFPGPO, OEMALIFPGPO2, _Duration);
+				item.SetValue(attributeValue, OEMALIFPGPO2, _Duration);
 			}
 		}
 	}

@@ -10,10 +10,10 @@ public class PerkActionVariable : PerkActionModificator
 	{
 	}
 
-	public PerkActionVariable(PerkActionVariable NOLFMPDGCOC)
-		: base(NOLFMPDGCOC)
+	public PerkActionVariable(PerkActionVariable source)
+		: base(source)
 	{
-		set_Value(NOLFMPDGCOC.GetValue());
+		set_Value(source.GetValue());
 	}
 
 	public FunctionExtension GetValue()

@@ -23,39 +23,39 @@ public class Bezier
 		_stepFactor += _stepFactor;
 	}
 
-	private void ComputeCurvePoints(Vector3f HAEJICBDOKC, Vector3f MILMANCOCLK, Vector3f DMECFLFKOPA, int count, List<Vector3f> OEMALIFPGPO)
+	private void ComputeCurvePoints(Vector3f startPoint, Vector3f controlPoint, Vector3f endPoint, int count, List<Vector3f> points)
 	{
 		float num = _secondDifference;
-		if (OEMALIFPGPO.Count != count)
+		if (points.Count != count)
 		{
-			OEMALIFPGPO.Resize(count);
+			points.Resize(count);
 			for (int i = 0; i < count; i++)
 			{
-				if (Vector2f.op_Equality(OEMALIFPGPO[i], null))
+				if (Vector2f.op_Equality(points[i], null))
 				{
-					OEMALIFPGPO[i] = new Vector3f();
+					points[i] = new Vector3f();
 				}
 			}
 		}
 		float num2 = 1f;
 		float num3 = 0f;
 		float num4 = 0f;
-		foreach (Vector3f item in OEMALIFPGPO)
+		foreach (Vector3f item in points)
 		{
 			num += _differenceStep;
 			num2 -= _stepFactor - num;
 			num3 += _stepFactor - num - num;
 			num4 += num;
-			item.SetX(num2 * HAEJICBDOKC.GetX() + num3 * MILMANCOCLK.GetX() + num4 * DMECFLFKOPA.GetX());
-			item.SetY(num2 * HAEJICBDOKC.GetY() + num3 * MILMANCOCLK.GetY() + num4 * DMECFLFKOPA.GetY());
-			item.SetZ(num2 * HAEJICBDOKC.GetZ() + num3 * MILMANCOCLK.GetZ() + num4 * DMECFLFKOPA.GetZ());
+			item.SetX(num2 * startPoint.GetX() + num3 * controlPoint.GetX() + num4 * endPoint.GetX());
+			item.SetY(num2 * startPoint.GetY() + num3 * controlPoint.GetY() + num4 * endPoint.GetY());
+			item.SetZ(num2 * startPoint.GetZ() + num3 * controlPoint.GetZ() + num4 * endPoint.GetZ());
 		}
 	}
 
-	public void BuildCurve(Vector3f MLGFPMDKOHD, Vector3f DMMNCDKPCCI, Vector3f PIBOFKAMIDL, List<Vector3f> OEMALIFPGPO)
+	public void BuildCurve(Vector3f startPoint, Vector3f controlPoint, Vector3f endPoint, List<Vector3f> points)
 	{
-		_firstMidPoint.SetMiddlePoint3D(MLGFPMDKOHD, DMMNCDKPCCI);
-		_secondMidPoint.SetMiddlePoint3D(DMMNCDKPCCI, PIBOFKAMIDL);
-		ComputeCurvePoints(_firstMidPoint, DMMNCDKPCCI, _secondMidPoint, _count, OEMALIFPGPO);
+		_firstMidPoint.SetMiddlePoint3D(startPoint, controlPoint);
+		_secondMidPoint.SetMiddlePoint3D(controlPoint, endPoint);
+		ComputeCurvePoints(_firstMidPoint, controlPoint, _secondMidPoint, _count, points);
 	}
 }

@@ -41,56 +41,56 @@ public class DialogsOpener
 		}
 	}
 
-	public static void OpenTradeDialog(TradeDialog.TradeAction IBODMPMJELJ, GameValueType value, long GLGKKGBLFPH, Action<object> ODDEOFKLIAG, long CNIOCCCBDBJ = 0L)
+	public static void OpenTradeDialog(TradeDialog.TradeAction tradeAction, GameValueType value, long price, Action<object> callback, long deliverySeconds = 0L)
 	{
-		TradeDialogInfo jGMLAFOPBBC = new TradeDialogInfo(IBODMPMJELJ, value, GLGKKGBLFPH, ODDEOFKLIAG, CNIOCCCBDBJ);
-		DialogsManager.ShowDialog(DialogType.DialogBuy, jGMLAFOPBBC);
+		TradeDialogInfo dialogInfo = new TradeDialogInfo(tradeAction, value, price, callback, deliverySeconds);
+		DialogsManager.ShowDialog(DialogType.DialogBuy, dialogInfo);
 	}
 
-	public static void OpenImpossibleDialog(ImpossibleDialog.ImpossibleDialogType IBODMPMJELJ, Action<object> ODDEOFKLIAG = null, object DMNBDBJNKME = null)
+	public static void OpenImpossibleDialog(ImpossibleDialog.ImpossibleDialogType reason, Action<object> callback = null, object content = null)
 	{
-		ImpossibleDialogInfo jGMLAFOPBBC = new ImpossibleDialogInfo(IBODMPMJELJ, ODDEOFKLIAG, DMNBDBJNKME);
-		DialogsManager.ShowDialog(DialogType.DialogImpossible, jGMLAFOPBBC);
+		ImpossibleDialogInfo dialogInfo = new ImpossibleDialogInfo(reason, callback, content);
+		DialogsManager.ShowDialog(DialogType.DialogImpossible, dialogInfo);
 	}
 
-	public static BaseDialog OpenStrangerDialog(string JIAKJEOEIMF, string GIBEOPMGOPG, List<StoryDialogContent> PBCJDMAPOOB, float ratio, Action<object> ODDEOFKLIAG = null, string FGJCMOLFFGH = "", string NMFJJEJEHMC = "", string BFNHNNFIBNM = "", LabelButton.ButtonColor IDHJGMKHNOP = LabelButton.ButtonColor.BUTTON_WHITE, LabelButton.ButtonColor CPKKNLPKBIO = LabelButton.ButtonColor.BUTTON_DARK, LabelButton.ButtonColor NFDONPAIONH = LabelButton.ButtonColor.BUTTON_WHITE, bool HNNKHNCELDA = true, bool MHLJPGALMFO = false, bool NKPIIFBDEIB = false, bool CJJBDGPDOFF = false, string IAHHOEJJJHP = "")
+	public static BaseDialog OpenStrangerDialog(string portraitName, string title, List<StoryDialogContent> contents, float ratio, Action<object> callback = null, string storeButtonText = "", string rejectButtonText = "", string acceptButtonText = "", LabelButton.ButtonColor storeButtonColor = LabelButton.ButtonColor.BUTTON_WHITE, LabelButton.ButtonColor rejectButtonColor = LabelButton.ButtonColor.BUTTON_DARK, LabelButton.ButtonColor acceptButtonColor = LabelButton.ButtonColor.BUTTON_WHITE, bool showDifficulty = true, bool useEdgeButtons = false, bool showCheckBox = false, bool checkBoxChecked = false, string checkBoxText = "")
 	{
 		bool flag = true;
-		for (int i = 0; i < PBCJDMAPOOB.Count; i++)
+		for (int i = 0; i < contents.Count; i++)
 		{
-			StoryDialogContent nJEPNCJLPPF = PBCJDMAPOOB[i];
-			if (!nJEPNCJLPPF.RefreshItemTimer())
+			StoryDialogContent content = contents[i];
+			if (!content.RefreshItemTimer())
 			{
 				flag = false;
 			}
 		}
-		if ((PBCJDMAPOOB.Count > 0 && PBCJDMAPOOB[0].CheckTimer && PBCJDMAPOOB[0].Timer <= 0) || (MHLJPGALMFO && !flag))
+		if ((contents.Count > 0 && contents[0].CheckTimer && contents[0].Timer <= 0) || (useEdgeButtons && !flag))
 		{
-			if (ODDEOFKLIAG != null)
+			if (callback != null)
 			{
-				int oNNLBFAOMMB = PBCJDMAPOOB[0].Id;
-				ODDEOFKLIAG(oNNLBFAOMMB);
+				int firstContentId = contents[0].Id;
+				callback(firstContentId);
 			}
 			return null;
 		}
-		StrangerDialogInfo jGMLAFOPBBC = new StrangerDialogInfo(JIAKJEOEIMF, GIBEOPMGOPG, PBCJDMAPOOB, ratio, ODDEOFKLIAG, FGJCMOLFFGH, NMFJJEJEHMC, BFNHNNFIBNM, IDHJGMKHNOP, CPKKNLPKBIO, NFDONPAIONH, HNNKHNCELDA, MHLJPGALMFO, NKPIIFBDEIB, CJJBDGPDOFF, IAHHOEJJJHP);
-		return DialogsManager.ShowDialog(DialogType.DialogStranger, jGMLAFOPBBC);
+		StrangerDialogInfo dialogInfo = new StrangerDialogInfo(portraitName, title, contents, ratio, callback, storeButtonText, rejectButtonText, acceptButtonText, storeButtonColor, rejectButtonColor, acceptButtonColor, showDifficulty, useEdgeButtons, showCheckBox, checkBoxChecked, checkBoxText);
+		return DialogsManager.ShowDialog(DialogType.DialogStranger, dialogInfo);
 	}
 
-	public static BaseDialog OpenSimpleDialog(string HHAAFADDOJB, string HCPNFPMHFCM, string ALOJJLCOGMP, string PAJIOGEINPI = "", Action<object> ODDEOFKLIAG = null, LabelButton.ButtonColor HGAGMJENCNM = LabelButton.ButtonColor.BUTTON_WHITE, LabelButton.ButtonColor PHBOACBIMMF = LabelButton.ButtonColor.BUTTON_DARK, bool LMAFOFCILBL = false, bool EPHHGNKDPEG = false, string DOEEIGAHKEN = "", bool literalText = false)
+	public static BaseDialog OpenSimpleDialog(string title, string message, string okText, string cancelText = "", Action<object> callback = null, LabelButton.ButtonColor okButtonColor = LabelButton.ButtonColor.BUTTON_WHITE, LabelButton.ButtonColor cancelButtonColor = LabelButton.ButtonColor.BUTTON_DARK, bool showCheckBox = false, bool checkBoxChecked = false, string checkBoxText = "", bool literalText = false)
 	{
-		BaseDialog.FooterType hJNAHNICGMH = BaseDialog.FooterType.FOOTER_BOTH;
-		if (ALOJJLCOGMP == string.Empty || PAJIOGEINPI == string.Empty)
+		BaseDialog.FooterType footerType = BaseDialog.FooterType.FOOTER_BOTH;
+		if (okText == string.Empty || cancelText == string.Empty)
 		{
-			hJNAHNICGMH = BaseDialog.FooterType.FOOTER_NONE;
-			hJNAHNICGMH = ((ALOJJLCOGMP != string.Empty) ? BaseDialog.FooterType.FOOTER_OK : ((PAJIOGEINPI != string.Empty) ? BaseDialog.FooterType.FOOTER_CANCEL : BaseDialog.FooterType.FOOTER_NONE));
+			footerType = BaseDialog.FooterType.FOOTER_NONE;
+			footerType = ((okText != string.Empty) ? BaseDialog.FooterType.FOOTER_OK : ((cancelText != string.Empty) ? BaseDialog.FooterType.FOOTER_CANCEL : BaseDialog.FooterType.FOOTER_NONE));
 		}
-		SimpleDialogInfo jGMLAFOPBBC = new SimpleDialogInfo(HHAAFADDOJB, HCPNFPMHFCM, hJNAHNICGMH, ALOJJLCOGMP, PAJIOGEINPI, HGAGMJENCNM, PHBOACBIMMF, LMAFOFCILBL, EPHHGNKDPEG, DOEEIGAHKEN, ODDEOFKLIAG);
-		jGMLAFOPBBC.UseLiteralText = literalText;
-		BaseDialog baseDialog = DialogsManager.ShowDialog(DialogType.DialogSimple, jGMLAFOPBBC);
-		if (ODDEOFKLIAG != null)
+		SimpleDialogInfo dialogInfo = new SimpleDialogInfo(title, message, footerType, okText, cancelText, okButtonColor, cancelButtonColor, showCheckBox, checkBoxChecked, checkBoxText, callback);
+		dialogInfo.UseLiteralText = literalText;
+		BaseDialog baseDialog = DialogsManager.ShowDialog(DialogType.DialogSimple, dialogInfo);
+		if (callback != null)
 		{
-			baseDialog.AddEventListener(0, ODDEOFKLIAG);
+			baseDialog.AddEventListener(0, callback);
 		}
 		return baseDialog;
 	}
@@ -100,38 +100,38 @@ public class DialogsOpener
 		return appleIdWarningAcknowledged;
 	}
 
-	public static BaseDialog OpenAppleIdRequiredDialog(Action JPCNFOHPAOB)
+	public static BaseDialog OpenAppleIdRequiredDialog(Action callback)
 	{
-		string hHAAFADDOJB = "dlgWarning";
-		string hCPNFPMHFCM = "dlg_appleID_required";
-		string aLOJJLCOGMP = "OK";
+		string title = "dlgWarning";
+		string message = "dlg_appleID_required";
+		string okText = "OK";
 		string empty = string.Empty;
-		return OpenSimpleDialog(hHAAFADDOJB, hCPNFPMHFCM, aLOJJLCOGMP, empty, (object KFBMKMCEMGG) =>
+		return OpenSimpleDialog(title, message, okText, empty, (object result) =>
 		{
 			appleIdWarningAcknowledged = true;
-			JPCNFOHPAOB();
+			callback();
 		}, LabelButton.ButtonColor.BUTTON_WHITE, LabelButton.ButtonColor.BUTTON_DARK, false, false, string.Empty);
 	}
 
-	public static BaseDialog OpenNoInternetValidationDialog(Action JPCNFOHPAOB)
+	public static BaseDialog OpenNoInternetValidationDialog(Action callback)
 	{
-		string hHAAFADDOJB = "Error";
-		string hCPNFPMHFCM = "Error_validation_nointernet";
-		string aLOJJLCOGMP = "OK";
+		string title = "Error";
+		string message = "Error_validation_nointernet";
+		string okText = "OK";
 		string empty = string.Empty;
-		return OpenSimpleDialog(hHAAFADDOJB, hCPNFPMHFCM, aLOJJLCOGMP, empty, (object KFBMKMCEMGG) =>
+		return OpenSimpleDialog(title, message, okText, empty, (object result) =>
 		{
-			JPCNFOHPAOB();
+			callback();
 		}, LabelButton.ButtonColor.BUTTON_WHITE, LabelButton.ButtonColor.BUTTON_DARK, false, false, string.Empty);
 	}
 
 	public static BaseDialog OpenValidationFailedDialog()
 	{
-		string hHAAFADDOJB = "Error";
-		string hCPNFPMHFCM = "Error_validation_failed";
-		string aLOJJLCOGMP = "OK";
+		string title = "Error";
+		string message = "Error_validation_failed";
+		string okText = "OK";
 		string empty = string.Empty;
-		return OpenSimpleDialog(hHAAFADDOJB, hCPNFPMHFCM, aLOJJLCOGMP, empty, (object KFBMKMCEMGG) =>
+		return OpenSimpleDialog(title, message, okText, empty, (object result) =>
 		{
 			ApplicationController.Quit();
 		}, LabelButton.ButtonColor.BUTTON_WHITE, LabelButton.ButtonColor.BUTTON_DARK, false, false, string.Empty);
@@ -139,29 +139,29 @@ public class DialogsOpener
 
 	public static BaseDialog OpenNoNetworkDialog()
 	{
-		string hHAAFADDOJB = "dlgNotNetworkTitle";
-		string hCPNFPMHFCM = "dlgNotNetworkMessage";
-		string aLOJJLCOGMP = "OK";
+		string title = "dlgNotNetworkTitle";
+		string message = "dlgNotNetworkMessage";
+		string okText = "OK";
 		string empty = string.Empty;
-		return OpenSimpleDialog(hHAAFADDOJB, hCPNFPMHFCM, aLOJJLCOGMP, empty, null, LabelButton.ButtonColor.BUTTON_WHITE, LabelButton.ButtonColor.BUTTON_DARK, false, false, string.Empty);
+		return OpenSimpleDialog(title, message, okText, empty, null, LabelButton.ButtonColor.BUTTON_WHITE, LabelButton.ButtonColor.BUTTON_DARK, false, false, string.Empty);
 	}
 
 	public static BaseDialog OpenDuelLockedDialog()
 	{
-		string hHAAFADDOJB = "dlgDuelLockedTitle";
-		string hCPNFPMHFCM = "dlgDuelLockedMessage";
-		string aLOJJLCOGMP = "OK";
+		string title = "dlgDuelLockedTitle";
+		string message = "dlgDuelLockedMessage";
+		string okText = "OK";
 		string empty = string.Empty;
-		return OpenSimpleDialog(hHAAFADDOJB, hCPNFPMHFCM, aLOJJLCOGMP, empty, null, LabelButton.ButtonColor.BUTTON_WHITE, LabelButton.ButtonColor.BUTTON_DARK, false, false, string.Empty);
+		return OpenSimpleDialog(title, message, okText, empty, null, LabelButton.ButtonColor.BUTTON_WHITE, LabelButton.ButtonColor.BUTTON_DARK, false, false, string.Empty);
 	}
 
 	public static BaseDialog OpenNotAvailableDialog()
 	{
-		string hHAAFADDOJB = "dlgNotAvaliableTitle";
-		string hCPNFPMHFCM = "dlgNotAvaliableMessage";
-		string aLOJJLCOGMP = "OK";
+		string title = "dlgNotAvaliableTitle";
+		string message = "dlgNotAvaliableMessage";
+		string okText = "OK";
 		string empty = string.Empty;
-		return OpenSimpleDialog(hHAAFADDOJB, hCPNFPMHFCM, aLOJJLCOGMP, empty, null, LabelButton.ButtonColor.BUTTON_WHITE, LabelButton.ButtonColor.BUTTON_DARK, false, false, string.Empty);
+		return OpenSimpleDialog(title, message, okText, empty, null, LabelButton.ButtonColor.BUTTON_WHITE, LabelButton.ButtonColor.BUTTON_DARK, false, false, string.Empty);
 	}
 
 	public static BaseDialog OpenExitDialog()
@@ -184,9 +184,9 @@ public class DialogsOpener
 		return DialogsManager.ShowDialog(DialogType.DialogSettingsAdvenced, null);
 	}
 
-	public static BaseDialog OpenNewsDialog(NewsDialogInfo EMBBNNBFODN)
+	public static BaseDialog OpenNewsDialog(NewsDialogInfo newsInfo)
 	{
-		return DialogsManager.ShowDialog(DialogType.DialogNews, EMBBNNBFODN);
+		return DialogsManager.ShowDialog(DialogType.DialogNews, newsInfo);
 	}
 
 	public static void OpenNewsDialog()
@@ -209,29 +209,29 @@ public class DialogsOpener
 		}
 		if (list.Count != 0)
 		{
-			NewsDialogInfo eMBBNNBFODN = new NewsDialogInfo(list);
-			OpenNewsDialog(eMBBNNBFODN);
+			NewsDialogInfo newsInfo = new NewsDialogInfo(list);
+			OpenNewsDialog(newsInfo);
 		}
 	}
 
-	public static BaseDialog OpenStoryDialog(string GDLKNAOPKIL, string PEMOECLNECD, List<StoryDialogContent> PBCJDMAPOOB, Action<object> ODDEOFKLIAG = null, string AGEBBHHPFME = "CANCEL", bool IJCBBJHLGFI = false, string NGJFMFPMAFL = "", LabelButton.ButtonColor FHNFKIHDCPC = LabelButton.ButtonColor.BUTTON_WHITE, LabelButton.ButtonColor ICLJIMNHGMN = LabelButton.ButtonColor.BUTTON_DARK, bool JLBJMEGPNPF = true, bool MHLJPGALMFO = false)
+	public static BaseDialog OpenStoryDialog(string portraitName, string title, List<StoryDialogContent> contents, Action<object> callback = null, string cancelText = "CANCEL", bool showCancelButton = false, string okText = "", LabelButton.ButtonColor okButtonColor = LabelButton.ButtonColor.BUTTON_WHITE, LabelButton.ButtonColor cancelButtonColor = LabelButton.ButtonColor.BUTTON_DARK, bool showPortrait = true, bool useEdgeButtons = false)
 	{
-		for (int i = 0; i < PBCJDMAPOOB.Count; i++)
+		for (int i = 0; i < contents.Count; i++)
 		{
-			StoryDialogContent nJEPNCJLPPF = PBCJDMAPOOB[i];
-			nJEPNCJLPPF.RefreshItemTimer();
+			StoryDialogContent content = contents[i];
+			content.RefreshItemTimer();
 		}
-		if (PBCJDMAPOOB.Count > 0 && PBCJDMAPOOB[0].CheckTimer && PBCJDMAPOOB[0].Timer <= 0)
+		if (contents.Count > 0 && contents[0].CheckTimer && contents[0].Timer <= 0)
 		{
-			if (ODDEOFKLIAG != null)
+			if (callback != null)
 			{
-				int oNNLBFAOMMB = PBCJDMAPOOB[0].Id;
-				ODDEOFKLIAG(oNNLBFAOMMB);
+				int firstContentId = contents[0].Id;
+				callback(firstContentId);
 			}
 			return null;
 		}
-		StoryDialogInfo jGMLAFOPBBC = new StoryDialogInfo(GDLKNAOPKIL, PEMOECLNECD, PBCJDMAPOOB, ODDEOFKLIAG, NGJFMFPMAFL, AGEBBHHPFME, IJCBBJHLGFI, FHNFKIHDCPC, ICLJIMNHGMN, JLBJMEGPNPF, MHLJPGALMFO);
-		return DialogsManager.ShowDialog(DialogType.DialogStory, jGMLAFOPBBC);
+		StoryDialogInfo dialogInfo = new StoryDialogInfo(portraitName, title, contents, callback, okText, cancelText, showCancelButton, okButtonColor, cancelButtonColor, showPortrait, useEdgeButtons);
+		return DialogsManager.ShowDialog(DialogType.DialogStory, dialogInfo);
 	}
 
 	public static void OpenExternalLink()

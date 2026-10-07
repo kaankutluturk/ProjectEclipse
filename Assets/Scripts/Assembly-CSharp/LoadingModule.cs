@@ -52,14 +52,14 @@ public class LoadingModule
 		}
 		if (_currentModuleIndex < _modules.Count)
 		{
-			LoadingModule pHNHABBBKKL = _modules[_currentModuleIndex];
-			if (!pHNHABBBKKL.IsLoadingActive())
+			LoadingModule currentModule = _modules[_currentModuleIndex];
+			if (!currentModule.IsLoadingActive())
 			{
-				pHNHABBBKKL.Start();
+				currentModule.Start();
 			}
-			if (!pHNHABBBKKL.IsFinished())
+			if (!currentModule.IsFinished())
 			{
-				pHNHABBBKKL.ProcessStep();
+				currentModule.ProcessStep();
 			}
 			else
 			{
@@ -72,17 +72,17 @@ public class LoadingModule
 		}
 	}
 
-	public virtual void AddModule(LoadingModule ENJECLFOHLD)
+	public virtual void AddModule(LoadingModule module)
 	{
-		_modules.AddIfNotExist(ENJECLFOHLD);
+		_modules.AddIfNotExist(module);
 	}
 
-	public virtual void AddModules(List<LoadingModule> CBLIEGAIBLP)
+	public virtual void AddModules(List<LoadingModule> modules)
 	{
-		_modules.AddIfNotExist(CBLIEGAIBLP);
+		_modules.AddIfNotExist(modules);
 	}
 
-	public virtual void ClearModules(bool LJCIEGKNKGG = false)
+	public virtual void ClearModules(bool clearActive = false)
 	{
 		_modules.Clear();
 	}

@@ -2,8 +2,8 @@ using System.Text;
 
 public sealed class WebSocketTextFrame : WebSocketBinaryFrame
 {
-	public WebSocketTextFrame(string HCPNFPMHFCM)
-		: base(Encoding.UTF8.GetBytes(HCPNFPMHFCM))
+	public WebSocketTextFrame(string text)
+		: base(Encoding.UTF8.GetBytes(text))
 	{
 	}
 

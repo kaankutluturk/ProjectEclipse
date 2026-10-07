@@ -10,10 +10,10 @@ public class PerkActionAddMagicCharge : PerkAction
 	{
 	}
 
-	public PerkActionAddMagicCharge(PerkActionAddMagicCharge NOLFMPDGCOC)
-		: base(NOLFMPDGCOC)
+	public PerkActionAddMagicCharge(PerkActionAddMagicCharge source)
+		: base(source)
 	{
-		set_Value(NOLFMPDGCOC.GetValue());
+		set_Value(source.GetValue());
 	}
 
 	public FunctionExtension GetValue()

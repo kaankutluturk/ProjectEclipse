@@ -21,9 +21,9 @@ namespace Nekki.SF2.GUI.Shop
 			return _onTouch;
 		}
 
-		public override void OnPointerDown(PointerEventData BHOLFGOGPCP)
+		public override void OnPointerDown(PointerEventData eventData)
 		{
-			base.OnPointerDown(BHOLFGOGPCP);
+			base.OnPointerDown(eventData);
 			_onTouch.Invoke();
 		}
 

@@ -10,8 +10,8 @@ public class NonDrawingGraphic : Graphic
 	{
 	}
 
-	protected override void OnPopulateMesh(VertexHelper JBJMENGNPNB)
+	protected override void OnPopulateMesh(VertexHelper vertexHelper)
 	{
-		JBJMENGNPNB.Clear();
+		vertexHelper.Clear();
 	}
 }

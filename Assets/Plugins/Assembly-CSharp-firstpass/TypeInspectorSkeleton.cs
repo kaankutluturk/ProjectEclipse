@@ -6,27 +6,27 @@ using System.Runtime.Serialization;
 
 public abstract class TypeInspectorSkeleton : ITypeInspector
 {
-	public abstract IEnumerable<IPropertyDescriptor> GetProperties(Type LFLGCDNKNJI, object EGJHGBCEPHO);
+	public abstract IEnumerable<IPropertyDescriptor> GetProperties(Type type, object container);
 
-	public IPropertyDescriptor GetProperty(Type LFLGCDNKNJI, object EGJHGBCEPHO, string name, bool GNFDAJLHBCN)
+	public IPropertyDescriptor GetProperty(Type type, object container, string name, bool ignoreUnmatched)
 	{
-		IEnumerable<IPropertyDescriptor> enumerable = from PIIEECCHMAC in GetProperties(LFLGCDNKNJI, EGJHGBCEPHO)
-			where PIIEECCHMAC.get_Name() == name
-			select PIIEECCHMAC;
+		IEnumerable<IPropertyDescriptor> enumerable = from property in GetProperties(type, container)
+			where property.get_Name() == name
+			select property;
 		using (IEnumerator<IPropertyDescriptor> enumerator = enumerable.GetEnumerator())
 		{
 			if (!enumerator.MoveNext())
 			{
-				if (GNFDAJLHBCN)
+				if (ignoreUnmatched)
 				{
 					return null;
 				}
-				throw new SerializationException(string.Format(CultureInfo.InvariantCulture, "Property '{0}' not found on type '{1}'.", name, LFLGCDNKNJI.FullName));
+				throw new SerializationException(string.Format(CultureInfo.InvariantCulture, "Property '{0}' not found on type '{1}'.", name, type.FullName));
 			}
 			IPropertyDescriptor current = enumerator.Current;
 			if (enumerator.MoveNext())
 			{
-				throw new SerializationException(string.Format(CultureInfo.InvariantCulture, "Multiple properties with the name/alias '{0}' already exists on type '{1}', maybe you're misusing YamlAlias or maybe you are using the wrong naming convention? The matching properties are: {2}", name, LFLGCDNKNJI.FullName, string.Join(", ", enumerable.Select((IPropertyDescriptor PIIEECCHMAC) => PIIEECCHMAC.get_Name()).ToArray())));
+				throw new SerializationException(string.Format(CultureInfo.InvariantCulture, "Multiple properties with the name/alias '{0}' already exists on type '{1}', maybe you're misusing YamlAlias or maybe you are using the wrong naming convention? The matching properties are: {2}", name, type.FullName, string.Join(", ", enumerable.Select((IPropertyDescriptor property) => property.get_Name()).ToArray())));
 			}
 			return current;
 		}

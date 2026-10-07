@@ -10,24 +10,24 @@ public class BarScales
 		Scales.Clear();
 		foreach (XmlNode childNode in node.ChildNodes)
 		{
-			BarScale bABKPEHINKF = new BarScale();
-			bABKPEHINKF.Name = childNode.Attributes["Name"].GetStringOrDefault();
-			XmlNode oEOOHNMCBOC = childNode["AttributeLimits"];
-			bABKPEHINKF.ParseLimits(oEOOHNMCBOC, bABKPEHINKF.AttributeLimits);
+			BarScale scale = new BarScale();
+			scale.Name = childNode.Attributes["Name"].GetStringOrDefault();
+			XmlNode limitsNode = childNode["AttributeLimits"];
+			scale.ParseLimits(limitsNode, scale.AttributeLimits);
 			XmlNode oEOOHNMCBOC2 = childNode["ItemLimits"];
-			bABKPEHINKF.ParseLimits(oEOOHNMCBOC2, bABKPEHINKF.ItemLimits);
-			XmlAttribute cJBEMNNNHDM = childNode.Attributes["Power"];
-			bABKPEHINKF.Power = cJBEMNNNHDM.ParseFloat(-1f);
+			scale.ParseLimits(oEOOHNMCBOC2, scale.ItemLimits);
+			XmlAttribute powerAttribute = childNode.Attributes["Power"];
+			scale.Power = powerAttribute.ParseFloat(-1f);
 			XmlAttribute cJBEMNNNHDM2 = childNode.Attributes["Min"];
-			bABKPEHINKF.MinPower = cJBEMNNNHDM2.ParseFloat(-1f);
+			scale.MinPower = cJBEMNNNHDM2.ParseFloat(-1f);
 			XmlAttribute cJBEMNNNHDM3 = childNode.Attributes["Type"];
-			bABKPEHINKF.Type = cJBEMNNNHDM3.GetStringOrDefault();
-			Scales.Add(bABKPEHINKF);
+			scale.Type = cJBEMNNNHDM3.GetStringOrDefault();
+			Scales.Add(scale);
 		}
 	}
 
 	public BarScale GetScaleByName(string name)
 	{
-		return Scales.Find((BarScale DHDMNHCIPEH) => DHDMNHCIPEH.Name.Equals(name));
+		return Scales.Find((BarScale scale) => scale.Name.Equals(name));
 	}
 }

@@ -12,11 +12,11 @@ namespace Nekki.Yaml
 
 		public List<Node> nodesInside { get; private set; }
 
-		public Sequence(string HODKINDOEGD, YamlSequenceNode GJPGKAEFMPI)
+		public Sequence(string nodeKey, YamlSequenceNode sequenceNode)
 		{
 			base.typeNode = "Sequence";
-			base.key = HODKINDOEGD;
-			base.value = GJPGKAEFMPI;
+			base.key = nodeKey;
+			base.value = sequenceNode;
 			_sequence = (YamlSequenceNode)base.value;
 			nodesInside = new List<Node>();
 			foreach (YamlNode item in _sequence)
@@ -25,10 +25,10 @@ namespace Nekki.Yaml
 			}
 		}
 
-		public Sequence(string HODKINDOEGD, Node node)
+		public Sequence(string nodeKey, Node node)
 		{
 			base.typeNode = "Sequence";
-			base.key = HODKINDOEGD;
+			base.key = nodeKey;
 			base.value = new YamlSequenceNode(new YamlNode[0]);
 			_sequence = (YamlSequenceNode)base.value;
 			nodesInside = new List<Node>();
@@ -39,65 +39,65 @@ namespace Nekki.Yaml
 			}
 		}
 
-		public Sequence(string HODKINDOEGD, Node[] AHBBBPNEMMM)
+		public Sequence(string nodeKey, Node[] nodes)
 		{
 			base.typeNode = "Sequence";
-			base.key = HODKINDOEGD;
+			base.key = nodeKey;
 			base.value = new YamlSequenceNode(new YamlNode[0]);
 			_sequence = (YamlSequenceNode)base.value;
 			nodesInside = new List<Node>();
-			AddNodes(AHBBBPNEMMM);
+			AddNodes(nodes);
 		}
 
-		public Sequence(string HODKINDOEGD, List<Node> AHBBBPNEMMM)
-			: this(HODKINDOEGD, AHBBBPNEMMM.ToArray())
+		public Sequence(string nodeKey, List<Node> nodes)
+			: this(nodeKey, nodes.ToArray())
 		{
 			base.typeNode = "Sequence";
 		}
 
-		public void ReplaceAt(int index, Node PHEPOJIKDPN)
+		public void ReplaceAt(int index, Node newNode)
 		{
-			_sequence.UpdateNode(nodesInside[index].value, PHEPOJIKDPN.value);
-			nodesInside[index] = PHEPOJIKDPN;
+			_sequence.UpdateNode(nodesInside[index].value, newNode.value);
+			nodesInside[index] = newNode;
 		}
 
-		public void Replace(List<Node> HBGCCCIABFC)
+		public void Replace(List<Node> nodes)
 		{
 			foreach (Node item in nodesInside)
 			{
 				_sequence.Remove(item.value);
 			}
-			foreach (Node item2 in HBGCCCIABFC)
+			foreach (Node item2 in nodes)
 			{
 				_sequence.Add(item2.value);
 			}
-			nodesInside = HBGCCCIABFC;
+			nodesInside = nodes;
 		}
 
-		public void Remove(Node PHEPOJIKDPN)
+		public void Remove(Node node)
 		{
-			_sequence.Remove(PHEPOJIKDPN.value);
-			nodesInside.Remove(PHEPOJIKDPN);
+			_sequence.Remove(node.value);
+			nodesInside.Remove(node);
 		}
 
-		public void Add(Node PHEPOJIKDPN)
+		public void Add(Node node)
 		{
-			_sequence.Add(PHEPOJIKDPN.value);
-			nodesInside.Add(PHEPOJIKDPN);
+			_sequence.Add(node.value);
+			nodesInside.Add(node);
 		}
 
-		public void AddNodes(Node[] HBGCCCIABFC)
+		public void AddNodes(Node[] nodes)
 		{
-			foreach (Node node in HBGCCCIABFC)
+			foreach (Node node in nodes)
 			{
 				_sequence.Add(node.value);
 				nodesInside.Add(node);
 			}
 		}
 
-		public void AddNodes(List<Node> HBGCCCIABFC)
+		public void AddNodes(List<Node> nodes)
 		{
-			foreach (Node item in HBGCCCIABFC)
+			foreach (Node item in nodes)
 			{
 				_sequence.Add(item.value);
 				nodesInside.Add(item);

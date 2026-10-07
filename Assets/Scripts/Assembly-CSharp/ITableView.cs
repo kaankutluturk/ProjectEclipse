@@ -33,11 +33,11 @@ public interface ITableView
 
 	float get_Position();
 
-	TableViewCell ReusableCellForRow(int IBAKGENOEPH);
+	TableViewCell ReusableCellForRow(int row);
 
-	TableViewCell CellForRow(int IBAKGENOEPH);
+	TableViewCell CellForRow(int row);
 
-	float PositionForRow(int IBAKGENOEPH);
+	float PositionForRow(int row);
 
 	void ReloadData();
 

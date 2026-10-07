@@ -32,8 +32,8 @@ public sealed class MappingStartEventInfo : ObjectEventInfo
 		}
 	}
 
-	public MappingStartEventInfo(IObjectDescriptor BBNKIBKPBLO)
-		: base(BBNKIBKPBLO)
+	public MappingStartEventInfo(IObjectDescriptor objectDescriptor)
+		: base(objectDescriptor)
 	{
 	}
 

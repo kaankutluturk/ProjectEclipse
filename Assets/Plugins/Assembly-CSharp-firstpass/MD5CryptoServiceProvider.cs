@@ -40,7 +40,7 @@ public sealed class MD5CryptoServiceProvider : MD5
 		Dispose(false);
 	}
 
-	protected override void Dispose(bool KLCPNDHEBGP)
+	protected override void Dispose(bool disposing)
 	{
 		if (_ProcessingBuffer != null)
 		{
@@ -59,32 +59,32 @@ public sealed class MD5CryptoServiceProvider : MD5
 		}
 	}
 
-	protected override void HashCore(byte[] JIBHIBGDEKD, int CHMHMMEBBHN, int OABLBDAIJDK)
+	protected override void HashCore(byte[] data, int startIndex, int length)
 	{
 		State = 1;
 		if (_ProcessingBufferCount != 0)
 		{
-			if (OABLBDAIJDK < 64 - _ProcessingBufferCount)
+			if (length < 64 - _ProcessingBufferCount)
 			{
-				Buffer.BlockCopy(JIBHIBGDEKD, CHMHMMEBBHN, _ProcessingBuffer, _ProcessingBufferCount, OABLBDAIJDK);
-				_ProcessingBufferCount += OABLBDAIJDK;
+				Buffer.BlockCopy(data, startIndex, _ProcessingBuffer, _ProcessingBufferCount, length);
+				_ProcessingBufferCount += length;
 				return;
 			}
 			int num = 64 - _ProcessingBufferCount;
-			Buffer.BlockCopy(JIBHIBGDEKD, CHMHMMEBBHN, _ProcessingBuffer, _ProcessingBufferCount, num);
+			Buffer.BlockCopy(data, startIndex, _ProcessingBuffer, _ProcessingBufferCount, num);
 			ProcessBlock(_ProcessingBuffer, 0);
 			_ProcessingBufferCount = 0;
-			CHMHMMEBBHN += num;
-			OABLBDAIJDK -= num;
+			startIndex += num;
+			length -= num;
 		}
-		for (int num = 0; num < OABLBDAIJDK - OABLBDAIJDK % 64; num += 64)
+		for (int num = 0; num < length - length % 64; num += 64)
 		{
-			ProcessBlock(JIBHIBGDEKD, CHMHMMEBBHN + num);
+			ProcessBlock(data, startIndex + num);
 		}
-		if (OABLBDAIJDK % 64 != 0)
+		if (length % 64 != 0)
 		{
-			Buffer.BlockCopy(JIBHIBGDEKD, OABLBDAIJDK - OABLBDAIJDK % 64 + CHMHMMEBBHN, _ProcessingBuffer, 0, OABLBDAIJDK % 64);
-			_ProcessingBufferCount = OABLBDAIJDK % 64;
+			Buffer.BlockCopy(data, length - length % 64 + startIndex, _ProcessingBuffer, 0, length % 64);
+			_ProcessingBufferCount = length % 64;
 		}
 	}
 
@@ -112,12 +112,12 @@ public sealed class MD5CryptoServiceProvider : MD5
 		_H[3] = 271733878u;
 	}
 
-	private void ProcessBlock(byte[] MMFIPPNMIKJ, int FMKACHAGFKK)
+	private void ProcessBlock(byte[] block, int blockOffset)
 	{
 		count += 64uL;
 		for (int i = 0; i < 16; i++)
 		{
-			buff[i] = (uint)(MMFIPPNMIKJ[FMKACHAGFKK + 4 * i] | (MMFIPPNMIKJ[FMKACHAGFKK + 4 * i + 1] << 8) | (MMFIPPNMIKJ[FMKACHAGFKK + 4 * i + 2] << 16) | (MMFIPPNMIKJ[FMKACHAGFKK + 4 * i + 3] << 24));
+			buff[i] = (uint)(block[blockOffset + 4 * i] | (block[blockOffset + 4 * i + 1] << 8) | (block[blockOffset + 4 * i + 2] << 16) | (block[blockOffset + 4 * i + 3] << 24));
 		}
 		uint num = _H[0];
 		uint num2 = _H[1];
@@ -321,42 +321,42 @@ public sealed class MD5CryptoServiceProvider : MD5
 		_H[3] += num4;
 	}
 
-	private void ProcessFinalBlock(byte[] MMFIPPNMIKJ, int FMKACHAGFKK, int GMNFIOIAJJM)
+	private void ProcessFinalBlock(byte[] data, int offset, int length)
 	{
-		ulong num = count + (ulong)GMNFIOIAJJM;
+		ulong num = count + (ulong)length;
 		int num2 = (int)(56 - num % 64);
 		if (num2 < 1)
 		{
 			num2 += 64;
 		}
-		byte[] array = new byte[GMNFIOIAJJM + num2 + 8];
-		for (int i = 0; i < GMNFIOIAJJM; i++)
+		byte[] array = new byte[length + num2 + 8];
+		for (int i = 0; i < length; i++)
 		{
-			array[i] = MMFIPPNMIKJ[i + FMKACHAGFKK];
+			array[i] = data[i + offset];
 		}
-		array[GMNFIOIAJJM] = 128;
-		for (int j = GMNFIOIAJJM + 1; j < GMNFIOIAJJM + num2; j++)
+		array[length] = 128;
+		for (int j = length + 1; j < length + num2; j++)
 		{
 			array[j] = 0;
 		}
-		ulong bDBOAEGELMC = num << 3;
-		AddLength(bDBOAEGELMC, array, GMNFIOIAJJM + num2);
+		ulong bitLength = num << 3;
+		AddLength(bitLength, array, length + num2);
 		ProcessBlock(array, 0);
-		if (GMNFIOIAJJM + num2 + 8 == 128)
+		if (length + num2 + 8 == 128)
 		{
 			ProcessBlock(array, 64);
 		}
 	}
 
-	internal void AddLength(ulong BDBOAEGELMC, byte[] buffer, int MGMMDGFPBLP)
+	internal void AddLength(ulong bitLength, byte[] buffer, int MGMMDGFPBLP)
 	{
-		buffer[MGMMDGFPBLP++] = (byte)BDBOAEGELMC;
-		buffer[MGMMDGFPBLP++] = (byte)(BDBOAEGELMC >> 8);
-		buffer[MGMMDGFPBLP++] = (byte)(BDBOAEGELMC >> 16);
-		buffer[MGMMDGFPBLP++] = (byte)(BDBOAEGELMC >> 24);
-		buffer[MGMMDGFPBLP++] = (byte)(BDBOAEGELMC >> 32);
-		buffer[MGMMDGFPBLP++] = (byte)(BDBOAEGELMC >> 40);
-		buffer[MGMMDGFPBLP++] = (byte)(BDBOAEGELMC >> 48);
-		buffer[MGMMDGFPBLP] = (byte)(BDBOAEGELMC >> 56);
+		buffer[MGMMDGFPBLP++] = (byte)bitLength;
+		buffer[MGMMDGFPBLP++] = (byte)(bitLength >> 8);
+		buffer[MGMMDGFPBLP++] = (byte)(bitLength >> 16);
+		buffer[MGMMDGFPBLP++] = (byte)(bitLength >> 24);
+		buffer[MGMMDGFPBLP++] = (byte)(bitLength >> 32);
+		buffer[MGMMDGFPBLP++] = (byte)(bitLength >> 40);
+		buffer[MGMMDGFPBLP++] = (byte)(bitLength >> 48);
+		buffer[MGMMDGFPBLP] = (byte)(bitLength >> 56);
 	}
 }

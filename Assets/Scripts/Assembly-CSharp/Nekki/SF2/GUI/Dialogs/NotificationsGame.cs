@@ -104,16 +104,16 @@ namespace Nekki.SF2.GUI.Dialogs
 			_instance = null;
 		}
 
-		public void OpenNotification(string KCDCAGJFHJF, List<StoryDialogContent> IHMEPGICLGF, Action<object> CGGAFBLKFBP, string JEDLCDIIFDN, LabelButton.ButtonColor JNBBEBBCEJK, float HEPAGADOKGI)
+		public void OpenNotification(string image, List<StoryDialogContent> contents, Action<object> onClose, string alias, LabelButton.ButtonColor color, float delay)
 		{
 			if (CanShowNotification())
 			{
-				imagePath = KCDCAGJFHJF;
-				BuildMessageText(IHMEPGICLGF);
-				buttonAlias = JEDLCDIIFDN;
-				buttonColor = JNBBEBBCEJK;
-				callback = CGGAFBLKFBP;
-				dismissDelay = HEPAGADOKGI;
+				imagePath = image;
+				BuildMessageText(contents);
+				buttonAlias = alias;
+				buttonColor = color;
+				callback = onClose;
+				dismissDelay = delay;
 				ShowNotification();
 				if (dismissDelayRoutine != null)
 				{
@@ -147,13 +147,13 @@ namespace Nekki.SF2.GUI.Dialogs
 			}
 		}
 
-		private void BuildMessageText(List<StoryDialogContent> IHMEPGICLGF)
+		private void BuildMessageText(List<StoryDialogContent> contents)
 		{
 			messageText = string.Empty;
-			for (int i = 0; i < IHMEPGICLGF.Count; i++)
+			for (int i = 0; i < contents.Count; i++)
 			{
-				messageText += LocalizationManager.GetString(IHMEPGICLGF[i].Text);
-				if (i + 1 < IHMEPGICLGF.Count)
+				messageText += LocalizationManager.GetString(contents[i].Text);
+				if (i + 1 < contents.Count)
 				{
 					messageText += "\n";
 				}

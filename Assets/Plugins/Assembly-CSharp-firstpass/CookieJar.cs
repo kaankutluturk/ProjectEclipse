@@ -117,9 +117,9 @@ public static class CookieJar
 		}
 	}
 
-	internal static void Set(HTTPResponse GIHDDAKBMHE)
+	internal static void Set(HTTPResponse response)
 	{
-		if (GIHDDAKBMHE == null)
+		if (response == null)
 		{
 			return;
 		}
@@ -129,7 +129,7 @@ public static class CookieJar
 			{
 				Maintain();
 				List<Cookie> list = new List<Cookie>();
-				List<string> list2 = GIHDDAKBMHE.GetHeaderValues("set-cookie");
+				List<string> list2 = response.GetHeaderValues("set-cookie");
 				if (list2 == null)
 				{
 					return;
@@ -138,37 +138,37 @@ public static class CookieJar
 				{
 					try
 					{
-						Cookie eKAOIOLAGFH = Cookie.Parse(item, GIHDDAKBMHE.BaseRequest.GetCurrentUri());
-						if (eKAOIOLAGFH == null)
+						Cookie cookie = Cookie.Parse(item, response.BaseRequest.GetCurrentUri());
+						if (cookie == null)
 						{
 							continue;
 						}
-						int OOPOEMNCCGH;
-						Cookie eKAOIOLAGFH2 = Find(eKAOIOLAGFH, out OOPOEMNCCGH);
-						if (!string.IsNullOrEmpty(eKAOIOLAGFH.GetValue()) && eKAOIOLAGFH.WillExpireInTheFuture())
+						int index;
+						Cookie eKAOIOLAGFH2 = Find(cookie, out index);
+						if (!string.IsNullOrEmpty(cookie.GetValue()) && cookie.WillExpireInTheFuture())
 						{
 							if (eKAOIOLAGFH2 == null)
 							{
-								cookies.Add(eKAOIOLAGFH);
-								list.Add(eKAOIOLAGFH);
+								cookies.Add(cookie);
+								list.Add(cookie);
 							}
 							else
 							{
-								eKAOIOLAGFH.SetDate(eKAOIOLAGFH2.GetDate());
-								cookies[OOPOEMNCCGH] = eKAOIOLAGFH;
-								list.Add(eKAOIOLAGFH);
+								cookie.SetDate(eKAOIOLAGFH2.GetDate());
+								cookies[index] = cookie;
+								list.Add(cookie);
 							}
 						}
-						else if (OOPOEMNCCGH != -1)
+						else if (index != -1)
 						{
-							cookies.RemoveAt(OOPOEMNCCGH);
+							cookies.RemoveAt(index);
 						}
 					}
 					catch
 					{
 					}
 				}
-				GIHDDAKBMHE.SetCookies(list);
+				response.SetCookies(list);
 			}
 			catch
 			{
@@ -187,15 +187,15 @@ public static class CookieJar
 				int num2 = 0;
 				while (num2 < cookies.Count)
 				{
-					Cookie eKAOIOLAGFH = cookies[num2];
-					if (!eKAOIOLAGFH.WillExpireInTheFuture() || eKAOIOLAGFH.GetLastAccess() + timeSpan < DateTime.UtcNow)
+					Cookie cookie = cookies[num2];
+					if (!cookie.WillExpireInTheFuture() || cookie.GetLastAccess() + timeSpan < DateTime.UtcNow)
 					{
 						cookies.RemoveAt(num2);
 						continue;
 					}
-					if (!eKAOIOLAGFH.GetIsSession())
+					if (!cookie.GetIsSession())
 					{
-						num += eKAOIOLAGFH.GuessSize();
+						num += cookie.GuessSize();
 					}
 					num2++;
 				}
@@ -293,11 +293,11 @@ public static class CookieJar
 						int num = binaryReader.ReadInt32();
 						for (int i = 0; i < num; i++)
 						{
-							Cookie eKAOIOLAGFH = new Cookie();
-							eKAOIOLAGFH.LoadFrom(binaryReader);
-							if (eKAOIOLAGFH.WillExpireInTheFuture())
+							Cookie cookie = new Cookie();
+							cookie.LoadFrom(binaryReader);
+							if (cookie.WillExpireInTheFuture())
 							{
-								cookies.Add(eKAOIOLAGFH);
+								cookies.Add(cookie);
 							}
 						}
 					}
@@ -314,7 +314,7 @@ public static class CookieJar
 		}
 	}
 
-	public static List<Cookie> Get(Uri KJHNCLAJMLO)
+	public static List<Cookie> Get(Uri uri)
 	{
 		lock (Locker)
 		{
@@ -322,35 +322,35 @@ public static class CookieJar
 			List<Cookie> list = null;
 			for (int i = 0; i < cookies.Count; i++)
 			{
-				Cookie eKAOIOLAGFH = cookies[i];
-				if (eKAOIOLAGFH.WillExpireInTheFuture() && KJHNCLAJMLO.Host.IndexOf(eKAOIOLAGFH.GetDomain()) != -1 && KJHNCLAJMLO.AbsolutePath.StartsWith(eKAOIOLAGFH.GetPath()))
+				Cookie cookie = cookies[i];
+				if (cookie.WillExpireInTheFuture() && uri.Host.IndexOf(cookie.GetDomain()) != -1 && uri.AbsolutePath.StartsWith(cookie.GetPath()))
 				{
 					if (list == null)
 					{
 						list = new List<Cookie>();
 					}
-					list.Add(eKAOIOLAGFH);
+					list.Add(cookie);
 				}
 			}
 			return list;
 		}
 	}
 
-	public static void Set(Uri KJHNCLAJMLO, Cookie ILHDJDNPFKH)
+	public static void Set(Uri uri, Cookie cookie)
 	{
 		lock (Locker)
 		{
 			Load();
-			Cookie eKAOIOLAGFH = new Cookie(ILHDJDNPFKH.get_Name(), ILHDJDNPFKH.GetValue(), KJHNCLAJMLO.AbsolutePath, KJHNCLAJMLO.Host);
-			int OOPOEMNCCGH;
-			Find(eKAOIOLAGFH, out OOPOEMNCCGH);
-			if (OOPOEMNCCGH >= 0)
+			Cookie newCookie = new Cookie(cookie.get_Name(), cookie.GetValue(), uri.AbsolutePath, uri.Host);
+			int index;
+			Find(newCookie, out index);
+			if (index >= 0)
 			{
-				cookies[OOPOEMNCCGH] = eKAOIOLAGFH;
+				cookies[index] = newCookie;
 			}
 			else
 			{
-				cookies.Add(eKAOIOLAGFH);
+				cookies.Add(newCookie);
 			}
 		}
 	}
@@ -373,7 +373,7 @@ public static class CookieJar
 		}
 	}
 
-	public static void Clear(TimeSpan HJALDNILENB)
+	public static void Clear(TimeSpan maxAge)
 	{
 		lock (Locker)
 		{
@@ -381,8 +381,8 @@ public static class CookieJar
 			int num = 0;
 			while (num < cookies.Count)
 			{
-				Cookie eKAOIOLAGFH = cookies[num];
-				if (!eKAOIOLAGFH.WillExpireInTheFuture() || eKAOIOLAGFH.GetDate() + HJALDNILENB < DateTime.UtcNow)
+				Cookie cookie = cookies[num];
+				if (!cookie.WillExpireInTheFuture() || cookie.GetDate() + maxAge < DateTime.UtcNow)
 				{
 					cookies.RemoveAt(num);
 				}
@@ -394,7 +394,7 @@ public static class CookieJar
 		}
 	}
 
-	public static void Clear(string OKDDNOHODMN)
+	public static void Clear(string domain)
 	{
 		lock (Locker)
 		{
@@ -402,8 +402,8 @@ public static class CookieJar
 			int num = 0;
 			while (num < cookies.Count)
 			{
-				Cookie eKAOIOLAGFH = cookies[num];
-				if (!eKAOIOLAGFH.WillExpireInTheFuture() || eKAOIOLAGFH.GetDomain().IndexOf(OKDDNOHODMN) != -1)
+				Cookie cookie = cookies[num];
+				if (!cookie.WillExpireInTheFuture() || cookie.GetDomain().IndexOf(domain) != -1)
 				{
 					cookies.RemoveAt(num);
 				}
@@ -415,7 +415,7 @@ public static class CookieJar
 		}
 	}
 
-	public static void Remove(Uri KJHNCLAJMLO, string name)
+	public static void Remove(Uri uri, string name)
 	{
 		lock (Locker)
 		{
@@ -423,8 +423,8 @@ public static class CookieJar
 			int num = 0;
 			while (num < cookies.Count)
 			{
-				Cookie eKAOIOLAGFH = cookies[num];
-				if (eKAOIOLAGFH.get_Name().Equals(name, StringComparison.OrdinalIgnoreCase) && KJHNCLAJMLO.Host.IndexOf(eKAOIOLAGFH.GetDomain()) != -1)
+				Cookie cookie = cookies[num];
+				if (cookie.get_Name().Equals(name, StringComparison.OrdinalIgnoreCase) && uri.Host.IndexOf(cookie.GetDomain()) != -1)
 				{
 					cookies.RemoveAt(num);
 				}
@@ -436,18 +436,18 @@ public static class CookieJar
 		}
 	}
 
-	private static Cookie Find(Cookie FJKPPODBPJF, out int OOPOEMNCCGH)
+	private static Cookie Find(Cookie cookie, out int index)
 	{
 		for (int i = 0; i < cookies.Count; i++)
 		{
-			Cookie eKAOIOLAGFH = cookies[i];
-			if (eKAOIOLAGFH.Equals(FJKPPODBPJF))
+			Cookie item = cookies[i];
+			if (item.Equals(cookie))
 			{
-				OOPOEMNCCGH = i;
-				return eKAOIOLAGFH;
+				index = i;
+				return item;
 			}
 		}
-		OOPOEMNCCGH = -1;
+		index = -1;
 		return null;
 	}
 }

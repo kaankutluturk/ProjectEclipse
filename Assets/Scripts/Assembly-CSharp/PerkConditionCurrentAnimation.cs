@@ -17,20 +17,20 @@ public class PerkConditionCurrentAnimation : PerkConditionMatchMinMax
 		minMax.Parse(node, this, GetPerk());
 	}
 
-	public override bool IsEqual(Model ACENLMONNPA, List<string> NIKHAICFGNM)
+	public override bool IsEqual(Model model, List<string> args)
 	{
-		Model fGCODGKLHED = ResolveTargetModel(ACENLMONNPA);
-		if (ACENLMONNPA == null)
+		Model targetModel = ResolveTargetModel(model);
+		if (model == null)
 		{
 			return false;
 		}
-		InfoAnimation pJAHIOELGGD = fGCODGKLHED.GetCurrentAnimation();
-		if (pJAHIOELGGD == null || !pJAHIOELGGD.HasName(Name))
+		InfoAnimation currentAnimation = targetModel.GetCurrentAnimation();
+		if (currentAnimation == null || !currentAnimation.HasName(Name))
 		{
 			return false;
 		}
 		minMax.EvaluateFunctions();
-		int num = fGCODGKLHED.GetCurrentFrame();
+		int num = targetModel.GetCurrentFrame();
 		if (!minMax.GetMinUnbounded() && minMax.GetMinValue() > (float)num)
 		{
 			return false;

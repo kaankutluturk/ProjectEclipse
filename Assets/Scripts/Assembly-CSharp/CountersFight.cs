@@ -37,19 +37,19 @@ public class CountersFight : global::EventDispatcher<object>
 
 	private CounterConditions conditions = new CounterConditions();
 
-	public void Init(Dictionary<string, Counter> GGOFNBMGJAF, ModelParameters KKNOCIPBIIK, BattleType JBJHPJMJNNF, float ratio)
+	public void Init(Dictionary<string, Counter> definitions, ModelParameters parameters, BattleType battleType, float ratio)
 	{
-		conditions.BattleType = JBJHPJMJNNF;
+		conditions.BattleType = battleType;
 		conditions.Ratio = ratio;
-		counterDefinitions = GGOFNBMGJAF;
-		modelParameters = KKNOCIPBIIK;
+		counterDefinitions = definitions;
+		modelParameters = parameters;
 		isFirstBlock = false;
 		foreach (KeyValuePair<string, Counter> item in counterDefinitions)
 		{
-			CurrentCounter pEMLBKDIDHA = new CurrentCounter();
-			pEMLBKDIDHA.Definition = item.Value;
-			pEMLBKDIDHA.Value = 0;
-			currentCounters.CountersByName[item.Key] = pEMLBKDIDHA;
+			CurrentCounter currentCounter = new CurrentCounter();
+			currentCounter.Definition = item.Value;
+			currentCounter.Value = 0;
+			currentCounters.CountersByName[item.Key] = currentCounter;
 		}
 	}
 
@@ -132,48 +132,48 @@ public class CountersFight : global::EventDispatcher<object>
 		CallCountersByType("DifficultyWin");
 	}
 
-	public void OnWinBattle(FightIDS DIAIIPCBMFL)
+	public void OnWinBattle(FightIDS fightId)
 	{
 		List<CurrentCounter> list = GetCountersByType("WinBattle");
 		foreach (CurrentCounter item in list)
 		{
-			if (item.Definition.IsFightComplete(DIAIIPCBMFL))
+			if (item.Definition.IsFightComplete(fightId))
 			{
 				IncrementCounter(item);
 			}
 		}
 	}
 
-	public void SetComboCount(int PKHDLOGJKAD)
+	public void SetComboCount(int comboCount)
 	{
 		List<CurrentCounter> list = GetCountersByType("ComboCount");
 		foreach (CurrentCounter item in list)
 		{
-			if ((float)PKHDLOGJKAD >= item.Definition.Value)
+			if ((float)comboCount >= item.Definition.Value)
 			{
 				IncrementCounter(item);
 			}
 		}
 	}
 
-	public void SetStyle(int PKHDLOGJKAD)
+	public void SetStyle(int style)
 	{
 		List<CurrentCounter> list = GetCountersByType("Style");
 		foreach (CurrentCounter item in list)
 		{
-			if ((float)PKHDLOGJKAD >= item.Definition.Value)
+			if ((float)style >= item.Definition.Value)
 			{
 				IncrementCounter(item);
 			}
 		}
 	}
 
-	public void OnFightBeaten(FightIDS DIAIIPCBMFL)
+	public void OnFightBeaten(FightIDS fightId)
 	{
 		List<CurrentCounter> list = GetCountersByType("FightBeaten");
 		foreach (CurrentCounter item in list)
 		{
-			if (DIAIIPCBMFL.Equals(item.Definition.FightName) || DIAIIPCBMFL.Equals(item.Definition.SecondFightName))
+			if (fightId.Equals(item.Definition.FightName) || fightId.Equals(item.Definition.SecondFightName))
 			{
 				IncrementCounter(item);
 			}
@@ -224,19 +224,19 @@ public class CountersFight : global::EventDispatcher<object>
 		}
 	}
 
-	public void OnBlock(bool OOCLHFGEPML)
+	public void OnBlock(bool isBlocked)
 	{
 		isFirstBlock = true;
-		CurrentCounter pEMLBKDIDHA = GetCounterByName("BlockedRound");
-		if (!OOCLHFGEPML && pEMLBKDIDHA != null && !pEMLBKDIDHA.IsNot)
+		CurrentCounter blockedCounter = GetCounterByName("BlockedRound");
+		if (!isBlocked && blockedCounter != null && !blockedCounter.IsNot)
 		{
-			pEMLBKDIDHA.IsNot = true;
+			blockedCounter.IsNot = true;
 		}
 	}
 
-	public void OnAnimationHit(InfoAnimation DBOLBEOCEME, bool APLJLFHDJIM, bool isFirstStrike, bool INDFLCGLJPP, bool LGNDOAHHHNP, bool OOCLHFGEPML, bool EPKEEMFHHFM)
+	public void OnAnimationHit(InfoAnimation animationInfo, bool isHeadHit, bool isFirstStrike, bool isDisarm, bool isTargetDead, bool isBlocked, bool isShock)
 	{
-		if (!OOCLHFGEPML && isFirstStrike)
+		if (!isBlocked && isFirstStrike)
 		{
 			List<CurrentCounter> list = GetCountersByType("FirstHits");
 			foreach (CurrentCounter item in list)
@@ -244,7 +244,7 @@ public class CountersFight : global::EventDispatcher<object>
 				IncrementCounter(item);
 			}
 		}
-		if (INDFLCGLJPP)
+		if (isDisarm)
 		{
 			List<CurrentCounter> list2 = GetCountersByType("Disarm");
 			foreach (CurrentCounter item2 in list2)
@@ -255,23 +255,23 @@ public class CountersFight : global::EventDispatcher<object>
 		List<CurrentCounter> list3 = GetCountersByType("RestrictedAnimation");
 		foreach (CurrentCounter item3 in list3)
 		{
-			if (!item3.IsNot && !DBOLBEOCEME.HasTemplateName(item3.Definition.AnimationName))
+			if (!item3.IsNot && !animationInfo.HasTemplateName(item3.Definition.AnimationName))
 			{
 				item3.IsNot = true;
 			}
-			string jIIFFJAJNNN = item3.Definition.WeaponName;
-			if (modelParameters.Weapon != null && jIIFFJAJNNN != string.Empty && modelParameters.Weapon.Name != jIIFFJAJNNN)
+			string weaponName = item3.Definition.WeaponName;
+			if (modelParameters.Weapon != null && weaponName != string.Empty && modelParameters.Weapon.Name != weaponName)
 			{
 				item3.IsNot = true;
 			}
-			if (LGNDOAHHHNP && !item3.IsNot)
+			if (isTargetDead && !item3.IsNot)
 			{
 				IncrementCounter(item3);
 			}
 		}
-		if (LGNDOAHHHNP)
+		if (isTargetDead)
 		{
-			if (APLJLFHDJIM)
+			if (isHeadHit)
 			{
 				List<CurrentCounter> list4 = GetCountersByType("HeadHitRound");
 				foreach (CurrentCounter item4 in list4)
@@ -279,38 +279,38 @@ public class CountersFight : global::EventDispatcher<object>
 					IncrementCounter(item4);
 				}
 			}
-			CurrentCounter pEMLBKDIDHA = GetCounterByName("BlockedRound");
-			if (pEMLBKDIDHA != null && !pEMLBKDIDHA.IsNot && isFirstBlock)
+			CurrentCounter blockedCounter = GetCounterByName("BlockedRound");
+			if (blockedCounter != null && !blockedCounter.IsNot && isFirstBlock)
 			{
-				IncrementCounter(pEMLBKDIDHA);
+				IncrementCounter(blockedCounter);
 			}
 		}
-		if (OOCLHFGEPML || !APLJLFHDJIM)
+		if (isBlocked || !isHeadHit)
 		{
 			return;
 		}
 		List<CurrentCounter> list5 = GetCountersByType("HeadKick");
 		foreach (CurrentCounter item5 in list5)
 		{
-			if (item5 != null && DBOLBEOCEME.HasTemplateName(item5.Definition.AnimationName))
+			if (item5 != null && animationInfo.HasTemplateName(item5.Definition.AnimationName))
 			{
 				IncrementCounter(item5);
 			}
 		}
 	}
 
-	public void CallCountersByType(string KFLJDKNOPCE)
+	public void CallCountersByType(string counterType)
 	{
-		List<CurrentCounter> list = GetCountersByType(KFLJDKNOPCE);
+		List<CurrentCounter> list = GetCountersByType(counterType);
 		foreach (CurrentCounter item in list)
 		{
 			IncrementCounter(item);
 		}
 	}
 
-	public void Complete(int roundTotal, bool CDCEOCEPMPK = false)
+	public void Complete(int roundTotal, bool skipFightEndCounters = false)
 	{
-		if (CDCEOCEPMPK)
+		if (skipFightEndCounters)
 		{
 			return;
 		}
@@ -325,11 +325,11 @@ public class CountersFight : global::EventDispatcher<object>
 		}
 	}
 
-	public void SaveCompleteValues(bool CDCEOCEPMPK)
+	public void SaveCompleteValues(bool skipFightEndCounters)
 	{
 		foreach (KeyValuePair<string, Counter> item in counterDefinitions)
 		{
-			if (!CDCEOCEPMPK || !item.Value.IsFightEnd)
+			if (!skipFightEndCounters || !item.Value.IsFightEnd)
 			{
 				item.Value.CompleteValue = currentCounters.CountersByName[item.Key].Value;
 			}
@@ -350,26 +350,26 @@ public class CountersFight : global::EventDispatcher<object>
 		}
 	}
 
-	private void IncrementCounter(CurrentCounter EPJGLECOIBG)
+	private void IncrementCounter(CurrentCounter counter)
 	{
-		bool flag = CheckFightType(EPJGLECOIBG.Definition.FightType);
-		bool flag2 = CheckDifficult(EPJGLECOIBG.Definition.MinDifficulty, EPJGLECOIBG.Definition.MaxDifficulty);
-		if (EPJGLECOIBG.Definition.AreConditionsMet(conditions) && flag && flag2)
+		bool flag = CheckFightType(counter.Definition.FightType);
+		bool flag2 = CheckDifficult(counter.Definition.MinDifficulty, counter.Definition.MaxDifficulty);
+		if (counter.Definition.AreConditionsMet(conditions) && flag && flag2)
 		{
-			EPJGLECOIBG.Increment();
-			if (EPJGLECOIBG.Definition.Span != Counter.CounterSpan.SPAN_FIGHT)
+			counter.Increment();
+			if (counter.Definition.Span != Counter.CounterSpan.SPAN_FIGHT)
 			{
-				CallEvent(0, EPJGLECOIBG);
+				CallEvent(0, counter);
 			}
 		}
 	}
 
-	private List<CurrentCounter> GetCountersByType(string LFLGCDNKNJI)
+	private List<CurrentCounter> GetCountersByType(string counterType)
 	{
 		List<CurrentCounter> list = new List<CurrentCounter>();
 		foreach (KeyValuePair<string, CurrentCounter> item in currentCounters.CountersByName)
 		{
-			if (item.Value.Definition.Type == LFLGCDNKNJI)
+			if (item.Value.Definition.Type == counterType)
 			{
 				list.Add(item.Value);
 			}
@@ -386,17 +386,17 @@ public class CountersFight : global::EventDispatcher<object>
 		return null;
 	}
 
-	private bool CheckFightType(string MPBIEONNLIJ)
+	private bool CheckFightType(string fightTypes)
 	{
-		if (MPBIEONNLIJ == null || MPBIEONNLIJ == string.Empty)
+		if (fightTypes == null || fightTypes == string.Empty)
 		{
 			return true;
 		}
-		string[] array = MPBIEONNLIJ.Split('|');
+		string[] array = fightTypes.Split('|');
 		for (int i = 0; i < array.Length; i++)
 		{
-			BattleType pJMEMGHKKBM = ListSF.GetInstance().GetBattleTypeByName(array[i]);
-			if (pJMEMGHKKBM == conditions.BattleType)
+			BattleType battleType = ListSF.GetInstance().GetBattleTypeByName(array[i]);
+			if (battleType == conditions.BattleType)
 			{
 				return true;
 			}
@@ -404,16 +404,16 @@ public class CountersFight : global::EventDispatcher<object>
 		return false;
 	}
 
-	private bool CheckDifficult(string HBACJNBIFCH, string EBGLLCMNIED)
+	private bool CheckDifficult(string minDifficulty, string maxDifficulty)
 	{
-		if (HBACJNBIFCH == string.Empty && EBGLLCMNIED == string.Empty)
+		if (minDifficulty == string.Empty && maxDifficulty == string.Empty)
 		{
 			return true;
 		}
-		bool flag = HBACJNBIFCH != string.Empty;
-		bool flag2 = EBGLLCMNIED != string.Empty;
-		float num = GetRationForDifficult(HBACJNBIFCH);
-		float num2 = GetRationForDifficult(EBGLLCMNIED);
+		bool flag = minDifficulty != string.Empty;
+		bool flag2 = maxDifficulty != string.Empty;
+		float num = GetRationForDifficult(minDifficulty);
+		float num2 = GetRationForDifficult(maxDifficulty);
 		if (flag && flag2)
 		{
 			return conditions.Ratio > num && conditions.Ratio < num2;
@@ -429,17 +429,17 @@ public class CountersFight : global::EventDispatcher<object>
 		return false;
 	}
 
-	private float GetRationForDifficult(string DOACAKFFFPB)
+	private float GetRationForDifficult(string difficultyName)
 	{
 		List<global::Pair<string, float>> difficultyEvaluation = DifficultyPanel.get_DifficultyEvaluation();
 		for (int i = 0; i < difficultyEvaluation.Count; i++)
 		{
-			global::Pair<string, float> cCKLNOPEKHO = difficultyEvaluation[i];
-			if (cCKLNOPEKHO.First == DOACAKFFFPB)
+			global::Pair<string, float> evaluation = difficultyEvaluation[i];
+			if (evaluation.First == difficultyName)
 			{
-				return cCKLNOPEKHO.Second;
+				return evaluation.Second;
 			}
 		}
-		return DOACAKFFFPB.ToFloat();
+		return difficultyName.ToFloat();
 	}
 }

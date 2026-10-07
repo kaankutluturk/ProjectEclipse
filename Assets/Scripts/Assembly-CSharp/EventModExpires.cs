@@ -23,13 +23,13 @@ public class EventModExpires : EventAnimation
 		return modName;
 	}
 
-	protected override bool Compare(EventAnimation FOPOKALJIIJ)
+	protected override bool Compare(EventAnimation other)
 	{
 		bool flag = false;
-		List<PerksStage.ActionPerk> fPFKABHOEHP = FOPOKALJIIJ.Conditions.SelfExpiredPerks;
-		for (int i = 0; i < fPFKABHOEHP.Count; i++)
+		List<PerksStage.ActionPerk> expiredPerks = other.Conditions.SelfExpiredPerks;
+		for (int i = 0; i < expiredPerks.Count; i++)
 		{
-			if (fPFKABHOEHP[i].GetModName() == modName)
+			if (expiredPerks[i].GetModName() == modName)
 			{
 				flag = true;
 			}
@@ -37,8 +37,8 @@ public class EventModExpires : EventAnimation
 		return (!IsNot) ? flag : (!flag);
 	}
 
-	protected override void Parse(XmlNode MEEAKLDGLDF)
+	protected override void Parse(XmlNode node)
 	{
-		modName = MEEAKLDGLDF.Attributes["Name"].GetStringOrDefault(string.Empty);
+		modName = node.Attributes["Name"].GetStringOrDefault(string.Empty);
 	}
 }

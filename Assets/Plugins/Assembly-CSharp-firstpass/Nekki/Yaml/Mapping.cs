@@ -12,37 +12,37 @@ namespace Nekki.Yaml
 
 		public List<Node> nodesInside { get; private set; }
 
-		public Mapping(string HODKINDOEGD, Node[] KBFJEPICNNB)
+		public Mapping(string nodeKey, Node[] nodes)
 		{
 			base.typeNode = "Mapping";
-			base.key = HODKINDOEGD;
+			base.key = nodeKey;
 			base.value = new YamlMappingNode(new YamlNode[0]);
 			_mapping = (YamlMappingNode)base.value;
 			nodesInside = new List<Node>();
-			foreach (Node node in KBFJEPICNNB)
+			foreach (Node node in nodes)
 			{
 				_mapping.Add(node.key, node.value);
 				nodesInside.Add(Node.CreateNode(node.key, node.value));
 			}
 		}
 
-		public Mapping(string HODKINDOEGD, List<Node> KBFJEPICNNB)
-			: this(HODKINDOEGD, KBFJEPICNNB.ToArray())
+		public Mapping(string nodeKey, List<Node> nodes)
+			: this(nodeKey, nodes.ToArray())
 		{
 			base.typeNode = "Mapping";
 		}
 
-		public Mapping(Mapping HELBCHMPMJP)
-			: this(HELBCHMPMJP.key, (YamlMappingNode)HELBCHMPMJP.value)
+		public Mapping(Mapping source)
+			: this(source.key, (YamlMappingNode)source.value)
 		{
 			base.typeNode = "Mapping";
 		}
 
-		public Mapping(string HODKINDOEGD, YamlMappingNode JPEFEBICPFI)
+		public Mapping(string nodeKey, YamlMappingNode mappingNode)
 		{
 			base.typeNode = "Mapping";
-			base.key = HODKINDOEGD;
-			base.value = JPEFEBICPFI;
+			base.key = nodeKey;
+			base.value = mappingNode;
 			_mapping = (YamlMappingNode)base.value;
 			nodesInside = new List<Node>();
 			foreach (KeyValuePair<YamlNode, YamlNode> item in _mapping)
@@ -70,39 +70,39 @@ namespace Nekki.Yaml
 			return nodesInside;
 		}
 
-		public void Add(Node OABDMNKEMFL)
+		public void Add(Node node)
 		{
-			_mapping.Add(OABDMNKEMFL.key, OABDMNKEMFL.value);
-			nodesInside.Add(OABDMNKEMFL);
+			_mapping.Add(node.key, node.value);
+			nodesInside.Add(node);
 		}
 
-		public void AddNodes(Node[] HBGCCCIABFC)
+		public void AddNodes(Node[] nodes)
 		{
-			foreach (Node node in HBGCCCIABFC)
+			foreach (Node node in nodes)
 			{
 				_mapping.Add(node.key, node.value);
 				nodesInside.Add(node);
 			}
 		}
 
-		public void Remove(string KGBGENDIMBC, string value)
+		public void Remove(string nodeKey, string value)
 		{
 			foreach (Node item in nodesInside)
 			{
-				if (item.key == KGBGENDIMBC && item.value.ToString() == value)
+				if (item.key == nodeKey && item.value.ToString() == value)
 				{
 					nodesInside.Remove(item);
-					_mapping.Remove(KGBGENDIMBC, item.value);
+					_mapping.Remove(nodeKey, item.value);
 					break;
 				}
 			}
 		}
 
-		public void Remove(Node HNIJHBJPEIA)
+		public void Remove(Node node)
 		{
-			if (HNIJHBJPEIA != null)
+			if (node != null)
 			{
-				Remove(HNIJHBJPEIA.key, HNIJHBJPEIA.value.ToString());
+				Remove(node.key, node.value.ToString());
 			}
 		}
 

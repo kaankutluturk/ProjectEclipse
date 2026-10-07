@@ -5,9 +5,9 @@ public class NekkiZipTest : MonoBehaviour
 {
 	private string logText;
 
-	private void Log(object NBEKIHKMJJG)
+	private void Log(object message)
 	{
-		logText = logText + NBEKIHKMJJG.ToString() + "\n";
+		logText = logText + message.ToString() + "\n";
 	}
 
 	private void Start()

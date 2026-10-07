@@ -6,9 +6,9 @@ public class ResistanceStruct
 
 	public ObscuredInt Count;
 
-	public ResistanceStruct(GameResistance DHOLEOOFCMB, int _count)
+	public ResistanceStruct(GameResistance gameResistance, int _count)
 	{
-		resistance = DHOLEOOFCMB;
+		resistance = gameResistance;
 		Count = (ObscuredInt)(_count);
 	}
 }

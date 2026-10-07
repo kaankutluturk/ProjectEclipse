@@ -159,64 +159,64 @@ namespace Nekki.SF2.GUI.Shop
 		{
 			if (!IsPurchaseBlockedByQuest())
 			{
-				ItemAction pCKPFBFHKJH = (ItemAction)data;
-				TradeDialog.TradeAction iBODMPMJELJ = TradeDialog.TradeAction.A_BUY;
-				GameValueType bAINMLLIKOL = GameValueType.Gold;
+				ItemAction itemAction = (ItemAction)data;
+				TradeDialog.TradeAction tradeAction = TradeDialog.TradeAction.A_BUY;
+				GameValueType valueType = GameValueType.Gold;
 				long num = 0L;
-				long cNIOCCCBDBJ = 0L;
+				long price = 0L;
 				bool flag = false;
-				ListSF.CheckItemType dDEDNPLHOJH = ListSF.CheckItemType.CHECK_ITEM_NONE;
-				Action<object> oDDEOFKLIAG = null;
-				UserItem dKCHDHMLKHN = ListSF.GetUserItem(currentItem.Name);
-				switch (pCKPFBFHKJH)
+				ListSF.CheckItemType checkType = ListSF.CheckItemType.CHECK_ITEM_NONE;
+				Action<object> confirmCallback = null;
+				UserItem userItem = ListSF.GetUserItem(currentItem.Name);
+				switch (itemAction)
 				{
 				case ItemAction.Item_Buy_Gold:
-					iBODMPMJELJ = TradeDialog.TradeAction.A_BUY;
-					bAINMLLIKOL = GameValueType.Gold;
+					tradeAction = TradeDialog.TradeAction.A_BUY;
+					valueType = GameValueType.Gold;
 					num = currentItem.GetCoinPrice();
-					cNIOCCCBDBJ = 0L;
-					oDDEOFKLIAG = OnBuyGoldConfirmed;
+					price = 0L;
+					confirmCallback = OnBuyGoldConfirmed;
 					flag = num > ListSF.GetRoster().GetMoney();
-					dDEDNPLHOJH = ListSF.CheckItemType.CHECK_ITEM_MONEY;
+					checkType = ListSF.CheckItemType.CHECK_ITEM_MONEY;
 					break;
 				case ItemAction.Item_Buy_Ruby:
-					iBODMPMJELJ = TradeDialog.TradeAction.A_BUY;
-					bAINMLLIKOL = GameValueType.Gems;
+					tradeAction = TradeDialog.TradeAction.A_BUY;
+					valueType = GameValueType.Gems;
 					num = currentItem.GetGemPrice();
-					cNIOCCCBDBJ = 0L;
-					oDDEOFKLIAG = OnBuyRubyConfirmed;
+					price = 0L;
+					confirmCallback = OnBuyRubyConfirmed;
 					flag = num > ListSF.GetRoster().GetBonus();
-					dDEDNPLHOJH = ListSF.CheckItemType.CHECK_ITEM_BONUS;
+					checkType = ListSF.CheckItemType.CHECK_ITEM_BONUS;
 					break;
 				case ItemAction.Item_Upgrade_Gold:
-					iBODMPMJELJ = TradeDialog.TradeAction.A_UPGRADE;
-					bAINMLLIKOL = GameValueType.Gold;
-					num = dKCHDHMLKHN.GetNextUpgradeItem().GetCoinPrice();
-					cNIOCCCBDBJ = 0L;
-					oDDEOFKLIAG = OnUpgradeGoldConfirmed;
+					tradeAction = TradeDialog.TradeAction.A_UPGRADE;
+					valueType = GameValueType.Gold;
+					num = userItem.GetNextUpgradeItem().GetCoinPrice();
+					price = 0L;
+					confirmCallback = OnUpgradeGoldConfirmed;
 					flag = num > ListSF.GetRoster().GetMoney();
-					dDEDNPLHOJH = ListSF.CheckItemType.CHECK_ITEM_MONEY;
+					checkType = ListSF.CheckItemType.CHECK_ITEM_MONEY;
 					break;
 				case ItemAction.Item_Upgrade_Ruby:
-					iBODMPMJELJ = TradeDialog.TradeAction.A_UPGRADE;
-					bAINMLLIKOL = GameValueType.Gems;
-					num = dKCHDHMLKHN.GetNextUpgradeItem().GetGemPrice();
-					cNIOCCCBDBJ = 0L;
-					oDDEOFKLIAG = OnUpgradeRubyConfirmed;
+					tradeAction = TradeDialog.TradeAction.A_UPGRADE;
+					valueType = GameValueType.Gems;
+					num = userItem.GetNextUpgradeItem().GetGemPrice();
+					price = 0L;
+					confirmCallback = OnUpgradeRubyConfirmed;
 					flag = num > ListSF.GetRoster().GetBonus();
-					dDEDNPLHOJH = ListSF.CheckItemType.CHECK_ITEM_BONUS;
+					checkType = ListSF.CheckItemType.CHECK_ITEM_BONUS;
 					break;
 				case ItemAction.Item_Delivery_Ruby:
 					BuyImmediateDelivery();
 					return;
 				case ItemAction.Item_Consumable:
-					iBODMPMJELJ = TradeDialog.TradeAction.A_BUY;
-					bAINMLLIKOL = GameValueType.Gems;
+					tradeAction = TradeDialog.TradeAction.A_BUY;
+					valueType = GameValueType.Gems;
 					num = currentItem.GetGemPrice();
-					cNIOCCCBDBJ = 0L;
-					oDDEOFKLIAG = OnConsumableConfirmed;
+					price = 0L;
+					confirmCallback = OnConsumableConfirmed;
 					flag = num > ListSF.GetRoster().GetBonus();
-					dDEDNPLHOJH = ListSF.CheckItemType.CHECK_ITEM_BONUS;
+					checkType = ListSF.CheckItemType.CHECK_ITEM_BONUS;
 					break;
 				case ItemAction.Item_Buy_Real:
 					ShopScene.get_Instance().get_PaymentUI().MakePurchase(currentItem);
@@ -225,11 +225,11 @@ namespace Nekki.SF2.GUI.Shop
 				pendingItem = currentItem;
 				if (flag)
 				{
-					GameUtils.NotifyPurchaseUnsuccessful(currentItem, dDEDNPLHOJH);
+					GameUtils.NotifyPurchaseUnsuccessful(currentItem, checkType);
 				}
 				else
 				{
-					DialogsOpener.OpenTradeDialog(iBODMPMJELJ, bAINMLLIKOL, num, oDDEOFKLIAG, cNIOCCCBDBJ);
+					DialogsOpener.OpenTradeDialog(tradeAction, valueType, num, confirmCallback, price);
 				}
 			}
 		}
@@ -237,18 +237,18 @@ namespace Nekki.SF2.GUI.Shop
 		private bool IsPurchaseBlockedByQuest()
 		{
 			bool result = false;
-			QuestParameters hHKLFIIBIFF = ListSF.GetInstance().GetQuestParameters();
-			FightIDS jLGLBLDPAAF = hHKLFIIBIFF.fightIds;
-			hHKLFIIBIFF.fightIds = FightIDS.Empty();
-			hHKLFIIBIFF.fightResult = string.Empty;
-			hHKLFIIBIFF.raidResult = string.Empty;
-			hHKLFIIBIFF.purchasedItem = currentItem;
+			QuestParameters questParameters = ListSF.GetInstance().GetQuestParameters();
+			FightIDS savedFightIds = questParameters.fightIds;
+			questParameters.fightIds = FightIDS.Empty();
+			questParameters.fightResult = string.Empty;
+			questParameters.raidResult = string.Empty;
+			questParameters.purchasedItem = currentItem;
 			if (ListSF.GetInstance().RaiseQuestEvent(QuestEvent.QuestEventType.QUEST_EVENT_PREPURCHASE))
 			{
 				ListSF.GetInstance().RunQuestActions();
 				result = true;
 			}
-			hHKLFIIBIFF.fightIds = jLGLBLDPAAF;
+			questParameters.fightIds = savedFightIds;
 			return result;
 		}
 
@@ -363,21 +363,21 @@ namespace Nekki.SF2.GUI.Shop
 			}
 		}
 
-		private void SetButton(IconLabelButton AMACDAACGCA, long GGPEGMLPBKA, Color OHJKNABLCMF)
+		private void SetButton(IconLabelButton button, long price, Color color)
 		{
-			if (GGPEGMLPBKA > 0)
+			if (price > 0)
 			{
-				SetButton(AMACDAACGCA, GGPEGMLPBKA.ToString(), OHJKNABLCMF);
+				SetButton(button, price.ToString(), color);
 			}
 		}
 
-		private void SetButton(IconLabelButton AMACDAACGCA, string NGEPNAJJHCD, Color OHJKNABLCMF)
+		private void SetButton(IconLabelButton button, string text, Color color)
 		{
-			if (AMACDAACGCA != null)
+			if (button != null)
 			{
-				AMACDAACGCA.gameObject.SetActive(true);
-				AMACDAACGCA.SetText(NGEPNAJJHCD);
-				AMACDAACGCA.SetColor(OHJKNABLCMF);
+				button.gameObject.SetActive(true);
+				button.SetText(text);
+				button.SetColor(color);
 			}
 		}
 
@@ -402,12 +402,12 @@ namespace Nekki.SF2.GUI.Shop
 
 		public void ShowConsumableButton()
 		{
-			Color oHJKNABLCMF = Color.black;
+			Color priceColor = Color.black;
 			if (ListSF.GetRoster().GetBonus() < (ObscuredLong)(currentItem.GemPrice))
 			{
-				oHJKNABLCMF = Constants.NegativeValueColor;
+				priceColor = Constants.NegativeValueColor;
 			}
-			SetButton(consumableButton, (ObscuredLong)(currentItem.GemPrice), oHJKNABLCMF);
+			SetButton(consumableButton, (ObscuredLong)(currentItem.GemPrice), priceColor);
 		}
 
 		public void ShowPaymentButton()
@@ -419,12 +419,12 @@ namespace Nekki.SF2.GUI.Shop
 		{
 			if (!isOwned)
 			{
-				Color oHJKNABLCMF = Color.black;
+				Color priceColor = Color.black;
 				if (ListSF.GetRoster().GetMoney() < (ObscuredLong)(currentItem.CoinPrice))
 				{
-					oHJKNABLCMF = Constants.NegativeValueColor;
+					priceColor = Constants.NegativeValueColor;
 				}
-				SetButton(buyGoldButton, (ObscuredLong)(currentItem.CoinPrice), oHJKNABLCMF);
+				SetButton(buyGoldButton, (ObscuredLong)(currentItem.CoinPrice), priceColor);
 				Color oHJKNABLCMF2 = Color.black;
 				if (ListSF.GetRoster().GetBonus() < (ObscuredLong)(currentItem.GemPrice))
 				{
@@ -434,17 +434,17 @@ namespace Nekki.SF2.GUI.Shop
 			}
 			else if (isBeingMade)
 			{
-				ItemInfo dJKEECEOCJB = userItem.GetNextUpgradeItem();
-				if (dJKEECEOCJB == null)
+				ItemInfo itemInfo = userItem.GetNextUpgradeItem();
+				if (itemInfo == null)
 				{
-					dJKEECEOCJB = userItem.GetCurrentUpgradeItem();
+					itemInfo = userItem.GetCurrentUpgradeItem();
 				}
 				Color oHJKNABLCMF3 = Color.black;
-				if (ListSF.GetRoster().GetBonus() < (ObscuredLong)(dJKEECEOCJB.DeliveryGemPrice))
+				if (ListSF.GetRoster().GetBonus() < (ObscuredLong)(itemInfo.DeliveryGemPrice))
 				{
 					oHJKNABLCMF3 = Constants.NegativeValueColor;
 				}
-				SetButton(deliveryRubyButton, (ObscuredLong)(dJKEECEOCJB.DeliveryGemPrice), oHJKNABLCMF3);
+				SetButton(deliveryRubyButton, (ObscuredLong)(itemInfo.DeliveryGemPrice), oHJKNABLCMF3);
 			}
 			else if (isUpgradable && ListSF.GetRoster().GetShowUpgrades())
 			{
@@ -535,14 +535,14 @@ namespace Nekki.SF2.GUI.Shop
 			}
 			else if (isUpgradable && ListSF.GetRoster().GetShowUpgrades())
 			{
-				ItemInfo dJKEECEOCJB = ((userItem == null) ? null : userItem.GetNextUpgradeItem());
-				if (dJKEECEOCJB != null)
+				ItemInfo upgradeItem = ((userItem == null) ? null : userItem.GetNextUpgradeItem());
+				if (upgradeItem != null)
 				{
-					int oMHDLKNHNMJ = ListSF.GetRoster().GetLevel();
-					int oBJDGBBFJOO = dJKEECEOCJB.UpgradeLevel;
-					UpgradeIndexItem aACAFOBANOH = dJKEECEOCJB.GetUpgradeIndexItem(oMHDLKNHNMJ, oBJDGBBFJOO);
-					int num = ((aACAFOBANOH != null) ? aACAFOBANOH.Index : 0);
-					if (aACAFOBANOH.Type == UpgradeIndexItem.UpgradeIndexType.UPGRADE_INDEX_MILESTONE)
+					int playerLevel = ListSF.GetRoster().GetLevel();
+					int upgradeLevel = upgradeItem.UpgradeLevel;
+					UpgradeIndexItem upgradeIndexItem = upgradeItem.GetUpgradeIndexItem(playerLevel, upgradeLevel);
+					int num = ((upgradeIndexItem != null) ? upgradeIndexItem.Index : 0);
+					if (upgradeIndexItem.Type == UpgradeIndexItem.UpgradeIndexType.UPGRADE_INDEX_MILESTONE)
 					{
 						string alias = "shopUpgrade{img::MiscSprites.star}{" + num + "}";
 						_description.SetAlias(alias);
@@ -581,9 +581,9 @@ namespace Nekki.SF2.GUI.Shop
 			}
 			if (_parametersPanel != null)
 			{
-				ItemInfo dJKEECEOCJB = ((userItem == null) ? null : userItem.GetNextUpgradeItem());
-				bool oGMLCLNEAIJ = ListSF.GetRoster().GetShowUpgrades() && isOwned && dJKEECEOCJB != null;
-				_parametersPanel.SetParameters(currentItem, dJKEECEOCJB, oGMLCLNEAIJ);
+				ItemInfo upgradeItem = ((userItem == null) ? null : userItem.GetNextUpgradeItem());
+				bool showUpgrades = ListSF.GetRoster().GetShowUpgrades() && isOwned && upgradeItem != null;
+				_parametersPanel.SetParameters(currentItem, upgradeItem, showUpgrades);
 			}
 		}
 

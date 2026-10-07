@@ -12,12 +12,12 @@ public class FightControlEventData
 
 		public bool isActive;
 
-		public KeyboardBinding(KeyCode MHDOBFNEIAB, FightCID _index, int PGKCCLIHPMN, bool PFOPNLKPBOI = false)
+		public KeyboardBinding(KeyCode keyCode, FightCID _index, int pressCount, bool active = false)
 		{
-			Key = MHDOBFNEIAB;
+			Key = keyCode;
 			Index = _index;
-			count = PGKCCLIHPMN;
-			isActive = PFOPNLKPBOI;
+			count = pressCount;
+			isActive = active;
 		}
 	}
 

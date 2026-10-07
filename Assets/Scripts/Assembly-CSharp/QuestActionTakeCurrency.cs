@@ -12,44 +12,44 @@ public class QuestActionTakeCurrency : QuestAction
 
 	private QuestActionsSequence errorSequence = new QuestActionsSequence();
 
-	public override void Parse(XmlNode EPKLCPOEELO)
+	public override void Parse(XmlNode node)
 	{
-		base.Parse(EPKLCPOEELO);
-		_type = EPKLCPOEELO.Attributes["Type"].GetStringOrDefault(string.Empty);
-		_name = EPKLCPOEELO.Attributes["Name"].GetStringOrDefault(string.Empty);
-		_value = EPKLCPOEELO.Attributes["Value"].GetStringOrDefault(string.Empty);
-		XmlNode ePKLCPOEELO = EPKLCPOEELO["Success"];
-		XmlNode ePKLCPOEELO2 = EPKLCPOEELO["Error"];
-		ParseSequenceWithUnlock(ePKLCPOEELO, successSequence, OnActionComplete);
+		base.Parse(node);
+		_type = node.Attributes["Type"].GetStringOrDefault(string.Empty);
+		_name = node.Attributes["Name"].GetStringOrDefault(string.Empty);
+		_value = node.Attributes["Value"].GetStringOrDefault(string.Empty);
+		XmlNode successNode = node["Success"];
+		XmlNode ePKLCPOEELO2 = node["Error"];
+		ParseSequenceWithUnlock(successNode, successSequence, OnActionComplete);
 		ParseSequenceWithUnlock(ePKLCPOEELO2, errorSequence, OnActionComplete);
 	}
 
-	public override void Execute(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters parameters)
 	{
 		ResetSequences();
-		base.Execute(GFIHPBCEEOB);
-		string LFLGCDNKNJI = string.Empty;
+		base.Execute(parameters);
+		string currencyType = string.Empty;
 		string name = string.Empty;
 		long value = 0L;
-		GetValues(ref LFLGCDNKNJI, ref name, ref value);
-		bool flag = GetIsCurrencyExist(LFLGCDNKNJI, name);
-		bool flag2 = GetCurrencyCount(LFLGCDNKNJI, name) >= value;
+		GetValues(ref currencyType, ref name, ref value);
+		bool flag = GetIsCurrencyExist(currencyType, name);
+		bool flag2 = GetCurrencyCount(currencyType, name) >= value;
 		if (flag && flag2)
 		{
-			AddCurrencyCount(LFLGCDNKNJI, name, value);
+			AddCurrencyCount(currencyType, name, value);
 			MenuController.RefreshMoney();
-			successSequence.Run(GFIHPBCEEOB);
+			successSequence.Run(parameters);
 		}
 		else
 		{
-			errorSequence.Run(GFIHPBCEEOB);
+			errorSequence.Run(parameters);
 		}
 	}
 
-	private bool GetIsCurrencyExist(string LFLGCDNKNJI, string name)
+	private bool GetIsCurrencyExist(string currencyType, string name)
 	{
 		bool result = false;
-		switch (LFLGCDNKNJI)
+		switch (currencyType)
 		{
 		case "Gold":
 		case "Bonus":
@@ -59,66 +59,66 @@ public class QuestActionTakeCurrency : QuestAction
 			result = ListSF.GetRoster().GetIsCurrencyExist(name);
 			break;
 		default:
-			if (LFLGCDNKNJI != string.Empty)
+			if (currencyType != string.Empty)
 			{
-				result = ListSF.GetRoster().GetIsCurrencyExist(LFLGCDNKNJI);
+				result = ListSF.GetRoster().GetIsCurrencyExist(currencyType);
 			}
 			break;
 		}
 		return result;
 	}
 
-	private long GetCurrencyCount(string LFLGCDNKNJI, string name)
+	private long GetCurrencyCount(string currencyType, string name)
 	{
 		long num = 0L;
-		Roster nKGLHEGIKKP = ListSF.GetRoster();
-		switch (LFLGCDNKNJI)
+		Roster roster = ListSF.GetRoster();
+		switch (currencyType)
 		{
 		case "Gold":
-			return nKGLHEGIKKP.GetMoney();
+			return roster.GetMoney();
 		case "Bonus":
-			return nKGLHEGIKKP.GetBonus();
+			return roster.GetBonus();
 		case "Currency":
-			return nKGLHEGIKKP.GetCurrencyCount(name);
+			return roster.GetCurrencyCount(name);
 		default:
-			return nKGLHEGIKKP.GetCurrencyCount(LFLGCDNKNJI);
+			return roster.GetCurrencyCount(currencyType);
 		}
 	}
 
-	private void AddCurrencyCount(string LFLGCDNKNJI, string name, long value)
+	private void AddCurrencyCount(string currencyType, string name, long value)
 	{
-		Roster nKGLHEGIKKP = ListSF.GetRoster();
-		switch (LFLGCDNKNJI)
+		Roster roster = ListSF.GetRoster();
+		switch (currencyType)
 		{
 		case "Gold":
-			nKGLHEGIKKP.SetMoney(nKGLHEGIKKP.GetMoney() - value);
+			roster.SetMoney(roster.GetMoney() - value);
 			return;
 		case "Bonus":
-			nKGLHEGIKKP.SetBonus(nKGLHEGIKKP.GetBonus() - value, Roster.BalanceChangeType.CHANGE_QUEST);
+			roster.SetBonus(roster.GetBonus() - value, Roster.BalanceChangeType.CHANGE_QUEST);
 			return;
 		case "Currency":
-			nKGLHEGIKKP.AddCurrencyCount(name, (int)(-value));
+			roster.AddCurrencyCount(name, (int)(-value));
 			return;
 		}
-		if (LFLGCDNKNJI != string.Empty)
+		if (currencyType != string.Empty)
 		{
-			nKGLHEGIKKP.AddCurrencyCount(LFLGCDNKNJI, (int)(-value));
+			roster.AddCurrencyCount(currencyType, (int)(-value));
 		}
 	}
 
-	private void GetValues(ref string LFLGCDNKNJI, ref string name, ref long value)
+	private void GetValues(ref string currencyType, ref string name, ref long value)
 	{
-		ConditionExtension.CompareResult lNIDLHOIHIM = new ConditionExtension.CompareResult();
-		QuestCondition kKDGLNECFHA = new QuestCondition();
-		kKDGLNECFHA.SetParameters(Parameters);
-		kKDGLNECFHA.SetValue(_type, lNIDLHOIHIM);
-		LFLGCDNKNJI = lNIDLHOIHIM.ToString();
-		lNIDLHOIHIM.Clear();
-		kKDGLNECFHA.SetValue(_name, lNIDLHOIHIM);
-		name = lNIDLHOIHIM.ToString();
-		lNIDLHOIHIM.Clear();
-		kKDGLNECFHA.SetValue(_value, lNIDLHOIHIM);
-		value = lNIDLHOIHIM.ToString().ToLong(0L);
+		ConditionExtension.CompareResult result = new ConditionExtension.CompareResult();
+		QuestCondition condition = new QuestCondition();
+		condition.SetParameters(Parameters);
+		condition.SetValue(_type, result);
+		currencyType = result.ToString();
+		result.Clear();
+		condition.SetValue(_name, result);
+		name = result.ToString();
+		result.Clear();
+		condition.SetValue(_value, result);
+		value = result.ToString().ToLong(0L);
 	}
 
 	private void OnActionComplete(object data)

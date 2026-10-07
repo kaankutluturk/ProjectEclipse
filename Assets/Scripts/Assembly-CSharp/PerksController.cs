@@ -9,42 +9,42 @@ public class PerksController : ITableViewDataSource, ITableViewDelegate
 
 	private TableView tableView;
 
-	public PerksController(TableView OIDFBEAABBA, GameObject CGLPIDAECLH)
+	public PerksController(TableView table, GameObject cellPrefab)
 	{
-		tableView = OIDFBEAABBA;
+		tableView = table;
 		LoadContainers();
-		OIDFBEAABBA.set_CellPrefab(CGLPIDAECLH);
-		OIDFBEAABBA.Init(this, this);
+		table.set_CellPrefab(cellPrefab);
+		table.Init(this, this);
 	}
 
-	public int NumberOfRowsInTableView(TableView OIDFBEAABBA)
+	public int NumberOfRowsInTableView(TableView tableView)
 	{
 		return perkContainers.Count;
 	}
 
-	public float SizeForRowInTableView(TableView OIDFBEAABBA, int IBAKGENOEPH)
+	public float SizeForRowInTableView(TableView tableView, int row)
 	{
 		return 270f;
 	}
 
-	public TableViewCell CellForRowInTableView(TableView OIDFBEAABBA, int BIPGPCAHKIG)
+	public TableViewCell CellForRowInTableView(TableView tableView, int row)
 	{
-		TableViewCell tableViewCell = OIDFBEAABBA.ReusableCellForRow(BIPGPCAHKIG);
+		TableViewCell tableViewCell = tableView.ReusableCellForRow(row);
 		PerkCell component = tableViewCell.GetComponent<PerkCell>();
 		component.RemoveEventListener(0, OnScrollToCellRequested);
 		component.AddEventListener(0, OnScrollToCellRequested);
-		ProfilePerkContainer iFIEEAGMMMF = perkContainers[BIPGPCAHKIG];
-		bool nMBEADHHHFH = BIPGPCAHKIG == 0;
-		bool iBMGAPMHMOB = BIPGPCAHKIG + 1 == perkContainers.Count;
-		component.Init(iFIEEAGMMMF, BIPGPCAHKIG, nMBEADHHHFH, iBMGAPMHMOB);
+		ProfilePerkContainer container = perkContainers[row];
+		bool isFirst = row == 0;
+		bool isLast = row + 1 == perkContainers.Count;
+		component.Init(container, row, isFirst, isLast);
 		return tableViewCell;
 	}
 
-	public void TableViewDidHighlightCellForRow(TableView OIDFBEAABBA, int IBAKGENOEPH)
+	public void TableViewDidHighlightCellForRow(TableView tableView, int row)
 	{
 	}
 
-	public void TableViewDidSelectCellForRow(TableView OIDFBEAABBA, int IBAKGENOEPH)
+	public void TableViewDidSelectCellForRow(TableView tableView, int row)
 	{
 	}
 
@@ -54,14 +54,14 @@ public class PerksController : ITableViewDataSource, ITableViewDelegate
 		perkContainers = PerkTree.GetInstance().GetLevelContainers();
 	}
 
-	public void RefreshCell(int BIPGPCAHKIG)
+	public void RefreshCell(int row)
 	{
-		TableViewCell tableViewCell = tableView.get_visibleCells().GetCellAtIndex(BIPGPCAHKIG);
+		TableViewCell tableViewCell = tableView.get_visibleCells().GetCellAtIndex(row);
 		PerkCell component = tableViewCell.GetComponent<PerkCell>();
-		ProfilePerkContainer iFIEEAGMMMF = perkContainers[BIPGPCAHKIG];
-		bool nMBEADHHHFH = BIPGPCAHKIG == 0;
-		bool iBMGAPMHMOB = BIPGPCAHKIG + 1 == perkContainers.Count;
-		component.Init(iFIEEAGMMMF, BIPGPCAHKIG, nMBEADHHHFH, iBMGAPMHMOB);
+		ProfilePerkContainer container = perkContainers[row];
+		bool isFirst = row == 0;
+		bool isLast = row + 1 == perkContainers.Count;
+		component.Init(container, row, isFirst, isLast);
 	}
 
 	public void ScrollToPerk(string name)
@@ -86,7 +86,7 @@ public class PerksController : ITableViewDataSource, ITableViewDelegate
 
 	public void OnScrollToCellRequested(object data)
 	{
-		int iBAKGENOEPH = (int)data;
-		tableView.ScrollToCell(iBAKGENOEPH, 0.5f);
+		int cellIndex = (int)data;
+		tableView.ScrollToCell(cellIndex, 0.5f);
 	}
 }

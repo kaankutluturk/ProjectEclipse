@@ -1,14 +1,14 @@
 public interface IEventEmitter
 {
-	void Emit(AliasEventInfo FNHCFCAALAE);
+	void Emit(AliasEventInfo eventInfo);
 
-	void Emit(ScalarEventInfo FNHCFCAALAE);
+	void Emit(ScalarEventInfo eventInfo);
 
-	void Emit(MappingStartEventInfo FNHCFCAALAE);
+	void Emit(MappingStartEventInfo eventInfo);
 
-	void Emit(MappingEndEventInfo FNHCFCAALAE);
+	void Emit(MappingEndEventInfo eventInfo);
 
-	void Emit(SequenceStartEventInfo FNHCFCAALAE);
+	void Emit(SequenceStartEventInfo eventInfo);
 
-	void Emit(SequenceEndEventInfo FNHCFCAALAE);
+	void Emit(SequenceEndEventInfo eventInfo);
 }

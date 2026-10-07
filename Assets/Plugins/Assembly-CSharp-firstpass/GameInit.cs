@@ -26,26 +26,26 @@ public abstract class GameInit
 
 	public static void AddInitializeDone(InitializeDoneHandler value)
 	{
-		InitializeDoneHandler kNHFNPECPED = InitializeDone;
+		InitializeDoneHandler current = InitializeDone;
 		InitializeDoneHandler kNHFNPECPED2;
 		do
 		{
-			kNHFNPECPED2 = kNHFNPECPED;
-			kNHFNPECPED = Interlocked.CompareExchange(ref InitializeDone, (InitializeDoneHandler)Delegate.Combine(kNHFNPECPED2, value), kNHFNPECPED);
+			kNHFNPECPED2 = current;
+			current = Interlocked.CompareExchange(ref InitializeDone, (InitializeDoneHandler)Delegate.Combine(kNHFNPECPED2, value), current);
 		}
-		while ((object)kNHFNPECPED != kNHFNPECPED2);
+		while ((object)current != kNHFNPECPED2);
 	}
 
 	public static void RemoveInitializeDone(InitializeDoneHandler value)
 	{
-		InitializeDoneHandler kNHFNPECPED = InitializeDone;
+		InitializeDoneHandler current = InitializeDone;
 		InitializeDoneHandler kNHFNPECPED2;
 		do
 		{
-			kNHFNPECPED2 = kNHFNPECPED;
-			kNHFNPECPED = Interlocked.CompareExchange(ref InitializeDone, (InitializeDoneHandler)Delegate.Remove(kNHFNPECPED2, value), kNHFNPECPED);
+			kNHFNPECPED2 = current;
+			current = Interlocked.CompareExchange(ref InitializeDone, (InitializeDoneHandler)Delegate.Remove(kNHFNPECPED2, value), current);
 		}
-		while ((object)kNHFNPECPED != kNHFNPECPED2);
+		while ((object)current != kNHFNPECPED2);
 	}
 
 	private static void RaiseInitializeDone()
@@ -62,14 +62,14 @@ public abstract class GameInit
 		RaiseInitializeDone();
 	}
 
-	public virtual void AddInitCallbacks(params Action[] AFENHJFICNN)
+	public virtual void AddInitCallbacks(params Action[] callbacks)
 	{
-		foreach (Action action in AFENHJFICNN)
+		foreach (Action action in callbacks)
 		{
-			Action IBODMPMJELJ = action;
+			Action callback = action;
 			AddInitializeDone(() =>
 			{
-				IBODMPMJELJ();
+				callback();
 			});
 		}
 	}
@@ -80,5 +80,5 @@ public abstract class GameInit
 		NotifyInitializeDone();
 	}
 
-	public abstract void Init(params Action[] AFENHJFICNN);
+	public abstract void Init(params Action[] callbacks);
 }

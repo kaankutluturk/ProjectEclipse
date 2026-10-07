@@ -71,15 +71,15 @@ namespace Nekki.SF2.GUI.Fight
 			return (RectTransform)base.transform;
 		}
 
-		public void Init(ModelParameters JCICKLIMBEF)
+		public void Init(ModelParameters parameters)
 		{
 			// Health and the delayed damage bar drain per tick; blend between ticks.
 			Eclipse.Rendering.Interpolation.TickPresentationSmoother.AttachFill(_healthBar,
 				Eclipse.Rendering.Interpolation.TickPresentationSmoother.Clock.Fight);
 			Eclipse.Rendering.Interpolation.TickPresentationSmoother.AttachFill(_hitBar,
 				Eclipse.Rendering.Interpolation.TickPresentationSmoother.Clock.Fight);
-			fighterModel = JCICKLIMBEF;
-			Eclipse.Multiplayer.PvpRecoverableBar.Attach(_healthBar, JCICKLIMBEF);
+			fighterModel = parameters;
+			Eclipse.Multiplayer.PvpRecoverableBar.Attach(_healthBar, parameters);
 			ResetState();
 		}
 

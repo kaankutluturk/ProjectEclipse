@@ -50,9 +50,9 @@ public class TacticValue
 	{
 	}
 
-	public TacticValue(XmlNode AFHNINCKJEE)
+	public TacticValue(XmlNode node)
 	{
-		Parse(AFHNINCKJEE);
+		Parse(node);
 	}
 
 	public TacticValue(TacticValue value)
@@ -98,48 +98,48 @@ public class TacticValue
 			}
 			else if (childNode.Name == "CurrentAnimation")
 			{
-				global::Pair<InfoAnimation, float> cCKLNOPEKHO = new global::Pair<InfoAnimation, float>(null, 0f);
-				cCKLNOPEKHO.First = AnimationData.GetAnimationByName(childNode.Attributes["Animation"].GetStringOrDefault(string.Empty));
-				cCKLNOPEKHO.Second = childNode.Attributes["Factor"].ParseFloat();
+				global::Pair<InfoAnimation, float> animationFactor = new global::Pair<InfoAnimation, float>(null, 0f);
+				animationFactor.First = AnimationData.GetAnimationByName(childNode.Attributes["Animation"].GetStringOrDefault(string.Empty));
+				animationFactor.Second = childNode.Attributes["Factor"].ParseFloat();
 				string text = childNode.Attributes["Player"].GetStringOrDefault("Me");
 				if (text == "Enemy")
 				{
-					_enemyAnimationFactors.Add(cCKLNOPEKHO);
+					_enemyAnimationFactors.Add(animationFactor);
 				}
 				else if (text == "Me")
 				{
-					_myAnimationFactors.Add(cCKLNOPEKHO);
+					_myAnimationFactors.Add(animationFactor);
 				}
 			}
 		}
 	}
 
-	public float GetValue(TacticFactors JCICKLIMBEF)
+	public float GetValue(TacticFactors factors)
 	{
-		float num = JCICKLIMBEF.FactorsCount * _counterFactor;
-		float num2 = JCICKLIMBEF.Damage * _damageFactor;
-		float num3 = (1f - JCICKLIMBEF.Health) * _healthFactor;
-		float num4 = (1f - JCICKLIMBEF.EnemyHealth) * _enemyHealthFactor;
-		float num5 = (float)JCICKLIMBEF.AnimationFrames * _animationFramesFactor;
-		float num6 = (float)JCICKLIMBEF.MagicBullets * _magicBulletFactor;
-		float num7 = (float)JCICKLIMBEF.MissileBullets * _missileBulletFactor;
-		float num8 = JCICKLIMBEF.Hits * _hitFactor;
-		float num9 = (float)JCICKLIMBEF.ChildFrames * _childFramesFactor;
-		float num10 = JCICKLIMBEF.Distance * _distanceFactor;
+		float num = factors.FactorsCount * _counterFactor;
+		float num2 = factors.Damage * _damageFactor;
+		float num3 = (1f - factors.Health) * _healthFactor;
+		float num4 = (1f - factors.EnemyHealth) * _enemyHealthFactor;
+		float num5 = (float)factors.AnimationFrames * _animationFramesFactor;
+		float num6 = (float)factors.MagicBullets * _magicBulletFactor;
+		float num7 = (float)factors.MissileBullets * _missileBulletFactor;
+		float num8 = factors.Hits * _hitFactor;
+		float num9 = (float)factors.ChildFrames * _childFramesFactor;
+		float num10 = factors.Distance * _distanceFactor;
 		float num11 = num + num2 + num3 + num4 + num5 + num6 + num7 + num8 + num9 + num10 + _shift;
 		foreach (global::Pair<string, TacticValue> item in _animationFactors)
 		{
 			float count = 0f;
-			float CKKFKEIELCP = 0f;
-			float JOOJIMPEPOJ = 0f;
-			JCICKLIMBEF.Statistics.GetCountAndDamage(true, item.First, ref count, ref CKKFKEIELCP, ref JOOJIMPEPOJ);
+			float damage = 0f;
+			float hits = 0f;
+			factors.Statistics.GetCountAndDamage(true, item.First, ref count, ref damage, ref hits);
 			float num12 = count * item.Second._counterFactor;
-			float num13 = CKKFKEIELCP * item.Second._damageFactor;
-			float num14 = JOOJIMPEPOJ * item.Second._hitFactor;
+			float num13 = damage * item.Second._damageFactor;
+			float num14 = hits * item.Second._hitFactor;
 			num11 += num12 + num13 + num14;
 		}
-		num11 += GetAnimationSummands(JCICKLIMBEF.CurrentAnimation, _myAnimationFactors);
-		num11 += GetAnimationSummands(JCICKLIMBEF.EnemyCurrentAnimation, _enemyAnimationFactors);
+		num11 += GetAnimationSummands(factors.CurrentAnimation, _myAnimationFactors);
+		num11 += GetAnimationSummands(factors.EnemyCurrentAnimation, _enemyAnimationFactors);
 		if (_factorType == FactorType.Exponential)
 		{
 			return CalculateExponentialChance(num11);
@@ -151,33 +151,33 @@ public class TacticValue
 		return 0f;
 	}
 
-	private float CalculateExponentialChance(float IGAPINAEDPP)
+	private float CalculateExponentialChance(float factor)
 	{
 		float num = 0f;
-		if (0f <= IGAPINAEDPP)
+		if (0f <= factor)
 		{
-			return _limit + (_base - _limit) * Mathf.Pow(2f, 0f - IGAPINAEDPP);
+			return _limit + (_base - _limit) * Mathf.Pow(2f, 0f - factor);
 		}
-		return _antiLimit + (_base - _antiLimit) * Mathf.Pow(2f, IGAPINAEDPP);
+		return _antiLimit + (_base - _antiLimit) * Mathf.Pow(2f, factor);
 	}
 
-	private float CalculateLinearChance(float IGAPINAEDPP)
+	private float CalculateLinearChance(float factor)
 	{
 		float num = 0f;
-		if (0f <= IGAPINAEDPP)
+		if (0f <= factor)
 		{
-			return _base + (_limit - _base) * Mathf.Min(1f, IGAPINAEDPP);
+			return _base + (_limit - _base) * Mathf.Min(1f, factor);
 		}
-		return _base + (_antiLimit - _base) * Mathf.Min(1f, 0f - IGAPINAEDPP);
+		return _base + (_antiLimit - _base) * Mathf.Min(1f, 0f - factor);
 	}
 
-	private void SetFactorType(string JNPHBPCMFEH)
+	private void SetFactorType(string factorType)
 	{
-		if (JNPHBPCMFEH == "Linear")
+		if (factorType == "Linear")
 		{
 			_factorType = FactorType.Linear;
 		}
-		else if (JNPHBPCMFEH == "Exponential")
+		else if (factorType == "Exponential")
 		{
 			_factorType = FactorType.Exponential;
 		}
@@ -187,11 +187,11 @@ public class TacticValue
 		}
 	}
 
-	private float GetAnimationSummands(InfoAnimation DBOLBEOCEME, List<global::Pair<InfoAnimation, float>> JCJDOODBPBB)
+	private float GetAnimationSummands(InfoAnimation animation, List<global::Pair<InfoAnimation, float>> animationFactors)
 	{
-		foreach (global::Pair<InfoAnimation, float> item in JCJDOODBPBB)
+		foreach (global::Pair<InfoAnimation, float> item in animationFactors)
 		{
-			if (DBOLBEOCEME == item.First)
+			if (animation == item.First)
 			{
 				return item.Second;
 			}
@@ -199,25 +199,25 @@ public class TacticValue
 		return 0f;
 	}
 
-	private void CopyFrom(TacticValue JFMALLHPPMH)
+	private void CopyFrom(TacticValue source)
 	{
-		_base = JFMALLHPPMH._base;
-		_counterFactor = JFMALLHPPMH._counterFactor;
-		_damageFactor = JFMALLHPPMH._damageFactor;
-		_healthFactor = JFMALLHPPMH._healthFactor;
-		_enemyHealthFactor = JFMALLHPPMH._enemyHealthFactor;
-		_animationFramesFactor = JFMALLHPPMH._animationFramesFactor;
-		_childFramesFactor = JFMALLHPPMH._childFramesFactor;
-		_magicBulletFactor = JFMALLHPPMH._magicBulletFactor;
-		_missileBulletFactor = JFMALLHPPMH._missileBulletFactor;
-		_hitFactor = JFMALLHPPMH._hitFactor;
-		_limit = JFMALLHPPMH._limit;
-		_antiLimit = JFMALLHPPMH._antiLimit;
-		_shift = JFMALLHPPMH._shift;
-		_animationFactors = JFMALLHPPMH._animationFactors;
-		_factorType = JFMALLHPPMH._factorType;
-		_distanceFactor = JFMALLHPPMH._distanceFactor;
-		_myAnimationFactors = JFMALLHPPMH._myAnimationFactors;
-		_enemyAnimationFactors = JFMALLHPPMH._enemyAnimationFactors;
+		_base = source._base;
+		_counterFactor = source._counterFactor;
+		_damageFactor = source._damageFactor;
+		_healthFactor = source._healthFactor;
+		_enemyHealthFactor = source._enemyHealthFactor;
+		_animationFramesFactor = source._animationFramesFactor;
+		_childFramesFactor = source._childFramesFactor;
+		_magicBulletFactor = source._magicBulletFactor;
+		_missileBulletFactor = source._missileBulletFactor;
+		_hitFactor = source._hitFactor;
+		_limit = source._limit;
+		_antiLimit = source._antiLimit;
+		_shift = source._shift;
+		_animationFactors = source._animationFactors;
+		_factorType = source._factorType;
+		_distanceFactor = source._distanceFactor;
+		_myAnimationFactors = source._myAnimationFactors;
+		_enemyAnimationFactors = source._enemyAnimationFactors;
 	}
 }

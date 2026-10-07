@@ -77,56 +77,56 @@ public class RenderContainer
 
 	private void OnEffectStarted(object data)
 	{
-		ActionEffect jFJGGMEJDPG = (ActionEffect)data;
-		if (jFJGGMEJDPG.GetIsOnBackground())
+		ActionEffect effect = (ActionEffect)data;
+		if (effect.GetIsOnBackground())
 		{
-			backgroundEffects.StartEffect(jFJGGMEJDPG);
+			backgroundEffects.StartEffect(effect);
 		}
 		else
 		{
-			foregroundEffects.StartEffect(jFJGGMEJDPG);
+			foregroundEffects.StartEffect(effect);
 		}
 	}
 
 	private void OnEffectStopped(object data)
 	{
-		ActionStopEffect iBODMPMJELJ = (ActionStopEffect)data;
-		backgroundEffects.StopEffect(iBODMPMJELJ);
-		foregroundEffects.StopEffect(iBODMPMJELJ);
+		ActionStopEffect stopEffect = (ActionStopEffect)data;
+		backgroundEffects.StopEffect(stopEffect);
+		foregroundEffects.StopEffect(stopEffect);
 	}
 
 	private void OnEffectFollowStopped(object data)
 	{
-		ActionStopFollowEffect iBODMPMJELJ = (ActionStopFollowEffect)data;
-		backgroundEffects.StopFollowEffect(iBODMPMJELJ);
-		foregroundEffects.StopFollowEffect(iBODMPMJELJ);
+		ActionStopFollowEffect stopFollowEffect = (ActionStopFollowEffect)data;
+		backgroundEffects.StopFollowEffect(stopFollowEffect);
+		foregroundEffects.StopFollowEffect(stopFollowEffect);
 	}
 
-	public void Init(Location LPJNEDFCBOI)
+	public void Init(Location location)
 	{
-		CreateViewerModel(LPJNEDFCBOI.floorHeight);
-		CreateEffectContainers(LPJNEDFCBOI.floorHeight);
-		_UnityObject.transform.localPosition = new Vector3((0f - LPJNEDFCBOI.width) / 2f, (0f - LPJNEDFCBOI.height) / 2f + LPJNEDFCBOI.floorHeight, 0f);
-		_UnityObject.transform.SetParent(LPJNEDFCBOI.gameLayer.GetLayerObject().transform, false);
+		CreateViewerModel(location.floorHeight);
+		CreateEffectContainers(location.floorHeight);
+		_UnityObject.transform.localPosition = new Vector3((0f - location.width) / 2f, (0f - location.height) / 2f + location.floorHeight, 0f);
+		_UnityObject.transform.SetParent(location.gameLayer.GetLayerObject().transform, false);
 		Vector3 localScale = _UnityObject.transform.localScale;
 		_UnityObject.transform.localScale = new Vector3(localScale.x, localScale.y * -1f, localScale.z);
 	}
 
-	public void CreateViewerModel(float GBNPHCHGKDO)
+	public void CreateViewerModel(float floorHeight)
 	{
-		viewerModel.Init(GBNPHCHGKDO);
+		viewerModel.Init(floorHeight);
 		viewerModel.GetRootObject().transform.SetParent(_UnityObject.transform, false);
 		viewerModel.GetRootObject().transform.localPosition = new Vector3(0f, 0f, 0f);
 	}
 
-	public void CreateEffectContainers(float GBNPHCHGKDO)
+	public void CreateEffectContainers(float floorHeight)
 	{
 		backgroundEffects = new EffectsContainer();
-		backgroundEffects.init(GBNPHCHGKDO);
+		backgroundEffects.init(floorHeight);
 		backgroundEffects.GetUnityObject().transform.SetParent(_UnityObject.transform, false);
 		backgroundEffects.GetUnityObject().transform.localPosition = new Vector3(0f, 0f, 0.01f);
 		foregroundEffects = new EffectsContainer();
-		foregroundEffects.init(GBNPHCHGKDO);
+		foregroundEffects.init(floorHeight);
 		foregroundEffects.GetUnityObject().transform.SetParent(_UnityObject.transform, false);
 		foregroundEffects.GetUnityObject().transform.localPosition = new Vector3(0f, 0f, -0.01f);
 	}
@@ -138,18 +138,18 @@ public class RenderContainer
 		foregroundEffects.ClearModels();
 	}
 
-	public void AttachModelEffects(Model ACENLMONNPA)
+	public void AttachModelEffects(Model model)
 	{
-		ACENLMONNPA.AddEventListener(7, OnEffectStarted);
-		ACENLMONNPA.AddEventListener(8, OnEffectStopped);
-		ACENLMONNPA.AddEventListener(9, OnEffectFollowStopped);
+		model.AddEventListener(7, OnEffectStarted);
+		model.AddEventListener(8, OnEffectStopped);
+		model.AddEventListener(9, OnEffectFollowStopped);
 	}
 
-	public void DetachModelEffects(Model ACENLMONNPA)
+	public void DetachModelEffects(Model model)
 	{
-		ACENLMONNPA.RemoveEventListener(7, OnEffectStarted);
-		ACENLMONNPA.RemoveEventListener(8, OnEffectStopped);
-		ACENLMONNPA.RemoveEventListener(9, OnEffectFollowStopped);
+		model.RemoveEventListener(7, OnEffectStarted);
+		model.RemoveEventListener(8, OnEffectStopped);
+		model.RemoveEventListener(9, OnEffectFollowStopped);
 	}
 
 	public void UpdateEffects()

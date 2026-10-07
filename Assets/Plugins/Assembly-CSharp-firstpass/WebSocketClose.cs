@@ -9,8 +9,8 @@ public sealed class WebSocketClose : WebSocketBinaryFrame
 	{
 	}
 
-	public WebSocketClose(ushort KJPGKHJNOMC, string LIOGIBJBHAH)
-		: base(GetCloseData(KJPGKHJNOMC, LIOGIBJBHAH))
+	public WebSocketClose(ushort code, string message)
+		: base(GetCloseData(code, message))
 	{
 	}
 
@@ -19,18 +19,18 @@ public sealed class WebSocketClose : WebSocketBinaryFrame
 		return WebSocketFrameTypes.ConnectionClose;
 	}
 
-	private static byte[] GetCloseData(ushort KJPGKHJNOMC, string LIOGIBJBHAH)
+	private static byte[] GetCloseData(ushort code, string message)
 	{
-		int byteCount = Encoding.UTF8.GetByteCount(LIOGIBJBHAH);
+		int byteCount = Encoding.UTF8.GetByteCount(message);
 		using (MemoryStream memoryStream = new MemoryStream(2 + byteCount))
 		{
-			byte[] bytes = BitConverter.GetBytes(KJPGKHJNOMC);
+			byte[] bytes = BitConverter.GetBytes(code);
 			if (BitConverter.IsLittleEndian)
 			{
 				Array.Reverse(bytes, 0, bytes.Length);
 			}
 			memoryStream.Write(bytes, 0, bytes.Length);
-			bytes = Encoding.UTF8.GetBytes(LIOGIBJBHAH);
+			bytes = Encoding.UTF8.GetBytes(message);
 			memoryStream.Write(bytes, 0, bytes.Length);
 			return memoryStream.ToArray();
 		}

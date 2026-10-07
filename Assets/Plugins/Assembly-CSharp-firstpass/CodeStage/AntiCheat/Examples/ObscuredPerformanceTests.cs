@@ -121,17 +121,17 @@ namespace CodeStage.AntiCheat.Examples
 		private void TestBool()
 		{
 			logBuilder.AppendLine("ObscuredBool vs bool, " + boolIterations + " iterations for read and write");
-			ObscuredBool bAINMLLIKOL = (ObscuredBool)(true);
-			bool flag = (ObscuredBool)(bAINMLLIKOL);
+			ObscuredBool obscuredBool = (ObscuredBool)(true);
+			bool flag = (ObscuredBool)(obscuredBool);
 			bool flag2 = false;
 			Stopwatch stopwatch = Stopwatch.StartNew();
 			for (int i = 0; i < boolIterations; i++)
 			{
-				flag2 = (ObscuredBool)(bAINMLLIKOL);
+				flag2 = (ObscuredBool)(obscuredBool);
 			}
 			for (int j = 0; j < boolIterations; j++)
 			{
-				bAINMLLIKOL = (ObscuredBool)(flag2);
+				obscuredBool = (ObscuredBool)(flag2);
 			}
 			stopwatch.Stop();
 			logBuilder.AppendLine("ObscuredBool:").AppendLine(stopwatch.ElapsedMilliseconds + " ms");
@@ -150,7 +150,7 @@ namespace CodeStage.AntiCheat.Examples
 			if (flag2)
 			{
 			}
-			if ((ObscuredBool)(bAINMLLIKOL))
+			if ((ObscuredBool)(obscuredBool))
 			{
 			}
 			if (!flag)
@@ -161,17 +161,17 @@ namespace CodeStage.AntiCheat.Examples
 		private void TestByte()
 		{
 			logBuilder.AppendLine("ObscuredByte vs byte, " + byteIterations + " iterations for read and write");
-			ObscuredByte bAINMLLIKOL = (ObscuredByte)(100);
-			byte b = (ObscuredByte)(bAINMLLIKOL);
+			ObscuredByte obscuredByte = (ObscuredByte)(100);
+			byte b = (ObscuredByte)(obscuredByte);
 			byte b2 = 0;
 			Stopwatch stopwatch = Stopwatch.StartNew();
 			for (int i = 0; i < byteIterations; i++)
 			{
-				b2 = (ObscuredByte)(bAINMLLIKOL);
+				b2 = (ObscuredByte)(obscuredByte);
 			}
 			for (int j = 0; j < byteIterations; j++)
 			{
-				bAINMLLIKOL = (ObscuredByte)(b2);
+				obscuredByte = (ObscuredByte)(b2);
 			}
 			stopwatch.Stop();
 			logBuilder.AppendLine("ObscuredByte:").AppendLine(stopwatch.ElapsedMilliseconds + " ms");
@@ -190,7 +190,7 @@ namespace CodeStage.AntiCheat.Examples
 			if (b2 != 0)
 			{
 			}
-			if ((ObscuredByte)(bAINMLLIKOL) != 0)
+			if ((ObscuredByte)(obscuredByte) != 0)
 			{
 			}
 			if (b == 0)
@@ -201,17 +201,17 @@ namespace CodeStage.AntiCheat.Examples
 		private void TestShort()
 		{
 			logBuilder.AppendLine("ObscuredShort vs short, " + shortIterations + " iterations for read and write");
-			ObscuredShort bAINMLLIKOL = (ObscuredShort)(100);
-			short num = (ObscuredShort)(bAINMLLIKOL);
+			ObscuredShort obscuredShort = (ObscuredShort)(100);
+			short num = (ObscuredShort)(obscuredShort);
 			short num2 = 0;
 			Stopwatch stopwatch = Stopwatch.StartNew();
 			for (int i = 0; i < shortIterations; i++)
 			{
-				num2 = (ObscuredShort)(bAINMLLIKOL);
+				num2 = (ObscuredShort)(obscuredShort);
 			}
 			for (int j = 0; j < shortIterations; j++)
 			{
-				bAINMLLIKOL = (ObscuredShort)(num2);
+				obscuredShort = (ObscuredShort)(num2);
 			}
 			stopwatch.Stop();
 			logBuilder.AppendLine("ObscuredShort:").AppendLine(stopwatch.ElapsedMilliseconds + " ms");
@@ -230,7 +230,7 @@ namespace CodeStage.AntiCheat.Examples
 			if (num2 != 0)
 			{
 			}
-			if ((ObscuredShort)(bAINMLLIKOL) != 0)
+			if ((ObscuredShort)(obscuredShort) != 0)
 			{
 			}
 			if (num == 0)
@@ -241,17 +241,17 @@ namespace CodeStage.AntiCheat.Examples
 		private void TestUShort()
 		{
 			logBuilder.AppendLine("ObscuredUShort vs ushort, " + ushortIterations + " iterations for read and write");
-			ObscuredUShort bAINMLLIKOL = (ObscuredUShort)(100);
-			ushort num = (ObscuredUShort)(bAINMLLIKOL);
+			ObscuredUShort obscuredUShort = (ObscuredUShort)(100);
+			ushort num = (ObscuredUShort)(obscuredUShort);
 			ushort num2 = 0;
 			Stopwatch stopwatch = Stopwatch.StartNew();
 			for (int i = 0; i < ushortIterations; i++)
 			{
-				num2 = (ObscuredUShort)(bAINMLLIKOL);
+				num2 = (ObscuredUShort)(obscuredUShort);
 			}
 			for (int j = 0; j < ushortIterations; j++)
 			{
-				bAINMLLIKOL = (ObscuredUShort)(num2);
+				obscuredUShort = (ObscuredUShort)(num2);
 			}
 			stopwatch.Stop();
 			logBuilder.AppendLine("ObscuredUShort:").AppendLine(stopwatch.ElapsedMilliseconds + " ms");
@@ -270,7 +270,7 @@ namespace CodeStage.AntiCheat.Examples
 			if (num2 != 0)
 			{
 			}
-			if ((ObscuredUShort)(bAINMLLIKOL) != 0)
+			if ((ObscuredUShort)(obscuredUShort) != 0)
 			{
 			}
 			if (num == 0)
@@ -281,17 +281,17 @@ namespace CodeStage.AntiCheat.Examples
 		private void TestDouble()
 		{
 			logBuilder.AppendLine("ObscuredDouble vs double, " + doubleIterations + " iterations for read and write");
-			ObscuredDouble bAINMLLIKOL = (ObscuredDouble)(100.0);
-			double num = (ObscuredDouble)(bAINMLLIKOL);
+			ObscuredDouble obscuredDouble = (ObscuredDouble)(100.0);
+			double num = (ObscuredDouble)(obscuredDouble);
 			double num2 = 0.0;
 			Stopwatch stopwatch = Stopwatch.StartNew();
 			for (int i = 0; i < doubleIterations; i++)
 			{
-				num2 = (ObscuredDouble)(bAINMLLIKOL);
+				num2 = (ObscuredDouble)(obscuredDouble);
 			}
 			for (int j = 0; j < doubleIterations; j++)
 			{
-				bAINMLLIKOL = (ObscuredDouble)(num2);
+				obscuredDouble = (ObscuredDouble)(num2);
 			}
 			stopwatch.Stop();
 			logBuilder.AppendLine("ObscuredDouble:").AppendLine(stopwatch.ElapsedMilliseconds + " ms");
@@ -310,7 +310,7 @@ namespace CodeStage.AntiCheat.Examples
 			if (num2 != 0.0)
 			{
 			}
-			if ((ObscuredDouble)(bAINMLLIKOL) != 0.0)
+			if ((ObscuredDouble)(obscuredDouble) != 0.0)
 			{
 			}
 			if (num == 0.0)
@@ -321,17 +321,17 @@ namespace CodeStage.AntiCheat.Examples
 		private void TestFloat()
 		{
 			logBuilder.AppendLine("ObscuredFloat vs float, " + floatIterations + " iterations for read and write");
-			ObscuredFloat bAINMLLIKOL = (ObscuredFloat)(100f);
-			float num = (ObscuredFloat)(bAINMLLIKOL);
+			ObscuredFloat obscuredFloat = (ObscuredFloat)(100f);
+			float num = (ObscuredFloat)(obscuredFloat);
 			float num2 = 0f;
 			Stopwatch stopwatch = Stopwatch.StartNew();
 			for (int i = 0; i < floatIterations; i++)
 			{
-				num2 = (ObscuredFloat)(bAINMLLIKOL);
+				num2 = (ObscuredFloat)(obscuredFloat);
 			}
 			for (int j = 0; j < floatIterations; j++)
 			{
-				bAINMLLIKOL = (ObscuredFloat)(num2);
+				obscuredFloat = (ObscuredFloat)(num2);
 			}
 			stopwatch.Stop();
 			logBuilder.AppendLine("ObscuredFloat:").AppendLine(stopwatch.ElapsedMilliseconds + " ms");
@@ -350,7 +350,7 @@ namespace CodeStage.AntiCheat.Examples
 			if (num2 != 0f)
 			{
 			}
-			if ((ObscuredFloat)(bAINMLLIKOL) != 0f)
+			if ((ObscuredFloat)(obscuredFloat) != 0f)
 			{
 			}
 			if (num == 0f)
@@ -361,17 +361,17 @@ namespace CodeStage.AntiCheat.Examples
 		private void TestInt()
 		{
 			logBuilder.AppendLine("ObscuredInt vs int, " + intIterations + " iterations for read and write");
-			ObscuredInt bAINMLLIKOL = (ObscuredInt)(100);
-			int num = (ObscuredInt)(bAINMLLIKOL);
+			ObscuredInt obscuredInt = (ObscuredInt)(100);
+			int num = (ObscuredInt)(obscuredInt);
 			int num2 = 0;
 			Stopwatch stopwatch = Stopwatch.StartNew();
 			for (int i = 0; i < intIterations; i++)
 			{
-				num2 = (ObscuredInt)(bAINMLLIKOL);
+				num2 = (ObscuredInt)(obscuredInt);
 			}
 			for (int j = 0; j < intIterations; j++)
 			{
-				bAINMLLIKOL = (ObscuredInt)(num2);
+				obscuredInt = (ObscuredInt)(num2);
 			}
 			stopwatch.Stop();
 			logBuilder.AppendLine("ObscuredInt:").AppendLine(stopwatch.ElapsedMilliseconds + " ms");
@@ -390,7 +390,7 @@ namespace CodeStage.AntiCheat.Examples
 			if (num2 != 0)
 			{
 			}
-			if ((ObscuredInt)(bAINMLLIKOL) != 0)
+			if ((ObscuredInt)(obscuredInt) != 0)
 			{
 			}
 			if (num == 0)
@@ -401,17 +401,17 @@ namespace CodeStage.AntiCheat.Examples
 		private void TestLong()
 		{
 			logBuilder.AppendLine("ObscuredLong vs long, " + longIterations + " iterations for read and write");
-			ObscuredLong bAINMLLIKOL = (ObscuredLong)(100L);
-			long num = (ObscuredLong)(bAINMLLIKOL);
+			ObscuredLong obscuredLong = (ObscuredLong)(100L);
+			long num = (ObscuredLong)(obscuredLong);
 			long num2 = 0L;
 			Stopwatch stopwatch = Stopwatch.StartNew();
 			for (int i = 0; i < longIterations; i++)
 			{
-				num2 = (ObscuredLong)(bAINMLLIKOL);
+				num2 = (ObscuredLong)(obscuredLong);
 			}
 			for (int j = 0; j < longIterations; j++)
 			{
-				bAINMLLIKOL = (ObscuredLong)(num2);
+				obscuredLong = (ObscuredLong)(num2);
 			}
 			stopwatch.Stop();
 			logBuilder.AppendLine("ObscuredLong:").AppendLine(stopwatch.ElapsedMilliseconds + " ms");
@@ -430,7 +430,7 @@ namespace CodeStage.AntiCheat.Examples
 			if (num2 != 0)
 			{
 			}
-			if ((ObscuredLong)(bAINMLLIKOL) != 0)
+			if ((ObscuredLong)(obscuredLong) != 0)
 			{
 			}
 			if (num == 0)
@@ -481,17 +481,17 @@ namespace CodeStage.AntiCheat.Examples
 		private void TestUInt()
 		{
 			logBuilder.AppendLine("ObscuredUInt vs uint, " + uintIterations + " iterations for read and write");
-			ObscuredUInt bAINMLLIKOL = (ObscuredUInt)(100u);
-			uint num = (ObscuredUInt)(bAINMLLIKOL);
+			ObscuredUInt obscuredUInt = (ObscuredUInt)(100u);
+			uint num = (ObscuredUInt)(obscuredUInt);
 			uint num2 = 0u;
 			Stopwatch stopwatch = Stopwatch.StartNew();
 			for (int i = 0; i < uintIterations; i++)
 			{
-				num2 = (ObscuredUInt)(bAINMLLIKOL);
+				num2 = (ObscuredUInt)(obscuredUInt);
 			}
 			for (int j = 0; j < uintIterations; j++)
 			{
-				bAINMLLIKOL = (ObscuredUInt)(num2);
+				obscuredUInt = (ObscuredUInt)(num2);
 			}
 			stopwatch.Stop();
 			logBuilder.AppendLine("ObscuredUInt:").AppendLine(stopwatch.ElapsedMilliseconds + " ms");
@@ -510,7 +510,7 @@ namespace CodeStage.AntiCheat.Examples
 			if (num2 != 0)
 			{
 			}
-			if ((ObscuredUInt)(bAINMLLIKOL) != 0)
+			if ((ObscuredUInt)(obscuredUInt) != 0)
 			{
 			}
 			if (num == 0)

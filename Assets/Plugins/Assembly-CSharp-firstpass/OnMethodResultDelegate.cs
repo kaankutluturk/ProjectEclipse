@@ -1,1 +1,1 @@
-public delegate void OnMethodResultDelegate(Hub CGFIJCNNCKP, ClientMessage BKNEELNMDHH, ResultMessage DCJLKCFKCOM);
+public delegate void OnMethodResultDelegate(Hub hub, ClientMessage originalMessage, ResultMessage result);

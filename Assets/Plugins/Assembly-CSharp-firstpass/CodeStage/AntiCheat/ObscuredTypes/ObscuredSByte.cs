@@ -26,9 +26,9 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 			inited = true;
 		}
 
-		public static void SetNewCryptoKey(sbyte CNOFJICCAHK)
+		public static void SetNewCryptoKey(sbyte newKey)
 		{
-			cryptoKey = CNOFJICCAHK;
+			cryptoKey = newKey;
 		}
 
 		public static sbyte EncryptDecrypt(sbyte value)
@@ -36,13 +36,13 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 			return EncryptDecrypt(value, 0);
 		}
 
-		public static sbyte EncryptDecrypt(sbyte value, sbyte KGBGENDIMBC)
+		public static sbyte EncryptDecrypt(sbyte value, sbyte key)
 		{
-			if (KGBGENDIMBC == 0)
+			if (key == 0)
 			{
 				return (sbyte)(value ^ cryptoKey);
 			}
-			return (sbyte)(value ^ KGBGENDIMBC);
+			return (sbyte)(value ^ key);
 		}
 
 		public void ApplyNewCryptoKey()
@@ -56,9 +56,9 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 
 		public void RandomizeCryptoKey()
 		{
-			sbyte bAINMLLIKOL = InternalDecrypt();
+			sbyte decrypted = InternalDecrypt();
 			currentCryptoKey = (sbyte)UnityEngine.Random.Range(-128, 127);
-			hiddenValue = EncryptDecrypt(bAINMLLIKOL, currentCryptoKey);
+			hiddenValue = EncryptDecrypt(decrypted, currentCryptoKey);
 		}
 
 		public sbyte GetEncrypted()
@@ -67,10 +67,10 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 			return hiddenValue;
 		}
 
-		public void SetEncrypted(sbyte ANGFOBEKKKD)
+		public void SetEncrypted(sbyte encrypted)
 		{
 			inited = true;
-			hiddenValue = ANGFOBEKKKD;
+			hiddenValue = encrypted;
 			if (ObscuredCheatingDetector.GetIsRunning())
 			{
 				fakeValue = InternalDecrypt();
@@ -110,45 +110,45 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 		}
 
 		[SpecialName]
-		public static ObscuredSByte op_Increment(ObscuredSByte NILNDHEKNLJ)
+		public static ObscuredSByte op_Increment(ObscuredSByte input)
 		{
-			sbyte bAINMLLIKOL = (sbyte)(NILNDHEKNLJ.InternalDecrypt() + 1);
-			NILNDHEKNLJ.hiddenValue = EncryptDecrypt(bAINMLLIKOL, NILNDHEKNLJ.currentCryptoKey);
+			sbyte newValue = (sbyte)(input.InternalDecrypt() + 1);
+			input.hiddenValue = EncryptDecrypt(newValue, input.currentCryptoKey);
 			if (ObscuredCheatingDetector.GetIsRunning())
 			{
-				NILNDHEKNLJ.fakeValue = bAINMLLIKOL;
+				input.fakeValue = newValue;
 			}
-			return NILNDHEKNLJ;
+			return input;
 		}
 
 		[SpecialName]
-		public static ObscuredSByte op_Decrement(ObscuredSByte NILNDHEKNLJ)
+		public static ObscuredSByte op_Decrement(ObscuredSByte input)
 		{
-			sbyte bAINMLLIKOL = (sbyte)(NILNDHEKNLJ.InternalDecrypt() - 1);
-			NILNDHEKNLJ.hiddenValue = EncryptDecrypt(bAINMLLIKOL, NILNDHEKNLJ.currentCryptoKey);
+			sbyte newValue = (sbyte)(input.InternalDecrypt() - 1);
+			input.hiddenValue = EncryptDecrypt(newValue, input.currentCryptoKey);
 			if (ObscuredCheatingDetector.GetIsRunning())
 			{
-				NILNDHEKNLJ.fakeValue = bAINMLLIKOL;
+				input.fakeValue = newValue;
 			}
-			return NILNDHEKNLJ;
+			return input;
 		}
 
-		public override bool Equals(object AOMLCBHAJJH)
+		public override bool Equals(object obj)
 		{
-			if (!(AOMLCBHAJJH is ObscuredSByte))
+			if (!(obj is ObscuredSByte))
 			{
 				return false;
 			}
-			return Equals((ObscuredSByte)AOMLCBHAJJH);
+			return Equals((ObscuredSByte)obj);
 		}
 
-		public bool Equals(ObscuredSByte AOMLCBHAJJH)
+		public bool Equals(ObscuredSByte other)
 		{
-			if (currentCryptoKey == AOMLCBHAJJH.currentCryptoKey)
+			if (currentCryptoKey == other.currentCryptoKey)
 			{
-				return hiddenValue == AOMLCBHAJJH.hiddenValue;
+				return hiddenValue == other.hiddenValue;
 			}
-			return EncryptDecrypt(hiddenValue, currentCryptoKey) == EncryptDecrypt(AOMLCBHAJJH.hiddenValue, AOMLCBHAJJH.currentCryptoKey);
+			return EncryptDecrypt(hiddenValue, currentCryptoKey) == EncryptDecrypt(other.hiddenValue, other.currentCryptoKey);
 		}
 
 		public override string ToString()
@@ -156,9 +156,9 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 			return InternalDecrypt().ToString();
 		}
 
-		public string ToString(string LBOHOKIBHOH)
+		public string ToString(string format)
 		{
-			return InternalDecrypt().ToString(LBOHOKIBHOH);
+			return InternalDecrypt().ToString(format);
 		}
 
 		public override int GetHashCode()
@@ -166,14 +166,14 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 			return InternalDecrypt().GetHashCode();
 		}
 
-		public string ToString(IFormatProvider EEGMFLOPLLH)
+		public string ToString(IFormatProvider provider)
 		{
-			return InternalDecrypt().ToString(EEGMFLOPLLH);
+			return InternalDecrypt().ToString(provider);
 		}
 
-		public string ToString(string LBOHOKIBHOH, IFormatProvider EEGMFLOPLLH)
+		public string ToString(string format, IFormatProvider provider)
 		{
-			return InternalDecrypt().ToString(LBOHOKIBHOH, EEGMFLOPLLH);
+			return InternalDecrypt().ToString(format, provider);
 		}
 	}
 }

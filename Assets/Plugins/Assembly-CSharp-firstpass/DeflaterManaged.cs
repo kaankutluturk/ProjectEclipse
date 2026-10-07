@@ -52,11 +52,11 @@ internal class DeflaterManaged : IDisposable, IDeflater
 		return input.GetCount() == 0 && deflateEncoder.GetBytesInHistory() == 0;
 	}
 
-	void IDeflater.SetInput(byte[] MMFIPPNMIKJ, int CAILGDNIKJD, int count)
+	void IDeflater.SetInput(byte[] buffer, int startIndex, int count)
 	{
-		input.set_Buffer(MMFIPPNMIKJ);
+		input.set_Buffer(buffer);
 		input.SetCount(count);
-		input.SetStartIndex(CAILGDNIKJD);
+		input.SetStartIndex(startIndex);
 		if (count > 0 && count < 256)
 		{
 			switch (processingState)
@@ -72,9 +72,9 @@ internal class DeflaterManaged : IDisposable, IDeflater
 		}
 	}
 
-	int IDeflater.GetDeflateOutput(byte[] EKJJNOOPFNJ)
+	int IDeflater.GetDeflateOutput(byte[] outputBuffer)
 	{
-		output.UpdateBuffer(EKJJNOOPFNJ);
+		output.UpdateBuffer(outputBuffer);
 		switch (processingState)
 		{
 		case DeflaterState.NotStarted:
@@ -122,12 +122,12 @@ internal class DeflaterManaged : IDisposable, IDeflater
 			break;
 		case DeflaterState.CheckingForIncompressible:
 		{
-			DeflateInput.InputState pIFKPLHIOFJ = input.DumpState();
+			DeflateInput.InputState inputState = input.DumpState();
 			OutputBuffer.BufferState pIFKPLHIOFJ2 = output.DumpState();
 			deflateEncoder.GetBlock(input, output, 8072);
 			if (!UseCompressed(deflateEncoder.GetLastCompressionRatio()))
 			{
-				input.RestoreState(pIFKPLHIOFJ);
+				input.RestoreState(inputState);
 				output.RestoreState(pIFKPLHIOFJ2);
 				copyEncoder.GetBlock(input, output, false);
 				FlushInputWindows();
@@ -145,20 +145,20 @@ internal class DeflaterManaged : IDisposable, IDeflater
 		return output.GetBytesWritten();
 	}
 
-	bool IDeflater.Finish(byte[] EKJJNOOPFNJ, out int GJBPPJIGAIG)
+	bool IDeflater.Finish(byte[] outputBuffer, out int bytesRead)
 	{
 		if (processingState == DeflaterState.NotStarted)
 		{
-			GJBPPJIGAIG = 0;
+			bytesRead = 0;
 			return true;
 		}
-		output.UpdateBuffer(EKJJNOOPFNJ);
+		output.UpdateBuffer(outputBuffer);
 		if (processingState == DeflaterState.CompressThenCheck || processingState == DeflaterState.HandlingSmallData || processingState == DeflaterState.SlowDownForIncompressible1)
 		{
 			deflateEncoder.GetBlockFooter(output);
 		}
 		WriteFinal();
-		GJBPPJIGAIG = output.GetBytesWritten();
+		bytesRead = output.GetBytesWritten();
 		return true;
 	}
 
@@ -166,7 +166,7 @@ internal class DeflaterManaged : IDisposable, IDeflater
 	{
 	}
 
-	protected void Dispose(bool KLCPNDHEBGP)
+	protected void Dispose(bool disposing)
 	{
 	}
 

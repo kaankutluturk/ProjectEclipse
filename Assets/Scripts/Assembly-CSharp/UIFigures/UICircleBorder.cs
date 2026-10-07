@@ -13,12 +13,12 @@ namespace UIFigures
 		[SerializeField]
 		private float _Width = 10f;
 
-		protected override void OnPopulateMesh(VertexHelper DHJBOKKAOJK)
+		protected override void OnPopulateMesh(VertexHelper vertexHelper)
 		{
-			base.OnPopulateMesh(DHJBOKKAOJK);
-			Vector2 gIAEPIIIMDH = (_LowerLeft + _UpperRight) * 0.5f;
-			Vector2 lPEMPCEJFIN = new Vector2(base.rectTransform.rect.width, base.rectTransform.rect.height) * 0.5f;
-			DrawFunctions.DrawArcBorder(DHJBOKKAOJK, gIAEPIIIMDH, lPEMPCEJFIN, _Width, 0f, (float)Math.PI * 2f, _Segments, color, color);
+			base.OnPopulateMesh(vertexHelper);
+			Vector2 center = (_LowerLeft + _UpperRight) * 0.5f;
+			Vector2 halfSize = new Vector2(base.rectTransform.rect.width, base.rectTransform.rect.height) * 0.5f;
+			DrawFunctions.DrawArcBorder(vertexHelper, center, halfSize, _Width, 0f, (float)Math.PI * 2f, _Segments, color, color);
 		}
 	}
 }

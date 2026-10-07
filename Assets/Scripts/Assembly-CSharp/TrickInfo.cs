@@ -13,12 +13,12 @@ public class TrickInfo
 
 	public Action<object> OnClickCallback;
 
-	public TrickInfo(string PGAFPNEHHLB, InfoAnimation HMMCEHGINBG, List<float> JOGLLIIGDMN, Action<object> _dlg = null, string _description = "")
+	public TrickInfo(string title, InfoAnimation animation, List<float> attackDamages, Action<object> _dlg = null, string _description = "")
 	{
-		Title = PGAFPNEHHLB;
+		Title = title;
 		Description = _description;
-		Animation = HMMCEHGINBG;
-		AttackDamages = JOGLLIIGDMN;
+		Animation = animation;
+		AttackDamages = attackDamages;
 		OnClickCallback = _dlg;
 	}
 }

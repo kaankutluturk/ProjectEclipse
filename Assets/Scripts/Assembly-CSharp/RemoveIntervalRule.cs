@@ -4,8 +4,8 @@ public class RemoveIntervalRule : InFightRule
 {
 	private IntervalAnimation.IntervalType intervalType;
 
-	public RemoveIntervalRule(XmlNode node, RuleAppliance EJPOJJKKICO)
-		: base(RuleType.RuleRemoveInterval, EJPOJJKKICO, node)
+	public RemoveIntervalRule(XmlNode node, RuleAppliance appliance)
+		: base(RuleType.RuleRemoveInterval, appliance, node)
 	{
 		intervalType = IntervalAnimation.IntervalType.INTERVAL_NONE;
 		Parse(node);
@@ -18,14 +18,14 @@ public class RemoveIntervalRule : InFightRule
 
 	public override void InitRule(object data)
 	{
-		RuleInitData oIFPCFEGFOB = (RuleInitData)data;
+		RuleInitData initData = (RuleInitData)data;
 		switch (appliance)
 		{
 		case RuleAppliance.AppliancePlayer:
-			oIFPCFEGFOB.PlayerModel.SuppressInterval(intervalType);
+			initData.PlayerModel.SuppressInterval(intervalType);
 			break;
 		case RuleAppliance.ApplianceOpponent:
-			oIFPCFEGFOB.OpponentModel.SuppressInterval(intervalType);
+			initData.OpponentModel.SuppressInterval(intervalType);
 			break;
 		default:
 			GameLog.Error("RemoveIntervalRule::initRule - wrong player appliance - %i", appliance);
@@ -64,11 +64,11 @@ public class RemoveIntervalRule : InFightRule
 
 	public override InFightRule Copy()
 	{
-		InFightRule aAJIFBJLJOA = null;
-		RuleAppliance eJPOJJKKICO = GetAppliance();
-		XmlNode hKPPBKPJOEO = GetXmlSource().GetNode();
-		aAJIFBJLJOA = new RemoveIntervalRule(hKPPBKPJOEO, eJPOJJKKICO);
-		aAJIFBJLJOA.IsRandom = IsRandom;
-		return aAJIFBJLJOA;
+		InFightRule copy = null;
+		RuleAppliance appliance = GetAppliance();
+		XmlNode node = GetXmlSource().GetNode();
+		copy = new RemoveIntervalRule(node, appliance);
+		copy.IsRandom = IsRandom;
+		return copy;
 	}
 }

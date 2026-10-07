@@ -50,17 +50,17 @@ public static class Rand
 		}
 	}
 
-	public static void Init(int OKGKLCLEDFN)
+	public static void Init(int seed)
 	{
-		if (_seed != (short)(OKGKLCLEDFN % 32767))
+		if (_seed != (short)(seed % 32767))
 		{
-			Reset(OKGKLCLEDFN);
+			Reset(seed);
 		}
 	}
 
-	private static void Reset(int OKGKLCLEDFN)
+	private static void Reset(int seed)
 	{
-		_seed = (short)(OKGKLCLEDFN % 32767);
+		_seed = (short)(seed % 32767);
 		_used.Clear();
 		_source.Clear();
 		for (short num = 0; num < short.MaxValue; num++)
@@ -94,13 +94,13 @@ public static class Rand
 		return num;
 	}
 
-	public static int Range(int IOFHCAAOELD, int IPMPAMAHLJG)
+	public static int Range(int min, int max)
 	{
-		if (IOFHCAAOELD > IPMPAMAHLJG)
+		if (min > max)
 		{
-			IPMPAMAHLJG = Interlocked.Exchange(ref IOFHCAAOELD, IPMPAMAHLJG);
+			max = Interlocked.Exchange(ref min, max);
 		}
-		int num = IPMPAMAHLJG - IOFHCAAOELD;
-		return (num != 0) ? (IOFHCAAOELD + TakeNext() % num) : 0;
+		int num = max - min;
+		return (num != 0) ? (min + TakeNext() % num) : 0;
 	}
 }

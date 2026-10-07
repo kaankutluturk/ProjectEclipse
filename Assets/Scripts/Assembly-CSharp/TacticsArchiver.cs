@@ -30,33 +30,33 @@ public class TacticsArchiver
 		}
 	}
 
-	private static void BuildArchive(string LGCMGHAFEDD)
+	private static void BuildArchive(string weaponName)
 	{
-		byte[] LHJNAJKAFIK = new byte[0];
-		AddTable(LGCMGHAFEDD, ref LHJNAJKAFIK);
-		if (LHJNAJKAFIK.Length > 0)
+		byte[] archiveBytes = new byte[0];
+		AddTable(weaponName, ref archiveBytes);
+		if (archiveBytes.Length > 0)
 		{
-			string OEMALIFPGPO = string.Empty;
-			GetFileName(LGCMGHAFEDD, ref OEMALIFPGPO);
-			File.WriteAllBytes(OEMALIFPGPO, Compressor.Compress(LHJNAJKAFIK));
+			string archivePath = string.Empty;
+			GetFileName(weaponName, ref archivePath);
+			File.WriteAllBytes(archivePath, Compressor.Compress(archiveBytes));
 		}
 	}
 
-	private static void BuildArchive(string NDAJLDOMNLK, string AFKFIEAMFKG)
+	private static void BuildArchive(string firstWeapon, string secondWeapon)
 	{
-		if (IsWeaponOrder(NDAJLDOMNLK, AFKFIEAMFKG))
+		if (IsWeaponOrder(firstWeapon, secondWeapon))
 		{
-			byte[] LHJNAJKAFIK = new byte[0];
-			AddTable(NDAJLDOMNLK, AFKFIEAMFKG, ref LHJNAJKAFIK);
-			if (NDAJLDOMNLK != AFKFIEAMFKG)
+			byte[] archiveBytes = new byte[0];
+			AddTable(firstWeapon, secondWeapon, ref archiveBytes);
+			if (firstWeapon != secondWeapon)
 			{
-				AddTable(AFKFIEAMFKG, NDAJLDOMNLK, ref LHJNAJKAFIK);
+				AddTable(secondWeapon, firstWeapon, ref archiveBytes);
 			}
-			if (LHJNAJKAFIK.Length > 0)
+			if (archiveBytes.Length > 0)
 			{
-				string OEMALIFPGPO = string.Empty;
-				GetFileName(NDAJLDOMNLK, AFKFIEAMFKG, ref OEMALIFPGPO);
-				File.WriteAllBytes(OEMALIFPGPO, Compressor.Compress(LHJNAJKAFIK));
+				string archivePath = string.Empty;
+				GetFileName(firstWeapon, secondWeapon, ref archivePath);
+				File.WriteAllBytes(archivePath, Compressor.Compress(archiveBytes));
 			}
 		}
 	}
@@ -75,15 +75,15 @@ public class TacticsArchiver
 		}
 	}
 
-	public static void LoadArchive(string LGCMGHAFEDD)
+	public static void LoadArchive(string weaponName)
 	{
-		string OEMALIFPGPO = string.Empty;
-		if (LGCMGHAFEDD == string.Empty)
+		string archivePath = string.Empty;
+		if (weaponName == string.Empty)
 		{
-			LGCMGHAFEDD = "default";
+			weaponName = "default";
 		}
-		GetFileName(LGCMGHAFEDD, ref OEMALIFPGPO);
-		byte[] array = ResourceManager.GetBinary(OEMALIFPGPO);
+		GetFileName(weaponName, ref archivePath);
+		byte[] array = ResourceManager.GetBinary(archivePath);
 		if (array != null && array.Length > 0)
 		{
 			byte[] buffer = Compressor.Decompress(array);
@@ -93,22 +93,22 @@ public class TacticsArchiver
 				{
 					while (binaryReader.BaseStream.Position != binaryReader.BaseStream.Length)
 					{
-						AiData.TableType hDHPLDFCDOF = (AiData.TableType)binaryReader.ReadUInt32();
+						AiData.TableType tableType = (AiData.TableType)binaryReader.ReadUInt32();
 						string text = TacticalTableHolder.ReadNullTerminatedString(binaryReader);
-						if (hDHPLDFCDOF != AiData.TableType.shiftTable)
+						if (tableType != AiData.TableType.shiftTable)
 						{
 							uint num = binaryReader.ReadUInt32();
 							if (0 < num)
 							{
-								byte[] mLFPOCMGFMB = binaryReader.ReadBytes((int)num);
-								TacticalTableHolder jIHNHLAIKAN = new TacticalTableHolder();
-								jIHNHLAIKAN.Load(mLFPOCMGFMB, (int)hDHPLDFCDOF, LGCMGHAFEDD);
-								AiData.AddTableHolder(jIHNHLAIKAN, text, text, hDHPLDFCDOF);
+								byte[] tableBytes = binaryReader.ReadBytes((int)num);
+								TacticalTableHolder tableHolder = new TacticalTableHolder();
+								tableHolder.Load(tableBytes, (int)tableType, weaponName);
+								AiData.AddTableHolder(tableHolder, text, text, tableType);
 							}
 						}
 						else
 						{
-							if (hDHPLDFCDOF != AiData.TableType.shiftTable)
+							if (tableType != AiData.TableType.shiftTable)
 							{
 								continue;
 							}
@@ -125,15 +125,15 @@ public class TacticsArchiver
 									uint num3 = binaryReader2.ReadUInt32();
 									for (int i = 0; i < num3; i++)
 									{
-										string gOHIIMFFFJI = TacticalTableHolder.ReadNullTerminatedString(binaryReader2);
-										InfoAnimation pJAHIOELGGD = AnimationData.GetAnimationByName(gOHIIMFFFJI);
-										if (pJAHIOELGGD != null)
+										string animationName = TacticalTableHolder.ReadNullTerminatedString(binaryReader2);
+										InfoAnimation animation = AnimationData.GetAnimationByName(animationName);
+										if (animation != null)
 										{
-											pJAHIOELGGD.ShiftTable.LoadFromFile(pJAHIOELGGD, binaryReader2);
+											animation.ShiftTable.LoadFromFile(animation, binaryReader2);
 											continue;
 										}
-										ModelShiftTable pGDHGIJKPHN = new ModelShiftTable();
-										pGDHGIJKPHN.LoadFromFile(null, binaryReader2);
+										ModelShiftTable animationShiftTable = new ModelShiftTable();
+										animationShiftTable.LoadFromFile(null, binaryReader2);
 									}
 								}
 							}
@@ -144,21 +144,21 @@ public class TacticsArchiver
 		}
 		else
 		{
-			GameLog.Write("file {0} not unzip", OEMALIFPGPO);
+			GameLog.Write("file {0} not unzip", archivePath);
 		}
 		// Several archives load together at a round boundary. Do not force a
 		// full-heap collection after each one; the runtime schedules collection.
 	}
 
-	public static void LoadArchive(string NDAJLDOMNLK, string AFKFIEAMFKG)
+	public static void LoadArchive(string firstWeapon, string secondWeapon)
 	{
-		if (!IsWeaponOrder(NDAJLDOMNLK, AFKFIEAMFKG))
+		if (!IsWeaponOrder(firstWeapon, secondWeapon))
 		{
 			return;
 		}
-		string OEMALIFPGPO = string.Empty;
-		GetFileName(NDAJLDOMNLK, AFKFIEAMFKG, ref OEMALIFPGPO);
-		byte[] array = ResourceManager.GetBinary(OEMALIFPGPO);
+		string archivePath = string.Empty;
+		GetFileName(firstWeapon, secondWeapon, ref archivePath);
+		byte[] array = ResourceManager.GetBinary(archivePath);
 		if (array != null && array.Length > 0)
 		{
 			byte[] buffer = Compressor.Decompress(array);
@@ -168,99 +168,99 @@ public class TacticsArchiver
 				{
 					while (binaryReader.BaseStream.Position != binaryReader.BaseStream.Length)
 					{
-						AiData.TableType hDHPLDFCDOF = (AiData.TableType)binaryReader.ReadUInt32();
-						if (AiData.CheckIfTableExists(NDAJLDOMNLK, AFKFIEAMFKG, hDHPLDFCDOF))
+						AiData.TableType tableType = (AiData.TableType)binaryReader.ReadUInt32();
+						if (AiData.CheckIfTableExists(firstWeapon, secondWeapon, tableType))
 						{
-							GameLog.Write("Skipping - table {0}/{1} !", NDAJLDOMNLK, AFKFIEAMFKG);
+							GameLog.Write("Skipping - table {0}/{1} !", firstWeapon, secondWeapon);
 							return;
 						}
-						GameLog.Write("Reading - table {0}/{1} !", NDAJLDOMNLK, AFKFIEAMFKG);
-						string kEEMLGNLKPF = TacticalTableHolder.ReadNullTerminatedString(binaryReader);
+						GameLog.Write("Reading - table {0}/{1} !", firstWeapon, secondWeapon);
+						string tableName = TacticalTableHolder.ReadNullTerminatedString(binaryReader);
 						string text = TacticalTableHolder.ReadNullTerminatedString(binaryReader);
-						byte[] mLFPOCMGFMB = new byte[0];
+						byte[] tableBytes = new byte[0];
 						uint num = binaryReader.ReadUInt32();
 						if (0 < num)
 						{
-							mLFPOCMGFMB = binaryReader.ReadBytes((int)num);
+							tableBytes = binaryReader.ReadBytes((int)num);
 						}
-						TacticalTableHolder jIHNHLAIKAN = new TacticalTableHolder();
-						jIHNHLAIKAN.Load(mLFPOCMGFMB, (int)hDHPLDFCDOF, text);
-						AiData.AddTableHolder(jIHNHLAIKAN, kEEMLGNLKPF, text, hDHPLDFCDOF);
+						TacticalTableHolder tableHolder = new TacticalTableHolder();
+						tableHolder.Load(tableBytes, (int)tableType, text);
+						AiData.AddTableHolder(tableHolder, tableName, text, tableType);
 					}
 				}
 			}
 		}
 		else
 		{
-			GameLog.Write("file {0} not unzip", OEMALIFPGPO);
+			GameLog.Write("file {0} not unzip", archivePath);
 		}
 	}
 
-	private static void AddTable(string LGCMGHAFEDD, ref byte[] LHJNAJKAFIK)
+	private static void AddTable(string weaponName, ref byte[] archiveBytes)
 	{
-		string dCOPLCIFCFL = SF2Paths.GetGameDataPath() + "/tactics/dodge/" + LGCMGHAFEDD + ".tbs";
-		string dCOPLCIFCFL2 = SF2Paths.GetGameDataPath() + "/tactics/shiftTables/" + LGCMGHAFEDD + ".sts";
-		byte[] array = ResourceManager.GetBinary(dCOPLCIFCFL);
+		string dodgeTablePath = SF2Paths.GetGameDataPath() + "/tactics/dodge/" + weaponName + ".tbs";
+		string dCOPLCIFCFL2 = SF2Paths.GetGameDataPath() + "/tactics/shiftTables/" + weaponName + ".sts";
+		byte[] array = ResourceManager.GetBinary(dodgeTablePath);
 		if (array != null && array.Length > 0)
 		{
-			LHJNAJKAFIK = Concat(LHJNAJKAFIK, BitConverter.GetBytes(2u));
-			LHJNAJKAFIK = Concat(LHJNAJKAFIK, Encoding.ASCII.GetBytes(LGCMGHAFEDD));
-			LHJNAJKAFIK = Concat(LHJNAJKAFIK, array);
+			archiveBytes = Concat(archiveBytes, BitConverter.GetBytes(2u));
+			archiveBytes = Concat(archiveBytes, Encoding.ASCII.GetBytes(weaponName));
+			archiveBytes = Concat(archiveBytes, array);
 		}
 		byte[] array2 = ResourceManager.GetBinary(dCOPLCIFCFL2);
 		if (array2 != null && array2.Length > 0)
 		{
-			LHJNAJKAFIK = Concat(LHJNAJKAFIK, BitConverter.GetBytes(7u));
-			LHJNAJKAFIK = Concat(LHJNAJKAFIK, Encoding.ASCII.GetBytes(LGCMGHAFEDD));
-			LHJNAJKAFIK = Concat(LHJNAJKAFIK, array2);
+			archiveBytes = Concat(archiveBytes, BitConverter.GetBytes(7u));
+			archiveBytes = Concat(archiveBytes, Encoding.ASCII.GetBytes(weaponName));
+			archiveBytes = Concat(archiveBytes, array2);
 		}
 	}
 
-	private static void AddTable(string NDAJLDOMNLK, string AFKFIEAMFKG, ref byte[] LHJNAJKAFIK)
+	private static void AddTable(string firstWeapon, string secondWeapon, ref byte[] archiveBytes)
 	{
-		string text = NDAJLDOMNLK + "_" + AFKFIEAMFKG + ".tbs";
-		string dCOPLCIFCFL = SF2Paths.GetGameDataPath() + "/tactics/movements/" + text;
+		string text = firstWeapon + "_" + secondWeapon + ".tbs";
+		string tablePath = SF2Paths.GetGameDataPath() + "/tactics/movements/" + text;
 		string dCOPLCIFCFL2 = SF2Paths.GetGameDataPath() + "/tactics/outcometablesforattack/" + text;
-		byte[] array = ResourceManager.GetBinary(dCOPLCIFCFL);
+		byte[] array = ResourceManager.GetBinary(tablePath);
 		if (array != null && array.Length > 0)
 		{
-			LHJNAJKAFIK = Concat(LHJNAJKAFIK, BitConverter.GetBytes(1u));
-			LHJNAJKAFIK = Concat(LHJNAJKAFIK, Encoding.ASCII.GetBytes(NDAJLDOMNLK));
-			LHJNAJKAFIK = Concat(LHJNAJKAFIK, Encoding.ASCII.GetBytes(AFKFIEAMFKG));
-			LHJNAJKAFIK = Concat(LHJNAJKAFIK, array);
+			archiveBytes = Concat(archiveBytes, BitConverter.GetBytes(1u));
+			archiveBytes = Concat(archiveBytes, Encoding.ASCII.GetBytes(firstWeapon));
+			archiveBytes = Concat(archiveBytes, Encoding.ASCII.GetBytes(secondWeapon));
+			archiveBytes = Concat(archiveBytes, array);
 		}
 		byte[] array2 = ResourceManager.GetBinary(dCOPLCIFCFL2);
 		if (array2 != null && array2.Length > 0)
 		{
-			LHJNAJKAFIK = Concat(LHJNAJKAFIK, BitConverter.GetBytes(0u));
-			LHJNAJKAFIK = Concat(LHJNAJKAFIK, Encoding.ASCII.GetBytes(NDAJLDOMNLK));
-			LHJNAJKAFIK = Concat(LHJNAJKAFIK, Encoding.ASCII.GetBytes(AFKFIEAMFKG));
-			LHJNAJKAFIK = Concat(LHJNAJKAFIK, array2);
+			archiveBytes = Concat(archiveBytes, BitConverter.GetBytes(0u));
+			archiveBytes = Concat(archiveBytes, Encoding.ASCII.GetBytes(firstWeapon));
+			archiveBytes = Concat(archiveBytes, Encoding.ASCII.GetBytes(secondWeapon));
+			archiveBytes = Concat(archiveBytes, array2);
 		}
 	}
 
-	private static bool IsWeaponOrder(string NDAJLDOMNLK, string AFKFIEAMFKG)
+	private static bool IsWeaponOrder(string firstWeapon, string secondWeapon)
 	{
-		return NDAJLDOMNLK == AFKFIEAMFKG || NDAJLDOMNLK == string.Empty || (AFKFIEAMFKG != string.Empty && string.Compare(NDAJLDOMNLK, AFKFIEAMFKG) < 0);
+		return firstWeapon == secondWeapon || firstWeapon == string.Empty || (secondWeapon != string.Empty && string.Compare(firstWeapon, secondWeapon) < 0);
 	}
 
-	private static int GetFileName(string LGCMGHAFEDD, ref string OEMALIFPGPO)
+	private static int GetFileName(string weaponName, ref string archivePath)
 	{
-		OEMALIFPGPO = SF2Paths.GetGameDataPath() + "/tactics_compressed/" + LGCMGHAFEDD.ToLower() + ".atf";
-		return OEMALIFPGPO.Length;
+		archivePath = SF2Paths.GetGameDataPath() + "/tactics_compressed/" + weaponName.ToLower() + ".atf";
+		return archivePath.Length;
 	}
 
-	private static int GetFileName(string NDAJLDOMNLK, string AFKFIEAMFKG, ref string OEMALIFPGPO)
+	private static int GetFileName(string firstWeapon, string secondWeapon, ref string archivePath)
 	{
-		OEMALIFPGPO = SF2Paths.GetGameDataPath() + "/tactics_compressed/" + NDAJLDOMNLK.ToLower() + "_" + AFKFIEAMFKG.ToLower() + ".atf";
-		return OEMALIFPGPO.Length;
+		archivePath = SF2Paths.GetGameDataPath() + "/tactics_compressed/" + firstWeapon.ToLower() + "_" + secondWeapon.ToLower() + ".atf";
+		return archivePath.Length;
 	}
 
-	private static byte[] Concat(byte[] DHDMNHCIPEH, byte[] BGEEALIPKCC)
+	private static byte[] Concat(byte[] first, byte[] second)
 	{
-		byte[] array = new byte[DHDMNHCIPEH.Length + BGEEALIPKCC.Length];
-		DHDMNHCIPEH.CopyTo(array, 0);
-		BGEEALIPKCC.CopyTo(array, DHDMNHCIPEH.Length);
+		byte[] array = new byte[first.Length + second.Length];
+		first.CopyTo(array, 0);
+		second.CopyTo(array, first.Length);
 		return array;
 	}
 }

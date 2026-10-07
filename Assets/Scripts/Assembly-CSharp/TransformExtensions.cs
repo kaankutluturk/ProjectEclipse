@@ -2,18 +2,18 @@ using UnityEngine;
 
 public static class TransformExtensions
 {
-	public static void SetLocalX(this Transform KGOIHPPNFGC, float value)
+	public static void SetLocalX(this Transform transform, float value)
 	{
-		KGOIHPPNFGC.localPosition = new Vector3(value, KGOIHPPNFGC.localPosition.y, KGOIHPPNFGC.localPosition.z);
+		transform.localPosition = new Vector3(value, transform.localPosition.y, transform.localPosition.z);
 	}
 
-	public static void SetLocalY(this Transform KGOIHPPNFGC, float value)
+	public static void SetLocalY(this Transform transform, float value)
 	{
-		KGOIHPPNFGC.localPosition = new Vector3(KGOIHPPNFGC.localPosition.x, value, KGOIHPPNFGC.localPosition.z);
+		transform.localPosition = new Vector3(transform.localPosition.x, value, transform.localPosition.z);
 	}
 
-	public static void SetLocalZ(this Transform KGOIHPPNFGC, float value)
+	public static void SetLocalZ(this Transform transform, float value)
 	{
-		KGOIHPPNFGC.localPosition = new Vector3(KGOIHPPNFGC.localPosition.x, KGOIHPPNFGC.localPosition.y, value);
+		transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y, value);
 	}
 }

@@ -308,8 +308,8 @@ namespace Nekki.SF2.GUI.Menu
 			Scroll.AddEventListener(4, OnScrollTouch);
 			Scroll.Collapse(0f);
 			UpdateMenuExtras();
-			ScreenType cCGJDFLIKFN = Module.GetInstance().GetCurrentScreenType();
-			UpdateCurrentButton(cCGJDFLIKFN);
+			ScreenType currentScreen = Module.GetInstance().GetCurrentScreenType();
+			UpdateCurrentButton(currentScreen);
 		}
 
 		private void UpdateMenuExtras()
@@ -335,13 +335,13 @@ namespace Nekki.SF2.GUI.Menu
 
 		private void OnScrollRolling(object data)
 		{
-			MenuScroll.ScrollState aNJKEGGALAG = (MenuScroll.ScrollState)data;
-			if (scrollState == aNJKEGGALAG)
+			MenuScroll.ScrollState newScrollState = (MenuScroll.ScrollState)data;
+			if (scrollState == newScrollState)
 			{
 				return;
 			}
-			scrollState = aNJKEGGALAG;
-			switch (aNJKEGGALAG)
+			scrollState = newScrollState;
+			switch (newScrollState)
 			{
 			case MenuScroll.ScrollState.ScrollOpen:
 				enableAiOnClose = true;
@@ -490,11 +490,11 @@ namespace Nekki.SF2.GUI.Menu
 			UpdateMenu();
 		}
 
-		public void UpdateBarExp(float OBLEMIHLFII, float KAEPJHHLLPK)
+		public void UpdateBarExp(float experience, float experienceToNextLevel)
 		{
 			if ((bool)_experience)
 			{
-				_experience.UpdateBarExp(OBLEMIHLFII, KAEPJHHLLPK);
+				_experience.UpdateBarExp(experience, experienceToNextLevel);
 			}
 		}
 
@@ -524,7 +524,7 @@ namespace Nekki.SF2.GUI.Menu
 
 		public void UpdateMenu()
 		{
-			Roster nKGLHEGIKKP = ListSF.GetRoster();
+			Roster roster = ListSF.GetRoster();
 			if (0 == 0)
 			{
 				_experience.gameObject.SetActive(true);
@@ -534,7 +534,7 @@ namespace Nekki.SF2.GUI.Menu
 					_raidRating.gameObject.SetActive(false);
 				}
 				UpdateLevel();
-				UpdateBarExp(nKGLHEGIKKP.GetExperience(), nKGLHEGIKKP.GetExperienceToNextLevel());
+				UpdateBarExp(roster.GetExperience(), roster.GetExperienceToNextLevel());
 			}
 			else
 			{
@@ -566,10 +566,10 @@ namespace Nekki.SF2.GUI.Menu
 			OnClickButton(MenuButtonType.MENU_MONEY);
 		}
 
-		private void OnClickButton(MenuButtonType KNCNFGABHCL)
+		private void OnClickButton(MenuButtonType buttonType)
 		{
 			enableAiOnClose = true;
-			switch (KNCNFGABHCL)
+			switch (buttonType)
 			{
 			case MenuButtonType.MENU_DOJO:
 				Module.OpenScreen(ScreenType.ModuleDojo);
@@ -611,16 +611,16 @@ namespace Nekki.SF2.GUI.Menu
 				Module.OpenScreen(ScreenType.ModuleDojo);
 				break;
 			}
-			if (KNCNFGABHCL == MenuButtonType.MENU_SETTINGS)
+			if (buttonType == MenuButtonType.MENU_SETTINGS)
 			{
 			}
 		}
 
-		public void SetEnabled(bool PKHDLOGJKAD)
+		public void SetEnabled(bool newEnabled)
 		{
-			if (IsEnabled() != PKHDLOGJKAD)
+			if (IsEnabled() != newEnabled)
 			{
-				isEnabled = PKHDLOGJKAD;
+				isEnabled = newEnabled;
 				_menuBlocker.gameObject.SetActive(!isEnabled);
 				if (!isEnabled)
 				{
@@ -650,9 +650,9 @@ namespace Nekki.SF2.GUI.Menu
 			Module.OpenScreen(ScreenType.ModuleMap);
 		}
 
-		public void UpdateCurrentButton(ScreenType CCGJDFLIKFN)
+		public void UpdateCurrentButton(ScreenType screenType)
 		{
-			switch (CCGJDFLIKFN)
+			switch (screenType)
 			{
 			case ScreenType.ModuleShop:
 				SetCurrentButton(btnShop);
@@ -670,12 +670,12 @@ namespace Nekki.SF2.GUI.Menu
 				SetCurrentButton(null);
 				break;
 			}
-			UpdateDojoDiscipleVisibility(CCGJDFLIKFN);
+			UpdateDojoDiscipleVisibility(screenType);
 		}
 
-		public SectionButton GetButtonFromScreen(ScreenType CCGJDFLIKFN)
+		public SectionButton GetButtonFromScreen(ScreenType screenType)
 		{
-			switch (CCGJDFLIKFN)
+			switch (screenType)
 			{
 			case ScreenType.ModuleDojo:
 				return btnDojo;
@@ -734,11 +734,11 @@ namespace Nekki.SF2.GUI.Menu
 		{
 		}
 
-		private void OnLevelHintClicked(object EMBBNNBFODN)
+		private void OnLevelHintClicked(object eventData)
 		{
-			Roster nKGLHEGIKKP = ListSF.GetRoster();
-			string hCPNFPMHFCM = ((nKGLHEGIKKP.GetExperience() != nKGLHEGIKKP.GetExperienceToNextLevel()) ? LocalizationManager.GetString("experienceHint", nKGLHEGIKKP.GetExperience().ToString(), nKGLHEGIKKP.GetExperienceToNextLevel().ToString()) : LocalizationManager.GetString("dlgComingSoonText"));
-			_experience.ShowHint(hCPNFPMHFCM);
+			Roster roster = ListSF.GetRoster();
+			string hintText = ((roster.GetExperience() != roster.GetExperienceToNextLevel()) ? LocalizationManager.GetString("experienceHint", roster.GetExperience().ToString(), roster.GetExperienceToNextLevel().ToString()) : LocalizationManager.GetString("dlgComingSoonText"));
+			_experience.ShowHint(hintText);
 		}
 
 		private void ResetBadgesAndExtras()
@@ -854,8 +854,8 @@ namespace Nekki.SF2.GUI.Menu
 
 		private void CloseMenuIfNotCurrent()
 		{
-			ScreenType cCGJDFLIKFN = Module.GetInstance().GetCurrentScreenType();
-			if (currentButton != GetButtonFromScreen(cCGJDFLIKFN))
+			ScreenType currentScreen = Module.GetInstance().GetCurrentScreenType();
+			if (currentButton != GetButtonFromScreen(currentScreen))
 			{
 				CloseMenu(0.25f);
 			}
@@ -866,7 +866,7 @@ namespace Nekki.SF2.GUI.Menu
 			CloseMenu(0.25f);
 		}
 
-		public void SetCurrentButton(SectionButton KLNKEPMAGKF)
+		public void SetCurrentButton(SectionButton button)
 		{
 			if ((bool)currentButton)
 			{
@@ -874,7 +874,7 @@ namespace Nekki.SF2.GUI.Menu
 				currentButton.transition = Selectable.Transition.ColorTint;
 				currentButton.SetPressType(ButtonStateExtensions.ButtonPressType.PressNormal);
 			}
-			currentButton = KLNKEPMAGKF;
+			currentButton = button;
 			if ((bool)currentButton)
 			{
 				currentButton.interactable = false;
@@ -890,19 +890,19 @@ namespace Nekki.SF2.GUI.Menu
 			UpdateMenu();
 		}
 
-		public void SetNormalViewMode(bool DGNLFEPIANN)
+		public void SetNormalViewMode(bool isNormalView)
 		{
 			_energy.gameObject.SetActive(false);
 			_money.SetNormalViewMode();
-			HideMaterialsForNormalView(DGNLFEPIANN);
+			HideMaterialsForNormalView(isNormalView);
 		}
 
-		public void SetForgeViewMode(bool DGNLFEPIANN)
+		public void SetForgeViewMode(bool isForgeView)
 		{
-			ApplyForgeView(DGNLFEPIANN);
+			ApplyForgeView(isForgeView);
 		}
 
-		private void HideMaterialsForNormalView(bool DGNLFEPIANN)
+		private void HideMaterialsForNormalView(bool isNormalView)
 		{
 			if (_materials != null)
 			{
@@ -915,7 +915,7 @@ namespace Nekki.SF2.GUI.Menu
 			_materials.gameObject.SetActive(false);
 		}
 
-		private void ApplyForgeView(bool DGNLFEPIANN)
+		private void ApplyForgeView(bool isForgeView)
 		{
 			ApplyForgeMoneyView();
 			if (_materials != null)

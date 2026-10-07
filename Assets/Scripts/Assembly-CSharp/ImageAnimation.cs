@@ -64,19 +64,19 @@ public class ImageAnimation : MonoBehaviour
 		}
 	}
 
-	public void SetAnimationTime(float NKNMHPLMFND)
+	public void SetAnimationTime(float animationTime)
 	{
-		if (!(NKNMHPLMFND <= 0f))
+		if (!(animationTime <= 0f))
 		{
-			frameDelay = NKNMHPLMFND / (float)_sprites.Length;
+			frameDelay = animationTime / (float)_sprites.Length;
 		}
 	}
 
-	public void SetPauseAfterLoop(float AJANNMFPEMN)
+	public void SetPauseAfterLoop(float pauseTime)
 	{
-		if (!(AJANNMFPEMN <= 0f))
+		if (!(pauseTime <= 0f))
 		{
-			loopPauseDelay = AJANNMFPEMN;
+			loopPauseDelay = pauseTime;
 		}
 	}
 }

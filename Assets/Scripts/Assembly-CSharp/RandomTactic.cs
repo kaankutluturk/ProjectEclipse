@@ -30,11 +30,11 @@ public class RandomTactic
 		XmlNode xmlNode3 = node["Delays"];
 		foreach (XmlNode childNode2 in xmlNode3.ChildNodes)
 		{
-			TacticDelay eILEKOMGNOP = new TacticDelay();
-			eILEKOMGNOP.animationName = childNode2.Attributes["Animation"].GetStringOrDefault(string.Empty);
-			eILEKOMGNOP.minDelay = childNode2.Attributes["Min"].ParseInt();
-			eILEKOMGNOP.maxDelay = childNode2.Attributes["Max"].ParseInt();
-			delays.Add(eILEKOMGNOP);
+			TacticDelay delay = new TacticDelay();
+			delay.animationName = childNode2.Attributes["Animation"].GetStringOrDefault(string.Empty);
+			delay.minDelay = childNode2.Attributes["Min"].ParseInt();
+			delay.maxDelay = childNode2.Attributes["Max"].ParseInt();
+			delays.Add(delay);
 		}
 		XmlNode xmlNode5 = node["BeginnerCheat"];
 		BeginnerCheat = xmlNode5.Attributes["Treshold"].ParseFloat();
@@ -45,11 +45,11 @@ public class RandomTactic
 		return Intervals.Contains(name);
 	}
 
-	public int GetDelayByName(List<string> NIKHAICFGNM)
+	public int GetDelayByName(List<string> animationNames)
 	{
 		foreach (TacticDelay item in delays)
 		{
-			foreach (string item2 in NIKHAICFGNM)
+			foreach (string item2 in animationNames)
 			{
 				if (item.animationName == item2)
 				{

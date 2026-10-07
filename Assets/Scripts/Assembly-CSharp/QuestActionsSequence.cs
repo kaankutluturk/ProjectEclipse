@@ -25,28 +25,28 @@ public class QuestActionsSequence : global::EventDispatcher<object>
 		actions = new List<QuestAction>();
 	}
 
-	public void AddAction(QuestAction IBODMPMJELJ)
+	public void AddAction(QuestAction action)
 	{
-		actions.Add(IBODMPMJELJ);
+		actions.Add(action);
 	}
 
-	public void Run(QuestParameters GFIHPBCEEOB)
+	public void Run(QuestParameters questParameters)
 	{
-		CallEvent(0, GFIHPBCEEOB);
-		this.parameters = GFIHPBCEEOB;
+		CallEvent(0, questParameters);
+		this.parameters = questParameters;
 		int count = actions.Count;
 		if (count > 0)
 		{
 			if (currentIndex < count)
 			{
-				QuestAction mBAAKHELFKL = actions[currentIndex];
-				mBAAKHELFKL.AddEventListener(1, actionCompleteHandler);
-				mBAAKHELFKL.Execute(GFIHPBCEEOB);
+				QuestAction action = actions[currentIndex];
+				action.AddEventListener(1, actionCompleteHandler);
+				action.Execute(questParameters);
 			}
 		}
 		else
 		{
-			CallEvent(1, GFIHPBCEEOB);
+			CallEvent(1, questParameters);
 		}
 	}
 
@@ -56,8 +56,8 @@ public class QuestActionsSequence : global::EventDispatcher<object>
 		{
 			parameters = (QuestParameters)data;
 		}
-		QuestAction mBAAKHELFKL = actions[currentIndex];
-		mBAAKHELFKL.RemoveEventListener(1, actionCompleteHandler);
+		QuestAction completedAction = actions[currentIndex];
+		completedAction.RemoveEventListener(1, actionCompleteHandler);
 		currentIndex++;
 		if (currentIndex < actions.Count)
 		{

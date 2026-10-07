@@ -9,19 +9,19 @@ public static class BundleManager
 
 	public static void AddBundle(string name)
 	{
-		BundleRef fJMBOHIMAMI = new BundleRef(name);
-		fJMBOHIMAMI.Load();
-		if (fJMBOHIMAMI.GetIsLoaded())
+		BundleRef bundle = new BundleRef(name);
+		bundle.Load();
+		if (bundle.GetIsLoaded())
 		{
-			string[] array = fJMBOHIMAMI.GetAllAssetNames();
+			string[] array = bundle.GetAllAssetNames();
 			string[] array2 = array;
-			foreach (string jHEMALDDIFN in array2)
+			foreach (string assetName in array2)
 			{
-				string key = AssetBundleExtension.GetSimplifiedAssetName(jHEMALDDIFN);
-				_bundlesByAssetName[key] = fJMBOHIMAMI;
+				string key = AssetBundleExtension.GetSimplifiedAssetName(assetName);
+				_bundlesByAssetName[key] = bundle;
 			}
 		}
-		fJMBOHIMAMI.Unload();
+		bundle.Unload();
 	}
 
 	public static T LoadAsset<T>(string name) where T : Object

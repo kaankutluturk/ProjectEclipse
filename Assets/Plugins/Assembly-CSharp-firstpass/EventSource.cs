@@ -182,9 +182,9 @@ public class EventSource : IHeartbeat
 		}
 	}
 
-	public EventSource(Uri KJHNCLAJMLO)
+	public EventSource(Uri uri)
 	{
-		set_Uri(KJHNCLAJMLO);
+		set_Uri(uri);
 		set_ReconnectionTime(TimeSpan.FromMilliseconds(2000.0));
 		SetInternalRequest(new HTTPRequest(GetUri(), HTTPMethods.Get, false, true, OnRequestFinished));
 		GetInternalRequest().SetHeader("Accept", "text/event-stream");
@@ -212,17 +212,17 @@ public class EventSource : IHeartbeat
 
 	private void set_State(EventSourceState value)
 	{
-		EventSourceState mAFFNGPOMJD = state;
+		EventSourceState oldState = state;
 		state = value;
 		if (OnStateChanged != null)
 		{
 			try
 			{
-				OnStateChanged(this, mAFFNGPOMJD, state);
+				OnStateChanged(this, oldState, state);
 			}
-			catch (Exception mPFFFAOGBJE)
+			catch (Exception ex)
 			{
-				HTTPManager.GetLogger().Exception("EventSource", "OnStateChanged", mPFFFAOGBJE);
+				HTTPManager.GetLogger().Exception("EventSource", "OnStateChanged", ex);
 			}
 		}
 	}
@@ -259,146 +259,146 @@ public class EventSource : IHeartbeat
 
 	public void AddOnOpen(OnGeneralEventDelegate value)
 	{
-		OnGeneralEventDelegate bHJHIPILHJB = OnOpen;
+		OnGeneralEventDelegate current = OnOpen;
 		OnGeneralEventDelegate bHJHIPILHJB2;
 		do
 		{
-			bHJHIPILHJB2 = bHJHIPILHJB;
-			bHJHIPILHJB = Interlocked.CompareExchange(ref OnOpen, (OnGeneralEventDelegate)Delegate.Combine(bHJHIPILHJB2, value), bHJHIPILHJB);
+			bHJHIPILHJB2 = current;
+			current = Interlocked.CompareExchange(ref OnOpen, (OnGeneralEventDelegate)Delegate.Combine(bHJHIPILHJB2, value), current);
 		}
-		while ((object)bHJHIPILHJB != bHJHIPILHJB2);
+		while ((object)current != bHJHIPILHJB2);
 	}
 
 	public void RemoveOnOpen(OnGeneralEventDelegate value)
 	{
-		OnGeneralEventDelegate bHJHIPILHJB = OnOpen;
+		OnGeneralEventDelegate current = OnOpen;
 		OnGeneralEventDelegate bHJHIPILHJB2;
 		do
 		{
-			bHJHIPILHJB2 = bHJHIPILHJB;
-			bHJHIPILHJB = Interlocked.CompareExchange(ref OnOpen, (OnGeneralEventDelegate)Delegate.Remove(bHJHIPILHJB2, value), bHJHIPILHJB);
+			bHJHIPILHJB2 = current;
+			current = Interlocked.CompareExchange(ref OnOpen, (OnGeneralEventDelegate)Delegate.Remove(bHJHIPILHJB2, value), current);
 		}
-		while ((object)bHJHIPILHJB != bHJHIPILHJB2);
+		while ((object)current != bHJHIPILHJB2);
 	}
 
 	public void AddOnMessage(OnEventSourceMessageDelegate value)
 	{
-		OnEventSourceMessageDelegate iPIGAJKKJLN = onMessageField;
+		OnEventSourceMessageDelegate current = onMessageField;
 		OnEventSourceMessageDelegate iPIGAJKKJLN2;
 		do
 		{
-			iPIGAJKKJLN2 = iPIGAJKKJLN;
-			iPIGAJKKJLN = Interlocked.CompareExchange(ref onMessageField, (OnEventSourceMessageDelegate)Delegate.Combine(iPIGAJKKJLN2, value), iPIGAJKKJLN);
+			iPIGAJKKJLN2 = current;
+			current = Interlocked.CompareExchange(ref onMessageField, (OnEventSourceMessageDelegate)Delegate.Combine(iPIGAJKKJLN2, value), current);
 		}
-		while ((object)iPIGAJKKJLN != iPIGAJKKJLN2);
+		while ((object)current != iPIGAJKKJLN2);
 	}
 
 	public void RemoveOnMessage(OnEventSourceMessageDelegate value)
 	{
-		OnEventSourceMessageDelegate iPIGAJKKJLN = onMessageField;
+		OnEventSourceMessageDelegate current = onMessageField;
 		OnEventSourceMessageDelegate iPIGAJKKJLN2;
 		do
 		{
-			iPIGAJKKJLN2 = iPIGAJKKJLN;
-			iPIGAJKKJLN = Interlocked.CompareExchange(ref onMessageField, (OnEventSourceMessageDelegate)Delegate.Remove(iPIGAJKKJLN2, value), iPIGAJKKJLN);
+			iPIGAJKKJLN2 = current;
+			current = Interlocked.CompareExchange(ref onMessageField, (OnEventSourceMessageDelegate)Delegate.Remove(iPIGAJKKJLN2, value), current);
 		}
-		while ((object)iPIGAJKKJLN != iPIGAJKKJLN2);
+		while ((object)current != iPIGAJKKJLN2);
 	}
 
 	public void AddOnError(OnErrorDelegate value)
 	{
-		OnErrorDelegate eGECAPOLBHF = onErrorField;
+		OnErrorDelegate current = onErrorField;
 		OnErrorDelegate eGECAPOLBHF2;
 		do
 		{
-			eGECAPOLBHF2 = eGECAPOLBHF;
-			eGECAPOLBHF = Interlocked.CompareExchange(ref onErrorField, (OnErrorDelegate)Delegate.Combine(eGECAPOLBHF2, value), eGECAPOLBHF);
+			eGECAPOLBHF2 = current;
+			current = Interlocked.CompareExchange(ref onErrorField, (OnErrorDelegate)Delegate.Combine(eGECAPOLBHF2, value), current);
 		}
-		while ((object)eGECAPOLBHF != eGECAPOLBHF2);
+		while ((object)current != eGECAPOLBHF2);
 	}
 
 	public void RemoveOnError(OnErrorDelegate value)
 	{
-		OnErrorDelegate eGECAPOLBHF = onErrorField;
+		OnErrorDelegate current = onErrorField;
 		OnErrorDelegate eGECAPOLBHF2;
 		do
 		{
-			eGECAPOLBHF2 = eGECAPOLBHF;
-			eGECAPOLBHF = Interlocked.CompareExchange(ref onErrorField, (OnErrorDelegate)Delegate.Remove(eGECAPOLBHF2, value), eGECAPOLBHF);
+			eGECAPOLBHF2 = current;
+			current = Interlocked.CompareExchange(ref onErrorField, (OnErrorDelegate)Delegate.Remove(eGECAPOLBHF2, value), current);
 		}
-		while ((object)eGECAPOLBHF != eGECAPOLBHF2);
+		while ((object)current != eGECAPOLBHF2);
 	}
 
 	public void AddOnRetry(OnRetryDelegate value)
 	{
-		OnRetryDelegate cPMLAEEAKNP = OnRetry;
+		OnRetryDelegate current = OnRetry;
 		OnRetryDelegate cPMLAEEAKNP2;
 		do
 		{
-			cPMLAEEAKNP2 = cPMLAEEAKNP;
-			cPMLAEEAKNP = Interlocked.CompareExchange(ref OnRetry, (OnRetryDelegate)Delegate.Combine(cPMLAEEAKNP2, value), cPMLAEEAKNP);
+			cPMLAEEAKNP2 = current;
+			current = Interlocked.CompareExchange(ref OnRetry, (OnRetryDelegate)Delegate.Combine(cPMLAEEAKNP2, value), current);
 		}
-		while ((object)cPMLAEEAKNP != cPMLAEEAKNP2);
+		while ((object)current != cPMLAEEAKNP2);
 	}
 
 	public void RemoveOnRetry(OnRetryDelegate value)
 	{
-		OnRetryDelegate cPMLAEEAKNP = OnRetry;
+		OnRetryDelegate current = OnRetry;
 		OnRetryDelegate cPMLAEEAKNP2;
 		do
 		{
-			cPMLAEEAKNP2 = cPMLAEEAKNP;
-			cPMLAEEAKNP = Interlocked.CompareExchange(ref OnRetry, (OnRetryDelegate)Delegate.Remove(cPMLAEEAKNP2, value), cPMLAEEAKNP);
+			cPMLAEEAKNP2 = current;
+			current = Interlocked.CompareExchange(ref OnRetry, (OnRetryDelegate)Delegate.Remove(cPMLAEEAKNP2, value), current);
 		}
-		while ((object)cPMLAEEAKNP != cPMLAEEAKNP2);
+		while ((object)current != cPMLAEEAKNP2);
 	}
 
 	public void AddOnClosed(OnGeneralEventDelegate value)
 	{
-		OnGeneralEventDelegate bHJHIPILHJB = onClosedField;
+		OnGeneralEventDelegate current = onClosedField;
 		OnGeneralEventDelegate bHJHIPILHJB2;
 		do
 		{
-			bHJHIPILHJB2 = bHJHIPILHJB;
-			bHJHIPILHJB = Interlocked.CompareExchange(ref onClosedField, (OnGeneralEventDelegate)Delegate.Combine(bHJHIPILHJB2, value), bHJHIPILHJB);
+			bHJHIPILHJB2 = current;
+			current = Interlocked.CompareExchange(ref onClosedField, (OnGeneralEventDelegate)Delegate.Combine(bHJHIPILHJB2, value), current);
 		}
-		while ((object)bHJHIPILHJB != bHJHIPILHJB2);
+		while ((object)current != bHJHIPILHJB2);
 	}
 
 	public void RemoveOnClosed(OnGeneralEventDelegate value)
 	{
-		OnGeneralEventDelegate bHJHIPILHJB = onClosedField;
+		OnGeneralEventDelegate current = onClosedField;
 		OnGeneralEventDelegate bHJHIPILHJB2;
 		do
 		{
-			bHJHIPILHJB2 = bHJHIPILHJB;
-			bHJHIPILHJB = Interlocked.CompareExchange(ref onClosedField, (OnGeneralEventDelegate)Delegate.Remove(bHJHIPILHJB2, value), bHJHIPILHJB);
+			bHJHIPILHJB2 = current;
+			current = Interlocked.CompareExchange(ref onClosedField, (OnGeneralEventDelegate)Delegate.Remove(bHJHIPILHJB2, value), current);
 		}
-		while ((object)bHJHIPILHJB != bHJHIPILHJB2);
+		while ((object)current != bHJHIPILHJB2);
 	}
 
 	public void AddOnStateChanged(OnStateChangedDelegate value)
 	{
-		OnStateChangedDelegate gAHJEMHNLNB = OnStateChanged;
+		OnStateChangedDelegate current = OnStateChanged;
 		OnStateChangedDelegate gAHJEMHNLNB2;
 		do
 		{
-			gAHJEMHNLNB2 = gAHJEMHNLNB;
-			gAHJEMHNLNB = Interlocked.CompareExchange(ref OnStateChanged, (OnStateChangedDelegate)Delegate.Combine(gAHJEMHNLNB2, value), gAHJEMHNLNB);
+			gAHJEMHNLNB2 = current;
+			current = Interlocked.CompareExchange(ref OnStateChanged, (OnStateChangedDelegate)Delegate.Combine(gAHJEMHNLNB2, value), current);
 		}
-		while ((object)gAHJEMHNLNB != gAHJEMHNLNB2);
+		while ((object)current != gAHJEMHNLNB2);
 	}
 
 	public void RemoveOnStateChanged(OnStateChangedDelegate value)
 	{
-		OnStateChangedDelegate gAHJEMHNLNB = OnStateChanged;
+		OnStateChangedDelegate current = OnStateChanged;
 		OnStateChangedDelegate gAHJEMHNLNB2;
 		do
 		{
-			gAHJEMHNLNB2 = gAHJEMHNLNB;
-			gAHJEMHNLNB = Interlocked.CompareExchange(ref OnStateChanged, (OnStateChangedDelegate)Delegate.Remove(gAHJEMHNLNB2, value), gAHJEMHNLNB);
+			gAHJEMHNLNB2 = current;
+			current = Interlocked.CompareExchange(ref OnStateChanged, (OnStateChangedDelegate)Delegate.Remove(gAHJEMHNLNB2, value), current);
 		}
-		while ((object)gAHJEMHNLNB != gAHJEMHNLNB2);
+		while ((object)current != gAHJEMHNLNB2);
 	}
 
 	public void OpenEventSource()
@@ -430,34 +430,34 @@ public class EventSource : IHeartbeat
 		}
 	}
 
-	public void On(string DOPHKKGNAEF, OnEventDelegate IBODMPMJELJ)
+	public void On(string eventName, OnEventDelegate handler)
 	{
 		if (eventTable == null)
 		{
 			eventTable = new Dictionary<string, OnEventDelegate>();
 		}
-		eventTable[DOPHKKGNAEF] = IBODMPMJELJ;
+		eventTable[eventName] = handler;
 	}
 
-	public void Off(string DOPHKKGNAEF)
+	public void Off(string eventName)
 	{
-		if (DOPHKKGNAEF != null)
+		if (eventName != null)
 		{
-			eventTable.Remove(DOPHKKGNAEF);
+			eventTable.Remove(eventName);
 		}
 	}
 
-	private void CallOnError(string JDONBAPIJCG, string CKEHOEGLMBM)
+	private void CallOnError(string error, string context)
 	{
 		if (onErrorField != null)
 		{
 			try
 			{
-				onErrorField(this, JDONBAPIJCG);
+				onErrorField(this, error);
 			}
-			catch (Exception mPFFFAOGBJE)
+			catch (Exception ex)
 			{
-				HTTPManager.GetLogger().Exception("EventSource", CKEHOEGLMBM + " - OnError", mPFFFAOGBJE);
+				HTTPManager.GetLogger().Exception("EventSource", context + " - OnError", ex);
 			}
 		}
 	}
@@ -470,15 +470,15 @@ public class EventSource : IHeartbeat
 			{
 				return OnRetry(this);
 			}
-			catch (Exception mPFFFAOGBJE)
+			catch (Exception ex)
 			{
-				HTTPManager.GetLogger().Exception("EventSource", "CallOnRetry", mPFFFAOGBJE);
+				HTTPManager.GetLogger().Exception("EventSource", "CallOnRetry", ex);
 			}
 		}
 		return true;
 	}
 
-	private void SetClosed(string CKEHOEGLMBM)
+	private void SetClosed(string context)
 	{
 		set_State(EventSourceState.Closed);
 		if (onClosedField != null)
@@ -487,9 +487,9 @@ public class EventSource : IHeartbeat
 			{
 				onClosedField(this);
 			}
-			catch (Exception mPFFFAOGBJE)
+			catch (Exception ex)
 			{
-				HTTPManager.GetLogger().Exception("EventSource", CKEHOEGLMBM + " - OnClosed", mPFFFAOGBJE);
+				HTTPManager.GetLogger().Exception("EventSource", context + " - OnClosed", ex);
 			}
 		}
 	}
@@ -507,10 +507,10 @@ public class EventSource : IHeartbeat
 		set_State(EventSourceState.Retrying);
 	}
 
-	private void OnUpgraded(HTTPRequest BPMCLBNFEDK, HTTPResponse GIHDDAKBMHE)
+	private void OnUpgraded(HTTPRequest request, HTTPResponse response)
 	{
-		EventSourceResponse eNJKHKLBBLI = GIHDDAKBMHE as EventSourceResponse;
-		if (eNJKHKLBBLI == null)
+		EventSourceResponse eventSourceResponse = response as EventSourceResponse;
+		if (eventSourceResponse == null)
 		{
 			CallOnError("Not an EventSourceResponse!", "OnUpgraded");
 			return;
@@ -521,18 +521,18 @@ public class EventSource : IHeartbeat
 			{
 				OnOpen(this);
 			}
-			catch (Exception mPFFFAOGBJE)
+			catch (Exception ex)
 			{
-				HTTPManager.GetLogger().Exception("EventSource", "OnOpen", mPFFFAOGBJE);
+				HTTPManager.GetLogger().Exception("EventSource", "OnOpen", ex);
 			}
 		}
-		eNJKHKLBBLI.OnMessage = (Action<EventSourceResponse, Message>)Delegate.Combine(eNJKHKLBBLI.OnMessage, new Action<EventSourceResponse, Message>(OnMessageReceived));
-		eNJKHKLBBLI.StartReceive();
+		eventSourceResponse.OnMessage = (Action<EventSourceResponse, Message>)Delegate.Combine(eventSourceResponse.OnMessage, new Action<EventSourceResponse, Message>(OnMessageReceived));
+		eventSourceResponse.StartReceive();
 		RetryCount = 0;
 		set_State(EventSourceState.Open);
 	}
 
-	private void OnRequestFinished(HTTPRequest CGOIOKHEGOE, HTTPResponse BEIGFGCBICO)
+	private void OnRequestFinished(HTTPRequest request, HTTPResponse response)
 	{
 		if (GetState() == EventSourceState.Closed)
 		{
@@ -545,25 +545,25 @@ public class EventSource : IHeartbeat
 		}
 		string text = string.Empty;
 		bool flag = true;
-		switch (CGOIOKHEGOE.GetState())
+		switch (request.GetState())
 		{
 		case HTTPRequestStates.Processing:
-			flag = !BEIGFGCBICO.HasHeader("content-length");
+			flag = !response.HasHeader("content-length");
 			break;
 		case HTTPRequestStates.Finished:
-			if (BEIGFGCBICO.GetStatusCode() == 200 && !BEIGFGCBICO.HasHeaderWithValue("content-type", "text/event-stream"))
+			if (response.GetStatusCode() == 200 && !response.HasHeaderWithValue("content-type", "text/event-stream"))
 			{
 				text = "No Content-Type header with value 'text/event-stream' present.";
 				flag = false;
 			}
-			if (flag && BEIGFGCBICO.GetStatusCode() != 500 && BEIGFGCBICO.GetStatusCode() != 502 && BEIGFGCBICO.GetStatusCode() != 503 && BEIGFGCBICO.GetStatusCode() != 504)
+			if (flag && response.GetStatusCode() != 500 && response.GetStatusCode() != 502 && response.GetStatusCode() != 503 && response.GetStatusCode() != 504)
 			{
 				flag = false;
-				text = string.Format("Request Finished Successfully, but the server sent an error. Status Code: {0}-{1} Message: {2}", BEIGFGCBICO.GetStatusCode(), BEIGFGCBICO.GetMessage(), BEIGFGCBICO.GetDataAsText());
+				text = string.Format("Request Finished Successfully, but the server sent an error. Status Code: {0}-{1} Message: {2}", response.GetStatusCode(), response.GetMessage(), response.GetDataAsText());
 			}
 			break;
 		case HTTPRequestStates.Error:
-			text = "Request Finished with Error! " + ((CGOIOKHEGOE.GetException() == null) ? "No Exception" : (CGOIOKHEGOE.GetException().Message + "\n" + CGOIOKHEGOE.GetException().StackTrace));
+			text = "Request Finished with Error! " + ((request.GetException() == null) ? "No Exception" : (request.GetException().Message + "\n" + request.GetException().StackTrace));
 			break;
 		case HTTPRequestStates.Aborted:
 			text = "OnRequestFinished - Aborted without request. EventSource's State: " + GetState();
@@ -596,21 +596,21 @@ public class EventSource : IHeartbeat
 		}
 	}
 
-	private void OnMessageReceived(EventSourceResponse BEIGFGCBICO, Message LIOGIBJBHAH)
+	private void OnMessageReceived(EventSourceResponse response, Message message)
 	{
 		if (GetState() >= EventSourceState.Closing)
 		{
 			return;
 		}
-		if (LIOGIBJBHAH.GetMessageId() != null)
+		if (message.GetMessageId() != null)
 		{
-			set_LastEventId(LIOGIBJBHAH.GetMessageId());
+			set_LastEventId(message.GetMessageId());
 		}
-		if (LIOGIBJBHAH.GetRetry().TotalMilliseconds > 0.0)
+		if (message.GetRetry().TotalMilliseconds > 0.0)
 		{
-			set_ReconnectionTime(LIOGIBJBHAH.GetRetry());
+			set_ReconnectionTime(message.GetRetry());
 		}
-		if (string.IsNullOrEmpty(LIOGIBJBHAH.GetData()))
+		if (string.IsNullOrEmpty(message.GetData()))
 		{
 			return;
 		}
@@ -618,21 +618,21 @@ public class EventSource : IHeartbeat
 		{
 			try
 			{
-				onMessageField(this, LIOGIBJBHAH);
+				onMessageField(this, message);
 			}
-			catch (Exception mPFFFAOGBJE)
+			catch (Exception ex)
 			{
-				HTTPManager.GetLogger().Exception("EventSource", "OnMessageReceived - OnMessage", mPFFFAOGBJE);
+				HTTPManager.GetLogger().Exception("EventSource", "OnMessageReceived - OnMessage", ex);
 			}
 		}
 		OnEventDelegate value;
-		if (string.IsNullOrEmpty(LIOGIBJBHAH.GetEvent()) || !eventTable.TryGetValue(LIOGIBJBHAH.GetEvent(), out value) || value == null)
+		if (string.IsNullOrEmpty(message.GetEvent()) || !eventTable.TryGetValue(message.GetEvent(), out value) || value == null)
 		{
 			return;
 		}
 		try
 		{
-			value(this, LIOGIBJBHAH);
+			value(this, message);
 		}
 		catch (Exception mPFFFAOGBJE2)
 		{
@@ -640,7 +640,7 @@ public class EventSource : IHeartbeat
 		}
 	}
 
-	void IHeartbeat.OnHeartbeatUpdate(TimeSpan OJOKANCMPLG)
+	void IHeartbeat.OnHeartbeatUpdate(TimeSpan elapsed)
 	{
 		if (GetState() != EventSourceState.Retrying)
 		{

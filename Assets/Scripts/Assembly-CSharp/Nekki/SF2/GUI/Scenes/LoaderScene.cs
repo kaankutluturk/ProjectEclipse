@@ -124,7 +124,7 @@ namespace Nekki.SF2.GUI.Scenes
 
 		public void ScalePicture()
 		{
-			float nHIDNIPGCPC = SystemProperties.ScaleY;
+			float scaleY = SystemProperties.ScaleY;
 		}
 
 		public void AddLogo()
@@ -139,7 +139,7 @@ namespace Nekki.SF2.GUI.Scenes
 		{
 			if (loadingImage == null)
 			{
-				float nHIDNIPGCPC = SystemProperties.ScaleY;
+				float scaleY = SystemProperties.ScaleY;
 			}
 		}
 

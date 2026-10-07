@@ -1,1 +1,1 @@
-public delegate void OnGeneralEventDelegate(EventSource GLFHBCIPCBD);
+public delegate void OnGeneralEventDelegate(EventSource eventSource);

@@ -7,19 +7,19 @@ public class EventAnimationStart : EventAnimation
 	{
 	}
 
-	protected override bool Compare(EventAnimation FOPOKALJIIJ)
+	protected override bool Compare(EventAnimation other)
 	{
-		EventAnimationStart hPCJMBAJKLJ = FOPOKALJIIJ as EventAnimationStart;
-		bool flag = IsCompareNames(hPCJMBAJKLJ.Conditions.SelfAnimationNames);
+		EventAnimationStart otherEvent = other as EventAnimationStart;
+		bool flag = IsCompareNames(otherEvent.Conditions.SelfAnimationNames);
 		return (!IsNot) ? flag : (!flag);
 	}
 
-	private bool IsCompareNames(List<string> NIKHAICFGNM)
+	private bool IsCompareNames(List<string> names)
 	{
 		int i = 0;
-		for (int count = NIKHAICFGNM.Count; i < count; i++)
+		for (int count = names.Count; i < count; i++)
 		{
-			if (NIKHAICFGNM[i] == AnimationName)
+			if (names[i] == AnimationName)
 			{
 				return true;
 			}

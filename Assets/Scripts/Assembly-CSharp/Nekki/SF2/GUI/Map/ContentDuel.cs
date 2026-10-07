@@ -19,42 +19,42 @@ namespace Nekki.SF2.GUI.Map
 
 		private Battle battle;
 
-		public void Init(Battle DPOOIONCEOA, FightList KOMGFJOCEDN)
+		public void Init(Battle newBattle, FightList fight)
 		{
-			battle = DPOOIONCEOA;
-			_lblDescription.SetAlias(KOMGFJOCEDN.GetDescription());
-			bool mMDLKOPCFLK = (DPOOIONCEOA.get_Type() != BattleType.FightBosses && DPOOIONCEOA.get_Type() != BattleType.FightBossesReplayable && DPOOIONCEOA.get_Type() != BattleType.FightFinalTitan) || !HasRewardItem(KOMGFJOCEDN);
-			_prizePanel.Init(-1, mMDLKOPCFLK, KOMGFJOCEDN);
-			_difficultyPanel.gameObject.SetActive(DPOOIONCEOA.GetFightCount() != 0);
-			_difficultyPanel.Init(GameUtils.CalculateFightDifficulty(KOMGFJOCEDN));
+			battle = newBattle;
+			_lblDescription.SetAlias(fight.GetDescription());
+			bool hideItems = (newBattle.get_Type() != BattleType.FightBosses && newBattle.get_Type() != BattleType.FightBossesReplayable && newBattle.get_Type() != BattleType.FightFinalTitan) || !HasRewardItem(fight);
+			_prizePanel.Init(-1, hideItems, fight);
+			_difficultyPanel.gameObject.SetActive(newBattle.GetFightCount() != 0);
+			_difficultyPanel.Init(GameUtils.CalculateFightDifficulty(fight));
 			_btnPeriodicReset.gameObject.SetActive(false);
-			if (DPOOIONCEOA.get_Type() == BattleType.FightPeriodic && SystemProperties.IsDebug())
+			if (newBattle.get_Type() == BattleType.FightPeriodic && SystemProperties.IsDebug())
 			{
 				_btnPeriodicReset.gameObject.SetActive(true);
 				_btnPeriodicReset.onClick.AddListener(OnPeriodicResetClicked);
 			}
 		}
 
-		private bool HasRewardItem(FightList KOMGFJOCEDN)
+		private bool HasRewardItem(FightList fight)
 		{
-			if (KOMGFJOCEDN == null)
+			if (fight == null)
 			{
 				return false;
 			}
-			RewardStruct fDFKLPHBAHJ = KOMGFJOCEDN.GetRewards()[KOMGFJOCEDN.GetRewards().Count - 1];
-			int gNLOCMLBNHF = ListSF.GetRoster().GetLevel();
-			RewardPrize cMHHEHILIIH = fDFKLPHBAHJ.GetPrizeForLevel(gNLOCMLBNHF);
-			if (cMHHEHILIIH.items.Count == 0)
+			RewardStruct rewardStruct = fight.GetRewards()[fight.GetRewards().Count - 1];
+			int level = ListSF.GetRoster().GetLevel();
+			RewardPrize prize = rewardStruct.GetPrizeForLevel(level);
+			if (prize.items.Count == 0)
 			{
 				return false;
 			}
-			RewardItem cACJANFAJEC = cMHHEHILIIH.items[0];
-			if (!cACJANFAJEC.ShowReward)
+			RewardItem rewardItem = prize.items[0];
+			if (!rewardItem.ShowReward)
 			{
 				return false;
 			}
-			ItemInfo dJKEECEOCJB = ListSF.GetItems().GetItemByName(cACJANFAJEC.Name);
-			return dJKEECEOCJB != null;
+			ItemInfo itemInfo = ListSF.GetItems().GetItemByName(rewardItem.Name);
+			return itemInfo != null;
 		}
 
 		private void OnPeriodicResetClicked()

@@ -4,15 +4,15 @@ public class QuestActionHideMapButton : QuestAction
 {
 	private string _name = string.Empty;
 
-	public override void Parse(XmlNode EPKLCPOEELO)
+	public override void Parse(XmlNode node)
 	{
-		base.Parse(EPKLCPOEELO);
-		_name = EPKLCPOEELO.Attributes["Name"].GetStringOrDefault(string.Empty);
+		base.Parse(node);
+		_name = node.Attributes["Name"].GetStringOrDefault(string.Empty);
 	}
 
-	public override void Execute(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters parameters)
 	{
-		base.Execute(GFIHPBCEEOB);
+		base.Execute(parameters);
 		string name = string.Empty;
 		GetValues(ref name);
 		MapButtonController.GetInstance().RemoveButton(name);
@@ -21,10 +21,10 @@ public class QuestActionHideMapButton : QuestAction
 
 	private void GetValues(ref string name)
 	{
-		ConditionExtension.CompareResult lNIDLHOIHIM = new ConditionExtension.CompareResult();
-		QuestCondition kKDGLNECFHA = new QuestCondition();
-		kKDGLNECFHA.SetParameters(Parameters);
-		kKDGLNECFHA.SetValue(_name, lNIDLHOIHIM);
-		name = lNIDLHOIHIM.ToString();
+		ConditionExtension.CompareResult result = new ConditionExtension.CompareResult();
+		QuestCondition condition = new QuestCondition();
+		condition.SetParameters(Parameters);
+		condition.SetValue(_name, result);
+		name = result.ToString();
 	}
 }

@@ -4,18 +4,18 @@ public class QuestActionEndTimer : QuestAction
 {
 	private string timerName;
 
-	public override void Parse(XmlNode EPKLCPOEELO)
+	public override void Parse(XmlNode node)
 	{
-		base.Parse(EPKLCPOEELO);
-		timerName = EPKLCPOEELO.Attributes["Name"].GetStringOrDefault(string.Empty);
+		base.Parse(node);
+		timerName = node.Attributes["Name"].GetStringOrDefault(string.Empty);
 	}
 
-	public override void Execute(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters parameters)
 	{
-		base.Execute(GFIHPBCEEOB);
-		Roster nKGLHEGIKKP = ListSF.GetRoster();
-		RosterTimerContainer kCMICMHCEBB = nKGLHEGIKKP.GetTimerContainer();
-		kCMICMHCEBB.RemoveTimer(timerName);
+		base.Execute(parameters);
+		Roster roster = ListSF.GetRoster();
+		RosterTimerContainer timerContainer = roster.GetTimerContainer();
+		timerContainer.RemoveTimer(timerName);
 		FinishAction();
 	}
 }

@@ -11,17 +11,17 @@ public class NekkiWebHandlerDownload : NekkiWebHandler
 
 	private readonly FileStream _file;
 
-	public NekkiWebHandlerDownload(NekkiUri IACLKBNEBDM, string NDAOKPCHGJP, string IAOMDDJCIPC)
-		: base(IACLKBNEBDM)
+	public NekkiWebHandlerDownload(NekkiUri uri, string targetPath, string tempPath)
+		: base(uri)
 	{
-		_targetPath = NDAOKPCHGJP;
-		_tempPath = IAOMDDJCIPC;
+		_targetPath = targetPath;
+		_tempPath = tempPath;
 		_file = FileUtils.OpenAppendStream(_tempPath);
 	}
 
-	protected override void OnDataReceived(byte[] data, int IAFIGGBIKOD, int HIGBAHGOFIJ)
+	protected override void OnDataReceived(byte[] data, int offset, int length)
 	{
-		_file.Write(data, 0, HIGBAHGOFIJ);
+		_file.Write(data, 0, length);
 	}
 
 	public override void Abort()

@@ -17,10 +17,10 @@ public class Attributes
 		values = new Dictionary<string, int>();
 	}
 
-	public Attributes(Attributes NOLFMPDGCOC)
+	public Attributes(Attributes other)
 	{
 		values = new Dictionary<string, int>();
-		foreach (KeyValuePair<string, int> item in NOLFMPDGCOC.values)
+		foreach (KeyValuePair<string, int> item in other.values)
 		{
 			values.Add(item.Key, item.Value);
 		}
@@ -31,63 +31,63 @@ public class Attributes
 		return values.Count;
 	}
 
-	public void AddRange(Attributes NOLFMPDGCOC)
+	public void AddRange(Attributes other)
 	{
-		foreach (KeyValuePair<string, int> item in NOLFMPDGCOC.values)
+		foreach (KeyValuePair<string, int> item in other.values)
 		{
 			values[item.Key] = item.Value;
 		}
 	}
 
-	public bool Get(string KGBGENDIMBC, ref int OEMALIFPGPO, bool PIDPHPGMLOD = true, bool OMHMHCLDBFA = false)
+	public bool Get(string name, ref int result, bool applyAspectBonus = true, bool isAspectName = false)
 	{
-		if (OMHMHCLDBFA)
+		if (isAspectName)
 		{
-			Aspect hOHAPDGFMHL = GameUtils.GetAspectByName(KGBGENDIMBC);
-			if (hOHAPDGFMHL != null)
+			Aspect aspect = GameUtils.GetAspectByName(name);
+			if (aspect != null)
 			{
-				return Get(hOHAPDGFMHL.GetAttribute(), ref OEMALIFPGPO, PIDPHPGMLOD, OMHMHCLDBFA);
+				return Get(aspect.GetAttribute(), ref result, applyAspectBonus, isAspectName);
 			}
 		}
-		if (KGBGENDIMBC != null && values.ContainsKey(KGBGENDIMBC))
+		if (name != null && values.ContainsKey(name))
 		{
-			int num = values[KGBGENDIMBC];
-			if (PIDPHPGMLOD)
+			int num = values[name];
+			if (applyAspectBonus)
 			{
-				Aspect hOHAPDGFMHL2 = GameUtils.GetAspectByName(KGBGENDIMBC);
+				Aspect hOHAPDGFMHL2 = GameUtils.GetAspectByName(name);
 				if (hOHAPDGFMHL2 != null)
 				{
-					int gNLOCMLBNHF = ListSF.GetRoster().GetLevel();
-					int bIJKNKAJBHH = GameUtils.GetAspectDoublingRange().GetLevelStep();
+					int level = ListSF.GetRoster().GetLevel();
+					int levelStep = GameUtils.GetAspectDoublingRange().GetLevelStep();
 					float num2 = GameUtils.GetAspectDoublingRange().GetValue();
-					OEMALIFPGPO = hOHAPDGFMHL2.GetValue(num, gNLOCMLBNHF, bIJKNKAJBHH, num2);
+					result = hOHAPDGFMHL2.GetValue(num, level, levelStep, num2);
 					if (values.ContainsKey(hOHAPDGFMHL2.GetAttribute()))
 					{
 						num = values[hOHAPDGFMHL2.GetAttribute()];
-						OEMALIFPGPO += num;
+						result += num;
 					}
 					return true;
 				}
 			}
-			OEMALIFPGPO = num;
+			result = num;
 			return true;
 		}
 		return false;
 	}
 
-	public void Set(string KGBGENDIMBC, int value, bool OMHMHCLDBFA = false)
+	public void Set(string name, int value, bool isAspectName = false)
 	{
-		if (OMHMHCLDBFA)
+		if (isAspectName)
 		{
-			Aspect hOHAPDGFMHL = GameUtils.GetAspectByName(KGBGENDIMBC);
-			if (hOHAPDGFMHL != null)
+			Aspect aspect = GameUtils.GetAspectByName(name);
+			if (aspect != null)
 			{
-				string key = hOHAPDGFMHL.GetAttribute();
+				string key = aspect.GetAttribute();
 				values[key] = value;
 				return;
 			}
 		}
-		values[KGBGENDIMBC] = value;
+		values[name] = value;
 	}
 
 	public void Clear()

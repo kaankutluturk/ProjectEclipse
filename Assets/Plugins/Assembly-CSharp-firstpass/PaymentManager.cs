@@ -56,9 +56,9 @@ public static class PaymentManager
 		return store;
 	}
 
-	public static void Init(ITransactionChangeListener ONDHILAOLIM, IPurchaseVerifier IHLKACMLEGK, ProductDefinition[] OCMDJBDPLJK, Dictionary<string, object> PCJAKPJMKGN = null)
+	public static void Init(ITransactionChangeListener transactionListener, IPurchaseVerifier purchaseVerifier, ProductDefinition[] productDefinitions, Dictionary<string, object> options = null)
 	{
-		listener = ONDHILAOLIM;
+		listener = transactionListener;
 		// Keep UI subscriptions on the inert local facade; no store or verification service.
 	}
 
@@ -93,37 +93,37 @@ public static class PaymentManager
 		return false;
 	}
 
-	public static PaymentInfo AddInProgressPayment(string ODJCLFJHKFP, string BGMLFNGKDHI, string DNHKNDPBGNM, string BGLGHEMMANM)
+	public static PaymentInfo AddInProgressPayment(string productId, string paymentId, string receipt, string signature)
 	{
-		PaymentInfo jLDHCFFAIPK = PaymentInfo.CreateNotVerified(ODJCLFJHKFP, BGMLFNGKDHI, DNHKNDPBGNM, BGLGHEMMANM);
-		inProgressPayments.Add(jLDHCFFAIPK);
+		PaymentInfo paymentInfo = PaymentInfo.CreateNotVerified(productId, paymentId, receipt, signature);
+		inProgressPayments.Add(paymentInfo);
 		listener.OnTransactionsChanged(true);
-		return jLDHCFFAIPK;
+		return paymentInfo;
 	}
 
-	public static PaymentInfo AddUnverifiedCompletedPayment(string ODJCLFJHKFP, string BGMLFNGKDHI, string DNHKNDPBGNM, string BGLGHEMMANM)
+	public static PaymentInfo AddUnverifiedCompletedPayment(string productId, string paymentId, string receipt, string signature)
 	{
-		PaymentInfo jLDHCFFAIPK = PaymentInfo.CreateNotVerifiedProcessed(ODJCLFJHKFP, BGMLFNGKDHI, DNHKNDPBGNM, BGLGHEMMANM);
-		completedPayments.Add(jLDHCFFAIPK);
+		PaymentInfo paymentInfo = PaymentInfo.CreateNotVerifiedProcessed(productId, paymentId, receipt, signature);
+		completedPayments.Add(paymentInfo);
 		listener.OnTransactionsChanged(true);
-		return jLDHCFFAIPK;
+		return paymentInfo;
 	}
 
-	public static PaymentInfo AddConfirmedPayment(string ODJCLFJHKFP, string BGMLFNGKDHI, string DNHKNDPBGNM, string BGLGHEMMANM, string PPJBKHKCONC)
+	public static PaymentInfo AddConfirmedPayment(string productId, string paymentId, string receipt, string signature, string purchaseDate)
 	{
-		PaymentInfo jLDHCFFAIPK = PaymentInfo.CreateVerifiedConfirmed(ODJCLFJHKFP, BGMLFNGKDHI, DNHKNDPBGNM, BGLGHEMMANM, PPJBKHKCONC);
-		completedPayments.Add(jLDHCFFAIPK);
+		PaymentInfo paymentInfo = PaymentInfo.CreateVerifiedConfirmed(productId, paymentId, receipt, signature, purchaseDate);
+		completedPayments.Add(paymentInfo);
 		listener.OnTransactionsChanged(true);
-		return jLDHCFFAIPK;
+		return paymentInfo;
 	}
 
-	public static PaymentInfo AddFailedPayment(string ODJCLFJHKFP, string BGMLFNGKDHI, string DNHKNDPBGNM, string BGLGHEMMANM, bool BGBMBECEGFH)
+	public static PaymentInfo AddFailedPayment(string productId, string paymentId, string receipt, string signature, bool isCheating)
 	{
-		PaymentInfo jLDHCFFAIPK = PaymentInfo.CreateVerificationFailed(ODJCLFJHKFP, BGMLFNGKDHI, DNHKNDPBGNM, BGLGHEMMANM);
-		jLDHCFFAIPK.SetIsCheating(BGBMBECEGFH);
-		completedPayments.Add(jLDHCFFAIPK);
+		PaymentInfo paymentInfo = PaymentInfo.CreateVerificationFailed(productId, paymentId, receipt, signature);
+		paymentInfo.SetIsCheating(isCheating);
+		completedPayments.Add(paymentInfo);
 		listener.OnTransactionsChanged(true);
-		return jLDHCFFAIPK;
+		return paymentInfo;
 	}
 
 	public static void ProcessPendingPayments()
@@ -132,40 +132,40 @@ public static class PaymentManager
 		// or verification backend when the payment UI opens.
 	}
 
-	public static void MarkPaymentFailed(PaymentInfo PAENLDALDGB)
+	public static void MarkPaymentFailed(PaymentInfo payment)
 	{
-		inProgressPayments.Remove(PAENLDALDGB);
-		PAENLDALDGB.MarkVerificationFailed();
-		completedPayments.Add(PAENLDALDGB);
+		inProgressPayments.Remove(payment);
+		payment.MarkVerificationFailed();
+		completedPayments.Add(payment);
 		listener.OnTransactionsChanged(true);
 	}
 
-	public static void MarkPaymentVerified(PaymentInfo PAENLDALDGB)
+	public static void MarkPaymentVerified(PaymentInfo payment)
 	{
-		PAENLDALDGB.MarkVerified();
+		payment.MarkVerified();
 		listener.OnTransactionsChanged(true);
 	}
 
-	public static void CompletePayment(PaymentInfo PAENLDALDGB)
+	public static void CompletePayment(PaymentInfo payment)
 	{
-		inProgressPayments.Remove(PAENLDALDGB);
-		completedPayments.Add(PAENLDALDGB);
+		inProgressPayments.Remove(payment);
+		completedPayments.Add(payment);
 		listener.OnTransactionsChanged(true);
 	}
 
-	public static void ConfirmPayment(PaymentInfo PAENLDALDGB)
+	public static void ConfirmPayment(PaymentInfo payment)
 	{
-		inProgressPayments.Remove(PAENLDALDGB);
-		PAENLDALDGB.MarkConfirmed();
-		completedPayments.Add(PAENLDALDGB);
+		inProgressPayments.Remove(payment);
+		payment.MarkConfirmed();
+		completedPayments.Add(payment);
 		listener.OnTransactionsChanged(true);
 	}
 
-	public static bool IsUnknownPayment(PaymentInfo PAENLDALDGB)
+	public static bool IsUnknownPayment(PaymentInfo payment)
 	{
 		for (int i = 0; i < inProgressPayments.Count; i++)
 		{
-			if (inProgressPayments[i].GetPaymentId() == PAENLDALDGB.GetPaymentId())
+			if (inProgressPayments[i].GetPaymentId() == payment.GetPaymentId())
 			{
 				return false;
 			}
@@ -173,11 +173,11 @@ public static class PaymentManager
 		return true;
 	}
 
-	public static bool HasInProgressPayment(string ODJCLFJHKFP, string BGMLFNGKDHI = null)
+	public static bool HasInProgressPayment(string productId, string paymentId = null)
 	{
 		foreach (PaymentInfo item in inProgressPayments)
 		{
-			if (item.GetProductId() == ODJCLFJHKFP && (BGMLFNGKDHI == null || item.GetPaymentId() == BGMLFNGKDHI))
+			if (item.GetProductId() == productId && (paymentId == null || item.GetPaymentId() == paymentId))
 			{
 				return true;
 			}
@@ -185,11 +185,11 @@ public static class PaymentManager
 		return false;
 	}
 
-	public static bool HasCompletedPayment(string ODJCLFJHKFP, string BGMLFNGKDHI = null)
+	public static bool HasCompletedPayment(string productId, string paymentId = null)
 	{
 		foreach (PaymentInfo item in completedPayments)
 		{
-			if (item.GetProductId() == ODJCLFJHKFP && (BGMLFNGKDHI == null || item.GetPaymentId() == BGMLFNGKDHI))
+			if (item.GetProductId() == productId && (paymentId == null || item.GetPaymentId() == paymentId))
 			{
 				return true;
 			}

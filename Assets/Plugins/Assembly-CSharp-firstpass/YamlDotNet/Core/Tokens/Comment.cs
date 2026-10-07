@@ -9,15 +9,15 @@ namespace YamlDotNet.Core.Tokens
 
 		public bool IsInline { get; private set; }
 
-		public Comment(string value, bool EKOKIGANOMO)
-			: this(value, EKOKIGANOMO, Mark.Empty, Mark.Empty)
+		public Comment(string value, bool isInline)
+			: this(value, isInline, Mark.Empty, Mark.Empty)
 		{
 		}
 
-		public Comment(string value, bool EKOKIGANOMO, Mark ILENLCMAMBH, Mark PCLFFOBJJFO)
-			: base(ILENLCMAMBH, PCLFFOBJJFO)
+		public Comment(string value, bool isInline, Mark startMark, Mark endMark)
+			: base(startMark, endMark)
 		{
-			IsInline = EKOKIGANOMO;
+			IsInline = isInline;
 			Value = value;
 		}
 	}

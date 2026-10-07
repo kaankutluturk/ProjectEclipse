@@ -59,22 +59,22 @@ public partial class PerksStage : global::EventDispatcher<PerksStage.PerkEventSt
 		{
 		}
 
-		public ActionPerk(ActionPerk IBODMPMJELJ)
+		public ActionPerk(ActionPerk source)
 		{
-			IsExpired = IBODMPMJELJ.IsExpired;
-			SourceModel = IBODMPMJELJ.SourceModel;
-			TargetModel = IBODMPMJELJ.TargetModel;
-			Action = IBODMPMJELJ.Action;
-			ElapsedFrames = IBODMPMJELJ.ElapsedFrames;
-			DurationFrames = IBODMPMJELJ.DurationFrames;
-			IconPath = IBODMPMJELJ.IconPath;
-			StackKey = IBODMPMJELJ.StackKey;
-			ShowExpiration = IBODMPMJELJ.ShowExpiration;
-				ExpirationVersion = IBODMPMJELJ.ExpirationVersion;
-				EclipseStackCount = IBODMPMJELJ.EclipseStackCount;
-			PreviousMagic = IBODMPMJELJ.PreviousMagic;
-            AppliedAttributes = IBODMPMJELJ.AppliedAttributes == null ? null :
-                new Dictionary<string, int>(IBODMPMJELJ.AppliedAttributes);
+			IsExpired = source.IsExpired;
+			SourceModel = source.SourceModel;
+			TargetModel = source.TargetModel;
+			Action = source.Action;
+			ElapsedFrames = source.ElapsedFrames;
+			DurationFrames = source.DurationFrames;
+			IconPath = source.IconPath;
+			StackKey = source.StackKey;
+			ShowExpiration = source.ShowExpiration;
+				ExpirationVersion = source.ExpirationVersion;
+				EclipseStackCount = source.EclipseStackCount;
+			PreviousMagic = source.PreviousMagic;
+            AppliedAttributes = source.AppliedAttributes == null ? null :
+                new Dictionary<string, int>(source.AppliedAttributes);
 		}
 
 		public string GetPerkName()
@@ -131,19 +131,19 @@ public partial class PerksStage : global::EventDispatcher<PerksStage.PerkEventSt
 		}
 	}
 
-	public void SetModels(List<Model> INNLAFHKJNI)
+	public void SetModels(List<Model> models)
 	{
 		ClearModels();
-		foreach (Model item in INNLAFHKJNI)
+		foreach (Model item in models)
 		{
 			AddModel(item);
 		}
 	}
 
-	public void AddModel(Model ACENLMONNPA)
+	public void AddModel(Model model)
 	{
-		var prepared = PrepareModelRegistration(ACENLMONNPA);
-		RemoveModel(ACENLMONNPA);
+		var prepared = PrepareModelRegistration(model);
+		RemoveModel(model);
 		modelRegistrations.Add(prepared);
 	}
 
@@ -312,11 +312,11 @@ public partial class PerksStage : global::EventDispatcher<PerksStage.PerkEventSt
         return prepared;
     }
 
-	public void RemoveModel(Model ACENLMONNPA)
+	public void RemoveModel(Model model)
 	{
 		foreach (PerkModelStruct item in modelRegistrations)
 		{
-			if (item.get_Model() == ACENLMONNPA)
+			if (item.get_Model() == model)
 			{
 				modelRegistrations.Remove(item);
 				break;
@@ -336,65 +336,65 @@ public partial class PerksStage : global::EventDispatcher<PerksStage.PerkEventSt
 		{
 			foreach (InfoPerk item2 in item.GetInfoPerks())
 			{
-				bool gIBIGPCELOB = true;
-				item2.ClearActions(gIBIGPCELOB);
+				bool clearAll = true;
+				item2.ClearActions(clearAll);
 			}
 		}
 	}
 
-	public bool FireEvent(Model FAJBDBKEHJL, PerkEvent.PerkEventType LFLGCDNKNJI, bool GMFCKPBJNLC = false, PerkTrigger CPBHKJFPFJB = null)
+	public bool FireEvent(Model model, PerkEvent.PerkEventType eventType, bool includePerkMap = false, PerkTrigger trigger = null)
 	{
-		DispatchEvent(FAJBDBKEHJL, LFLGCDNKNJI);
+		DispatchEvent(model, eventType);
 		object obj = ((!GetPerkMap().ContainsKey("Namespace")) ? null : GetPerkMap()["Namespace"]);
-		string fILIJOFBNMA = string.Empty;
+		string eventNamespace = string.Empty;
 		if (obj != null)
 		{
-			fILIJOFBNMA = (string)obj;
+			eventNamespace = (string)obj;
 		}
 		foreach (PerkModelStruct item in modelRegistrations)
 		{
-			if (CPBHKJFPFJB != null)
+			if (trigger != null)
 			{
-				if (FAJBDBKEHJL == item.get_Model())
+				if (model == item.get_Model())
 				{
-					ProcessTrigger(item, FAJBDBKEHJL, null, CPBHKJFPFJB, true);
+					ProcessTrigger(item, model, null, trigger, true);
 				}
 				continue;
 			}
-			List<PerkTrigger> list = item.GetTriggersForEvent(LFLGCDNKNJI);
+			List<PerkTrigger> list = item.GetTriggersForEvent(eventType);
 			if (list == null)
 			{
 				continue;
 			}
-			PerkEvent.EventStruct pJEJIOPNBIJ = new PerkEvent.EventStruct();
-			pJEJIOPNBIJ.Type = LFLGCDNKNJI;
-			pJEJIOPNBIJ.Info = ((!GMFCKPBJNLC) ? null : GetPerkMap());
-			pJEJIOPNBIJ.PerkOwnerModel = item.get_Model();
-			pJEJIOPNBIJ.EventModel = FAJBDBKEHJL;
-			pJEJIOPNBIJ.Namespace = fILIJOFBNMA;
+			PerkEvent.EventStruct eventData = new PerkEvent.EventStruct();
+			eventData.Type = eventType;
+			eventData.Info = ((!includePerkMap) ? null : GetPerkMap());
+			eventData.PerkOwnerModel = item.get_Model();
+			eventData.EventModel = model;
+			eventData.Namespace = eventNamespace;
 			foreach (PerkTrigger item2 in list)
 			{
-				ProcessTrigger(item, FAJBDBKEHJL, pJEJIOPNBIJ, item2);
+				ProcessTrigger(item, model, eventData, item2);
 			}
 		}
-		if (CPBHKJFPFJB == null)
+		if (trigger == null)
 		{
 			Run();
 		}
 		return true;
 	}
 
-	private void ProcessTrigger(PerkModelStruct MAEPLNACFKD, Model FAJBDBKEHJL, PerkEvent.EventStruct EJMEALJNNIL, PerkTrigger CPBHKJFPFJB, bool CAPNMPNNBHF = false)
+	private void ProcessTrigger(PerkModelStruct modelRegistration, Model model, PerkEvent.EventStruct eventData, PerkTrigger trigger, bool forceTrigger = false)
 	{
-		PerkData mFKICNALNFB = MAEPLNACFKD.FindPerkData(CPBHKJFPFJB.GetPerk());
-		if (mFKICNALNFB != null && mFKICNALNFB.Enabled)
+		PerkData perkData = modelRegistration.FindPerkData(trigger.GetPerk());
+		if (perkData != null && perkData.Enabled)
 		{
-			InfoPerk bPDFFLADJMJ = FindInfoPerk(MAEPLNACFKD, CPBHKJFPFJB.GetPerk());
-			List<string> nIKHAICFGNM = ((bPDFFLADJMJ == null) ? new List<string>() : bPDFFLADJMJ.GetActiveActionNames());
-			CPBHKJFPFJB.GetPerk().SetOwnerModel(MAEPLNACFKD.get_Model());
-			if ((EJMEALJNNIL == null || CPBHKJFPFJB.MatchesEvent(EJMEALJNNIL)) && CPBHKJFPFJB.AreConditionsMet(MAEPLNACFKD.get_Model(), nIKHAICFGNM))
+			InfoPerk infoPerk = FindInfoPerk(modelRegistration, trigger.GetPerk());
+			List<string> activeActionNames = ((infoPerk == null) ? new List<string>() : infoPerk.GetActiveActionNames());
+			trigger.GetPerk().SetOwnerModel(modelRegistration.get_Model());
+			if ((eventData == null || trigger.MatchesEvent(eventData)) && trigger.AreConditionsMet(modelRegistration.get_Model(), activeActionNames))
 			{
-				ExecuteTriggerActions(MAEPLNACFKD, FAJBDBKEHJL, CPBHKJFPFJB, CAPNMPNNBHF);
+				ExecuteTriggerActions(modelRegistration, model, trigger, forceTrigger);
 			}
 		}
 	}
@@ -411,55 +411,55 @@ public partial class PerksStage : global::EventDispatcher<PerksStage.PerkEventSt
 		}
 	}
 
-	public void CollectActiveActions(Model ACENLMONNPA, List<ActionPerk> FFFLNOBCBGL)
+	public void CollectActiveActions(Model model, List<ActionPerk> outActions)
 	{
-		FFFLNOBCBGL.Clear();
-		PerkModelStruct iAIBLEELGNK = null;
-		InfoPerk bPDFFLADJMJ = null;
-		ActionPerk oAJGINIDKJD = null;
+		outActions.Clear();
+		PerkModelStruct modelRegistration = null;
+		InfoPerk infoPerk = null;
+		ActionPerk actionPerk = null;
 		for (int i = 0; i < modelRegistrations.Count; i++)
 		{
-			iAIBLEELGNK = modelRegistrations[i];
-			for (int j = 0; j < iAIBLEELGNK.GetInfoPerks().Count; j++)
+			modelRegistration = modelRegistrations[i];
+			for (int j = 0; j < modelRegistration.GetInfoPerks().Count; j++)
 			{
-				bPDFFLADJMJ = iAIBLEELGNK.GetInfoPerks()[j];
-				for (int k = 0; k < bPDFFLADJMJ.GetActiveActions().Count; k++)
+				infoPerk = modelRegistration.GetInfoPerks()[j];
+				for (int k = 0; k < infoPerk.GetActiveActions().Count; k++)
 				{
-					oAJGINIDKJD = bPDFFLADJMJ.GetActiveActions()[k];
-					if (oAJGINIDKJD.TargetModel == ACENLMONNPA)
+					actionPerk = infoPerk.GetActiveActions()[k];
+					if (actionPerk.TargetModel == model)
 					{
-						FFFLNOBCBGL.Add(oAJGINIDKJD);
+						outActions.Add(actionPerk);
 					}
 				}
 			}
 		}
 	}
 
-	public void CollectExpiredActions(Model ACENLMONNPA, List<ActionPerk> FFFLNOBCBGL)
+	public void CollectExpiredActions(Model model, List<ActionPerk> outActions)
 	{
-		FFFLNOBCBGL.Clear();
-		ActionPerk oAJGINIDKJD = null;
+		outActions.Clear();
+		ActionPerk actionPerk = null;
 		for (int i = 0; i < expiredActions.Count; i++)
 		{
-			oAJGINIDKJD = expiredActions[i];
-			if (oAJGINIDKJD.TargetModel == ACENLMONNPA)
+			actionPerk = expiredActions[i];
+			if (actionPerk.TargetModel == model)
 			{
-				FFFLNOBCBGL.Add(oAJGINIDKJD);
+				outActions.Add(actionPerk);
 			}
 		}
 	}
 
-	public InfoPerk FindInfoPerk(Model ACENLMONNPA, PerkInfoItem AEFFHJGMNFI)
+	public InfoPerk FindInfoPerk(Model model, PerkInfoItem perkInfo)
 	{
 		foreach (PerkModelStruct item in modelRegistrations)
 		{
-			if (ACENLMONNPA != item.get_Model())
+			if (model != item.get_Model())
 			{
 				continue;
 			}
 			foreach (InfoPerk item2 in item.GetInfoPerks())
 			{
-				if (item2.Data.PerkInfo == AEFFHJGMNFI)
+				if (item2.Data.PerkInfo == perkInfo)
 				{
 					return item2;
 				}
@@ -468,25 +468,25 @@ public partial class PerksStage : global::EventDispatcher<PerksStage.PerkEventSt
 		return null;
 	}
 
-	public InfoPerk FindInfoPerk(PerkModelStruct ACENLMONNPA, PerkInfoItem AEFFHJGMNFI)
+	public InfoPerk FindInfoPerk(PerkModelStruct modelRegistration, PerkInfoItem perkInfo)
 	{
-		return FindInfoPerk(ACENLMONNPA.get_Model(), AEFFHJGMNFI);
+		return FindInfoPerk(modelRegistration.get_Model(), perkInfo);
 	}
 
 	public void OnDisarm(object data)
 	{
-		Model.DisarmData aADFODEJPHG = (Model.DisarmData)data;
-		PerkModelStruct iAIBLEELGNK = FindModelRegistration(aADFODEJPHG.Owner);
-		foreach (PerkInfoItem item in aADFODEJPHG.LostPerks)
+		Model.DisarmData disarmData = (Model.DisarmData)data;
+		PerkModelStruct modelRegistration = FindModelRegistration(disarmData.Owner);
+		foreach (PerkInfoItem item in disarmData.LostPerks)
 		{
-			foreach (InfoPerk item2 in iAIBLEELGNK.GetInfoPerks())
+			foreach (InfoPerk item2 in modelRegistration.GetInfoPerks())
 			{
 				if (item2.Data.PerkInfo == item)
 				{
 					item2.ClearActions(true);
 				}
 			}
-			iAIBLEELGNK.SetPerkEnabled(item, false);
+			modelRegistration.SetPerkEnabled(item, false);
 		}
 	}
 
@@ -494,9 +494,9 @@ public partial class PerksStage : global::EventDispatcher<PerksStage.PerkEventSt
 	{
 		foreach (PerkModelStruct item in modelRegistrations)
 		{
-			item.GetPerkDataList().ForEach((PerkData DHDMNHCIPEH) =>
+			item.GetPerkDataList().ForEach((PerkData perkData) =>
 			{
-				DHDMNHCIPEH.Enabled = true;
+				perkData.Enabled = true;
 			});
 		}
 	}
@@ -505,37 +505,37 @@ public partial class PerksStage : global::EventDispatcher<PerksStage.PerkEventSt
 	{
 		foreach (PerkModelStruct item in modelRegistrations)
 		{
-			item.GetInfoPerks().ForEach((InfoPerk DHDMNHCIPEH) =>
+			item.GetInfoPerks().ForEach((InfoPerk infoPerk) =>
 			{
-				DHDMNHCIPEH.ResetExpiredMods();
+				infoPerk.ResetExpiredMods();
 			});
 		}
 	}
 
-	public static void RegisterNamespaceAction(ActionPerk IBODMPMJELJ)
+	public static void RegisterNamespaceAction(ActionPerk actionPerk)
 	{
-		if (IBODMPMJELJ.Action.GetModificator())
+		if (actionPerk.Action.GetModificator())
 		{
-			PerkActionModificator cKCICHAIMFL = (PerkActionModificator)IBODMPMJELJ.Action;
-			if (cKCICHAIMFL != null && !string.IsNullOrEmpty(cKCICHAIMFL.GetNamespace()))
+			PerkActionModificator modificator = (PerkActionModificator)actionPerk.Action;
+			if (modificator != null && !string.IsNullOrEmpty(modificator.GetNamespace()))
 			{
-				if (!actionsByNamespace.ContainsKey(cKCICHAIMFL.GetNamespace()))
-					actionsByNamespace.Add(cKCICHAIMFL.GetNamespace(), new List<ActionPerk>());
-				List<ActionPerk> oMKIGJOLJJE = actionsByNamespace[cKCICHAIMFL.GetNamespace()];
-				oMKIGJOLJJE.AddIfNotExist(IBODMPMJELJ);
+				if (!actionsByNamespace.ContainsKey(modificator.GetNamespace()))
+					actionsByNamespace.Add(modificator.GetNamespace(), new List<ActionPerk>());
+				List<ActionPerk> namespaceActions = actionsByNamespace[modificator.GetNamespace()];
+				namespaceActions.AddIfNotExist(actionPerk);
 			}
 		}
 	}
 
-	public static void UnregisterNamespaceAction(ActionPerk IBODMPMJELJ)
+	public static void UnregisterNamespaceAction(ActionPerk actionPerk)
 	{
-		if (IBODMPMJELJ.Action.GetModificator())
+		if (actionPerk.Action.GetModificator())
 		{
-			PerkActionModificator cKCICHAIMFL = (PerkActionModificator)IBODMPMJELJ.Action;
-			if (cKCICHAIMFL != null && actionsByNamespace.ContainsKey(cKCICHAIMFL.GetNamespace()))
+			PerkActionModificator modificator = (PerkActionModificator)actionPerk.Action;
+			if (modificator != null && actionsByNamespace.ContainsKey(modificator.GetNamespace()))
 			{
-				List<ActionPerk> list = actionsByNamespace[cKCICHAIMFL.GetNamespace()];
-				list.Remove(IBODMPMJELJ);
+				List<ActionPerk> list = actionsByNamespace[modificator.GetNamespace()];
+				list.Remove(actionPerk);
 			}
 		}
 	}
@@ -545,14 +545,14 @@ public partial class PerksStage : global::EventDispatcher<PerksStage.PerkEventSt
 		actionsByNamespace.Clear();
 	}
 
-	public static bool CheckModNameInNamespace(string GBHAIILPKFC, string PJPJIBOAFKF)
+	public static bool CheckModNameInNamespace(string modName, string namespaceName)
 	{
-		if (actionsByNamespace.ContainsKey(PJPJIBOAFKF))
+		if (actionsByNamespace.ContainsKey(namespaceName))
 		{
-			List<ActionPerk> list = actionsByNamespace[PJPJIBOAFKF];
+			List<ActionPerk> list = actionsByNamespace[namespaceName];
 			foreach (ActionPerk item in list)
 			{
-				if (item.Action.get_Name().Equals(GBHAIILPKFC))
+				if (item.Action.get_Name().Equals(modName))
 				{
 					return true;
 				}
@@ -561,16 +561,16 @@ public partial class PerksStage : global::EventDispatcher<PerksStage.PerkEventSt
 		return false;
 	}
 
-	public static ActionPerk FindNamespaceAction(string GBHAIILPKFC, string PJPJIBOAFKF)
+	public static ActionPerk FindNamespaceAction(string modName, string namespaceName)
 	{
-		if (!actionsByNamespace.ContainsKey(PJPJIBOAFKF))
+		if (!actionsByNamespace.ContainsKey(namespaceName))
 		{
 			return null;
 		}
-		List<ActionPerk> list = actionsByNamespace[PJPJIBOAFKF];
+		List<ActionPerk> list = actionsByNamespace[namespaceName];
 		foreach (ActionPerk item in list)
 		{
-			if (item.Action.get_Name().Equals(GBHAIILPKFC))
+			if (item.Action.get_Name().Equals(modName))
 			{
 				return item;
 			}
@@ -578,9 +578,9 @@ public partial class PerksStage : global::EventDispatcher<PerksStage.PerkEventSt
 		return null;
 	}
 
-	public static List<ActionPerk> GetNamespaceActions(string PJPJIBOAFKF)
+	public static List<ActionPerk> GetNamespaceActions(string namespaceName)
 	{
-		return (!actionsByNamespace.ContainsKey(PJPJIBOAFKF)) ? null : actionsByNamespace[PJPJIBOAFKF];
+		return (!actionsByNamespace.ContainsKey(namespaceName)) ? null : actionsByNamespace[namespaceName];
 	}
 
 	public static void IncrementPerkUse(string name)
@@ -602,84 +602,84 @@ public partial class PerksStage : global::EventDispatcher<PerksStage.PerkEventSt
 		return true;
 	}
 
-	public void ExecuteTriggerActions(Model FAJBDBKEHJL, PerkTrigger CPBHKJFPFJB, bool CAPNMPNNBHF = false)
+	public void ExecuteTriggerActions(Model model, PerkTrigger trigger, bool forceTrigger = false)
 	{
 		foreach (PerkModelStruct item in modelRegistrations)
 		{
-			if (FAJBDBKEHJL == item.get_Model())
+			if (model == item.get_Model())
 			{
-				ExecuteTriggerActions(item, FAJBDBKEHJL, CPBHKJFPFJB, CAPNMPNNBHF);
+				ExecuteTriggerActions(item, model, trigger, forceTrigger);
 				break;
 			}
 		}
 	}
 
-	public void ExecuteTriggerActions(PerkModelStruct MAEPLNACFKD, Model FAJBDBKEHJL, PerkTrigger CPBHKJFPFJB, bool CAPNMPNNBHF = false)
+	public void ExecuteTriggerActions(PerkModelStruct modelRegistration, Model model, PerkTrigger trigger, bool forceTrigger = false)
 	{
-		InfoPerk bPDFFLADJMJ = FindInfoPerk(MAEPLNACFKD, CPBHKJFPFJB.GetPerk());
-		if (bPDFFLADJMJ == null)
+		InfoPerk infoPerk = FindInfoPerk(modelRegistration, trigger.GetPerk());
+		if (infoPerk == null)
 		{
-			bPDFFLADJMJ = new InfoPerk();
-			bPDFFLADJMJ.Data = new PerkData(CPBHKJFPFJB.GetPerk());
-			MAEPLNACFKD.GetInfoPerks().Add(bPDFFLADJMJ);
+			infoPerk = new InfoPerk();
+			infoPerk.Data = new PerkData(trigger.GetPerk());
+			modelRegistration.GetInfoPerks().Add(infoPerk);
 		}
 		List<ActionPerk> list = new List<ActionPerk>();
-		List<PerkAction> list2 = CPBHKJFPFJB.GetActions();
+		List<PerkAction> list2 = trigger.GetActions();
 		foreach (PerkAction item in list2)
 		{
-			ActionPerk oAJGINIDKJD = new ActionPerk();
-			oAJGINIDKJD.TargetModel = item.ResolveTargetModel(MAEPLNACFKD.get_Model());
-			oAJGINIDKJD.SourceModel = FAJBDBKEHJL;
-			oAJGINIDKJD.Action = item;
-			oAJGINIDKJD.IsExpired = false;
-			oAJGINIDKJD.ElapsedFrames = 0;
-			oAJGINIDKJD.DurationFrames = 0;
+			ActionPerk actionPerk = new ActionPerk();
+			actionPerk.TargetModel = item.ResolveTargetModel(modelRegistration.get_Model());
+			actionPerk.SourceModel = model;
+			actionPerk.Action = item;
+			actionPerk.IsExpired = false;
+			actionPerk.ElapsedFrames = 0;
+			actionPerk.DurationFrames = 0;
 			if (item.GetFrames() != null)
 			{
-				FunctionResult dEIHAOLOPLC = item.GetFrames().Calculate();
-				oAJGINIDKJD.DurationFrames = dEIHAOLOPLC.ToInt();
+				FunctionResult durationResult = item.GetFrames().Calculate();
+				actionPerk.DurationFrames = durationResult.ToInt();
 			}
-			if (CAPNMPNNBHF)
+			if (forceTrigger)
 			{
-				list.Add(oAJGINIDKJD);
+				list.Add(actionPerk);
 			}
 			else
 			{
-				bPDFFLADJMJ.GetPendingActions().Add(oAJGINIDKJD);
+				infoPerk.GetPendingActions().Add(actionPerk);
 			}
 		}
 		if (list.Count > 0)
 		{
-			bPDFFLADJMJ.ExecuteActions(list);
+			infoPerk.ExecuteActions(list);
 		}
 	}
 
-	public void RegisterPerkTriggers(PerkModelStruct ACENLMONNPA, PerkInfoItem AEFFHJGMNFI)
+	public void RegisterPerkTriggers(PerkModelStruct modelRegistration, PerkInfoItem perkInfo)
 	{
-		if (AEFFHJGMNFI != null)
+		if (perkInfo != null)
 		{
-			AEFFHJGMNFI.CollectTriggersForEvent(ACENLMONNPA.GetComboTriggers(), PerkEvent.PerkEventType.EVENT_COMBO);
-			AEFFHJGMNFI.CollectTriggersForEvent(ACENLMONNPA.GetEveryFrameTriggers(), PerkEvent.PerkEventType.EVENT_EVERY_FRAME);
-			AEFFHJGMNFI.CollectTriggersForEvent(ACENLMONNPA.GetHitPreCritTriggers(), PerkEvent.PerkEventType.EVENT_HIT_PRECRIT);
-			AEFFHJGMNFI.CollectTriggersForEvent(ACENLMONNPA.GetHitPostCritTriggers(), PerkEvent.PerkEventType.EVENT_HIT_POSTCRIT);
-			AEFFHJGMNFI.CollectTriggersForEvent(ACENLMONNPA.GetPostHitTriggers(), PerkEvent.PerkEventType.EVENT_POST_HIT);
-			AEFFHJGMNFI.CollectTriggersForEvent(ACENLMONNPA.GetMagicChargedTriggers(), PerkEvent.PerkEventType.EVENT_MAGIC_CHARGED);
-			AEFFHJGMNFI.CollectTriggersForEvent(ACENLMONNPA.GetRoundStageStartTriggers(), PerkEvent.PerkEventType.EVENT_ROUND_STAGE_START);
-			AEFFHJGMNFI.CollectTriggersForEvent(ACENLMONNPA.GetStyleTriggers(), PerkEvent.PerkEventType.EVENT_STYLE);
-			AEFFHJGMNFI.CollectTriggersForEvent(ACENLMONNPA.GetAnimationStartTriggers(), PerkEvent.PerkEventType.EVENT_ANIMATION_START);
-			AEFFHJGMNFI.CollectTriggersForEvent(ACENLMONNPA.GetAnimationEndTriggers(), PerkEvent.PerkEventType.EVENT_ANIMATION_END);
-			AEFFHJGMNFI.CollectTriggersForEvent(ACENLMONNPA.GetModExpiresTriggers(), PerkEvent.PerkEventType.EVENT_MOD_EXPIRES);
-			AEFFHJGMNFI.CollectTriggersForEvent(ACENLMONNPA.GetAreaEnterTriggers(), PerkEvent.PerkEventType.EVENT_AREA_ENTER);
-			AEFFHJGMNFI.CollectTriggersForEvent(ACENLMONNPA.GetAreaExitTriggers(), PerkEvent.PerkEventType.EVENT_AREA_EXIT);
-			AEFFHJGMNFI.CollectTriggersForEvent(ACENLMONNPA.GetIntervalEndTriggers(), PerkEvent.PerkEventType.EVENT_INTERVAL_END);
-			PerkData item = new PerkData(AEFFHJGMNFI);
-			ACENLMONNPA.GetPerkDataList().Add(item);
+			perkInfo.CollectTriggersForEvent(modelRegistration.GetComboTriggers(), PerkEvent.PerkEventType.EVENT_COMBO);
+			perkInfo.CollectTriggersForEvent(modelRegistration.GetEveryFrameTriggers(), PerkEvent.PerkEventType.EVENT_EVERY_FRAME);
+			perkInfo.CollectTriggersForEvent(modelRegistration.GetHitPreCritTriggers(), PerkEvent.PerkEventType.EVENT_HIT_PRECRIT);
+			perkInfo.CollectTriggersForEvent(modelRegistration.GetHitPostCritTriggers(), PerkEvent.PerkEventType.EVENT_HIT_POSTCRIT);
+			perkInfo.CollectTriggersForEvent(modelRegistration.GetPostHitTriggers(), PerkEvent.PerkEventType.EVENT_POST_HIT);
+			perkInfo.CollectTriggersForEvent(modelRegistration.GetMagicChargedTriggers(), PerkEvent.PerkEventType.EVENT_MAGIC_CHARGED);
+			perkInfo.CollectTriggersForEvent(modelRegistration.GetRoundStageStartTriggers(), PerkEvent.PerkEventType.EVENT_ROUND_STAGE_START);
+			perkInfo.CollectTriggersForEvent(modelRegistration.GetStyleTriggers(), PerkEvent.PerkEventType.EVENT_STYLE);
+			perkInfo.CollectTriggersForEvent(modelRegistration.GetAnimationStartTriggers(), PerkEvent.PerkEventType.EVENT_ANIMATION_START);
+			perkInfo.CollectTriggersForEvent(modelRegistration.GetAnimationEndTriggers(), PerkEvent.PerkEventType.EVENT_ANIMATION_END);
+			perkInfo.CollectTriggersForEvent(modelRegistration.GetModExpiresTriggers(), PerkEvent.PerkEventType.EVENT_MOD_EXPIRES);
+			perkInfo.CollectTriggersForEvent(modelRegistration.GetAreaEnterTriggers(), PerkEvent.PerkEventType.EVENT_AREA_ENTER);
+			perkInfo.CollectTriggersForEvent(modelRegistration.GetAreaExitTriggers(), PerkEvent.PerkEventType.EVENT_AREA_EXIT);
+			perkInfo.CollectTriggersForEvent(modelRegistration.GetIntervalEndTriggers(), PerkEvent.PerkEventType.EVENT_INTERVAL_END);
+			PerkData item = new PerkData(perkInfo);
+			modelRegistration.GetPerkDataList().Add(item);
 		}
 	}
 
-	public void AddExpiredAction(ActionPerk DIMEFLGFIME)
+	public void AddExpiredAction(ActionPerk actionPerk)
 	{
-		expiredActions.Add(DIMEFLGFIME);
+		expiredActions.Add(actionPerk);
 	}
 
 	private void ClearExpiredActions()
@@ -687,20 +687,20 @@ public partial class PerksStage : global::EventDispatcher<PerksStage.PerkEventSt
 		expiredActions.Clear();
 	}
 
-	private PerkModelStruct FindModelRegistration(Model ACENLMONNPA)
+	private PerkModelStruct FindModelRegistration(Model model)
 	{
-		return modelRegistrations.Find((PerkModelStruct DHDMNHCIPEH) => DHDMNHCIPEH.get_Model() == ACENLMONNPA);
+		return modelRegistrations.Find((PerkModelStruct registration) => registration.get_Model() == model);
 	}
 
-	private void DispatchEvent(Model ACENLMONNPA, PerkEvent.PerkEventType LFLGCDNKNJI)
+	private void DispatchEvent(Model model, PerkEvent.PerkEventType eventType)
 	{
-		PerkEventStruct nFFNFAAPEPF = new PerkEventStruct();
-		nFFNFAAPEPF.Model = ACENLMONNPA;
-		nFFNFAAPEPF.EventType = LFLGCDNKNJI;
-		if (LFLGCDNKNJI == PerkEvent.PerkEventType.EVENT_MOD_EXPIRES)
+		PerkEventStruct eventData = new PerkEventStruct();
+		eventData.Model = model;
+		eventData.EventType = eventType;
+		if (eventType == PerkEvent.PerkEventType.EVENT_MOD_EXPIRES)
 		{
-			nFFNFAAPEPF.Data = ((!GetPerkMap().ContainsKey("ModExpires")) ? null : GetPerkMap()["ModExpires"]);
-			CallEvent((int)LFLGCDNKNJI, nFFNFAAPEPF);
+			eventData.Data = ((!GetPerkMap().ContainsKey("ModExpires")) ? null : GetPerkMap()["ModExpires"]);
+			CallEvent((int)eventType, eventData);
 		}
 	}
 }

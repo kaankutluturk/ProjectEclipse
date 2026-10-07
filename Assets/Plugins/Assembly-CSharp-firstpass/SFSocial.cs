@@ -17,10 +17,10 @@ public class SFSocial : global::EventDispatcher<object>
 			complete = false;
 		}
 
-		public Achievement(string _name, int JLHFNCKLMDI)
+		public Achievement(string _name, int newProgress)
 		{
 			name = _name;
-			progress = JLHFNCKLMDI;
+			progress = newProgress;
 			complete = false;
 		}
 	}
@@ -46,14 +46,14 @@ public class SFSocial : global::EventDispatcher<object>
 
 	private static SFSocial secondaryInstance;
 
-	public static void SetInstance(SFSocial ENMMMPLLLCD)
+	public static void SetInstance(SFSocial socialInstance)
 	{
-		instance = ENMMMPLLLCD;
+		instance = socialInstance;
 	}
 
-	public static void SetSecondaryInstance(SFSocial ENMMMPLLLCD)
+	public static void SetSecondaryInstance(SFSocial socialInstance)
 	{
-		secondaryInstance = ENMMMPLLLCD;
+		secondaryInstance = socialInstance;
 	}
 
 	public static SFSocial GetInstance()
@@ -86,7 +86,7 @@ public class SFSocial : global::EventDispatcher<object>
 		return string.Empty;
 	}
 
-	public virtual void PostAchievements(List<Achievement> CIMGCGDDKCE)
+	public virtual void PostAchievements(List<Achievement> achievements)
 	{
 	}
 
@@ -121,8 +121,8 @@ public class SFSocial : global::EventDispatcher<object>
 	{
 	}
 
-	protected void OnPostAchievementFailed(Achievement PGAGNLJABIE)
+	protected void OnPostAchievementFailed(Achievement achievement)
 	{
-		CallEvent(2, PGAGNLJABIE);
+		CallEvent(2, achievement);
 	}
 }

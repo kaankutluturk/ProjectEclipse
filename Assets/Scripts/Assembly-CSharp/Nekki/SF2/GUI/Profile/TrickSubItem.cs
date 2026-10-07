@@ -30,18 +30,18 @@ namespace Nekki.SF2.GUI.Profile
 		[SerializeField]
 		private GameObject _keys;
 
-		public void Init(string KHPKDMGDMAB, Trick JECLDALKMKA, int OKNNNLIPODI)
+		public void Init(string iconName, Trick trickData, int buttonId)
 		{
-			Init(OKNNNLIPODI);
+			Init(buttonId);
 			_keys.gameObject.SetActive(false);
 			_keysDescription.gameObject.SetActive(false);
-			trick = JECLDALKMKA;
-			spriteName = KHPKDMGDMAB;
+			trick = trickData;
+			spriteName = iconName;
 			iconMaxOpacity = ProfileGUI.PerkOpacity.Max / 255f;
 			iconMinOpacity = ProfileGUI.PerkOpacity.Min / 255f;
 			isNew = trick != null && trick.IsNew;
-			infoAnimation = JECLDALKMKA.Animation;
-			trickInfo = new TrickInfo(trick.DisplayName, JECLDALKMKA.Animation, GetAttackDamages(), OnShowCallback, trick.EffectDescription);
+			infoAnimation = trickData.Animation;
+			trickInfo = new TrickInfo(trick.DisplayName, trickData.Animation, GetAttackDamages(), OnShowCallback, trick.EffectDescription);
 			Data = trickInfo;
 			UpdateIcon();
 			SetActive(true);
@@ -107,17 +107,17 @@ namespace Nekki.SF2.GUI.Profile
 			{
 				Object.Destroy(item.gameObject);
 			}
-			ConditionKeys bHDEBDIHDFM = trick.Animation.GetFirstKeysCondition();
-			if (bHDEBDIHDFM == null)
+			ConditionKeys conditionKeys = trick.Animation.GetFirstKeysCondition();
+			if (conditionKeys == null)
 			{
 				return;
 			}
 			_keys.gameObject.SetActive(true);
 			float num = 0f;
-			KeyData fONEJOKEIEN = bHDEBDIHDFM.RequiredKeys;
-			for (int i = 0; i < fONEJOKEIEN.AdditionalKeys.Count; i++)
+			KeyData keyData = conditionKeys.RequiredKeys;
+			for (int i = 0; i < keyData.AdditionalKeys.Count; i++)
 			{
-				ResolutionImage keyIcon = PerkContent.GetKeyIcon(fONEJOKEIEN.AdditionalKeys[i]);
+				ResolutionImage keyIcon = PerkContent.GetKeyIcon(keyData.AdditionalKeys[i]);
 				if (keyIcon != null)
 				{
 					keyIcon.transform.SetParent(_keys.transform, false);
@@ -125,7 +125,7 @@ namespace Nekki.SF2.GUI.Profile
 					num += 110f;
 				}
 			}
-			if (fONEJOKEIEN.AdditionalKeys.Count > 0)
+			if (keyData.AdditionalKeys.Count > 0)
 			{
 				GameObject gameObject = new GameObject("KeyIcon");
 				ResolutionImage resolutionImage = gameObject.AddComponent<ResolutionImage>();
@@ -136,9 +136,9 @@ namespace Nekki.SF2.GUI.Profile
 				resolutionImage.transform.SetLocalX(num);
 				num += 110f;
 			}
-			for (int j = 0; j < fONEJOKEIEN.StarterKeys.Count; j++)
+			for (int j = 0; j < keyData.StarterKeys.Count; j++)
 			{
-				ResolutionImage keyIcon2 = PerkContent.GetKeyIcon(fONEJOKEIEN.StarterKeys[j]);
+				ResolutionImage keyIcon2 = PerkContent.GetKeyIcon(keyData.StarterKeys[j]);
 				if (keyIcon2 != null)
 				{
 					keyIcon2.transform.SetParent(_keys.transform, false);
@@ -173,12 +173,12 @@ namespace Nekki.SF2.GUI.Profile
 			List<float> list = new List<float>();
 			if (infoAnimation != null)
 			{
-				List<IntervalAnimation> cAANBJEPGAA = infoAnimation.MoveData.Intervals;
-				for (int i = 0; i < cAANBJEPGAA.Count; i++)
+				List<IntervalAnimation> intervals = infoAnimation.MoveData.Intervals;
+				for (int i = 0; i < intervals.Count; i++)
 				{
-					if (cAANBJEPGAA[i].Type == IntervalAnimation.IntervalType.INTERVAL_ATTACK)
+					if (intervals[i].Type == IntervalAnimation.IntervalType.INTERVAL_ATTACK)
 					{
-						list.Add(((IntervalAttack)cAANBJEPGAA[i]).GetDamage());
+						list.Add(((IntervalAttack)intervals[i]).GetDamage());
 					}
 				}
 			}

@@ -27,22 +27,22 @@ namespace Nekki.SF2.GUI.Shop
 			_items.Clear();
 		}
 
-		public void SetParameters(ItemInfo item, ItemInfo FJIENDKAIDO, bool OGMLCLNEAIJ)
+		public void SetParameters(ItemInfo item, ItemInfo upgradeItem, bool showUpgrades)
 		{
 			Clear();
-			List<WarriorAttribute> iBLHIAHECLK = GameUtils.WarriorAttributeList.AttributeList;
+			List<WarriorAttribute> attributes = GameUtils.WarriorAttributeList.AttributeList;
 			float num = 0f;
-			foreach (WarriorAttribute warriorItem in iBLHIAHECLK)
+			foreach (WarriorAttribute warriorItem in attributes)
 			{
-				int OEMALIFPGPO = 0;
-				if (item == null || !item.ItemAttributes.Get(warriorItem.get_Name(), ref OEMALIFPGPO) || warriorItem.IsHidden || warriorItem.IsShopHidden)
+				int baseValue = 0;
+				if (item == null || !item.ItemAttributes.Get(warriorItem.get_Name(), ref baseValue) || warriorItem.IsHidden || warriorItem.IsShopHidden)
 				{
 					continue;
 				}
-				int OEMALIFPGPO2 = OEMALIFPGPO;
-				if (FJIENDKAIDO != null && OGMLCLNEAIJ)
+				int OEMALIFPGPO2 = baseValue;
+				if (upgradeItem != null && showUpgrades)
 				{
-					FJIENDKAIDO.ItemAttributes.Get(warriorItem.get_Name(), ref OEMALIFPGPO2);
+					upgradeItem.ItemAttributes.Get(warriorItem.get_Name(), ref OEMALIFPGPO2);
 				}
 				if (_itemPrefab != null)
 				{
@@ -51,8 +51,8 @@ namespace Nekki.SF2.GUI.Shop
 					ParameterScrollItem component = gameObject.GetComponent<ParameterScrollItem>();
 					if (component != null)
 					{
-						bool eIAKNKDEEKA = true;
-						component.Init(warriorItem.get_Name(), warriorItem.IconName, OEMALIFPGPO, OEMALIFPGPO2, eIAKNKDEEKA);
+						bool isItemLimit = true;
+						component.Init(warriorItem.get_Name(), warriorItem.IconName, baseValue, OEMALIFPGPO2, isItemLimit);
 						num += component.get_MinHeight();
 						_items.Add(component);
 					}
@@ -68,9 +68,9 @@ namespace Nekki.SF2.GUI.Shop
 			}
 		}
 
-		public void SetParameters(ItemInfo item, bool OGMLCLNEAIJ)
+		public void SetParameters(ItemInfo item, bool showUpgrades)
 		{
-			SetParameters(item, null, OGMLCLNEAIJ);
+			SetParameters(item, null, showUpgrades);
 		}
 	}
 }

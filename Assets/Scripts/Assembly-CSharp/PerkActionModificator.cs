@@ -5,9 +5,9 @@ public class PerkActionModificator : PerkAction
 		set_Modificator(true);
 	}
 
-	public PerkActionModificator(PerkActionModificator NOLFMPDGCOC)
-		: base(NOLFMPDGCOC)
+	public PerkActionModificator(PerkActionModificator source)
+		: base(source)
 	{
-		set_Modificator(NOLFMPDGCOC.GetModificator());
+		set_Modificator(source.GetModificator());
 	}
 }

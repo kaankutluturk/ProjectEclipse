@@ -11,30 +11,30 @@ public class NekkiMath
 
 	private static NekkiRandom random = new NekkiRandom();
 
-	public static float round(float number, int HCHKHLJLJBG)
+	public static float round(float number, int scale)
 	{
-		return (float)(int)(number * (float)HCHKHLJLJBG) / (float)HCHKHLJLJBG;
+		return (float)(int)(number * (float)scale) / (float)scale;
 	}
 
-	public static float CeilToDecimals(float value, int OMGDBOOMDKP)
+	public static float CeilToDecimals(float value, int decimals)
 	{
-		return 0f - FloorToDecimals(0f - value, OMGDBOOMDKP);
+		return 0f - FloorToDecimals(0f - value, decimals);
 	}
 
-	public static float FloorToDecimals(float value, int OMGDBOOMDKP)
+	public static float FloorToDecimals(float value, int decimals)
 	{
-		float num = TruncateToDecimals(value, OMGDBOOMDKP);
+		float num = TruncateToDecimals(value, decimals);
 		if (value < num && value < 0f)
 		{
-			return num - (float)Math.Pow(10.0, -OMGDBOOMDKP);
+			return num - (float)Math.Pow(10.0, -decimals);
 		}
 		return num;
 	}
 
-	public static float RoundAwayFromZero(float value, int OMGDBOOMDKP)
+	public static float RoundAwayFromZero(float value, int decimals)
 	{
 		int num = ((value > 0f) ? 1 : (-1));
-		return (float)num * CeilToDecimals(Math.Abs(value), OMGDBOOMDKP);
+		return (float)num * CeilToDecimals(Math.Abs(value), decimals);
 	}
 
 	public static float TruncateToDecimals(float number, int order)
@@ -48,24 +48,24 @@ public class NekkiMath
 		return Math.Round(number, order).ToString();
 	}
 
-	public static float LogBase(float EHCLMBADLKH, float _base)
+	public static float LogBase(float number, float _base)
 	{
 		float result = 0f;
-		if (_base > 0f && _base != 1f && EHCLMBADLKH > 0f)
+		if (_base > 0f && _base != 1f && number > 0f)
 		{
-			result = (float)(Math.Log(EHCLMBADLKH) / Math.Log(_base));
+			result = (float)(Math.Log(number) / Math.Log(_base));
 		}
 		return result;
 	}
 
-	public static float RadToDeg(float LMKNPGGDOCO)
+	public static float RadToDeg(float radians)
 	{
-		return (float)((double)LMKNPGGDOCO * (180.0 / Math.PI));
+		return (float)((double)radians * (180.0 / Math.PI));
 	}
 
-	public static float DegToRad(float NGMLOAFJDAP)
+	public static float DegToRad(float degrees)
 	{
-		return (float)((double)NGMLOAFJDAP * (Math.PI / 180.0));
+		return (float)((double)degrees * (Math.PI / 180.0));
 	}
 
 	public static float randomFloat()
@@ -73,29 +73,29 @@ public class NekkiMath
 		return random.randomFloat();
 	}
 
-	public static float randomFloat(float KAEPJHHLLPK)
+	public static float randomFloat(float max)
 	{
-		return random.randomFloat(KAEPJHHLLPK);
+		return random.randomFloat(max);
 	}
 
-	public static float randomFloat(float LHNCHOAEGEA, float KAEPJHHLLPK)
+	public static float randomFloat(float min, float max)
 	{
-		return random.randomFloat(LHNCHOAEGEA, KAEPJHHLLPK);
+		return random.randomFloat(min, max);
 	}
 
-	public static int randomInt(int KAEPJHHLLPK)
+	public static int randomInt(int max)
 	{
-		return (int)random.randomInt((uint)KAEPJHHLLPK);
+		return (int)random.randomInt((uint)max);
 	}
 
-	public static int randomInt(int LHNCHOAEGEA, int KAEPJHHLLPK)
+	public static int randomInt(int min, int max)
 	{
-		return (int)random.randomInt((uint)LHNCHOAEGEA, (uint)KAEPJHHLLPK);
+		return (int)random.randomInt((uint)min, (uint)max);
 	}
 
-	public static bool randomChance(float AMBMJABLPFE, float BCCEJBCHNHC = 100f)
+	public static bool randomChance(float chance, float outOf = 100f)
 	{
-		return random.randomChance(AMBMJABLPFE, BCCEJBCHNHC);
+		return random.randomChance(chance, outOf);
 	}
 
 	public static uint SetSeed()
@@ -105,19 +105,19 @@ public class NekkiMath
 		return num;
 	}
 
-	public static void SetSeed(int OKGKLCLEDFN)
+	public static void SetSeed(int seed)
 	{
-		random.setSeed((uint)OKGKLCLEDFN);
+		random.setSeed((uint)seed);
 	}
 
-	public static T RandomElement<T>(List<T> HCMPBOCKJOP)
+	public static T RandomElement<T>(List<T> list)
 	{
-		int count = HCMPBOCKJOP.Count;
+		int count = list.Count;
 		if (count == 0)
 		{
 			AdvLog.LogError("NekkiMath::randomElement - empty vector");
 		}
-		return HCMPBOCKJOP[randomInt(count)];
+		return list[randomInt(count)];
 	}
 
 	private static int GetRandMax()

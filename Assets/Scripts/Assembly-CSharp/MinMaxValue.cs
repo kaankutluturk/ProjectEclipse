@@ -6,15 +6,15 @@ public class MinMaxValue
 
 	public float Max;
 
-	public MinMaxValue(float NOFALOKFBEM = 0f, float MFODOCNLNPH = 0f)
+	public MinMaxValue(float min = 0f, float max = 0f)
 	{
-		Min = NOFALOKFBEM;
-		Max = MFODOCNLNPH;
+		Min = min;
+		Max = max;
 	}
 
-	public void Parse(XmlNode node, float PCEKHCGCHFH = 0f, float JCKIAGACDMA = 0f)
+	public void Parse(XmlNode node, float defaultMin = 0f, float defaultMax = 0f)
 	{
-		Min = node.Attributes["Min"].ParseFloat(PCEKHCGCHFH);
-		Max = node.Attributes["Max"].ParseFloat(JCKIAGACDMA);
+		Min = node.Attributes["Min"].ParseFloat(defaultMin);
+		Max = node.Attributes["Max"].ParseFloat(defaultMax);
 	}
 }

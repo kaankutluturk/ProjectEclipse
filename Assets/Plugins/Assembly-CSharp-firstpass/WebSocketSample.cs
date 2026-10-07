@@ -38,8 +38,8 @@ public class WebSocketSample : MonoBehaviour
 				{
 					webSocket.GetInternalRequest().SetProxy(new HTTPProxy(HTTPManager.GetProxy().GetAddress(), HTTPManager.GetProxy().GetCredentials(), false));
 				}
-				WebSocket iLNFPNFEOCL = webSocket;
-				iLNFPNFEOCL.OnOpen = (OnWebSocketOpenDelegate)Delegate.Combine(iLNFPNFEOCL.OnOpen, new OnWebSocketOpenDelegate(OnOpen));
+				WebSocket socket = webSocket;
+				socket.OnOpen = (OnWebSocketOpenDelegate)Delegate.Combine(socket.OnOpen, new OnWebSocketOpenDelegate(OnOpen));
 				WebSocket iLNFPNFEOCL2 = webSocket;
 				iLNFPNFEOCL2.OnMessage = (OnWebSocketMessageDelegate)Delegate.Combine(iLNFPNFEOCL2.OnMessage, new OnWebSocketMessageDelegate(OnMessageReceived));
 				WebSocket iLNFPNFEOCL3 = webSocket;
@@ -69,30 +69,30 @@ public class WebSocketSample : MonoBehaviour
 		});
 	}
 
-	private void OnOpen(WebSocket IIBIPJJLEGJ)
+	private void OnOpen(WebSocket socket)
 	{
 		logText += string.Format("-WebSocket Open!\n");
 	}
 
-	private void OnMessageReceived(WebSocket IIBIPJJLEGJ, string LIOGIBJBHAH)
+	private void OnMessageReceived(WebSocket socket, string message)
 	{
-		logText += string.Format("-Message received: {0}\n", LIOGIBJBHAH);
+		logText += string.Format("-Message received: {0}\n", message);
 	}
 
-	private void OnClosed(WebSocket IIBIPJJLEGJ, ushort KJPGKHJNOMC, string LIOGIBJBHAH)
+	private void OnClosed(WebSocket socket, ushort code, string message)
 	{
-		logText += string.Format("-WebSocket closed! Code: {0} Message: {1}\n", KJPGKHJNOMC, LIOGIBJBHAH);
+		logText += string.Format("-WebSocket closed! Code: {0} Message: {1}\n", code, message);
 		webSocket = null;
 	}
 
-	private void OnError(WebSocket IIBIPJJLEGJ, Exception MPFFFAOGBJE)
+	private void OnError(WebSocket socket, Exception error)
 	{
 		string text = string.Empty;
-		if (IIBIPJJLEGJ.GetInternalRequest().GetResponse() != null)
+		if (socket.GetInternalRequest().GetResponse() != null)
 		{
-			text = string.Format("Status Code from Server: {0} and Message: {1}", IIBIPJJLEGJ.GetInternalRequest().GetResponse().GetStatusCode(), IIBIPJJLEGJ.GetInternalRequest().GetResponse().GetMessage());
+			text = string.Format("Status Code from Server: {0} and Message: {1}", socket.GetInternalRequest().GetResponse().GetStatusCode(), socket.GetInternalRequest().GetResponse().GetMessage());
 		}
-		logText += string.Format("-An error occured: {0}\n", (MPFFFAOGBJE == null) ? ("Unknown Error " + text) : MPFFFAOGBJE.Message);
+		logText += string.Format("-An error occured: {0}\n", (error == null) ? ("Unknown Error " + text) : error.Message);
 		webSocket = null;
 	}
 }

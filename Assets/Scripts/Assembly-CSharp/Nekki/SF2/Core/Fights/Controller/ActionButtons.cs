@@ -161,9 +161,9 @@ namespace Nekki.SF2.Core.Fights.Controller
             return _btnMissile;
         }
 
-		public void SetButtonRaidChargePos(float DHDMNHCIPEH, float BGEEALIPKCC)
+		public void SetButtonRaidChargePos(float x, float y)
 		{
-			_btnRaidCharge.transform.position = new Vector2(DHDMNHCIPEH, BGEEALIPKCC);
+			_btnRaidCharge.transform.position = new Vector2(x, y);
 			_lblRaidChargeCount.transform.position = _btnRaidCharge.transform.position;
 		}
 
@@ -177,19 +177,19 @@ namespace Nekki.SF2.Core.Fights.Controller
 			SetRequestedVisibility(FightCID.Kick, value);
 		}
 
-		public void ShowMagic(bool HFIIEPMEMFF)
+		public void ShowMagic(bool visible)
 		{
-			SetRequestedVisibility(FightCID.MagicButton, HFIIEPMEMFF);
+			SetRequestedVisibility(FightCID.MagicButton, visible);
 		}
 
-		public void ShowRanged(bool GKGKKCLPGBB)
+		public void ShowRanged(bool visible)
 		{
-			SetRequestedVisibility(FightCID.MissileButton, GKGKKCLPGBB);
+			SetRequestedVisibility(FightCID.MissileButton, visible);
 		}
 
-		public void ShowRaidCharge(bool OPPBHOOBHOE)
+		public void ShowRaidCharge(bool visible)
 		{
-			SetRequestedVisibility(FightCID.RaidChargeButton, OPPBHOOBHOE);
+			SetRequestedVisibility(FightCID.RaidChargeButton, visible);
 		}
 
         // Eclipse: an equipped ability on RaidCharge outside a raid. The raid charge
@@ -200,33 +200,33 @@ namespace Nekki.SF2.Core.Fights.Controller
             if (_lblRaidChargeCount != null) _lblRaidChargeCount.gameObject.SetActive(false);
         }
 
-		public void SetNeededPercentageToActBtn(FightCID DGECPBJDPNL, float NDFGBDLLMGB, float _Duration = 0.5f)
+		public void SetNeededPercentageToActBtn(FightCID button, float percentage, float _Duration = 0.5f)
 		{
-			switch (DGECPBJDPNL)
+			switch (button)
 			{
 			case FightCID.MagicButton:
-				_btnMagic.SetPercentage(NDFGBDLLMGB, _Duration);
+				_btnMagic.SetPercentage(percentage, _Duration);
 				break;
 			case FightCID.MissileButton:
-				_btnMissile.SetPercentage(NDFGBDLLMGB, _Duration);
+				_btnMissile.SetPercentage(percentage, _Duration);
 				break;
 			case FightCID.RaidChargeButton:
-				_btnRaidCharge.SetPercentage(NDFGBDLLMGB, _Duration);
+				_btnRaidCharge.SetPercentage(percentage, _Duration);
 				break;
 			case FightCID.Punch:
-				_btnPunch.SetPercentage(NDFGBDLLMGB, _Duration);
+				_btnPunch.SetPercentage(percentage, _Duration);
 				break;
 			case FightCID.Kick:
-				_btnKick.SetPercentage(NDFGBDLLMGB, _Duration);
+				_btnKick.SetPercentage(percentage, _Duration);
 				break;
 			}
 		}
 
-		public void SetBulletsCountToActBtn(FightCID DGECPBJDPNL, int HFBOCMEDCOA)
+		public void SetBulletsCountToActBtn(FightCID button, int count)
 		{
-			if (DGECPBJDPNL == FightCID.RaidChargeButton)
+			if (button == FightCID.RaidChargeButton)
 			{
-				_lblRaidChargeCount.text = HFBOCMEDCOA.ToString();
+				_lblRaidChargeCount.text = count.ToString();
 			}
 		}
 
@@ -240,35 +240,35 @@ namespace Nekki.SF2.Core.Fights.Controller
 			_btnRaidCharge.ResetPercentage();
 		}
 
-		public virtual void SetVisible(bool HHFKEDNEOIL)
+		public virtual void SetVisible(bool visible)
 		{
-			base.gameObject.SetActive(HHFKEDNEOIL);
+			base.gameObject.SetActive(visible);
 		}
 
 		public void ButtonClick(object data)
 		{
-			FightCID kJPGKHJNOMC = (FightCID)data;
-			DispatchButtonEvent(ButtonEventType.OnButtonClick, kJPGKHJNOMC);
+			FightCID buttonId = (FightCID)data;
+			DispatchButtonEvent(ButtonEventType.OnButtonClick, buttonId);
 		}
 
 		public void ButtonPress(object data)
 		{
-			FightCID kJPGKHJNOMC = (FightCID)data;
-			DispatchButtonEvent(ButtonEventType.OnButtonPress, kJPGKHJNOMC);
+			FightCID buttonId = (FightCID)data;
+			DispatchButtonEvent(ButtonEventType.OnButtonPress, buttonId);
 		}
 
 		public void ButtonRelease(object data)
 		{
-			FightCID kJPGKHJNOMC = (FightCID)data;
-			DispatchButtonEvent(ButtonEventType.OnButtonRelease, kJPGKHJNOMC);
+			FightCID buttonId = (FightCID)data;
+			DispatchButtonEvent(ButtonEventType.OnButtonRelease, buttonId);
 		}
 
-		private void DispatchButtonEvent(ButtonEventType DOPHKKGNAEF, FightCID KJPGKHJNOMC)
+		private void DispatchButtonEvent(ButtonEventType eventType, FightCID buttonId)
 		{
-			FightControlEventData cBBEIGACPPD = new FightControlEventData();
-			cBBEIGACPPD.Index = 0;
-			cBBEIGACPPD.Control = KJPGKHJNOMC;
-			CallEvent((int)DOPHKKGNAEF, cBBEIGACPPD);
+			FightControlEventData eventData = new FightControlEventData();
+			eventData.Index = 0;
+			eventData.Control = buttonId;
+			CallEvent((int)eventType, eventData);
 		}
 
 		private float GetSegmentAngle(int count)

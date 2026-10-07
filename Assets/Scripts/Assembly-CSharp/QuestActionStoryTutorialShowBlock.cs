@@ -10,9 +10,9 @@ public class QuestActionStoryTutorialShowBlock : QuestAction
 	private TutorialCanvas tutorialCanvas;
 	private bool running;
 
-	public override void Execute(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters parameters)
 	{
-		base.Execute(GFIHPBCEEOB);
+		base.Execute(parameters);
 		running = true;
 		profile = Scene<ProfileScene>.get_Current();
 		if (profile == null)

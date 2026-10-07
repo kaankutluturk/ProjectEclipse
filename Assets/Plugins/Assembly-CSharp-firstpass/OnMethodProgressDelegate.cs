@@ -1,1 +1,1 @@
-public delegate void OnMethodProgressDelegate(Hub CGFIJCNNCKP, ClientMessage JBEJKCPHFJP, ProgressMessage progress);
+public delegate void OnMethodProgressDelegate(Hub hub, ClientMessage originalMessage, ProgressMessage progress);

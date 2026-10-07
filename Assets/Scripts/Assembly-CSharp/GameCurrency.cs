@@ -29,17 +29,17 @@ public class GameCurrency
 		}
 	}
 
-	public GameCurrency(string PIKIACPLHJE, string NFBKDDABPOM, CurrencyGroup APLILFFIMMM = CurrencyGroup.CURRENCY_GROUP_NONE)
+	public GameCurrency(string name, string icon, CurrencyGroup group = CurrencyGroup.CURRENCY_GROUP_NONE)
 	{
-		Name = PIKIACPLHJE;
-		Icon = NFBKDDABPOM;
-		Group = APLILFFIMMM;
+		Name = name;
+		Icon = icon;
+		Group = group;
 	}
 
-	public void CopyFrom(GameCurrency MDDNHLBDJBN)
+	public void CopyFrom(GameCurrency other)
 	{
-		Name = MDDNHLBDJBN.Name;
-		Icon = MDDNHLBDJBN.Icon;
-		Group = MDDNHLBDJBN.Group;
+		Name = other.Name;
+		Icon = other.Icon;
+		Group = other.Group;
 	}
 }

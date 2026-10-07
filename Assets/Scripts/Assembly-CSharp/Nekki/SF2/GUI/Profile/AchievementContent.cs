@@ -48,12 +48,12 @@ namespace Nekki.SF2.GUI.Profile
 			_takeButton.AddEventListener(2, OnTakeButtonClicked);
 		}
 
-		public void Init(string HCPNFPMHFCM, int PABLCLGLPBB = 0, int GNDNEONJDKG = 0, Action<object> ODDEOFKLIAG = null, bool DJGOCCEOAKD = false, bool NNEHNDILGDP = false)
+		public void Init(string text, int moneyReward = 0, int rubiesReward = 0, Action<object> ODDEOFKLIAG = null, bool DJGOCCEOAKD = false, bool NNEHNDILGDP = false)
 		{
 			_takeButton.gameObject.SetActive(false);
-			_text = HCPNFPMHFCM;
-			rewardMoney = PABLCLGLPBB;
-			rewardRubies = GNDNEONJDKG;
+			_text = text;
+			rewardMoney = moneyReward;
+			rewardRubies = rubiesReward;
 			takeCallback = ODDEOFKLIAG;
 			showReward = DJGOCCEOAKD;
 			isCompleted = NNEHNDILGDP;
@@ -121,8 +121,8 @@ namespace Nekki.SF2.GUI.Profile
 			if (hasUpBorder && _rewardLabel != null && _textLabel != null)
 			{
 				float num = _rewardLabel.transform.localPosition.y + _rewardLabel.rectTransform.rect.height / 2f;
-				float bAINMLLIKOL = upBorder - (upBorder - num) / 2f;
-				_textLabel.transform.SetLocalY(bAINMLLIKOL);
+				float labelY = upBorder - (upBorder - num) / 2f;
+				_textLabel.transform.SetLocalY(labelY);
 			}
 		}
 	}

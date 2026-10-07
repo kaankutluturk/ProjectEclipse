@@ -165,9 +165,9 @@ public abstract class SavedXmlProfile : global::EventDispatcher<object>
 		SetNodeAttribute(name, (!value) ? "0" : "1");
 	}
 
-	public void RequestSave(bool AEGFPEGKLPJ = false)
+	public void RequestSave(bool immediate = false)
 	{
-		if (AEGFPEGKLPJ)
+		if (immediate)
 		{
 			CallEvent(0, null);
 		}
@@ -177,7 +177,7 @@ public abstract class SavedXmlProfile : global::EventDispatcher<object>
 		}
 	}
 
-	private void OnTimerTick(ExtentionBehaviour.CallEventArgs JKOCDNPPJDG)
+	private void OnTimerTick(ExtentionBehaviour.CallEventArgs args)
 	{
 		if (savePending)
 		{

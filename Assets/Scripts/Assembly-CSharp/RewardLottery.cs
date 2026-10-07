@@ -15,7 +15,7 @@ public class RewardLottery : Rewardable
 		return clone;
 	}
 
-	public RewardLottery(XmlNode node, ushort CDCJKJNGPOE, ushort MCDAHGPLLDO)
+	public RewardLottery(XmlNode node, ushort moneyExponent, ushort prizeBaseExponent)
 	{
 		Kind = RewardKind.REWARD_LOTTERY;
 		lotteryType = node.Attributes["Type"].GetStringOrDefault(string.Empty);
@@ -23,7 +23,7 @@ public class RewardLottery : Rewardable
 		{
 			if (childNode.Name == "Slot")
 			{
-				LotteryPrizeEntry item = new LotteryPrizeEntry(childNode, CDCJKJNGPOE, MCDAHGPLLDO);
+				LotteryPrizeEntry item = new LotteryPrizeEntry(childNode, moneyExponent, prizeBaseExponent);
 				slots.Add(item);
 			}
 			else
@@ -32,14 +32,14 @@ public class RewardLottery : Rewardable
 				{
 					continue;
 				}
-				int bDJKDCMHEBI = childNode.Attributes["Min"].ParseInt(-1);
-				int cIKLDJLOFDJ = childNode.Attributes["Max"].ParseInt(-1);
+				int minLevel = childNode.Attributes["Min"].ParseInt(-1);
+				int maxLevel = childNode.Attributes["Max"].ParseInt(-1);
 				foreach (XmlNode childNode2 in childNode.ChildNodes)
 				{
-					LotteryPrizeEntry item2 = new LotteryPrizeEntry(childNode2, CDCJKJNGPOE, MCDAHGPLLDO)
+					LotteryPrizeEntry item2 = new LotteryPrizeEntry(childNode2, moneyExponent, prizeBaseExponent)
 					{
-						MinLevel = bDJKDCMHEBI,
-						MaxLevel = cIKLDJLOFDJ
+						MinLevel = minLevel,
+						MaxLevel = maxLevel
 					};
 					slots.Add(item2);
 				}

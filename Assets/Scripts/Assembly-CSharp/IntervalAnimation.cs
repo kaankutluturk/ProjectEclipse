@@ -48,11 +48,11 @@ public class IntervalAnimation
 		}
 	}
 
-	public IntervalAnimation(IntervalType AFGJECLDAIG)
+	public IntervalAnimation(IntervalType intervalType)
 	{
 		_Id = -1;
 		animationFinishFrame = int.MaxValue;
-		Type = AFGJECLDAIG;
+		Type = intervalType;
 	}
 
 	public int GetAnimationId()
@@ -65,10 +65,10 @@ public class IntervalAnimation
 		animationFinishFrame = value;
 	}
 
-	public virtual void Parse(XmlNode MEEAKLDGLDF)
+	public virtual void Parse(XmlNode node)
 	{
-		NodeInterval = MEEAKLDGLDF;
-		_Id = XmlUtils.ParseInt(MEEAKLDGLDF.Attributes["ID"], -1);
+		NodeInterval = node;
+		_Id = XmlUtils.ParseInt(node.Attributes["ID"], -1);
 	}
 
 	public virtual void Init()
@@ -100,9 +100,9 @@ public class IntervalAnimation
 		NodeInterval = null;
 	}
 
-	public static IntervalType ParseIntervalType(string LFLGCDNKNJI)
+	public static IntervalType ParseIntervalType(string typeName)
 	{
-		switch (LFLGCDNKNJI)
+		switch (typeName)
 		{
 		case "Attack":
 			return IntervalType.INTERVAL_ATTACK;
@@ -117,9 +117,9 @@ public class IntervalAnimation
 		}
 	}
 
-	private static string IntervalTypeToString(IntervalType LFLGCDNKNJI)
+	private static string IntervalTypeToString(IntervalType intervalType)
 	{
-		switch (LFLGCDNKNJI)
+		switch (intervalType)
 		{
 		case IntervalType.INTERVAL_NONE:
 			return string.Empty;

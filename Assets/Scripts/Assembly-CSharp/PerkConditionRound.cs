@@ -11,21 +11,21 @@ public class PerkConditionRound : PerkConditionFunctionExtension
 	public override void Parse(XmlNode node)
 	{
 		base.Parse(node);
-		string bLLCOEAOJGF = node.Attributes["Number"].GetStringOrDefault(string.Empty);
-		functionExtension.Parse(bLLCOEAOJGF);
+		string expression = node.Attributes["Number"].GetStringOrDefault(string.Empty);
+		functionExtension.Parse(expression);
 		functionExtension.set_Target(this);
 	}
 
-	public override bool IsEqual(Model ACENLMONNPA, List<string> NIKHAICFGNM)
+	public override bool IsEqual(Model model, List<string> args)
 	{
-		Model fGCODGKLHED = ResolveTargetModel(ACENLMONNPA);
-		if (ACENLMONNPA == null)
+		Model targetModel = ResolveTargetModel(model);
+		if (model == null)
 		{
 			return false;
 		}
-		FunctionResult dEIHAOLOPLC = functionExtension.Calculate();
-		int num = dEIHAOLOPLC.Value.ToInt();
-		int num2 = fGCODGKLHED.GetRound();
+		FunctionResult functionResult = functionExtension.Calculate();
+		int num = functionResult.Value.ToInt();
+		int num2 = targetModel.GetRound();
 		if (num2 != num)
 		{
 			return false;

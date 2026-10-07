@@ -14,13 +14,13 @@ public class PerkContentData
 
 	public float LabelWidth;
 
-	public PerkContentData(string _name = "", string _description = "", ProfilePerk.ProfilePerkState MAFFNGPOMJD = ProfilePerk.ProfilePerkState.PERK_LOCK, Action<object> _dlg = null, InfoAnimation BJONHDGCNFE = null, float GEFOLNHPJMI = -1f)
+	public PerkContentData(string _name = "", string _description = "", ProfilePerk.ProfilePerkState perkState = ProfilePerk.ProfilePerkState.PERK_LOCK, Action<object> _dlg = null, InfoAnimation animation = null, float labelWidth = -1f)
 	{
 		name = _name;
 		description = _description;
 		Callback = _dlg;
-		state = MAFFNGPOMJD;
-		Animation = BJONHDGCNFE;
-		LabelWidth = GEFOLNHPJMI;
+		state = perkState;
+		Animation = animation;
+		LabelWidth = labelWidth;
 	}
 }

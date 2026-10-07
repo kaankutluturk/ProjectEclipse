@@ -51,10 +51,10 @@ namespace Nekki.SF2.GUI.Map
 		{
 		}
 
-		public int GetZoneIndex(ZoneScrollItem JEOIJBLAMIO)
+		public int GetZoneIndex(ZoneScrollItem zoneItem)
 		{
 			List<ZoneScrollItem> zones = GetZones();
-			return zones.IndexOf(JEOIJBLAMIO);
+			return zones.IndexOf(zoneItem);
 		}
 
 		public int GetZoneIndexByName(string name)
@@ -79,9 +79,9 @@ namespace Nekki.SF2.GUI.Map
 
 		public void AddStoryZones()
 		{
-			List<Zone> hFPCBJLOJEM = ListSF.GetZones().FindAll(
+			List<Zone> storyZones = ListSF.GetZones().FindAll(
 				zone => !UnderworldZonePolicy.IsRaidZone(zone));
-			AddZones(hFPCBJLOJEM);
+			AddZones(storyZones);
 		}
 
 		public void AddRaidZones()
@@ -101,12 +101,12 @@ namespace Nekki.SF2.GUI.Map
 			}
 		}
 
-		public bool HasBattle(Battle DPOOIONCEOA)
+		public bool HasBattle(Battle battle)
 		{
 			List<ZoneScrollItem> zones = GetZones();
 			foreach (ZoneScrollItem item in zones)
 			{
-				if ((bool)item.GetButtonByBattle(DPOOIONCEOA))
+				if ((bool)item.GetButtonByBattle(battle))
 				{
 					return true;
 				}
@@ -114,12 +114,12 @@ namespace Nekki.SF2.GUI.Map
 			return false;
 		}
 
-		public bool HasZone(ZoneScrollItem HLJKOKMKMLM)
+		public bool HasZone(ZoneScrollItem zoneItem)
 		{
 			List<ZoneScrollItem> zones = GetZones();
 			foreach (ZoneScrollItem item in zones)
 			{
-				if (item == HLJKOKMKMLM)
+				if (item == zoneItem)
 				{
 					return true;
 				}
@@ -127,18 +127,18 @@ namespace Nekki.SF2.GUI.Map
 			return false;
 		}
 
-		public void SelectBattle(Battle DPOOIONCEOA, float _Duration)
+		public void SelectBattle(Battle battle, float _Duration)
 		{
-			if (DPOOIONCEOA == null)
+			if (battle == null)
 			{
 				return;
 			}
 			List<ZoneScrollItem> zones = GetZones();
 			foreach (ZoneScrollItem item in zones)
 			{
-				if ((bool)item.GetButtonByBattle(DPOOIONCEOA))
+				if ((bool)item.GetButtonByBattle(battle))
 				{
-					item.SetLastBattle(DPOOIONCEOA);
+					item.SetLastBattle(battle);
 					if (zoneScroll.GetCurrentItem() != item)
 					{
 						zoneScroll.ScrollToItem(item, _Duration);
@@ -227,15 +227,15 @@ namespace Nekki.SF2.GUI.Map
 			CallEvent(1, data);
 		}
 
-		private void AddZones(List<Zone> HFPCBJLOJEM)
+		private void AddZones(List<Zone> zones)
 		{
-			foreach (Zone item in HFPCBJLOJEM)
+			foreach (Zone item in zones)
 			{
 				AddZone(item);
 			}
 		}
 
-		private void AddZone(Zone HLJKOKMKMLM)
+		private void AddZone(Zone zone)
 		{
 			if (zoneScroll == null || _scrollItemPrefab == null)
 			{
@@ -243,17 +243,17 @@ namespace Nekki.SF2.GUI.Map
 			}
 			else
 			{
-				if (HLJKOKMKMLM.GetIsStart())
+				if (zone.GetIsStart())
 				{
 					return;
 				}
 				bool flag = true;
-				List<Battle> lGIIBNJFADA = HLJKOKMKMLM.Battles;
-				for (int i = 0; i < lGIIBNJFADA.Count; i++)
+				List<Battle> battles = zone.Battles;
+				for (int i = 0; i < battles.Count; i++)
 				{
-					Battle cGJCGEBPCAF = lGIIBNJFADA[i];
-					bool dCHJDPCEODD = cGJCGEBPCAF.IsMapVisible;
-					flag &= !dCHJDPCEODD;
+					Battle battle = battles[i];
+					bool isMapVisible = battle.IsMapVisible;
+					flag &= !isMapVisible;
 				}
 				if (!flag)
 				{
@@ -261,7 +261,7 @@ namespace Nekki.SF2.GUI.Map
 					ZoneScrollItem component = gameObject.GetComponent<ZoneScrollItem>();
 					if (component != null)
 					{
-						component.Init(HLJKOKMKMLM);
+						component.Init(zone);
 						component.AddEventListener(0, ForwardBattleClick);
 						component.SelectFirstBattle();
 						zoneScroll.AddItem(component);

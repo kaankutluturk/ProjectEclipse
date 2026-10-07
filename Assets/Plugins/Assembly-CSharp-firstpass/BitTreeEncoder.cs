@@ -4,10 +4,10 @@ internal struct BitTreeEncoder
 
 	private int NumBitLevels;
 
-	public BitTreeEncoder(int PLIPKMLGGIP)
+	public BitTreeEncoder(int numBitLevels)
 	{
-		NumBitLevels = PLIPKMLGGIP;
-		Models = new BitEncoder[1 << PLIPKMLGGIP];
+		NumBitLevels = numBitLevels;
+		Models = new BitEncoder[1 << numBitLevels];
 	}
 
 	public void Init()
@@ -18,7 +18,7 @@ internal struct BitTreeEncoder
 		}
 	}
 
-	public void Encode(RangeEncoder JHAAEJNODIF, uint symbol)
+	public void Encode(RangeEncoder rangeEncoder, uint symbol)
 	{
 		uint num = 1u;
 		int num2 = NumBitLevels;
@@ -26,18 +26,18 @@ internal struct BitTreeEncoder
 		{
 			num2--;
 			uint num3 = (symbol >> num2) & 1;
-			Models[num].Encode(JHAAEJNODIF, num3);
+			Models[num].Encode(rangeEncoder, num3);
 			num = (num << 1) | num3;
 		}
 	}
 
-	public void ReverseEncode(RangeEncoder JHAAEJNODIF, uint symbol)
+	public void ReverseEncode(RangeEncoder rangeEncoder, uint symbol)
 	{
 		uint num = 1u;
 		for (uint num2 = 0u; num2 < NumBitLevels; num2++)
 		{
 			uint num3 = symbol & 1;
-			Models[num].Encode(JHAAEJNODIF, num3);
+			Models[num].Encode(rangeEncoder, num3);
 			num = (num << 1) | num3;
 			symbol >>= 1;
 		}
@@ -72,7 +72,7 @@ internal struct BitTreeEncoder
 		return num;
 	}
 
-	public static uint ReverseGetPrice(BitEncoder[] LNDLFINJHDB, uint CAILGDNIKJD, int NumBitLevels, uint symbol)
+	public static uint ReverseGetPrice(BitEncoder[] models, uint startIndex, int NumBitLevels, uint symbol)
 	{
 		uint num = 0u;
 		uint num2 = 1u;
@@ -80,19 +80,19 @@ internal struct BitTreeEncoder
 		{
 			uint num4 = symbol & 1;
 			symbol >>= 1;
-			num += LNDLFINJHDB[CAILGDNIKJD + num2].GetPrice(num4);
+			num += models[startIndex + num2].GetPrice(num4);
 			num2 = (num2 << 1) | num4;
 		}
 		return num;
 	}
 
-	public static void ReverseEncode(BitEncoder[] LNDLFINJHDB, uint CAILGDNIKJD, RangeEncoder JHAAEJNODIF, int NumBitLevels, uint symbol)
+	public static void ReverseEncode(BitEncoder[] models, uint startIndex, RangeEncoder rangeEncoder, int NumBitLevels, uint symbol)
 	{
 		uint num = 1u;
 		for (int i = 0; i < NumBitLevels; i++)
 		{
 			uint num2 = symbol & 1;
-			LNDLFINJHDB[CAILGDNIKJD + num].Encode(JHAAEJNODIF, num2);
+			models[startIndex + num].Encode(rangeEncoder, num2);
 			num = (num << 1) | num2;
 			symbol >>= 1;
 		}

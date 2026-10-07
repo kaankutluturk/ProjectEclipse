@@ -73,8 +73,8 @@ namespace Nekki.SF2.GUI.Shop
 		{
 			if (SystemProperties.IsDebug())
 			{
-				uint bAINMLLIKOL = ListSF.GetRoster().GetExperienceToNextLevel();
-				ListSF.GetRoster().SetExperience(bAINMLLIKOL);
+				uint newExperience = ListSF.GetRoster().GetExperienceToNextLevel();
+				ListSF.GetRoster().SetExperience(newExperience);
 				if (MainMenu.get_Instance() != null)
 				{
 					MainMenu.get_Instance().UpdateLevel();

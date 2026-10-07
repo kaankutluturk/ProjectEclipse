@@ -4,42 +4,42 @@ public abstract class ChainedEventEmitter : IEventEmitter
 {
 	protected readonly IEventEmitter nextEmitter;
 
-	protected ChainedEventEmitter(IEventEmitter JDJEJDIJLLE)
+	protected ChainedEventEmitter(IEventEmitter emitter)
 	{
-		if (JDJEJDIJLLE == null)
+		if (emitter == null)
 		{
 			throw new ArgumentNullException("nextEmitter");
 		}
-		this.nextEmitter = JDJEJDIJLLE;
+		this.nextEmitter = emitter;
 	}
 
-	public virtual void Emit(AliasEventInfo FNHCFCAALAE)
+	public virtual void Emit(AliasEventInfo eventInfo)
 	{
-		nextEmitter.Emit(FNHCFCAALAE);
+		nextEmitter.Emit(eventInfo);
 	}
 
-	public virtual void Emit(ScalarEventInfo FNHCFCAALAE)
+	public virtual void Emit(ScalarEventInfo eventInfo)
 	{
-		nextEmitter.Emit(FNHCFCAALAE);
+		nextEmitter.Emit(eventInfo);
 	}
 
-	public virtual void Emit(MappingStartEventInfo FNHCFCAALAE)
+	public virtual void Emit(MappingStartEventInfo eventInfo)
 	{
-		nextEmitter.Emit(FNHCFCAALAE);
+		nextEmitter.Emit(eventInfo);
 	}
 
-	public virtual void Emit(MappingEndEventInfo FNHCFCAALAE)
+	public virtual void Emit(MappingEndEventInfo eventInfo)
 	{
-		nextEmitter.Emit(FNHCFCAALAE);
+		nextEmitter.Emit(eventInfo);
 	}
 
-	public virtual void Emit(SequenceStartEventInfo FNHCFCAALAE)
+	public virtual void Emit(SequenceStartEventInfo eventInfo)
 	{
-		nextEmitter.Emit(FNHCFCAALAE);
+		nextEmitter.Emit(eventInfo);
 	}
 
-	public virtual void Emit(SequenceEndEventInfo FNHCFCAALAE)
+	public virtual void Emit(SequenceEndEventInfo eventInfo)
 	{
-		nextEmitter.Emit(FNHCFCAALAE);
+		nextEmitter.Emit(eventInfo);
 	}
 }

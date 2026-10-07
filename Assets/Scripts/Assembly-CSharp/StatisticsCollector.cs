@@ -396,19 +396,19 @@ public class StatisticsCollector
 		return GetInstance()._Counter;
 	}
 
-	public static void LogEvent(StatisticsEvent.EventType IGABHEMGKKE, ArgsDict LKIOKGCNKHE = null)
+	public static void LogEvent(StatisticsEvent.EventType eventType, ArgsDict eventArgs = null)
 	{
 		// Remote analytics removed. Combat/stat counters elsewhere remain local.
 	}
 
-	public static void LogPayEvent(StatisticsEvent.EventType IGABHEMGKKE, ArgsDict LKIOKGCNKHE = null)
+	public static void LogPayEvent(StatisticsEvent.EventType eventType, ArgsDict eventArgs = null)
 	{
 		// Remote analytics removed. Combat/stat counters elsewhere remain local.
 	}
 
-	public void SetEventsLogging(bool MAACIEHOLML)
+	public void SetEventsLogging(bool isEnabled)
 	{
-		if (MAACIEHOLML)
+		if (isEnabled)
 		{
 			_EventsLoggingState = LoggingState.Logging;
 			Send();
@@ -419,9 +419,9 @@ public class StatisticsCollector
 		}
 	}
 
-	public void SetPaysLogging(bool MAACIEHOLML)
+	public void SetPaysLogging(bool isEnabled)
 	{
-		if (MAACIEHOLML)
+		if (isEnabled)
 		{
 			_PaysLoggingState = LoggingState.Logging;
 			SendPayLog();
@@ -574,7 +574,7 @@ public class StatisticsCollector
 		}
 	}
 
-	private void SaveFullLog(string MMEHKDAMJBF)
+	private void SaveFullLog(string logContent)
 	{
 		try
 		{
@@ -585,7 +585,7 @@ public class StatisticsCollector
 			}
 			using (StreamWriter streamWriter = fileInfo.AppendText())
 			{
-				streamWriter.Write(MMEHKDAMJBF);
+				streamWriter.Write(logContent);
 			}
 		}
 		catch (Exception ex)
@@ -604,7 +604,7 @@ public class StatisticsCollector
 		FlushBuffer(_PaysBuffer, GetPaysPath());
 	}
 
-	private void FlushBuffer(StringBuilder Data, string PDLAFCOODMM)
+	private void FlushBuffer(StringBuilder Data, string filePath)
 	{
 		if (Data.Length == 0)
 		{
@@ -618,7 +618,7 @@ public class StatisticsCollector
 			{
 				Directory.CreateDirectory(SF2Paths.GetStatisticsPath());
 			}
-			FileInfo fileInfo = new FileInfo(PDLAFCOODMM);
+			FileInfo fileInfo = new FileInfo(filePath);
 			if (!fileInfo.Exists)
 			{
 				FileStream fileStream = fileInfo.Create();
@@ -640,20 +640,20 @@ public class StatisticsCollector
 
 	public void SendFullLog()
 	{
-		int pCOENEHCGNI = 2000000;
+		int maxChunkSize = 2000000;
 		FlushEventsBuffer();
 		SaveFullLog();
-		Send(GetFullEventsPath(), ref _FullLogPosition, (bool AMKKLMOONEP, string GHDPPHAAPCA, object JHJDJOFPHPH, string MDIJEPEOAJH) =>
+		Send(GetFullEventsPath(), ref _FullLogPosition, (bool success, string response, object userData, string requestName) =>
 		{
-			OnFullLogSent(AMKKLMOONEP, GHDPPHAAPCA, JHJDJOFPHPH, MDIJEPEOAJH);
-		}, pCOENEHCGNI, false, "save_full_json_log");
+			OnFullLogSent(success, response, userData, requestName);
+		}, maxChunkSize, false, "save_full_json_log");
 	}
 
-	public void OnFullLogSent(bool AMKKLMOONEP, string GHDPPHAAPCA, object JHJDJOFPHPH, string CCNACAJIIGA)
+	public void OnFullLogSent(bool success, string response, object userData, string sentData)
 	{
-		if (AMKKLMOONEP)
+		if (success)
 		{
-			JSONNode jSONNode = JSON.Parse(GHDPPHAAPCA);
+			JSONNode jSONNode = JSON.Parse(response);
 			if (jSONNode != null && jSONNode["data"] != null && jSONNode["data"].Value == "ok")
 			{
 				SendOnNextFrame(SendFullLog);
@@ -665,19 +665,19 @@ public class StatisticsCollector
 	{
 		if (_PaysLoggingState != LoggingState.NotLogging && _PaysLoggingState != LoggingState.Undecided)
 		{
-			int pCOENEHCGNI = 2000000;
-			Send(GetPaysPath(), ref _PaysFilePosition, (bool AMKKLMOONEP, string GHDPPHAAPCA, object JHJDJOFPHPH, string MDIJEPEOAJH) =>
+			int maxChunkSize = 2000000;
+			Send(GetPaysPath(), ref _PaysFilePosition, (bool success, string response, object userData, string requestName) =>
 			{
-				OnPayLogSent(AMKKLMOONEP, GHDPPHAAPCA, JHJDJOFPHPH, MDIJEPEOAJH);
-			}, pCOENEHCGNI, false, "save_pay_log");
+				OnPayLogSent(success, response, userData, requestName);
+			}, maxChunkSize, false, "save_pay_log");
 		}
 	}
 
-	public void OnPayLogSent(bool AMKKLMOONEP, string GHDPPHAAPCA, object JHJDJOFPHPH, string CCNACAJIIGA)
+	public void OnPayLogSent(bool success, string response, object userData, string sentData)
 	{
-		if (AMKKLMOONEP)
+		if (success)
 		{
-			JSONNode jSONNode = JSON.Parse(GHDPPHAAPCA);
+			JSONNode jSONNode = JSON.Parse(response);
 			if (jSONNode != null && jSONNode["data"] != null && jSONNode["data"].Value == "ok")
 			{
 				ClearPayLogIfSent();
@@ -707,31 +707,31 @@ public class StatisticsCollector
 
 	private void Send()
 	{
-		int pCOENEHCGNI = 2000000;
+		int maxChunkSize = 2000000;
 		if (_EventsLoggingState != LoggingState.NotLogging && _EventsLoggingState != LoggingState.Undecided)
 		{
 			_LastSendTime = GameTimeUtils.GetUnixTimeMs();
 			FlushEventsBuffer();
-			Send(GetEventsPath(), ref _EventsFilePosition, (bool AMKKLMOONEP, string GHDPPHAAPCA, object JHJDJOFPHPH, string MDIJEPEOAJH) =>
+			Send(GetEventsPath(), ref _EventsFilePosition, (bool success, string response, object userData, string requestName) =>
 			{
-				OnEventsSent(AMKKLMOONEP, GHDPPHAAPCA, JHJDJOFPHPH, MDIJEPEOAJH);
-			}, pCOENEHCGNI);
+				OnEventsSent(success, response, userData, requestName);
+			}, maxChunkSize);
 		}
 	}
 
-	private void Send(string EFGLOMANJHN, ref long DNGJNMNHIOB, Action<bool, string, object, string> p_delegate, int PCOENEHCGNI = 2000000, bool AOOKEDHEDHJ = true, string IBODMPMJELJ = "save_json_log")
+	private void Send(string filePath, ref long filePosition, Action<bool, string, object, string> p_delegate, int maxChunkSize = 2000000, bool saveFullLog = true, string requestName = "save_json_log")
 	{
 		// No telemetry transport.
 	}
 
-	public void OnEventsSent(bool AMKKLMOONEP, string GHDPPHAAPCA, object JHJDJOFPHPH, string CCNACAJIIGA)
+	public void OnEventsSent(bool success, string response, object userData, string sentData)
 	{
-		if (AMKKLMOONEP)
+		if (success)
 		{
-			JSONNode jSONNode = JSON.Parse(GHDPPHAAPCA);
+			JSONNode jSONNode = JSON.Parse(response);
 			if (jSONNode != null && jSONNode["data"] != null && jSONNode["data"].Value == "ok")
 			{
-				SaveFullLog(CCNACAJIIGA);
+				SaveFullLog(sentData);
 				ClearEventsLogIfSent();
 			}
 		}
@@ -760,15 +760,15 @@ public class StatisticsCollector
 		}
 	}
 
-	private void SendOnNextFrame(Action IBODMPMJELJ)
+	private void SendOnNextFrame(Action callback)
 	{
-		ServerProvider.get_Instance().StartCoroutine(SendOnNextFrameCorutine(IBODMPMJELJ));
+		ServerProvider.get_Instance().StartCoroutine(SendOnNextFrameCorutine(callback));
 	}
 
-	private IEnumerator SendOnNextFrameCorutine(Action IBODMPMJELJ)
+	private IEnumerator SendOnNextFrameCorutine(Action callback)
 	{
 		yield return new WaitForEndOfFrame();
-		IBODMPMJELJ();
+		callback();
 	}
 
 	private void TrimEventsLog()
@@ -799,13 +799,13 @@ public class StatisticsCollector
 		_SessionLength++;
 	}
 
-	public void OnApplicationPause(bool FILCEHABKLK)
+	public void OnApplicationPause(bool isPaused)
 	{
-		if (!FILCEHABKLK && GameTimeUtils.GetUnixTimeMs() - _LastSendTime > 900000)
+		if (!isPaused && GameTimeUtils.GetUnixTimeMs() - _LastSendTime > 900000)
 		{
 			Send();
 		}
-		if (FILCEHABKLK)
+		if (isPaused)
 		{
 			SaveEndState();
 		}
@@ -814,8 +814,8 @@ public class StatisticsCollector
 	private void SaveEndState()
 	{
 		_EndDate = GlobalTimer.get_LocalTimeUTC();
-		Roster nKGLHEGIKKP = ListSF.GetRoster();
-		if (nKGLHEGIKKP != null)
+		Roster roster = ListSF.GetRoster();
+		if (roster != null)
 		{
 			_EndBonus = ListSF.GetRoster().GetBonus();
 			_EndLevel = ListSF.GetRoster().GetLevel();

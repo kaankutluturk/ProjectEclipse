@@ -13,8 +13,8 @@ public sealed class LambdaObjectFactory : IObjectFactory
 		factory = DJFCIPIMOBC;
 	}
 
-	public object Create(Type LFLGCDNKNJI)
+	public object Create(Type type)
 	{
-		return factory(LFLGCDNKNJI);
+		return factory(type);
 	}
 }

@@ -41,9 +41,9 @@ public class DistancePoint
 
 		public ModelObject Owner;
 
-		public ChildPoint(ModelObject ACENLMONNPA)
+		public ChildPoint(ModelObject owner)
 		{
-			Owner = ACENLMONNPA;
+			Owner = owner;
 		}
 	}
 
@@ -97,18 +97,18 @@ public class DistancePoint
 	public virtual void Create(XmlNode node)
 	{
 		TargetModel = ModelType.ParseTargetType((node == null) ? "Null" : node.Attributes["Player"].GetStringOrDefault("Null"));
-		XmlAttribute cJBEMNNNHDM = ((node == null) ? null : node.Attributes["Object"]);
-		string bAINMLLIKOL = cJBEMNNNHDM.GetStringOrDefault(string.Empty);
-		ObjectType = (Object)MovesMaps.GetMappedIndex(MovesMaps.MapType.DISTANCE_OBJECT_TYPE, bAINMLLIKOL);
-		cJBEMNNNHDM = ((node == null) ? null : node.Attributes["Part"]);
-		Part = cJBEMNNNHDM.GetStringOrDefault(string.Empty);
+		XmlAttribute attribute = ((node == null) ? null : node.Attributes["Object"]);
+		string objectName = attribute.GetStringOrDefault(string.Empty);
+		ObjectType = (Object)MovesMaps.GetMappedIndex(MovesMaps.MapType.DISTANCE_OBJECT_TYPE, objectName);
+		attribute = ((node == null) ? null : node.Attributes["Part"]);
+		Part = attribute.GetStringOrDefault(string.Empty);
 		if (ObjectType == Object.OBJECT_WALL)
 		{
 			IsBackWall = Part == "Back";
 		}
 		Frame = DistanceFrame.DISTANCE_FRAME_CURRENT;
-		cJBEMNNNHDM = ((node == null) ? null : node.Attributes["Frame"]);
-		if (cJBEMNNNHDM != null && cJBEMNNNHDM.GetStringOrDefault(string.Empty) == "Previous")
+		attribute = ((node == null) ? null : node.Attributes["Frame"]);
+		if (attribute != null && attribute.GetStringOrDefault(string.Empty) == "Previous")
 		{
 			Frame = DistanceFrame.DISTANCE_FRAME_PREVIOUS;
 		}
@@ -116,13 +116,13 @@ public class DistancePoint
 		ShiftY = ((node == null) ? 0f : node.Attributes["ShiftY"].ParseFloat());
 	}
 
-	public void Create(string ENAEDFEDNGI, string HIPONJCKJEH, string BOLAFILGINF)
+	public void Create(string targetName, string objectName, string partName)
 	{
-		TargetModel = ModelType.ParseTargetType(ENAEDFEDNGI);
-		ObjectType = (Object)MovesMaps.GetMappedIndex(MovesMaps.MapType.DISTANCE_OBJECT_TYPE, HIPONJCKJEH);
+		TargetModel = ModelType.ParseTargetType(targetName);
+		ObjectType = (Object)MovesMaps.GetMappedIndex(MovesMaps.MapType.DISTANCE_OBJECT_TYPE, objectName);
 		if (ObjectType == Object.OBJECT_WALL)
 		{
-			IsBackWall = BOLAFILGINF == "Back";
+			IsBackWall = partName == "Back";
 		}
 		Frame = DistanceFrame.DISTANCE_FRAME_CURRENT;
 		string empty = string.Empty;
@@ -151,34 +151,34 @@ public class DistancePoint
 
 	public virtual Vector3 GetPosition(ModelConditions conditions)
 	{
-		ModelConditions.ModelPositions dFKJGDBENAL = GetModelPositions(conditions);
-		ModelNode lCDGOCIAIDK = null;
+		ModelConditions.ModelPositions modelPositions = GetModelPositions(conditions);
+		ModelNode modelNode = null;
 		Vector3 result = default(Vector3);
 		switch (ObjectType)
 		{
 		case Object.OBJECT_NODES:
 		{
-			lCDGOCIAIDK = GetNode(conditions);
-			if (lCDGOCIAIDK != null)
+			modelNode = GetNode(conditions);
+			if (modelNode != null)
 			{
-				result = Vector3f.op_Implicit(GetFramePosition(lCDGOCIAIDK));
+				result = Vector3f.op_Implicit(GetFramePosition(modelNode));
 			}
 			float x = result.x + ShiftX * (float)conditions.AnimationSign;
 			float y = result.y - ShiftY;
 			return new Vector3(x, y);
 		}
 		case Object.OBJECT_PIVOT:
-			lCDGOCIAIDK = GetPivotNode(conditions);
-			if (lCDGOCIAIDK != null)
+			modelNode = GetPivotNode(conditions);
+			if (modelNode != null)
 			{
-				result = Vector3f.op_Implicit(GetFramePosition(lCDGOCIAIDK));
+				result = Vector3f.op_Implicit(GetFramePosition(modelNode));
 			}
 			result.x += ShiftX * (float)conditions.AnimationSign;
 			result.y -= ShiftY;
 			return result;
 		case Object.OBJECT_WALL:
 		{
-			Vector2 vector = GetWallPosition(conditions, dFKJGDBENAL);
+			Vector2 vector = GetWallPosition(conditions, modelPositions);
 			vector.x += ShiftX * (float)conditions.SelfSign;
 			vector.y -= ShiftY;
 			return Vector3f.op_Implicit(new Vector3f(vector));
@@ -186,8 +186,8 @@ public class DistancePoint
 		case Object.OBJECT_FLOOR:
 			return Vector3f.op_Implicit(new Vector3f(ShiftX, 0f - ShiftY));
 		case Object.OBJECT_COM:
-			lCDGOCIAIDK = dFKJGDBENAL.Body.GetCenterOfMassNode();
-			result = Vector3f.op_Implicit(GetFramePosition(lCDGOCIAIDK));
+			modelNode = modelPositions.Body.GetCenterOfMassNode();
+			result = Vector3f.op_Implicit(GetFramePosition(modelNode));
 			result.x += ShiftX * (float)conditions.SelfSign;
 			result.y -= ShiftY;
 			return result;
@@ -197,7 +197,7 @@ public class DistancePoint
 		}
 	}
 
-	public void UpdateNode(ModelObject OECPEDPMKCD, bool EKBOGDKIHIH, ModelNode AECCPADGGPG, bool PHADJMAONJG, ModelObject MJCGOJBGFIE)
+	public void UpdateNode(ModelObject rootModel, bool isPlayer, ModelNode pivotNode, bool isChildPoint, ModelObject childModel)
 	{
         ModelNode resolved = null;
         if (ObjectType == Object.OBJECT_NODES)
@@ -205,47 +205,47 @@ public class DistancePoint
             // Binding visits both fighters' candidate moves before selection.
             // Equipment/child nodes can be absent on this body. Preserve the
             // native nullable lookup and replace any retired body's cached node.
-            resolved = OECPEDPMKCD.GetNodeByName(Part);
+            resolved = rootModel.GetNodeByName(Part);
         }
-		PointNode bKHJJICJODB = null;
-		if (PHADJMAONJG)
+		PointNode pointNode = null;
+		if (isChildPoint)
 		{
 			bool flag = false;
-			List<ChildPoint> list = ((!EKBOGDKIHIH) ? opponentChildPoints : playerChildPoints);
+			List<ChildPoint> list = ((!isPlayer) ? opponentChildPoints : playerChildPoints);
 			for (int i = 0; i < list.Count; i++)
 			{
-				if (list[i].Owner == MJCGOJBGFIE)
+				if (list[i].Owner == childModel)
 				{
-					bKHJJICJODB = list[i].Point;
+					pointNode = list[i].Point;
 					flag = true;
 					break;
 				}
 			}
 			if (!flag)
 			{
-				ChildPoint fKKHKDFDLJI = new ChildPoint(MJCGOJBGFIE);
-				list.Add(fKKHKDFDLJI);
-				bKHJJICJODB = fKKHKDFDLJI.Point;
+				ChildPoint childPoint = new ChildPoint(childModel);
+				list.Add(childPoint);
+				pointNode = childPoint.Point;
 			}
 		}
 		else
 		{
-			bKHJJICJODB = ((!EKBOGDKIHIH) ? opponentPoint : playerPoint);
-            if (OECPEDPMKCD != null)
+			pointNode = ((!isPlayer) ? opponentPoint : playerPoint);
+            if (rootModel != null)
             {
-                var rootPoint = _rootPoints.GetValue(OECPEDPMKCD, _ => new PointNode());
+                var rootPoint = _rootPoints.GetValue(rootModel, _ => new PointNode());
                 if (ObjectType == Object.OBJECT_NODES) rootPoint.Node = resolved;
-                rootPoint.PivotNode = AECCPADGGPG;
+                rootPoint.PivotNode = pivotNode;
             }
 		}
 		if (ObjectType == Object.OBJECT_NODES)
 		{
-			bKHJJICJODB.Node = resolved;
+			pointNode.Node = resolved;
 		}
-		bKHJJICJODB.PivotNode = AECCPADGGPG;
+		pointNode.PivotNode = pivotNode;
 	}
 
-	protected Vector2 GetWallPosition(ModelConditions conditions, ModelConditions.ModelPositions MDBELBGHDFP)
+	protected Vector2 GetWallPosition(ModelConditions conditions, ModelConditions.ModelPositions positions)
 	{
 		int num = 0;
 		switch (TargetModel)
@@ -265,25 +265,25 @@ public class DistancePoint
 			GameLog.Error("ERROR: DistancePoint::getPosition - unknown model: {0}", TargetModel);
 			break;
 		}
-		return (num > 0 != IsBackWall) ? MDBELBGHDFP.RightWall : MDBELBGHDFP.LeftWall;
+		return (num > 0 != IsBackWall) ? positions.RightWall : positions.LeftWall;
 	}
 
 	protected ModelNode GetPivotNode(ModelConditions conditions)
 	{
-		ModelNode lCDGOCIAIDK = GetPointNode(conditions).PivotNode;
-		if (lCDGOCIAIDK != null)
+		ModelNode pivotNode = GetPointNode(conditions).PivotNode;
+		if (pivotNode != null)
 		{
-			ModelNode lCDGOCIAIDK2 = lCDGOCIAIDK.GetPairNode();
+			ModelNode lCDGOCIAIDK2 = pivotNode.GetPairNode();
 			if (lCDGOCIAIDK2 != null)
 			{
-				int pCAOCHAIBJC = conditions.AnimationSign;
-				int fOIHIKCEBJF = conditions.PivotPairSelector;
-				float num = lCDGOCIAIDK.GetStart().GetX() * (float)pCAOCHAIBJC;
-				float num2 = lCDGOCIAIDK2.GetStart().GetX() * (float)pCAOCHAIBJC;
+				int animationSign = conditions.AnimationSign;
+				int pairSelector = conditions.PivotPairSelector;
+				float num = pivotNode.GetStart().GetX() * (float)animationSign;
+				float num2 = lCDGOCIAIDK2.GetStart().GetX() * (float)animationSign;
 				bool flag = num > num2;
-				if ((fOIHIKCEBJF == 1 && !flag) || (fOIHIKCEBJF == 2 && flag))
+				if ((pairSelector == 1 && !flag) || (pairSelector == 2 && flag))
 				{
-					lCDGOCIAIDK = lCDGOCIAIDK2;
+					pivotNode = lCDGOCIAIDK2;
 				}
 			}
 		}
@@ -293,21 +293,21 @@ public class DistancePoint
 			{
 			case ModelType.ModelTargetType.MODEL_NULL:
 			case ModelType.ModelTargetType.MODEL_THIS:
-				lCDGOCIAIDK = conditions.SelfNode;
+				pivotNode = conditions.SelfNode;
 				break;
 			case ModelType.ModelTargetType.MODEL_OTHER:
 			case ModelType.ModelTargetType.MODEL_OTHER_CHILD:
-				lCDGOCIAIDK = conditions.OtherNode;
+				pivotNode = conditions.OtherNode;
 				break;
 			case ModelType.ModelTargetType.MODEL_PARENT:
-				lCDGOCIAIDK = conditions.ParentNode;
+				pivotNode = conditions.ParentNode;
 				break;
 			default:
 				GameLog.Error("DistancePoint: getNode - wrong type: {1}", TargetModel);
 				break;
 			}
 		}
-		return lCDGOCIAIDK;
+		return pivotNode;
 	}
 
 	private ModelNode GetNode(ModelConditions conditions)
@@ -392,7 +392,7 @@ public class DistancePoint
 
 	private PointNode GetChildPointNode(ModelConditions conditions)
 	{
-		ModelObject cBAECAAKAIA = conditions.SelfPositions.Body;
+		ModelObject selfBody = conditions.SelfPositions.Body;
 		List<ChildPoint> list = null;
 		switch (TargetModel)
 		{
@@ -412,7 +412,7 @@ public class DistancePoint
 		}
 		for (int i = 0; i < list.Count; i++)
 		{
-			if (list[i].Owner == cBAECAAKAIA)
+			if (list[i].Owner == selfBody)
 			{
 				return list[i].Point;
 			}

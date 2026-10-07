@@ -34,17 +34,17 @@ namespace Nekki.SF2.GUI.Fight
 
 		public UnityEvent OnHide = new UnityEvent();
 
-		public void Init(Achievement NCCHENOEPNF)
+		public void Init(Achievement achievementInfo)
 		{
-			achievement = NCCHENOEPNF;
-			if (text != null && NCCHENOEPNF != null)
+			achievement = achievementInfo;
+			if (text != null && achievementInfo != null)
 			{
-				text.SetAlias(NCCHENOEPNF.Name);
+				text.SetAlias(achievementInfo.Name);
 			}
-			if (icon != null && NCCHENOEPNF != null)
+			if (icon != null && achievementInfo != null)
 			{
 				icon.set_TexturePath("UI/Achievements/");
-				icon.set_SpriteName(NCCHENOEPNF.IconName);
+				icon.set_SpriteName(achievementInfo.IconName);
 			}
 			if (canvasGroup != null)
 			{

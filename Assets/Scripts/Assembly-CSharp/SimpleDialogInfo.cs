@@ -27,18 +27,18 @@ public class SimpleDialogInfo
 
 	public Action<object> Dlg;
 
-	public SimpleDialogInfo(string HHAAFADDOJB, string HCPNFPMHFCM, BaseDialog.FooterType HJNAHNICGMH, string ALOJJLCOGMP, string PAJIOGEINPI, LabelButton.ButtonColor HGAGMJENCNM, LabelButton.ButtonColor PHBOACBIMMF, bool LMAFOFCILBL, bool KPBBOCBCMBN, string DOEEIGAHKEN, Action<object> ODDEOFKLIAG)
+	public SimpleDialogInfo(string title, string message, BaseDialog.FooterType footerType, string okButtonText, string cancelButtonText, LabelButton.ButtonColor okButtonStyle, LabelButton.ButtonColor cancelButtonStyle, bool showCheckBox, bool checkBoxChecked, string checkBoxText, Action<object> dialogCallback)
 	{
-		Title = HHAAFADDOJB;
-		Message = HCPNFPMHFCM;
-		FooterType = HJNAHNICGMH;
-		OkButtonText = ALOJJLCOGMP;
-		CancelButtonText = PAJIOGEINPI;
-		OkButtonStyle = HGAGMJENCNM;
-		CancelButtonStyle = PHBOACBIMMF;
-		ShowCheckBox = LMAFOFCILBL;
-		CheckBoxChecked = KPBBOCBCMBN;
-		CheckBoxText = DOEEIGAHKEN;
-		Dlg = ODDEOFKLIAG;
+		Title = title;
+		Message = message;
+		FooterType = footerType;
+		OkButtonText = okButtonText;
+		CancelButtonText = cancelButtonText;
+		OkButtonStyle = okButtonStyle;
+		CancelButtonStyle = cancelButtonStyle;
+		ShowCheckBox = showCheckBox;
+		CheckBoxChecked = checkBoxChecked;
+		CheckBoxText = checkBoxText;
+		Dlg = dialogCallback;
 	}
 }

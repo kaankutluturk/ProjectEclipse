@@ -6,33 +6,33 @@ public class QuestActionDenomination : QuestAction
 
 	private string coinIcon = "MiscSprites.gold";
 
-	public override void Parse(XmlNode EPKLCPOEELO)
+	public override void Parse(XmlNode node)
 	{
-		base.Parse(EPKLCPOEELO);
-		denominationDigits = EPKLCPOEELO.Attributes["DenominationDigits"].ParseInt(-1);
-		coinIcon = EPKLCPOEELO.Attributes["CoinIcon"].GetStringOrDefault(string.Empty);
+		base.Parse(node);
+		denominationDigits = node.Attributes["DenominationDigits"].ParseInt(-1);
+		coinIcon = node.Attributes["CoinIcon"].GetStringOrDefault(string.Empty);
 	}
 
-	public override void Execute(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters parameters)
 	{
-		base.Execute(GFIHPBCEEOB);
-		int nPFOBKBJAOB = ListSF.GetRoster().GetDenominationDigits();
+		base.Execute(parameters);
+		int previousDigits = ListSF.GetRoster().GetDenominationDigits();
 		ListSF.GetRoster().SetDenominationDigits(denominationDigits);
 		ListSF.GetRoster().SetCoinIcon(coinIcon);
-		ApplyDenomination(nPFOBKBJAOB);
+		ApplyDenomination(previousDigits);
 		MenuController.RecreateMoney();
-		ScreenType iPKNDMINFMJ = Module.GetInstance().ScreenInfo.ScreenType;
-		if (iPKNDMINFMJ != ScreenType.ModuleFight)
+		ScreenType currentScreen = Module.GetInstance().ScreenInfo.ScreenType;
+		if (currentScreen != ScreenType.ModuleFight)
 		{
-			Module.OpenScreen(iPKNDMINFMJ);
+			Module.OpenScreen(currentScreen);
 		}
 		ListSF.GetInstance().OnAuthenticate(true);
 		FinishAction();
 	}
 
-	private void ApplyDenomination(int NPFOBKBJAOB)
+	private void ApplyDenomination(int previousDigits)
 	{
-		ItemInfo.DenominateItems(NPFOBKBJAOB);
-		ListSF.GetRoster().RescaleCurrencyDenomination(NPFOBKBJAOB);
+		ItemInfo.DenominateItems(previousDigits);
+		ListSF.GetRoster().RescaleCurrencyDenomination(previousDigits);
 	}
 }

@@ -8,11 +8,11 @@ public class QuestActionBuyItem : QuestAction
 
 	private ItemAction _itemAction;
 
-	public override void Parse(XmlNode EPKLCPOEELO)
+	public override void Parse(XmlNode node)
 	{
-		base.Parse(EPKLCPOEELO);
-		_name = EPKLCPOEELO.Attributes["Name"].GetStringOrDefault(string.Empty);
-		currency = EPKLCPOEELO.Attributes["Currency"].GetStringOrDefault(string.Empty);
+		base.Parse(node);
+		_name = node.Attributes["Name"].GetStringOrDefault(string.Empty);
+		currency = node.Attributes["Currency"].GetStringOrDefault(string.Empty);
 		if (currency == "Coins")
 		{
 			_itemAction = ItemAction.Item_Buy_Gold;
@@ -27,18 +27,18 @@ public class QuestActionBuyItem : QuestAction
 		}
 	}
 
-	public override void Execute(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters parameters)
 	{
-		base.Execute(GFIHPBCEEOB);
-		ConditionExtension.CompareResult lNIDLHOIHIM = new ConditionExtension.CompareResult();
-		QuestCondition kKDGLNECFHA = new QuestCondition();
-		kKDGLNECFHA.SetParameters(GFIHPBCEEOB);
-		kKDGLNECFHA.SetValue(_name, lNIDLHOIHIM);
-		string gOHIIMFFFJI = lNIDLHOIHIM.ToString();
-		ItemInfo dJKEECEOCJB = ListSF.GetItems().GetItemByName(gOHIIMFFFJI);
-		if (dJKEECEOCJB != null)
+		base.Execute(parameters);
+		ConditionExtension.CompareResult result = new ConditionExtension.CompareResult();
+		QuestCondition condition = new QuestCondition();
+		condition.SetParameters(parameters);
+		condition.SetValue(_name, result);
+		string itemName = result.ToString();
+		ItemInfo itemInfo = ListSF.GetItems().GetItemByName(itemName);
+		if (itemInfo != null)
 		{
-			GameUtils.ApplyItemAction(dJKEECEOCJB, _itemAction);
+			GameUtils.ApplyItemAction(itemInfo, _itemAction);
 		}
 		FinishAction();
 	}

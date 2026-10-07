@@ -196,13 +196,13 @@ public static class InternetController
 	public static void Parse(XmlNode node)
 	{
 		SetPostPictureUrl(node["FBPostPicture"].Attributes["Url"].GetStringOrDefault(string.Empty));
-		XmlNode hKPPBKPJOEO = node["Android"];
-		PlatformType jGJNNAHDPBA = PlatformType.ANDROID;
-		ParsePlatformNode(hKPPBKPJOEO, jGJNNAHDPBA);
+		XmlNode platformNode = node["Android"];
+		PlatformType platformType = PlatformType.ANDROID;
+		ParsePlatformNode(platformNode, platformType);
 		ParseServer(node["Server"]);
 	}
 
-	private static void ParsePlatformNode(XmlNode node, PlatformType JGJNNAHDPBA)
+	private static void ParsePlatformNode(XmlNode node, PlatformType platformType)
 	{
 		SetLikeUrls(new LikeUrlInfo());
 		if (node["FBLikeUrl"] != null)
@@ -241,7 +241,7 @@ public static class InternetController
 			}
 		}
 		string name = "Url";
-		if (JGJNNAHDPBA == PlatformType.ANDROID)
+		if (platformType == PlatformType.ANDROID)
 		{
 			name = ((!AssemblyController.GetMarket().GetIsChinaMarket()) ? "PlayMarket" : "China360");
 			name = ((!AssemblyController.GetMarket().GetIsAmazonMobileMarket()) ? name : "Amazon");

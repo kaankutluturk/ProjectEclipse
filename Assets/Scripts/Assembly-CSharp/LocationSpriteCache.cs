@@ -7,23 +7,23 @@ public static class LocationSpriteCache
 
 	private static Dictionary<string, Sprite> _CachedSingleSprite = new Dictionary<string, Sprite>();
 
-	public static Sprite[] LoadAtlasSprites(string ONNKJLOGHGH)
+	public static Sprite[] LoadAtlasSprites(string atlasPath)
 	{
-		if (!_CachedAtlases.ContainsKey(ONNKJLOGHGH))
+		if (!_CachedAtlases.ContainsKey(atlasPath))
 		{
-			Sprite[] array = ResourcesAndBundles.LoadAllAssets<Sprite>(ONNKJLOGHGH);
+			Sprite[] array = ResourcesAndBundles.LoadAllAssets<Sprite>(atlasPath);
 			if (array != null)
 			{
-				_CachedAtlases.Add(ONNKJLOGHGH, array);
+				_CachedAtlases.Add(atlasPath, array);
 			}
 			return array;
 		}
-		return _CachedAtlases[ONNKJLOGHGH];
+		return _CachedAtlases[atlasPath];
 	}
 
-	private static Sprite LoadSingleSprite(string PPAJIHNNNDG, string CMMPHNJDOCF)
+	private static Sprite LoadSingleSprite(string texturePath, string spriteName)
 	{
-		string text = string.Format("{0}/{1}", PPAJIHNNNDG, CMMPHNJDOCF);
+		string text = string.Format("{0}/{1}", texturePath, spriteName);
 		if (_CachedSingleSprite.ContainsKey(text))
 		{
 			return _CachedSingleSprite[text];
@@ -37,30 +37,30 @@ public static class LocationSpriteCache
 		return sprite;
 	}
 
-	public static Sprite GetSprite(string PPAJIHNNNDG, string CMMPHNJDOCF, string BBPGNOBFECF)
+	public static Sprite GetSprite(string texturePath, string spriteName, string atlasName)
 	{
-		if (Eclipse.Modding.AssetId.TryParse(PPAJIHNNNDG, out _))
+		if (Eclipse.Modding.AssetId.TryParse(texturePath, out _))
 		{
 			// Qualified core/mod location art is addressed per sprite. Legacy atlas sub-assets
 			// remain available for installed/core locations through the branch below.
-			return LoadSingleSprite(PPAJIHNNNDG, CMMPHNJDOCF);
+			return LoadSingleSprite(texturePath, spriteName);
 		}
-        if (Eclipse.Modding.ModRuntime.TryResolveCoreReplacement(PPAJIHNNNDG + "/" + CMMPHNJDOCF, out var replacement))
+        if (Eclipse.Modding.ModRuntime.TryResolveCoreReplacement(texturePath + "/" + spriteName, out var replacement))
             return Eclipse.Modding.ModRuntime.Host.TypedAssets.LoadSprite(replacement);
-		if (!string.IsNullOrEmpty(BBPGNOBFECF))
+		if (!string.IsNullOrEmpty(atlasName))
 		{
-			string oNNKJLOGHGH = string.Format("{0}/{1}", PPAJIHNNNDG, BBPGNOBFECF);
-			Sprite[] array = LoadAtlasSprites(oNNKJLOGHGH);
+			string atlasSpritePath = string.Format("{0}/{1}", texturePath, atlasName);
+			Sprite[] array = LoadAtlasSprites(atlasSpritePath);
 			Sprite[] array2 = array ?? new Sprite[0];
 			foreach (Sprite sprite in array2)
 			{
-				if (sprite.name == CMMPHNJDOCF)
+				if (sprite.name == spriteName)
 				{
 					return sprite;
 				}
 			}
 		}
-		return LoadSingleSprite(PPAJIHNNNDG, CMMPHNJDOCF);
+		return LoadSingleSprite(texturePath, spriteName);
 	}
 
 	public static void Clear()

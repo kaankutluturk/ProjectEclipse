@@ -15,16 +15,16 @@ public class LedgerManager
 		// load remote ledger settings, and local fights must not depend on them.
 	}
 
-	private void OnLedgerReceived(bool DCJLKCFKCOM, string data, object IEHMCKBJCAK)
+	private void OnLedgerReceived(bool success, string data, object state)
 	{
-		Roster nKGLHEGIKKP = ListSF.GetRoster();
-		if (nKGLHEGIKKP == null)
+		Roster roster = ListSF.GetRoster();
+		if (roster == null)
 		{
 			Debug.LogError("Roster not created error");
 		}
 		else
 		{
-			if (!DCJLKCFKCOM)
+			if (!success)
 			{
 				return;
 			}
@@ -37,9 +37,9 @@ public class LedgerManager
 				if (!unconfirmedIds.Contains(asInt))
 				{
 					unconfirmedIds.Add(asInt);
-					string lFLGCDNKNJI = jSONNode2["cur"].GetString();
-					string fDGOFODPGPH = jSONNode2["ini"].GetString();
-					GiveReward(lFLGCDNKNJI, jSONNode2["cnt"], fDGOFODPGPH);
+					string currency = jSONNode2["cur"].GetString();
+					string source = jSONNode2["ini"].GetString();
+					GiveReward(currency, jSONNode2["cnt"], source);
 				}
 			}
 			OnRewardsGiven();
@@ -48,31 +48,31 @@ public class LedgerManager
 		}
 	}
 
-	private void GiveReward(string LFLGCDNKNJI, JSONNode NICNMHCJIBJ, string FDGOFODPGPH)
+	private void GiveReward(string currency, JSONNode amount, string source)
 	{
-		Roster nKGLHEGIKKP = ListSF.GetRoster();
-		if (FDGOFODPGPH == "admin")
+		Roster roster = ListSF.GetRoster();
+		if (source == "admin")
 		{
-			switch (LFLGCDNKNJI)
+			switch (currency)
 			{
 			case "GEMS":
-				AddGems(NICNMHCJIBJ.ParseInt());
-				DialogsOpener.OpenSimpleDialog("dlgAlertTitle", string.Concat("dlgGotGift{img::MiscSprites.ruby}{", NICNMHCJIBJ, "}"), "dlgStoryBtnTake", string.Empty, null, LabelButton.ButtonColor.BUTTON_WHITE, LabelButton.ButtonColor.BUTTON_DARK, false, false, string.Empty);
+				AddGems(amount.ParseInt());
+				DialogsOpener.OpenSimpleDialog("dlgAlertTitle", string.Concat("dlgGotGift{img::MiscSprites.ruby}{", amount, "}"), "dlgStoryBtnTake", string.Empty, null, LabelButton.ButtonColor.BUTTON_WHITE, LabelButton.ButtonColor.BUTTON_DARK, false, false, string.Empty);
 				break;
 			case "COINS":
-				AddCoins(NICNMHCJIBJ.ParseInt());
-				DialogsOpener.OpenSimpleDialog("dlgAlertTitle", string.Concat("dlgGotGift{img::MiscSprites.gold}{", NICNMHCJIBJ, "}"), "dlgStoryBtnTake", string.Empty, null, LabelButton.ButtonColor.BUTTON_WHITE, LabelButton.ButtonColor.BUTTON_DARK, false, false, string.Empty);
+				AddCoins(amount.ParseInt());
+				DialogsOpener.OpenSimpleDialog("dlgAlertTitle", string.Concat("dlgGotGift{img::MiscSprites.gold}{", amount, "}"), "dlgStoryBtnTake", string.Empty, null, LabelButton.ButtonColor.BUTTON_WHITE, LabelButton.ButtonColor.BUTTON_DARK, false, false, string.Empty);
 				break;
 			default:
 				Debug.LogError("LedgerManagerSF::giveReward Unknown currency type");
 				break;
 			}
 		}
-		else if (!(LFLGCDNKNJI == "GEMS"))
+		else if (!(currency == "GEMS"))
 		{
-			if (LFLGCDNKNJI == "AscensionTicket")
+			if (currency == "AscensionTicket")
 			{
-				nKGLHEGIKKP.AddCurrencyCount("AscensionTicket", NICNMHCJIBJ.ParseInt());
+				roster.AddCurrencyCount("AscensionTicket", amount.ParseInt());
 			}
 			else
 			{
@@ -82,16 +82,16 @@ public class LedgerManager
 		MenuController.RefreshMoney();
 	}
 
-	private static void AddCoins(int NICNMHCJIBJ)
+	private static void AddCoins(int amount)
 	{
-		Roster nKGLHEGIKKP = ListSF.GetRoster();
-		nKGLHEGIKKP.SetMoney(Math.Max(0L, nKGLHEGIKKP.GetMoney() + NICNMHCJIBJ));
+		Roster roster = ListSF.GetRoster();
+		roster.SetMoney(Math.Max(0L, roster.GetMoney() + amount));
 	}
 
-	private static void AddGems(int NICNMHCJIBJ)
+	private static void AddGems(int amount)
 	{
-		Roster nKGLHEGIKKP = ListSF.GetRoster();
-		nKGLHEGIKKP.SetBonus(Math.Max(0L, nKGLHEGIKKP.GetBonus() + NICNMHCJIBJ), Roster.BalanceChangeType.CHANGE_LEDGER);
+		Roster roster = ListSF.GetRoster();
+		roster.SetBonus(Math.Max(0L, roster.GetBonus() + amount), Roster.BalanceChangeType.CHANGE_LEDGER);
 	}
 
 	private void OnRewardsGiven()
@@ -103,9 +103,9 @@ public class LedgerManager
 		// No remote reward confirmation in offline builds.
 	}
 
-	private void OnConfirmResponse(bool DCJLKCFKCOM, string data, object IEHMCKBJCAK)
+	private void OnConfirmResponse(bool success, string data, object state)
 	{
-		if (DCJLKCFKCOM)
+		if (success)
 		{
 			JSONNode jSONNode = JSON.Parse(data);
 			for (int i = 0; i < jSONNode.Count; i++)

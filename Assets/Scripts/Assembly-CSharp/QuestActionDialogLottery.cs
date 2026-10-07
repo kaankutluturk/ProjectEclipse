@@ -15,16 +15,16 @@ public class QuestActionDialogLottery : QuestAction
 		spinNumber = node.Attributes["SpinNumber"].GetStringOrDefault(string.Empty);
 	}
 
-	public override void Execute(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters parameters)
 	{
 		// SpinNumber is an archived paid-spin continuation, not a free draw count.
 		if (!string.IsNullOrEmpty(spinNumber)) throw new NotSupportedException("Paid lottery spin continuation is not implemented.");
 		if (GetLockMode() != InputLockMode.LOCK_NONE) throw new NotSupportedException("Lottery dialogs own their input; omit the native Lock attribute.");
 		presentation?.Dispose();
-		base.Execute(GFIHPBCEEOB);
+		base.Execute(parameters);
 		var result = new ConditionExtension.CompareResult();
 		var condition = new QuestCondition();
-		condition.SetParameters(GFIHPBCEEOB);
+		condition.SetParameters(parameters);
 		condition.SetValue(fightName, result);
 		presentation = new ModQuestLotteryAction(this, result.ToString(), FinishAction);
 		presentation.Show();

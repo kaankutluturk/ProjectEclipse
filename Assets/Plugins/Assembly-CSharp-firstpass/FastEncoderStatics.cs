@@ -164,21 +164,21 @@ internal static class FastEncoderStatics
 		}
 	}
 
-	internal static int GetSlot(int LCCLEFMKLPB)
+	internal static int GetSlot(int distance)
 	{
-		return distLookup[(LCCLEFMKLPB >= 256) ? (256 + (LCCLEFMKLPB >> 7)) : LCCLEFMKLPB];
+		return distLookup[(distance >= 256) ? (256 + (distance >> 7)) : distance];
 	}
 
-	public static uint BitReverse(uint KJPGKHJNOMC, int BDBOAEGELMC)
+	public static uint BitReverse(uint code, int length)
 	{
 		uint num = 0u;
 		do
 		{
-			num |= KJPGKHJNOMC & 1;
+			num |= code & 1;
 			num <<= 1;
-			KJPGKHJNOMC >>= 1;
+			code >>= 1;
 		}
-		while (--BDBOAEGELMC > 0);
+		while (--length > 0);
 		return num >> 1;
 	}
 }

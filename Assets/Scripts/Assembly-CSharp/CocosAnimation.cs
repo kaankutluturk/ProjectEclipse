@@ -115,9 +115,9 @@ public class CocosAnimation : MonoBehaviour
 			_SpriteRender.sortingOrder = value;
 	}
 
-	public bool Init(string ONEIGMLOGDC, bool MPMHHEMGHOJ)
+	public bool Init(string resourcePath, bool forceResource)
 	{
-		_Animation = CocosAnimationData.Create(ONEIGMLOGDC + "_xml", MPMHHEMGHOJ);
+		_Animation = CocosAnimationData.Create(resourcePath + "_xml", forceResource);
 		if (_Animation == null)
 		{
 			return false;
@@ -148,11 +148,11 @@ public class CocosAnimation : MonoBehaviour
 		}
 	}
 
-	public void Render(float PPOFNJGPHGP)
+	public void Render(float deltaTime)
 	{
 		if (_IsWork && !(_SpriteRender == null))
 		{
-			_frameTimer += PPOFNJGPHGP;
+			_frameTimer += deltaTime;
 			while (_frameTimer >= _changeSpriteTime)
 			{
 				AdvanceFrame();
@@ -180,18 +180,18 @@ public class CocosAnimation : MonoBehaviour
 		}
 	}
 
-	private void SetSpriteFrame(int DCHCFFFFLLK)
+	private void SetSpriteFrame(int frameIndex)
 	{
-		if (DCHCFFFFLLK < _totalFrames)
+		if (frameIndex < _totalFrames)
 		{
-			CocosAnimationData.SpriteFrameCocos pBAHNJDFMBO = _Animation.GetFrames()[DCHCFFFFLLK];
-			_SpriteRender.sprite = pBAHNJDFMBO.GetSprite();
-			_childObject.transform.localEulerAngles = new Vector3(0f, 0f, pBAHNJDFMBO.GetRotated() ? 90 : 0);
+			CocosAnimationData.SpriteFrameCocos spriteFrame = _Animation.GetFrames()[frameIndex];
+			_SpriteRender.sprite = spriteFrame.GetSprite();
+			_childObject.transform.localEulerAngles = new Vector3(0f, 0f, spriteFrame.GetRotated() ? 90 : 0);
 			// Preserve the Cocos/TexturePacker frame offset exactly. The recovered
 			// XML matches the original plist metadata, and the original Mono build
 			// applies this offset without inverting it. Negating it makes trim
 			// compensation run in the wrong direction and visibly shakes sequences.
-			Vector2 frameOffset = pBAHNJDFMBO.GetOffset();
+			Vector2 frameOffset = spriteFrame.GetOffset();
 			_childObject.transform.localPosition = new Vector3(frameOffset.x, frameOffset.y, 0f);
 		}
 	}

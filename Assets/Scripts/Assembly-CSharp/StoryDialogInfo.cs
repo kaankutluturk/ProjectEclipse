@@ -27,19 +27,19 @@ public class StoryDialogInfo
 
 	public bool UseEdgeButtons;
 
-	public StoryDialogInfo(string JFJKJIJPJJM, string HFEGNMEEDCF, List<StoryDialogContent> IHMEPGICLGF, Action<object> _dlg = null, string FLDCNEGDMCK = "", string HBBAFHJCHIC = "CANCEL", bool OJMOOJCOGCE = false, LabelButton.ButtonColor JCAOLHHIFEC = LabelButton.ButtonColor.BUTTON_WHITE, LabelButton.ButtonColor OKJBFFAIJPL = LabelButton.ButtonColor.BUTTON_DARK, bool ANIJAKJOHED = true, bool AOFKALBFNNI = false, float OCMLLEDKLFL = 840f)
+	public StoryDialogInfo(string portraitName, string title, List<StoryDialogContent> contents, Action<object> _dlg = null, string okButtonText = "", string cancelButtonText = "CANCEL", bool showCancelButton = false, LabelButton.ButtonColor okButtonColor = LabelButton.ButtonColor.BUTTON_WHITE, LabelButton.ButtonColor cancelButtonColor = LabelButton.ButtonColor.BUTTON_DARK, bool showPortrait = true, bool useEdgeButtons = false, float scrollWidth = 840f)
 	{
-		PortraitName = JFJKJIJPJJM;
-		Title = HFEGNMEEDCF;
-		Contents = IHMEPGICLGF;
+		PortraitName = portraitName;
+		Title = title;
+		Contents = contents;
 		Dlg = _dlg;
-		OkButtonText = FLDCNEGDMCK;
-		CancelButtonText = HBBAFHJCHIC;
-		OkButtonColor = JCAOLHHIFEC;
-		CancelButtonColor = OKJBFFAIJPL;
-		ScrollWidth = OCMLLEDKLFL;
-		ShowCancelButton = OJMOOJCOGCE;
-		ShowPortrait = ANIJAKJOHED;
-		UseEdgeButtons = AOFKALBFNNI;
+		OkButtonText = okButtonText;
+		CancelButtonText = cancelButtonText;
+		OkButtonColor = okButtonColor;
+		CancelButtonColor = cancelButtonColor;
+		ScrollWidth = scrollWidth;
+		ShowCancelButton = showCancelButton;
+		ShowPortrait = showPortrait;
+		UseEdgeButtons = useEdgeButtons;
 	}
 }

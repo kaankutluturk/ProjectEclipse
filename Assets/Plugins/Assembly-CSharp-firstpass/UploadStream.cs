@@ -74,13 +74,13 @@ public sealed class UploadStream : Stream
 		}
 	}
 
-	public override int Read(byte[] buffer, int IPCOBJBKNAO, int count)
+	public override int Read(byte[] buffer, int offset, int count)
 	{
 		if (noMoreData)
 		{
 			if (ReadBuffer.Position != ReadBuffer.Length)
 			{
-				return ReadBuffer.Read(buffer, IPCOBJBKNAO, count);
+				return ReadBuffer.Read(buffer, offset, count);
 			}
 			if (WriteBuffer.Length <= 0)
 			{
@@ -103,11 +103,11 @@ public sealed class UploadStream : Stream
 		int num = -1;
 		lock (locker)
 		{
-			return ReadBuffer.Read(buffer, IPCOBJBKNAO, count);
+			return ReadBuffer.Read(buffer, offset, count);
 		}
 	}
 
-	public override void Write(byte[] buffer, int IPCOBJBKNAO, int count)
+	public override void Write(byte[] buffer, int offset, int count)
 	{
 		if (noMoreData)
 		{
@@ -115,7 +115,7 @@ public sealed class UploadStream : Stream
 		}
 		lock (locker)
 		{
-			WriteBuffer.Write(buffer, IPCOBJBKNAO, count);
+			WriteBuffer.Write(buffer, offset, count);
 			SwitchBuffers();
 		}
 		ARE.Set();
@@ -126,9 +126,9 @@ public sealed class UploadStream : Stream
 		Finish();
 	}
 
-	protected override void Dispose(bool KLCPNDHEBGP)
+	protected override void Dispose(bool disposing)
 	{
-		if (KLCPNDHEBGP)
+		if (disposing)
 		{
 			HTTPManager.GetLogger().Information("UploadStream", string.Format("{0} - Dispose", get_Name()));
 			ReadBuffer.Dispose();
@@ -138,7 +138,7 @@ public sealed class UploadStream : Stream
 			ARE.Close();
 			ARE = null;
 		}
-		base.Dispose(KLCPNDHEBGP);
+		base.Dispose(disposing);
 	}
 
 	public void Finish()
@@ -160,9 +160,9 @@ public sealed class UploadStream : Stream
 			{
 				WriteBuffer.Seek(0L, SeekOrigin.Begin);
 				ReadBuffer.SetLength(0L);
-				MemoryStream lCDHLKCLFLB = WriteBuffer;
+				MemoryStream oldReadBuffer = WriteBuffer;
 				WriteBuffer = ReadBuffer;
-				ReadBuffer = lCDHLKCLFLB;
+				ReadBuffer = oldReadBuffer;
 				return true;
 			}
 		}
@@ -213,7 +213,7 @@ public sealed class UploadStream : Stream
 		}
 	}
 
-	public override long Seek(long IPCOBJBKNAO, SeekOrigin IKOOJMAOFOD)
+	public override long Seek(long offset, SeekOrigin origin)
 	{
 		throw new NotImplementedException();
 	}

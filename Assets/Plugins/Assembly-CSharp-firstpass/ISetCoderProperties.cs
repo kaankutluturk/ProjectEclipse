@@ -1,4 +1,4 @@
 public interface ISetCoderProperties
 {
-	void SetCoderProperties(CoderPropID[] JPIKKLMCDNM, object[] properties);
+	void SetCoderProperties(CoderPropID[] propIDs, object[] properties);
 }

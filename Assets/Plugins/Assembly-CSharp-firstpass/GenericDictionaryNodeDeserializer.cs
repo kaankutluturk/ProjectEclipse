@@ -7,77 +7,77 @@ public sealed class GenericDictionaryNodeDeserializer : INodeDeserializer
 
 	private static readonly GenericStaticMethod deserializeHelperMethod = new GenericStaticMethod(() => DeserializeHelper<object, object>(null, null, null, null));
 
-	public GenericDictionaryNodeDeserializer(IObjectFactory EJPHFDCKCCE)
+	public GenericDictionaryNodeDeserializer(IObjectFactory factory)
 	{
-		objectFactory = EJPHFDCKCCE;
+		objectFactory = factory;
 	}
 
-	bool INodeDeserializer.Deserialize(EventReader reader, Type MBLGNMBFHBI, Func<EventReader, Type, object> IJBAEAEDMCC, out object value)
+	bool INodeDeserializer.Deserialize(EventReader reader, Type expectedType, Func<EventReader, Type, object> nestedObjectDeserializer, out object value)
 	{
-		Type type = ReflectionUtility.GetImplementedGenericInterface(MBLGNMBFHBI, typeof(IDictionary<, >));
+		Type type = ReflectionUtility.GetImplementedGenericInterface(expectedType, typeof(IDictionary<, >));
 		if (type == null)
 		{
 			value = false;
 			return false;
 		}
 		reader.Expect<MappingStart>();
-		value = objectFactory.Create(MBLGNMBFHBI);
-		deserializeHelperMethod.Invoke(type.GetGenericArguments(), reader, MBLGNMBFHBI, IJBAEAEDMCC, value);
+		value = objectFactory.Create(expectedType);
+		deserializeHelperMethod.Invoke(type.GetGenericArguments(), reader, expectedType, nestedObjectDeserializer, value);
 		reader.Expect<MappingEnd>();
 		return true;
 	}
 
-	private static void DeserializeHelper<TKey, TValue>(EventReader reader, Type MBLGNMBFHBI, Func<EventReader, Type, object> IJBAEAEDMCC, IDictionary<TKey, TValue> DCJLKCFKCOM)
+	private static void DeserializeHelper<TKey, TValue>(EventReader reader, Type expectedType, Func<EventReader, Type, object> nestedObjectDeserializer, IDictionary<TKey, TValue> dictionary)
 	{
 		while (!reader.Accept<MappingEnd>())
 		{
-			object KGBGENDIMBC = IJBAEAEDMCC(reader, typeof(TKey));
-			IValuePromise aGAMFLELGLG = KGBGENDIMBC as IValuePromise;
-			object value = IJBAEAEDMCC(reader, typeof(TValue));
+			object key = nestedObjectDeserializer(reader, typeof(TKey));
+			IValuePromise keyPromise = key as IValuePromise;
+			object value = nestedObjectDeserializer(reader, typeof(TValue));
 			IValuePromise aGAMFLELGLG2 = value as IValuePromise;
-			if (aGAMFLELGLG == null)
+			if (keyPromise == null)
 			{
 				if (aGAMFLELGLG2 == null)
 				{
-					DCJLKCFKCOM[(TKey)KGBGENDIMBC] = (TValue)value;
+					dictionary[(TKey)key] = (TValue)value;
 					continue;
 				}
-				aGAMFLELGLG2.add_ValueAvailable((object AFIEJABPAKA) =>
+				aGAMFLELGLG2.add_ValueAvailable((object resolved) =>
 				{
-					DCJLKCFKCOM[(TKey)KGBGENDIMBC] = (TValue)AFIEJABPAKA;
+					dictionary[(TKey)key] = (TValue)resolved;
 				});
 				continue;
 			}
 			if (aGAMFLELGLG2 == null)
 			{
-				aGAMFLELGLG.add_ValueAvailable((object AFIEJABPAKA) =>
+				keyPromise.add_ValueAvailable((object resolved) =>
 				{
-					DCJLKCFKCOM[(TKey)AFIEJABPAKA] = (TValue)value;
+					dictionary[(TKey)resolved] = (TValue)value;
 				});
 				continue;
 			}
 			bool hasFirstPart = false;
-			aGAMFLELGLG.add_ValueAvailable((object AFIEJABPAKA) =>
+			keyPromise.add_ValueAvailable((object resolved) =>
 			{
 				if (hasFirstPart)
 				{
-					DCJLKCFKCOM[(TKey)AFIEJABPAKA] = (TValue)value;
+					dictionary[(TKey)resolved] = (TValue)value;
 				}
 				else
 				{
-					KGBGENDIMBC = AFIEJABPAKA;
+					key = resolved;
 					hasFirstPart = true;
 				}
 			});
-			aGAMFLELGLG2.add_ValueAvailable((object AFIEJABPAKA) =>
+			aGAMFLELGLG2.add_ValueAvailable((object resolved) =>
 			{
 				if (hasFirstPart)
 				{
-					DCJLKCFKCOM[(TKey)KGBGENDIMBC] = (TValue)AFIEJABPAKA;
+					dictionary[(TKey)key] = (TValue)resolved;
 				}
 				else
 				{
-					value = AFIEJABPAKA;
+					value = resolved;
 					hasFirstPart = true;
 				}
 			});

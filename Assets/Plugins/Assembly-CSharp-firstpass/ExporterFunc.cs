@@ -1,1 +1,1 @@
-internal delegate void ExporterFunc(object AOMLCBHAJJH, JsonWriter writer);
+internal delegate void ExporterFunc(object obj, JsonWriter writer);

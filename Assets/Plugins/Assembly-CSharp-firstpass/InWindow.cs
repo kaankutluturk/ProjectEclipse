@@ -77,23 +77,23 @@ public class InWindow
 		_bufferBase = null;
 	}
 
-	public void Create(uint CMNIBPLKJEA, uint ABFKEDIJFPN, uint IKHIOAIPBNL)
+	public void Create(uint keepSizeBefore, uint keepSizeAfter, uint keepSizeReserv)
 	{
-		_keepSizeBefore = CMNIBPLKJEA;
-		_keepSizeAfter = ABFKEDIJFPN;
-		uint num = CMNIBPLKJEA + ABFKEDIJFPN + IKHIOAIPBNL;
+		_keepSizeBefore = keepSizeBefore;
+		_keepSizeAfter = keepSizeAfter;
+		uint num = keepSizeBefore + keepSizeAfter + keepSizeReserv;
 		if (_bufferBase == null || _blockSize != num)
 		{
 			Free();
 			_blockSize = num;
 			_bufferBase = new byte[_blockSize];
 		}
-		_pointerToLastSafePosition = _blockSize - ABFKEDIJFPN;
+		_pointerToLastSafePosition = _blockSize - keepSizeAfter;
 	}
 
-	public void SetStream(Stream ABJIEFMMIEK)
+	public void SetStream(Stream stream)
 	{
-		_stream = ABJIEFMMIEK;
+		_stream = stream;
 	}
 
 	public void ReleaseStream()
@@ -129,16 +129,16 @@ public class InWindow
 		return _bufferBase[_bufferOffset + _pos + index];
 	}
 
-	public uint GetMatchLen(int index, uint OIOMNNFMDOO, uint LOHCIKNKDEI)
+	public uint GetMatchLen(int index, uint distance, uint limit)
 	{
-		if (_streamEndWasReached && _pos + index + LOHCIKNKDEI > _streamPos)
+		if (_streamEndWasReached && _pos + index + limit > _streamPos)
 		{
-			LOHCIKNKDEI = _streamPos - (uint)(int)(_pos + index);
+			limit = _streamPos - (uint)(int)(_pos + index);
 		}
-		OIOMNNFMDOO++;
+		distance++;
 		uint num = _bufferOffset + _pos + (uint)index;
 		uint num2;
-		for (num2 = 0u; num2 < LOHCIKNKDEI && _bufferBase[num + num2] == _bufferBase[num + num2 - OIOMNNFMDOO]; num2++)
+		for (num2 = 0u; num2 < limit && _bufferBase[num + num2] == _bufferBase[num + num2 - distance]; num2++)
 		{
 		}
 		return num2;
@@ -149,11 +149,11 @@ public class InWindow
 		return _streamPos - _pos;
 	}
 
-	public void ReduceOffsets(int BALBEBAOPMP)
+	public void ReduceOffsets(int subValue)
 	{
-		_bufferOffset += (uint)BALBEBAOPMP;
-		_posLimit -= (uint)BALBEBAOPMP;
-		_pos -= (uint)BALBEBAOPMP;
-		_streamPos -= (uint)BALBEBAOPMP;
+		_bufferOffset += (uint)subValue;
+		_posLimit -= (uint)subValue;
+		_pos -= (uint)subValue;
+		_streamPos -= (uint)subValue;
 	}
 }

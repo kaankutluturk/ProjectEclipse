@@ -22,10 +22,10 @@ public class PerkActionSetTactics : PerkAction
 	{
 	}
 
-	public PerkActionSetTactics(PerkActionSetTactics NOLFMPDGCOC)
-		: base(NOLFMPDGCOC)
+	public PerkActionSetTactics(PerkActionSetTactics source)
+		: base(source)
 	{
-		set_Tactics(NOLFMPDGCOC.GetTactics());
+		set_Tactics(source.GetTactics());
 	}
 
 	public string GetTactics()

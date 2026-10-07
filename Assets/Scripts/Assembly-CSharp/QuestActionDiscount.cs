@@ -17,32 +17,32 @@ public class QuestActionDiscount : QuestAction
 
 	private string saleExpression = string.Empty;
 
-	public override void Parse(XmlNode EPKLCPOEELO)
+	public override void Parse(XmlNode node)
 	{
-		base.Parse(EPKLCPOEELO);
-		itemExpression = EPKLCPOEELO.Attributes["Item"].GetStringOrDefault(string.Empty);
-		percentExpression = EPKLCPOEELO.Attributes["Percent"].GetStringOrDefault(string.Empty);
-		toggleExpression = EPKLCPOEELO.Attributes["Toggle"].GetStringOrDefault(string.Empty);
-		newAmountExpression = EPKLCPOEELO.Attributes["NewAmount"].GetStringOrDefault("0");
-		newPriceExpression = EPKLCPOEELO.Attributes["NewPrice"].GetStringOrDefault(string.Empty);
-		periodExpression = EPKLCPOEELO.Attributes["Period"].GetStringOrDefault("0");
-		saleExpression = EPKLCPOEELO.Attributes["Sale"].GetStringOrDefault(string.Empty);
+		base.Parse(node);
+		itemExpression = node.Attributes["Item"].GetStringOrDefault(string.Empty);
+		percentExpression = node.Attributes["Percent"].GetStringOrDefault(string.Empty);
+		toggleExpression = node.Attributes["Toggle"].GetStringOrDefault(string.Empty);
+		newAmountExpression = node.Attributes["NewAmount"].GetStringOrDefault("0");
+		newPriceExpression = node.Attributes["NewPrice"].GetStringOrDefault(string.Empty);
+		periodExpression = node.Attributes["Period"].GetStringOrDefault("0");
+		saleExpression = node.Attributes["Sale"].GetStringOrDefault(string.Empty);
 	}
 
-	public override void Execute(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters parameters)
 	{
-		base.Execute(GFIHPBCEEOB);
+		base.Execute(parameters);
 		FinishAction();
 	}
 
-	private void EvaluateParameters(QuestParameters GFIHPBCEEOB, ItemInfo item, ref int upgradeLevel, ref float IFKAJHEOAEG, ref bool LPPNCLBEAFA, ref long AJKMNFGEHIJ, ref long GKIHFPFHKCI, ref string DDHOJFFGBKM, ref bool GEPBMEMMLEA)
+	private void EvaluateParameters(QuestParameters parameters, ItemInfo item, ref int upgradeLevel, ref float discountPercent, ref bool isToggled, ref long newAmount, ref long period, ref string newPrice, ref bool isSale)
 	{
 		string empty = string.Empty;
-		ConditionExtension.CompareResult lNIDLHOIHIM = new ConditionExtension.CompareResult();
-		QuestCondition kKDGLNECFHA = new QuestCondition();
-		kKDGLNECFHA.SetParameters(GFIHPBCEEOB);
-		kKDGLNECFHA.SetValue(itemExpression, lNIDLHOIHIM);
-		empty = lNIDLHOIHIM.ToString();
+		ConditionExtension.CompareResult result = new ConditionExtension.CompareResult();
+		QuestCondition condition = new QuestCondition();
+		condition.SetParameters(parameters);
+		condition.SetValue(itemExpression, result);
+		empty = result.ToString();
 		string text = string.Empty;
 		string text2 = string.Empty;
 		List<string> list = new List<string>(empty.Split('|'));
@@ -57,38 +57,38 @@ public class QuestActionDiscount : QuestAction
 		}
 		if (text2 != string.Empty)
 		{
-			kKDGLNECFHA.SetValue(text2, lNIDLHOIHIM);
-			upgradeLevel = (int)lNIDLHOIHIM.resultNumber;
+			condition.SetValue(text2, result);
+			upgradeLevel = (int)result.resultNumber;
 		}
 		else
 		{
 			upgradeLevel = -1;
 		}
-		lNIDLHOIHIM.Clear();
-		kKDGLNECFHA.SetValue(percentExpression, lNIDLHOIHIM);
-		IFKAJHEOAEG = (float)lNIDLHOIHIM.resultNumber;
-		lNIDLHOIHIM.Clear();
-		kKDGLNECFHA.SetValue(toggleExpression, lNIDLHOIHIM);
-		LPPNCLBEAFA = lNIDLHOIHIM.resultNumber > 0.0;
-		lNIDLHOIHIM.Clear();
-		kKDGLNECFHA.SetValue(newAmountExpression, lNIDLHOIHIM);
-		AJKMNFGEHIJ = (long)lNIDLHOIHIM.resultNumber;
-		lNIDLHOIHIM.Clear();
-		kKDGLNECFHA.SetValue(periodExpression, lNIDLHOIHIM);
-		GKIHFPFHKCI = (long)lNIDLHOIHIM.resultNumber;
-		lNIDLHOIHIM.Clear();
-		kKDGLNECFHA.SetValue(newPriceExpression, lNIDLHOIHIM);
-		if (newPriceExpression != string.Empty && lNIDLHOIHIM.IsNumber())
+		result.Clear();
+		condition.SetValue(percentExpression, result);
+		discountPercent = (float)result.resultNumber;
+		result.Clear();
+		condition.SetValue(toggleExpression, result);
+		isToggled = result.resultNumber > 0.0;
+		result.Clear();
+		condition.SetValue(newAmountExpression, result);
+		newAmount = (long)result.resultNumber;
+		result.Clear();
+		condition.SetValue(periodExpression, result);
+		period = (long)result.resultNumber;
+		result.Clear();
+		condition.SetValue(newPriceExpression, result);
+		if (newPriceExpression != string.Empty && result.IsNumber())
 		{
-			DDHOJFFGBKM = lNIDLHOIHIM.resultNumber.ToString();
+			newPrice = result.resultNumber.ToString();
 		}
 		else
 		{
-			DDHOJFFGBKM = lNIDLHOIHIM.resultSTR;
+			newPrice = result.resultSTR;
 		}
-		lNIDLHOIHIM.Clear();
-		kKDGLNECFHA.SetValue(saleExpression, lNIDLHOIHIM);
-		GEPBMEMMLEA = lNIDLHOIHIM.resultNumber > 0.0;
+		result.Clear();
+		condition.SetValue(saleExpression, result);
+		isSale = result.resultNumber > 0.0;
 		item = ListSF.GetItems().GetItemByName(text);
 		if (item == null)
 		{

@@ -8,10 +8,10 @@ internal class OverallUnitPool
 
 	private static readonly List<AudioUnit> _sources = new List<AudioUnit>();
 
-	internal static void Init(AudioManager BJGMPDIKEJC)
+	internal static void Init(AudioManager audioManager)
 	{
 		GameObject gameObject = new GameObject(string.Format("_pool ({0} max)", MAX_CHANELS));
-		gameObject.transform.parent = BJGMPDIKEJC.transform;
+		gameObject.transform.parent = audioManager.transform;
 		for (int i = 0; i < MAX_CHANELS; i++)
 		{
 			_sources.Add(gameObject.AddComponent<AudioUnit>());

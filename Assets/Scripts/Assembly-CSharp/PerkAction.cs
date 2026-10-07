@@ -77,16 +77,16 @@ public class PerkAction : PerkObject
 	{
 	}
 
-	public PerkAction(PerkAction NOLFMPDGCOC)
-		: base(NOLFMPDGCOC)
+	public PerkAction(PerkAction source)
+		: base(source)
 	{
-		set_Name(NOLFMPDGCOC.get_Name());
-		SetElementName(NOLFMPDGCOC.GetElementName());
-		set_Namespace(NOLFMPDGCOC.GetNamespace());
-		set_Type(NOLFMPDGCOC.get_Type());
-		set_Modificator(NOLFMPDGCOC.GetModificator());
-		SetTrigger(NOLFMPDGCOC.GetTrigger());
-		set_Frames(NOLFMPDGCOC.GetFrames());
+		set_Name(source.get_Name());
+		SetElementName(source.GetElementName());
+		set_Namespace(source.GetNamespace());
+		set_Type(source.get_Type());
+		set_Modificator(source.GetModificator());
+		SetTrigger(source.GetTrigger());
+		set_Frames(source.GetFrames());
 	}
 
 	public string get_Name()
@@ -176,238 +176,238 @@ public class PerkAction : PerkObject
 		set_Namespace(node.Attributes["Namespace"].GetStringOrDefault(string.Empty));
 	}
 
-	public Model ResolveTargetModel(Model ACENLMONNPA)
+	public Model ResolveTargetModel(Model sourceModel)
 	{
 		if (TargetPlayer == PlayerType.PLAYER_ME)
 		{
-			return ACENLMONNPA;
+			return sourceModel;
 		}
 		if (TargetPlayer == PlayerType.PLAYER_ENEMY)
 		{
-			return ACENLMONNPA.GetCombatTarget();
+			return sourceModel.GetCombatTarget();
 		}
 		return null;
 	}
 
-	public static List<PerkAction> Create(XmlNode node, PerkInfoItem AEFFHJGMNFI, PerkTrigger CPBHKJFPFJB)
+	public static List<PerkAction> Create(XmlNode node, PerkInfoItem perk, PerkTrigger trigger)
 	{
 		List<PerkAction> list = new List<PerkAction>();
 		foreach (XmlNode childNode in node.ChildNodes)
 		{
-			PerkAction nPEKHPDCPPO = null;
+			PerkAction action = null;
 			switch (childNode.Name)
 			{
 			case "ModIcon":
-				nPEKHPDCPPO = new PerkActionShowIcon();
+				action = new PerkActionShowIcon();
 				break;
 			case "ModAttributes":
-				nPEKHPDCPPO = new PerkActionSetAttributes();
+				action = new PerkActionSetAttributes();
 				break;
 			case "ModFlag":
-				nPEKHPDCPPO = new PerkActionFlag();
+				action = new PerkActionFlag();
 				break;
 			case "ClearMods":
-				nPEKHPDCPPO = new PerkActionClearAction();
+				action = new PerkActionClearAction();
 				break;
 			case "DisableInterval":
-				nPEKHPDCPPO = new PerkActionDisableInterval();
+				action = new PerkActionDisableInterval();
 				break;
 			case "SetHit":
-				nPEKHPDCPPO = new PerkActionSetHit();
+				action = new PerkActionSetHit();
 				break;
 			case "AddBullets":
-				nPEKHPDCPPO = new PerkActionAddBullets();
+				action = new PerkActionAddBullets();
 				break;
 			case "AddMagicCharge":
-				nPEKHPDCPPO = new PerkActionAddMagicCharge();
+				action = new PerkActionAddMagicCharge();
 				break;
 			case "SetModFrames":
-				nPEKHPDCPPO = new PerkActionSetModFrames();
+				action = new PerkActionSetModFrames();
 				break;
 			case "ApplyModEffect":
-				nPEKHPDCPPO = new PerkActionSetModEffect();
+				action = new PerkActionSetModEffect();
 				break;
 			case "ModHealthChange":
-				nPEKHPDCPPO = new ModHealthChange();
+				action = new ModHealthChange();
 				break;
 			case "Provoke":
-				nPEKHPDCPPO = new PerkActionProvoke();
+				action = new PerkActionProvoke();
 				break;
 			case "SetTactic":
-				nPEKHPDCPPO = new PerkActionSetTactics();
+				action = new PerkActionSetTactics();
 				break;
 			case "Lifesteal":
-				nPEKHPDCPPO = new PerkActionLifesteal();
+				action = new PerkActionLifesteal();
 				break;
 			case "ModInvisibility":
-				nPEKHPDCPPO = new ModInvisibility();
+				action = new ModInvisibility();
 				break;
 			case "ModVariable":
-				nPEKHPDCPPO = new PerkActionVariable();
+				action = new PerkActionVariable();
 				break;
 			case "SetVariable":
 			case "SetRangeVariable":
-				nPEKHPDCPPO = new PerkActionSetVariable();
+				action = new PerkActionSetVariable();
 				break;
 			case "SetModVariable":
-				nPEKHPDCPPO = new PerkActionVariable();
+				action = new PerkActionVariable();
 				break;
 			case "SetCooldown":
-				nPEKHPDCPPO = new PerkActionSetCooldown();
+				action = new PerkActionSetCooldown();
 				break;
 			case "ChangeImpulse":
-				nPEKHPDCPPO = new PerkActionChangeImpulse();
+				action = new PerkActionChangeImpulse();
 				break;
 			case "ChangeHitEffectScale":
-				nPEKHPDCPPO = new PerkActionChangeHitEffectScale();
+				action = new PerkActionChangeHitEffectScale();
 				break;
 			case "ChangeAdditionalDamageValue":
-				nPEKHPDCPPO = new PerkActionChangeAdditionalDamageValue();
+				action = new PerkActionChangeAdditionalDamageValue();
 				break;
 			case "ChangeModelColor":
-				nPEKHPDCPPO = new PerkActionChangeModelColor();
+				action = new PerkActionChangeModelColor();
 				break;
 			case "SlowModel":
-				nPEKHPDCPPO = new PerkActionSlowModel();
+				action = new PerkActionSlowModel();
 				break;
 			case "TurnOffCollision":
-				nPEKHPDCPPO = new PerkActionTurnOffCollision();
+				action = new PerkActionTurnOffCollision();
 				break;
 			case "Switch":
-				nPEKHPDCPPO = new PerkActionSwitch();
+				action = new PerkActionSwitch();
 				break;
 			case "MarkPerkAsUsed":
-				nPEKHPDCPPO = new PerkActionMarkUsed();
+				action = new PerkActionMarkUsed();
 				break;
 			case "PerkArea":
-				nPEKHPDCPPO = new PerkActionArea();
+				action = new PerkActionArea();
 				break;
 			case "MoveModel":
-				nPEKHPDCPPO = new PerkActionMoveModel();
+				action = new PerkActionMoveModel();
 				break;
 			case "SetMovesVariable":
-				nPEKHPDCPPO = new PerkActionSetMovesVariable();
+				action = new PerkActionSetMovesVariable();
 				break;
 			case "StealMagicMod":
-				nPEKHPDCPPO = new PerkActionStealMagic();
+				action = new PerkActionStealMagic();
 				break;
 			}
-			if (nPEKHPDCPPO != null)
+			if (action != null)
 			{
-				nPEKHPDCPPO.SetPerk(AEFFHJGMNFI);
-				nPEKHPDCPPO.SetTrigger(CPBHKJFPFJB);
-				nPEKHPDCPPO.Parse(childNode);
-				list.Add(nPEKHPDCPPO);
+				action.SetPerk(perk);
+				action.SetTrigger(trigger);
+				action.Parse(childNode);
+				list.Add(action);
 			}
 		}
 		return list;
 	}
 
-	public static PerkAction Clone(PerkAction IBODMPMJELJ, PerkInfoItem AEFFHJGMNFI, PerkTrigger CPBHKJFPFJB)
+	public static PerkAction Clone(PerkAction source, PerkInfoItem perk, PerkTrigger trigger)
 	{
-		PerkAction nPEKHPDCPPO = null;
-		switch (IBODMPMJELJ.get_Type())
+		PerkAction action = null;
+		switch (source.get_Type())
 		{
 		case ActionType.ACTION_SHOW_ICONS:
-			nPEKHPDCPPO = new PerkActionShowIcon((PerkActionShowIcon)IBODMPMJELJ);
+			action = new PerkActionShowIcon((PerkActionShowIcon)source);
 			break;
 		case ActionType.ACTION_SET_ATTRIBUTES:
-			nPEKHPDCPPO = new PerkActionSetAttributes((PerkActionSetAttributes)IBODMPMJELJ);
+			action = new PerkActionSetAttributes((PerkActionSetAttributes)source);
 			break;
 		case ActionType.ACTION_FLAG:
-			nPEKHPDCPPO = new PerkActionFlag((PerkActionFlag)IBODMPMJELJ);
+			action = new PerkActionFlag((PerkActionFlag)source);
 			break;
 		case ActionType.ACTION_CLEAR_ACTION:
-			nPEKHPDCPPO = new PerkActionClearAction((PerkActionClearAction)IBODMPMJELJ);
+			action = new PerkActionClearAction((PerkActionClearAction)source);
 			break;
 		case ActionType.ACTION_DISABLE_INTERVAL:
-			nPEKHPDCPPO = new PerkActionDisableInterval((PerkActionDisableInterval)IBODMPMJELJ);
+			action = new PerkActionDisableInterval((PerkActionDisableInterval)source);
 			break;
 		case ActionType.ACTION_SET_HIT:
-			nPEKHPDCPPO = new PerkActionSetHit((PerkActionSetHit)IBODMPMJELJ);
+			action = new PerkActionSetHit((PerkActionSetHit)source);
 			break;
 		case ActionType.ACTION_ADD_BULLETS:
-			nPEKHPDCPPO = new PerkActionAddBullets((PerkActionAddBullets)IBODMPMJELJ);
+			action = new PerkActionAddBullets((PerkActionAddBullets)source);
 			break;
 		case ActionType.ACTION_ADD_MAGIC:
-			nPEKHPDCPPO = new PerkActionAddMagicCharge((PerkActionAddMagicCharge)IBODMPMJELJ);
+			action = new PerkActionAddMagicCharge((PerkActionAddMagicCharge)source);
 			break;
 		case ActionType.ACTION_SET_MOD_FRAMES:
-			nPEKHPDCPPO = new PerkActionSetModFrames((PerkActionSetModFrames)IBODMPMJELJ);
+			action = new PerkActionSetModFrames((PerkActionSetModFrames)source);
 			break;
 		case ActionType.ACTION_MOD_EFFECT:
-			nPEKHPDCPPO = new PerkActionSetModEffect((PerkActionSetModEffect)IBODMPMJELJ);
+			action = new PerkActionSetModEffect((PerkActionSetModEffect)source);
 			break;
 		case ActionType.ACTION_MOD_HEALTH_CHANGE:
-			nPEKHPDCPPO = new ModHealthChange((ModHealthChange)IBODMPMJELJ);
+			action = new ModHealthChange((ModHealthChange)source);
 			break;
 		case ActionType.ACTION_PROVOKE:
-			nPEKHPDCPPO = new PerkActionProvoke((PerkActionProvoke)IBODMPMJELJ);
+			action = new PerkActionProvoke((PerkActionProvoke)source);
 			break;
 		case ActionType.ACTION_SET_TACTICS:
-			nPEKHPDCPPO = new PerkActionSetTactics((PerkActionSetTactics)IBODMPMJELJ);
+			action = new PerkActionSetTactics((PerkActionSetTactics)source);
 			break;
 		case ActionType.ACTION_LIFE_STEAL:
-			nPEKHPDCPPO = new PerkActionLifesteal((PerkActionLifesteal)IBODMPMJELJ);
+			action = new PerkActionLifesteal((PerkActionLifesteal)source);
 			break;
 		case ActionType.ACTION_INVISIBILITY:
-			nPEKHPDCPPO = new ModInvisibility((ModInvisibility)IBODMPMJELJ);
+			action = new ModInvisibility((ModInvisibility)source);
 			break;
 		case ActionType.ACTION_VARIABLE:
-			nPEKHPDCPPO = new PerkActionVariable((PerkActionVariable)IBODMPMJELJ);
+			action = new PerkActionVariable((PerkActionVariable)source);
 			break;
 		case ActionType.ACTION_SET_VARIABLE:
-			nPEKHPDCPPO = new PerkActionSetVariable((PerkActionSetVariable)IBODMPMJELJ);
+			action = new PerkActionSetVariable((PerkActionSetVariable)source);
 			break;
 		case ActionType.ACTION_SET_COOLDOWN:
-			nPEKHPDCPPO = new PerkActionSetCooldown((PerkActionSetCooldown)IBODMPMJELJ);
+			action = new PerkActionSetCooldown((PerkActionSetCooldown)source);
 			break;
 		case ActionType.ACTION_CHANGE_IMPULSE:
-			nPEKHPDCPPO = new PerkActionChangeImpulse((PerkActionChangeImpulse)IBODMPMJELJ);
+			action = new PerkActionChangeImpulse((PerkActionChangeImpulse)source);
 			break;
 		case ActionType.ACTION_CHANGE_HIT_EFFECT_SCALE:
-			nPEKHPDCPPO = new PerkActionChangeHitEffectScale((PerkActionChangeHitEffectScale)IBODMPMJELJ);
+			action = new PerkActionChangeHitEffectScale((PerkActionChangeHitEffectScale)source);
 			break;
 		case ActionType.ACTION_CHANGE_ADD_DAMAGE_VALUE:
-			nPEKHPDCPPO = new PerkActionChangeAdditionalDamageValue((PerkActionChangeAdditionalDamageValue)IBODMPMJELJ);
+			action = new PerkActionChangeAdditionalDamageValue((PerkActionChangeAdditionalDamageValue)source);
 			break;
 		case ActionType.ACTION_CHANGE_MODEL_COLOR:
-			nPEKHPDCPPO = new PerkActionChangeModelColor((PerkActionChangeModelColor)IBODMPMJELJ);
+			action = new PerkActionChangeModelColor((PerkActionChangeModelColor)source);
 			break;
 		case ActionType.ACTION_SLOW_MODEL:
-			nPEKHPDCPPO = new PerkActionSlowModel((PerkActionSlowModel)IBODMPMJELJ);
+			action = new PerkActionSlowModel((PerkActionSlowModel)source);
 			break;
 		case ActionType.ACTION_TURN_OFF_COLLISION:
-			nPEKHPDCPPO = new PerkActionTurnOffCollision((PerkActionTurnOffCollision)IBODMPMJELJ);
+			action = new PerkActionTurnOffCollision((PerkActionTurnOffCollision)source);
 			break;
 		case ActionType.ACTION_SWITCH:
-			nPEKHPDCPPO = new PerkActionSwitch((PerkActionSwitch)IBODMPMJELJ);
+			action = new PerkActionSwitch((PerkActionSwitch)source);
 			break;
 		case ActionType.ACTION_MARK_PERK_USED:
-			nPEKHPDCPPO = new PerkActionMarkUsed((PerkActionMarkUsed)IBODMPMJELJ);
+			action = new PerkActionMarkUsed((PerkActionMarkUsed)source);
 			break;
 		case ActionType.ACTION_PERK_AREA:
-			nPEKHPDCPPO = new PerkActionArea((PerkActionArea)IBODMPMJELJ);
+			action = new PerkActionArea((PerkActionArea)source);
 			break;
 		case ActionType.ACTION_MOVE_MODEL:
-			nPEKHPDCPPO = new PerkActionMoveModel((PerkActionMoveModel)IBODMPMJELJ);
+			action = new PerkActionMoveModel((PerkActionMoveModel)source);
 			break;
 		case ActionType.ACTION_SET_MOVES_VARIABLE:
-			nPEKHPDCPPO = new PerkActionSetMovesVariable((PerkActionSetMovesVariable)IBODMPMJELJ);
+			action = new PerkActionSetMovesVariable((PerkActionSetMovesVariable)source);
 			break;
 		case ActionType.ACTION_STEAL_MAGIC:
-			nPEKHPDCPPO = new PerkActionStealMagic((PerkActionStealMagic)IBODMPMJELJ);
+			action = new PerkActionStealMagic((PerkActionStealMagic)source);
 			break;
 		default:
 			GameLog.Error("PerkAction.Clone PerkAction type is ActionType.ACTION_NONE");
 			break;
 		}
-		if (nPEKHPDCPPO != null)
+		if (action != null)
 		{
-			nPEKHPDCPPO.SetPerk(AEFFHJGMNFI);
-			nPEKHPDCPPO.SetTrigger(CPBHKJFPFJB);
+			action.SetPerk(perk);
+			action.SetTrigger(trigger);
 		}
-		return nPEKHPDCPPO;
+		return action;
 	}
 }
 

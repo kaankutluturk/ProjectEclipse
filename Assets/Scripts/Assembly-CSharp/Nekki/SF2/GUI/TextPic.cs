@@ -129,7 +129,7 @@ namespace Nekki.SF2.GUI
                 prefix = Regex.Replace(prefix, @"\s", "");
                 int item = prefix.Length * 4 + 3;
 				_quadVertexIndices.Add(item);
-				_iconImages.RemoveAll((ResolutionImage KHPKDMGDMAB) => KHPKDMGDMAB == null);
+				_iconImages.RemoveAll((ResolutionImage image) => image == null);
 				if (_iconImages.Count == 0)
 				{
 					GetComponentsInChildren(_iconImages);
@@ -188,11 +188,11 @@ namespace Nekki.SF2.GUI
 			}
 		}
 
-		protected override void OnPopulateMesh(VertexHelper EMOHIIMOAAL)
+		protected override void OnPopulateMesh(VertexHelper vertexHelper)
 		{
 			string text = m_Text;
 			m_Text = _parsedText;
-			base.OnPopulateMesh(EMOHIIMOAAL);
+			base.OnPopulateMesh(vertexHelper);
 			m_Text = text;
 			_quadPositions.Clear();
 			UIVertex vertex = default(UIVertex);
@@ -201,19 +201,19 @@ namespace Nekki.SF2.GUI
 				int num = _quadVertexIndices[i];
 				RectTransform rectTransform = _iconImages[i].rectTransform;
 				Vector2 sizeDelta = rectTransform.sizeDelta;
-				if (num < EMOHIIMOAAL.currentVertCount)
+				if (num < vertexHelper.currentVertCount)
 				{
-					EMOHIIMOAAL.PopulateUIVertex(ref vertex, num);
+					vertexHelper.PopulateUIVertex(ref vertex, num);
 					_quadPositions.Add(vertex.position);
-					EMOHIIMOAAL.PopulateUIVertex(ref vertex, num - 3);
+					vertexHelper.PopulateUIVertex(ref vertex, num - 3);
 					Vector3 position = vertex.position;
 					int num2 = num;
 					int num3 = num - 3;
 					while (num2 > num3)
 					{
-						EMOHIIMOAAL.PopulateUIVertex(ref vertex, num);
+						vertexHelper.PopulateUIVertex(ref vertex, num);
 						vertex.position = position;
-						EMOHIIMOAAL.SetUIVertex(vertex, num2);
+						vertexHelper.SetUIVertex(vertex, num2);
 						num2--;
 					}
 				}
@@ -225,17 +225,17 @@ namespace Nekki.SF2.GUI
 			foreach (HrefInfo item in _hrefInfos)
 			{
 				item.Boxes.Clear();
-				if (item.StartIndex >= EMOHIIMOAAL.currentVertCount)
+				if (item.StartIndex >= vertexHelper.currentVertCount)
 				{
 					continue;
 				}
-				EMOHIIMOAAL.PopulateUIVertex(ref vertex, item.StartIndex);
+				vertexHelper.PopulateUIVertex(ref vertex, item.StartIndex);
 				Vector3 position2 = vertex.position;
 				Bounds bounds = new Bounds(position2, Vector3.zero);
 				int j = item.StartIndex;
-				for (int fBGEOOKNPCF = item.EndIndex; j < fBGEOOKNPCF && j < EMOHIIMOAAL.currentVertCount; j++)
+				for (int vertexIndex = item.EndIndex; j < vertexIndex && j < vertexHelper.currentVertCount; j++)
 				{
-					EMOHIIMOAAL.PopulateUIVertex(ref vertex, j);
+					vertexHelper.PopulateUIVertex(ref vertex, j);
 					position2 = vertex.position;
 					if (position2.x < bounds.min.x)
 					{
@@ -287,11 +287,11 @@ namespace Nekki.SF2.GUI
 				Group obj = item2.Groups[1];
 				if (isCreating_m_HrefInfos)
 				{
-					HrefInfo lLHOOOEJICC = new HrefInfo();
-					lLHOOOEJICC.StartIndex = _textBuilder.Length * 4;
-					lLHOOOEJICC.EndIndex = (_textBuilder.Length + item2.Groups[2].Length - 1) * 4 + 3;
-					lLHOOOEJICC.name = obj.Value;
-					HrefInfo item = lLHOOOEJICC;
+					HrefInfo hrefInfo = new HrefInfo();
+					hrefInfo.StartIndex = _textBuilder.Length * 4;
+					hrefInfo.EndIndex = (_textBuilder.Length + item2.Groups[2].Length - 1) * 4 + 3;
+					hrefInfo.name = obj.Value;
+					HrefInfo item = hrefInfo;
 					_hrefInfos.Add(item);
 				}
 				else if (_hrefInfos.Count > 0)
@@ -312,16 +312,16 @@ namespace Nekki.SF2.GUI
 			return _textBuilder.ToString();
 		}
 
-		public void OnPointerClick(PointerEventData BHOLFGOGPCP)
+		public void OnPointerClick(PointerEventData eventData)
 		{
 			Vector2 localPoint;
-			RectTransformUtility.ScreenPointToLocalPointInRectangle(base.rectTransform, BHOLFGOGPCP.position, BHOLFGOGPCP.pressEventCamera, out localPoint);
+			RectTransformUtility.ScreenPointToLocalPointInRectangle(base.rectTransform, eventData.position, eventData.pressEventCamera, out localPoint);
 			foreach (HrefInfo item in _hrefInfos)
 			{
-				List<Rect> eGOEJCBNDIJ = item.Boxes;
-				for (int i = 0; i < eGOEJCBNDIJ.Count; i++)
+				List<Rect> linkRects = item.Boxes;
+				for (int i = 0; i < linkRects.Count; i++)
 				{
-					if (eGOEJCBNDIJ[i].Contains(localPoint))
+					if (linkRects[i].Contains(localPoint))
 					{
 						m_OnHrefClick.Invoke(item.name);
 						return;
@@ -330,7 +330,7 @@ namespace Nekki.SF2.GUI
 			}
 		}
 
-		public void OnPointerEnter(PointerEventData BHOLFGOGPCP)
+		public void OnPointerEnter(PointerEventData eventData)
 		{
 			if (_iconImages.Count < 1)
 			{
@@ -344,7 +344,7 @@ namespace Nekki.SF2.GUI
 			}
 		}
 
-		public void OnPointerExit(PointerEventData BHOLFGOGPCP)
+		public void OnPointerExit(PointerEventData eventData)
 		{
 			if (_iconImages.Count < 1)
 			{
@@ -358,7 +358,7 @@ namespace Nekki.SF2.GUI
 			}
 		}
 
-		public void OnSelect(BaseEventData BHOLFGOGPCP)
+		public void OnSelect(BaseEventData eventData)
 		{
 			if (_iconImages.Count < 1)
 			{

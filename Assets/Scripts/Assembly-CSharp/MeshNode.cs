@@ -15,24 +15,24 @@ public class MeshNode
 	private List<int> _TrianglesList = new List<int>();
 
 	// best guess for name
-	public void AddTriangle(ModelNode FJKBEFJGAHF, ModelNode GMHJFPCFFMM, ModelNode PNMPELDMCJF, string figureName = "")
+	public void AddTriangle(ModelNode firstNode, ModelNode secondNode, ModelNode thirdNode, string figureName = "")
 	{
-		int item = GetOrAddNodeIndex(FJKBEFJGAHF);
-		int item2 = GetOrAddNodeIndex(GMHJFPCFFMM);
-		int item3 = GetOrAddNodeIndex(PNMPELDMCJF);
+		int item = GetOrAddNodeIndex(firstNode);
+		int item2 = GetOrAddNodeIndex(secondNode);
+		int item3 = GetOrAddNodeIndex(thirdNode);
 		_TrianglesList.Add(item);
 		_TrianglesList.Add(item2);
 		_TrianglesList.Add(item3);
         _FigureNames.Add(figureName);
 	}
 
-	private int GetOrAddNodeIndex(ModelNode MEEAKLDGLDF)
+	private int GetOrAddNodeIndex(ModelNode node)
 	{
-		if (nodes.Contains(MEEAKLDGLDF))
+		if (nodes.Contains(node))
 		{
-			return nodes.IndexOf(MEEAKLDGLDF);
+			return nodes.IndexOf(node);
 		}
-		nodes.Add(MEEAKLDGLDF);
+		nodes.Add(node);
 		return nodes.Count - 1;
 	}
 

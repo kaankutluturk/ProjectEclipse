@@ -62,8 +62,8 @@ public sealed class ScalarEventInfo : ObjectEventInfo
 		}
 	}
 
-	public ScalarEventInfo(IObjectDescriptor BBNKIBKPBLO)
-		: base(BBNKIBKPBLO)
+	public ScalarEventInfo(IObjectDescriptor source)
+		: base(source)
 	{
 	}
 

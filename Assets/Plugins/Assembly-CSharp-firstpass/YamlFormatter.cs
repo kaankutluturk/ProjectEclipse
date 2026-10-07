@@ -21,18 +21,18 @@ internal static class YamlFormatter
 		return Convert.ToString(number, numberFormat);
 	}
 
-	public static string FormatBool(object CIGMFMBICLJ)
+	public static string FormatBool(object value)
 	{
-		return (!CIGMFMBICLJ.Equals(true)) ? "false" : "true";
+		return (!value.Equals(true)) ? "false" : "true";
 	}
 
-	public static string FormatDateTime(object KLHLNCMNKDD)
+	public static string FormatDateTime(object value)
 	{
-		return ((DateTime)KLHLNCMNKDD).ToString("o", CultureInfo.InvariantCulture);
+		return ((DateTime)value).ToString("o", CultureInfo.InvariantCulture);
 	}
 
-	public static string FormatTimeSpan(object NFBCAMOCHFG)
+	public static string FormatTimeSpan(object value)
 	{
-		return ((TimeSpan)NFBCAMOCHFG/*cast due to constrained. prefix*/).ToString();
+		return ((TimeSpan)value/*cast due to constrained. prefix*/).ToString();
 	}
 }

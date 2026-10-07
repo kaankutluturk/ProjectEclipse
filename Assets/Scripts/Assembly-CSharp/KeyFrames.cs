@@ -63,49 +63,49 @@ public class KeyFrames
 		currentFrameIndex++;
 	}
 
-	public void InterruptFramesSeted(int FPDMCHPHFAJ)
+	public void InterruptFramesSeted(int nodeCount)
 	{
 		frameCount = 2;
 		_IsInterruptFramesSeted = true;
 		if (frames.Count < frameCount)
 		{
-			AllocateFrames(2, FPDMCHPHFAJ);
+			AllocateFrames(2, nodeCount);
 		}
 		for (int i = 0; i < frameCount; i++)
 		{
-			Frame cJMFONMNFBI = frames[i];
-			if (cJMFONMNFBI.Size != FPDMCHPHFAJ)
+			Frame frame = frames[i];
+			if (frame.Size != nodeCount)
 			{
-				if (cJMFONMNFBI.Size < FPDMCHPHFAJ)
+				if (frame.Size < nodeCount)
 				{
-					cJMFONMNFBI.Data.Resize(FPDMCHPHFAJ);
+					frame.Data.Resize(nodeCount);
 				}
-				cJMFONMNFBI.Size = FPDMCHPHFAJ;
+				frame.Size = nodeCount;
 			}
 		}
 	}
 
-	public Frame GetFrame(int DCHCFFFFLLK)
+	public Frame GetFrame(int index)
 	{
-		if (frameCount <= DCHCFFFFLLK)
+		if (frameCount <= index)
 		{
 			return null;
 		}
-		return frames[DCHCFFFFLLK];
+		return frames[index];
 	}
 
-	public Frame GetFrameRelativeToCurrent(int OCDKOFPGCHH)
+	public Frame GetFrameRelativeToCurrent(int offset)
 	{
-		return frames[currentFrameIndex + OCDKOFPGCHH];
+		return frames[currentFrameIndex + offset];
 	}
 
-	public void Shift(float HLBMDDOPKKL, float ELAKEOGEDPN = 0f, float PIIFLHIBODE = 0f)
+	public void Shift(float offsetX, float offsetY = 0f, float offsetZ = 0f)
 	{
 		for (int i = (_IsInterruptFramesSeted ? 2 : 0); i < frameCount; i++)
 		{
 			for (int j = 0; j < frames[i].Size; j++)
 			{
-				frames[i].Data[j].Add(HLBMDDOPKKL, ELAKEOGEDPN, PIIFLHIBODE);
+				frames[i].Data[j].Add(offsetX, offsetY, offsetZ);
 			}
 		}
 	}
@@ -116,8 +116,8 @@ public class KeyFrames
 		{
 			for (int j = 0; j < frames[i].Size; j++)
 			{
-				Vector3f eMAFACPEPDK = frames[i].Data[j];
-				eMAFACPEPDK.SetX(eMAFACPEPDK.GetX() * -1f);
+				Vector3f point = frames[i].Data[j];
+				point.SetX(point.GetX() * -1f);
 			}
 		}
 	}
@@ -129,54 +129,54 @@ public class KeyFrames
 		_IsInterruptFramesSeted = false;
 	}
 
-	public void SetFramesFromRange(int AMNCLCPADOO, int IFIOLDFCLIE, bool HOHEFHKJIOG, Vector3[][] GHDPPHAAPCA)
+	public void SetFramesFromRange(int startFrame, int endFrame, bool repeatFirstFrame, Vector3[][] animation)
 	{
-		if (HOHEFHKJIOG)
+		if (repeatFirstFrame)
 		{
-			int num = Math.Min(GHDPPHAAPCA.Length - 1, AMNCLCPADOO + 2);
-			SetFrame(GHDPPHAAPCA[num]);
-			SetFrame(GHDPPHAAPCA[num]);
+			int num = Math.Min(animation.Length - 1, startFrame + 2);
+			SetFrame(animation[num]);
+			SetFrame(animation[num]);
 		}
-		for (int i = AMNCLCPADOO; i <= IFIOLDFCLIE; i++)
+		for (int i = startFrame; i <= endFrame; i++)
 		{
-			SetFrame(GHDPPHAAPCA[i]);
+			SetFrame(animation[i]);
 		}
 	}
 
-	public void SetFrame(Vector3[] GHDPPHAAPCA)
+	public void SetFrame(Vector3[] framePoints)
 	{
 		frameCount++;
 		if (frames.Count < frameCount)
 		{
-			AllocateFrames(1, GHDPPHAAPCA.Length);
+			AllocateFrames(1, framePoints.Length);
 		}
-		Frame cJMFONMNFBI = frames[frameCount - 1];
-		if (cJMFONMNFBI.Size != GHDPPHAAPCA.Length)
+		Frame frame = frames[frameCount - 1];
+		if (frame.Size != framePoints.Length)
 		{
-			if (cJMFONMNFBI.Size < GHDPPHAAPCA.Length)
+			if (frame.Size < framePoints.Length)
 			{
-				cJMFONMNFBI.Data.Resize(GHDPPHAAPCA.Length);
+				frame.Data.Resize(framePoints.Length);
 			}
-			cJMFONMNFBI.Size = GHDPPHAAPCA.Length;
+			frame.Size = framePoints.Length;
 		}
-		for (int i = 0; i < GHDPPHAAPCA.Length; i++)
+		for (int i = 0; i < framePoints.Length; i++)
 		{
-			cJMFONMNFBI.Data[i].Set(GHDPPHAAPCA[i]);
+			frame.Data[i].Set(framePoints[i]);
 		}
 	}
 
-	protected void AllocateFrames(int GNDPBMIJEMH, int DGHIGGGFNLP)
+	protected void AllocateFrames(int count, int nodeCount)
 	{
-		for (int i = 0; i < GNDPBMIJEMH; i++)
+		for (int i = 0; i < count; i++)
 		{
-			Frame cJMFONMNFBI = new Frame();
-			cJMFONMNFBI.Data = new List<Vector3f>(DGHIGGGFNLP);
-			frames.Add(cJMFONMNFBI);
-			for (int j = 0; j < DGHIGGGFNLP; j++)
+			Frame frame = new Frame();
+			frame.Data = new List<Vector3f>(nodeCount);
+			frames.Add(frame);
+			for (int j = 0; j < nodeCount; j++)
 			{
-				cJMFONMNFBI.Data.Add(new Vector3f());
+				frame.Data.Add(new Vector3f());
 			}
-			cJMFONMNFBI.Size = DGHIGGGFNLP;
+			frame.Size = nodeCount;
 		}
 	}
 }

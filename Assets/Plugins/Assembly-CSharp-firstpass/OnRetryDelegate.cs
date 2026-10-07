@@ -1,1 +1,1 @@
-public delegate bool OnRetryDelegate(EventSource GLFHBCIPCBD);
+public delegate bool OnRetryDelegate(EventSource eventSource);

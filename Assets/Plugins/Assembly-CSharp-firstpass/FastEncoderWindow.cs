@@ -73,11 +73,11 @@ internal class FastEncoderWindow
 
 	public DeflateInput GetUnprocessedInput()
 	{
-		DeflateInput pGEGNLJIJFE = new DeflateInput();
-		pGEGNLJIJFE.set_Buffer(window);
-		pGEGNLJIJFE.SetStartIndex(bufPos);
-		pGEGNLJIJFE.SetCount(bufEnd - bufPos);
-		return pGEGNLJIJFE;
+		DeflateInput input = new DeflateInput();
+		input.set_Buffer(window);
+		input.SetStartIndex(bufPos);
+		input.SetCount(bufEnd - bufPos);
+		return input;
 	}
 
 	public void FlushWindow()
@@ -99,9 +99,9 @@ internal class FastEncoderWindow
 		return 16384 - bufEnd;
 	}
 
-	public void CopyBytes(byte[] MMFIPPNMIKJ, int CAILGDNIKJD, int count)
+	public void CopyBytes(byte[] array, int sourceIndex, int count)
 	{
-		Array.Copy(MMFIPPNMIKJ, CAILGDNIKJD, window, bufEnd, count);
+		Array.Copy(array, sourceIndex, window, bufEnd, count);
 		bufEnd += count;
 	}
 
@@ -136,39 +136,39 @@ internal class FastEncoderWindow
 		bufEnd = bufPos;
 	}
 
-	private uint HashValue(uint HDPBNCNCMOH, byte AAOIAEJJINO)
+	private uint HashValue(uint hash, byte nextByte)
 	{
-		return (HDPBNCNCMOH << 4) ^ AAOIAEJJINO;
+		return (hash << 4) ^ nextByte;
 	}
 
-	private uint InsertString(ref uint HDPBNCNCMOH)
+	private uint InsertString(ref uint hash)
 	{
-		HDPBNCNCMOH = HashValue(HDPBNCNCMOH, window[bufPos + 2]);
-		uint num = lookup[HDPBNCNCMOH & 0x7FF];
-		lookup[HDPBNCNCMOH & 0x7FF] = (ushort)bufPos;
+		hash = HashValue(hash, window[bufPos + 2]);
+		uint num = lookup[hash & 0x7FF];
+		lookup[hash & 0x7FF] = (ushort)bufPos;
 		prev[bufPos & 0x1FFF] = (ushort)num;
 		return num;
 	}
 
-	private void InsertStrings(ref uint HDPBNCNCMOH, int EEPFDKNNGJB)
+	private void InsertStrings(ref uint hash, int count)
 	{
-		if (bufEnd - bufPos <= EEPFDKNNGJB)
+		if (bufEnd - bufPos <= count)
 		{
-			bufPos += EEPFDKNNGJB - 1;
+			bufPos += count - 1;
 			return;
 		}
-		while (--EEPFDKNNGJB > 0)
+		while (--count > 0)
 		{
-			InsertString(ref HDPBNCNCMOH);
+			InsertString(ref hash);
 			bufPos++;
 		}
 	}
 
-	internal bool GetNextSymbolOrMatch(Match MLPEJKLNAKF)
+	internal bool GetNextSymbolOrMatch(Match match)
 	{
-		uint hDPBNCNCMOH = HashValue(0u, window[bufPos]);
-		hDPBNCNCMOH = HashValue(hDPBNCNCMOH, window[bufPos + 1]);
-		int MIAOKJENHOF = 0;
+		uint hash = HashValue(0u, window[bufPos]);
+		hash = HashValue(hash, window[bufPos + 1]);
+		int matchPos = 0;
 		int num;
 		if (bufEnd - bufPos <= 3)
 		{
@@ -176,10 +176,10 @@ internal class FastEncoderWindow
 		}
 		else
 		{
-			int num2 = (int)InsertString(ref hDPBNCNCMOH);
+			int num2 = (int)InsertString(ref hash);
 			if (num2 != 0)
 			{
-				num = FindMatch(num2, out MIAOKJENHOF, 32, 32);
+				num = FindMatch(num2, out matchPos, 32, 32);
 				if (bufPos + num > bufEnd)
 				{
 					num = bufEnd - bufPos;
@@ -192,8 +192,8 @@ internal class FastEncoderWindow
 		}
 		if (num < 3)
 		{
-			MLPEJKLNAKF.set_State(MatchState.HasSymbol);
-			MLPEJKLNAKF.set_Symbol(window[bufPos]);
+			match.set_State(MatchState.HasSymbol);
+			match.set_Symbol(window[bufPos]);
 			bufPos++;
 		}
 		else
@@ -202,7 +202,7 @@ internal class FastEncoderWindow
 			if (num <= 6)
 			{
 				int MIAOKJENHOF2 = 0;
-				int num3 = (int)InsertString(ref hDPBNCNCMOH);
+				int num3 = (int)InsertString(ref hash);
 				int num4;
 				if (num3 != 0)
 				{
@@ -218,30 +218,30 @@ internal class FastEncoderWindow
 				}
 				if (num4 > num)
 				{
-					MLPEJKLNAKF.set_State(MatchState.HasSymbolAndMatch);
-					MLPEJKLNAKF.set_Symbol(window[bufPos - 1]);
-					MLPEJKLNAKF.set_Position(MIAOKJENHOF2);
-					MLPEJKLNAKF.set_Length(num4);
+					match.set_State(MatchState.HasSymbolAndMatch);
+					match.set_Symbol(window[bufPos - 1]);
+					match.set_Position(MIAOKJENHOF2);
+					match.set_Length(num4);
 					bufPos++;
 					num = num4;
-					InsertStrings(ref hDPBNCNCMOH, num);
+					InsertStrings(ref hash, num);
 				}
 				else
 				{
-					MLPEJKLNAKF.set_State(MatchState.HasMatch);
-					MLPEJKLNAKF.set_Position(MIAOKJENHOF);
-					MLPEJKLNAKF.set_Length(num);
+					match.set_State(MatchState.HasMatch);
+					match.set_Position(matchPos);
+					match.set_Length(num);
 					num--;
 					bufPos++;
-					InsertStrings(ref hDPBNCNCMOH, num);
+					InsertStrings(ref hash, num);
 				}
 			}
 			else
 			{
-				MLPEJKLNAKF.set_State(MatchState.HasMatch);
-				MLPEJKLNAKF.set_Position(MIAOKJENHOF);
-				MLPEJKLNAKF.set_Length(num);
-				InsertStrings(ref hDPBNCNCMOH, num);
+				match.set_State(MatchState.HasMatch);
+				match.set_Position(matchPos);
+				match.set_Length(num);
+				InsertStrings(ref hash, num);
 			}
 		}
 		if (bufPos == 16384)
@@ -251,24 +251,24 @@ internal class FastEncoderWindow
 		return true;
 	}
 
-	private int FindMatch(int AFMNFDABMGF, out int MIAOKJENHOF, int KJPBPEOKMBG, int AFEAHPCPHHI)
+	private int FindMatch(int search, out int matchPos, int searchDepth, int niceLength)
 	{
 		int num = 0;
 		int num2 = 0;
 		int num3 = bufPos - 8192;
 		byte b = window[bufPos];
-		while (AFMNFDABMGF > num3)
+		while (search > num3)
 		{
-			if (window[AFMNFDABMGF + num] == b)
+			if (window[search + num] == b)
 			{
 				int i;
-				for (i = 0; i < 258 && window[bufPos + i] == window[AFMNFDABMGF + i]; i++)
+				for (i = 0; i < 258 && window[bufPos + i] == window[search + i]; i++)
 				{
 				}
 				if (i > num)
 				{
 					num = i;
-					num2 = AFMNFDABMGF;
+					num2 = search;
 					if (i > 32)
 					{
 						break;
@@ -276,14 +276,14 @@ internal class FastEncoderWindow
 					b = window[bufPos + i];
 				}
 			}
-			if (--KJPBPEOKMBG == 0)
+			if (--searchDepth == 0)
 			{
 				break;
 			}
-			AFMNFDABMGF = prev[AFMNFDABMGF & 0x1FFF];
+			search = prev[search & 0x1FFF];
 		}
-		MIAOKJENHOF = bufPos - num2 - 1;
-		if (num == 3 && MIAOKJENHOF >= 16384)
+		matchPos = bufPos - num2 - 1;
+		if (num == 3 && matchPos >= 16384)
 		{
 			return 0;
 		}

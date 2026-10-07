@@ -25,9 +25,9 @@ namespace Nekki.SF2.GUI.Map
 		{
 			private FightIDS fightIds;
 
-			public LastFight(FightIDS JFIIJBAOOIK)
+			public LastFight(FightIDS ids)
 			{
-				fightIds = JFIIJBAOOIK;
+				fightIds = ids;
 			}
 
 			public FightIDS GetFightIds()
@@ -201,20 +201,20 @@ namespace Nekki.SF2.GUI.Map
 			_infoBattle.Refresh();
 		}
 
-		public void UpdateBattleButtonHidden(Battle DPOOIONCEOA)
+		public void UpdateBattleButtonHidden(Battle battle)
 		{
-			RosterBattle dDNLCGOPAGC = DPOOIONCEOA.GetRosterBattle();
-			if (dDNLCGOPAGC == null)
+			RosterBattle rosterBattle = battle.GetRosterBattle();
+			if (rosterBattle == null)
 			{
 				return;
 			}
-			Zone pKCPOJKLMOK = DPOOIONCEOA.GetZone();
-			if (pKCPOJKLMOK != null)
+			Zone zone = battle.GetZone();
+			if (zone != null)
 			{
-				ZoneScrollItem zoneScrollItem = GetZoneItem(pKCPOJKLMOK);
+				ZoneScrollItem zoneScrollItem = GetZoneItem(zone);
 				if (null != zoneScrollItem)
 				{
-					zoneScrollItem.UpdateBattleHidden(DPOOIONCEOA);
+					zoneScrollItem.UpdateBattleHidden(battle);
 				}
 			}
 		}
@@ -313,12 +313,12 @@ namespace Nekki.SF2.GUI.Map
 				_storyContainer.FadeZonesBackgroundMask(_raidPowerMode ? power : normal, duration);
 		}
 
-		public void SelectFight(string IGGFGLLIGCG, int frames = 0)
+		public void SelectFight(string fightIdString, int frames = 0)
 		{
-			FightIDS mOCEDDJOAEB = new FightIDS();
-			mOCEDDJOAEB.SetFightIDSByString(IGGFGLLIGCG);
-			FightList cPAOKGPGHEH = ListSF.GetFightById(mOCEDDJOAEB);
-			SelectFight(cPAOKGPGHEH, frames);
+			FightIDS parsedFightIds = new FightIDS();
+			parsedFightIds.SetFightIDSByString(fightIdString);
+			FightList fightList = ListSF.GetFightById(parsedFightIds);
+			SelectFight(fightList, frames);
 		}
 
 		public void SelectFight(FightList fight, float _Duration = 0f)
@@ -329,30 +329,30 @@ namespace Nekki.SF2.GUI.Map
 			}
 		}
 
-		public void SelectBattle(Battle DPOOIONCEOA, float _Duration)
+		public void SelectBattle(Battle battle, float _Duration)
 		{
-			if (DPOOIONCEOA == null)
+			if (battle == null)
 			{
 				return;
 			}
 			MapContainer mapContainer = null;
-			if (_storyContainer.HasBattle(DPOOIONCEOA))
+			if (_storyContainer.HasBattle(battle))
 			{
 				mapContainer = _storyContainer;
 			}
 			if ((bool)mapContainer)
 			{
-				mapContainer.SelectBattle(DPOOIONCEOA, _Duration);
+				mapContainer.SelectBattle(battle, _Duration);
 				UpdateCurrentZone();
 				SyncCurrentZoneLamp();
 			}
 		}
 
-		public void SelectZone(MapContainer FJANDPPJDIH, int IGNBCKPAENN, float _Duration)
+		public void SelectZone(MapContainer targetContainer, int zoneIndex, float _Duration)
 		{
-			if (!(FJANDPPJDIH == null))
+			if (!(targetContainer == null))
 			{
-				ZoneScrollItem zone = FJANDPPJDIH.GetZone(IGNBCKPAENN);
+				ZoneScrollItem zone = targetContainer.GetZone(zoneIndex);
 				Battle lastBattle = zone.get_LastBattle();
 				SelectBattle(lastBattle, _Duration);
 			}
@@ -367,27 +367,27 @@ namespace Nekki.SF2.GUI.Map
 			}
 		}
 
-		public void ActiveBattleByFightIDS(FightIDS DIAIIPCBMFL, bool PEJELKNFEKJ, bool HCNBLJBAOHK = true, bool DPFMIACNGLL = false)
+		public void ActiveBattleByFightIDS(FightIDS targetFightIds, bool isVisible, bool shouldSelect = true, bool skipFade = false)
 		{
-			ZoneScrollItem zoneScrollItem = GetZoneItemByName(DIAIIPCBMFL.GetZone());
+			ZoneScrollItem zoneScrollItem = GetZoneItemByName(targetFightIds.GetZone());
 			if ((bool)zoneScrollItem)
 			{
-				zoneScrollItem.ActiveBattle(DIAIIPCBMFL.GetBattle(), PEJELKNFEKJ, HCNBLJBAOHK, DPFMIACNGLL);
+				zoneScrollItem.ActiveBattle(targetFightIds.GetBattle(), isVisible, shouldSelect, skipFade);
 			}
 		}
 
-		public static bool IsZoneHaveDontCompleteBattle(Zone HLJKOKMKMLM)
+		public static bool IsZoneHaveDontCompleteBattle(Zone zone)
 		{
-			List<string> gBDHOPBMLHK = MapGUI.ZoneSwitchFade.BattleTypeNames;
-			for (int i = 0; i < gBDHOPBMLHK.Count; i++)
+			List<string> battleNames = MapGUI.ZoneSwitchFade.BattleTypeNames;
+			for (int i = 0; i < battleNames.Count; i++)
 			{
-				Battle cGJCGEBPCAF = HLJKOKMKMLM.Battles.Find(battle => battle.get_Name() == gBDHOPBMLHK[i]);
-				if (cGJCGEBPCAF != null)
+				Battle battle = zone.Battles.Find(battle => battle.get_Name() == battleNames[i]);
+				if (battle != null)
 				{
-					bool flag = cGJCGEBPCAF.GetStatus() == ConditionStatus.StatusOpen;
-					bool flag2 = !cGJCGEBPCAF.IsLocked();
-					bool dCHJDPCEODD = cGJCGEBPCAF.IsMapVisible;
-					if (flag && flag2 && dCHJDPCEODD)
+					bool flag = battle.GetStatus() == ConditionStatus.StatusOpen;
+					bool flag2 = !battle.IsLocked();
+					bool isMapVisible = battle.IsMapVisible;
+					if (flag && flag2 && isMapVisible)
 					{
 						return true;
 					}
@@ -396,16 +396,16 @@ namespace Nekki.SF2.GUI.Map
 			return false;
 		}
 
-		public static bool IsZoneOpen(Zone HLJKOKMKMLM)
+		public static bool IsZoneOpen(Zone zone)
 		{
-			if (HLJKOKMKMLM == null)
+			if (zone == null)
 			{
 				return false;
 			}
-			if (HLJKOKMKMLM.Battles.Exists(battle => battle.IsMapVisible && Eclipse.Modding.ModModeRuntime.OwnsBattle(battle))) return true;
-			if (UnderworldZonePolicy.IsRaidZone(HLJKOKMKMLM))
-				return HLJKOKMKMLM.Battles.Exists(battle => battle.IsMapVisible);
-			List<Battle> list = HLJKOKMKMLM.Battles.FindAll(battle =>
+			if (zone.Battles.Exists(battle => battle.IsMapVisible && Eclipse.Modding.ModModeRuntime.OwnsBattle(battle))) return true;
+			if (UnderworldZonePolicy.IsRaidZone(zone))
+				return zone.Battles.Exists(battle => battle.IsMapVisible);
+			List<Battle> list = zone.Battles.FindAll(battle =>
 				battle.get_Type() == BattleType.FightBosses || battle.get_Type() == BattleType.FightFinalTitan ||
 				battle.get_Type() == BattleType.FightBossesIntermission);
 			for (int i = 0; i < list.Count; i++)
@@ -418,9 +418,9 @@ namespace Nekki.SF2.GUI.Map
 			return false;
 		}
 
-		public void EnableMapButtons(bool IJHFJPBBNEJ)
+		public void EnableMapButtons(bool buttonsEnabled)
 		{
-			if (!IJHFJPBBNEJ)
+			if (!buttonsEnabled)
 			{
 				SetStoryButtonsEnabled(false);
 				SetRaidButtonsEnabled(false);
@@ -458,31 +458,31 @@ namespace Nekki.SF2.GUI.Map
 			_infoBattle.Init();
 		}
 
-		private void ShowBattleInfo(Battle DPOOIONCEOA)
+		private void ShowBattleInfo(Battle battle)
 		{
 			if (!(_infoBattle != null))
 			{
 				return;
 			}
-			_infoBattle.UpdateBattleInfo(DPOOIONCEOA);
+			_infoBattle.UpdateBattleInfo(battle);
 			FightList currentFight = _infoBattle.GetCurrentFight();
 			if (currentFight != null)
 			{
-				string jFIIJBAOOIK = currentFight.FightId.ToString();
+				string fightIdString = currentFight.FightId.ToString();
 				if (mapMode != MapMode.RaidMode)
 				{
-					ListSF.GetRoster().SetMapFocus(jFIIJBAOOIK);
+					ListSF.GetRoster().SetMapFocus(fightIdString);
 				}
 				else
 				{
-					ListSF.GetRoster().SetRaidMapFocus(jFIIJBAOOIK);
+					ListSF.GetRoster().SetRaidMapFocus(fightIdString);
 				}
 				return;
 			}
-			FightList jDIPBIHBGPF = GameUtils.GetLastFight(DPOOIONCEOA);
-			if (jDIPBIHBGPF != null)
+			FightList lastFight = GameUtils.GetLastFight(battle);
+			if (lastFight != null)
 			{
-				string jFIIJBAOOIK2 = jDIPBIHBGPF.FightId.ToString();
+				string jFIIJBAOOIK2 = lastFight.FightId.ToString();
 				if (mapMode != MapMode.RaidMode)
 				{
 					ListSF.GetRoster().SetMapFocus(jFIIJBAOOIK2);
@@ -503,9 +503,9 @@ namespace Nekki.SF2.GUI.Map
 				if (!(mapContainer == null))
 				{
 					activeZone.SelectBattle();
-					string aBJMDKJHJCP = activeZone.get_Zone().get_Name();
+					string zoneAlias = activeZone.get_Zone().get_Name();
 					int currentItemIndex = mapContainer.GetCurrentItemIndex();
-					mapContainer.SetCurrentZone(currentItemIndex, aBJMDKJHJCP);
+					mapContainer.SetCurrentZone(currentItemIndex, zoneAlias);
 					mapContainer.GetLampsPanel().SetLampsVisible(true);
 				}
 			}
@@ -636,24 +636,24 @@ namespace Nekki.SF2.GUI.Map
 
 		private void OnBattleClicked(object data)
 		{
-			Battle cGJCGEBPCAF = (Battle)data;
-			if (cGJCGEBPCAF != _infoBattle.GetCurrentBattle())
+			Battle clickedBattle = (Battle)data;
+			if (clickedBattle != _infoBattle.GetCurrentBattle())
 			{
-				ShowBattleInfo(cGJCGEBPCAF);
+				ShowBattleInfo(clickedBattle);
 				RefreshLastFights();
 			}
 		}
 
 		private void OnZoneSelected(object data)
 		{
-			ZoneScrollItem jEOIJBLAMIO = (ZoneScrollItem)data;
-			int zoneIndex = _storyContainer.GetZoneIndex(jEOIJBLAMIO);
+			ZoneScrollItem selectedZone = (ZoneScrollItem)data;
+			int zoneIndex = _storyContainer.GetZoneIndex(selectedZone);
 			SelectZone(_storyContainer, zoneIndex, 0f);
 		}
 
-		private ZoneScrollItem GetZoneItemByName(string BCKMHHFHGNH)
+		private ZoneScrollItem GetZoneItemByName(string zoneName)
 		{
-			int zoneIndexByName = _storyContainer.GetZoneIndexByName(BCKMHHFHGNH);
+			int zoneIndexByName = _storyContainer.GetZoneIndexByName(zoneName);
 			if (zoneIndexByName >= 0)
 			{
 				return _storyContainer.GetZone(zoneIndexByName);
@@ -669,24 +669,24 @@ namespace Nekki.SF2.GUI.Map
 			}
 		}
 
-		private ZoneScrollItem GetZoneItem(Zone HLJKOKMKMLM)
+		private ZoneScrollItem GetZoneItem(Zone zone)
 		{
-			return GetZoneItemByName(HLJKOKMKMLM.get_Name());
+			return GetZoneItemByName(zone.get_Name());
 		}
 
-		private void SetStoryButtonsEnabled(bool IJHFJPBBNEJ)
-		{
-		}
-
-		private void SetRaidButtonsEnabled(bool IJHFJPBBNEJ)
+		private void SetStoryButtonsEnabled(bool buttonsEnabled)
 		{
 		}
 
-		private void SelectLastFight(LastFight BEFANIBLCPI)
+		private void SetRaidButtonsEnabled(bool buttonsEnabled)
 		{
-			if (BEFANIBLCPI != null)
+		}
+
+		private void SelectLastFight(LastFight lastFightInfo)
+		{
+			if (lastFightInfo != null)
 			{
-				SelectBattle(BEFANIBLCPI.GetBattle(), 0f);
+				SelectBattle(lastFightInfo.GetBattle(), 0f);
 			}
 		}
 

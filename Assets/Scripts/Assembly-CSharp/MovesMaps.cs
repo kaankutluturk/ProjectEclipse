@@ -82,9 +82,9 @@ public static class MovesMaps
 		_Objects = null;
 	}
 
-	public static int GetMappedIndex(MapType BLGLGNGBADH, string value)
+	public static int GetMappedIndex(MapType mapType, string value)
 	{
-		switch (BLGLGNGBADH)
+		switch (mapType)
 		{
 		case MapType.KEY_TYPE:
 			if (value == null)
@@ -99,7 +99,7 @@ public static class MovesMaps
 			}
 			return (int)(_Objects.ContainsKey(value) ? _Objects[value] : DistancePoint.Object.OBJECT_NULL);
 		default:
-			GameLog.Error("ERROR: MovesMaps::getIndex - no map for index: " + BLGLGNGBADH);
+			GameLog.Error("ERROR: MovesMaps::getIndex - no map for index: " + mapType);
 			return -1;
 		}
 	}

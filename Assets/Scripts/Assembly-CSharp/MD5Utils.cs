@@ -6,12 +6,12 @@ using UnityEngine;
 
 public static class MD5Utils
 {
-	public static string MD5HashFile(string DCOPLCIFCFL, string JBAPBBGCOGG = null)
+	public static string MD5HashFile(string filePath, string salt = null)
 	{
 		try
 		{
-			byte[] oIOHECBCFJA = File.ReadAllBytes(DCOPLCIFCFL);
-			return MD5HashBytes(oIOHECBCFJA, JBAPBBGCOGG);
+			byte[] fileBytes = File.ReadAllBytes(filePath);
+			return MD5HashBytes(fileBytes, salt);
 		}
 		catch (Exception exception)
 		{
@@ -20,59 +20,59 @@ public static class MD5Utils
 		return string.Empty;
 	}
 
-	public static string MD5HashString(string DMKMNOINKFC, string JBAPBBGCOGG = null)
+	public static string MD5HashString(string input, string salt = null)
 	{
 		using (MD5 mD = MD5.Create())
 		{
-			byte[] nCHAHPLJBMD = mD.ComputeHash(StringToByteArray(DMKMNOINKFC));
-			string text = ByteArrayToString(nCHAHPLJBMD);
-			if (JBAPBBGCOGG == null)
+			byte[] hashBytes = mD.ComputeHash(StringToByteArray(input));
+			string text = ByteArrayToString(hashBytes);
+			if (salt == null)
 			{
 				return text;
 			}
-			byte[] nCHAHPLJBMD2 = mD.ComputeHash(StringToByteArray(text + JBAPBBGCOGG));
+			byte[] nCHAHPLJBMD2 = mD.ComputeHash(StringToByteArray(text + salt));
 			return ByteArrayToString(nCHAHPLJBMD2);
 		}
 	}
 
-	public static string MD5HashBytes(byte[] OIOHECBCFJA, string JBAPBBGCOGG = null)
+	public static string MD5HashBytes(byte[] data, string salt = null)
 	{
 		using (MD5 mD = MD5.Create())
 		{
-			byte[] nCHAHPLJBMD = mD.ComputeHash(OIOHECBCFJA);
-			string text = ByteArrayToString(nCHAHPLJBMD);
-			if (JBAPBBGCOGG == null)
+			byte[] hashBytes = mD.ComputeHash(data);
+			string text = ByteArrayToString(hashBytes);
+			if (salt == null)
 			{
 				return text;
 			}
-			byte[] nCHAHPLJBMD2 = mD.ComputeHash(StringToByteArray(text + JBAPBBGCOGG));
+			byte[] nCHAHPLJBMD2 = mD.ComputeHash(StringToByteArray(text + salt));
 			return ByteArrayToString(nCHAHPLJBMD2);
 		}
 	}
 
-	public static bool CheckFileHash(string DCOPLCIFCFL, string IMMGBGKAMPK, string JBAPBBGCOGG = null)
+	public static bool CheckFileHash(string filePath, string expectedHash, string salt = null)
 	{
-		return MD5HashFile(DCOPLCIFCFL, JBAPBBGCOGG) == IMMGBGKAMPK;
+		return MD5HashFile(filePath, salt) == expectedHash;
 	}
 
-	public static bool CheckStringHash(string DMKMNOINKFC, string IMMGBGKAMPK, string JBAPBBGCOGG = null)
+	public static bool CheckStringHash(string input, string expectedHash, string salt = null)
 	{
-		return MD5HashString(DMKMNOINKFC, JBAPBBGCOGG) == IMMGBGKAMPK;
+		return MD5HashString(input, salt) == expectedHash;
 	}
 
-	public static bool CheckBytesHash(byte[] OIOHECBCFJA, string IMMGBGKAMPK, string JBAPBBGCOGG = null)
+	public static bool CheckBytesHash(byte[] data, string expectedHash, string salt = null)
 	{
-		return MD5HashBytes(OIOHECBCFJA, JBAPBBGCOGG) == IMMGBGKAMPK;
+		return MD5HashBytes(data, salt) == expectedHash;
 	}
 
-	public static string ByteArrayToString(byte[] NCHAHPLJBMD)
+	public static string ByteArrayToString(byte[] bytes)
 	{
-		string text = BitConverter.ToString(NCHAHPLJBMD);
+		string text = BitConverter.ToString(bytes);
 		return text.Replace("-", string.Empty);
 	}
 
-	public static byte[] StringToByteArray(string DMKMNOINKFC)
+	public static byte[] StringToByteArray(string input)
 	{
-		return Encoding.UTF8.GetBytes(DMKMNOINKFC);
+		return Encoding.UTF8.GetBytes(input);
 	}
 }

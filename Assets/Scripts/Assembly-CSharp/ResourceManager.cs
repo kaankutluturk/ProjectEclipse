@@ -9,10 +9,10 @@ using UnityEngine.Video;
 
 public static class ResourceManager
 {
-	public static Texture2D GetTextureFromExternal(string DCOPLCIFCFL)
+	public static Texture2D GetTextureFromExternal(string path)
 	{
 		byte[] array;
-		using (FileStream fileStream = new FileStream(DCOPLCIFCFL, FileMode.Open, FileAccess.Read))
+		using (FileStream fileStream = new FileStream(path, FileMode.Open, FileAccess.Read))
 		{
 			array = new byte[fileStream.Length];
 			fileStream.Read(array, 0, array.Length);
@@ -22,44 +22,44 @@ public static class ResourceManager
 		return texture2D;
 	}
 
-	public static byte[] GetBinary(string DCOPLCIFCFL)
+	public static byte[] GetBinary(string path)
 	{
 		byte[] externalBinary;
-		if (Eclipse.Modding.ModAssetBinding.TryLoadBinary(DCOPLCIFCFL, out externalBinary))
+		if (Eclipse.Modding.ModAssetBinding.TryLoadBinary(path, out externalBinary))
 		{
 			return externalBinary;
 		}
-		if (Eclipse.Modding.ModAssetBinding.IsQualified(DCOPLCIFCFL))
+		if (Eclipse.Modding.ModAssetBinding.IsQualified(path))
 		{
 			return null;
 		}
 #if UNITY_EDITOR
 		byte[] previewAnimation;
-		if (Eclipse.Content.LocalAnimationPreview.TryGetBinary(DCOPLCIFCFL, out previewAnimation))
+		if (Eclipse.Content.LocalAnimationPreview.TryGetBinary(path, out previewAnimation))
 			return previewAnimation;
 #endif
 		if (SF2Paths.UseBundledResources)
 		{
-			DCOPLCIFCFL = DCOPLCIFCFL.TrimStart('\\', '/');
-			DCOPLCIFCFL = StripExtension(DCOPLCIFCFL);
-			TextAsset textAsset = ResourcesAndBundles.Load<TextAsset>(DCOPLCIFCFL);
+			path = path.TrimStart('\\', '/');
+			path = StripExtension(path);
+			TextAsset textAsset = ResourcesAndBundles.Load<TextAsset>(path);
 			return (!textAsset) ? null : textAsset.bytes;
 		}
-		FileStream fileStream = new FileStream(DCOPLCIFCFL, FileMode.Open, FileAccess.Read);
+		FileStream fileStream = new FileStream(path, FileMode.Open, FileAccess.Read);
 		byte[] array = new byte[fileStream.Length];
 		fileStream.Read(array, 0, (int)fileStream.Length);
 		fileStream.Close();
 		return array;
 	}
 
-	public static AudioClip GetAudioClip(string DCOPLCIFCFL)
+	public static AudioClip GetAudioClip(string path)
 	{
 		if (SF2Paths.UseBundledResources)
 		{
-			DCOPLCIFCFL = DCOPLCIFCFL.TrimStart('\\', '/');
-			return ResourcesAndBundles.Load<AudioClip>(DCOPLCIFCFL);
+			path = path.TrimStart('\\', '/');
+			return ResourcesAndBundles.Load<AudioClip>(path);
 		}
-		WWW wWW = new WWW(string.Format("file:///{0}", DCOPLCIFCFL));
+		WWW wWW = new WWW(string.Format("file:///{0}", path));
 		while (!wWW.isDone && string.IsNullOrEmpty(wWW.error))
 		{
 		}
@@ -70,11 +70,11 @@ public static class ResourceManager
 		return null;
 	}
 
-	public static VideoClip GetVideoClip(string DCOPLCIFCFL)
+	public static VideoClip GetVideoClip(string path)
 	{
-		DCOPLCIFCFL = SF2Paths.GetVideoPath() + "/" + Path.ChangeExtension(DCOPLCIFCFL, null);
-		DCOPLCIFCFL = DCOPLCIFCFL.TrimStart('\\', '/');
-		return ResourcesAndBundles.Load<VideoClip>(DCOPLCIFCFL);
+		path = SF2Paths.GetVideoPath() + "/" + Path.ChangeExtension(path, null);
+		path = path.TrimStart('\\', '/');
+		return ResourcesAndBundles.Load<VideoClip>(path);
 	}
 
 
@@ -536,11 +536,11 @@ public static class ResourceManager
 			return document.OuterXml;
 		}
 
-		public static bool TryDevXml(string ONEIGMLOGDC, out string text)
+		public static bool TryDevXml(string resourcePath, out string text)
 		{
 			text = null;
 			string gamedataRelativePath;
-			if (!ContentOverridePaths.TryGetGamedataRelativePath(ONEIGMLOGDC, out gamedataRelativePath))
+			if (!ContentOverridePaths.TryGetGamedataRelativePath(resourcePath, out gamedataRelativePath))
 			{
 				return false;
 			}
@@ -572,10 +572,10 @@ public static class ResourceManager
 				Debug.LogWarning("[DevXml] root missing: " + root);
 				return false;
 			}
-			if (!_devXmlLogged.Contains("lookup:" + ONEIGMLOGDC))
+			if (!_devXmlLogged.Contains("lookup:" + resourcePath))
 			{
-				_devXmlLogged.Add("lookup:" + ONEIGMLOGDC);
-				Debug.Log("[DevXml] lookup: " + ONEIGMLOGDC);
+				_devXmlLogged.Add("lookup:" + resourcePath);
+				Debug.Log("[DevXml] lookup: " + resourcePath);
 			}
 			foreach (string cand in ContentOverridePaths.BuildCandidates(gamedataRelativePath))
 			{
@@ -593,7 +593,7 @@ public static class ResourceManager
 					try
 					{
 						text = File.ReadAllText(file);
-						text = AdaptDevXml(ONEIGMLOGDC, file, text);
+						text = AdaptDevXml(resourcePath, file, text);
 					}
 					catch (Exception exception)
 					{
@@ -604,14 +604,14 @@ public static class ResourceManager
 						}
 						return false;
 					}
-					if (!IsCompatibleDevXml(ONEIGMLOGDC, file, text))
+					if (!IsCompatibleDevXml(resourcePath, file, text))
 					{
 						text = null;
 						continue;
 					}
 					if (_devXmlLogged.Add(file))
 					{
-						Debug.Log("[DevXml] override: " + ONEIGMLOGDC + " -> " + file);
+						Debug.Log("[DevXml] override: " + resourcePath + " -> " + file);
 					}
 					return true;
 				}
@@ -625,7 +625,7 @@ public static class ResourceManager
 					string fallbackFile = Path.Combine(root, "models", fallbackModel + ".xml");
 					if (File.Exists(fallbackFile))
 					{
-						text = AdaptDevXml(ONEIGMLOGDC, fallbackFile, File.ReadAllText(fallbackFile));
+						text = AdaptDevXml(resourcePath, fallbackFile, File.ReadAllText(fallbackFile));
 					}
 					else
 					{
@@ -652,106 +652,106 @@ public static class ResourceManager
 			return false;
 		}
 
-	public static string GetText(string ONEIGMLOGDC, bool GIEAPLJHHDK = false)
+	public static string GetText(string resourcePath, bool preferFile = false)
 	{
-        string replacement = Eclipse.Modding.ModRuntime.LoadCoreModelReplacement(ONEIGMLOGDC);
+        string replacement = Eclipse.Modding.ModRuntime.LoadCoreModelReplacement(resourcePath);
         if (replacement != null) return replacement;
-		string modModel = Eclipse.Modding.ModRuntime.LoadQualifiedModelText(ONEIGMLOGDC);
+		string modModel = Eclipse.Modding.ModRuntime.LoadQualifiedModelText(resourcePath);
 		if (!string.IsNullOrEmpty(modModel)) return modModel;
-		if (TryDevXml(ONEIGMLOGDC, out var t0))
+		if (TryDevXml(resourcePath, out var t0))
 		{
 			return t0;
 		}
 
-		if (SF2Paths.UseBundledResources && !GIEAPLJHHDK)
+		if (SF2Paths.UseBundledResources && !preferFile)
 		{
-			return GetBundledOrModText(ONEIGMLOGDC);
+			return GetBundledOrModText(resourcePath);
 		}
-		return GetFileOrDevText(ONEIGMLOGDC);
+		return GetFileOrDevText(resourcePath);
 	}
 
 	// Loads the asset embedded in this Unity project without consulting the
 	// plaintext override directory.  Visual layout XML must stay paired with
 	// the installed textures/atlases even while gameplay XML is migrated.
-	public static string GetBundledText(string ONEIGMLOGDC)
+	public static string GetBundledText(string resourcePath)
 	{
-		if (string.IsNullOrEmpty(ONEIGMLOGDC))
+		if (string.IsNullOrEmpty(resourcePath))
 		{
 			return string.Empty;
 		}
-		ONEIGMLOGDC = ONEIGMLOGDC.TrimStart('\\', '/');
-		ONEIGMLOGDC = StripExtension(ONEIGMLOGDC);
-		TextAsset textAsset = ResourcesAndBundles.Load<TextAsset>(ONEIGMLOGDC);
+		resourcePath = resourcePath.TrimStart('\\', '/');
+		resourcePath = StripExtension(resourcePath);
+		TextAsset textAsset = ResourcesAndBundles.Load<TextAsset>(resourcePath);
 		return (!textAsset) ? string.Empty : textAsset.text;
 	}
 
-	public static string GetBundledOrModText(string ONEIGMLOGDC)
+	public static string GetBundledOrModText(string resourcePath)
 	{
-        string replacement = Eclipse.Modding.ModRuntime.LoadCoreModelReplacement(ONEIGMLOGDC);
+        string replacement = Eclipse.Modding.ModRuntime.LoadCoreModelReplacement(resourcePath);
         if (replacement != null) return replacement;
-		string modModel = Eclipse.Modding.ModRuntime.LoadQualifiedModelText(ONEIGMLOGDC);
+		string modModel = Eclipse.Modding.ModRuntime.LoadQualifiedModelText(resourcePath);
 		if (!string.IsNullOrEmpty(modModel)) return modModel;
-		if (TryDevXml(ONEIGMLOGDC, out var t1))
+		if (TryDevXml(resourcePath, out var t1))
 		{
 			return t1;
 		}
-		ONEIGMLOGDC = ONEIGMLOGDC.TrimStart('\\', '/');
-		string text = SF2Paths.ResolveWritablePath(ONEIGMLOGDC);
+		resourcePath = resourcePath.TrimStart('\\', '/');
+		string text = SF2Paths.ResolveWritablePath(resourcePath);
 		if (File.Exists(text))
 		{
 			return GetFileOrDevText(text);
 		}
-		string packagedModel = Eclipse.Content.PackagedArtCatalog.LoadModelText(ONEIGMLOGDC);
+		string packagedModel = Eclipse.Content.PackagedArtCatalog.LoadModelText(resourcePath);
 		if (!string.IsNullOrEmpty(packagedModel))
 		{
 			return packagedModel;
 		}
-		string packagedLocationData = Eclipse.Content.PackagedArtCatalog.LoadLocationDataText(ONEIGMLOGDC);
+		string packagedLocationData = Eclipse.Content.PackagedArtCatalog.LoadLocationDataText(resourcePath);
 		if (!string.IsNullOrEmpty(packagedLocationData))
 		{
 			return packagedLocationData;
 		}
-		ONEIGMLOGDC = StripExtension(ONEIGMLOGDC);
-		TextAsset textAsset = ResourcesAndBundles.Load<TextAsset>(ONEIGMLOGDC);
+		resourcePath = StripExtension(resourcePath);
+		TextAsset textAsset = ResourcesAndBundles.Load<TextAsset>(resourcePath);
 		return (!textAsset) ? string.Empty : textAsset.text;
 	}
 
-	public static string GetFileOrDevText(string ONEIGMLOGDC)
+	public static string GetFileOrDevText(string resourcePath)
 	{
-        string replacement = Eclipse.Modding.ModRuntime.LoadCoreModelReplacement(ONEIGMLOGDC);
+        string replacement = Eclipse.Modding.ModRuntime.LoadCoreModelReplacement(resourcePath);
         if (replacement != null) return replacement;
-		string modModel = Eclipse.Modding.ModRuntime.LoadQualifiedModelText(ONEIGMLOGDC);
+		string modModel = Eclipse.Modding.ModRuntime.LoadQualifiedModelText(resourcePath);
 		if (!string.IsNullOrEmpty(modModel)) return modModel;
-		if (TryDevXml(ONEIGMLOGDC, out var t2))
+		if (TryDevXml(resourcePath, out var t2))
 		{
 			return t2;
 		}
-		if (ONEIGMLOGDC.StartsWith(SF2Paths.GetGameDataPath()))
+		if (resourcePath.StartsWith(SF2Paths.GetGameDataPath()))
 		{
-			string path = ONEIGMLOGDC.Replace(SF2Paths.GetGameDataPath(), SF2Paths.GetWritableGameDataPath());
+			string path = resourcePath.Replace(SF2Paths.GetGameDataPath(), SF2Paths.GetWritableGameDataPath());
 			if (File.Exists(path))
 			{
 				return File.ReadAllText(path);
 			}
-			if (File.Exists(ONEIGMLOGDC))
+			if (File.Exists(resourcePath))
 			{
-				return File.ReadAllText(ONEIGMLOGDC);
+				return File.ReadAllText(resourcePath);
 			}
 			return null;
 		}
-		if (File.Exists(ONEIGMLOGDC))
+		if (File.Exists(resourcePath))
 		{
-			return File.ReadAllText(ONEIGMLOGDC);
+			return File.ReadAllText(resourcePath);
 		}
 		return null;
 	}
 
-	private static string StripExtension(string ONEIGMLOGDC)
+	private static string StripExtension(string path)
 	{
-		if (Path.HasExtension(ONEIGMLOGDC))
+		if (Path.HasExtension(path))
 		{
-			return Path.ChangeExtension(ONEIGMLOGDC, null);
+			return Path.ChangeExtension(path, null);
 		}
-		return ONEIGMLOGDC;
+		return path;
 	}
 }

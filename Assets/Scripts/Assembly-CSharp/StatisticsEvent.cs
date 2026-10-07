@@ -64,68 +64,68 @@ public static class StatisticsEvent
 		}
 	}
 
-	public static bool IsEventEnabled(EventType IGABHEMGKKE)
+	public static bool IsEventEnabled(EventType eventType)
 	{
 		return true;
 	}
 
-	public static bool IsEventLogged(EventType IGABHEMGKKE)
+	public static bool IsEventLogged(EventType eventType)
 	{
 		return true;
 	}
 
-	public static string BuildEventJson(EventType IGABHEMGKKE, ArgsDict PCJAKPJMKGN)
+	public static string BuildEventJson(EventType eventType, ArgsDict eventArgs)
 	{
-		switch (IGABHEMGKKE)
+		switch (eventType)
 		{
 		case EventType.User:
 			ResetSessionCounters();
-			return BuildUserJson(PCJAKPJMKGN);
+			return BuildUserJson(eventArgs);
 		case EventType.Fight_End:
 			StatisticsCollector.SetFightAmount(StatisticsCollector.GetFightAmount() + 1);
-			return BuildFightEndJson(PCJAKPJMKGN);
+			return BuildFightEndJson(eventArgs);
 		case EventType.Achievement:
-			return BuildAchievementJson(PCJAKPJMKGN);
+			return BuildAchievementJson(eventArgs);
 		case EventType.Gems_Changed:
-			return BuildGemsChangedJson(PCJAKPJMKGN);
+			return BuildGemsChangedJson(eventArgs);
 		case EventType.Level_Up:
-			return BuildLevelUpJson(PCJAKPJMKGN);
+			return BuildLevelUpJson(eventArgs);
 		case EventType.Purchase:
-			return BuildPurchaseJson(PCJAKPJMKGN);
+			return BuildPurchaseJson(eventArgs);
 		case EventType.Payment:
-			return BuildPaymentJson(PCJAKPJMKGN);
+			return BuildPaymentJson(eventArgs);
 		case EventType.Perk:
-			return BuildPerkJson(PCJAKPJMKGN);
+			return BuildPerkJson(eventArgs);
 		case EventType.Session_End:
 			StatisticsCollector.SetSessionId(StatisticsCollector.GetSessionId() + 1);
-			return BuildSessionEndJson(PCJAKPJMKGN);
+			return BuildSessionEndJson(eventArgs);
 		case EventType.Pay_Request_Start:
-			return BuildPayRequestStartJson(PCJAKPJMKGN);
+			return BuildPayRequestStartJson(eventArgs);
 		case EventType.Pay_Status_Update:
-			return BuildPayStatusUpdateJson(PCJAKPJMKGN);
+			return BuildPayStatusUpdateJson(eventArgs);
 		case EventType.Pay_Handle_Start:
-			return BuildPayHandleStartJson(PCJAKPJMKGN);
+			return BuildPayHandleStartJson(eventArgs);
 		case EventType.Pay_Handle_Finish:
-			return BuildPayHandleFinishJson(PCJAKPJMKGN);
+			return BuildPayHandleFinishJson(eventArgs);
 		case EventType.Pay_Transaction_Finish:
-			return BuildPayTransactionFinishJson(PCJAKPJMKGN);
+			return BuildPayTransactionFinishJson(eventArgs);
 		case EventType.Pay_Handle_Error:
-			return BuildPayHandleErrorJson(PCJAKPJMKGN);
+			return BuildPayHandleErrorJson(eventArgs);
 		case EventType.Pay_Handle_Debug:
-			return BuildPayHandleDebugJson(PCJAKPJMKGN);
+			return BuildPayHandleDebugJson(eventArgs);
 		case EventType.Pay_Request_Fail:
-			return BuildPayRequestFailJson(PCJAKPJMKGN);
+			return BuildPayRequestFailJson(eventArgs);
 		case EventType.Pay_Verification_Status_Change:
-			return BuildPayVerificationJson(PCJAKPJMKGN);
+			return BuildPayVerificationJson(eventArgs);
 		default:
 			return null;
 		}
 	}
 
-	private static JSONClass CreateHeadJson(EventType IGABHEMGKKE)
+	private static JSONClass CreateHeadJson(EventType eventType)
 	{
 		JSONClass jSONClass = new JSONClass();
-		string text = GetEventTypeName(IGABHEMGKKE);
+		string text = GetEventTypeName(eventType);
 		jSONClass["eid"] = StatisticsCollector.GetNextEventId();
 		jSONClass["etype"] = text;
 		jSONClass["build_version"] = SystemProperties.GetVersion().ToString();
@@ -146,21 +146,21 @@ public static class StatisticsEvent
 		return jSONClass;
 	}
 
-	private static JSONClass CreateHeadPayJSON(EventType GIGAFKGDKNH, string HOKDOMALLDB, string JDHJMKDOAMO)
+	private static JSONClass CreateHeadPayJSON(EventType eventType, string packageName, string receipt)
 	{
-		return CreateHeadPayJSON(GetEventTypeName(GIGAFKGDKNH), HOKDOMALLDB, JDHJMKDOAMO);
+		return CreateHeadPayJSON(GetEventTypeName(eventType), packageName, receipt);
 	}
 
-	private static JSONClass CreateHeadPayJSON(string GIGAFKGDKNH, string HOKDOMALLDB, string JDHJMKDOAMO)
+	private static JSONClass CreateHeadPayJSON(string subtype, string packageName, string receipt)
 	{
 		JSONClass jSONClass = new JSONClass();
 		jSONClass["eid"] = StatisticsCollector.GetNextPayEventId();
 		jSONClass["etype"] = "pay";
 		jSONClass["build_version"] = SystemProperties.GetVersion().ToString();
 		jSONClass["data_version"] = SystemProperties.GetDataVersion().ToString(true);
-		jSONClass["subtype"] = GIGAFKGDKNH;
-		jSONClass["package_id"] = ((!string.IsNullOrEmpty(HOKDOMALLDB)) ? HOKDOMALLDB : string.Empty);
-		jSONClass["rid"] = ((!string.IsNullOrEmpty(JDHJMKDOAMO)) ? MD5Utils.MD5HashString(JDHJMKDOAMO) : string.Empty);
+		jSONClass["subtype"] = subtype;
+		jSONClass["package_id"] = ((!string.IsNullOrEmpty(packageName)) ? packageName : string.Empty);
+		jSONClass["rid"] = ((!string.IsNullOrEmpty(receipt)) ? MD5Utils.MD5HashString(receipt) : string.Empty);
 		jSONClass["paid_version"] = SystemProperties.IsPaidApp();
 		if (SystemProperties.IsDebug())
 		{
@@ -169,24 +169,24 @@ public static class StatisticsEvent
 		return jSONClass;
 	}
 
-	private static void AddTag(JSONClass data, string EDLADAAKMDF)
+	private static void AddTag(JSONClass data, string tag)
 	{
 		JSONArray asArray = data["tags"].AsArray;
-		asArray.Add(EDLADAAKMDF);
+		asArray.Add(tag);
 		data["tags"] = asArray;
 	}
 
-	private static void AddRosterData(JSONClass data, string DOPHKKGNAEF)
+	private static void AddRosterData(JSONClass data, string key)
 	{
-		Roster nKGLHEGIKKP = ListSF.GetRoster();
-		if (nKGLHEGIKKP != null)
+		Roster roster = ListSF.GetRoster();
+		if (roster != null)
 		{
 		}
 	}
 
-	private static string GetEventTypeName(EventType IGABHEMGKKE)
+	private static string GetEventTypeName(EventType eventType)
 	{
-		return IGABHEMGKKE.ToString().ToLower();
+		return eventType.ToString().ToLower();
 	}
 
 	private static int GetUnixTimestamp()
@@ -207,7 +207,7 @@ public static class StatisticsEvent
 		return "u";
 	}
 
-	private static string BuildUserJson(ArgsDict PCJAKPJMKGN)
+	private static string BuildUserJson(ArgsDict eventArgs)
 	{
 		JSONClass jSONClass = CreateHeadJson(EventType.User);
 		jSONClass["device_token"] = SystemProperties.GetUserIdentifier();
@@ -223,41 +223,41 @@ public static class StatisticsEvent
 		return jSONClass.ToString();
 	}
 
-	private static string BuildFightEndJson(ArgsDict PCJAKPJMKGN)
+	private static string BuildFightEndJson(ArgsDict eventArgs)
 	{
 		JSONClass jSONClass = CreateHeadJson(EventType.Fight_End);
-		StatisticsGeter.AddFightInfo(jSONClass, PCJAKPJMKGN);
-		StatisticsGeter.AddFightResult(jSONClass, PCJAKPJMKGN);
+		StatisticsGeter.AddFightInfo(jSONClass, eventArgs);
+		StatisticsGeter.AddFightResult(jSONClass, eventArgs);
 		StatisticsGeter.AddFpsLimit(jSONClass);
 		StatisticsGeter.AddEclipseMode(jSONClass);
-		StatisticsGeter.AddRounds(jSONClass, PCJAKPJMKGN);
-		StatisticsGeter.AddAverageFps(jSONClass, PCJAKPJMKGN);
-		StatisticsGeter.AddFightTimeElapsed(jSONClass, PCJAKPJMKGN);
+		StatisticsGeter.AddRounds(jSONClass, eventArgs);
+		StatisticsGeter.AddAverageFps(jSONClass, eventArgs);
+		StatisticsGeter.AddFightTimeElapsed(jSONClass, eventArgs);
 		jSONClass["user_level"] = ListSF.GetRoster().GetLevel();
 		jSONClass["device_name"] = SystemProperties.GetDeviceInfo().Id;
 		StatisticsGeter.AddPerks(jSONClass);
 		return jSONClass.ToString();
 	}
 
-	private static string BuildAchievementJson(ArgsDict PCJAKPJMKGN)
+	private static string BuildAchievementJson(ArgsDict eventArgs)
 	{
 		JSONClass jSONClass = CreateHeadJson(EventType.Achievement);
-		string text = ((!PCJAKPJMKGN.ContainsKey("name")) ? string.Empty : PCJAKPJMKGN["name"].ToString());
+		string text = ((!eventArgs.ContainsKey("name")) ? string.Empty : eventArgs["name"].ToString());
 		jSONClass["name"] = text;
 		jSONClass["user_level"] = ListSF.GetRoster().GetLevel();
 		return jSONClass.ToString();
 	}
 
-	private static string BuildGemsChangedJson(ArgsDict PCJAKPJMKGN)
+	private static string BuildGemsChangedJson(ArgsDict eventArgs)
 	{
 		JSONClass jSONClass = CreateHeadJson(EventType.Gems_Changed);
 		jSONClass["user_level"] = ListSF.GetRoster().GetLevel();
-		StatisticsGeter.AddGemsChange(jSONClass, PCJAKPJMKGN);
+		StatisticsGeter.AddGemsChange(jSONClass, eventArgs);
 		StatisticsGeter.AddBalances(jSONClass);
 		return jSONClass.ToString();
 	}
 
-	private static string BuildLevelUpJson(ArgsDict PCJAKPJMKGN)
+	private static string BuildLevelUpJson(ArgsDict eventArgs)
 	{
 		JSONClass jSONClass = CreateHeadJson(EventType.Level_Up);
 		jSONClass["user_level"] = ListSF.GetRoster().GetLevel();
@@ -266,43 +266,43 @@ public static class StatisticsEvent
 		return jSONClass.ToString();
 	}
 
-	private static string BuildPurchaseJson(ArgsDict PCJAKPJMKGN)
+	private static string BuildPurchaseJson(ArgsDict eventArgs)
 	{
 		JSONClass jSONClass = CreateHeadJson(EventType.Purchase);
 		jSONClass["user_level"] = ListSF.GetRoster().GetLevel();
-		StatisticsGeter.AddPurchaseInfo(jSONClass, PCJAKPJMKGN);
+		StatisticsGeter.AddPurchaseInfo(jSONClass, eventArgs);
 		StatisticsGeter.AddBalances(jSONClass);
 		return jSONClass.ToString();
 	}
 
-	private static string BuildPaymentJson(ArgsDict PCJAKPJMKGN)
+	private static string BuildPaymentJson(ArgsDict eventArgs)
 	{
 		JSONClass jSONClass = CreateHeadJson(EventType.Payment);
-		string text = PCJAKPJMKGN["item"].ToString();
+		string text = eventArgs["item"].ToString();
 		jSONClass["item"] = text;
 		jSONClass["user_level"] = ListSF.GetRoster().GetLevel();
-		jSONClass["price"] = (float)PCJAKPJMKGN["price"];
-		jSONClass["price_currency"] = PCJAKPJMKGN["price_currency"].ToString();
-		jSONClass["money_changed"] = (long)PCJAKPJMKGN["money_changed"];
-		jSONClass["gems_paid_changed"] = (long)PCJAKPJMKGN["gems_paid_changed"];
+		jSONClass["price"] = (float)eventArgs["price"];
+		jSONClass["price_currency"] = eventArgs["price_currency"].ToString();
+		jSONClass["money_changed"] = (long)eventArgs["money_changed"];
+		jSONClass["gems_paid_changed"] = (long)eventArgs["gems_paid_changed"];
 		jSONClass["total_payment_count"] = ListSF.GetRoster().GetPaymentCount();
 		StatisticsGeter.AddPriceUsd(jSONClass, text);
 		StatisticsGeter.AddBalances(jSONClass);
 		return jSONClass.ToString();
 	}
 
-	private static string BuildPerkJson(ArgsDict PCJAKPJMKGN)
+	private static string BuildPerkJson(ArgsDict eventArgs)
 	{
 		JSONClass jSONClass = CreateHeadJson(EventType.Perk);
 		jSONClass["user_level"] = ListSF.GetRoster().GetLevel();
 		jSONClass["reset_count"] = ListSF.GetRoster().GetPerks().GetPerkResetCount();
 		jSONClass["level_sum"] = ListSF.GetRoster().GetPerks().GetTotalPerkLevels();
 		StatisticsGeter.AddPerks(jSONClass, "user_perks");
-		StatisticsGeter.AddPerkChoice(jSONClass, PCJAKPJMKGN);
+		StatisticsGeter.AddPerkChoice(jSONClass, eventArgs);
 		return jSONClass.ToString();
 	}
 
-	private static string BuildSessionEndJson(ArgsDict PCJAKPJMKGN)
+	private static string BuildSessionEndJson(ArgsDict eventArgs)
 	{
 		JSONClass jSONClass = CreateHeadJson(EventType.Session_End);
 		jSONClass["session_id"] = StatisticsCollector.GetSessionId();
@@ -313,85 +313,85 @@ public static class StatisticsEvent
 		return jSONClass.ToString();
 	}
 
-	private static string BuildPayRequestStartJson(ArgsDict PCJAKPJMKGN)
+	private static string BuildPayRequestStartJson(ArgsDict eventArgs)
 	{
-		JSONClass jSONClass = CreateHeadPayJSON(EventType.Pay_Request_Start, PCJAKPJMKGN["packageName"].ToString(), null);
+		JSONClass jSONClass = CreateHeadPayJSON(EventType.Pay_Request_Start, eventArgs["packageName"].ToString(), null);
 		return jSONClass.ToString();
 	}
 
-	private static string BuildPayStatusUpdateJson(ArgsDict PCJAKPJMKGN)
+	private static string BuildPayStatusUpdateJson(ArgsDict eventArgs)
 	{
-		string hOKDOMALLDB = PCJAKPJMKGN["packageName"].ToString();
-		string text = PCJAKPJMKGN["receipt"].ToString();
-		PayStatus fFFCCEEDMKI = (PayStatus)PCJAKPJMKGN["status"];
-		int num = (int)PCJAKPJMKGN["resultCode"];
-		JSONClass jSONClass = CreateHeadPayJSON(EventType.Pay_Status_Update, hOKDOMALLDB, text);
-		jSONClass["status"] = GetStatusName(fFFCCEEDMKI);
+		string packageName = eventArgs["packageName"].ToString();
+		string text = eventArgs["receipt"].ToString();
+		PayStatus payStatus = (PayStatus)eventArgs["status"];
+		int num = (int)eventArgs["resultCode"];
+		JSONClass jSONClass = CreateHeadPayJSON(EventType.Pay_Status_Update, packageName, text);
+		jSONClass["status"] = GetStatusName(payStatus);
 		jSONClass["result_code"] = num;
 		jSONClass["receipt"] = ((!string.IsNullOrEmpty(text)) ? text : string.Empty);
 		return jSONClass.ToString();
 	}
 
-	private static string BuildPayHandleStartJson(ArgsDict PCJAKPJMKGN)
+	private static string BuildPayHandleStartJson(ArgsDict eventArgs)
 	{
-		string hOKDOMALLDB = PCJAKPJMKGN["packageName"].ToString();
-		string jDHJMKDOAMO = PCJAKPJMKGN["receipt"].ToString();
-		JSONClass jSONClass = CreateHeadPayJSON(EventType.Pay_Handle_Start, hOKDOMALLDB, jDHJMKDOAMO);
+		string packageName = eventArgs["packageName"].ToString();
+		string receipt = eventArgs["receipt"].ToString();
+		JSONClass jSONClass = CreateHeadPayJSON(EventType.Pay_Handle_Start, packageName, receipt);
 		return jSONClass.ToString();
 	}
 
-	private static string BuildPayHandleFinishJson(ArgsDict PCJAKPJMKGN)
+	private static string BuildPayHandleFinishJson(ArgsDict eventArgs)
 	{
-		string hOKDOMALLDB = PCJAKPJMKGN["packageName"].ToString();
-		string jDHJMKDOAMO = PCJAKPJMKGN["receipt"].ToString();
-		long num = (long)PCJAKPJMKGN["money_changed"];
-		long num2 = (long)PCJAKPJMKGN["gems_changed"];
-		JSONClass jSONClass = CreateHeadPayJSON(EventType.Pay_Handle_Finish, hOKDOMALLDB, jDHJMKDOAMO);
+		string packageName = eventArgs["packageName"].ToString();
+		string receipt = eventArgs["receipt"].ToString();
+		long num = (long)eventArgs["money_changed"];
+		long num2 = (long)eventArgs["gems_changed"];
+		JSONClass jSONClass = CreateHeadPayJSON(EventType.Pay_Handle_Finish, packageName, receipt);
 		jSONClass["moneyChanged"] = num;
 		jSONClass["gemsChanged"] = num2;
 		return jSONClass.ToString();
 	}
 
-	private static string BuildPayTransactionFinishJson(ArgsDict PCJAKPJMKGN)
+	private static string BuildPayTransactionFinishJson(ArgsDict eventArgs)
 	{
-		string hOKDOMALLDB = PCJAKPJMKGN["packageName"].ToString();
-		string jDHJMKDOAMO = PCJAKPJMKGN["receipt"].ToString();
-		JSONClass jSONClass = CreateHeadPayJSON(EventType.Pay_Transaction_Finish, hOKDOMALLDB, jDHJMKDOAMO);
+		string packageName = eventArgs["packageName"].ToString();
+		string receipt = eventArgs["receipt"].ToString();
+		JSONClass jSONClass = CreateHeadPayJSON(EventType.Pay_Transaction_Finish, packageName, receipt);
 		return jSONClass.ToString();
 	}
 
-	private static string BuildPayHandleErrorJson(ArgsDict PCJAKPJMKGN)
+	private static string BuildPayHandleErrorJson(ArgsDict eventArgs)
 	{
-		string hOKDOMALLDB = PCJAKPJMKGN["packageName"].ToString();
-		string text = PCJAKPJMKGN["reason"].ToString();
-		JSONClass jSONClass = CreateHeadPayJSON(EventType.Pay_Handle_Error, hOKDOMALLDB, null);
+		string packageName = eventArgs["packageName"].ToString();
+		string text = eventArgs["reason"].ToString();
+		JSONClass jSONClass = CreateHeadPayJSON(EventType.Pay_Handle_Error, packageName, null);
 		jSONClass["reason"] = text;
 		return jSONClass.ToString();
 	}
 
-	private static string BuildPayHandleDebugJson(ArgsDict PCJAKPJMKGN)
+	private static string BuildPayHandleDebugJson(ArgsDict eventArgs)
 	{
-		string hOKDOMALLDB = PCJAKPJMKGN["packageName"].ToString();
-		string text = PCJAKPJMKGN["message"].ToString();
-		JSONClass jSONClass = CreateHeadPayJSON(EventType.Pay_Handle_Debug, hOKDOMALLDB, null);
+		string packageName = eventArgs["packageName"].ToString();
+		string text = eventArgs["message"].ToString();
+		JSONClass jSONClass = CreateHeadPayJSON(EventType.Pay_Handle_Debug, packageName, null);
 		jSONClass["message"] = text;
 		return jSONClass.ToString();
 	}
 
-	private static string BuildPayRequestFailJson(ArgsDict PCJAKPJMKGN)
+	private static string BuildPayRequestFailJson(ArgsDict eventArgs)
 	{
-		string hOKDOMALLDB = PCJAKPJMKGN["packageName"].ToString();
-		JSONClass jSONClass = CreateHeadPayJSON(EventType.Pay_Request_Fail, hOKDOMALLDB, null);
+		string packageName = eventArgs["packageName"].ToString();
+		JSONClass jSONClass = CreateHeadPayJSON(EventType.Pay_Request_Fail, packageName, null);
 		return jSONClass.ToString();
 	}
 
-	private static string BuildPayVerificationJson(ArgsDict PCJAKPJMKGN)
+	private static string BuildPayVerificationJson(ArgsDict eventArgs)
 	{
-		string hOKDOMALLDB = PCJAKPJMKGN["packageName"].ToString();
-		string jDHJMKDOAMO = PCJAKPJMKGN["receipt"].ToString();
-		VerificationStatus fFFCCEEDMKI = (VerificationStatus)PCJAKPJMKGN["status"];
-		string gIGAFKGDKNH = string.Format("pay_verify_{0}", GetStatusName(fFFCCEEDMKI));
-		JSONClass jSONClass = CreateHeadPayJSON(gIGAFKGDKNH, hOKDOMALLDB, jDHJMKDOAMO);
+		string packageName = eventArgs["packageName"].ToString();
+		string receipt = eventArgs["receipt"].ToString();
+		VerificationStatus verificationStatus = (VerificationStatus)eventArgs["status"];
+		string subtype = string.Format("pay_verify_{0}", GetStatusName(verificationStatus));
+		JSONClass jSONClass = CreateHeadPayJSON(subtype, packageName, receipt);
 		return jSONClass.ToString();
 	}
 

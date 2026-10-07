@@ -15,6 +15,6 @@ public class AchievCounter
 			Achievement item = new Achievement(childNode);
 			Achievements.Add(item);
 		}
-		Achievements.Sort((Achievement LHBNIMGFKIB, Achievement AAOIAEJJINO) => LHBNIMGFKIB.CounterValue.CompareTo(AAOIAEJJINO.CounterValue));
+		Achievements.Sort((Achievement left, Achievement right) => left.CounterValue.CompareTo(right.CounterValue));
 	}
 }

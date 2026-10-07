@@ -38,8 +38,8 @@ public class RingOutRule : InFightRule
 
 	private float sequenceSpeed;
 
-	public RingOutRule(XmlNode node, RuleAppliance EJPOJJKKICO)
-		: base(RuleType.RuleRingout, EJPOJJKKICO, node)
+	public RingOutRule(XmlNode node, RuleAppliance appliance)
+		: base(RuleType.RuleRingout, appliance, node)
 	{
 		_nodeName = string.Empty;
 		maxY = 100000f;
@@ -70,24 +70,24 @@ public class RingOutRule : InFightRule
 
 	public override void InitRule(object data)
 	{
-		RuleInitData oIFPCFEGFOB = (RuleInitData)data;
-		if (oIFPCFEGFOB.FightLocation != null)
+		RuleInitData initData = (RuleInitData)data;
+		if (initData.FightLocation != null)
 		{
-			originOffsetX = (0f - oIFPCFEGFOB.FightLocation.width) / 2f;
-			originOffsetY = 0f - oIFPCFEGFOB.FightLocation.floorHeight;
+			originOffsetX = (0f - initData.FightLocation.width) / 2f;
+			originOffsetY = 0f - initData.FightLocation.floorHeight;
 		}
 		switch (appliance)
 		{
 		case RuleAppliance.AppliancePlayer:
-			if (oIFPCFEGFOB.PlayerModel != null)
+			if (initData.PlayerModel != null)
 			{
-				_node = oIFPCFEGFOB.PlayerModel.GetBodyObject().GetNodeByName(_nodeName);
+				_node = initData.PlayerModel.GetBodyObject().GetNodeByName(_nodeName);
 			}
 			break;
 		case RuleAppliance.ApplianceOpponent:
-			if (oIFPCFEGFOB.OpponentModel != null)
+			if (initData.OpponentModel != null)
 			{
-				_node = oIFPCFEGFOB.OpponentModel.GetBodyObject().GetNodeByName(_nodeName);
+				_node = initData.OpponentModel.GetBodyObject().GetNodeByName(_nodeName);
 			}
 			break;
 		}
@@ -139,11 +139,11 @@ public class RingOutRule : InFightRule
 
 	public override InFightRule Copy()
 	{
-		InFightRule aAJIFBJLJOA = null;
-		RuleAppliance eJPOJJKKICO = GetAppliance();
-		XmlNode hKPPBKPJOEO = GetXmlSource().GetNode();
-		aAJIFBJLJOA = new RingOutRule(hKPPBKPJOEO, eJPOJJKKICO);
-		aAJIFBJLJOA.IsRandom = IsRandom;
-		return aAJIFBJLJOA;
+		InFightRule copy = null;
+		RuleAppliance appliance = GetAppliance();
+		XmlNode node = GetXmlSource().GetNode();
+		copy = new RingOutRule(node, appliance);
+		copy.IsRandom = IsRandom;
+		return copy;
 	}
 }

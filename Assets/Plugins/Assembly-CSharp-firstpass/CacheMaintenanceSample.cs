@@ -38,23 +38,23 @@ public sealed class CacheMaintenanceSample : MonoBehaviour
 			GUILayout.Space(10f);
 			if (GUILayout.Button("Maintenance"))
 			{
-				TimeSpan hJELDPKENPC = TimeSpan.FromDays(14.0);
+				TimeSpan maintenanceAge = TimeSpan.FromDays(14.0);
 				switch (timespan)
 				{
 				case TimeSpans.Days:
-					hJELDPKENPC = TimeSpan.FromDays(value);
+					maintenanceAge = TimeSpan.FromDays(value);
 					break;
 				case TimeSpans.Hours:
-					hJELDPKENPC = TimeSpan.FromHours(value);
+					maintenanceAge = TimeSpan.FromHours(value);
 					break;
 				case TimeSpans.Mins:
-					hJELDPKENPC = TimeSpan.FromMinutes(value);
+					maintenanceAge = TimeSpan.FromMinutes(value);
 					break;
 				case TimeSpans.Secs:
-					hJELDPKENPC = TimeSpan.FromSeconds(value);
+					maintenanceAge = TimeSpan.FromSeconds(value);
 					break;
 				}
-				HTTPCacheService.BeginMaintainence(new HTTPCacheMaintananceParams(hJELDPKENPC, (ulong)maxCacheSize));
+				HTTPCacheService.BeginMaintainence(new HTTPCacheMaintananceParams(maintenanceAge, (ulong)maxCacheSize));
 			}
 		});
 	}

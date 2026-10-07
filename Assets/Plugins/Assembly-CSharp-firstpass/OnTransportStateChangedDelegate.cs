@@ -1,1 +1,1 @@
-public delegate void OnTransportStateChangedDelegate(TransportBase CHMELBKHOPP, TransportStates JOBAGBFMMFP, TransportStates MPJEMGJIBBD);
+public delegate void OnTransportStateChangedDelegate(TransportBase transport, TransportStates oldState, TransportStates newState);

@@ -10,10 +10,10 @@ public class CreditsScreenElement : SFMonoBehaviour<object>
 	[SerializeField]
 	private LabelAlias lblNames;
 
-	public void Init(string KNNEDNHONBJ, string MBHLBMNMJII)
+	public void Init(string role, string names)
 	{
-		lblRole.set_text(KNNEDNHONBJ);
-		lblNames.set_text(MBHLBMNMJII);
+		lblRole.set_text(role);
+		lblNames.set_text(names);
 		lblRole.UpdateLabelFontSize();
 		lblNames.UpdateLabelFontSize();
 		int fontSize = lblRole.fontSize;

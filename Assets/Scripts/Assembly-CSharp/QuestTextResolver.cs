@@ -2,35 +2,35 @@ using System.Text;
 
 public static class QuestTextResolver
 {
-	public static string ResolveText(string PMDPPGNJAFE, QuestParameters GFIHPBCEEOB)
+	public static string ResolveText(string template, QuestParameters parameters)
 	{
-		int num = PMDPPGNJAFE.IndexOf('{');
+		int num = template.IndexOf('{');
 		if (num == -1)
 		{
-			return PMDPPGNJAFE;
+			return template;
 		}
 		StringBuilder stringBuilder = new StringBuilder();
-		stringBuilder.Append(PMDPPGNJAFE);
-		int num2 = PMDPPGNJAFE.LastIndexOf('}');
+		stringBuilder.Append(template);
+		int num2 = template.LastIndexOf('}');
 		if (num2 == -1)
 		{
 			return stringBuilder.ToString();
 		}
-		ConditionExtension.CompareResult lNIDLHOIHIM = new ConditionExtension.CompareResult();
-		QuestCondition kKDGLNECFHA = new QuestCondition();
-		kKDGLNECFHA.SetParameters(GFIHPBCEEOB);
+		ConditionExtension.CompareResult result = new ConditionExtension.CompareResult();
+		QuestCondition condition = new QuestCondition();
+		condition.SetParameters(parameters);
 		while (num <= num2)
 		{
 			string newValue = string.Empty;
-			if (PMDPPGNJAFE[num].Equals('{'))
+			if (template[num].Equals('{'))
 			{
-				int num3 = PMDPPGNJAFE.IndexOf('}', num);
-				string text = PMDPPGNJAFE.Substring(num + 1, num3 - num - 1);
+				int num3 = template.IndexOf('}', num);
+				string text = template.Substring(num + 1, num3 - num - 1);
 				if (!text.Equals(string.Empty))
 				{
-					lNIDLHOIHIM.Clear();
-					kKDGLNECFHA.SetValue(text, lNIDLHOIHIM);
-					newValue = lNIDLHOIHIM.ToString();
+					result.Clear();
+					condition.SetValue(text, result);
+					newValue = result.ToString();
 				}
 				int startIndex = stringBuilder.ToString().IndexOf(text);
 				stringBuilder.Replace(text, newValue, startIndex, text.Length);

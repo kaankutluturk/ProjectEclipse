@@ -1,1 +1,1 @@
-public delegate void OnEventDelegate(EventSource GLFHBCIPCBD, Message LIOGIBJBHAH);
+public delegate void OnEventDelegate(EventSource eventSource, Message message);

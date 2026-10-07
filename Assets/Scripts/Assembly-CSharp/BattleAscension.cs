@@ -2,8 +2,8 @@ using UnityEngine;
 
 public class BattleAscension : BattleReplayable
 {
-	public BattleAscension(string LFLGCDNKNJI, Vector2 MGMMDGFPBLP, string name, string ADONPNOBBDE, string LHCFHAIDNDP, string EMDJGBHIAIA, ushort CDCJKJNGPOE, ushort MCDAHGPLLDO, string LOKLDPLAPOL, string PEMOECLNECD, string LPJNEDFCBOI, string PINIIFIOECE, string OAPKHNPPGHP, string IHBMPGKIBAN)
-		: base(LFLGCDNKNJI, MGMMDGFPBLP, name, ADONPNOBBDE, LHCFHAIDNDP, EMDJGBHIAIA, CDCJKJNGPOE, MCDAHGPLLDO, LOKLDPLAPOL, PEMOECLNECD, LPJNEDFCBOI, PINIIFIOECE, OAPKHNPPGHP, IHBMPGKIBAN)
+	public BattleAscension(string typeName, Vector2 MGMMDGFPBLP, string name, string iconName, string previewIcon, string description, ushort rewardDigits, ushort prizeBaseDigits, string alias, string title, string location, string music, string rewardImage, string showResistance)
+		: base(typeName, MGMMDGFPBLP, name, iconName, previewIcon, description, rewardDigits, prizeBaseDigits, alias, title, location, music, rewardImage, showResistance)
 	{
 	}
 
@@ -29,14 +29,14 @@ public class BattleAscension : BattleReplayable
 		}
 	}
 
-	public new virtual void RefreshFightStatus(FightList KGKDKENMAOA)
+	public new virtual void RefreshFightStatus(FightList fight)
 	{
 		int num = 0;
 		bool flag = false;
 		int num2 = ((_rosterBattle == null) ? 1 : _rosterBattle.GetAscensionLevel());
 		foreach (FightList item in _fights)
 		{
-			if (item == KGKDKENMAOA)
+			if (item == fight)
 			{
 				flag = true;
 				break;
@@ -47,11 +47,11 @@ public class BattleAscension : BattleReplayable
 		{
 			if (num + 1 < num2)
 			{
-				KGKDKENMAOA.Status = ConditionStatus.StatusComplete;
+				fight.Status = ConditionStatus.StatusComplete;
 			}
 			else
 			{
-				KGKDKENMAOA.Status = ConditionStatus.StatusOpen;
+				fight.Status = ConditionStatus.StatusOpen;
 			}
 		}
 	}
@@ -76,22 +76,22 @@ public class BattleAscension : BattleReplayable
 		ListSF.GetInstance().RequestSave();
 	}
 
-	public void AdvanceAscensionAfterFight(FightList KGKDKENMAOA)
+	public void AdvanceAscensionAfterFight(FightList fight)
 	{
-		int num = GetFightIndex(KGKDKENMAOA);
+		int num = GetFightIndex(fight);
 		if (num >= 0)
 		{
 			SetAscensionLevel(num + 2);
 		}
 	}
 
-	public int GetFightIndex(FightList KGKDKENMAOA)
+	public int GetFightIndex(FightList fight)
 	{
 		int num = 0;
 		bool flag = false;
 		foreach (FightList item in _fights)
 		{
-			if (item == KGKDKENMAOA)
+			if (item == fight)
 			{
 				flag = true;
 				break;

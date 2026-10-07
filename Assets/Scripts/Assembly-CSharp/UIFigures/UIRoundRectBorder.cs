@@ -33,48 +33,48 @@ namespace UIFigures
 
 		protected List<UIVertex> _Vertexes = new List<UIVertex>();
 
-		protected override void OnPopulateMesh(VertexHelper DHJBOKKAOJK)
+		protected override void OnPopulateMesh(VertexHelper vertexHelper)
 		{
-			base.OnPopulateMesh(DHJBOKKAOJK);
-			Vector2 eFOBPHOJNJF = (_LowerLeft + _UpperRight) * 0.5f;
-			Vector2 dGHIGGGFNLP = new Vector2(base.rectTransform.rect.width, base.rectTransform.rect.height) * 0.5f;
-			Draw(DHJBOKKAOJK, eFOBPHOJNJF, dGHIGGGFNLP);
+			base.OnPopulateMesh(vertexHelper);
+			Vector2 center = (_LowerLeft + _UpperRight) * 0.5f;
+			Vector2 halfSize = new Vector2(base.rectTransform.rect.width, base.rectTransform.rect.height) * 0.5f;
+			Draw(vertexHelper, center, halfSize);
 		}
 
-		public void Draw(VertexHelper DHJBOKKAOJK, Vector2 EFOBPHOJNJF, Vector2 DGHIGGGFNLP)
+		public void Draw(VertexHelper vertexHelper, Vector2 center, Vector2 halfSize)
 		{
-			DHJBOKKAOJK.Clear();
+			vertexHelper.Clear();
 			_Vertexes.Clear();
-			AddArc(new Vector2(DGHIGGGFNLP.x - _RadiusUpRight, DGHIGGGFNLP.y - _RadiusUpRight), _RadiusUpRight, 0f);
-			AddArc(new Vector2(0f - DGHIGGGFNLP.x + _RadiusUpLeft, DGHIGGGFNLP.y - _RadiusUpLeft), _RadiusUpLeft, (float)Math.PI / 2f);
-			AddArc(new Vector2(0f - DGHIGGGFNLP.x + _RadiusBottomLeft, 0f - DGHIGGGFNLP.y + _RadiusBottomLeft), _RadiusBottomLeft, (float)Math.PI);
-			AddArc(new Vector2(DGHIGGGFNLP.x - _RadiusBottomRight, 0f - DGHIGGGFNLP.y + _RadiusBottomRight), _RadiusBottomRight, 4.712389f);
-			AddVertex(new Vector2(DGHIGGGFNLP.x, DGHIGGGFNLP.y - _RadiusUpRight));
-			AddVertex(new Vector2(DGHIGGGFNLP.x - _Width, DGHIGGGFNLP.y - _RadiusUpRight));
-			DHJBOKKAOJK.AddUIVertexStream(_Vertexes, FigureTopology.CreateStripIndices((_Sectors + 1) * 8));
+			AddArc(new Vector2(halfSize.x - _RadiusUpRight, halfSize.y - _RadiusUpRight), _RadiusUpRight, 0f);
+			AddArc(new Vector2(0f - halfSize.x + _RadiusUpLeft, halfSize.y - _RadiusUpLeft), _RadiusUpLeft, (float)Math.PI / 2f);
+			AddArc(new Vector2(0f - halfSize.x + _RadiusBottomLeft, 0f - halfSize.y + _RadiusBottomLeft), _RadiusBottomLeft, (float)Math.PI);
+			AddArc(new Vector2(halfSize.x - _RadiusBottomRight, 0f - halfSize.y + _RadiusBottomRight), _RadiusBottomRight, 4.712389f);
+			AddVertex(new Vector2(halfSize.x, halfSize.y - _RadiusUpRight));
+			AddVertex(new Vector2(halfSize.x - _Width, halfSize.y - _RadiusUpRight));
+			vertexHelper.AddUIVertexStream(_Vertexes, FigureTopology.CreateStripIndices((_Sectors + 1) * 8));
 		}
 
-		protected void AddArc(Vector3 EFOBPHOJNJF, float LPEMPCEJFIN, float AMNCLCPADOO, bool MEFMAPOEPNE = true)
+		protected void AddArc(Vector3 center, float radius, float startAngle, bool addInnerVertex = true)
 		{
 			float num = (float)Math.PI / 2f / (float)_Sectors;
 			for (int i = 0; i < _Sectors + 1; i++)
 			{
-				float jIGOJGPKGPO = AMNCLCPADOO + (float)i * num;
-				AddSegment(EFOBPHOJNJF, LPEMPCEJFIN, jIGOJGPKGPO, MEFMAPOEPNE);
+				float angle = startAngle + (float)i * num;
+				AddSegment(center, radius, angle, addInnerVertex);
 			}
 		}
 
-		protected void AddSegment(Vector2 EFOBPHOJNJF, float LPEMPCEJFIN, float JIGOJGPKGPO, bool MEFMAPOEPNE = true)
+		protected void AddSegment(Vector2 center, float radius, float angle, bool addInnerVertex = true)
 		{
-			float num = Mathf.Cos(JIGOJGPKGPO);
-			float num2 = Mathf.Sin(JIGOJGPKGPO);
-			float x = num * LPEMPCEJFIN + EFOBPHOJNJF.x;
-			float y = num2 * LPEMPCEJFIN + EFOBPHOJNJF.y;
+			float num = Mathf.Cos(angle);
+			float num2 = Mathf.Sin(angle);
+			float x = num * radius + center.x;
+			float y = num2 * radius + center.y;
 			AddVertex(new Vector2(x, y));
-			if (MEFMAPOEPNE)
+			if (addInnerVertex)
 			{
-				x = num * (LPEMPCEJFIN - _Width) + EFOBPHOJNJF.x;
-				y = num2 * (LPEMPCEJFIN - _Width) + EFOBPHOJNJF.y;
+				x = num * (radius - _Width) + center.x;
+				y = num2 * (radius - _Width) + center.y;
 				AddVertex(new Vector2(x, y));
 			}
 		}

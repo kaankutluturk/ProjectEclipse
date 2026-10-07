@@ -39,7 +39,7 @@ namespace Nekki.SF2.Core
 			}
 		}
 
-		public static ApplicationController BPCBBHAKFDM
+		public static ApplicationController Current
 		{
 			get
 			{
@@ -154,12 +154,12 @@ namespace Nekki.SF2.Core
 			UnityEngine.Debug.LogFormat("Application.installerName={0}", Application.installerName);
 		}
 
-		private void OnApplicationPause(bool NBNEAOHDBBI)
+		private void OnApplicationPause(bool isPaused)
 		{
-			UnityEngine.Debug.Log((!NBNEAOHDBBI) ? "ApplicationController.Resume" : "ApplicationController.Pause");
-			_IsPaused = NBNEAOHDBBI;
+			UnityEngine.Debug.Log((!isPaused) ? "ApplicationController.Resume" : "ApplicationController.Pause");
+			_IsPaused = isPaused;
 			OnPause(_IsPaused);
-			if (!NBNEAOHDBBI)
+			if (!isPaused)
 			{
 				RandomizeObscuredVars();
 			}

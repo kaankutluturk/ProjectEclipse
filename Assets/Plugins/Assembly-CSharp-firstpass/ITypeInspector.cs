@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 public interface ITypeInspector
 {
-	IEnumerable<IPropertyDescriptor> GetProperties(Type LFLGCDNKNJI, object EGJHGBCEPHO);
+	IEnumerable<IPropertyDescriptor> GetProperties(Type type, object target);
 
-	IPropertyDescriptor GetProperty(Type LFLGCDNKNJI, object EGJHGBCEPHO, string name, bool GNFDAJLHBCN);
+	IPropertyDescriptor GetProperty(Type type, object container, string name, bool ignoreUnmatched);
 }

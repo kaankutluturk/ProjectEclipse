@@ -6,13 +6,13 @@ public interface IHub
 
 	void GNLCPJFBAJE(Connection value);
 
-	void Call(ClientMessage CKEHOEGLMBM);
+	void Call(ClientMessage message);
 
-	bool HasSentMessageId(ulong OKNNNLIPODI);
+	bool HasSentMessageId(ulong messageId);
 
 	void Close();
 
-	void OnMethod(MethodCallMessage CKEHOEGLMBM);
+	void OnMethod(MethodCallMessage message);
 
-	void OnMessage(IServerMessage CKEHOEGLMBM);
+	void OnMessage(IServerMessage message);
 }

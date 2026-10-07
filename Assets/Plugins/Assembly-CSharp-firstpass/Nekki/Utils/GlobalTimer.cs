@@ -137,13 +137,13 @@ namespace Nekki.Utils
 			return _isLastRequestSuccessful;
 		}
 
-		public static long ConvertToUnixTimestamp(DateTime CIODNJIEKKK)
+		public static long ConvertToUnixTimestamp(DateTime date)
 		{
 			DateTime dateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0);
-			return (long)Math.Floor((CIODNJIEKKK.ToUniversalTime() - dateTime).TotalSeconds);
+			return (long)Math.Floor((date.ToUniversalTime() - dateTime).TotalSeconds);
 		}
 
-		public static void Init(bool GCPIOLHKMAI = false)
+		public static void Init(bool skipServerSync = false)
 		{
 			if (!_instance)
 			{
@@ -153,28 +153,28 @@ namespace Nekki.Utils
 			_serverTimeOffset = default(TimeSpan);
 			_isSynchronized = false;
 			_isLastRequestSuccessful = false;
-			_skipServerSync = GCPIOLHKMAI;
+			_skipServerSync = skipServerSync;
 			if (!_skipServerSync)
 			{
 				ServerTimeSync();
 			}
 		}
 
-		public static void ServerTimeSync(Action AFMCMJDBDIN = null, Action onError = null)
+		public static void ServerTimeSync(Action onSuccess = null, Action onError = null)
 		{
 			// Local clock only; keep timer callbacks and elapsed-time gameplay working.
 			_isRequestInProgress = true;
-			_onSyncSuccess = AFMCMJDBDIN;
+			_onSyncSuccess = onSuccess;
 			_onSyncError = onError;
 			OnServerTimeReceived(ConvertToUnixTimestamp(DateTime.UtcNow));
 		}
 
-		public static void ServerTimeExtended(long CFGPDFHPGJP)
+		public static void ServerTimeExtended(long milliseconds)
 		{
-			DateTime jMIPAPNMNIP = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
-			TimeSpan timeSpan = TimeSpan.FromMilliseconds(CFGPDFHPGJP);
-			jMIPAPNMNIP += timeSpan;
-			_serverTime = jMIPAPNMNIP;
+			DateTime serverTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+			TimeSpan timeSpan = TimeSpan.FromMilliseconds(milliseconds);
+			serverTime += timeSpan;
+			_serverTime = serverTime;
 			_syncUnscaledTime = Time.unscaledTime;
 			_serverTimeOffset = _serverTime - DateTime.Now;
 			_isSynchronized = true;
@@ -204,7 +204,7 @@ namespace Nekki.Utils
 			}
 		}
 
-		private static void OnServerTimeError(object LIOGIBJBHAH)
+		private static void OnServerTimeError(object error)
 		{
 			_serverTime = DateTime.Now;
 			_syncUnscaledTime = Time.unscaledTime;
@@ -218,17 +218,17 @@ namespace Nekki.Utils
 				_onSyncSuccess = null;
 				_onSyncError = null;
 			}
-			AdvLog.LogError(LIOGIBJBHAH);
+			AdvLog.LogError(error);
 		}
 
-		public static DateTime UnixTimeStampToDateTime(double NNBJNDAFEDH)
+		public static DateTime UnixTimeStampToDateTime(double unixTimeStamp)
 		{
-			return new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc).AddSeconds(NNBJNDAFEDH);
+			return new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc).AddSeconds(unixTimeStamp);
 		}
 
-		public static DateTime UnixTimeStampToDateTimeLocal(double NNBJNDAFEDH)
+		public static DateTime UnixTimeStampToDateTimeLocal(double unixTimeStamp)
 		{
-			return UnixTimeStampToDateTime(NNBJNDAFEDH).ToLocalTime();
+			return UnixTimeStampToDateTime(unixTimeStamp).ToLocalTime();
 		}
 
 		private void Update()
@@ -242,9 +242,9 @@ namespace Nekki.Utils
 			}
 		}
 
-		private void OnApplicationPause(bool OHCAIDHJHKC)
+		private void OnApplicationPause(bool paused)
 		{
-			if (!OHCAIDHJHKC && !_skipServerSync)
+			if (!paused && !_skipServerSync)
 			{
 				ServerTimeSync();
 			}

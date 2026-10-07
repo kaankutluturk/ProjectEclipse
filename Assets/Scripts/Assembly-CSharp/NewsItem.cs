@@ -34,22 +34,22 @@ public class NewsItem
 	{
 	}
 
-	public NewsItem(NewsItem AOMLCBHAJJH)
+	public NewsItem(NewsItem source)
 	{
-		Name = AOMLCBHAJJH.Name;
-		Url = AOMLCBHAJJH.Url;
-		ImageUrl = AOMLCBHAJJH.ImageUrl;
-		LocalImagePath = AOMLCBHAJJH.LocalImagePath;
-		Title = AOMLCBHAJJH.Title;
-		RedirectShop = AOMLCBHAJJH.RedirectShop;
-		SpenderTypeId = AOMLCBHAJJH.SpenderTypeId;
-		IsActive = AOMLCBHAJJH.IsActive;
-		WasShown = AOMLCBHAJJH.WasShown;
-		IsImageReady = AOMLCBHAJJH.IsImageReady;
-		GoShop = AOMLCBHAJJH.GoShop;
-		Id = AOMLCBHAJJH.Id;
-		EndDate = AOMLCBHAJJH.EndDate;
-		foreach (NewsButton item in AOMLCBHAJJH.Buttons)
+		Name = source.Name;
+		Url = source.Url;
+		ImageUrl = source.ImageUrl;
+		LocalImagePath = source.LocalImagePath;
+		Title = source.Title;
+		RedirectShop = source.RedirectShop;
+		SpenderTypeId = source.SpenderTypeId;
+		IsActive = source.IsActive;
+		WasShown = source.WasShown;
+		IsImageReady = source.IsImageReady;
+		GoShop = source.GoShop;
+		Id = source.Id;
+		EndDate = source.EndDate;
+		foreach (NewsButton item in source.Buttons)
 		{
 			Buttons.Add(new NewsButton(item));
 		}

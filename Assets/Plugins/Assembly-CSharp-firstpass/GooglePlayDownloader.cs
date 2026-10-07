@@ -58,14 +58,14 @@ public class GooglePlayDownloader
 		}
 	}
 
-	public static string GetMainOBBPath(string CIEFMEOOPDE)
+	public static string GetMainOBBPath(string expansionFilePath)
 	{
 		PopulateOBBData();
-		if (CIEFMEOOPDE == null)
+		if (expansionFilePath == null)
 		{
 			return null;
 		}
-		string text = string.Format("{0}/main.{1}.{2}.obb", CIEFMEOOPDE, obb_version, obb_package);
+		string text = string.Format("{0}/main.{1}.{2}.obb", expansionFilePath, obb_version, obb_package);
 		if (!File.Exists(text))
 		{
 			return null;
@@ -73,14 +73,14 @@ public class GooglePlayDownloader
 		return text;
 	}
 
-	public static string GetPatchOBBPath(string CIEFMEOOPDE)
+	public static string GetPatchOBBPath(string expansionFilePath)
 	{
 		PopulateOBBData();
-		if (CIEFMEOOPDE == null)
+		if (expansionFilePath == null)
 		{
 			return null;
 		}
-		string text = string.Format("{0}/patch.{1}.{2}.obb", CIEFMEOOPDE, obb_version, obb_package);
+		string text = string.Format("{0}/patch.{1}.{2}.obb", expansionFilePath, obb_version, obb_package);
 		if (!File.Exists(text))
 		{
 			return null;

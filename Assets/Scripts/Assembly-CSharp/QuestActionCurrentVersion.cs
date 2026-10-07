@@ -10,30 +10,30 @@ public class QuestActionCurrentVersion : QuestAction
 
 	private string dataVersionExpression = string.Empty;
 
-	public override void Parse(XmlNode EPKLCPOEELO)
+	public override void Parse(XmlNode node)
 	{
-		base.Parse(EPKLCPOEELO);
-		productionExpression = EPKLCPOEELO.Attributes["Production"].GetStringOrDefault(string.Empty);
-		majorExpression = EPKLCPOEELO.Attributes["Major"].GetStringOrDefault(string.Empty);
-		minorExpression = EPKLCPOEELO.Attributes["Minor"].GetStringOrDefault(string.Empty);
-		dataVersionExpression = EPKLCPOEELO.Attributes["DataVersion"].GetStringOrDefault(string.Empty);
+		base.Parse(node);
+		productionExpression = node.Attributes["Production"].GetStringOrDefault(string.Empty);
+		majorExpression = node.Attributes["Major"].GetStringOrDefault(string.Empty);
+		minorExpression = node.Attributes["Minor"].GetStringOrDefault(string.Empty);
+		dataVersionExpression = node.Attributes["DataVersion"].GetStringOrDefault(string.Empty);
 	}
 
-	public override void Execute(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters parameters)
 	{
-		base.Execute(GFIHPBCEEOB);
-		ConditionExtension.CompareResult lNIDLHOIHIM = new ConditionExtension.CompareResult();
+		base.Execute(parameters);
+		ConditionExtension.CompareResult result = new ConditionExtension.CompareResult();
 		ConditionExtension.CompareResult lNIDLHOIHIM2 = new ConditionExtension.CompareResult();
 		ConditionExtension.CompareResult lNIDLHOIHIM3 = new ConditionExtension.CompareResult();
 		ConditionExtension.CompareResult lNIDLHOIHIM4 = new ConditionExtension.CompareResult();
-		QuestCondition kKDGLNECFHA = new QuestCondition();
-		kKDGLNECFHA.SetParameters(GFIHPBCEEOB);
-		kKDGLNECFHA.SetValue(productionExpression, lNIDLHOIHIM);
-		kKDGLNECFHA.SetValue(majorExpression, lNIDLHOIHIM2);
-		kKDGLNECFHA.SetValue(minorExpression, lNIDLHOIHIM3);
-		kKDGLNECFHA.SetValue(dataVersionExpression, lNIDLHOIHIM4);
+		QuestCondition condition = new QuestCondition();
+		condition.SetParameters(parameters);
+		condition.SetValue(productionExpression, result);
+		condition.SetValue(majorExpression, lNIDLHOIHIM2);
+		condition.SetValue(minorExpression, lNIDLHOIHIM3);
+		condition.SetValue(dataVersionExpression, lNIDLHOIHIM4);
 		string empty = string.Empty;
-		empty += lNIDLHOIHIM.ToString();
+		empty += result.ToString();
 		empty += ".";
 		empty += lNIDLHOIHIM2.ToString();
 		empty += ".";

@@ -41,9 +41,9 @@ public class BinTree : InWindow, IInWindowStream, IMatchFinder
 
 	private uint kFixHashSize = 66560u;
 
-	public void SetType(int EOKCENIBPJD)
+	public void SetType(int type)
 	{
-		HASH_ARRAY = EOKCENIBPJD > 2;
+		HASH_ARRAY = type > 2;
 		if (HASH_ARRAY)
 		{
 			kNumHashDirectBytes = 0u;
@@ -58,9 +58,9 @@ public class BinTree : InWindow, IInWindowStream, IMatchFinder
 		}
 	}
 
-	public new void SetStream(Stream ABJIEFMMIEK)
+	public new void SetStream(Stream stream)
 	{
-		base.SetStream(ABJIEFMMIEK);
+		base.SetStream(stream);
 	}
 
 	public new void ReleaseStream()
@@ -97,9 +97,9 @@ public class BinTree : InWindow, IInWindowStream, IMatchFinder
 		return base.GetIndexByte(index);
 	}
 
-	public new uint GetMatchLen(int index, uint OIOMNNFMDOO, uint LOHCIKNKDEI)
+	public new uint GetMatchLen(int index, uint distance, uint limit)
 	{
-		return base.GetMatchLen(index, OIOMNNFMDOO, LOHCIKNKDEI);
+		return base.GetMatchLen(index, distance, limit);
 	}
 
 	public new uint GetNumAvailableBytes()
@@ -107,17 +107,17 @@ public class BinTree : InWindow, IInWindowStream, IMatchFinder
 		return base.GetNumAvailableBytes();
 	}
 
-	public void Create(uint PGNMIJNBAAJ, uint JHKHNGLLCLK, uint CCKFKNACIIN, uint CDINDGLFPKA)
+	public void Create(uint historySize, uint keepAddBufferBefore, uint matchMaxLen, uint keepAddBufferAfter)
 	{
-		if (PGNMIJNBAAJ > 2147483391)
+		if (historySize > 2147483391)
 		{
 			throw new Exception();
 		}
-		_cutValue = 16 + (CCKFKNACIIN >> 1);
-		uint iKHIOAIPBNL = (PGNMIJNBAAJ + JHKHNGLLCLK + CCKFKNACIIN + CDINDGLFPKA) / 2 + 256;
-		Create(PGNMIJNBAAJ + JHKHNGLLCLK, CCKFKNACIIN + CDINDGLFPKA, iKHIOAIPBNL);
-		_matchMaxLen = CCKFKNACIIN;
-		uint num = PGNMIJNBAAJ + 1;
+		_cutValue = 16 + (matchMaxLen >> 1);
+		uint blockSize = (historySize + keepAddBufferBefore + matchMaxLen + keepAddBufferAfter) / 2 + 256;
+		Create(historySize + keepAddBufferBefore, matchMaxLen + keepAddBufferAfter, blockSize);
+		_matchMaxLen = matchMaxLen;
+		uint num = historySize + 1;
 		if (_cyclicBufferSize != num)
 		{
 			_son = new uint[(_cyclicBufferSize = num) * 2];
@@ -125,7 +125,7 @@ public class BinTree : InWindow, IInWindowStream, IMatchFinder
 		uint num2 = 65536u;
 		if (HASH_ARRAY)
 		{
-			num2 = PGNMIJNBAAJ - 1;
+			num2 = historySize - 1;
 			num2 |= num2 >> 1;
 			num2 |= num2 >> 2;
 			num2 |= num2 >> 4;
@@ -146,7 +146,7 @@ public class BinTree : InWindow, IInWindowStream, IMatchFinder
 		}
 	}
 
-	public uint GetMatches(uint[] PIPLHPNGIPF)
+	public uint GetMatches(uint[] distances)
 	{
 		uint num;
 		if (_pos + _matchMaxLen <= _streamPos)
@@ -190,8 +190,8 @@ public class BinTree : InWindow, IInWindowStream, IMatchFinder
 			_hash[1024 + num7] = _pos;
 			if (num11 > num3 && _bufferBase[_bufferOffset + num11] == _bufferBase[num4])
 			{
-				num5 = (PIPLHPNGIPF[num2++] = 2u);
-				PIPLHPNGIPF[num2++] = _pos - num11 - 1;
+				num5 = (distances[num2++] = 2u);
+				distances[num2++] = _pos - num11 - 1;
 			}
 			if (num12 > num3 && _bufferBase[_bufferOffset + num12] == _bufferBase[num4])
 			{
@@ -199,8 +199,8 @@ public class BinTree : InWindow, IInWindowStream, IMatchFinder
 				{
 					num2 -= 2;
 				}
-				num5 = (PIPLHPNGIPF[num2++] = 3u);
-				PIPLHPNGIPF[num2++] = _pos - num12 - 1;
+				num5 = (distances[num2++] = 3u);
+				distances[num2++] = _pos - num12 - 1;
 				num11 = num12;
 			}
 			if (num2 != 0 && num11 == num10)
@@ -216,13 +216,13 @@ public class BinTree : InWindow, IInWindowStream, IMatchFinder
 		uint val = (val2 = kNumHashDirectBytes);
 		if (kNumHashDirectBytes != 0 && num10 > num3 && _bufferBase[_bufferOffset + num10 + kNumHashDirectBytes] != _bufferBase[num4 + kNumHashDirectBytes])
 		{
-			num5 = (PIPLHPNGIPF[num2++] = kNumHashDirectBytes);
-			PIPLHPNGIPF[num2++] = _pos - num10 - 1;
+			num5 = (distances[num2++] = kNumHashDirectBytes);
+			distances[num2++] = _pos - num10 - 1;
 		}
-		uint pNKNDHJACDC = _cutValue;
+		uint cutValue = _cutValue;
 		while (true)
 		{
-			if (num10 <= num3 || pNKNDHJACDC-- == 0)
+			if (num10 <= num3 || cutValue-- == 0)
 			{
 				_son[num13] = (_son[num14] = 0u);
 				break;
@@ -238,8 +238,8 @@ public class BinTree : InWindow, IInWindowStream, IMatchFinder
 				}
 				if (num5 < num18)
 				{
-					num5 = (PIPLHPNGIPF[num2++] = num18);
-					PIPLHPNGIPF[num2++] = num15 - 1;
+					num5 = (distances[num2++] = num18);
+					distances[num2++] = num15 - 1;
 					if (num18 == num)
 					{
 						_son[num14] = _son[num16];
@@ -267,7 +267,7 @@ public class BinTree : InWindow, IInWindowStream, IMatchFinder
 		return num2;
 	}
 
-	public void Skip(uint OMEDGJMNGKE)
+	public void Skip(uint count)
 	{
 		do
 		{
@@ -308,10 +308,10 @@ public class BinTree : InWindow, IInWindowStream, IMatchFinder
 			uint num10 = _cyclicBufferPos << 1;
 			uint val2;
 			uint val = (val2 = kNumHashDirectBytes);
-			uint pNKNDHJACDC = _cutValue;
+			uint cutValue = _cutValue;
 			while (true)
 			{
-				if (num8 <= num2 || pNKNDHJACDC-- == 0)
+				if (num8 <= num2 || cutValue-- == 0)
 				{
 					_son[num9] = (_son[num10] = 0u);
 					break;
@@ -349,29 +349,29 @@ public class BinTree : InWindow, IInWindowStream, IMatchFinder
 			}
 			MovePos();
 		}
-		while (--OMEDGJMNGKE != 0);
+		while (--count != 0);
 	}
 
-	private void NormalizeLinks(uint[] HELFDCAIJNE, uint DDLKICOHOGG, uint BALBEBAOPMP)
+	private void NormalizeLinks(uint[] items, uint count, uint subValue)
 	{
-		for (uint num = 0u; num < DDLKICOHOGG; num++)
+		for (uint num = 0u; num < count; num++)
 		{
-			uint num2 = HELFDCAIJNE[num];
-			num2 = ((num2 > BALBEBAOPMP) ? (num2 - BALBEBAOPMP) : 0u);
-			HELFDCAIJNE[num] = num2;
+			uint num2 = items[num];
+			num2 = ((num2 > subValue) ? (num2 - subValue) : 0u);
+			items[num] = num2;
 		}
 	}
 
 	private void Normalize()
 	{
-		uint bALBEBAOPMP = _pos - _cyclicBufferSize;
-		NormalizeLinks(_son, _cyclicBufferSize * 2, bALBEBAOPMP);
-		NormalizeLinks(_hash, _hashSizeSum, bALBEBAOPMP);
-		ReduceOffsets((int)bALBEBAOPMP);
+		uint subValue = _pos - _cyclicBufferSize;
+		NormalizeLinks(_son, _cyclicBufferSize * 2, subValue);
+		NormalizeLinks(_hash, _hashSizeSum, subValue);
+		ReduceOffsets((int)subValue);
 	}
 
-	public void SetCutValue(uint PADNFMPEFDM)
+	public void SetCutValue(uint cutValue)
 	{
-		_cutValue = PADNFMPEFDM;
+		_cutValue = cutValue;
 	}
 }

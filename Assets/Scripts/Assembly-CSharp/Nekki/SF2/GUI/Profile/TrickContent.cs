@@ -54,12 +54,12 @@ namespace Nekki.SF2.GUI.Profile
 			_btnShow.onClick.AddListener(OnShowClicked);
 		}
 
-		public void Init(InfoAnimation EMBBNNBFODN, List<float> CKKFKEIELCP, Action<object> ODDEOFKLIAG = null, string EMDJGBHIAIA = "")
+		public void Init(InfoAnimation animation, List<float> values, Action<object> callback = null, string description = "")
 		{
-			infoAnimation = EMBBNNBFODN;
-			_value = CKKFKEIELCP;
-			showCallback = ODDEOFKLIAG;
-			_description = EMDJGBHIAIA;
+			infoAnimation = animation;
+			_value = values;
+			showCallback = callback;
+			_description = description;
 			InitDescriptionLabel();
 			InitShowButton();
 			UpdateDamageLabel();
@@ -71,13 +71,13 @@ namespace Nekki.SF2.GUI.Profile
 			LayoutDescription();
 		}
 
-		public override void SetUpBorder(float BGEEALIPKCC)
+		public override void SetUpBorder(float upBorder)
 		{
 			if (_btnShow != null && _valueLabel != null)
 			{
 				float num = _btnShow.transform.localPosition.y + _btnShow.GetComponent<RectTransform>().rect.height / 2f;
-				float bAINMLLIKOL = BGEEALIPKCC - (BGEEALIPKCC - num) / 2f;
-				_valueLabel.transform.SetLocalY(bAINMLLIKOL);
+				float valueY = upBorder - (upBorder - num) / 2f;
+				_valueLabel.transform.SetLocalY(valueY);
 			}
 		}
 

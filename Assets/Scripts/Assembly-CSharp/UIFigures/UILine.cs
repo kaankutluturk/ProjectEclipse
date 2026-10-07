@@ -50,10 +50,10 @@ namespace UIFigures
 			_Width = value;
 		}
 
-		protected override void OnPopulateMesh(VertexHelper DHJBOKKAOJK)
+		protected override void OnPopulateMesh(VertexHelper vertexHelper)
 		{
-			base.OnPopulateMesh(DHJBOKKAOJK);
-			DrawFunctions.DrawLine(DHJBOKKAOJK, _Points, _Width, color, _SingleTexturCord);
+			base.OnPopulateMesh(vertexHelper);
+			DrawFunctions.DrawLine(vertexHelper, _Points, _Width, color, _SingleTexturCord);
 		}
 	}
 }

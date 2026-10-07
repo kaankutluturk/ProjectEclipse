@@ -12,7 +12,7 @@ public class Interpolator
 	{
 		for (int i = 0; i < intervals.Count; i++)
 		{
-			float bAINMLLIKOL = intervals[i].value;
+			float startValue = intervals[i].value;
 			float num = ((i != intervals.Count - 1) ? intervals[i + 1].value : intervals[0].value);
 			if (intervals[i].Duration == 0f)
 			{
@@ -21,44 +21,44 @@ public class Interpolator
 			}
 			if (intervals[i].Acceleration == 0f)
 			{
-				intervals[i].SlopeOrShift = (num - bAINMLLIKOL) / intervals[i].Duration;
-				intervals[i].BaseValue = bAINMLLIKOL;
+				intervals[i].SlopeOrShift = (num - startValue) / intervals[i].Duration;
+				intervals[i].BaseValue = startValue;
 			}
 			else
 			{
-				intervals[i].SlopeOrShift = (num - bAINMLLIKOL - intervals[i].Acceleration * intervals[i].Duration * intervals[i].Duration) / (2f * intervals[i].Acceleration * intervals[i].Duration);
-				intervals[i].BaseValue = bAINMLLIKOL - intervals[i].Acceleration * intervals[i].SlopeOrShift * intervals[i].SlopeOrShift;
+				intervals[i].SlopeOrShift = (num - startValue - intervals[i].Acceleration * intervals[i].Duration * intervals[i].Duration) / (2f * intervals[i].Acceleration * intervals[i].Duration);
+				intervals[i].BaseValue = startValue - intervals[i].Acceleration * intervals[i].SlopeOrShift * intervals[i].SlopeOrShift;
 			}
 		}
 	}
 
-	public bool AddInterval(float GKIHFPFHKCI, float value, float JENJFNNFGLD)
+	public bool AddInterval(float duration, float value, float acceleration)
 	{
-		if (GKIHFPFHKCI < 0f)
+		if (duration < 0f)
 		{
 			return false;
 		}
-		IntervalSet aAPMFNMJAFG = new IntervalSet();
-		aAPMFNMJAFG.Duration = GKIHFPFHKCI;
-		aAPMFNMJAFG.value = value;
-		aAPMFNMJAFG.Acceleration = JENJFNNFGLD;
-		intervals.Add(aAPMFNMJAFG);
+		IntervalSet interval = new IntervalSet();
+		interval.Duration = duration;
+		interval.value = value;
+		interval.Acceleration = acceleration;
+		intervals.Add(interval);
 		RecalculateCoefficients();
 		return true;
 	}
 
-	public bool AdvanceTime(float HDJFIPHOLMP)
+	public bool AdvanceTime(float deltaTime)
 	{
-		if (HDJFIPHOLMP < 0f)
+		if (deltaTime < 0f)
 		{
 			return false;
 		}
 		if (!HasIntervals())
 		{
-			innerTime += HDJFIPHOLMP;
+			innerTime += deltaTime;
 			return true;
 		}
-		innerTime += HDJFIPHOLMP;
+		innerTime += deltaTime;
 		while (innerTime > intervals[nowInterval].Duration)
 		{
 			if (innerTime > intervals[nowInterval].Duration)

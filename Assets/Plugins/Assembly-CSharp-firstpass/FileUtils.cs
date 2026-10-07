@@ -6,70 +6,70 @@ using UnityEngine;
 
 public class FileUtils
 {
-	public static void WriteAllBytes(string path, byte[] KPAMPCLHCEN)
+	public static void WriteAllBytes(string path, byte[] bytes)
 	{
 		CreateDirectory(Path.GetDirectoryName(path));
-		File.WriteAllBytes(path, KPAMPCLHCEN);
+		File.WriteAllBytes(path, bytes);
 	}
 
-	public static void WriteText(string path, string DMNBDBJNKME = "")
+	public static void WriteText(string path, string text = "")
 	{
-		WriteOrAppendText(path, DMNBDBJNKME, true);
+		WriteOrAppendText(path, text, true);
 	}
 
-	public static void WriteOrAppendText(string path, string DMNBDBJNKME = "", bool OGOAJGKFMPF = false)
+	public static void WriteOrAppendText(string path, string text = "", bool overwrite = false)
 	{
 		CreateDirectory(Path.GetDirectoryName(path));
-		if (!OGOAJGKFMPF && FileExists(path))
+		if (!overwrite && FileExists(path))
 		{
-			File.AppendAllText(path, DMNBDBJNKME);
+			File.AppendAllText(path, text);
 		}
 		else
 		{
-			File.WriteAllText(path, DMNBDBJNKME);
+			File.WriteAllText(path, text);
 		}
 	}
 
-	public static void UseStreamWriter(string path, Action<TextWriter> IBODMPMJELJ, bool FBLOBGLPAFJ = false)
+	public static void UseStreamWriter(string path, Action<TextWriter> action, bool append = false)
 	{
-		using (TextWriter bAINMLLIKOL = CreateStreamWriter(path, FBLOBGLPAFJ))
+		using (TextWriter writer = CreateStreamWriter(path, append))
 		{
-			IBODMPMJELJ.SafeInvoke(bAINMLLIKOL);
+			action.SafeInvoke(writer);
 		}
 	}
 
-	public static TextWriter CreateStreamWriter(string path, bool FBLOBGLPAFJ = false)
+	public static TextWriter CreateStreamWriter(string path, bool append = false)
 	{
 		CreateDirectory(Path.GetDirectoryName(path));
-		return new StreamWriter(path, FBLOBGLPAFJ, Encoding.UTF8);
+		return new StreamWriter(path, append, Encoding.UTF8);
 	}
 
 	public static FileStream OpenAppendStream(string path)
 	{
-		FileMode nMMPBADCFHK = ((!FileExists(path)) ? FileMode.OpenOrCreate : FileMode.Append);
-		return OpenFileStream(path, nMMPBADCFHK);
+		FileMode mode = ((!FileExists(path)) ? FileMode.OpenOrCreate : FileMode.Append);
+		return OpenFileStream(path, mode);
 	}
 
-	public static void UseFileStream(string path, Action<FileStream> IBODMPMJELJ, FileMode NMMPBADCFHK = FileMode.OpenOrCreate, FileAccess HIOFGOHJANN = FileAccess.Write)
+	public static void UseFileStream(string path, Action<FileStream> action, FileMode mode = FileMode.OpenOrCreate, FileAccess access = FileAccess.Write)
 	{
-		using (FileStream bAINMLLIKOL = OpenFileStream(path, NMMPBADCFHK, HIOFGOHJANN))
+		using (FileStream stream = OpenFileStream(path, mode, access))
 		{
-			IBODMPMJELJ.SafeInvoke(bAINMLLIKOL);
+			action.SafeInvoke(stream);
 		}
 	}
 
-	public static FileStream OpenFileStream(string path, FileMode NMMPBADCFHK = FileMode.OpenOrCreate, FileAccess HIOFGOHJANN = FileAccess.Write)
+	public static FileStream OpenFileStream(string path, FileMode mode = FileMode.OpenOrCreate, FileAccess access = FileAccess.Write)
 	{
 		CreateDirectory(Path.GetDirectoryName(path));
-		return new FileStream(path, NMMPBADCFHK, HIOFGOHJANN);
+		return new FileStream(path, mode, access);
 	}
 
-	public static void SaveJson(string path, object AOMLCBHAJJH, Formatting LFHMGPBFEPI = Formatting.None)
+	public static void SaveJson(string path, object obj, Formatting formatting = Formatting.None)
 	{
 		try
 		{
-			string dMNBDBJNKME = JsonConvert.SerializeObject(AOMLCBHAJJH, LFHMGPBFEPI);
-			WriteText(path, dMNBDBJNKME);
+			string json = JsonConvert.SerializeObject(obj, formatting);
+			WriteText(path, json);
 		}
 		catch (Exception ex)
 		{
@@ -167,23 +167,23 @@ public class FileUtils
 		return false;
 	}
 
-	public static bool MoveFile(string OOFLNBMPPID, string FMEOELPPAFJ)
+	public static bool MoveFile(string sourcePath, string destinationPath)
 	{
-		if (FileExists(OOFLNBMPPID) && !IsFileLocked(OOFLNBMPPID))
+		if (FileExists(sourcePath) && !IsFileLocked(sourcePath))
 		{
-			DeleteFile(FMEOELPPAFJ);
-			File.Move(OOFLNBMPPID, FMEOELPPAFJ);
+			DeleteFile(destinationPath);
+			File.Move(sourcePath, destinationPath);
 			return true;
 		}
 		return false;
 	}
 
-	public static bool CopyFile(string OOFLNBMPPID, string FMEOELPPAFJ)
+	public static bool CopyFile(string sourcePath, string destinationPath)
 	{
-		if (FileExists(OOFLNBMPPID))
+		if (FileExists(sourcePath))
 		{
-			CreateDirectory(Path.GetDirectoryName(FMEOELPPAFJ));
-			File.Copy(OOFLNBMPPID, FMEOELPPAFJ);
+			CreateDirectory(Path.GetDirectoryName(destinationPath));
+			File.Copy(sourcePath, destinationPath);
 			return true;
 		}
 		return false;

@@ -2,7 +2,7 @@ internal interface ILookAheadBuffer
 {
 	bool EndOfInput { get; }
 
-	char Peek(int IPCOBJBKNAO);
+	char Peek(int offset);
 
-	void Skip(int BDBOAEGELMC);
+	void Skip(int length);
 }

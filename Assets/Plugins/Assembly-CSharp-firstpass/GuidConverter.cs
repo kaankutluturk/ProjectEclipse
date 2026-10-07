@@ -2,20 +2,20 @@ using System;
 
 public class GuidConverter : IYamlTypeConverter
 {
-	public bool Accepts(Type LFLGCDNKNJI)
+	public bool Accepts(Type type)
 	{
-		return LFLGCDNKNJI == typeof(Guid);
+		return type == typeof(Guid);
 	}
 
-	public object ReadYaml(IParser BPGMNGAJMKK, Type LFLGCDNKNJI)
+	public object ReadYaml(IParser parser, Type type)
 	{
-		string g = ((Scalar)BPGMNGAJMKK.GetCurrent()).GetValue();
-		BPGMNGAJMKK.MoveNext();
+		string g = ((Scalar)parser.GetCurrent()).GetValue();
+		parser.MoveNext();
 		return new Guid(g);
 	}
 
-	public void WriteYaml(IEmitter NPIDIMCLNEM, object value, Type LFLGCDNKNJI)
+	public void WriteYaml(IEmitter emitter, object value, Type type)
 	{
-		NPIDIMCLNEM.Emit(new Scalar(((Guid)value).ToString("D")));
+		emitter.Emit(new Scalar(((Guid)value).ToString("D")));
 	}
 }

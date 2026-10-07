@@ -1,1 +1,1 @@
-public delegate void OnErrorDelegate(EventSource GLFHBCIPCBD, string JDONBAPIJCG);
+public delegate void OnErrorDelegate(EventSource eventSource, string error);

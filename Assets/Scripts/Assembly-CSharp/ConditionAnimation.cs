@@ -52,9 +52,9 @@ public class ConditionAnimation
 		}
 	}
 
-	public ConditionAnimation(ConditionType LFLGCDNKNJI)
+	public ConditionAnimation(ConditionType conditionType)
 	{
-		Type = LFLGCDNKNJI;
+		Type = conditionType;
 		IsNot = false;
 	}
 
@@ -78,47 +78,47 @@ public class ConditionAnimation
 		return false;
 	}
 
-	public virtual bool IsEqual(Model ACENLMONNPA, InfoAnimation DBOLBEOCEME)
+	public virtual bool IsEqual(Model model, InfoAnimation animationInfo)
 	{
-		return IsEqual(ACENLMONNPA.GetConditions());
+		return IsEqual(model.GetConditions());
 	}
 
-	public virtual void Parse(XmlNode BGPKIKNPIKP)
+	public virtual void Parse(XmlNode node)
 	{
-		IsNot = XmlUtils.ParseBool(BGPKIKNPIKP.Attributes["Not"]);
-		_targetModelType = ModelType.ParseTargetType(XmlUtils.ParseString(BGPKIKNPIKP.Attributes["Player"], "Me"));
+		IsNot = XmlUtils.ParseBool(node.Attributes["Not"]);
+		_targetModelType = ModelType.ParseTargetType(XmlUtils.ParseString(node.Attributes["Player"], "Me"));
 		Init();
 	}
 
-	private static int CollectConditionsOfType(List<ConditionAnimation> BBNKIBKPBLO, ConditionType KLFPAELMPJL, List<ConditionAnimation> GKHEPKGMEFI)
+	private static int CollectConditionsOfType(List<ConditionAnimation> conditions, ConditionType conditionType, List<ConditionAnimation> result)
 	{
-		int count = GKHEPKGMEFI.Count;
-		foreach (ConditionAnimation item in BBNKIBKPBLO)
+		int count = result.Count;
+		foreach (ConditionAnimation item in conditions)
 		{
-			if (KLFPAELMPJL == item.Type)
+			if (conditionType == item.Type)
 			{
-				GKHEPKGMEFI.Add(item);
+				result.Add(item);
 			}
 			if (item.Type == ConditionType.LIST)
 			{
-				ConditionList eLFKOGJJNMN = item as ConditionList;
-				if (eLFKOGJJNMN != null)
+				ConditionList conditionList = item as ConditionList;
+				if (conditionList != null)
 				{
-					List<ConditionAnimation> bBNKIBKPBLO = eLFKOGJJNMN.GetConditions();
-					CollectConditionsOfType(bBNKIBKPBLO, KLFPAELMPJL, GKHEPKGMEFI);
+					List<ConditionAnimation> childConditions = conditionList.GetConditions();
+					CollectConditionsOfType(childConditions, conditionType, result);
 				}
 			}
 		}
-		return GKHEPKGMEFI.Count - count;
+		return result.Count - count;
 	}
 
-	public virtual Model ResolveTargetModel(Model BPBMKGHEEBI, ModelType.ModelTargetType LFLGCDNKNJI)
+	public virtual Model ResolveTargetModel(Model model, ModelType.ModelTargetType targetType)
 	{
-		return BPBMKGHEEBI.GetModelByType(LFLGCDNKNJI);
+		return model.GetModelByType(targetType);
 	}
 
-	public virtual void ApplyTargetModelType(ModelType.ModelTargetType LFLGCDNKNJI)
+	public virtual void ApplyTargetModelType(ModelType.ModelTargetType targetType)
 	{
-		_targetModelType = LFLGCDNKNJI;
+		_targetModelType = targetType;
 	}
 }

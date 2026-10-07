@@ -13,28 +13,28 @@ public class ManagedGZipStream : Stream
 		}
 	}
 
-	public ManagedGZipStream(Stream ABJIEFMMIEK, DeflateCompressionMode NMMPBADCFHK)
-		: this(ABJIEFMMIEK, NMMPBADCFHK, false)
+	public ManagedGZipStream(Stream stream, DeflateCompressionMode compressionMode)
+		: this(stream, compressionMode, false)
 	{
 	}
 
-	public ManagedGZipStream(Stream ABJIEFMMIEK, DeflateCompressionMode NMMPBADCFHK, bool LOLBAGJKKPH)
+	public ManagedGZipStream(Stream stream, DeflateCompressionMode compressionMode, bool leaveOpen)
 	{
-		deflateStream = new ManagedDeflateStream(ABJIEFMMIEK, NMMPBADCFHK, LOLBAGJKKPH);
-		SetDeflateStreamFileFormatter(NMMPBADCFHK);
+		deflateStream = new ManagedDeflateStream(stream, compressionMode, leaveOpen);
+		SetDeflateStreamFileFormatter(compressionMode);
 	}
 
-	private void SetDeflateStreamFileFormatter(DeflateCompressionMode NMMPBADCFHK)
+	private void SetDeflateStreamFileFormatter(DeflateCompressionMode compressionMode)
 	{
-		if (NMMPBADCFHK == DeflateCompressionMode.Compress)
+		if (compressionMode == DeflateCompressionMode.Compress)
 		{
-			IFileFormatWriter aPMCMDOBFOI = new GZipFormatter();
-			deflateStream.SetFileFormatWriter(aPMCMDOBFOI);
+			IFileFormatWriter fileFormatWriter = new GZipFormatter();
+			deflateStream.SetFileFormatWriter(fileFormatWriter);
 		}
 		else
 		{
-			IFileFormatReader iJIMLLIHKGN = new GZipDecoder();
-			deflateStream.SetFileFormatReader(iJIMLLIHKGN);
+			IFileFormatReader fileFormatReader = new GZipDecoder();
+			deflateStream.SetFileFormatReader(fileFormatReader);
 		}
 	}
 
@@ -95,7 +95,7 @@ public class ManagedGZipStream : Stream
 		BaseStream.Flush();
 	}
 
-	public override long Seek(long IPCOBJBKNAO, SeekOrigin IKOOJMAOFOD)
+	public override long Seek(long offset, SeekOrigin origin)
 	{
 		throw new NotSupportedException(SR.GetString("Not supported"));
 	}
@@ -105,65 +105,65 @@ public class ManagedGZipStream : Stream
 		throw new NotSupportedException(SR.GetString("Not supported"));
 	}
 
-	public override IAsyncResult BeginRead(byte[] HFPDMGAEJJE, int IPCOBJBKNAO, int count, AsyncCallback FCLGHDMMEBC, object LEGPNOBHGIE)
+	public override IAsyncResult BeginRead(byte[] array, int offset, int count, AsyncCallback asyncCallback, object asyncState)
 	{
 		if (deflateStream == null)
 		{
 			throw new InvalidOperationException(SR.GetString("Object disposed"));
 		}
-		return deflateStream.BeginRead(HFPDMGAEJJE, IPCOBJBKNAO, count, FCLGHDMMEBC, LEGPNOBHGIE);
+		return deflateStream.BeginRead(array, offset, count, asyncCallback, asyncState);
 	}
 
-	public override int EndRead(IAsyncResult BHNNOKGCDEG)
+	public override int EndRead(IAsyncResult asyncResult)
 	{
 		if (deflateStream == null)
 		{
 			throw new InvalidOperationException(SR.GetString("Object disposed"));
 		}
-		return deflateStream.EndRead(BHNNOKGCDEG);
+		return deflateStream.EndRead(asyncResult);
 	}
 
-	public override IAsyncResult BeginWrite(byte[] HFPDMGAEJJE, int IPCOBJBKNAO, int count, AsyncCallback FCLGHDMMEBC, object LEGPNOBHGIE)
+	public override IAsyncResult BeginWrite(byte[] array, int offset, int count, AsyncCallback asyncCallback, object asyncState)
 	{
 		if (deflateStream == null)
 		{
 			throw new InvalidOperationException(SR.GetString("Object disposed"));
 		}
-		return deflateStream.BeginWrite(HFPDMGAEJJE, IPCOBJBKNAO, count, FCLGHDMMEBC, LEGPNOBHGIE);
+		return deflateStream.BeginWrite(array, offset, count, asyncCallback, asyncState);
 	}
 
-	public override void EndWrite(IAsyncResult BHNNOKGCDEG)
+	public override void EndWrite(IAsyncResult asyncResult)
 	{
 		if (deflateStream == null)
 		{
 			throw new InvalidOperationException(SR.GetString("Object disposed"));
 		}
-		deflateStream.EndWrite(BHNNOKGCDEG);
+		deflateStream.EndWrite(asyncResult);
 	}
 
-	public override int Read(byte[] HFPDMGAEJJE, int IPCOBJBKNAO, int count)
+	public override int Read(byte[] array, int offset, int count)
 	{
 		if (deflateStream == null)
 		{
 			throw new ObjectDisposedException(null, SR.GetString("Object disposed"));
 		}
-		return deflateStream.Read(HFPDMGAEJJE, IPCOBJBKNAO, count);
+		return deflateStream.Read(array, offset, count);
 	}
 
-	public override void Write(byte[] HFPDMGAEJJE, int IPCOBJBKNAO, int count)
+	public override void Write(byte[] array, int offset, int count)
 	{
 		if (deflateStream == null)
 		{
 			throw new ObjectDisposedException(null, SR.GetString("Object disposed"));
 		}
-		deflateStream.Write(HFPDMGAEJJE, IPCOBJBKNAO, count);
+		deflateStream.Write(array, offset, count);
 	}
 
-	protected override void Dispose(bool KLCPNDHEBGP)
+	protected override void Dispose(bool disposing)
 	{
 		try
 		{
-			if (KLCPNDHEBGP && deflateStream != null)
+			if (disposing && deflateStream != null)
 			{
 				deflateStream.Dispose();
 			}
@@ -171,7 +171,7 @@ public class ManagedGZipStream : Stream
 		}
 		finally
 		{
-			base.Dispose(KLCPNDHEBGP);
+			base.Dispose(disposing);
 		}
 	}
 

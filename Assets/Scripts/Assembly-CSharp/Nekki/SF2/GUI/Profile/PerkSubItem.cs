@@ -51,12 +51,12 @@ namespace Nekki.SF2.GUI.Profile
 			perk = value;
 		}
 
-		public void Init(ProfilePerk AEFFHJGMNFI, int OKNNNLIPODI)
+		public void Init(ProfilePerk profilePerk, int buttonId)
 		{
-			Init(OKNNNLIPODI);
+			Init(buttonId);
 			_upgradeLevelIcon.gameObject.SetActive(false);
 			Clear();
-			SetPerk(AEFFHJGMNFI);
+			SetPerk(profilePerk);
 			if (get_Perk() != null)
 			{
 				get_Perk().AddEventListener(0, OnPerkStateChanged);
@@ -80,7 +80,7 @@ namespace Nekki.SF2.GUI.Profile
 			UpdateIcon();
 			UpdateState();
 			UpdateLevelIcon();
-			if (ListSF.GetRoster().GetLevel() < AEFFHJGMNFI.GetLevel())
+			if (ListSF.GetRoster().GetLevel() < profilePerk.GetLevel())
 			{
 				SetLock(true);
 			}
@@ -103,9 +103,9 @@ namespace Nekki.SF2.GUI.Profile
 			}
 		}
 
-		public override void SetLock(bool AJPDLMOHKEN)
+		public override void SetLock(bool locked)
 		{
-			isForcedLocked = AJPDLMOHKEN;
+			isForcedLocked = locked;
 			base.SetLock(isForcedLocked || (get_Perk() != null && get_Perk().GetState() == ProfilePerk.ProfilePerkState.PERK_LOCK));
 		}
 
@@ -167,11 +167,11 @@ namespace Nekki.SF2.GUI.Profile
 			return infoAnimation != null;
 		}
 
-		public override void OnPointerDown(PointerEventData BHOLFGOGPCP)
+		public override void OnPointerDown(PointerEventData eventData)
 		{
 			if (!GetLock())
 			{
-				base.OnPointerDown(BHOLFGOGPCP);
+				base.OnPointerDown(eventData);
 			}
 		}
 
@@ -223,8 +223,8 @@ namespace Nekki.SF2.GUI.Profile
 			if (get_Perk() != null)
 			{
 				bool flag = get_Perk().GetUpgradeLevel() <= 0;
-				ProfilePerk.ProfilePerkType jHDKDOPHGOO = get_Perk().get_Type();
-				bool flag2 = get_Perk().GetUpgradeLevel() == 1 && jHDKDOPHGOO != ProfilePerk.ProfilePerkType.TYPE_UPGRADE && jHDKDOPHGOO != ProfilePerk.ProfilePerkType.TYPE_PERK_SELETED;
+				ProfilePerk.ProfilePerkType perkType = get_Perk().get_Type();
+				bool flag2 = get_Perk().GetUpgradeLevel() == 1 && perkType != ProfilePerk.ProfilePerkType.TYPE_UPGRADE && perkType != ProfilePerk.ProfilePerkType.TYPE_PERK_SELETED;
 				if (!flag && !flag2)
 				{
 					_upgradeLevelIcon.gameObject.SetActive(true);

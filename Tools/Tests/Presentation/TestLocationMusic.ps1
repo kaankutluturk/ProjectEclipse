@@ -2,7 +2,7 @@ $ErrorActionPreference='Stop'
 $root=Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $PSScriptRoot))
 $source=Get-Content -Raw -LiteralPath (Join-Path $root 'Assets/Scripts/Assembly-CSharp/Location.cs')
 $start=$source.IndexOf("`t`tmusics.Clear();")
-$end=$source.IndexOf("`t`tXmlAttribute cJBEMNNNHDM",$start)
+$end=$source.IndexOf("`t`tXmlAttribute frictionAttribute",$start)
 if($start -lt 0 -or $end -le $start){throw 'Location music selection block not found.'}
 $block=$source.Substring($start,$end-$start)
 $fixture=@'

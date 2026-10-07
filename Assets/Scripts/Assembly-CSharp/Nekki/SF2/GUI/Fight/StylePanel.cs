@@ -66,17 +66,17 @@ namespace Nekki.SF2.GUI.Fight
 
 		public string get_CurrentStyleName()
 		{
-			Style mHOJFHKHIIL = GameUtils.StyleLevelTable.GetStyle(currentStyleStrip);
-			return (mHOJFHKHIIL == null) ? string.Empty : mHOJFHKHIIL.Name;
+			Style style = GameUtils.StyleLevelTable.GetStyle(currentStyleStrip);
+			return (style == null) ? string.Empty : style.Name;
 		}
 
-		public void Init(ResolutionImage ECJDAIHCDBA)
+		public void Init(ResolutionImage styleNameImage)
 		{
-			_styleName = ECJDAIHCDBA;
+			_styleName = styleNameImage;
 			_styleBar.Init();
-			GameUtils.StyleLevelTable.Styles.ForEach((Style DHDMNHCIPEH) =>
+			GameUtils.StyleLevelTable.Styles.ForEach((Style style) =>
 			{
-				_styleBar.AddStrip(DHDMNHCIPEH.BarImage, string.Empty, 25f, DHDMNHCIPEH.Name);
+				_styleBar.AddStrip(style.BarImage, string.Empty, 25f, style.Name);
 			});
 			_styleBar.SetValue(0f, 0);
 		}
@@ -85,11 +85,11 @@ namespace Nekki.SF2.GUI.Fight
 		{
 			if (!(_styleName == null))
 			{
-				Style mHOJFHKHIIL = GameUtils.StyleLevelTable.GetStyle(currentStyleStrip);
-				if (mHOJFHKHIIL != null && !mHOJFHKHIIL.TextImage.Equals(string.Empty))
+				Style style = GameUtils.StyleLevelTable.GetStyle(currentStyleStrip);
+				if (style != null && !style.TextImage.Equals(string.Empty))
 				{
 					_styleName.gameObject.SetActive(true);
-					_styleName.set_SpriteName(mHOJFHKHIIL.TextImage);
+					_styleName.set_SpriteName(style.TextImage);
 					_styleName.SetNativeSize();
 				}
 			}
@@ -102,33 +102,33 @@ namespace Nekki.SF2.GUI.Fight
 			UpdateStyleLabel();
 		}
 
-		public float GetStyleIncrease(InfoAnimation IFPDGKDKJOD)
+		public float GetStyleIncrease(InfoAnimation animation)
 		{
-			if (IFPDGKDKJOD == null)
+			if (animation == null)
 			{
 				return 0f;
 			}
 			int num = 0;
-			if (animationUseCounts.ContainsKey(IFPDGKDKJOD))
+			if (animationUseCounts.ContainsKey(animation))
 			{
-				num = ++animationUseCounts[IFPDGKDKJOD];
+				num = ++animationUseCounts[animation];
 			}
 			if (num == 0)
 			{
-				animationUseCounts[IFPDGKDKJOD] = num;
+				animationUseCounts[animation] = num;
 			}
-			float eNKMAPMCMCM = GameUtils.StyleLevelTable.StylePerHit;
+			float stylePerHit = GameUtils.StyleLevelTable.StylePerHit;
 			float num2 = GameUtils.StyleLevelTable.GetStyleMultiplier(currentStyleStrip);
-			float pKOFNMPOMKM = GameUtils.StyleLevelTable.Penalty;
-			return eNKMAPMCMCM * num2 * Mathf.Pow(pKOFNMPOMKM, -num) * IFPDGKDKJOD.StyleFactor;
+			float penalty = GameUtils.StyleLevelTable.Penalty;
+			return stylePerHit * num2 * Mathf.Pow(penalty, -num) * animation.StyleFactor;
 		}
 
-		public void UpdateStyle(InfoAnimation IFPDGKDKJOD)
+		public void UpdateStyle(InfoAnimation animation)
 		{
-			float styleIncrease = GetStyleIncrease(IFPDGKDKJOD);
+			float styleIncrease = GetStyleIncrease(animation);
 			float value = _styleBar.GetValue(currentStyleStrip);
-			float bAINMLLIKOL = value + styleIncrease;
-			IncreaseStyleStripByValue(bAINMLLIKOL);
+			float increaseAmount = value + styleIncrease;
+			IncreaseStyleStripByValue(increaseAmount);
 		}
 
 		public void IncreaseStyleStripByValue(float value)
@@ -161,9 +161,9 @@ namespace Nekki.SF2.GUI.Fight
 			_styleBar.SetValue(value, 0);
 		}
 
-		public float GetStyleValue(int KNECPEAFMIM)
+		public float GetStyleValue(int stripIndex)
 		{
-			return _styleBar.GetValue(KNECPEAFMIM);
+			return _styleBar.GetValue(stripIndex);
 		}
 
 		public float GetStyleValue()

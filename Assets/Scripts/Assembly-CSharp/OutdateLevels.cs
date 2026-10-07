@@ -10,17 +10,17 @@ public class OutdateLevels
 		Types.Clear();
 		foreach (XmlNode childNode in node.ChildNodes)
 		{
-			OutdateLevelItem nCIJAJGCAPA = new OutdateLevelItem();
-			nCIJAJGCAPA.Parse(childNode);
-			Types.Add(nCIJAJGCAPA);
+			OutdateLevelItem outdateItem = new OutdateLevelItem();
+			outdateItem.Parse(childNode);
+			Types.Add(outdateItem);
 		}
 	}
 
-	public float GetValue(string LFLGCDNKNJI)
+	public float GetValue(string typeName)
 	{
 		foreach (OutdateLevelItem item in Types)
 		{
-			if (item.IsType(LFLGCDNKNJI))
+			if (item.IsType(typeName))
 			{
 				return item.Value;
 			}

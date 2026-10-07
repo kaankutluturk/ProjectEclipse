@@ -63,24 +63,24 @@ public class QualityOption
 		}
 	}
 
-	public static string GetNextQualityCondition(string HEPNIDFNHBA, string FPIDIHLACAM)
+	public static string GetNextQualityCondition(string quality, string condition)
 	{
 		string text = "LOW";
-		switch (ParseQualityLevel(FPIDIHLACAM))
+		switch (ParseQualityLevel(condition))
 		{
 		case QualityLevel.QUALITY_HIGH:
 		case QualityLevel.QUALITY_NONE:
-			return CycleQualityUp(HEPNIDFNHBA);
+			return CycleQualityUp(quality);
 		case QualityLevel.QUALITY_MEDIUM:
-			return ToggleLowMedium(HEPNIDFNHBA);
+			return ToggleLowMedium(quality);
 		default:
 			return "LOW";
 		}
 	}
 
-	public static bool CompareQualityCondition(string MKICABFAHFA, string JMLKHIPBCLI)
+	public static bool CompareQualityCondition(string qualityA, string qualityB)
 	{
-		return ParseQualityLevel(MKICABFAHFA) > ParseQualityLevel(JMLKHIPBCLI);
+		return ParseQualityLevel(qualityA) > ParseQualityLevel(qualityB);
 	}
 
 	public void ApplyIfConditionMatches()
@@ -96,9 +96,9 @@ public class QualityOption
 		}
 	}
 
-	private static string CycleQualityUp(string HEPNIDFNHBA)
+	private static string CycleQualityUp(string quality)
 	{
-		switch (HEPNIDFNHBA)
+		switch (quality)
 		{
 		case "LOW":
 			return "MEDIUM";
@@ -111,13 +111,13 @@ public class QualityOption
 		}
 	}
 
-	private static string ToggleLowMedium(string HEPNIDFNHBA)
+	private static string ToggleLowMedium(string quality)
 	{
-		if (HEPNIDFNHBA == "LOW")
+		if (quality == "LOW")
 		{
 			return "MEDIUM";
 		}
-		if (HEPNIDFNHBA == "MEDIUM")
+		if (quality == "MEDIUM")
 		{
 			return "LOW";
 		}

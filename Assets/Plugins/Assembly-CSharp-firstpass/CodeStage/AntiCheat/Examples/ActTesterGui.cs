@@ -184,18 +184,18 @@ namespace CodeStage.AntiCheat.Examples
 			ObscuredInt.SetNewCryptoKey(434523);
 			int num = 5;
 			logBuilder.AppendLine("Original lives count: " + num);
-			ObscuredInt bAINMLLIKOL = (ObscuredInt)(num);
-			logBuilder.AppendLine("How your lives count is stored in memory when obscured: " + bAINMLLIKOL.GetEncrypted());
+			ObscuredInt lives = (ObscuredInt)(num);
+			logBuilder.AppendLine("How your lives count is stored in memory when obscured: " + lives.GetEncrypted());
 			ObscuredInt.SetNewCryptoKey(666);
-			num = (int)(bAINMLLIKOL);
-			bAINMLLIKOL = (ObscuredInt)((int)(bAINMLLIKOL) - 2);
-			bAINMLLIKOL = (ObscuredInt)((int)(bAINMLLIKOL) + num + 10);
-			bAINMLLIKOL = (ObscuredInt)((int)(bAINMLLIKOL) / 2);
-			bAINMLLIKOL = ObscuredInt.op_Increment(bAINMLLIKOL);
+			num = (int)(lives);
+			lives = (ObscuredInt)((int)(lives) - 2);
+			lives = (ObscuredInt)((int)(lives) + num + 10);
+			lives = (ObscuredInt)((int)(lives) / 2);
+			lives = ObscuredInt.op_Increment(lives);
 			ObscuredInt.SetNewCryptoKey(999);
-			bAINMLLIKOL = ObscuredInt.op_Increment(bAINMLLIKOL);
-			bAINMLLIKOL = ObscuredInt.op_Decrement(bAINMLLIKOL);
-			logBuilder.AppendLine(string.Concat("Lives count after few usual operations: ", bAINMLLIKOL, " (", bAINMLLIKOL.ToString("X"), "h)"));
+			lives = ObscuredInt.op_Increment(lives);
+			lives = ObscuredInt.op_Decrement(lives);
+			logBuilder.AppendLine(string.Concat("Lives count after few usual operations: ", lives, " (", lives.ToString("X"), "h)"));
 			Debug.Log(logBuilder);
 		}
 
@@ -206,16 +206,16 @@ namespace CodeStage.AntiCheat.Examples
 			ObscuredFloat.SetNewCryptoKey(404);
 			float num = 99.9f;
 			logBuilder.AppendLine("Original health bar: " + num);
-			ObscuredFloat bAINMLLIKOL = (ObscuredFloat)(num);
-			logBuilder.AppendLine("How your health bar is stored in memory when obscured: " + bAINMLLIKOL.GetEncrypted());
+			ObscuredFloat healthBar = (ObscuredFloat)(num);
+			logBuilder.AppendLine("How your health bar is stored in memory when obscured: " + healthBar.GetEncrypted());
 			ObscuredFloat.SetNewCryptoKey(666);
-			bAINMLLIKOL = (ObscuredFloat)((float)(bAINMLLIKOL) + 6f);
-			bAINMLLIKOL = (ObscuredFloat)((float)(bAINMLLIKOL) - 1.5f);
-			bAINMLLIKOL = ObscuredFloat.op_Increment(bAINMLLIKOL);
-			bAINMLLIKOL = ObscuredFloat.op_Decrement(bAINMLLIKOL);
-			bAINMLLIKOL = ObscuredFloat.op_Decrement(bAINMLLIKOL);
-			bAINMLLIKOL = (ObscuredFloat)(num - (float)(bAINMLLIKOL) + 10.5f);
-			logBuilder.AppendLine("Health bar after few usual operations: " + bAINMLLIKOL);
+			healthBar = (ObscuredFloat)((float)(healthBar) + 6f);
+			healthBar = (ObscuredFloat)((float)(healthBar) - 1.5f);
+			healthBar = ObscuredFloat.op_Increment(healthBar);
+			healthBar = ObscuredFloat.op_Decrement(healthBar);
+			healthBar = ObscuredFloat.op_Decrement(healthBar);
+			healthBar = (ObscuredFloat)(num - (float)(healthBar) + 10.5f);
+			logBuilder.AppendLine("Health bar after few usual operations: " + healthBar);
 			Debug.Log(logBuilder);
 		}
 
@@ -503,27 +503,27 @@ namespace CodeStage.AntiCheat.Examples
 		private string GetAllSimpleObscuredTypes()
 		{
 			string result = "Can't get the list, sorry :(";
-			string PKLOIFLHINB = string.Empty;
+			string typesList = string.Empty;
 			if (string.IsNullOrEmpty(allSimpleObscuredTypes))
 			{
-				IEnumerable<Type> source = from GNAONAPDDLD in Assembly.GetExecutingAssembly().GetTypes()
-					where GNAONAPDDLD.IsPublic && GNAONAPDDLD.Namespace == "CodeStage.AntiCheat.ObscuredTypes" && GNAONAPDDLD.Name != "ObscuredPrefs"
-					select GNAONAPDDLD;
-				source.ToList().ForEach((Type GNAONAPDDLD) =>
+				IEnumerable<Type> source = from type in Assembly.GetExecutingAssembly().GetTypes()
+					where type.IsPublic && type.Namespace == "CodeStage.AntiCheat.ObscuredTypes" && type.Name != "ObscuredPrefs"
+					select type;
+				source.ToList().ForEach((Type type) =>
 				{
-					if (PKLOIFLHINB.Length > 0)
+					if (typesList.Length > 0)
 					{
-						PKLOIFLHINB = PKLOIFLHINB + "\n" + GNAONAPDDLD.Name;
+						typesList = typesList + "\n" + type.Name;
 					}
 					else
 					{
-						PKLOIFLHINB += GNAONAPDDLD.Name;
+						typesList += type.Name;
 					}
 				});
-				if (!string.IsNullOrEmpty(PKLOIFLHINB))
+				if (!string.IsNullOrEmpty(typesList))
 				{
-					result = PKLOIFLHINB;
-					allSimpleObscuredTypes = PKLOIFLHINB;
+					result = typesList;
+					allSimpleObscuredTypes = typesList;
 				}
 			}
 			else
@@ -541,8 +541,8 @@ namespace CodeStage.AntiCheat.Examples
 		private void LoadRegularPrefs()
 		{
 			regularPrefs = "int: " + PlayerPrefs.GetInt("money", -1) + "\n";
-			string jGENFAEFIGJ = regularPrefs;
-			regularPrefs = jGENFAEFIGJ + "float: " + PlayerPrefs.GetFloat("lifeBar", -1f) + "\n";
+			string prefsText = regularPrefs;
+			regularPrefs = prefsText + "float: " + PlayerPrefs.GetFloat("lifeBar", -1f) + "\n";
 			regularPrefs = regularPrefs + "string: " + PlayerPrefs.GetString("name", "No saved PlayerPrefs!");
 		}
 
@@ -566,29 +566,29 @@ namespace CodeStage.AntiCheat.Examples
 		{
 			byte[] array = ObscuredPrefs.GetByteArray("demoByteArray", 0, 4);
 			obscuredPrefs = "int: " + ObscuredPrefs.GetInt("money", -1) + "\n";
-			string gMBAPAPCHCJ = obscuredPrefs;
-			obscuredPrefs = gMBAPAPCHCJ + "float: " + ObscuredPrefs.GetFloat("lifeBar", -1f) + "\n";
+			string prefsText = obscuredPrefs;
+			obscuredPrefs = prefsText + "float: " + ObscuredPrefs.GetFloat("lifeBar", -1f) + "\n";
 			obscuredPrefs = obscuredPrefs + "string: " + ObscuredPrefs.GetString("name", "No saved ObscuredPrefs!") + "\n";
-			gMBAPAPCHCJ = obscuredPrefs;
-			obscuredPrefs = gMBAPAPCHCJ + "bool: " + ObscuredPrefs.GetBool("gameComplete", false) + "\n";
-			gMBAPAPCHCJ = obscuredPrefs;
-			obscuredPrefs = gMBAPAPCHCJ + "uint: " + ObscuredPrefs.GetUInt("demoUint", 0u) + "\n";
-			gMBAPAPCHCJ = obscuredPrefs;
-			obscuredPrefs = gMBAPAPCHCJ + "long: " + ObscuredPrefs.GetLong("demoLong", -1L) + "\n";
-			gMBAPAPCHCJ = obscuredPrefs;
-			obscuredPrefs = gMBAPAPCHCJ + "double: " + ObscuredPrefs.GetDouble("demoDouble", -1.0) + "\n";
-			gMBAPAPCHCJ = obscuredPrefs;
-			obscuredPrefs = string.Concat(gMBAPAPCHCJ, "Vector2: ", ObscuredPrefs.GetVector2("demoVector2", Vector2.zero), "\n");
-			gMBAPAPCHCJ = obscuredPrefs;
-			obscuredPrefs = string.Concat(gMBAPAPCHCJ, "Vector3: ", ObscuredPrefs.GetVector3("demoVector3", Vector3.zero), "\n");
-			gMBAPAPCHCJ = obscuredPrefs;
-			obscuredPrefs = string.Concat(gMBAPAPCHCJ, "Quaternion: ", ObscuredPrefs.GetQuaternion("demoQuaternion", Quaternion.identity), "\n");
-			gMBAPAPCHCJ = obscuredPrefs;
-			obscuredPrefs = string.Concat(gMBAPAPCHCJ, "Rect: ", ObscuredPrefs.GetRect("demoRect", new Rect(0f, 0f, 0f, 0f)), "\n");
-			gMBAPAPCHCJ = obscuredPrefs;
-			obscuredPrefs = string.Concat(gMBAPAPCHCJ, "Color: ", ObscuredPrefs.GetColor("demoColor", Color.black), "\n");
-			gMBAPAPCHCJ = obscuredPrefs;
-			obscuredPrefs = gMBAPAPCHCJ + "byte[]: {" + array[0] + "," + array[1] + "," + array[2] + "," + array[3] + "}";
+			prefsText = obscuredPrefs;
+			obscuredPrefs = prefsText + "bool: " + ObscuredPrefs.GetBool("gameComplete", false) + "\n";
+			prefsText = obscuredPrefs;
+			obscuredPrefs = prefsText + "uint: " + ObscuredPrefs.GetUInt("demoUint", 0u) + "\n";
+			prefsText = obscuredPrefs;
+			obscuredPrefs = prefsText + "long: " + ObscuredPrefs.GetLong("demoLong", -1L) + "\n";
+			prefsText = obscuredPrefs;
+			obscuredPrefs = prefsText + "double: " + ObscuredPrefs.GetDouble("demoDouble", -1.0) + "\n";
+			prefsText = obscuredPrefs;
+			obscuredPrefs = string.Concat(prefsText, "Vector2: ", ObscuredPrefs.GetVector2("demoVector2", Vector2.zero), "\n");
+			prefsText = obscuredPrefs;
+			obscuredPrefs = string.Concat(prefsText, "Vector3: ", ObscuredPrefs.GetVector3("demoVector3", Vector3.zero), "\n");
+			prefsText = obscuredPrefs;
+			obscuredPrefs = string.Concat(prefsText, "Quaternion: ", ObscuredPrefs.GetQuaternion("demoQuaternion", Quaternion.identity), "\n");
+			prefsText = obscuredPrefs;
+			obscuredPrefs = string.Concat(prefsText, "Rect: ", ObscuredPrefs.GetRect("demoRect", new Rect(0f, 0f, 0f, 0f)), "\n");
+			prefsText = obscuredPrefs;
+			obscuredPrefs = string.Concat(prefsText, "Color: ", ObscuredPrefs.GetColor("demoColor", Color.black), "\n");
+			prefsText = obscuredPrefs;
+			obscuredPrefs = prefsText + "byte[]: {" + array[0] + "," + array[1] + "," + array[2] + "," + array[3] + "}";
 		}
 
 		private void SaveObscuredPrefs()
@@ -627,30 +627,30 @@ namespace CodeStage.AntiCheat.Examples
 			ObscuredPrefs.Save();
 		}
 
-		private void ShowHelpButton(string BEPKJNKCKPH)
+		private void ShowHelpButton(string url)
 		{
-			ShowHelpButton(BEPKJNKCKPH, 30);
+			ShowHelpButton(url, 30);
 		}
 
-		private void ShowHelpButton(string BEPKJNKCKPH, int JMLAKAKDBBL)
+		private void ShowHelpButton(string url, int width)
 		{
-			ShowHelpButton(BEPKJNKCKPH, "?", JMLAKAKDBBL);
+			ShowHelpButton(url, "?", width);
 		}
 
-		private void ShowHelpButton(string BEPKJNKCKPH, string GCKANEECDHE, int JMLAKAKDBBL)
+		private void ShowHelpButton(string url, string label, int width)
 		{
 			GUILayoutOption[] array = new GUILayoutOption[1];
-			if (JMLAKAKDBBL != -1)
+			if (width != -1)
 			{
-				array[0] = GUILayout.Width(JMLAKAKDBBL);
+				array[0] = GUILayout.Width(width);
 			}
 			else
 			{
 				array = null;
 			}
-			if (GUILayout.Button(GCKANEECDHE, array))
+			if (GUILayout.Button(label, array))
 			{
-				OfflineServices.OpenExternalUrl(BEPKJNKCKPH);
+				OfflineServices.OpenExternalUrl(url);
 			}
 		}
 

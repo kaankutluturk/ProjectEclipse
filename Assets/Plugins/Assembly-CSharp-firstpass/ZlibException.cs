@@ -8,8 +8,8 @@ internal class ZlibException : Exception
 	{
 	}
 
-	public ZlibException(string JDCCBCNFENK)
-		: base(JDCCBCNFENK)
+	public ZlibException(string message)
+		: base(message)
 	{
 	}
 }

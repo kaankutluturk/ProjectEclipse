@@ -25,16 +25,16 @@ namespace YamlDotNet.Core.Tokens
 			}
 		}
 
-		public Tag(string FODGADCGDBH, string NCFFAGOLJEC)
-			: this(FODGADCGDBH, NCFFAGOLJEC, Mark.Empty, Mark.Empty)
+		public Tag(string tagHandle, string tagSuffix)
+			: this(tagHandle, tagSuffix, Mark.Empty, Mark.Empty)
 		{
 		}
 
-		public Tag(string FODGADCGDBH, string NCFFAGOLJEC, Mark ILENLCMAMBH, Mark PCLFFOBJJFO)
-			: base(ILENLCMAMBH, PCLFFOBJJFO)
+		public Tag(string tagHandle, string tagSuffix, Mark startMark, Mark endMark)
+			: base(startMark, endMark)
 		{
-			handle = FODGADCGDBH;
-			suffix = NCFFAGOLJEC;
+			handle = tagHandle;
+			suffix = tagSuffix;
 		}
 	}
 }

@@ -10,8 +10,8 @@ namespace YamlDotNet.Core.Tokens
 		{
 		}
 
-		public FlowEntry(Mark ILENLCMAMBH, Mark PCLFFOBJJFO)
-			: base(ILENLCMAMBH, PCLFFOBJJFO)
+		public FlowEntry(Mark startMark, Mark endMark)
+			: base(startMark, endMark)
 		{
 		}
 	}

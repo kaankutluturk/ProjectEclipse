@@ -41,11 +41,11 @@ public class ExtentionBehaviour : MonoBehaviour
 			}
 		}
 
-		public CallEventArgs(int IILOLJJLLGH, object DMNBDBJNKME, object target)
+		public CallEventArgs(int eventId, object content, object target)
 		{
 			set_Target(target);
-			SetContent(DMNBDBJNKME);
-			set_Event(IILOLJJLLGH);
+			SetContent(content);
+			set_Event(eventId);
 		}
 
 		public object GetTarget()
@@ -132,24 +132,24 @@ public class ExtentionBehaviour : MonoBehaviour
 		}
 	}
 
-	protected void Log(object LIOGIBJBHAH, UnityEngine.Object BBNKIBKPBLO = null)
+	protected void Log(object message, UnityEngine.Object context = null)
 	{
-		AdvLog.Log(LIOGIBJBHAH, BBNKIBKPBLO ?? this);
+		AdvLog.Log(message, context ?? this);
 	}
 
-	protected void LogWarning(object LIOGIBJBHAH, UnityEngine.Object BBNKIBKPBLO = null)
+	protected void LogWarning(object message, UnityEngine.Object context = null)
 	{
-		AdvLog.LogWarning(LIOGIBJBHAH, BBNKIBKPBLO ?? this);
+		AdvLog.LogWarning(message, context ?? this);
 	}
 
-	protected void LogError(object LIOGIBJBHAH, UnityEngine.Object BBNKIBKPBLO = null)
+	protected void LogError(object message, UnityEngine.Object context = null)
 	{
-		AdvLog.LogError(LIOGIBJBHAH, BBNKIBKPBLO ?? this);
+		AdvLog.LogError(message, context ?? this);
 	}
 
-	protected void LogException(Exception MPFFFAOGBJE, UnityEngine.Object BBNKIBKPBLO = null)
+	protected void LogException(Exception exception, UnityEngine.Object context = null)
 	{
-		AdvLog.LogException(MPFFFAOGBJE, BBNKIBKPBLO ?? this);
+		AdvLog.LogException(exception, context ?? this);
 	}
 
 	public GameObject get_gameObject()
@@ -188,31 +188,31 @@ public class ExtentionBehaviour : MonoBehaviour
 		return _animator;
 	}
 
-	protected void Invoke(Action IBODMPMJELJ, float GNAONAPDDLD)
+	protected void Invoke(Action action, float delay)
 	{
-		StartCoroutine(InvokeActionRoutine(IBODMPMJELJ, GNAONAPDDLD));
+		StartCoroutine(InvokeActionRoutine(action, delay));
 	}
 
-	private IEnumerator InvokeActionRoutine(Action IBODMPMJELJ, float GNAONAPDDLD)
+	private IEnumerator InvokeActionRoutine(Action action, float delay)
 	{
-		yield return new WaitForSeconds(GNAONAPDDLD);
-		IBODMPMJELJ();
+		yield return new WaitForSeconds(delay);
+		action();
 	}
 
-	public void addEventListener(int IILOLJJLLGH, Action<CallEventArgs> callback)
+	public void addEventListener(int eventId, Action<CallEventArgs> callback)
 	{
-		if (!eventListeners.ContainsKey(IILOLJJLLGH))
+		if (!eventListeners.ContainsKey(eventId))
 		{
-			eventListeners.Add(IILOLJJLLGH, new List<Action<CallEventArgs>>());
+			eventListeners.Add(eventId, new List<Action<CallEventArgs>>());
 		}
-		eventListeners[IILOLJJLLGH].Add(callback);
+		eventListeners[eventId].Add(callback);
 	}
 
-	public void addEventListener(int[] IILOLJJLLGH, Action<CallEventArgs> callback)
+	public void addEventListener(int[] eventIds, Action<CallEventArgs> callback)
 	{
-		for (int i = 0; i < IILOLJJLLGH.Length; i++)
+		for (int i = 0; i < eventIds.Length; i++)
 		{
-			addEventListener(IILOLJJLLGH[i], callback);
+			addEventListener(eventIds[i], callback);
 		}
 	}
 
@@ -221,21 +221,21 @@ public class ExtentionBehaviour : MonoBehaviour
 		eventListeners.Clear();
 	}
 
-	public void removeEvent(int IILOLJJLLGH)
+	public void removeEvent(int eventId)
 	{
-		if (eventListeners.ContainsKey(IILOLJJLLGH))
+		if (eventListeners.ContainsKey(eventId))
 		{
-			eventListeners.Remove(IILOLJJLLGH);
+			eventListeners.Remove(eventId);
 		}
 	}
 
-	public void removeEventListener(int IILOLJJLLGH, Action<CallEventArgs> callback)
+	public void removeEventListener(int eventId, Action<CallEventArgs> callback)
 	{
-		if (eventListeners.ContainsKey(IILOLJJLLGH))
+		if (eventListeners.ContainsKey(eventId))
 		{
-			while (eventListeners[IILOLJJLLGH].Contains(callback))
+			while (eventListeners[eventId].Contains(callback))
 			{
-				eventListeners[IILOLJJLLGH].Remove(callback);
+				eventListeners[eventId].Remove(callback);
 			}
 		}
 	}
@@ -245,18 +245,18 @@ public class ExtentionBehaviour : MonoBehaviour
 		RemoveAllEventListeners();
 	}
 
-	public void callEvent(int IILOLJJLLGH, object DMNBDBJNKME = null)
+	public void callEvent(int eventId, object content = null)
 	{
-		if (!eventListeners.ContainsKey(IILOLJJLLGH))
+		if (!eventListeners.ContainsKey(eventId))
 		{
 			return;
 		}
-		List<Action<CallEventArgs>> list = new List<Action<CallEventArgs>>(eventListeners[IILOLJJLLGH]);
+		List<Action<CallEventArgs>> list = new List<Action<CallEventArgs>>(eventListeners[eventId]);
 		for (int i = 0; i < list.Count; i++)
 		{
-			if (list[i] != null && eventListeners.ContainsKey(IILOLJJLLGH) && eventListeners[IILOLJJLLGH].Contains(list[i]))
+			if (list[i] != null && eventListeners.ContainsKey(eventId) && eventListeners[eventId].Contains(list[i]))
 			{
-				list[i](new CallEventArgs(IILOLJJLLGH, DMNBDBJNKME, this));
+				list[i](new CallEventArgs(eventId, content, this));
 			}
 		}
 	}

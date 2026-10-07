@@ -59,17 +59,17 @@ public class WebSocketBinaryFrame : IWebSocketFrameWriter
 	{
 	}
 
-	public WebSocketBinaryFrame(byte[] data, bool JDHJLBBIKLM)
-		: this(data, 0uL, (ulong)((data == null) ? 0 : data.Length), JDHJLBBIKLM)
+	public WebSocketBinaryFrame(byte[] data, bool isFinal)
+		: this(data, 0uL, (ulong)((data == null) ? 0 : data.Length), isFinal)
 	{
 	}
 
-	public WebSocketBinaryFrame(byte[] data, ulong LCCLEFMKLPB, ulong BDBOAEGELMC, bool JDHJLBBIKLM)
+	public WebSocketBinaryFrame(byte[] data, ulong LCCLEFMKLPB, ulong length, bool isFinal)
 	{
 		set_Data(data);
 		SetPos(LCCLEFMKLPB);
-		set_Length(BDBOAEGELMC);
-		set_IsFinal(JDHJLBBIKLM);
+		set_Length(length);
+		set_IsFinal(isFinal);
 	}
 
 	public virtual WebSocketFrameTypes get_Type()

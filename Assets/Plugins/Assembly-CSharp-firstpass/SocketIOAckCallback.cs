@@ -1,1 +1,1 @@
-public delegate void SocketIOAckCallback(Socket JLEACANCMJF, Packet NPKADBPBKIG, params object[] LKIOKGCNKHE);
+public delegate void SocketIOAckCallback(Socket socket, Packet packet, params object[] args);

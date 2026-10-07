@@ -84,8 +84,8 @@ public class JsonWriter
 		Init();
 	}
 
-	public JsonWriter(StringBuilder NGPACMILENE)
-		: this(new StringWriter(NGPACMILENE))
+	public JsonWriter(StringBuilder stringBuilder)
+		: this(new StringWriter(stringBuilder))
 	{
 	}
 
@@ -135,7 +135,7 @@ public class JsonWriter
 		validate = value;
 	}
 
-	private void DoValidation(JsonWriterCondition AJEPDBPHNCM)
+	private void DoValidation(JsonWriterCondition condition)
 	{
 		if (!context.ExpectingValue)
 		{
@@ -149,7 +149,7 @@ public class JsonWriter
 		{
 			throw new JsonException("A complete JSON symbol has already been written");
 		}
-		switch (AJEPDBPHNCM)
+		switch (condition)
 		{
 		case JsonWriterCondition.InArray:
 			if (!context.InArray)
@@ -197,20 +197,20 @@ public class JsonWriter
 		ctx_stack.Push(context);
 	}
 
-	private static void IntToHex(int HDKKKCDKFEE, char[] IJGJLEJKMBJ)
+	private static void IntToHex(int number, char[] hex)
 	{
 		for (int i = 0; i < 4; i++)
 		{
-			int num = HDKKKCDKFEE % 16;
+			int num = number % 16;
 			if (num < 10)
 			{
-				IJGJLEJKMBJ[3 - i] = (char)(48 + num);
+				hex[3 - i] = (char)(48 + num);
 			}
 			else
 			{
-				IJGJLEJKMBJ[3 - i] = (char)(65 + (num - 10));
+				hex[3 - i] = (char)(65 + (num - 10));
 			}
-			HDKKKCDKFEE >>= 4;
+			number >>= 4;
 		}
 	}
 
@@ -222,7 +222,7 @@ public class JsonWriter
 		}
 	}
 
-	private void Put(string IGGFGLLIGCG)
+	private void Put(string text)
 	{
 		if (pretty_print && !context.ExpectingValue)
 		{
@@ -231,7 +231,7 @@ public class JsonWriter
 				writer.Write(' ');
 			}
 		}
-		writer.Write(IGGFGLLIGCG);
+		writer.Write(text);
 	}
 
 	private void PutNewline()
@@ -239,9 +239,9 @@ public class JsonWriter
 		PutNewline(true);
 	}
 
-	private void PutNewline(bool GOLEKPDOAAP)
+	private void PutNewline(bool addComma)
 	{
-		if (GOLEKPDOAAP && !context.ExpectingValue && context.Count > 1)
+		if (addComma && !context.ExpectingValue && context.Count > 1)
 		{
 			writer.Write(',');
 		}
@@ -251,14 +251,14 @@ public class JsonWriter
 		}
 	}
 
-	private void PutString(string IGGFGLLIGCG)
+	private void PutString(string text)
 	{
 		Put(string.Empty);
 		writer.Write('"');
-		int length = IGGFGLLIGCG.Length;
+		int length = text.Length;
 		for (int i = 0; i < length; i++)
 		{
-			switch (IGGFGLLIGCG[i])
+			switch (text[i])
 			{
 			case '\n':
 				writer.Write("\\n");
@@ -272,7 +272,7 @@ public class JsonWriter
 			case '"':
 			case '\\':
 				writer.Write('\\');
-				writer.Write(IGGFGLLIGCG[i]);
+				writer.Write(text[i]);
 				continue;
 			case '\f':
 				writer.Write("\\f");
@@ -281,12 +281,12 @@ public class JsonWriter
 				writer.Write("\\b");
 				continue;
 			}
-			if (IGGFGLLIGCG[i] >= ' ' && IGGFGLLIGCG[i] <= '~')
+			if (text[i] >= ' ' && text[i] <= '~')
 			{
-				writer.Write(IGGFGLLIGCG[i]);
+				writer.Write(text[i]);
 				continue;
 			}
-			IntToHex(IGGFGLLIGCG[i], hex_seq);
+			IntToHex(text[i], hex_seq);
 			writer.Write("\\u");
 			writer.Write(hex_seq);
 		}
@@ -322,11 +322,11 @@ public class JsonWriter
 		}
 	}
 
-	public void Write(bool CIGMFMBICLJ)
+	public void Write(bool boolValue)
 	{
 		DoValidation(JsonWriterCondition.Value);
 		PutNewline();
-		Put((!CIGMFMBICLJ) ? "false" : "true");
+		Put((!boolValue) ? "false" : "true");
 		context.ExpectingValue = false;
 	}
 
@@ -367,17 +367,17 @@ public class JsonWriter
 		context.ExpectingValue = false;
 	}
 
-	public void Write(string IGGFGLLIGCG)
+	public void Write(string stringValue)
 	{
 		DoValidation(JsonWriterCondition.Value);
 		PutNewline();
-		if (IGGFGLLIGCG == null)
+		if (stringValue == null)
 		{
 			Put("null");
 		}
 		else
 		{
-			PutString(IGGFGLLIGCG);
+			PutString(stringValue);
 		}
 		context.ExpectingValue = false;
 	}
@@ -448,18 +448,18 @@ public class JsonWriter
 		Indent();
 	}
 
-	public void WritePropertyName(string MHJMMIJKOGH)
+	public void WritePropertyName(string propertyName)
 	{
 		DoValidation(JsonWriterCondition.Property);
 		PutNewline();
-		PutString(MHJMMIJKOGH);
+		PutString(propertyName);
 		if (pretty_print)
 		{
-			if (MHJMMIJKOGH.Length > context.Padding)
+			if (propertyName.Length > context.Padding)
 			{
-				context.Padding = MHJMMIJKOGH.Length;
+				context.Padding = propertyName.Length;
 			}
-			for (int num = context.Padding - MHJMMIJKOGH.Length; num >= 0; num--)
+			for (int num = context.Padding - propertyName.Length; num >= 0; num--)
 			{
 				writer.Write(' ');
 			}

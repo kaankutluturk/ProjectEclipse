@@ -12,7 +12,7 @@ $dispatch = [regex]::Match($fightSource,
     '(?ms)^\tprivate void DispatchEclipseCombatEvent\([^\r\n]*\).*?^\t\}(?=\r?\n\r?\n\tprivate void StartStance)').Value
 if (!$dispatch) { throw 'Could not extract DispatchEclipseCombatEvent from Fight.cs.' }
 $damageBefore = $fightSource.IndexOf('float eclipseHealthBefore =')
-$damageApply = $fightSource.IndexOf('UpdateLife(EGHPHELLOGO.KJDFJPBIGJC', $damageBefore)
+$damageApply = $fightSource.IndexOf('UpdateLife(eventModel.sourceModel', $damageBefore)
 $damageDispatch = $fightSource.IndexOf('DispatchEclipseCombatEvent(ModEffectEvent.DamageReceived', $damageApply)
 $damageBookkeeping = $fightSource.IndexOf('ApplyLifeSteal(EGHPHELLOGO.KJDFJPBIGJC', $damageDispatch)
 if ($damageBefore -lt 0 -or $damageApply -le $damageBefore -or $damageDispatch -le $damageApply -or $damageBookkeeping -le $damageDispatch) {

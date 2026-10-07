@@ -34,10 +34,10 @@ public class NekkiUri : Uri
 		}
 	}
 
-	public NekkiUri([NotNull] string GDJGOEDDJIJ)
-		: base(GDJGOEDDJIJ)
+	public NekkiUri([NotNull] string uriString)
+		: base(uriString)
 	{
-		_fileName = Path.GetFileNameWithoutExtension(GDJGOEDDJIJ);
+		_fileName = Path.GetFileNameWithoutExtension(uriString);
 		_fileNameWithExtension = Path.GetFileName(base.LocalPath);
 		_extension = Path.GetExtension(base.LocalPath);
 	}

@@ -23,16 +23,16 @@ internal class DocumentLoadingState
 		anchors.Add(node.Anchor, node);
 	}
 
-	public YamlNode GetNode(string KOLNNNLOCFE, bool MIPDMNEJOCI, Mark ILENLCMAMBH, Mark PCLFFOBJJFO)
+	public YamlNode GetNode(string anchor, bool throwIfMissing, Mark start, Mark end)
 	{
 		YamlNode value;
-		if (anchors.TryGetValue(KOLNNNLOCFE, out value))
+		if (anchors.TryGetValue(anchor, out value))
 		{
 			return value;
 		}
-		if (MIPDMNEJOCI)
+		if (throwIfMissing)
 		{
-			throw new AnchorNotFoundException(ILENLCMAMBH, PCLFFOBJJFO, string.Format(CultureInfo.InvariantCulture, "The anchor '{0}' does not exists", KOLNNNLOCFE));
+			throw new AnchorNotFoundException(start, end, string.Format(CultureInfo.InvariantCulture, "The anchor '{0}' does not exists", anchor));
 		}
 		return null;
 	}

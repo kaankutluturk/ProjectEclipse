@@ -138,48 +138,48 @@ internal sealed class ZTree
 
 	internal StaticTree staticTree;
 
-	internal static int DistanceCode(int CGIBMHPALCO)
+	internal static int DistanceCode(int distance)
 	{
-		return (CGIBMHPALCO >= 256) ? distCodeTable[256 + SharedUtils.URShift(CGIBMHPALCO, 7)] : distCodeTable[CGIBMHPALCO];
+		return (distance >= 256) ? distCodeTable[256 + SharedUtils.URShift(distance, 7)] : distCodeTable[distance];
 	}
 
-	internal void GenerateBitLengths(DeflateManager JDCCBCNFENK)
+	internal void GenerateBitLengths(DeflateManager deflateManager)
 	{
-		short[] kAMMGDHOHKA = dyn_tree;
-		short[] cNKMPIHKGLL = staticTree.treeCodes;
-		int[] lILPPGCPPGO = staticTree.extraBits;
-		int gFDLABEMBHB = staticTree.extraBase;
-		int aFKIJFBEHCN = staticTree.maxLength;
+		short[] tree = dyn_tree;
+		short[] staticCodes = staticTree.treeCodes;
+		int[] extraBitsTable = staticTree.extraBits;
+		int extraBase = staticTree.extraBase;
+		int maxLength = staticTree.maxLength;
 		int num = 0;
 		for (int i = 0; i <= InternalConstants.MAX_BITS; i++)
 		{
-			JDCCBCNFENK.bl_count[i] = 0;
+			deflateManager.bl_count[i] = 0;
 		}
-		kAMMGDHOHKA[JDCCBCNFENK.heap[JDCCBCNFENK.heap_max] * 2 + 1] = 0;
+		tree[deflateManager.heap[deflateManager.heap_max] * 2 + 1] = 0;
 		int j;
-		for (j = JDCCBCNFENK.heap_max + 1; j < HEAP_SIZE; j++)
+		for (j = deflateManager.heap_max + 1; j < HEAP_SIZE; j++)
 		{
-			int num2 = JDCCBCNFENK.heap[j];
-			int i = kAMMGDHOHKA[kAMMGDHOHKA[num2 * 2 + 1] * 2 + 1] + 1;
-			if (i > aFKIJFBEHCN)
+			int num2 = deflateManager.heap[j];
+			int i = tree[tree[num2 * 2 + 1] * 2 + 1] + 1;
+			if (i > maxLength)
 			{
-				i = aFKIJFBEHCN;
+				i = maxLength;
 				num++;
 			}
-			kAMMGDHOHKA[num2 * 2 + 1] = (short)i;
+			tree[num2 * 2 + 1] = (short)i;
 			if (num2 <= max_code)
 			{
-				JDCCBCNFENK.bl_count[i]++;
+				deflateManager.bl_count[i]++;
 				int num3 = 0;
-				if (num2 >= gFDLABEMBHB)
+				if (num2 >= extraBase)
 				{
-					num3 = lILPPGCPPGO[num2 - gFDLABEMBHB];
+					num3 = extraBitsTable[num2 - extraBase];
 				}
-				short num4 = kAMMGDHOHKA[num2 * 2];
-				JDCCBCNFENK.opt_len += num4 * (i + num3);
-				if (cNKMPIHKGLL != null)
+				short num4 = tree[num2 * 2];
+				deflateManager.opt_len += num4 * (i + num3);
+				if (staticCodes != null)
 				{
-					JDCCBCNFENK.static_len += num4 * (cNKMPIHKGLL[num2 * 2 + 1] + num3);
+					deflateManager.static_len += num4 * (staticCodes[num2 * 2 + 1] + num3);
 				}
 			}
 		}
@@ -189,29 +189,29 @@ internal sealed class ZTree
 		}
 		do
 		{
-			int i = aFKIJFBEHCN - 1;
-			while (JDCCBCNFENK.bl_count[i] == 0)
+			int i = maxLength - 1;
+			while (deflateManager.bl_count[i] == 0)
 			{
 				i--;
 			}
-			JDCCBCNFENK.bl_count[i]--;
-			JDCCBCNFENK.bl_count[i + 1] = (short)(JDCCBCNFENK.bl_count[i + 1] + 2);
-			JDCCBCNFENK.bl_count[aFKIJFBEHCN]--;
+			deflateManager.bl_count[i]--;
+			deflateManager.bl_count[i + 1] = (short)(deflateManager.bl_count[i + 1] + 2);
+			deflateManager.bl_count[maxLength]--;
 			num -= 2;
 		}
 		while (num > 0);
-		for (int i = aFKIJFBEHCN; i != 0; i--)
+		for (int i = maxLength; i != 0; i--)
 		{
-			int num2 = JDCCBCNFENK.bl_count[i];
+			int num2 = deflateManager.bl_count[i];
 			while (num2 != 0)
 			{
-				int num5 = JDCCBCNFENK.heap[--j];
+				int num5 = deflateManager.heap[--j];
 				if (num5 <= max_code)
 				{
-					if (kAMMGDHOHKA[num5 * 2 + 1] != i)
+					if (tree[num5 * 2 + 1] != i)
 					{
-						JDCCBCNFENK.opt_len = (int)(JDCCBCNFENK.opt_len + ((long)i - (long)kAMMGDHOHKA[num5 * 2 + 1]) * kAMMGDHOHKA[num5 * 2]);
-						kAMMGDHOHKA[num5 * 2 + 1] = (short)i;
+						deflateManager.opt_len = (int)(deflateManager.opt_len + ((long)i - (long)tree[num5 * 2 + 1]) * tree[num5 * 2]);
+						tree[num5 * 2 + 1] = (short)i;
 					}
 					num2--;
 				}
@@ -219,92 +219,92 @@ internal sealed class ZTree
 		}
 	}
 
-	internal void BuildTree(DeflateManager JDCCBCNFENK)
+	internal void BuildTree(DeflateManager deflateManager)
 	{
-		short[] kAMMGDHOHKA = dyn_tree;
-		short[] cNKMPIHKGLL = staticTree.treeCodes;
-		int pNNMNEEJEGD = staticTree.elems;
+		short[] tree = dyn_tree;
+		short[] staticCodes = staticTree.treeCodes;
+		int elementCount = staticTree.elems;
 		int num = -1;
-		JDCCBCNFENK.heap_len = 0;
-		JDCCBCNFENK.heap_max = HEAP_SIZE;
-		for (int i = 0; i < pNNMNEEJEGD; i++)
+		deflateManager.heap_len = 0;
+		deflateManager.heap_max = HEAP_SIZE;
+		for (int i = 0; i < elementCount; i++)
 		{
-			if (kAMMGDHOHKA[i * 2] != 0)
+			if (tree[i * 2] != 0)
 			{
-				num = (JDCCBCNFENK.heap[++JDCCBCNFENK.heap_len] = i);
-				JDCCBCNFENK.depth[i] = 0;
+				num = (deflateManager.heap[++deflateManager.heap_len] = i);
+				deflateManager.depth[i] = 0;
 			}
 			else
 			{
-				kAMMGDHOHKA[i * 2 + 1] = 0;
+				tree[i * 2 + 1] = 0;
 			}
 		}
 		int num2;
-		while (JDCCBCNFENK.heap_len < 2)
+		while (deflateManager.heap_len < 2)
 		{
-			num2 = (JDCCBCNFENK.heap[++JDCCBCNFENK.heap_len] = ((num < 2) ? (++num) : 0));
-			kAMMGDHOHKA[num2 * 2] = 1;
-			JDCCBCNFENK.depth[num2] = 0;
-			JDCCBCNFENK.opt_len--;
-			if (cNKMPIHKGLL != null)
+			num2 = (deflateManager.heap[++deflateManager.heap_len] = ((num < 2) ? (++num) : 0));
+			tree[num2 * 2] = 1;
+			deflateManager.depth[num2] = 0;
+			deflateManager.opt_len--;
+			if (staticCodes != null)
 			{
-				JDCCBCNFENK.static_len -= cNKMPIHKGLL[num2 * 2 + 1];
+				deflateManager.static_len -= staticCodes[num2 * 2 + 1];
 			}
 		}
 		max_code = num;
-		for (int i = JDCCBCNFENK.heap_len / 2; i >= 1; i--)
+		for (int i = deflateManager.heap_len / 2; i >= 1; i--)
 		{
-			JDCCBCNFENK.pqdownheap(kAMMGDHOHKA, i);
+			deflateManager.pqdownheap(tree, i);
 		}
-		num2 = pNNMNEEJEGD;
+		num2 = elementCount;
 		do
 		{
-			int i = JDCCBCNFENK.heap[1];
-			JDCCBCNFENK.heap[1] = JDCCBCNFENK.heap[JDCCBCNFENK.heap_len--];
-			JDCCBCNFENK.pqdownheap(kAMMGDHOHKA, 1);
-			int num3 = JDCCBCNFENK.heap[1];
-			JDCCBCNFENK.heap[--JDCCBCNFENK.heap_max] = i;
-			JDCCBCNFENK.heap[--JDCCBCNFENK.heap_max] = num3;
-			kAMMGDHOHKA[num2 * 2] = (short)(kAMMGDHOHKA[i * 2] + kAMMGDHOHKA[num3 * 2]);
-			JDCCBCNFENK.depth[num2] = (sbyte)(Math.Max((byte)JDCCBCNFENK.depth[i], (byte)JDCCBCNFENK.depth[num3]) + 1);
-			kAMMGDHOHKA[i * 2 + 1] = (kAMMGDHOHKA[num3 * 2 + 1] = (short)num2);
-			JDCCBCNFENK.heap[1] = num2++;
-			JDCCBCNFENK.pqdownheap(kAMMGDHOHKA, 1);
+			int i = deflateManager.heap[1];
+			deflateManager.heap[1] = deflateManager.heap[deflateManager.heap_len--];
+			deflateManager.pqdownheap(tree, 1);
+			int num3 = deflateManager.heap[1];
+			deflateManager.heap[--deflateManager.heap_max] = i;
+			deflateManager.heap[--deflateManager.heap_max] = num3;
+			tree[num2 * 2] = (short)(tree[i * 2] + tree[num3 * 2]);
+			deflateManager.depth[num2] = (sbyte)(Math.Max((byte)deflateManager.depth[i], (byte)deflateManager.depth[num3]) + 1);
+			tree[i * 2 + 1] = (tree[num3 * 2 + 1] = (short)num2);
+			deflateManager.heap[1] = num2++;
+			deflateManager.pqdownheap(tree, 1);
 		}
-		while (JDCCBCNFENK.heap_len >= 2);
-		JDCCBCNFENK.heap[--JDCCBCNFENK.heap_max] = JDCCBCNFENK.heap[1];
-		GenerateBitLengths(JDCCBCNFENK);
-		GenerateCodes(kAMMGDHOHKA, num, JDCCBCNFENK.bl_count);
+		while (deflateManager.heap_len >= 2);
+		deflateManager.heap[--deflateManager.heap_max] = deflateManager.heap[1];
+		GenerateBitLengths(deflateManager);
+		GenerateCodes(tree, num, deflateManager.bl_count);
 	}
 
-	internal static void GenerateCodes(short[] EDBPBGAMMDO, int max_code, short[] OOJOJFEKPEL)
+	internal static void GenerateCodes(short[] tree, int max_code, short[] blCount)
 	{
 		short[] array = new short[InternalConstants.MAX_BITS + 1];
 		short num = 0;
 		for (int i = 1; i <= InternalConstants.MAX_BITS; i++)
 		{
-			num = (array[i] = (short)(num + OOJOJFEKPEL[i - 1] << 1));
+			num = (array[i] = (short)(num + blCount[i - 1] << 1));
 		}
 		for (int j = 0; j <= max_code; j++)
 		{
-			int num2 = EDBPBGAMMDO[j * 2 + 1];
+			int num2 = tree[j * 2 + 1];
 			if (num2 != 0)
 			{
-				EDBPBGAMMDO[j * 2] = (short)BitReverse(array[num2]++, num2);
+				tree[j * 2] = (short)BitReverse(array[num2]++, num2);
 			}
 		}
 	}
 
-	internal static int BitReverse(int KJPGKHJNOMC, int JCAJDBOMGOM)
+	internal static int BitReverse(int code, int length)
 	{
 		int num = 0;
 		do
 		{
-			num |= KJPGKHJNOMC & 1;
-			KJPGKHJNOMC >>= 1;
+			num |= code & 1;
+			code >>= 1;
 			num <<= 1;
 		}
-		while (--JCAJDBOMGOM > 0);
+		while (--length > 0);
 		return num >> 1;
 	}
 }

@@ -53,14 +53,14 @@ namespace Nekki.SF2.GUI.Map
 			return lastSelectedBattle;
 		}
 
-		public int AddEventListener(int name, Action<object> ODDEOFKLIAG)
+		public int AddEventListener(int name, Action<object> callback)
 		{
-			return eventDispatcher.AddEventListener(name, ODDEOFKLIAG);
+			return eventDispatcher.AddEventListener(name, callback);
 		}
 
-		public int CallEvent(int name, object EHCLMBADLKH)
+		public int CallEvent(int name, object eventData)
 		{
-			return eventDispatcher.CallEvent(name, EHCLMBADLKH);
+			return eventDispatcher.CallEvent(name, eventData);
 		}
 
 		public int RemoveAllEventListener()
@@ -73,33 +73,33 @@ namespace Nekki.SF2.GUI.Map
 			return eventDispatcher.RemoveEvent(name);
 		}
 
-		public int RemoveEventListener(int name, Action<object> ODDEOFKLIAG)
+		public int RemoveEventListener(int name, Action<object> callback)
 		{
-			return eventDispatcher.RemoveEventListener(name, ODDEOFKLIAG);
+			return eventDispatcher.RemoveEventListener(name, callback);
 		}
 
-		public void Init(Zone HLJKOKMKMLM)
+		public void Init(Zone newZone)
 		{
-			zone = HLJKOKMKMLM;
+			zone = newZone;
 			ApplyZoneSprite();
 			CreateBattleButtons();
 		}
 
 		public BattleButton GetBattleButtonByBattleName(string _BattleName)
 		{
-			Battle cGJCGEBPCAF = get_Zone().FindBattle(_BattleName);
-			if (cGJCGEBPCAF != null)
+			Battle battle = get_Zone().FindBattle(_BattleName);
+			if (battle != null)
 			{
-				return GetButtonByBattle(cGJCGEBPCAF);
+				return GetButtonByBattle(battle);
 			}
 			return null;
 		}
 
-		public BattleButton GetButtonByBattle(Battle DPOOIONCEOA)
+		public BattleButton GetButtonByBattle(Battle battle)
 		{
 			foreach (BattleButton item in _buttons)
 			{
-				if (item.get_Battle() == DPOOIONCEOA)
+				if (item.get_Battle() == battle)
 				{
 					return item;
 				}
@@ -109,14 +109,14 @@ namespace Nekki.SF2.GUI.Map
 
 		public void SelectFirstBattle()
 		{
-			List<Battle> lGIIBNJFADA = zone.Battles;
-			if (lGIIBNJFADA.Count <= 0)
+			List<Battle> battles = zone.Battles;
+			if (battles.Count <= 0)
 			{
 				return;
 			}
 			bool flag = false;
 			int num = 0;
-			foreach (Battle item in lGIIBNJFADA)
+			foreach (Battle item in battles)
 			{
 				if (item.IsMapVisible && UnderworldMapBattlePresentation.IsBattleVisible(item, zone, _raidPowerMode))
 				{
@@ -125,7 +125,7 @@ namespace Nekki.SF2.GUI.Map
 				}
 				num++;
 			}
-			SetLastBattle(lGIIBNJFADA[flag ? num : 0]);
+			SetLastBattle(battles[flag ? num : 0]);
 		}
 
 		public void SelectBattle()
@@ -138,12 +138,12 @@ namespace Nekki.SF2.GUI.Map
 			CallEvent(0, lastSelectedBattle);
 		}
 
-		public void UpdateBattleHidden(Battle DPOOIONCEOA)
+		public void UpdateBattleHidden(Battle battle)
 		{
-			BattleButton buttonByBattle = GetButtonByBattle(DPOOIONCEOA);
+			BattleButton buttonByBattle = GetButtonByBattle(battle);
 			if (null != buttonByBattle)
 			{
-				buttonByBattle.set_Hidden(DPOOIONCEOA.IsHidden());
+				buttonByBattle.set_Hidden(battle.IsHidden());
 			}
 			RefreshButtons();
 		}
@@ -154,9 +154,9 @@ namespace Nekki.SF2.GUI.Map
 			SetLastBattle(lastBattle);
 		}
 
-		public void SetLastBattle(Battle DPOOIONCEOA)
+		public void SetLastBattle(Battle battle)
 		{
-			lastSelectedBattle = DPOOIONCEOA;
+			lastSelectedBattle = battle;
 		}
 
 		public void UpdateBattleFocus()
@@ -239,17 +239,17 @@ namespace Nekki.SF2.GUI.Map
 			}
 		}
 
-		public void ActiveBattle(string GGNFBODEOMM, bool PEJELKNFEKJ, bool HCNBLJBAOHK = true, bool DPFMIACNGLL = false)
+		public void ActiveBattle(string battleName, bool isVisible, bool shouldSelect = true, bool skipFade = false)
 		{
 			int num = 0;
-			Battle cGJCGEBPCAF = null;
-			List<Battle> lGIIBNJFADA = zone.Battles;
-			foreach (Battle item in lGIIBNJFADA)
+			Battle battle = null;
+			List<Battle> battles = zone.Battles;
+			foreach (Battle item in battles)
 			{
 				string text = item.get_Name();
-				if (text == GGNFBODEOMM)
+				if (text == battleName)
 				{
-					cGJCGEBPCAF = item;
+					battle = item;
 					break;
 				}
 				if (item.get_Type() != BattleType.FightUnregister)
@@ -257,26 +257,26 @@ namespace Nekki.SF2.GUI.Map
 					num++;
 				}
 			}
-			if (cGJCGEBPCAF != null && num < lGIIBNJFADA.Count)
+			if (battle != null && num < battles.Count)
 			{
-				ActivateBattleAtIndex(cGJCGEBPCAF, num, PEJELKNFEKJ, HCNBLJBAOHK, DPFMIACNGLL);
+				ActivateBattleAtIndex(battle, num, isVisible, shouldSelect, skipFade);
 			}
 			else
 			{
-				GameLog.Error("DisplayZone::activeBattle - cant find name " + GGNFBODEOMM);
+				GameLog.Error("DisplayZone::activeBattle - cant find name " + battleName);
 			}
 		}
 
-		private void ActivateBattleByType(BattleType JBJHPJMJNNF, bool PEJELKNFEKJ, bool HCNBLJBAOHK = true, bool DPFMIACNGLL = false)
+		private void ActivateBattleByType(BattleType battleType, bool isVisible, bool shouldSelect = true, bool skipFade = false)
 		{
 			int num = 0;
-			Battle hHMPCKCPOEA = null;
-			List<Battle> lGIIBNJFADA = zone.Battles;
-			foreach (Battle item in lGIIBNJFADA)
+			Battle battle = null;
+			List<Battle> battles = zone.Battles;
+			foreach (Battle item in battles)
 			{
-				if (item.get_Type() == JBJHPJMJNNF)
+				if (item.get_Type() == battleType)
 				{
-					hHMPCKCPOEA = item;
+					battle = item;
 					break;
 				}
 				if (item.get_Type() != BattleType.FightUnregister)
@@ -284,37 +284,37 @@ namespace Nekki.SF2.GUI.Map
 					num++;
 				}
 			}
-			if (num < lGIIBNJFADA.Count)
+			if (num < battles.Count)
 			{
-				ActivateBattleAtIndex(hHMPCKCPOEA, num, PEJELKNFEKJ, HCNBLJBAOHK, DPFMIACNGLL);
+				ActivateBattleAtIndex(battle, num, isVisible, shouldSelect, skipFade);
 			}
 			else
 			{
-				GameLog.Error("DisplayZone::activeBattle - cant find type " + JBJHPJMJNNF);
+				GameLog.Error("DisplayZone::activeBattle - cant find type " + battleType);
 			}
 		}
 
-		private void ActivateBattleAtIndex(Battle HHMPCKCPOEA, int PHPDMMMAOIJ, bool PEJELKNFEKJ, bool HCNBLJBAOHK = true, bool DPFMIACNGLL = false)
+		private void ActivateBattleAtIndex(Battle battle, int buttonIndex, bool isVisible, bool shouldSelect = true, bool skipFade = false)
 		{
-			if (HHMPCKCPOEA == null)
+			if (battle == null)
 			{
 				return;
 			}
-			if (PHPDMMMAOIJ < _buttons.Count)
+			if (buttonIndex < _buttons.Count)
 			{
-				BattleButton battleButton = _buttons[PHPDMMMAOIJ];
-				if (battleButton.Locked != HHMPCKCPOEA.IsLocked())
+				BattleButton battleButton = _buttons[buttonIndex];
+				if (battleButton.Locked != battle.IsLocked())
 				{
-					battleButton = RecreateButtonForBattle(HHMPCKCPOEA);
+					battleButton = RecreateButtonForBattle(battle);
 				}
-				HHMPCKCPOEA.IsMapVisible = PEJELKNFEKJ;
-				if (PEJELKNFEKJ)
+				battle.IsMapVisible = isVisible;
+				if (isVisible)
 				{
 					if (battleButton != null)
 					{
-						if (DPFMIACNGLL)
+						if (skipFade)
 						{
-							battleButton.gameObject.SetActive(!HHMPCKCPOEA.IsHidden());
+							battleButton.gameObject.SetActive(!battle.IsHidden());
 						}
 						else
 						{
@@ -323,7 +323,7 @@ namespace Nekki.SF2.GUI.Map
 							battleButton.SetAlpha(1f, 0.5f);
 						}
 					}
-					SetLastBattle(HHMPCKCPOEA);
+					SetLastBattle(battle);
 				}
 				else
 				{
@@ -331,25 +331,25 @@ namespace Nekki.SF2.GUI.Map
 					{
 						battleButton.gameObject.SetActive(false);
 					}
-					if (HHMPCKCPOEA == lastSelectedBattle)
+					if (battle == lastSelectedBattle)
 					{
 						SelectFirstBattle();
 					}
 				}
-				if (HCNBLJBAOHK)
+				if (shouldSelect)
 				{
 					SelectBattle();
 				}
 			}
 			else
 			{
-				GameLog.Error("DisplayZone::activeBattle - no button " + PHPDMMMAOIJ);
+				GameLog.Error("DisplayZone::activeBattle - no button " + buttonIndex);
 			}
 		}
 
-		private BattleButton RecreateButtonForBattle(Battle DPOOIONCEOA)
+		private BattleButton RecreateButtonForBattle(Battle battle)
 		{
-			BattleButton buttonByBattle = GetButtonByBattle(DPOOIONCEOA);
+			BattleButton buttonByBattle = GetButtonByBattle(battle);
 			if (buttonByBattle == null)
 			{
 				GameLog.Error("DisplayZone::recreateButtonByBattle ERROR - btn is NULL");
@@ -365,9 +365,9 @@ namespace Nekki.SF2.GUI.Map
 				num++;
 			}
 			UnityEngine.Object.Destroy(buttonByBattle.gameObject);
-			buttonByBattle = CreateBattleButton(DPOOIONCEOA);
-			buttonByBattle.transform.localPosition = new Vector3(DPOOIONCEOA.GetPosition().x * 2f, DPOOIONCEOA.GetPosition().y * 2f, buttonByBattle.transform.position.z);
-			buttonByBattle.set_Hidden(DPOOIONCEOA.IsHidden());
+			buttonByBattle = CreateBattleButton(battle);
+			buttonByBattle.transform.localPosition = new Vector3(battle.GetPosition().x * 2f, battle.GetPosition().y * 2f, buttonByBattle.transform.position.z);
+			buttonByBattle.set_Hidden(battle.IsHidden());
 			_buttons[num] = buttonByBattle;
 			return buttonByBattle;
 		}
@@ -377,10 +377,10 @@ namespace Nekki.SF2.GUI.Map
 			foreach (BattleButton item in _buttons)
 			{
 				bool flag = false;
-				RosterBattle dDNLCGOPAGC = item.get_Battle().GetRosterBattle();
-				if (dDNLCGOPAGC != null)
+				RosterBattle rosterBattle = item.get_Battle().GetRosterBattle();
+				if (rosterBattle != null)
 				{
-					flag = dDNLCGOPAGC.IsHidden();
+					flag = rosterBattle.IsHidden();
 				}
 				if (item.get_Hidden() != flag)
 				{
@@ -413,8 +413,8 @@ namespace Nekki.SF2.GUI.Map
 
 		private void CreateBattleButtons()
 		{
-			List<Battle> lGIIBNJFADA = zone.Battles;
-			foreach (Battle item in lGIIBNJFADA)
+			List<Battle> battles = zone.Battles;
+			foreach (Battle item in battles)
 			{
 				if (item.get_Type() != BattleType.FightUnregister)
 				{
@@ -426,53 +426,53 @@ namespace Nekki.SF2.GUI.Map
 			}
 		}
 
-		private BattleButton CreateBattleButton(Battle DPOOIONCEOA)
+		private BattleButton CreateBattleButton(Battle battle)
 		{
-			RosterBattle dDNLCGOPAGC = DPOOIONCEOA.GetRosterBattle();
-			bool flag = dDNLCGOPAGC != null && dDNLCGOPAGC.IsLocked();
-			bool hidden = dDNLCGOPAGC != null && dDNLCGOPAGC.IsHidden();
+			RosterBattle rosterBattle = battle.GetRosterBattle();
+			bool flag = rosterBattle != null && rosterBattle.IsLocked();
+			bool hidden = rosterBattle != null && rosterBattle.IsHidden();
 			string iconAtlas = UnderworldMapBattlePresentation.ResolveBattleIconAtlas(
-				zone, DPOOIONCEOA.GetIconAtlas());
-			BattleButton battleButton = InstantiateBattleButton(DPOOIONCEOA.GetAlias(), DPOOIONCEOA.GetBaseIconName(), DPOOIONCEOA.GetActiveIconName(), DPOOIONCEOA.GetLockedIconName(), DPOOIONCEOA.GetLockedActiveIconName(), flag, iconAtlas);
-			if (Eclipse.Modding.ModPolicies.TryBattleIcons(DPOOIONCEOA.get_Name(), out var modIcons))
+				zone, battle.GetIconAtlas());
+			BattleButton battleButton = InstantiateBattleButton(battle.GetAlias(), battle.GetBaseIconName(), battle.GetActiveIconName(), battle.GetLockedIconName(), battle.GetLockedActiveIconName(), flag, iconAtlas);
+			if (Eclipse.Modding.ModPolicies.TryBattleIcons(battle.get_Name(), out var modIcons))
 			{
 				battleButton.ApplyModIcons(modIcons.Base, modIcons.Active, modIcons.Locked, modIcons.LockedActive, flag);
 			}
 			battleButton.onClick.AddListener(() =>
 			{
-				OnBattleButtonClicked(DPOOIONCEOA);
+				OnBattleButtonClicked(battle);
 			});
 			Eclipse.UI.PressBounce.Attach(battleButton.gameObject);
 			battleButton.Locked = flag;
-			battleButton.set_Battle(DPOOIONCEOA);
+			battleButton.set_Battle(battle);
 			battleButton.set_Hidden(hidden);
 			return battleButton;
 		}
 
-		private BattleButton InstantiateBattleButton(string OEICDGHJKMP, string KHPKDMGDMAB, string HNDCJIBKBML, string JMECOJDJMIA, string JIGDGEHJEDF, bool NIBIMBDBPMI, string iconAtlas)
+		private BattleButton InstantiateBattleButton(string alias, string baseIconName, string activeIconName, string lockedIconName, string lockedActiveIconName, bool isLocked, string iconAtlas)
 		{
 			GameObject gameObject = UnityEngine.Object.Instantiate(BattleBtnPrefab);
 			BattleButton component = gameObject.GetComponent<BattleButton>();
 			component.gameObject.transform.SetParent(base.gameObject.transform, false);
 			if (component != null)
 			{
-				component.Init(KHPKDMGDMAB, HNDCJIBKBML, JMECOJDJMIA, JIGDGEHJEDF, NIBIMBDBPMI, iconAtlas);
-				component.SetAlias(OEICDGHJKMP);
+				component.Init(baseIconName, activeIconName, lockedIconName, lockedActiveIconName, isLocked, iconAtlas);
+				component.SetAlias(alias);
 			}
 			return component;
 		}
 
 		private void OnBattleButtonClicked(object data)
 		{
-			Battle cGJCGEBPCAF = (Battle)data;
-			BattleButton buttonByBattle = GetButtonByBattle(cGJCGEBPCAF);
-			SetLastBattle(cGJCGEBPCAF);
+			Battle clickedBattle = (Battle)data;
+			BattleButton buttonByBattle = GetButtonByBattle(clickedBattle);
+			SetLastBattle(clickedBattle);
 			SelectBattle();
 		}
 
-		private Battle FindNearestVisibleBattle(Battle DPOOIONCEOA)
+		private Battle FindNearestVisibleBattle(Battle battle)
 		{
-			BattleButton buttonByBattle = GetButtonByBattle(DPOOIONCEOA);
+			BattleButton buttonByBattle = GetButtonByBattle(battle);
 			float x = buttonByBattle.transform.position.x;
 			float y = buttonByBattle.transform.position.y;
 			double num = 2147483647.0;
@@ -498,10 +498,10 @@ namespace Nekki.SF2.GUI.Map
 			return null;
 		}
 
-		public int CompareTo(ZoneScrollItem NOLFMPDGCOC)
+		public int CompareTo(ZoneScrollItem otherItem)
 		{
 			string text = ((zone == null) ? string.Empty : zone.get_Name());
-			string strB = ((NOLFMPDGCOC.zone == null) ? string.Empty : NOLFMPDGCOC.zone.get_Name());
+			string strB = ((otherItem.zone == null) ? string.Empty : otherItem.zone.get_Name());
 			return text.CompareTo(strB);
 		}
 

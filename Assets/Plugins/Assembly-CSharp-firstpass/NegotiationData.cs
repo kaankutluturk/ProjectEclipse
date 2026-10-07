@@ -165,9 +165,9 @@ public sealed class NegotiationData
 		}
 	}
 
-	public NegotiationData(Connection MDGFGCDPGFI)
+	public NegotiationData(Connection parentConnection)
 	{
-		connection = MDGFGCDPGFI;
+		connection = parentConnection;
 	}
 
 	public string GetUrl()
@@ -298,25 +298,25 @@ public sealed class NegotiationData
 		}
 	}
 
-	private void OnNegotiationRequestFinished(HTTPRequest CGOIOKHEGOE, HTTPResponse BEIGFGCBICO)
+	private void OnNegotiationRequestFinished(HTTPRequest request, HTTPResponse response)
 	{
 		negotiationRequest = null;
-		switch (CGOIOKHEGOE.GetState())
+		switch (request.GetState())
 		{
 		case HTTPRequestStates.Finished:
-			if (BEIGFGCBICO.GetIsSuccess())
+			if (response.GetIsSuccess())
 			{
-				HTTPManager.GetLogger().Information("NegotiationData", "Negotiation data arrived: " + BEIGFGCBICO.GetDataAsText());
-				int num = BEIGFGCBICO.GetDataAsText().IndexOf("{");
+				HTTPManager.GetLogger().Information("NegotiationData", "Negotiation data arrived: " + response.GetDataAsText());
+				int num = response.GetDataAsText().IndexOf("{");
 				if (num < 0)
 				{
-					RaiseOnError("Invalid negotiation text: " + BEIGFGCBICO.GetDataAsText());
+					RaiseOnError("Invalid negotiation text: " + response.GetDataAsText());
 					break;
 				}
-				NegotiationData jNNJJJOPCKL = Parse(BEIGFGCBICO.GetDataAsText().Substring(num));
-				if (jNNJJJOPCKL == null)
+				NegotiationData parsedData = Parse(response.GetDataAsText().Substring(num));
+				if (parsedData == null)
 				{
-					RaiseOnError("Parsing Negotiation data failed: " + BEIGFGCBICO.GetDataAsText());
+					RaiseOnError("Parsing Negotiation data failed: " + response.GetDataAsText());
 				}
 				else if (OnReceived != null)
 				{
@@ -326,33 +326,33 @@ public sealed class NegotiationData
 			}
 			else
 			{
-				RaiseOnError(string.Format("Negotiation request finished Successfully, but the server sent an error. Status Code: {0}-{1} Message: {2} Uri: {3}", BEIGFGCBICO.GetStatusCode(), BEIGFGCBICO.GetMessage(), BEIGFGCBICO.GetDataAsText(), CGOIOKHEGOE.GetCurrentUri()));
+				RaiseOnError(string.Format("Negotiation request finished Successfully, but the server sent an error. Status Code: {0}-{1} Message: {2} Uri: {3}", response.GetStatusCode(), response.GetMessage(), response.GetDataAsText(), request.GetCurrentUri()));
 			}
 			break;
 		case HTTPRequestStates.Error:
-			RaiseOnError((CGOIOKHEGOE.GetException() == null) ? string.Empty : (CGOIOKHEGOE.GetException().Message + " " + CGOIOKHEGOE.GetException().StackTrace));
+			RaiseOnError((request.GetException() == null) ? string.Empty : (request.GetException().Message + " " + request.GetException().StackTrace));
 			break;
 		default:
-			RaiseOnError(CGOIOKHEGOE.GetState().ToString());
+			RaiseOnError(request.GetState().ToString());
 			break;
 		}
 	}
 
-	private void RaiseOnError(string KEPBNIIECPN)
+	private void RaiseOnError(string error)
 	{
-		HTTPManager.GetLogger().Error("NegotiationData", "Negotiation request failed with error: " + KEPBNIIECPN);
+		HTTPManager.GetLogger().Error("NegotiationData", "Negotiation request failed with error: " + error);
 		if (OnError != null)
 		{
-			OnError(this, KEPBNIIECPN);
+			OnError(this, error);
 			OnError = null;
 		}
 	}
 
-	private NegotiationData Parse(string IGGFGLLIGCG)
+	private NegotiationData Parse(string json)
 	{
-		bool IBFAPIMOMBA = false;
-		Dictionary<string, object> dictionary = Json.Decode(IGGFGLLIGCG, ref IBFAPIMOMBA) as Dictionary<string, object>;
-		if (!IBFAPIMOMBA)
+		bool success = false;
+		Dictionary<string, object> dictionary = Json.Decode(json, ref success) as Dictionary<string, object>;
+		if (!success)
 		{
 			return null;
 		}
@@ -377,31 +377,31 @@ public sealed class NegotiationData
 			SetLongPollDelay(TimeSpan.FromSeconds(GetDouble(dictionary, "LongPollDelay")));
 			return this;
 		}
-		catch (Exception mPFFFAOGBJE)
+		catch (Exception exception)
 		{
-			HTTPManager.GetLogger().Exception("NegotiationData", "Parse", mPFFFAOGBJE);
+			HTTPManager.GetLogger().Exception("NegotiationData", "Parse", exception);
 			return null;
 		}
 	}
 
-	private static object Get(Dictionary<string, object> IOFHCAAOELD, string KGBGENDIMBC)
+	private static object Get(Dictionary<string, object> data, string key)
 	{
 		object value;
-		if (!IOFHCAAOELD.TryGetValue(KGBGENDIMBC, out value))
+		if (!data.TryGetValue(key, out value))
 		{
-			throw new Exception(string.Format("Can't get {0} from Negotiation data!", KGBGENDIMBC));
+			throw new Exception(string.Format("Can't get {0} from Negotiation data!", key));
 		}
 		return value;
 	}
 
-	private static string GetString(Dictionary<string, object> IOFHCAAOELD, string KGBGENDIMBC)
+	private static string GetString(Dictionary<string, object> data, string key)
 	{
-		return Get(IOFHCAAOELD, KGBGENDIMBC) as string;
+		return Get(data, key) as string;
 	}
 
-	private static List<string> GetStringList(Dictionary<string, object> IOFHCAAOELD, string KGBGENDIMBC)
+	private static List<string> GetStringList(Dictionary<string, object> data, string key)
 	{
-		List<object> list = Get(IOFHCAAOELD, KGBGENDIMBC) as List<object>;
+		List<object> list = Get(data, key) as List<object>;
 		List<string> list2 = new List<string>(list.Count);
 		for (int i = 0; i < list.Count; i++)
 		{
@@ -414,13 +414,13 @@ public sealed class NegotiationData
 		return list2;
 	}
 
-	private static int GetInt(Dictionary<string, object> IOFHCAAOELD, string KGBGENDIMBC)
+	private static int GetInt(Dictionary<string, object> data, string key)
 	{
-		return (int)(double)Get(IOFHCAAOELD, KGBGENDIMBC);
+		return (int)(double)Get(data, key);
 	}
 
-	private static double GetDouble(Dictionary<string, object> IOFHCAAOELD, string KGBGENDIMBC)
+	private static double GetDouble(Dictionary<string, object> data, string key)
 	{
-		return (double)Get(IOFHCAAOELD, KGBGENDIMBC);
+		return (double)Get(data, key);
 	}
 }

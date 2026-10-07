@@ -22,10 +22,10 @@ public class PerkActionClearAction : PerkAction
 	{
 	}
 
-	public PerkActionClearAction(PerkActionClearAction NOLFMPDGCOC)
-		: base(NOLFMPDGCOC)
+	public PerkActionClearAction(PerkActionClearAction source)
+		: base(source)
 	{
-		set_NameAction(NOLFMPDGCOC.GetNameAction());
+		set_NameAction(source.GetNameAction());
 	}
 
 	public string GetNameAction()

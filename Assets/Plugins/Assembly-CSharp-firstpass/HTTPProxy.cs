@@ -83,33 +83,33 @@ public sealed class HTTPProxy
 	{
 	}
 
-	public HTTPProxy(Uri IKHEAOEKLHL)
-		: this(IKHEAOEKLHL, null, false)
+	public HTTPProxy(Uri address)
+		: this(address, null, false)
 	{
 	}
 
-	public HTTPProxy(Uri IKHEAOEKLHL, Credentials JKBAHGNLECO)
-		: this(IKHEAOEKLHL, JKBAHGNLECO, false)
+	public HTTPProxy(Uri address, Credentials credentials)
+		: this(address, credentials, false)
 	{
 	}
 
-	public HTTPProxy(Uri IKHEAOEKLHL, Credentials JKBAHGNLECO, bool CBLAANPNDHE)
-		: this(IKHEAOEKLHL, JKBAHGNLECO, CBLAANPNDHE, true)
+	public HTTPProxy(Uri address, Credentials credentials, bool isTransparent)
+		: this(address, credentials, isTransparent, true)
 	{
 	}
 
-	public HTTPProxy(Uri IKHEAOEKLHL, Credentials JKBAHGNLECO, bool CBLAANPNDHE, bool HAIHALMOEFD)
-		: this(IKHEAOEKLHL, JKBAHGNLECO, CBLAANPNDHE, true, true)
+	public HTTPProxy(Uri address, Credentials credentials, bool isTransparent, bool sendWholeUri)
+		: this(address, credentials, isTransparent, true, true)
 	{
 	}
 
-	public HTTPProxy(Uri IKHEAOEKLHL, Credentials JKBAHGNLECO, bool CBLAANPNDHE, bool HAIHALMOEFD, bool AGCDFHONOEF)
+	public HTTPProxy(Uri address, Credentials credentials, bool isTransparent, bool sendWholeUri, bool nonTransparentForHttps)
 	{
-		set_Address(IKHEAOEKLHL);
-		SetCredentials(JKBAHGNLECO);
-		SetIsTransparent(CBLAANPNDHE);
-		SetSendWholeUri(HAIHALMOEFD);
-		SetNonTransparentForHTTPS(AGCDFHONOEF);
+		set_Address(address);
+		SetCredentials(credentials);
+		SetIsTransparent(isTransparent);
+		SetSendWholeUri(sendWholeUri);
+		SetNonTransparentForHTTPS(nonTransparentForHttps);
 	}
 
 	public Uri GetAddress()

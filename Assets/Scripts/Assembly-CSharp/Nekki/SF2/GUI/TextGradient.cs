@@ -12,17 +12,17 @@ namespace Nekki.SF2.GUI
 		[SerializeField]
 		private Color32 bottomColor = Color.black;
 
-		public override void ModifyMesh(VertexHelper CEDCPKHHDGF)
+		public override void ModifyMesh(VertexHelper vertexHelper)
 		{
 			if (!IsActive())
 			{
 				return;
 			}
 			List<UIVertex> list = new List<UIVertex>();
-			CEDCPKHHDGF.GetUIVertexStream(list);
+			vertexHelper.GetUIVertexStream(list);
 			float num = list[0].position.y;
 			float num2 = list[0].position.y;
-			for (int i = 1; i < CEDCPKHHDGF.currentVertCount; i++)
+			for (int i = 1; i < vertexHelper.currentVertCount; i++)
 			{
 				float y = list[i].position.y;
 				if (y > num2)
@@ -36,11 +36,11 @@ namespace Nekki.SF2.GUI
 			}
 			float num3 = num2 - num;
 			UIVertex vertex = default(UIVertex);
-			for (int j = 0; j < CEDCPKHHDGF.currentVertCount; j++)
+			for (int j = 0; j < vertexHelper.currentVertCount; j++)
 			{
-				CEDCPKHHDGF.PopulateUIVertex(ref vertex, j);
+				vertexHelper.PopulateUIVertex(ref vertex, j);
 				vertex.color = Color32.Lerp(bottomColor, topColor, (vertex.position.y - num) / num3);
-				CEDCPKHHDGF.SetUIVertex(vertex, j);
+				vertexHelper.SetUIVertex(vertex, j);
 			}
 		}
 	}

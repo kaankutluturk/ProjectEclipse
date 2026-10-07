@@ -3,9 +3,9 @@ using Nekki.SF2.GUI;
 
 public class QuestActionStoryTutorialLearnPerk : QuestAction
 {
-	public override void Execute(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters parameters)
 	{
-		base.Execute(GFIHPBCEEOB);
+		base.Execute(parameters);
 		TutorialCanvas.get_Instance().set_BlockOn(true);
 		ProfileScene current = Scene<ProfileScene>.get_Current();
 		if (current == null)
@@ -13,8 +13,8 @@ public class QuestActionStoryTutorialLearnPerk : QuestAction
 			FinishAction();
 			return;
 		}
-		string oHCGEEEKEJH = "PERK_DOUBLE_SWEEP";
-		current.ScrollToItemByName(SliderType.SliderPerks, oHCGEEEKEJH);
+		string perkName = "PERK_DOUBLE_SWEEP";
+		current.ScrollToItemByName(SliderType.SliderPerks, perkName);
 		LabelButton btnPerkImprove = current.GetBtnPerkImprove();
 		btnPerkImprove.set_IsFlashing(true);
 		btnPerkImprove.GetComponent<TutorialComponent>().IsActive = true;

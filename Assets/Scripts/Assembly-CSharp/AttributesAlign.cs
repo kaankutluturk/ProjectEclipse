@@ -18,38 +18,38 @@ public class AttributesAlign
 		DifficultyFilter = ModelParameters.DifficultyFilter.DFBoth;
 	}
 
-	public AttributesAlign(AttributesAlign NBMGOEMJJAF)
+	public AttributesAlign(AttributesAlign other)
 	{
-		Factor = NBMGOEMJJAF.Factor;
-		Shift = NBMGOEMJJAF.Shift;
-		Priority = NBMGOEMJJAF.Priority;
-		DifficultyFilter = NBMGOEMJJAF.DifficultyFilter;
+		Factor = other.Factor;
+		Shift = other.Shift;
+		Priority = other.Priority;
+		DifficultyFilter = other.DifficultyFilter;
 	}
 
-	public static int GetMaxPriority(List<AttributesAlign> JPJIIDGEODE)
+	public static int GetMaxPriority(List<AttributesAlign> alignments)
 	{
 		int num = int.MinValue;
-		for (int i = 0; i < JPJIIDGEODE.Count; i++)
+		for (int i = 0; i < alignments.Count; i++)
 		{
-			if (num < JPJIIDGEODE[i].Priority)
+			if (num < alignments[i].Priority)
 			{
-				num = JPJIIDGEODE[i].Priority;
+				num = alignments[i].Priority;
 			}
 		}
 		return num;
 	}
 
-	public static int AppendHighestPriority(List<AttributesAlign> MHDPIEJEKIP, List<AttributesAlign> PNKJPOHEOJB)
+	public static int AppendHighestPriority(List<AttributesAlign> source, List<AttributesAlign> destination)
 	{
-		int count = PNKJPOHEOJB.Count;
-		int num = GetMaxPriority(MHDPIEJEKIP);
-		for (int i = 0; i < MHDPIEJEKIP.Count; i++)
+		int count = destination.Count;
+		int num = GetMaxPriority(source);
+		for (int i = 0; i < source.Count; i++)
 		{
-			if (MHDPIEJEKIP[i].Priority == num)
+			if (source[i].Priority == num)
 			{
-				PNKJPOHEOJB.Add(MHDPIEJEKIP[i]);
+				destination.Add(source[i]);
 			}
 		}
-		return PNKJPOHEOJB.Count - count;
+		return destination.Count - count;
 	}
 }

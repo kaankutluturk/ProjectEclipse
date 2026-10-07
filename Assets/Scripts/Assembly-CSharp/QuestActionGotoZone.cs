@@ -8,16 +8,16 @@ public class QuestActionGotoZone : QuestAction
 
 	private int _frames;
 
-	public override void Parse(XmlNode EPKLCPOEELO)
+	public override void Parse(XmlNode node)
 	{
-		base.Parse(EPKLCPOEELO);
-		_name = EPKLCPOEELO.Attributes["Name"].GetStringOrDefault(string.Empty);
-		_frames = EPKLCPOEELO.Attributes["Frames"].ParseInt();
+		base.Parse(node);
+		_name = node.Attributes["Name"].GetStringOrDefault(string.Empty);
+		_frames = node.Attributes["Frames"].ParseInt();
 	}
 
-	public override void Execute(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters parameters)
 	{
-		base.Execute(GFIHPBCEEOB);
+		base.Execute(parameters);
 		MapScene current = Scene<MapScene>.get_Current();
 		if (current != null)
 		{

@@ -21,16 +21,16 @@ public class Comment : ParsingEvent
 		}
 	}
 
-	public Comment(string value, bool EKOKIGANOMO)
-		: this(value, EKOKIGANOMO, Mark.Empty, Mark.Empty)
+	public Comment(string value, bool isInline)
+		: this(value, isInline, Mark.Empty, Mark.Empty)
 	{
 	}
 
-	public Comment(string value, bool EKOKIGANOMO, Mark ILENLCMAMBH, Mark PCLFFOBJJFO)
-		: base(ILENLCMAMBH, PCLFFOBJJFO)
+	public Comment(string value, bool isInline, Mark start, Mark end)
+		: base(start, end)
 	{
 		set_Value(value);
-		set_IsInline(EKOKIGANOMO);
+		set_IsInline(isInline);
 	}
 
 	public string GetValue()
@@ -58,8 +58,8 @@ public class Comment : ParsingEvent
 		return ParsingEventType.Comment;
 	}
 
-	public override void Accept(IParsingEventVisitor NKECMANOOEM)
+	public override void Accept(IParsingEventVisitor visitor)
 	{
-		NKECMANOOEM.Visit(this);
+		visitor.Visit(this);
 	}
 }

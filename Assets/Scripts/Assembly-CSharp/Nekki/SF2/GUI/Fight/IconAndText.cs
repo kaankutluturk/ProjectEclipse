@@ -14,11 +14,11 @@ namespace Nekki.SF2.GUI.Fight
 		[SerializeField]
 		private LayoutElement layoutElement;
 
-		public void SetIcon(string INFKLFKKJOJ)
+		public void SetIcon(string spriteName)
 		{
 			if (icon != null)
 			{
-				icon.set_SpriteName(INFKLFKKJOJ);
+				icon.set_SpriteName(spriteName);
 			}
 			UpdateLayoutWidth();
 		}

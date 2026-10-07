@@ -67,15 +67,15 @@ internal class DeflateStreamAsyncResult : IAsyncResult
 		}
 	}
 
-	public DeflateStreamAsyncResult(object FKBFNLAMILO, object LEGPNOBHGIE, AsyncCallback FCLGHDMMEBC, byte[] buffer, int IPCOBJBKNAO, int count)
+	public DeflateStreamAsyncResult(object asyncObject, object asyncState, AsyncCallback asyncCallback, byte[] buffer, int offset, int count)
 	{
 		this.buffer = buffer;
-		this.offset = IPCOBJBKNAO;
+		this.offset = offset;
 		this.count = count;
 		m_CompletedSynchronously = true;
-		m_AsyncObject = FKBFNLAMILO;
-		m_AsyncState = LEGPNOBHGIE;
-		m_AsyncCallback = FCLGHDMMEBC;
+		m_AsyncObject = asyncObject;
+		m_AsyncState = asyncState;
+		m_AsyncCallback = asyncCallback;
 	}
 
 	public object AsyncState
@@ -90,13 +90,13 @@ internal class DeflateStreamAsyncResult : IAsyncResult
 	{
 		get
 		{
-		int oBPDLMDNOEM = m_Completed;
+		int completed = m_Completed;
 		if (m_Event == null)
 		{
-			Interlocked.CompareExchange(ref m_Event, new ManualResetEvent(oBPDLMDNOEM != 0), null);
+			Interlocked.CompareExchange(ref m_Event, new ManualResetEvent(completed != 0), null);
 		}
 		ManualResetEvent manualResetEvent = (ManualResetEvent)m_Event;
-		if (oBPDLMDNOEM == 0 && m_Completed != 0)
+		if (completed == 0 && m_Completed != 0)
 		{
 			manualResetEvent.Set();
 		}
@@ -133,25 +133,25 @@ internal class DeflateStreamAsyncResult : IAsyncResult
 		}
 	}
 
-	internal void InvokeCallback(bool ALLIOBCJDGG, object DCJLKCFKCOM)
+	internal void InvokeCallback(bool completedSynchronously, object result)
 	{
-		Complete(ALLIOBCJDGG, DCJLKCFKCOM);
+		Complete(completedSynchronously, result);
 	}
 
-	internal void InvokeCallback(object DCJLKCFKCOM)
+	internal void InvokeCallback(object result)
 	{
-		Complete(DCJLKCFKCOM);
+		Complete(result);
 	}
 
-	private void Complete(bool ALLIOBCJDGG, object DCJLKCFKCOM)
+	private void Complete(bool completedSynchronously, object result)
 	{
-		m_CompletedSynchronously = ALLIOBCJDGG;
-		Complete(DCJLKCFKCOM);
+		m_CompletedSynchronously = completedSynchronously;
+		Complete(result);
 	}
 
-	private void Complete(object DCJLKCFKCOM)
+	private void Complete(object result)
 	{
-		m_AsyncResult = DCJLKCFKCOM;
+		m_AsyncResult = result;
 		Interlocked.Increment(ref m_Completed);
 		if (m_Event != null)
 		{

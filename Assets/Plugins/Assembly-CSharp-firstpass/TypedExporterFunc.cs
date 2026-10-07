@@ -1,1 +1,1 @@
-public delegate void TypedExporterFunc<T>(T AOMLCBHAJJH, JsonWriter writer);
+public delegate void TypedExporterFunc<T>(T obj, JsonWriter writer);

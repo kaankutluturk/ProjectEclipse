@@ -32,8 +32,8 @@ public class LoseFallRule : AnimationListRule
 
 	private bool _isCheckRender;
 
-	public LoseFallRule(XmlNode node, RuleAppliance EJPOJJKKICO)
-		: base(RuleType.RuleLoseFall, EJPOJJKKICO, node)
+	public LoseFallRule(XmlNode node, RuleAppliance appliance)
+		: base(RuleType.RuleLoseFall, appliance, node)
 	{
 		_isCheckRender = false;
 		maxX = -100000f;
@@ -81,24 +81,24 @@ public class LoseFallRule : AnimationListRule
 	public override void InitRule(object data)
 	{
 		Reset();
-		RuleInitData oIFPCFEGFOB = (RuleInitData)data;
-		if (oIFPCFEGFOB.FightLocation != null)
+		RuleInitData initData = (RuleInitData)data;
+		if (initData.FightLocation != null)
 		{
-			offsetX = (0f - oIFPCFEGFOB.FightLocation.width) / 2f;
-			offsetY = 0f - oIFPCFEGFOB.FightLocation.positionY;
+			offsetX = (0f - initData.FightLocation.width) / 2f;
+			offsetY = 0f - initData.FightLocation.positionY;
 		}
 		switch (appliance)
 		{
 		case RuleAppliance.AppliancePlayer:
-			if (oIFPCFEGFOB.PlayerModel != null)
+			if (initData.PlayerModel != null)
 			{
-				_node = oIFPCFEGFOB.PlayerModel.GetBodyObject().GetNodeByName(_nodeName);
+				_node = initData.PlayerModel.GetBodyObject().GetNodeByName(_nodeName);
 			}
 			break;
 		case RuleAppliance.ApplianceOpponent:
-			if (oIFPCFEGFOB.OpponentModel != null)
+			if (initData.OpponentModel != null)
 			{
-				_node = oIFPCFEGFOB.OpponentModel.GetBodyObject().GetNodeByName(_nodeName);
+				_node = initData.OpponentModel.GetBodyObject().GetNodeByName(_nodeName);
 			}
 			break;
 		}
@@ -120,14 +120,14 @@ public class LoseFallRule : AnimationListRule
 
 	protected override bool CompareSingle(object data)
 	{
-		FightData hCPJJKMNMCE = (FightData)data;
-		switch (hCPJJKMNMCE.FightEventType)
+		FightData fightData = (FightData)data;
+		switch (fightData.FightEventType)
 		{
 		case FightEvent.PhysicsStartEvent:
 			_isCheckRender = true;
 			return CheckOutOfBounds();
 		case FightEvent.AnimationStartEvent:
-			_isCheckRender = CheckAnimation(hCPJJKMNMCE.CurrentAnimation);
+			_isCheckRender = CheckAnimation(fightData.CurrentAnimation);
 			return CheckOutOfBounds();
 		case FightEvent.RenderEvent:
 			return CheckOutOfBounds();

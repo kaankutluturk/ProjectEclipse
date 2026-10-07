@@ -2,46 +2,46 @@ using UnityEngine;
 
 public static class ResourcesAndBundles
 {
-	public static T Load<T>(string ONEIGMLOGDC) where T : Object
+	public static T Load<T>(string assetPath) where T : Object
 	{
 		T modAsset;
-			if (Eclipse.Modding.ModRuntime.TryLoadQualified(ONEIGMLOGDC, out modAsset))
+			if (Eclipse.Modding.ModRuntime.TryLoadQualified(assetPath, out modAsset))
 			{
 				return modAsset;
 			}
-			if (Eclipse.Modding.ModRuntime.TryLoadCore(ONEIGMLOGDC, out modAsset))
+			if (Eclipse.Modding.ModRuntime.TryLoadCore(assetPath, out modAsset))
 			{
 				return modAsset;
 			}
 
-		if (IsLooseLocationAsset(ONEIGMLOGDC))
+		if (IsLooseLocationAsset(assetPath))
 		{
-			return Resources.Load<T>(ONEIGMLOGDC);
+			return Resources.Load<T>(assetPath);
 		}
 
 			// Core assets are owned by the reserved core namespace. The provider currently
 			// reads TAR/LZ4 through PackagedArtCatalog; callers do not depend on that storage.
-			return Resources.Load<T>(ONEIGMLOGDC);
+			return Resources.Load<T>(assetPath);
 	}
 
-	public static T[] LoadAllAssets<T>(string ONEIGMLOGDC) where T : Object
+	public static T[] LoadAllAssets<T>(string assetPath) where T : Object
 	{
 		T[] modAssets;
-			if (Eclipse.Modding.ModRuntime.TryLoadQualifiedWithSubAssets(ONEIGMLOGDC, out modAssets))
+			if (Eclipse.Modding.ModRuntime.TryLoadQualifiedWithSubAssets(assetPath, out modAssets))
 			{
 				return modAssets;
 			}
-			if (Eclipse.Modding.ModRuntime.TryLoadCoreWithSubAssets(ONEIGMLOGDC, out modAssets))
+			if (Eclipse.Modding.ModRuntime.TryLoadCoreWithSubAssets(assetPath, out modAssets))
 			{
 				return modAssets;
 			}
 
-		if (IsLooseLocationAsset(ONEIGMLOGDC))
+		if (IsLooseLocationAsset(assetPath))
 		{
-			return Resources.LoadAll<T>(ONEIGMLOGDC);
+			return Resources.LoadAll<T>(assetPath);
 		}
 
-			return Resources.LoadAll<T>(ONEIGMLOGDC);
+			return Resources.LoadAll<T>(assetPath);
 	}
 
 	private static bool IsLooseLocationAsset(string resourcePath)

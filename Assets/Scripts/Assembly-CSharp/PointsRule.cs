@@ -35,8 +35,8 @@ public class PointsRule : InFightRule
 
 	private StrikeZone strikeZone;
 
-	public PointsRule(XmlNode node, RuleAppliance EJPOJJKKICO)
-		: base(RuleType.RulePoints, EJPOJJKKICO, node)
+	public PointsRule(XmlNode node, RuleAppliance appliance)
+		: base(RuleType.RulePoints, appliance, node)
 	{
 		opponentPoints = 0;
 		playerPoints = 0;
@@ -63,9 +63,9 @@ public class PointsRule : InFightRule
 	public override bool Compare(object data)
 	{
 		PrepareCompare(data);
-		PlayersFightData jNGGHELCPFM = (PlayersFightData)data;
-		bool result = false || TryCountStrike(jNGGHELCPFM.PlayerData, jNGGHELCPFM.EnemyData, true) || TryCountStrike(jNGGHELCPFM.EnemyData, jNGGHELCPFM.PlayerData, false);
-		if (jNGGHELCPFM.PlayerData.FightEventType == FightEvent.TimeoutEvent || jNGGHELCPFM.EnemyData.FightEventType == FightEvent.TimeoutEvent)
+		PlayersFightData fightData = (PlayersFightData)data;
+		bool result = false || TryCountStrike(fightData.PlayerData, fightData.EnemyData, true) || TryCountStrike(fightData.EnemyData, fightData.PlayerData, false);
+		if (fightData.PlayerData.FightEventType == FightEvent.TimeoutEvent || fightData.EnemyData.FightEventType == FightEvent.TimeoutEvent)
 		{
 			isFinished = true;
 			result = true;
@@ -160,19 +160,19 @@ public class PointsRule : InFightRule
 		}
 	}
 
-	protected bool CheckStrikeZone(bool BNPGBHPDGHM)
+	protected bool CheckStrikeZone(bool isHeadHit)
 	{
-		return strikeZone == StrikeZone.STRIKE_ZONE_ALL || (strikeZone == StrikeZone.STRIKE_ZONE_HEAD && BNPGBHPDGHM) || (strikeZone == StrikeZone.STRIKE_ZONE_BODY && !BNPGBHPDGHM);
+		return strikeZone == StrikeZone.STRIKE_ZONE_ALL || (strikeZone == StrikeZone.STRIKE_ZONE_HEAD && isHeadHit) || (strikeZone == StrikeZone.STRIKE_ZONE_BODY && !isHeadHit);
 	}
 
-	protected bool TryCountStrike(FightData MKIPNLEHIGE, FightData PHPLHIDFGMG, bool AKBKFMJLNFK)
+	protected bool TryCountStrike(FightData strikerData, FightData targetData, bool isPlayer)
 	{
-		bool flag = !hasBlockFilter || MKIPNLEHIGE.IsBlocked == requiredBlock;
-		bool flag2 = !hasCriticalFilter || MKIPNLEHIGE.IsCritical == requiredCritical;
-		bool flag3 = !hasShockFilter || PHPLHIDFGMG.IsShocked == requiredShock;
-		if (MKIPNLEHIGE.FightEventType == FightEvent.StrikeEvent && MKIPNLEHIGE.IsAttacker && flag && CheckStrikeZone(MKIPNLEHIGE.IsHeadHit) && flag2 && flag3)
+		bool flag = !hasBlockFilter || strikerData.IsBlocked == requiredBlock;
+		bool flag2 = !hasCriticalFilter || strikerData.IsCritical == requiredCritical;
+		bool flag3 = !hasShockFilter || targetData.IsShocked == requiredShock;
+		if (strikerData.FightEventType == FightEvent.StrikeEvent && strikerData.IsAttacker && flag && CheckStrikeZone(strikerData.IsHeadHit) && flag2 && flag3)
 		{
-			if (AKBKFMJLNFK)
+			if (isPlayer)
 			{
 				playerPoints++;
 			}
@@ -180,7 +180,7 @@ public class PointsRule : InFightRule
 			{
 				opponentPoints++;
 			}
-			if (tableType == PointsTableType.POINTS_TABLE_SCORE && ((AKBKFMJLNFK && playerPoints >= maxPoints) || (!AKBKFMJLNFK && opponentPoints >= maxPoints)))
+			if (tableType == PointsTableType.POINTS_TABLE_SCORE && ((isPlayer && playerPoints >= maxPoints) || (!isPlayer && opponentPoints >= maxPoints)))
 			{
 				isFinished = true;
 			}
@@ -191,11 +191,11 @@ public class PointsRule : InFightRule
 
 	public override InFightRule Copy()
 	{
-		InFightRule aAJIFBJLJOA = null;
-		RuleAppliance eJPOJJKKICO = GetAppliance();
-		XmlNode hKPPBKPJOEO = GetXmlSource().GetNode();
-		aAJIFBJLJOA = new PointsRule(hKPPBKPJOEO, eJPOJJKKICO);
-		aAJIFBJLJOA.IsRandom = IsRandom;
-		return aAJIFBJLJOA;
+		InFightRule copy = null;
+		RuleAppliance appliance = GetAppliance();
+		XmlNode node = GetXmlSource().GetNode();
+		copy = new PointsRule(node, appliance);
+		copy.IsRandom = IsRandom;
+		return copy;
 	}
 }

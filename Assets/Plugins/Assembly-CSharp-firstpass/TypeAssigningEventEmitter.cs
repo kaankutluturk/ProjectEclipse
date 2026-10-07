@@ -5,22 +5,22 @@ public sealed class TypeAssigningEventEmitter : ChainedEventEmitter
 {
 	private readonly bool requireTagWhenStaticAndActualTypesAreDifferent;
 
-	public TypeAssigningEventEmitter(IEventEmitter JDJEJDIJLLE, bool KAHOIHHBHGG)
-		: base(JDJEJDIJLLE)
+	public TypeAssigningEventEmitter(IEventEmitter innerEmitter, bool requireTag)
+		: base(innerEmitter)
 	{
-		requireTagWhenStaticAndActualTypesAreDifferent = KAHOIHHBHGG;
+		requireTagWhenStaticAndActualTypesAreDifferent = requireTag;
 	}
 
-	public override void Emit(ScalarEventInfo FNHCFCAALAE)
+	public override void Emit(ScalarEventInfo eventInfo)
 	{
-		FNHCFCAALAE.SetIsPlainImplicit(true);
-		FNHCFCAALAE.SetStyle(ScalarStyle.Plain);
-		TypeCode typeCode = ((FNHCFCAALAE.GetSource().GetValue() != null) ? FNHCFCAALAE.GetSource().get_Type().GetTypeCode() : TypeCode.Empty);
+		eventInfo.SetIsPlainImplicit(true);
+		eventInfo.SetStyle(ScalarStyle.Plain);
+		TypeCode typeCode = ((eventInfo.GetSource().GetValue() != null) ? eventInfo.GetSource().get_Type().GetTypeCode() : TypeCode.Empty);
 		switch (typeCode)
 		{
 		case TypeCode.Boolean:
-			FNHCFCAALAE.set_Tag("tag:yaml.org,2002:bool");
-			FNHCFCAALAE.set_RenderedValue(YamlFormatter.FormatBool(FNHCFCAALAE.GetSource().GetValue()));
+			eventInfo.set_Tag("tag:yaml.org,2002:bool");
+			eventInfo.set_RenderedValue(YamlFormatter.FormatBool(eventInfo.GetSource().GetValue()));
 			break;
 		case TypeCode.SByte:
 		case TypeCode.Byte:
@@ -30,57 +30,57 @@ public sealed class TypeAssigningEventEmitter : ChainedEventEmitter
 		case TypeCode.UInt32:
 		case TypeCode.Int64:
 		case TypeCode.UInt64:
-			FNHCFCAALAE.set_Tag("tag:yaml.org,2002:int");
-			FNHCFCAALAE.set_RenderedValue(YamlFormatter.FormatNumber(FNHCFCAALAE.GetSource().GetValue()));
+			eventInfo.set_Tag("tag:yaml.org,2002:int");
+			eventInfo.set_RenderedValue(YamlFormatter.FormatNumber(eventInfo.GetSource().GetValue()));
 			break;
 		case TypeCode.Single:
 		case TypeCode.Double:
 		case TypeCode.Decimal:
-			FNHCFCAALAE.set_Tag("tag:yaml.org,2002:float");
-			FNHCFCAALAE.set_RenderedValue(YamlFormatter.FormatNumber(FNHCFCAALAE.GetSource().GetValue()));
+			eventInfo.set_Tag("tag:yaml.org,2002:float");
+			eventInfo.set_RenderedValue(YamlFormatter.FormatNumber(eventInfo.GetSource().GetValue()));
 			break;
 		case TypeCode.Char:
 		case TypeCode.String:
-			FNHCFCAALAE.set_Tag("tag:yaml.org,2002:str");
-			FNHCFCAALAE.set_RenderedValue(FNHCFCAALAE.GetSource().GetValue().ToString());
-			FNHCFCAALAE.SetStyle(ScalarStyle.Any);
+			eventInfo.set_Tag("tag:yaml.org,2002:str");
+			eventInfo.set_RenderedValue(eventInfo.GetSource().GetValue().ToString());
+			eventInfo.SetStyle(ScalarStyle.Any);
 			break;
 		case TypeCode.DateTime:
-			FNHCFCAALAE.set_Tag("tag:yaml.org,2002:timestamp");
-			FNHCFCAALAE.set_RenderedValue(YamlFormatter.FormatDateTime(FNHCFCAALAE.GetSource().GetValue()));
+			eventInfo.set_Tag("tag:yaml.org,2002:timestamp");
+			eventInfo.set_RenderedValue(YamlFormatter.FormatDateTime(eventInfo.GetSource().GetValue()));
 			break;
 		case TypeCode.Empty:
-			FNHCFCAALAE.set_Tag("tag:yaml.org,2002:null");
-			FNHCFCAALAE.set_RenderedValue(string.Empty);
+			eventInfo.set_Tag("tag:yaml.org,2002:null");
+			eventInfo.set_RenderedValue(string.Empty);
 			break;
 		default:
-			if (FNHCFCAALAE.GetSource().get_Type() == typeof(TimeSpan))
+			if (eventInfo.GetSource().get_Type() == typeof(TimeSpan))
 			{
-				FNHCFCAALAE.set_RenderedValue(YamlFormatter.FormatTimeSpan(FNHCFCAALAE.GetSource().GetValue()));
+				eventInfo.set_RenderedValue(YamlFormatter.FormatTimeSpan(eventInfo.GetSource().GetValue()));
 				break;
 			}
 			throw new NotSupportedException(string.Format(CultureInfo.InvariantCulture, "TypeCode.{0} is not supported.", typeCode));
 		}
-		base.Emit(FNHCFCAALAE);
+		base.Emit(eventInfo);
 	}
 
-	public override void Emit(MappingStartEventInfo FNHCFCAALAE)
+	public override void Emit(MappingStartEventInfo eventInfo)
 	{
-		AssignTypeIfDifferent(FNHCFCAALAE);
-		base.Emit(FNHCFCAALAE);
+		AssignTypeIfDifferent(eventInfo);
+		base.Emit(eventInfo);
 	}
 
-	public override void Emit(SequenceStartEventInfo FNHCFCAALAE)
+	public override void Emit(SequenceStartEventInfo eventInfo)
 	{
-		AssignTypeIfDifferent(FNHCFCAALAE);
-		base.Emit(FNHCFCAALAE);
+		AssignTypeIfDifferent(eventInfo);
+		base.Emit(eventInfo);
 	}
 
-	private void AssignTypeIfDifferent(ObjectEventInfo FNHCFCAALAE)
+	private void AssignTypeIfDifferent(ObjectEventInfo eventInfo)
 	{
-		if (requireTagWhenStaticAndActualTypesAreDifferent && FNHCFCAALAE.GetSource().GetValue() != null && FNHCFCAALAE.GetSource().get_Type() != FNHCFCAALAE.GetSource().GetStaticType())
+		if (requireTagWhenStaticAndActualTypesAreDifferent && eventInfo.GetSource().GetValue() != null && eventInfo.GetSource().get_Type() != eventInfo.GetSource().GetStaticType())
 		{
-			FNHCFCAALAE.set_Tag("!" + FNHCFCAALAE.GetSource().get_Type().AssemblyQualifiedName);
+			eventInfo.set_Tag("!" + eventInfo.GetSource().get_Type().AssemblyQualifiedName);
 		}
 	}
 }

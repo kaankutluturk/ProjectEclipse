@@ -136,15 +136,15 @@ namespace Nekki.SF2.GUI.Common
 			}
 		}
 
-		public static void Log(string BFFNFGKHBJA)
+		public static void Log(string text)
 		{
 			if (_Current != null)
 			{
-				_Current.AddText(BFFNFGKHBJA);
+				_Current.AddText(text);
 			}
 			else
 			{
-				_OutputList.AppendLine(BFFNFGKHBJA);
+				_OutputList.AppendLine(text);
 			}
 		}
 
@@ -174,9 +174,9 @@ namespace Nekki.SF2.GUI.Common
 				AddText(string.Format("<b>{0}</b>", text));
 				GameLog.Write(text2);
 				string[] array = text2.Split('\n');
-				foreach (string nGEPNAJJHCD in array)
+				foreach (string line in array)
 				{
-					AddText(nGEPNAJJHCD);
+					AddText(line);
 				}
 				_Input.text = string.Empty;
 				_Input.ActivateInputField();
@@ -205,18 +205,18 @@ namespace Nekki.SF2.GUI.Common
 			}
 		}
 
-		protected void Activate(bool DMOGLMLJCDP)
+		protected void Activate(bool active)
 		{
-			_Window.gameObject.SetActive(DMOGLMLJCDP);
+			_Window.gameObject.SetActive(active);
 			if (initialized && OnConsoleActive != null)
 			{
-				OnConsoleActive(DMOGLMLJCDP);
+				OnConsoleActive(active);
 			}
 		}
 
-		private void AddText(string NGEPNAJJHCD)
+		private void AddText(string text)
 		{
-			_OutputList.AppendLine(NGEPNAJJHCD);
+			_OutputList.AppendLine(text);
 			_Text.text = _OutputList.ToString();
 		}
 

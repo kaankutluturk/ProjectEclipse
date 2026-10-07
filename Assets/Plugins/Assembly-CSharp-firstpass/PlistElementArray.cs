@@ -4,32 +4,32 @@ public class PlistElementArray : PlistElement
 {
 	public List<PlistElement> values = new List<PlistElement>();
 
-	public void AddString(string PKHDLOGJKAD)
+	public void AddString(string value)
 	{
-		values.Add(new PlistElementString(PKHDLOGJKAD));
+		values.Add(new PlistElementString(value));
 	}
 
-	public void AddInteger(int PKHDLOGJKAD)
+	public void AddInteger(int value)
 	{
-		values.Add(new PlistElementInteger(PKHDLOGJKAD));
+		values.Add(new PlistElementInteger(value));
 	}
 
-	public void AddBoolean(bool PKHDLOGJKAD)
+	public void AddBoolean(bool value)
 	{
-		values.Add(new PlistElementBoolean(PKHDLOGJKAD));
+		values.Add(new PlistElementBoolean(value));
 	}
 
 	public PlistElementArray AddArray()
 	{
-		PlistElementArray gHFPDLCPEBH = new PlistElementArray();
-		values.Add(gHFPDLCPEBH);
-		return gHFPDLCPEBH;
+		PlistElementArray array = new PlistElementArray();
+		values.Add(array);
+		return array;
 	}
 
 	public PlistElementDict AddDict()
 	{
-		PlistElementDict jDMGABPEDFI = new PlistElementDict();
-		values.Add(jDMGABPEDFI);
-		return jDMGABPEDFI;
+		PlistElementDict dict = new PlistElementDict();
+		values.Add(dict);
+		return dict;
 	}
 }

@@ -49,26 +49,26 @@ public class AndroidLocalNotification
 		}, false);
 	}
 
-	public static void SendNotification(int OKNNNLIPODI, string PEMOECLNECD, string LIOGIBJBHAH, long ENDPMCNJPEA)
+	public static void SendNotification(int id, string title, string message, long delaySeconds)
 	{
-		SetNotification(OKNNNLIPODI, ENDPMCNJPEA, PEMOECLNECD, LIOGIBJBHAH, Color.black);
+		SetNotification(id, delaySeconds, title, message, Color.black);
 	}
 
-	private static void SetNotification(int OKNNNLIPODI, long ENDPMCNJPEA, string PEMOECLNECD, string LIOGIBJBHAH, Color32 NPCPKCNJCOM, bool LGLFOBEIPKB = true, bool CEGOKEEKHDP = true, bool KILOFHBEDKP = true, NotificationExecuteMode GFGGECPLIID = NotificationExecuteMode.Inexact)
+	private static void SetNotification(int id, long delaySeconds, string title, string message, Color32 bgColor, bool sound = true, bool vibrate = true, bool lights = true, NotificationExecuteMode executeMode = NotificationExecuteMode.Inexact)
 	{
 		AndroidJavaClass androidJavaClass = new AndroidJavaClass(GetPluginClassName());
 		if (androidJavaClass != null)
 		{
-			androidJavaClass.CallStatic("SetNotification", OKNNNLIPODI, ENDPMCNJPEA * 1000, PEMOECLNECD, LIOGIBJBHAH, LIOGIBJBHAH, LGLFOBEIPKB ? 1 : 0, CEGOKEEKHDP ? 1 : 0, KILOFHBEDKP ? 1 : 0, "app_icon", "notify_icon_small", NPCPKCNJCOM.r * 65536 + NPCPKCNJCOM.g * 256 + NPCPKCNJCOM.b, (int)GFGGECPLIID, GetUnityClassName());
+			androidJavaClass.CallStatic("SetNotification", id, delaySeconds * 1000, title, message, message, sound ? 1 : 0, vibrate ? 1 : 0, lights ? 1 : 0, "app_icon", "notify_icon_small", bgColor.r * 65536 + bgColor.g * 256 + bgColor.b, (int)executeMode, GetUnityClassName());
 		}
 	}
 
-	public static void CancelNotification(int OKNNNLIPODI)
+	public static void CancelNotification(int id)
 	{
 		AndroidJavaClass androidJavaClass = new AndroidJavaClass(GetPluginClassName());
 		if (androidJavaClass != null)
 		{
-			androidJavaClass.CallStatic("CancelNotification", OKNNNLIPODI);
+			androidJavaClass.CallStatic("CancelNotification", id);
 		}
 	}
 }

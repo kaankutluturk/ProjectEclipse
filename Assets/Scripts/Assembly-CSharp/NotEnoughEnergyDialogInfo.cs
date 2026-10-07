@@ -6,10 +6,10 @@ public class NotEnoughEnergyDialogInfo
 
 	public int Value;
 
-	public NotEnoughEnergyDialogInfo(int PEEHDJAJHFF, GameValueType EJGJHBGMCDM, int value)
+	public NotEnoughEnergyDialogInfo(int waitSeconds, GameValueType valueType, int value)
 	{
-		WaitSeconds = PEEHDJAJHFF;
-		ValueType = EJGJHBGMCDM;
+		WaitSeconds = waitSeconds;
+		ValueType = valueType;
 		Value = value;
 	}
 }

@@ -13,9 +13,9 @@ public class ConditionCounter
 
 	protected bool _isNot;
 
-	public ConditionCounter(CounterConditionType LFLGCDNKNJI)
+	public ConditionCounter(CounterConditionType conditionType)
 	{
-		_conditionType = LFLGCDNKNJI;
+		_conditionType = conditionType;
 	}
 
 	public virtual bool IsEqual(CounterConditions conditions)
@@ -24,17 +24,17 @@ public class ConditionCounter
 		return false;
 	}
 
-	public bool IsNotCompare(bool DCJLKCFKCOM)
+	public bool IsNotCompare(bool result)
 	{
-		return _isNot ? (!DCJLKCFKCOM) : DCJLKCFKCOM;
+		return _isNot ? (!result) : result;
 	}
 
 	public virtual void Initialize()
 	{
 	}
 
-	protected virtual void Parse(XmlNode BGPKIKNPIKP)
+	protected virtual void Parse(XmlNode node)
 	{
-		_isNot = BGPKIKNPIKP.Attributes["Not"].ParseBool();
+		_isNot = node.Attributes["Not"].ParseBool();
 	}
 }

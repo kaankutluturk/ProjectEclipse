@@ -17,14 +17,14 @@ public class LzmaDecoder : ICoder, ISetDecoderProperties
 
 		private uint m_NumPosStates;
 
-		public void Create(uint BHMGNFOKODN)
+		public void Create(uint numPosStates)
 		{
-			for (uint num = m_NumPosStates; num < BHMGNFOKODN; num++)
+			for (uint num = m_NumPosStates; num < numPosStates; num++)
 			{
 				m_LowCoder[num] = new BitTreeDecoder(3);
 				m_MidCoder[num] = new BitTreeDecoder(3);
 			}
-			m_NumPosStates = BHMGNFOKODN;
+			m_NumPosStates = numPosStates;
 		}
 
 		public void Init()
@@ -39,19 +39,19 @@ public class LzmaDecoder : ICoder, ISetDecoderProperties
 			m_HighCoder.Init();
 		}
 
-		public uint Decode(RangeDecoder HELKEOGALEA, uint LFOAILOHHHD)
+		public uint Decode(RangeDecoder rangeDecoder, uint posState)
 		{
-			if (m_Choice.Decode(HELKEOGALEA) == 0)
+			if (m_Choice.Decode(rangeDecoder) == 0)
 			{
-				return m_LowCoder[LFOAILOHHHD].Decode(HELKEOGALEA);
+				return m_LowCoder[posState].Decode(rangeDecoder);
 			}
 			uint num = 8u;
-			if (m_Choice2.Decode(HELKEOGALEA) == 0)
+			if (m_Choice2.Decode(rangeDecoder) == 0)
 			{
-				return num + m_MidCoder[LFOAILOHHHD].Decode(HELKEOGALEA);
+				return num + m_MidCoder[posState].Decode(rangeDecoder);
 			}
 			num += 8;
-			return num + m_HighCoder.Decode(HELKEOGALEA);
+			return num + m_HighCoder.Decode(rangeDecoder);
 		}
 	}
 
@@ -74,31 +74,31 @@ public class LzmaDecoder : ICoder, ISetDecoderProperties
 				}
 			}
 
-			public byte DecodeNormal(RangeDecoder HELKEOGALEA)
+			public byte DecodeNormal(RangeDecoder rangeDecoder)
 			{
 				uint num = 1u;
 				do
 				{
-					num = (num << 1) | m_Decoders[num].Decode(HELKEOGALEA);
+					num = (num << 1) | m_Decoders[num].Decode(rangeDecoder);
 				}
 				while (num < 256);
 				return (byte)num;
 			}
 
-			public byte DecodeWithMatchByte(RangeDecoder HELKEOGALEA, byte HGMKIONDDNO)
+			public byte DecodeWithMatchByte(RangeDecoder rangeDecoder, byte matchByte)
 			{
 				uint num = 1u;
 				do
 				{
-					uint num2 = (uint)((HGMKIONDDNO >> 7) & 1);
-					HGMKIONDDNO <<= 1;
-					uint num3 = m_Decoders[(1 + num2 << 8) + num].Decode(HELKEOGALEA);
+					uint num2 = (uint)((matchByte >> 7) & 1);
+					matchByte <<= 1;
+					uint num3 = m_Decoders[(1 + num2 << 8) + num].Decode(rangeDecoder);
 					num = (num << 1) | num3;
 					if (num2 != num3)
 					{
 						while (num < 256)
 						{
-							num = (num << 1) | m_Decoders[num].Decode(HELKEOGALEA);
+							num = (num << 1) | m_Decoders[num].Decode(rangeDecoder);
 						}
 						break;
 					}
@@ -116,13 +116,13 @@ public class LzmaDecoder : ICoder, ISetDecoderProperties
 
 		private uint m_PosMask;
 
-		public void Create(int PGIOGOCKAPN, int NNNENAADHAE)
+		public void Create(int posBits, int prevBits)
 		{
-			if (m_Coders == null || m_NumPrevBits != NNNENAADHAE || m_NumPosBits != PGIOGOCKAPN)
+			if (m_Coders == null || m_NumPrevBits != prevBits || m_NumPosBits != posBits)
 			{
-				m_NumPosBits = PGIOGOCKAPN;
-				m_PosMask = (uint)((1 << PGIOGOCKAPN) - 1);
-				m_NumPrevBits = NNNENAADHAE;
+				m_NumPosBits = posBits;
+				m_PosMask = (uint)((1 << posBits) - 1);
+				m_NumPrevBits = prevBits;
 				uint num = (uint)(1 << m_NumPrevBits + m_NumPosBits);
 				m_Coders = new Decoder2[num];
 				for (uint num2 = 0u; num2 < num; num2++)
@@ -141,19 +141,19 @@ public class LzmaDecoder : ICoder, ISetDecoderProperties
 			}
 		}
 
-		private uint GetState(uint LCCLEFMKLPB, byte PMEIMKDGNJP)
+		private uint GetState(uint LCCLEFMKLPB, byte prevByte)
 		{
-			return ((LCCLEFMKLPB & m_PosMask) << m_NumPrevBits) + (uint)(PMEIMKDGNJP >> 8 - m_NumPrevBits);
+			return ((LCCLEFMKLPB & m_PosMask) << m_NumPrevBits) + (uint)(prevByte >> 8 - m_NumPrevBits);
 		}
 
-		public byte DecodeNormal(RangeDecoder HELKEOGALEA, uint LCCLEFMKLPB, byte PMEIMKDGNJP)
+		public byte DecodeNormal(RangeDecoder rangeDecoder, uint LCCLEFMKLPB, byte prevByte)
 		{
-			return m_Coders[GetState(LCCLEFMKLPB, PMEIMKDGNJP)].DecodeNormal(HELKEOGALEA);
+			return m_Coders[GetState(LCCLEFMKLPB, prevByte)].DecodeNormal(rangeDecoder);
 		}
 
-		public byte DecodeWithMatchByte(RangeDecoder HELKEOGALEA, uint LCCLEFMKLPB, byte PMEIMKDGNJP, byte HGMKIONDDNO)
+		public byte DecodeWithMatchByte(RangeDecoder rangeDecoder, uint LCCLEFMKLPB, byte prevByte, byte matchByte)
 		{
-			return m_Coders[GetState(LCCLEFMKLPB, PMEIMKDGNJP)].DecodeWithMatchByte(HELKEOGALEA, HGMKIONDDNO);
+			return m_Coders[GetState(LCCLEFMKLPB, prevByte)].DecodeWithMatchByte(rangeDecoder, matchByte);
 		}
 	}
 
@@ -202,46 +202,46 @@ public class LzmaDecoder : ICoder, ISetDecoderProperties
 		}
 	}
 
-	private void SetDictionarySize(uint MMNLJFOCACJ)
+	private void SetDictionarySize(uint dictionarySize)
 	{
-		if (m_DictionarySize != MMNLJFOCACJ)
+		if (m_DictionarySize != dictionarySize)
 		{
-			m_DictionarySize = MMNLJFOCACJ;
+			m_DictionarySize = dictionarySize;
 			m_DictionarySizeCheck = Math.Max(m_DictionarySize, 1u);
-			uint aKOEOKJFINO = Math.Max(m_DictionarySizeCheck, 4096u);
-			m_OutWindow.Create(aKOEOKJFINO);
+			uint blockSize = Math.Max(m_DictionarySizeCheck, 4096u);
+			m_OutWindow.Create(blockSize);
 		}
 	}
 
-	private void SetLiteralProperties(int MHNGHOGBEAE, int LMHBHHENKHG)
+	private void SetLiteralProperties(int literalPosBits, int literalContextBits)
 	{
-		if (MHNGHOGBEAE > 8)
+		if (literalPosBits > 8)
 		{
 			throw new InvalidParamException();
 		}
-		if (LMHBHHENKHG > 8)
+		if (literalContextBits > 8)
 		{
 			throw new InvalidParamException();
 		}
-		m_LiteralDecoder.Create(MHNGHOGBEAE, LMHBHHENKHG);
+		m_LiteralDecoder.Create(literalPosBits, literalContextBits);
 	}
 
-	private void SetPosBitsProperties(int LMJOLGGBKNL)
+	private void SetPosBitsProperties(int posBits)
 	{
-		if (LMJOLGGBKNL > 4)
+		if (posBits > 4)
 		{
 			throw new InvalidParamException();
 		}
-		uint num = (uint)(1 << LMJOLGGBKNL);
+		uint num = (uint)(1 << posBits);
 		m_LenDecoder.Create(num);
 		m_RepLenDecoder.Create(num);
 		m_PosStateMask = num - 1;
 	}
 
-	private void Init(Stream BHHJJHBNEKD, Stream BBBGGJLOCPB)
+	private void Init(Stream inStream, Stream outStream)
 	{
-		m_RangeDecoder.Init(BHHJJHBNEKD);
-		m_OutWindow.Init(BBBGGJLOCPB, _solid);
+		m_RangeDecoder.Init(inStream);
+		m_OutWindow.Init(outStream, _solid);
 		for (uint num = 0u; num < 12; num++)
 		{
 			for (uint num2 = 0u; num2 <= m_PosStateMask; num2++)
@@ -269,47 +269,47 @@ public class LzmaDecoder : ICoder, ISetDecoderProperties
 		m_PosAlignDecoder.Init();
 	}
 
-	public void Code(Stream BHHJJHBNEKD, Stream BBBGGJLOCPB, long NCKELGLBGJN, long JNILCBKONPG, ICodeProgress progress)
+	public void Code(Stream inStream, Stream outStream, long inSize, long outSize, ICodeProgress progress)
 	{
-		Init(BHHJJHBNEKD, BBBGGJLOCPB);
-		Base.CoderState iPAFOKKOCPF = default(Base.CoderState);
-		iPAFOKKOCPF.Init();
+		Init(inStream, outStream);
+		Base.CoderState coderState = default(Base.CoderState);
+		coderState.Init();
 		uint num = 0u;
 		uint num2 = 0u;
 		uint num3 = 0u;
 		uint num4 = 0u;
 		ulong num5 = 0uL;
-		if (num5 < (ulong)JNILCBKONPG)
+		if (num5 < (ulong)outSize)
 		{
-			if (m_IsMatchDecoders[iPAFOKKOCPF.Index << 4].Decode(m_RangeDecoder) != 0)
+			if (m_IsMatchDecoders[coderState.Index << 4].Decode(m_RangeDecoder) != 0)
 			{
 				throw new DataErrorException();
 			}
-			iPAFOKKOCPF.UpdateChar();
-			byte aAOIAEJJINO = m_LiteralDecoder.DecodeNormal(m_RangeDecoder, 0u, 0);
-			m_OutWindow.PutByte(aAOIAEJJINO);
+			coderState.UpdateChar();
+			byte literalByte = m_LiteralDecoder.DecodeNormal(m_RangeDecoder, 0u, 0);
+			m_OutWindow.PutByte(literalByte);
 			num5++;
 		}
-		while (num5 < (ulong)JNILCBKONPG)
+		while (num5 < (ulong)outSize)
 		{
 			uint num6 = (uint)(int)num5 & m_PosStateMask;
-			if (m_IsMatchDecoders[(iPAFOKKOCPF.Index << 4) + num6].Decode(m_RangeDecoder) == 0)
+			if (m_IsMatchDecoders[(coderState.Index << 4) + num6].Decode(m_RangeDecoder) == 0)
 			{
-				byte pMEIMKDGNJP = m_OutWindow.GetByte(0u);
-				byte aAOIAEJJINO2 = (iPAFOKKOCPF.IsCharState() ? m_LiteralDecoder.DecodeNormal(m_RangeDecoder, (uint)num5, pMEIMKDGNJP) : m_LiteralDecoder.DecodeWithMatchByte(m_RangeDecoder, (uint)num5, pMEIMKDGNJP, m_OutWindow.GetByte(num)));
+				byte prevByte = m_OutWindow.GetByte(0u);
+				byte aAOIAEJJINO2 = (coderState.IsCharState() ? m_LiteralDecoder.DecodeNormal(m_RangeDecoder, (uint)num5, prevByte) : m_LiteralDecoder.DecodeWithMatchByte(m_RangeDecoder, (uint)num5, prevByte, m_OutWindow.GetByte(num)));
 				m_OutWindow.PutByte(aAOIAEJJINO2);
-				iPAFOKKOCPF.UpdateChar();
+				coderState.UpdateChar();
 				num5++;
 				continue;
 			}
 			uint num8;
-			if (m_IsRepDecoders[iPAFOKKOCPF.Index].Decode(m_RangeDecoder) == 1)
+			if (m_IsRepDecoders[coderState.Index].Decode(m_RangeDecoder) == 1)
 			{
-				if (m_IsRepG0Decoders[iPAFOKKOCPF.Index].Decode(m_RangeDecoder) == 0)
+				if (m_IsRepG0Decoders[coderState.Index].Decode(m_RangeDecoder) == 0)
 				{
-					if (m_IsRep0LongDecoders[(iPAFOKKOCPF.Index << 4) + num6].Decode(m_RangeDecoder) == 0)
+					if (m_IsRep0LongDecoders[(coderState.Index << 4) + num6].Decode(m_RangeDecoder) == 0)
 					{
-						iPAFOKKOCPF.UpdateShortRep();
+						coderState.UpdateShortRep();
 						m_OutWindow.PutByte(m_OutWindow.GetByte(num));
 						num5++;
 						continue;
@@ -318,13 +318,13 @@ public class LzmaDecoder : ICoder, ISetDecoderProperties
 				else
 				{
 					uint num7;
-					if (m_IsRepG1Decoders[iPAFOKKOCPF.Index].Decode(m_RangeDecoder) == 0)
+					if (m_IsRepG1Decoders[coderState.Index].Decode(m_RangeDecoder) == 0)
 					{
 						num7 = num2;
 					}
 					else
 					{
-						if (m_IsRepG2Decoders[iPAFOKKOCPF.Index].Decode(m_RangeDecoder) == 0)
+						if (m_IsRepG2Decoders[coderState.Index].Decode(m_RangeDecoder) == 0)
 						{
 							num7 = num3;
 						}
@@ -339,7 +339,7 @@ public class LzmaDecoder : ICoder, ISetDecoderProperties
 					num = num7;
 				}
 				num8 = m_RepLenDecoder.Decode(m_RangeDecoder, num6) + 2;
-				iPAFOKKOCPF.UpdateRep();
+				coderState.UpdateRep();
 			}
 			else
 			{
@@ -347,7 +347,7 @@ public class LzmaDecoder : ICoder, ISetDecoderProperties
 				num3 = num2;
 				num2 = num;
 				num8 = 2 + m_LenDecoder.Decode(m_RangeDecoder, num6);
-				iPAFOKKOCPF.UpdateMatch();
+				coderState.UpdateMatch();
 				uint num9 = m_PosSlotDecoder[Base.GetLenToPosState(num8)].Decode(m_RangeDecoder);
 				if (num9 >= 4)
 				{
@@ -390,9 +390,9 @@ public class LzmaDecoder : ICoder, ISetDecoderProperties
 		{
 			throw new InvalidParamException();
 		}
-		int lMHBHHENKHG = properties[0] % 9;
+		int literalContextBits = properties[0] % 9;
 		int num = properties[0] / 9;
-		int mHNGHOGBEAE = num % 5;
+		int literalPosBits = num % 5;
 		int num2 = num / 5;
 		if (num2 > 4)
 		{
@@ -404,13 +404,13 @@ public class LzmaDecoder : ICoder, ISetDecoderProperties
 			num3 += (uint)(properties[1 + i] << i * 8);
 		}
 		SetDictionarySize(num3);
-		SetLiteralProperties(mHNGHOGBEAE, lMHBHHENKHG);
+		SetLiteralProperties(literalPosBits, literalContextBits);
 		SetPosBitsProperties(num2);
 	}
 
-	public bool Train(Stream ABJIEFMMIEK)
+	public bool Train(Stream stream)
 	{
 		_solid = true;
-		return m_OutWindow.Train(ABJIEFMMIEK);
+		return m_OutWindow.Train(stream);
 	}
 }

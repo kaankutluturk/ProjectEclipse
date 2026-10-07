@@ -12,9 +12,9 @@ public class QuestActionShowRaidToggleBtn : QuestAction
 		_visible = node.Attributes["Value"].ParseInt(1) != 0;
 	}
 
-	public override void Execute(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters parameters)
 	{
-		base.Execute(GFIHPBCEEOB);
+		base.Execute(parameters);
 		MapScene current = Scene<MapScene>.get_Current();
 		if (current != null)
 		{

@@ -24,63 +24,63 @@ namespace Nekki.Audio
 
 		private static AudioSettings _settings;
 
-		public static void Init(string ALHKHJOJECK, int[] DOBMHKNFHCA, int[] HLGLHKIOPDE)
+		public static void Init(string rootPath, int[] musicChannels, int[] soundChannels)
 		{
 			if ((bool)_instance)
 			{
 				AdvLog.LogWarning("AudioManager already exists!");
 				return;
 			}
-			_musicChanels = new List<int>(DOBMHKNFHCA);
+			_musicChanels = new List<int>(musicChannels);
 			_instance = new GameObject("_audioManager").AddComponent<AudioManager>();
 			UnityEngine.Object.DontDestroyOnLoad(_instance.gameObject);
-			Load(ALHKHJOJECK);
+			Load(rootPath);
 			OverallUnitPool.Init(_instance);
 			_settings = new AudioSettings();
 		}
 
-		public static void Init(string ALHKHJOJECK, int CEDJBBELDLH, int[] HLGLHKIOPDE)
+		public static void Init(string rootPath, int musicChannel, int[] soundChannels)
 		{
-			Init(ALHKHJOJECK, new int[1] { CEDJBBELDLH }, HLGLHKIOPDE);
+			Init(rootPath, new int[1] { musicChannel }, soundChannels);
 		}
 
-		public static void Init(string ALHKHJOJECK, int CEDJBBELDLH, int DCMFMCGMMKG)
+		public static void Init(string rootPath, int musicChannel, int soundChannel)
 		{
-			Init(ALHKHJOJECK, new int[1] { CEDJBBELDLH }, new int[1] { DCMFMCGMMKG });
+			Init(rootPath, new int[1] { musicChannel }, new int[1] { soundChannel });
 		}
 
-		public static void Init(string ALHKHJOJECK)
+		public static void Init(string rootPath)
 		{
-			Init(ALHKHJOJECK, new int[1], new int[1] { 1 });
+			Init(rootPath, new int[1], new int[1] { 1 });
 		}
 
-		private static void Load(string ALHKHJOJECK)
+		private static void Load(string directoryPath)
 		{
-			if (Directory.Exists(ALHKHJOJECK))
+			if (Directory.Exists(directoryPath))
 			{
-				string[] directories = Directory.GetDirectories(ALHKHJOJECK);
+				string[] directories = Directory.GetDirectories(directoryPath);
 				for (int i = 0; i < directories.Length; i++)
 				{
 					Load(directories[i]);
 				}
-				List<string> list = new List<string>(Directory.GetFiles(ALHKHJOJECK, "*.xml"));
+				List<string> list = new List<string>(Directory.GetFiles(directoryPath, "*.xml"));
 				for (int j = 0; j < list.Count; j++)
 				{
-					LoadSoundsXml(list[j], ALHKHJOJECK);
+					LoadSoundsXml(list[j], directoryPath);
 				}
 			}
 		}
 
-		private static void LoadSoundsXml(string HIOFDADIEME, string ALHKHJOJECK)
+		private static void LoadSoundsXml(string xmlPath, string rootPath)
 		{
-			if (!File.Exists(HIOFDADIEME))
+			if (!File.Exists(xmlPath))
 			{
 				return;
 			}
 			XmlDocument xmlDocument = new XmlDocument();
 			try
 			{
-				xmlDocument.LoadXml(File.ReadAllText(HIOFDADIEME));
+				xmlDocument.LoadXml(File.ReadAllText(xmlPath));
 			}
 			catch (Exception ex)
 			{
@@ -103,8 +103,8 @@ namespace Nekki.Audio
 				float value2 = ((childNode.Attributes["Volume"] != null) ? float.Parse(childNode.Attributes["Volume"].Value) : 1f);
 				if (!string.IsNullOrEmpty(text))
 				{
-					string aKGGCMGELKH = ALHKHJOJECK + "/" + text;
-					LoadClip(value, aKGGCMGELKH);
+					string clipPath = rootPath + "/" + text;
+					LoadClip(value, clipPath);
 					if (_volumesByClips.ContainsKey(value))
 					{
 						_volumesByClips[value] = value2;
@@ -117,23 +117,23 @@ namespace Nekki.Audio
 			}
 		}
 
-		private static void LoadClip(string LGLFOBEIPKB, string AKGGCMGELKH)
+		private static void LoadClip(string clipName, string clipPath)
 		{
-			if (!File.Exists(AKGGCMGELKH))
+			if (!File.Exists(clipPath))
 			{
-				AdvLog.Log("No" + AKGGCMGELKH);
+				AdvLog.Log("No" + clipPath);
 				return;
 			}
-			AudioClip audioClip = GeAudioClip(AKGGCMGELKH);
+			AudioClip audioClip = GeAudioClip(clipPath);
 			if ((bool)audioClip)
 			{
-				if (!_clips.ContainsKey(LGLFOBEIPKB))
+				if (!_clips.ContainsKey(clipName))
 				{
-					_clips.Add(LGLFOBEIPKB, audioClip);
+					_clips.Add(clipName, audioClip);
 				}
 				else
 				{
-					_clips[LGLFOBEIPKB] = audioClip;
+					_clips[clipName] = audioClip;
 				}
 			}
 		}
@@ -152,23 +152,23 @@ namespace Nekki.Audio
 			return null;
 		}
 
-		public static void AddAudio(AudioClip PIKHEAGHOKB, string name, float JIJAJFEJJHK)
+		public static void AddAudio(AudioClip clip, string name, float volume)
 		{
 			if (_clips.ContainsKey(name))
 			{
-				_clips[name] = PIKHEAGHOKB;
+				_clips[name] = clip;
 			}
 			else
 			{
-				_clips.Add(name, PIKHEAGHOKB);
+				_clips.Add(name, clip);
 			}
 			if (_volumesByClips.ContainsKey(name))
 			{
-				_volumesByClips[name] = JIJAJFEJJHK;
+				_volumesByClips[name] = volume;
 			}
 			else
 			{
-				_volumesByClips.Add(name, JIJAJFEJJHK);
+				_volumesByClips.Add(name, volume);
 			}
 		}
 
@@ -184,99 +184,99 @@ namespace Nekki.Audio
 			}
 		}
 
-		public static void Play(int ADNDLGKIJJK, string LGLFOBEIPKB, bool KKHJAJFEPPA, bool ENNOPELJKPB, float JIJAJFEJJHK = 1f)
+		public static void Play(int channelId, string clipName, bool loop, bool overlap, float volume = 1f)
 		{
-			if (_clips.ContainsKey(LGLFOBEIPKB))
+			if (_clips.ContainsKey(clipName))
 			{
-				if (!_chanels.ContainsKey(ADNDLGKIJJK))
+				if (!_chanels.ContainsKey(channelId))
 				{
-					_chanels.Add(ADNDLGKIJJK, new Chanel(ADNDLGKIJJK, IsMusicChanel(ADNDLGKIJJK), _clips));
+					_chanels.Add(channelId, new Chanel(channelId, IsMusicChanel(channelId), _clips));
 				}
-				PlayCommand iPHFFPCPLDP = new PlayCommand(ADNDLGKIJJK, LGLFOBEIPKB, KKHJAJFEPPA, ENNOPELJKPB, JIJAJFEJJHK * _volumesByClips[LGLFOBEIPKB]);
-				iPHFFPCPLDP.SetAudioSettings(_settings);
-				_chanels[ADNDLGKIJJK].Play(iPHFFPCPLDP);
+				PlayCommand command = new PlayCommand(channelId, clipName, loop, overlap, volume * _volumesByClips[clipName]);
+				command.SetAudioSettings(_settings);
+				_chanels[channelId].Play(command);
 			}
 		}
 
-		public static void Play(PlayCommand LEKEGLMDAHA)
+		public static void Play(PlayCommand command)
 		{
 			if (!_instance)
 			{
 				AdvLog.LogWarning("you must init AudioManager first!");
 				return;
 			}
-			LEKEGLMDAHA.SetAudioSettings(_settings);
-			if (_chanels.ContainsKey(LEKEGLMDAHA.GetChanelID()))
+			command.SetAudioSettings(_settings);
+			if (_chanels.ContainsKey(command.GetChanelID()))
 			{
-				_chanels.Add(LEKEGLMDAHA.GetChanelID(), new Chanel(LEKEGLMDAHA.GetChanelID(), IsMusicChanel(LEKEGLMDAHA.GetChanelID()), _clips));
+				_chanels.Add(command.GetChanelID(), new Chanel(command.GetChanelID(), IsMusicChanel(command.GetChanelID()), _clips));
 			}
-			_chanels[LEKEGLMDAHA.GetChanelID()].Play(LEKEGLMDAHA);
+			_chanels[command.GetChanelID()].Play(command);
 		}
 
-		public static void Mute(int ADNDLGKIJJK)
+		public static void Mute(int channelId)
 		{
-			if (!_chanels.ContainsKey(ADNDLGKIJJK))
+			if (!_chanels.ContainsKey(channelId))
 			{
-				_chanels.Add(ADNDLGKIJJK, new Chanel(ADNDLGKIJJK, IsMusicChanel(ADNDLGKIJJK), _clips));
+				_chanels.Add(channelId, new Chanel(channelId, IsMusicChanel(channelId), _clips));
 			}
-			_chanels[ADNDLGKIJJK].Mute();
+			_chanels[channelId].Mute();
 		}
 
-		public static void UnMute(int ADNDLGKIJJK)
+		public static void UnMute(int channelId)
 		{
-			if (!_chanels.ContainsKey(ADNDLGKIJJK))
+			if (!_chanels.ContainsKey(channelId))
 			{
-				_chanels.Add(ADNDLGKIJJK, new Chanel(ADNDLGKIJJK, IsMusicChanel(ADNDLGKIJJK), _clips));
+				_chanels.Add(channelId, new Chanel(channelId, IsMusicChanel(channelId), _clips));
 			}
-			_chanels[ADNDLGKIJJK].Unmute();
+			_chanels[channelId].Unmute();
 		}
 
-		private static void Pause(bool KCANPMPILKI, int ADNDLGKIJJK, string DPBKBKDCIOI)
+		private static void Pause(bool pause, int channelId, string clipName)
 		{
-			if (_chanels.ContainsKey(ADNDLGKIJJK))
+			if (_chanels.ContainsKey(channelId))
 			{
-				_chanels[ADNDLGKIJJK].Pause(KCANPMPILKI, DPBKBKDCIOI);
+				_chanels[channelId].Pause(pause, clipName);
 			}
 		}
 
-		public static void Pause(bool KCANPMPILKI, int ADNDLGKIJJK)
+		public static void Pause(bool pause, int channelId)
 		{
-			if (_chanels.ContainsKey(ADNDLGKIJJK))
+			if (_chanels.ContainsKey(channelId))
 			{
-				_chanels[ADNDLGKIJJK].Pause(KCANPMPILKI);
+				_chanels[channelId].Pause(pause);
 			}
 		}
 
-		private static void Pause(bool KCANPMPILKI)
+		private static void Pause(bool pause)
 		{
 			foreach (Chanel value in _chanels.Values)
 			{
-				value.Pause(KCANPMPILKI);
+				value.Pause(pause);
 			}
 		}
 
-		public static void Stop(int AHCPPDFEDNJ, bool BJIOMMPCLEA = false)
+		public static void Stop(int channelId, bool fadeOut = false)
 		{
-			if (_chanels.ContainsKey(AHCPPDFEDNJ))
+			if (_chanels.ContainsKey(channelId))
 			{
-				_chanels[AHCPPDFEDNJ].StopAll(BJIOMMPCLEA);
+				_chanels[channelId].StopAll(fadeOut);
 			}
 		}
 
-		public static void SetVolume(float JIJAJFEJJHK, int AHCPPDFEDNJ)
+		public static void SetVolume(float volume, int channelId)
 		{
-			if (!_chanels.ContainsKey(AHCPPDFEDNJ))
+			if (!_chanels.ContainsKey(channelId))
 			{
-				_chanels.Add(AHCPPDFEDNJ, new Chanel(AHCPPDFEDNJ, IsMusicChanel(AHCPPDFEDNJ), _clips));
+				_chanels.Add(channelId, new Chanel(channelId, IsMusicChanel(channelId), _clips));
 			}
-			_chanels[AHCPPDFEDNJ].set_MasterVolume(JIJAJFEJJHK);
+			_chanels[channelId].set_MasterVolume(volume);
 		}
 
-		public static float GetVolume(int AHCPPDFEDNJ)
+		public static float GetVolume(int channelId)
 		{
-			if (_chanels.ContainsKey(AHCPPDFEDNJ))
+			if (_chanels.ContainsKey(channelId))
 			{
-				return _chanels[AHCPPDFEDNJ].GetMasterVolume();
+				return _chanels[channelId].GetMasterVolume();
 			}
 			return 1f;
 		}
@@ -289,23 +289,23 @@ namespace Nekki.Audio
 			}
 		}
 
-		private static bool IsMusicChanel(int LIAILCGJBDK)
+		private static bool IsMusicChanel(int channelId)
 		{
-			return _musicChanels.Contains(LIAILCGJBDK);
+			return _musicChanels.Contains(channelId);
 		}
 
-		public static bool IsPlaying(int AHCPPDFEDNJ)
+		public static bool IsPlaying(int channelId)
 		{
-			if (_chanels.ContainsKey(AHCPPDFEDNJ))
+			if (_chanels.ContainsKey(channelId))
 			{
-				return _chanels[AHCPPDFEDNJ].GetIsPlaying();
+				return _chanels[channelId].GetIsPlaying();
 			}
 			return false;
 		}
 
-		public static bool CheckAudioLoaded(string LGLFOBEIPKB)
+		public static bool CheckAudioLoaded(string clipName)
 		{
-			return _clips.ContainsKey(LGLFOBEIPKB);
+			return _clips.ContainsKey(clipName);
 		}
 	}
 }

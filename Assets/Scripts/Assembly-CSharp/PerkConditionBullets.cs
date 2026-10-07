@@ -17,17 +17,17 @@ public class PerkConditionBullets : PerkConditionMatchMinMax
 		_bulletType = node.Attributes["Type"].GetStringOrDefault(string.Empty);
 	}
 
-	public override bool IsEqual(Model ACENLMONNPA, List<string> NIKHAICFGNM)
+	public override bool IsEqual(Model model, List<string> args)
 	{
-		Model fGCODGKLHED = ResolveTargetModel(ACENLMONNPA);
-		if (ACENLMONNPA == null)
+		Model targetModel = ResolveTargetModel(model);
+		if (model == null)
 		{
 			return false;
 		}
 		int num = 0;
 		if (_bulletType.Equals("MagicBullet"))
 		{
-			num = fGCODGKLHED.GetMagicCharges();
+			num = targetModel.GetMagicCharges();
 		}
 		else
 		{
@@ -35,7 +35,7 @@ public class PerkConditionBullets : PerkConditionMatchMinMax
 			{
 				return false;
 			}
-			num = fGCODGKLHED.GetRaidBullets();
+			num = targetModel.GetRaidBullets();
 		}
 		minMax.EvaluateFunctions();
 		if (!minMax.GetMinUnbounded() && (int)minMax.GetMinValue() > num)

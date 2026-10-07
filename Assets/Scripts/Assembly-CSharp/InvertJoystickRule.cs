@@ -10,10 +10,10 @@ public class InvertJoystickRule : InFightRule
 
 	public override InFightRule Copy()
 	{
-		InFightRule aAJIFBJLJOA = null;
-		XmlNode hKPPBKPJOEO = GetXmlSource().GetNode();
-		aAJIFBJLJOA = new InvertJoystickRule(hKPPBKPJOEO);
-		aAJIFBJLJOA.IsRandom = IsRandom;
-		return aAJIFBJLJOA;
+		InFightRule copy = null;
+		XmlNode sourceNode = GetXmlSource().GetNode();
+		copy = new InvertJoystickRule(sourceNode);
+		copy.IsRandom = IsRandom;
+		return copy;
 	}
 }

@@ -12,11 +12,11 @@ public class Trigger
 
 		public List<ActionAnimation> Actions = new List<ActionAnimation>();
 
-		public EventAnimation FindEvent(EventAnimation.EventAnimationType LFLGCDNKNJI)
+		public EventAnimation FindEvent(EventAnimation.EventAnimationType eventType)
 		{
 			foreach (EventAnimation item in Events)
 			{
-				if (item.Type == LFLGCDNKNJI)
+				if (item.Type == eventType)
 				{
 					return item;
 				}
@@ -80,13 +80,13 @@ public class Trigger
 		return false;
 	}
 
-	public virtual bool CheckConditions(ModelConditions conditions, List<ConditionAnimation> JPGMNIFICDM = null, EventAnimation DOANBADPBGH = null)
+	public virtual bool CheckConditions(ModelConditions conditions, List<ConditionAnimation> conditionsToCheck = null, EventAnimation eventAnimation = null)
 	{
-		List<ConditionAnimation> list = ((JPGMNIFICDM == null) ? Definition.Conditions : JPGMNIFICDM);
-		if (DOANBADPBGH != null)
+		List<ConditionAnimation> list = ((conditionsToCheck == null) ? Definition.Conditions : conditionsToCheck);
+		if (eventAnimation != null)
 		{
-			conditions.CurrentEvent = DOANBADPBGH;
-			DOANBADPBGH.Conditions = conditions;
+			conditions.CurrentEvent = eventAnimation;
+			eventAnimation.Conditions = conditions;
 		}
 		foreach (ConditionAnimation item in list)
 		{
@@ -98,43 +98,43 @@ public class Trigger
 		return true;
 	}
 
-	public virtual bool CheckConditions(Model ACENLMONNPA, List<ConditionAnimation> JPGMNIFICDM = null, EventAnimation DOANBADPBGH = null)
+	public virtual bool CheckConditions(Model model, List<ConditionAnimation> conditionsToCheck = null, EventAnimation eventAnimation = null)
 	{
-		List<ConditionAnimation> list = ((JPGMNIFICDM == null) ? Definition.Conditions : JPGMNIFICDM);
+		List<ConditionAnimation> list = ((conditionsToCheck == null) ? Definition.Conditions : conditionsToCheck);
 		foreach (ConditionAnimation item in list)
 		{
-			ModelType.ModelTargetType kEIDBIOIFGA = item.GetTargetModelType();
-			Model fGCODGKLHED = item.ResolveTargetModel(ACENLMONNPA, kEIDBIOIFGA);
-			if (fGCODGKLHED == null)
+			ModelType.ModelTargetType targetType = item.GetTargetModelType();
+			Model targetModel = item.ResolveTargetModel(model, targetType);
+			if (targetModel == null)
 			{
 				return false;
 			}
-			ModelConditions dGJJDPIAEAO = fGCODGKLHED.GetConditions();
-			if (DOANBADPBGH != null)
+			ModelConditions targetConditions = targetModel.GetConditions();
+			if (eventAnimation != null)
 			{
-				dGJJDPIAEAO.CurrentEvent = DOANBADPBGH;
-				DOANBADPBGH.Conditions = dGJJDPIAEAO;
+				targetConditions.CurrentEvent = eventAnimation;
+				eventAnimation.Conditions = targetConditions;
 			}
 			item.ApplyTargetModelType(ModelType.ModelTargetType.MODEL_THIS);
 			bool flag = false;
 			if (item.Type == ConditionAnimation.ConditionType.LIST)
 			{
-				ConditionList eLFKOGJJNMN = item as ConditionList;
-				if (eLFKOGJJNMN != null)
+				ConditionList conditionList = item as ConditionList;
+				if (conditionList != null)
 				{
-					flag = eLFKOGJJNMN.EvaluateWithModel(ACENLMONNPA.GetConditions(), ACENLMONNPA, DOANBADPBGH);
+					flag = conditionList.EvaluateWithModel(model.GetConditions(), model, eventAnimation);
 				}
 			}
 			else
 			{
-				flag = item.IsEqual(fGCODGKLHED.GetConditions());
+				flag = item.IsEqual(targetModel.GetConditions());
 			}
 			if (!flag)
 			{
-				item.SetTargetModelType(kEIDBIOIFGA);
+				item.SetTargetModelType(targetType);
 				return false;
 			}
-			item.SetTargetModelType(kEIDBIOIFGA);
+			item.SetTargetModelType(targetType);
 		}
 		return true;
 	}
@@ -156,25 +156,25 @@ public class Trigger
 		return list;
 	}
 
-	public static ConditionKeys AsConditionKeys(ConditionAnimation IOFGGOCEIAM)
+	public static ConditionKeys AsConditionKeys(ConditionAnimation condition)
 	{
-		if (IOFGGOCEIAM.Type == ConditionAnimation.ConditionType.KEYS)
+		if (condition.Type == ConditionAnimation.ConditionType.KEYS)
 		{
-			return IOFGGOCEIAM as ConditionKeys;
+			return condition as ConditionKeys;
 		}
 		return null;
 	}
 
-	public virtual void PreloadEffects(List<string> MNDEJPFJODO = null)
+	public virtual void PreloadEffects(List<string> effectNames = null)
 	{
 		string text = "Textures/Effects/Magic/";
 		foreach (ActionAnimation item in Definition.Actions)
 		{
 			if (item.get_Type() == ActionAnimation.ActionType.EFFECT)
 			{
-				ActionEffect jFJGGMEJDPG = (ActionEffect)item;
-				string oNNKJLOGHGH = text + jFJGGMEJDPG.GetSequence();
-				LocationSpriteCache.LoadAtlasSprites(oNNKJLOGHGH);
+				ActionEffect effect = (ActionEffect)item;
+				string atlasName = text + effect.GetSequence();
+				LocationSpriteCache.LoadAtlasSprites(atlasName);
 			}
 		}
 	}
@@ -185,47 +185,47 @@ public class Trigger
 		{
 			if (item.get_Type() == ActionAnimation.ActionType.SOUND)
 			{
-				ActionSound nMLKJLJHCIA = (ActionSound)item;
-				Sound.LoadSound(nMLKJLJHCIA.get_Name());
+				ActionSound soundAction = (ActionSound)item;
+				Sound.LoadSound(soundAction.get_Name());
 			}
 		}
 	}
 
-	public virtual void MergeDefinition(TriggerInside KECIIKEIJBH)
+	public virtual void MergeDefinition(TriggerInside sourceDefinition)
 	{
 		if (Definition != null)
 		{
-			AddEvents(KECIIKEIJBH.Events);
-			AddConditions(KECIIKEIJBH.Conditions);
-			AddActions(KECIIKEIJBH.Actions);
-			AddExtraConditions(KECIIKEIJBH.ExtraConditions);
+			AddEvents(sourceDefinition.Events);
+			AddConditions(sourceDefinition.Conditions);
+			AddActions(sourceDefinition.Actions);
+			AddExtraConditions(sourceDefinition.ExtraConditions);
 		}
 	}
 
-	public virtual void UpdateForObject(ModelObject OECPEDPMKCD, bool EKBOGDKIHIH, bool PHADJMAONJG, ModelObject MJCGOJBGFIE)
+	public virtual void UpdateForObject(ModelObject modelObject, bool isPlayer, bool isChildObject, ModelObject childOwner)
 	{
-		ModelNode aECCPADGGPG = null;
-		UpdateConditions(Definition.Conditions, OECPEDPMKCD, EKBOGDKIHIH, PHADJMAONJG, MJCGOJBGFIE, aECCPADGGPG);
+		ModelNode modelNode = null;
+		UpdateConditions(Definition.Conditions, modelObject, isPlayer, isChildObject, childOwner, modelNode);
 		foreach (ActionAnimation item in Definition.Actions)
 		{
 			if (item.get_Type() == ActionAnimation.ActionType.EFFECT)
 			{
-				ActionEffect jFJGGMEJDPG = (ActionEffect)item;
-				jFJGGMEJDPG.UpdateNodes(OECPEDPMKCD, EKBOGDKIHIH, null, PHADJMAONJG, MJCGOJBGFIE);
+				ActionEffect effect = (ActionEffect)item;
+				effect.UpdateNodes(modelObject, isPlayer, null, isChildObject, childOwner);
 			}
 		}
 	}
 
-	public void ResetConditions(List<ConditionAnimation> AIDMEPEKEOL)
+	public void ResetConditions(List<ConditionAnimation> conditions)
 	{
-		foreach (ConditionAnimation item in AIDMEPEKEOL)
+		foreach (ConditionAnimation item in conditions)
 		{
 			if (item.Type == ConditionAnimation.ConditionType.DISTANCE)
 			{
-				ConditionDistance jNPIBKBDJAN = item as ConditionDistance;
-				if (jNPIBKBDJAN != null)
+				ConditionDistance distanceCondition = item as ConditionDistance;
+				if (distanceCondition != null)
 				{
-					jNPIBKBDJAN.ResetNodes();
+					distanceCondition.ResetNodes();
 				}
 				else
 				{
@@ -234,10 +234,10 @@ public class Trigger
 			}
 			else if (item.Type == ConditionAnimation.ConditionType.DIRECTION)
 			{
-				ConditionDirection cFCGJLJBOKI = item as ConditionDirection;
-				if (cFCGJLJBOKI != null)
+				ConditionDirection directionCondition = item as ConditionDirection;
+				if (directionCondition != null)
 				{
-					cFCGJLJBOKI.ResetNodes();
+					directionCondition.ResetNodes();
 				}
 				else
 				{
@@ -246,11 +246,11 @@ public class Trigger
 			}
 			else if (item.Type == ConditionAnimation.ConditionType.LIST)
 			{
-				ConditionList eLFKOGJJNMN = item as ConditionList;
-				if (eLFKOGJJNMN != null)
+				ConditionList conditionList = item as ConditionList;
+				if (conditionList != null)
 				{
-					List<ConditionAnimation> aIDMEPEKEOL = eLFKOGJJNMN.GetConditions();
-					ResetConditions(aIDMEPEKEOL);
+					List<ConditionAnimation> nestedConditions = conditionList.GetConditions();
+					ResetConditions(nestedConditions);
 				}
 				else
 				{
@@ -267,8 +267,8 @@ public class Trigger
 		{
 			if (item.get_Type() == ActionAnimation.ActionType.EFFECT)
 			{
-				ActionEffect jFJGGMEJDPG = (ActionEffect)item;
-				jFJGGMEJDPG.ResetNodes();
+				ActionEffect effect = (ActionEffect)item;
+				effect.ResetNodes();
 			}
 		}
 	}
@@ -278,11 +278,11 @@ public class Trigger
 		return Name == name || HasTemplateName(name);
 	}
 
-	public virtual bool HasTemplateName(string IJBOAGICOON)
+	public virtual bool HasTemplateName(string templateName)
 	{
 		foreach (string item in _TemplateNames)
 		{
-			if (item == IJBOAGICOON)
+			if (item == templateName)
 			{
 				return true;
 			}
@@ -296,14 +296,14 @@ public class Trigger
 		{
 			if (item.Type == ConditionAnimation.ConditionType.LIST)
 			{
-				ConditionList eLFKOGJJNMN = item as ConditionList;
-				if (eLFKOGJJNMN != null)
+				ConditionList conditionList = item as ConditionList;
+				if (conditionList != null)
 				{
-					List<ConditionAnimation> kDOGKKGDOBK = eLFKOGJJNMN.GetConditions();
-					ConditionKeys bHDEBDIHDFM = FindFirstKeyConditions(kDOGKKGDOBK);
-					if (bHDEBDIHDFM != null)
+					List<ConditionAnimation> nestedConditions = conditionList.GetConditions();
+					ConditionKeys keysCondition = FindFirstKeyConditions(nestedConditions);
+					if (keysCondition != null)
 					{
-						return bHDEBDIHDFM;
+						return keysCondition;
 					}
 				}
 				else
@@ -323,17 +323,17 @@ public class Trigger
 		return null;
 	}
 
-	protected static void CollectKeyConditions(List<ConditionAnimation> conditions, List<ConditionKeys> GKHEPKGMEFI)
+	protected static void CollectKeyConditions(List<ConditionAnimation> conditions, List<ConditionKeys> keyConditions)
 	{
 		foreach (ConditionAnimation item in conditions)
 		{
 			if (item.Type == ConditionAnimation.ConditionType.LIST)
 			{
-				ConditionList eLFKOGJJNMN = item as ConditionList;
-				if (eLFKOGJJNMN != null)
+				ConditionList conditionList = item as ConditionList;
+				if (conditionList != null)
 				{
-					List<ConditionAnimation> kDOGKKGDOBK = eLFKOGJJNMN.GetConditions();
-					CollectKeyConditions(kDOGKKGDOBK, GKHEPKGMEFI);
+					List<ConditionAnimation> nestedConditions = conditionList.GetConditions();
+					CollectKeyConditions(nestedConditions, keyConditions);
 				}
 				else
 				{
@@ -342,16 +342,16 @@ public class Trigger
 			}
 			else
 			{
-				ConditionKeys bHDEBDIHDFM = InfoAnimation.AsKeysCondition(item);
-				if (bHDEBDIHDFM != null)
+				ConditionKeys keysCondition = InfoAnimation.AsKeysCondition(item);
+				if (keysCondition != null)
 				{
-					GKHEPKGMEFI.Add(bHDEBDIHDFM);
+					keyConditions.Add(keysCondition);
 				}
 			}
 		}
 	}
 
-	protected virtual void UpdateConditions(List<ConditionAnimation> conditions, ModelObject OECPEDPMKCD, bool EKBOGDKIHIH, bool PHADJMAONJG, ModelObject MJCGOJBGFIE, ModelNode AECCPADGGPG)
+	protected virtual void UpdateConditions(List<ConditionAnimation> conditions, ModelObject modelObject, bool isPlayer, bool isChildObject, ModelObject childOwner, ModelNode modelNode)
 	{
 		foreach (ConditionAnimation item in conditions)
 		{
@@ -361,10 +361,10 @@ public class Trigger
 			}
 			if (item.Type == ConditionAnimation.ConditionType.DISTANCE)
 			{
-				ConditionDistance jNPIBKBDJAN = ((item == null) ? null : (item as ConditionDistance));
-				if (jNPIBKBDJAN != null)
+				ConditionDistance distanceCondition = ((item == null) ? null : (item as ConditionDistance));
+				if (distanceCondition != null)
 				{
-					jNPIBKBDJAN.UpdateNodes(OECPEDPMKCD, EKBOGDKIHIH, AECCPADGGPG, PHADJMAONJG, MJCGOJBGFIE);
+					distanceCondition.UpdateNodes(modelObject, isPlayer, modelNode, isChildObject, childOwner);
 				}
 				else
 				{
@@ -373,10 +373,10 @@ public class Trigger
 			}
 			if (item.Type == ConditionAnimation.ConditionType.DIRECTION)
 			{
-				ConditionDirection cFCGJLJBOKI = item as ConditionDirection;
-				if (cFCGJLJBOKI != null)
+				ConditionDirection directionCondition = item as ConditionDirection;
+				if (directionCondition != null)
 				{
-					cFCGJLJBOKI.UpdateNodes(OECPEDPMKCD, EKBOGDKIHIH, AECCPADGGPG, PHADJMAONJG, MJCGOJBGFIE);
+					directionCondition.UpdateNodes(modelObject, isPlayer, modelNode, isChildObject, childOwner);
 				}
 				else
 				{
@@ -385,11 +385,11 @@ public class Trigger
 			}
 			else if (item.Type == ConditionAnimation.ConditionType.LIST)
 			{
-				ConditionList eLFKOGJJNMN = item as ConditionList;
-				if (eLFKOGJJNMN != null)
+				ConditionList conditionList = item as ConditionList;
+				if (conditionList != null)
 				{
-					List<ConditionAnimation> kDOGKKGDOBK = eLFKOGJJNMN.GetConditions();
-					UpdateConditions(kDOGKKGDOBK, OECPEDPMKCD, EKBOGDKIHIH, PHADJMAONJG, MJCGOJBGFIE, AECCPADGGPG);
+					List<ConditionAnimation> nestedConditions = conditionList.GetConditions();
+					UpdateConditions(nestedConditions, modelObject, isPlayer, isChildObject, childOwner, modelNode);
 				}
 				else
 				{

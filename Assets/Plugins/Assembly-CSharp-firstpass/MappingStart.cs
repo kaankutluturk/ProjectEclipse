@@ -39,15 +39,15 @@ public class MappingStart : NodeEvent
 		}
 	}
 
-	public MappingStart(string KOLNNNLOCFE, string EDLADAAKMDF, bool isImplicit, MappingStyle KIGNIBIMLKK, Mark ILENLCMAMBH, Mark PCLFFOBJJFO)
-		: base(KOLNNNLOCFE, EDLADAAKMDF, ILENLCMAMBH, PCLFFOBJJFO)
+	public MappingStart(string anchor, string tag, bool isImplicit, MappingStyle style, Mark start, Mark end)
+		: base(anchor, tag, start, end)
 	{
 		this.isImplicit = isImplicit;
-		this.style = KIGNIBIMLKK;
+		this.style = style;
 	}
 
-	public MappingStart(string KOLNNNLOCFE, string EDLADAAKMDF, bool isImplicit, MappingStyle KIGNIBIMLKK)
-		: this(KOLNNNLOCFE, EDLADAAKMDF, isImplicit, KIGNIBIMLKK, Mark.Empty, Mark.Empty)
+	public MappingStart(string anchor, string tag, bool isImplicit, MappingStyle style)
+		: this(anchor, tag, isImplicit, style, Mark.Empty, Mark.Empty)
 	{
 	}
 
@@ -86,8 +86,8 @@ public class MappingStart : NodeEvent
 		return string.Format(CultureInfo.InvariantCulture, "Mapping start [anchor = {0}, tag = {1}, isImplicit = {2}, style = {3}]", GetAnchor(), GetTag(), isImplicit, style);
 	}
 
-	public override void Accept(IParsingEventVisitor NKECMANOOEM)
+	public override void Accept(IParsingEventVisitor visitor)
 	{
-		NKECMANOOEM.Visit(this);
+		visitor.Visit(this);
 	}
 }

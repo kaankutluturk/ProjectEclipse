@@ -72,11 +72,11 @@ internal class Chanel
 		}
 	}
 
-	internal Chanel(int OKNNNLIPODI, bool MHAFPAHIFKP, Dictionary<string, AudioClip> OCEMOHJPDLK)
+	internal Chanel(int id, bool isMusic, Dictionary<string, AudioClip> clips)
 	{
-		set_IsMusic(MHAFPAHIFKP);
-		set_ID(OKNNNLIPODI);
-		_clips = OCEMOHJPDLK;
+		set_IsMusic(isMusic);
+		set_ID(id);
+		_clips = clips;
 		IsMute = false;
 		set_MasterVolume(1f);
 	}
@@ -121,37 +121,37 @@ internal class Chanel
 		masterVolume = value;
 	}
 
-	internal void Play(PlayCommand LEKEGLMDAHA)
+	internal void Play(PlayCommand command)
 	{
-		AudioClip audioClip = ((!_clips.ContainsKey(LEKEGLMDAHA.GetSound())) ? null : _clips[LEKEGLMDAHA.GetSound()]);
+		AudioClip audioClip = ((!_clips.ContainsKey(command.GetSound())) ? null : _clips[command.GetSound()]);
 		if (!audioClip)
 		{
 			return;
 		}
-		if (!LEKEGLMDAHA.GetOverlap())
+		if (!command.GetOverlap())
 		{
 			StopAll();
 		}
-		if (_active.ContainsKey(LEKEGLMDAHA.GetSound()))
+		if (_active.ContainsKey(command.GetSound()))
 		{
-			_active[LEKEGLMDAHA.GetSound()].Init(this, LEKEGLMDAHA, audioClip);
-			_active[LEKEGLMDAHA.GetSound()].set_IsMute(IsMute);
+			_active[command.GetSound()].Init(this, command, audioClip);
+			_active[command.GetSound()].set_IsMute(IsMute);
 			return;
 		}
 		AudioUnit audioUnit = OverallUnitPool.GetFreeUnit();
 		if ((bool)audioUnit)
 		{
-			audioUnit.Init(this, LEKEGLMDAHA, audioClip);
+			audioUnit.Init(this, command, audioClip);
 			audioUnit.set_IsMute(IsMute);
-			_active.Add(LEKEGLMDAHA.GetSound(), audioUnit);
+			_active.Add(command.GetSound(), audioUnit);
 		}
 	}
 
-	internal void Pause(bool KCANPMPILKI)
+	internal void Pause(bool paused)
 	{
 		foreach (AudioUnit value in _active.Values)
 		{
-			if (KCANPMPILKI)
+			if (paused)
 			{
 				value.Pause();
 			}
@@ -162,26 +162,26 @@ internal class Chanel
 		}
 	}
 
-	internal void Pause(bool KCANPMPILKI, string LGLFOBEIPKB)
+	internal void Pause(bool paused, string soundName)
 	{
-		if (_active.ContainsKey(LGLFOBEIPKB))
+		if (_active.ContainsKey(soundName))
 		{
-			if (KCANPMPILKI)
+			if (paused)
 			{
-				_active[LGLFOBEIPKB].Pause();
+				_active[soundName].Pause();
 			}
 			else
 			{
-				_active[LGLFOBEIPKB].UnPause();
+				_active[soundName].UnPause();
 			}
 		}
 	}
 
-	public void FreeUnit(AudioUnit PNJCPKNCLCP)
+	public void FreeUnit(AudioUnit unit)
 	{
 		foreach (KeyValuePair<string, AudioUnit> item in _active)
 		{
-			if (item.Value == PNJCPKNCLCP)
+			if (item.Value == unit)
 			{
 				_active.Remove(item.Key);
 				break;
@@ -189,11 +189,11 @@ internal class Chanel
 		}
 	}
 
-	public void StopAll(bool BJIOMMPCLEA = false)
+	public void StopAll(bool immediately = false)
 	{
 		foreach (AudioUnit value in _active.Values)
 		{
-			value.Stop(BJIOMMPCLEA);
+			value.Stop(immediately);
 		}
 		_active.Clear();
 	}

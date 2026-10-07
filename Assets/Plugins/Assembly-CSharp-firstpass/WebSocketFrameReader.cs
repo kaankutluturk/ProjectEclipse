@@ -131,18 +131,18 @@ public sealed class WebSocketFrameReader
 		data = value;
 	}
 
-	internal void Read(Stream ABJIEFMMIEK)
+	internal void Read(Stream stream)
 	{
-		byte b = (byte)ABJIEFMMIEK.ReadByte();
+		byte b = (byte)stream.ReadByte();
 		set_IsFinal((b & 0x80) != 0);
 		set_Type((WebSocketFrameTypes)(b & 0xF));
-		b = (byte)ABJIEFMMIEK.ReadByte();
+		b = (byte)stream.ReadByte();
 		SetHasMask((b & 0x80) != 0);
 		set_Length((ulong)(b & 0x7F));
 		if (GetLength() == 126)
 		{
 			byte[] array = new byte[2];
-			ABJIEFMMIEK.ReadBuffer(array);
+			stream.ReadBuffer(array);
 			if (BitConverter.IsLittleEndian)
 			{
 				Array.Reverse(array, 0, array.Length);
@@ -152,7 +152,7 @@ public sealed class WebSocketFrameReader
 		else if (GetLength() == 127)
 		{
 			byte[] array2 = new byte[8];
-			ABJIEFMMIEK.ReadBuffer(array2);
+			stream.ReadBuffer(array2);
 			if (BitConverter.IsLittleEndian)
 			{
 				Array.Reverse(array2, 0, array2.Length);
@@ -162,7 +162,7 @@ public sealed class WebSocketFrameReader
 		if (GetHasMask())
 		{
 			SetMask(new byte[4]);
-			ABJIEFMMIEK.Read(GetMask(), 0, 4);
+			stream.Read(GetMask(), 0, 4);
 		}
 		set_Data(new byte[GetLength()]);
 		if (GetLength() == 0)
@@ -172,7 +172,7 @@ public sealed class WebSocketFrameReader
 		int num = 0;
 		do
 		{
-			num += ABJIEFMMIEK.Read(GetData(), num, GetData().Length - num);
+			num += stream.Read(GetData(), num, GetData().Length - num);
 		}
 		while (num < GetData().Length);
 		if (GetHasMask())
@@ -184,22 +184,22 @@ public sealed class WebSocketFrameReader
 		}
 	}
 
-	internal void Assemble(List<WebSocketFrameReader> DAGGODDBKDD)
+	internal void Assemble(List<WebSocketFrameReader> frames)
 	{
-		DAGGODDBKDD.Add(this);
+		frames.Add(this);
 		ulong num = 0uL;
-		for (int i = 0; i < DAGGODDBKDD.Count; i++)
+		for (int i = 0; i < frames.Count; i++)
 		{
-			num += DAGGODDBKDD[i].GetLength();
+			num += frames[i].GetLength();
 		}
 		byte[] array = new byte[num];
 		ulong num2 = 0uL;
-		for (int j = 0; j < DAGGODDBKDD.Count; j++)
+		for (int j = 0; j < frames.Count; j++)
 		{
-			Array.Copy(DAGGODDBKDD[j].GetData(), 0, array, (int)num2, (int)DAGGODDBKDD[j].GetLength());
-			num2 += DAGGODDBKDD[j].GetLength();
+			Array.Copy(frames[j].GetData(), 0, array, (int)num2, (int)frames[j].GetLength());
+			num2 += frames[j].GetLength();
 		}
-		set_Type(DAGGODDBKDD[0].get_Type());
+		set_Type(frames[0].get_Type());
 		set_Length(num);
 		set_Data(array);
 	}

@@ -121,9 +121,9 @@ internal class Inflater
 		}
 	}
 
-	public void SetInput(byte[] APACFLKJCKF, int IPCOBJBKNAO, int BDBOAEGELMC)
+	public void SetInput(byte[] buffer, int offset, int length)
 	{
-		input.SetInput(APACFLKJCKF, IPCOBJBKNAO, BDBOAEGELMC);
+		input.SetInput(buffer, offset, length);
 	}
 
 	public bool Finished()
@@ -141,24 +141,24 @@ internal class Inflater
 		return input.NeedsInput();
 	}
 
-	public int Inflate(byte[] KPAMPCLHCEN, int IPCOBJBKNAO, int BDBOAEGELMC)
+	public int Inflate(byte[] buffer, int offset, int length)
 	{
 		int num = 0;
 		do
 		{
-			int num2 = output.CopyTo(KPAMPCLHCEN, IPCOBJBKNAO, BDBOAEGELMC);
+			int num2 = output.CopyTo(buffer, offset, length);
 			if (num2 > 0)
 			{
 				if (hasFormatReader)
 				{
-					formatReader.UpdateWithBytesRead(KPAMPCLHCEN, IPCOBJBKNAO, num2);
+					formatReader.UpdateWithBytesRead(buffer, offset, num2);
 				}
-				IPCOBJBKNAO += num2;
+				offset += num2;
 				num += num2;
-				BDBOAEGELMC -= num2;
+				length -= num2;
 			}
 		}
-		while (BDBOAEGELMC != 0 && !Finished() && Decode());
+		while (length != 0 && !Finished() && Decode());
 		if (state == InflaterState.VerifyingFooter && output.GetAvailableBytes() == 0)
 		{
 			formatReader.Validate();
@@ -168,7 +168,7 @@ internal class Inflater
 
 	private bool Decode()
 	{
-		bool DNCHJPDPNJK = false;
+		bool endOfBlock = false;
 		bool flag = false;
 		if (Finished())
 		{
@@ -232,11 +232,11 @@ internal class Inflater
 		}
 		if (blockType == BlockType.Dynamic)
 		{
-			flag = ((state >= InflaterState.DecodeTop) ? DecodeBlock(out DNCHJPDPNJK) : DecodeDynamicBlockHeader());
+			flag = ((state >= InflaterState.DecodeTop) ? DecodeBlock(out endOfBlock) : DecodeDynamicBlockHeader());
 		}
 		else if (blockType == BlockType.Static)
 		{
-			flag = DecodeBlock(out DNCHJPDPNJK);
+			flag = DecodeBlock(out endOfBlock);
 		}
 		else
 		{
@@ -244,9 +244,9 @@ internal class Inflater
 			{
 				throw new InvalidDataException(SR.GetString("Unknown block type"));
 			}
-			flag = DecodeUncompressedBlock(out DNCHJPDPNJK);
+			flag = DecodeUncompressedBlock(out endOfBlock);
 		}
-		if (DNCHJPDPNJK && bfinal != 0)
+		if (endOfBlock && bfinal != 0)
 		{
 			if (hasFormatReader)
 			{
@@ -260,9 +260,9 @@ internal class Inflater
 		return flag;
 	}
 
-	private bool DecodeUncompressedBlock(out bool DNCHJPDPNJK)
+	private bool DecodeUncompressedBlock(out bool endOfBlock)
 	{
-		DNCHJPDPNJK = false;
+		endOfBlock = false;
 		while (true)
 		{
 			switch (state)
@@ -300,7 +300,7 @@ internal class Inflater
 				if (blockLength == 0)
 				{
 					state = InflaterState.ReadingBFinal;
-					DNCHJPDPNJK = true;
+					endOfBlock = true;
 					return true;
 				}
 				if (output.GetFreeBytes() == 0)
@@ -316,9 +316,9 @@ internal class Inflater
 		}
 	}
 
-	private bool DecodeBlock(out bool COIHANBPBME)
+	private bool DecodeBlock(out bool endOfBlock)
 	{
-		COIHANBPBME = false;
+		endOfBlock = false;
 		int num = output.GetFreeBytes();
 		while (num > 258)
 		{
@@ -339,7 +339,7 @@ internal class Inflater
 				}
 				if (num2 == 256)
 				{
-					COIHANBPBME = true;
+					endOfBlock = true;
 					state = InflaterState.ReadingBFinal;
 					return true;
 				}
@@ -403,7 +403,7 @@ internal class Inflater
 				goto case InflaterState.HaveDistCode;
 			case InflaterState.HaveDistCode:
 			{
-				int oIOMNNFMDOO;
+				int distance;
 				if (distanceCode > 3)
 				{
 					extraBits = distanceCode - 2 >> 1;
@@ -412,13 +412,13 @@ internal class Inflater
 					{
 						return false;
 					}
-					oIOMNNFMDOO = distanceBasePosition[distanceCode] + num3;
+					distance = distanceBasePosition[distanceCode] + num3;
 				}
 				else
 				{
-					oIOMNNFMDOO = distanceCode + 1;
+					distance = distanceCode + 1;
 				}
-				output.WriteLengthDistance(length, oIOMNNFMDOO);
+				output.WriteLengthDistance(length, distance);
 				num -= length;
 				state = InflaterState.DecodeTop;
 				break;

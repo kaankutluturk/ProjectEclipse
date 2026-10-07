@@ -4,51 +4,51 @@ public sealed class Adler
 
 	private static readonly int NMAX = 5552;
 
-	public static uint Adler32(uint HMGBNHKFPAG, byte[] HLDLIFPJMOA, int index, int JCAJDBOMGOM)
+	public static uint Adler32(uint adler, byte[] buffer, int index, int length)
 	{
-		if (HLDLIFPJMOA == null)
+		if (buffer == null)
 		{
 			return 1u;
 		}
-		uint num = HMGBNHKFPAG & 0xFFFF;
-		uint num2 = (HMGBNHKFPAG >> 16) & 0xFFFF;
-		while (JCAJDBOMGOM > 0)
+		uint num = adler & 0xFFFF;
+		uint num2 = (adler >> 16) & 0xFFFF;
+		while (length > 0)
 		{
-			int num3 = ((JCAJDBOMGOM >= NMAX) ? NMAX : JCAJDBOMGOM);
-			JCAJDBOMGOM -= num3;
+			int num3 = ((length >= NMAX) ? NMAX : length);
+			length -= num3;
 			while (num3 >= 16)
 			{
-				num += HLDLIFPJMOA[index++];
+				num += buffer[index++];
 				num2 += num;
-				num += HLDLIFPJMOA[index++];
+				num += buffer[index++];
 				num2 += num;
-				num += HLDLIFPJMOA[index++];
+				num += buffer[index++];
 				num2 += num;
-				num += HLDLIFPJMOA[index++];
+				num += buffer[index++];
 				num2 += num;
-				num += HLDLIFPJMOA[index++];
+				num += buffer[index++];
 				num2 += num;
-				num += HLDLIFPJMOA[index++];
+				num += buffer[index++];
 				num2 += num;
-				num += HLDLIFPJMOA[index++];
+				num += buffer[index++];
 				num2 += num;
-				num += HLDLIFPJMOA[index++];
+				num += buffer[index++];
 				num2 += num;
-				num += HLDLIFPJMOA[index++];
+				num += buffer[index++];
 				num2 += num;
-				num += HLDLIFPJMOA[index++];
+				num += buffer[index++];
 				num2 += num;
-				num += HLDLIFPJMOA[index++];
+				num += buffer[index++];
 				num2 += num;
-				num += HLDLIFPJMOA[index++];
+				num += buffer[index++];
 				num2 += num;
-				num += HLDLIFPJMOA[index++];
+				num += buffer[index++];
 				num2 += num;
-				num += HLDLIFPJMOA[index++];
+				num += buffer[index++];
 				num2 += num;
-				num += HLDLIFPJMOA[index++];
+				num += buffer[index++];
 				num2 += num;
-				num += HLDLIFPJMOA[index++];
+				num += buffer[index++];
 				num2 += num;
 				num3 -= 16;
 			}
@@ -56,7 +56,7 @@ public sealed class Adler
 			{
 				do
 				{
-					num += HLDLIFPJMOA[index++];
+					num += buffer[index++];
 					num2 += num;
 				}
 				while (--num3 != 0);

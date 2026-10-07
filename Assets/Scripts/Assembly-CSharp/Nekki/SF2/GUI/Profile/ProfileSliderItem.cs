@@ -18,35 +18,35 @@ namespace Nekki.SF2.GUI.Profile
 		[SerializeField]
 		private PerkTreeLines _perkLines;
 
-		public void Init(float PEIAPNNLFFL = 95f)
+		public void Init(float spacing = 95f)
 		{
-			iconSpacing = PEIAPNNLFFL;
+			iconSpacing = spacing;
 			_perkLines.gameObject.SetActive(false);
 		}
 
-		public void AddIcons(SubItem ADONPNOBBDE, IconAlignment LJFADBBKKPH = IconAlignment.NONE_ALIGNMENT)
+		public void AddIcons(SubItem icon, IconAlignment alignment = IconAlignment.NONE_ALIGNMENT)
 		{
-			if (ADONPNOBBDE != null)
+			if (icon != null)
 			{
-				AddIcon(ADONPNOBBDE);
-				switch (LJFADBBKKPH)
+				AddIcon(icon);
+				switch (alignment)
 				{
 				case IconAlignment.NONE_ALIGNMENT:
 					LayoutIcons();
 					break;
 				case IconAlignment.LEFT_ALIGNMENT:
-					ADONPNOBBDE.transform.SetLocalX(60f - GetComponent<RectTransform>().rect.width / 2f);
+					icon.transform.SetLocalX(60f - GetComponent<RectTransform>().rect.width / 2f);
 					break;
 				}
 			}
 		}
 
-		public void AddIcons(List<SubItem> BAOPCLKCLAF)
+		public void AddIcons(List<SubItem> newIcons)
 		{
-			int count = BAOPCLKCLAF.Count;
+			int count = newIcons.Count;
 			for (int i = 0; i < count; i++)
 			{
-				AddIcon(BAOPCLKCLAF[i]);
+				AddIcon(newIcons[i]);
 			}
 			LayoutIcons();
 		}
@@ -88,10 +88,10 @@ namespace Nekki.SF2.GUI.Profile
 			icons.Clear();
 		}
 
-		private void AddIcon(SubItem ADONPNOBBDE)
+		private void AddIcon(SubItem icon)
 		{
-			ADONPNOBBDE.transform.SetLocalY(0f);
-			icons.Add(ADONPNOBBDE);
+			icon.transform.SetLocalY(0f);
+			icons.Add(icon);
 		}
 
 		private void LayoutIcons()
@@ -121,11 +121,11 @@ namespace Nekki.SF2.GUI.Profile
 			}
 		}
 
-		public void AddPerkLines(bool NMBEADHHHFH, bool IBMGAPMHMOB)
+		public void AddPerkLines(bool isFirst, bool isLast)
 		{
 			_perkLines.gameObject.SetActive(true);
 			int count = GetIcons().Count;
-			_perkLines.Init(count >= 2, !NMBEADHHHFH, !IBMGAPMHMOB);
+			_perkLines.Init(count >= 2, !isFirst, !isLast);
 		}
 	}
 }

@@ -10,10 +10,10 @@ public class SelectAnimation
 
 		public Model OwnerModel;
 
-		public TriggerStruct(Trigger CPBHKJFPFJB, Model ACENLMONNPA)
+		public TriggerStruct(Trigger sourceTrigger, Model ownerModel)
 		{
-			SourceTrigger = CPBHKJFPFJB;
-			OwnerModel = ACENLMONNPA;
+			SourceTrigger = sourceTrigger;
+			OwnerModel = ownerModel;
 		}
 	}
 
@@ -84,21 +84,21 @@ public class SelectAnimation
 		_Models.AddRange(value);
 	}
 
-	public void AddModel(Model ACENLMONNPA)
+	public void AddModel(Model model)
 	{
 		int count = _Models.Count;
-		int num = _Models.AddIfNotExist(ACENLMONNPA);
+		int num = _Models.AddIfNotExist(model);
 		if (num == count)
 		{
-			ACENLMONNPA.AddEventListener(2, OnAnimationStart);
-			ACENLMONNPA.AddEventListener(3, OnAnimationEnd);
-			ACENLMONNPA.AddEventListener(0, OnIntervalStart);
-			ACENLMONNPA.AddEventListener(1, OnIntervalEnd);
-			ACENLMONNPA.AddEventListener(4, OnEveryFrame);
-			ACENLMONNPA.AddEventListener(6, OnModelCreate);
-			ACENLMONNPA.AddEventListener(10, OnKeyPress);
-			ACENLMONNPA.AddEventListener(11, OnKeyRelease);
-			ACENLMONNPA.UpdateAnimationParameters(_Models);
+			model.AddEventListener(2, OnAnimationStart);
+			model.AddEventListener(3, OnAnimationEnd);
+			model.AddEventListener(0, OnIntervalStart);
+			model.AddEventListener(1, OnIntervalEnd);
+			model.AddEventListener(4, OnEveryFrame);
+			model.AddEventListener(6, OnModelCreate);
+			model.AddEventListener(10, OnKeyPress);
+			model.AddEventListener(11, OnKeyRelease);
+			model.UpdateAnimationParameters(_Models);
 		}
 	}
 
@@ -187,25 +187,25 @@ public class SelectAnimation
         };
     }
 
-	public void RemoveModel(Model ACENLMONNPA)
+	public void RemoveModel(Model targetModel)
 	{
-		if (ACENLMONNPA == null) return;
-		ACENLMONNPA.RemoveEventListener(2, OnAnimationStart);
-		ACENLMONNPA.RemoveEventListener(3, OnAnimationEnd);
-		ACENLMONNPA.RemoveEventListener(0, OnIntervalStart);
-		ACENLMONNPA.RemoveEventListener(1, OnIntervalEnd);
-		ACENLMONNPA.RemoveEventListener(4, OnEveryFrame);
-		ACENLMONNPA.RemoveEventListener(6, OnModelCreate);
-		ACENLMONNPA.RemoveEventListener(10, OnKeyPress);
-		ACENLMONNPA.RemoveEventListener(11, OnKeyRelease);
-		RemoveEventsForModel(ACENLMONNPA, _PendingEvents);
-		RemoveEventsForModel(ACENLMONNPA, _PendingIntervalEndEvents);
-		_ExplicitBirthModels.RemoveAll(model => model == ACENLMONNPA);
-		_NewlyCreatedModels.RemoveAll(model => model == ACENLMONNPA);
-		_PendingTriggers.RemoveAll(trigger => trigger.OwnerModel == ACENLMONNPA);
+		if (targetModel == null) return;
+		targetModel.RemoveEventListener(2, OnAnimationStart);
+		targetModel.RemoveEventListener(3, OnAnimationEnd);
+		targetModel.RemoveEventListener(0, OnIntervalStart);
+		targetModel.RemoveEventListener(1, OnIntervalEnd);
+		targetModel.RemoveEventListener(4, OnEveryFrame);
+		targetModel.RemoveEventListener(6, OnModelCreate);
+		targetModel.RemoveEventListener(10, OnKeyPress);
+		targetModel.RemoveEventListener(11, OnKeyRelease);
+		RemoveEventsForModel(targetModel, _PendingEvents);
+		RemoveEventsForModel(targetModel, _PendingIntervalEndEvents);
+		_ExplicitBirthModels.RemoveAll(model => model == targetModel);
+		_NewlyCreatedModels.RemoveAll(model => model == targetModel);
+		_PendingTriggers.RemoveAll(trigger => trigger.OwnerModel == targetModel);
 		for (int num = _Models.Count - 1; num >= 0; num--)
 		{
-			if (_Models[num] == ACENLMONNPA)
+			if (_Models[num] == targetModel)
 			{
 				_Models.RemoveAt(num);
 				if (num < _ModelsConditions.Count) _ModelsConditions.RemoveAt(num);
@@ -213,27 +213,27 @@ public class SelectAnimation
 		}
 	}
 
-	public void CheckEvent(EventAnimation.EventAnimationType LFLGCDNKNJI, Model.EventModel EGHPHELLOGO, bool HLEIILHFBKP = false)
+	public void CheckEvent(EventAnimation.EventAnimationType eventType, Model.EventModel eventModel, bool isRandom = false)
 	{
-		EventModelDelayed gBEJMGCOCOJ = new EventModelDelayed();
-		gBEJMGCOCOJ.Type = LFLGCDNKNJI;
-		gBEJMGCOCOJ.Data = EGHPHELLOGO.Data;
-		gBEJMGCOCOJ.Owner = ((LFLGCDNKNJI != EventAnimation.EventAnimationType.EVENT_STRIKE) ? EGHPHELLOGO.KJDFJPBIGJC : EGHPHELLOGO.Opponent);
-		gBEJMGCOCOJ.Target = gBEJMGCOCOJ.Owner.EventData.Opponent;
-		gBEJMGCOCOJ.IsRandom = HLEIILHFBKP;
-		if (LFLGCDNKNJI == EventAnimation.EventAnimationType.EVENT_INTERVAL_END)
+		EventModelDelayed delayedEvent = new EventModelDelayed();
+		delayedEvent.Type = eventType;
+		delayedEvent.Data = eventModel.Data;
+		delayedEvent.Owner = ((eventType != EventAnimation.EventAnimationType.EVENT_STRIKE) ? eventModel.sourceModel : eventModel.Opponent);
+		delayedEvent.Target = delayedEvent.Owner.EventData.Opponent;
+		delayedEvent.IsRandom = isRandom;
+		if (eventType == EventAnimation.EventAnimationType.EVENT_INTERVAL_END)
 		{
-			_PendingIntervalEndEvents.Add(gBEJMGCOCOJ);
+			_PendingIntervalEndEvents.Add(delayedEvent);
 		}
 		else
 		{
-			_PendingEvents.Add(gBEJMGCOCOJ);
+			_PendingEvents.Add(delayedEvent);
 		}
 	}
 
-	public void OnRandomKeyPress(Model.EventModel EGHPHELLOGO)
+	public void OnRandomKeyPress(Model.EventModel eventModel)
 	{
-		CheckEvent(EventAnimation.EventAnimationType.EVENT_KEY_PRESSED, EGHPHELLOGO, true);
+		CheckEvent(EventAnimation.EventAnimationType.EVENT_KEY_PRESSED, eventModel, true);
 		foreach (Model item in _Models)
 		{
 			item.FrameInRound = _FrameRound;
@@ -292,16 +292,16 @@ public class SelectAnimation
 
 	public void OnModelCreate(object data)
 	{
-		Model fGCODGKLHED = (Model)data;
-		AddModel(fGCODGKLHED);
-		_NewlyCreatedModels.Add(fGCODGKLHED);
-		if (fGCODGKLHED.HasExplicitBirthAnimation())
+		Model newModel = (Model)data;
+		AddModel(newModel);
+		_NewlyCreatedModels.Add(newModel);
+		if (newModel.HasExplicitBirthAnimation())
 		{
-			_ExplicitBirthModels.Add(fGCODGKLHED);
+			_ExplicitBirthModels.Add(newModel);
 		}
 		else
 		{
-			CheckEvent(EventAnimation.EventAnimationType.EVENT_BIRTH, fGCODGKLHED.EventData);
+			CheckEvent(EventAnimation.EventAnimationType.EVENT_BIRTH, newModel.EventData);
 		}
 	}
 
@@ -333,11 +333,11 @@ public class SelectAnimation
 		}
 		foreach (TriggerStruct item3 in _PendingTriggers)
 		{
-			Model kJDFJPBIGJC = item3.OwnerModel;
-			Trigger fEDHCBGNJIM = item3.SourceTrigger;
-			if (kJDFJPBIGJC != null && fEDHCBGNJIM != null)
+			Model ownerModel = item3.OwnerModel;
+			Trigger sourceTrigger = item3.SourceTrigger;
+			if (ownerModel != null && sourceTrigger != null)
 			{
-				kJDFJPBIGJC.RunActions(fEDHCBGNJIM.Definition.Actions);
+				ownerModel.RunActions(sourceTrigger.Definition.Actions);
 			}
 		}
 		// Model-create listeners (camera, effects and renderer) have all completed
@@ -369,11 +369,11 @@ public class SelectAnimation
 		}
 	}
 
-	private static bool ContainsAnimation(InfoAnimation DBOLBEOCEME, List<SelectInfo> MAHEJFLCCHP)
+	private static bool ContainsAnimation(InfoAnimation animation, List<SelectInfo> selectInfos)
 	{
-		foreach (SelectInfo item in MAHEJFLCCHP)
+		foreach (SelectInfo item in selectInfos)
 		{
-			if (DBOLBEOCEME == item.Animation)
+			if (animation == item.Animation)
 			{
 				return true;
 			}
@@ -381,94 +381,94 @@ public class SelectAnimation
 		return false;
 	}
 
-	private SelectInfo SelectAnimationWithWeights(Model ACENLMONNPA, List<SelectInfo> GBKDAGPNJLB)
+	private SelectInfo SelectAnimationWithWeights(Model model, List<SelectInfo> selectInfos)
 	{
-		int count = GBKDAGPNJLB.Count;
+		int count = selectInfos.Count;
 		if (0 < count)
 		{
 			List<InfoAnimation> list = new List<InfoAnimation>();
-			foreach (SelectInfo item in GBKDAGPNJLB)
+			foreach (SelectInfo item in selectInfos)
 			{
 				list.Add(item.Animation);
 			}
-			int num = ACENLMONNPA.GetAi().SelectAnimationWithWeights(list);
+			int num = model.GetAi().SelectAnimationWithWeights(list);
 			if (-1 < num && num < count)
 			{
-				return GBKDAGPNJLB[num];
+				return selectInfos[num];
 			}
 		}
 		return null;
 	}
 
-	private void PlayAnimation(Model ACENLMONNPA, List<SelectInfo> MAHEJFLCCHP, bool HLEIILHFBKP = false)
+	private void PlayAnimation(Model model, List<SelectInfo> selectInfos, bool ignoreRandom = false)
 	{
 		List<SelectInfo> list = new List<SelectInfo>();
 		int num = int.MinValue;
-		SelectInfo nKDNDLNDFJH = null;
+		SelectInfo chosenInfo = null;
 		List<SelectInfo> list2 = new List<SelectInfo>();
 		SelectInfo nKDNDLNDFJH2 = null;
-		for (int i = 0; i < MAHEJFLCCHP.Count; i++)
+		for (int i = 0; i < selectInfos.Count; i++)
 		{
-			nKDNDLNDFJH2 = MAHEJFLCCHP[i];
-			if (!HLEIILHFBKP && nKDNDLNDFJH2.IsRandom)
+			nKDNDLNDFJH2 = selectInfos[i];
+			if (!ignoreRandom && nKDNDLNDFJH2.IsRandom)
 			{
 				list.Add(nKDNDLNDFJH2);
 			}
-			int eBMPEMKCDGP = nKDNDLNDFJH2.Animation.Priority;
-			if (eBMPEMKCDGP >= num)
+			int priority = nKDNDLNDFJH2.Animation.Priority;
+			if (priority >= num)
 			{
-				if (eBMPEMKCDGP > num)
+				if (priority > num)
 				{
-					num = eBMPEMKCDGP;
+					num = priority;
 					list2.Clear();
 				}
 				list2.Add(nKDNDLNDFJH2);
 			}
 		}
 		int index = Eclipse.Multiplayer.VersusDeterminism.Range(0, list2.Count);
-		nKDNDLNDFJH = list2[index];
+		chosenInfo = list2[index];
 		if (list.Count > 0)
 		{
-			if (nKDNDLNDFJH != null)
+			if (chosenInfo != null)
 			{
-				list.Add(nKDNDLNDFJH);
+				list.Add(chosenInfo);
 			}
-			PlayAnimationRandom(ACENLMONNPA, list);
+			PlayAnimationRandom(model, list);
 		}
-		else if (nKDNDLNDFJH != null)
+		else if (chosenInfo != null)
 		{
-			if (!nKDNDLNDFJH.Animation.HasPhysics)
+			if (!chosenInfo.Animation.HasPhysics)
 			{
-				SetTransitions(ACENLMONNPA, _ModelsConditions[nKDNDLNDFJH.Index], nKDNDLNDFJH.Animation, nKDNDLNDFJH.FacingSign);
+				SetTransitions(model, _ModelsConditions[chosenInfo.Index], chosenInfo.Animation, chosenInfo.FacingSign);
 			}
 			else
 			{
-				ACENLMONNPA.SetDelayedStrike(nKDNDLNDFJH.Animation, nKDNDLNDFJH.IsHit);
+				model.SetDelayedStrike(chosenInfo.Animation, chosenInfo.IsHit);
 			}
-			ACENLMONNPA.LastAnimationType = nKDNDLNDFJH.Animation.Type;
-			ACENLMONNPA.LastEventType = nKDNDLNDFJH.EventType;
-            if (nKDNDLNDFJH.IsHit && ACENLMONNPA.Parameters.RemainingHealthBars == 0)
+			model.LastAnimationType = chosenInfo.Animation.Type;
+			model.LastEventType = chosenInfo.EventType;
+            if (chosenInfo.IsHit && model.Parameters.RemainingHealthBars == 0)
             {
                 // The round-end path runs later in this same simulation step.
                 // Commit the selected hit reaction before it changes the stage.
-                if (!ACENLMONNPA.RenderStrikeDelay()) ACENLMONNPA.RenderAnimationDelay();
+                if (!model.RenderStrikeDelay()) model.RenderAnimationDelay();
             }
 		}
 	}
 
-	private void PlayAnimationRandom(Model ACENLMONNPA, List<SelectInfo> MAHEJFLCCHP)
+	private void PlayAnimationRandom(Model model, List<SelectInfo> selectInfos)
 	{
-		int num = MAHEJFLCCHP.Count;
+		int num = selectInfos.Count;
 		if (0 < num)
 		{
 			int num2 = 0;
-			for (int i = 0; i < MAHEJFLCCHP.Count; i++)
+			for (int i = 0; i < selectInfos.Count; i++)
 			{
-				InfoAnimation.CapabilityTable iCANLHJKKNE = MAHEJFLCCHP[i].Animation.PriorityConflicts;
+				InfoAnimation.CapabilityTable priorityConflicts = selectInfos[i].Animation.PriorityConflicts;
 				bool flag = true;
-				for (int j = 0; j < MAHEJFLCCHP.Count; j++)
+				for (int j = 0; j < selectInfos.Count; j++)
 				{
-					if (!iCANLHJKKNE.IsThePriority(MAHEJFLCCHP[j].Animation))
+					if (!priorityConflicts.IsThePriority(selectInfos[j].Animation))
 					{
 						flag = false;
 						break;
@@ -476,61 +476,61 @@ public class SelectAnimation
 				}
 				if (flag)
 				{
-					MAHEJFLCCHP[num2] = MAHEJFLCCHP[i];
+					selectInfos[num2] = selectInfos[i];
 					num2++;
 				}
 			}
-			num = MAHEJFLCCHP.Count;
+			num = selectInfos.Count;
 			if (num2 < num)
 			{
-				MAHEJFLCCHP.Resize(num2);
+				selectInfos.Resize(num2);
 				num = num2;
 			}
 		}
 		if (0 < num)
 		{
 			int num3 = 0;
-			for (int l = 0; l < MAHEJFLCCHP.Count; l++)
+			for (int l = 0; l < selectInfos.Count; l++)
 			{
-				SelectInfo item3 = MAHEJFLCCHP[l];
+				SelectInfo item3 = selectInfos[l];
 				if (item3.Animation.MoveData.TacticsConditions.Count != 0)
 				{
-					ACENLMONNPA.GetConditions().CandidateMoveNames = item3.Animation.GetTemplateNames();
-					ACENLMONNPA.GetConditions().AnimationSign = item3.Animation.GetDirection(ACENLMONNPA.GetConditions(), ACENLMONNPA.GetAnimationModule().GetSign());
-					ACENLMONNPA.GetConditions().PivotPairSelector = (int)item3.Animation.MoveData.AlignData.PivotSideKind;
-					if (item3.Animation.AreConditionsMet(ACENLMONNPA.GetConditions(), item3.Animation.MoveData.TacticsConditions, item3.MatchedEvent))
+					model.GetConditions().CandidateMoveNames = item3.Animation.GetTemplateNames();
+					model.GetConditions().AnimationSign = item3.Animation.GetDirection(model.GetConditions(), model.GetAnimationModule().GetSign());
+					model.GetConditions().PivotPairSelector = (int)item3.Animation.MoveData.AlignData.PivotSideKind;
+					if (item3.Animation.AreConditionsMet(model.GetConditions(), item3.Animation.MoveData.TacticsConditions, item3.MatchedEvent))
 					{
-						MAHEJFLCCHP[num3] = item3;
+						selectInfos[num3] = item3;
 						num3++;
 					}
 				}
 				else
 				{
-					MAHEJFLCCHP[num3] = item3;
+					selectInfos[num3] = item3;
 					num3++;
 				}
 			}
-			num = MAHEJFLCCHP.Count;
+			num = selectInfos.Count;
 			if (num3 < num)
 			{
-				MAHEJFLCCHP.Resize(num3);
+				selectInfos.Resize(num3);
 				num = num3;
 			}
 		}
-		SelectInfo nKDNDLNDFJH = SelectAnimationWithWeights(ACENLMONNPA, MAHEJFLCCHP);
-		if (nKDNDLNDFJH == null)
+		SelectInfo selectedInfo = SelectAnimationWithWeights(model, selectInfos);
+		if (selectedInfo == null)
 		{
 			return;
 		}
 		List<SelectInfo> list = new List<SelectInfo>();
-		ConditionKeys bHDEBDIHDFM = nKDNDLNDFJH.Animation.GetFirstKeysCondition();
-		for (int m = 0; m < MAHEJFLCCHP.Count; m++)
+		ConditionKeys firstKeysCondition = selectedInfo.Animation.GetFirstKeysCondition();
+		for (int m = 0; m < selectInfos.Count; m++)
 		{
-			SelectInfo item4 = MAHEJFLCCHP[m];
+			SelectInfo item4 = selectInfos[m];
 			ConditionKeys bHDEBDIHDFM2 = item4.Animation.GetFirstKeysCondition();
-			if (bHDEBDIHDFM != null && bHDEBDIHDFM2 != null)
+			if (firstKeysCondition != null && bHDEBDIHDFM2 != null)
 			{
-				if (bHDEBDIHDFM2.IsEqual(bHDEBDIHDFM.RequiredKeys, true))
+				if (bHDEBDIHDFM2.IsEqual(firstKeysCondition.RequiredKeys, true))
 				{
 					list.Add(item4);
 				}
@@ -540,63 +540,63 @@ public class SelectAnimation
 				list.Add(item4);
 			}
 		}
-		PlayAnimation(ACENLMONNPA, list, true);
+		PlayAnimation(model, list, true);
 	}
 
-	private static bool IsEventMatch(EventAnimation DOANBADPBGH, ModelConditions BCGJLLNBHJG, EventModelDelayed PEADINOKLKN)
+	private static bool IsEventMatch(EventAnimation eventAnimation, ModelConditions modelConditions, EventModelDelayed delayedEvent)
 	{
 		bool result = false;
-		if (PEADINOKLKN.Type == DOANBADPBGH.Type)
+		if (delayedEvent.Type == eventAnimation.Type)
 		{
-			switch (PEADINOKLKN.Type)
+			switch (delayedEvent.Type)
 			{
 			case EventAnimation.EventAnimationType.EVENT_ROUND_STAGE:
-				result = IsRoundStageMatch(DOANBADPBGH, (StageType.Stage)PEADINOKLKN.Data);
-				result = ((!DOANBADPBGH.IsNot) ? result : (!result));
+				result = IsRoundStageMatch(eventAnimation, (StageType.Stage)delayedEvent.Data);
+				result = ((!eventAnimation.IsNot) ? result : (!result));
 				break;
 			case EventAnimation.EventAnimationType.EVENT_KEY_PRESSED:
-				result = IsKeyPressedMatch(DOANBADPBGH);
-				result = ((!DOANBADPBGH.IsNot) ? result : (!result));
+				result = IsKeyPressedMatch(eventAnimation);
+				result = ((!eventAnimation.IsNot) ? result : (!result));
 				break;
 			case EventAnimation.EventAnimationType.EVENT_KEY_RELEASED:
-				result = IsKeyReleasedMatch(DOANBADPBGH);
-				result = ((!DOANBADPBGH.IsNot) ? result : (!result));
+				result = IsKeyReleasedMatch(eventAnimation);
+				result = ((!eventAnimation.IsNot) ? result : (!result));
 				break;
 			case EventAnimation.EventAnimationType.EVENT_ANIMATION_START:
-				result = IsAnimationStartMatch(DOANBADPBGH, BCGJLLNBHJG, PEADINOKLKN);
+				result = IsAnimationStartMatch(eventAnimation, modelConditions, delayedEvent);
 				break;
 			case EventAnimation.EventAnimationType.EVENT_ANIMATION_END:
-				result = IsAnimationEndMatch(DOANBADPBGH, BCGJLLNBHJG, PEADINOKLKN);
+				result = IsAnimationEndMatch(eventAnimation, modelConditions, delayedEvent);
 				break;
 			case EventAnimation.EventAnimationType.EVENT_INTERVAL_START:
-				result = IsIntervalStartMatch(DOANBADPBGH, (IntervalAnimation)PEADINOKLKN.Data);
-				result = ((!DOANBADPBGH.IsNot) ? result : (!result));
+				result = IsIntervalStartMatch(eventAnimation, (IntervalAnimation)delayedEvent.Data);
+				result = ((!eventAnimation.IsNot) ? result : (!result));
 				break;
 			case EventAnimation.EventAnimationType.EVENT_INTERVAL_END:
-				result = IsIntervalEndMatch(DOANBADPBGH, (IntervalAnimation)PEADINOKLKN.Data);
-				result = ((!DOANBADPBGH.IsNot) ? result : (!result));
+				result = IsIntervalEndMatch(eventAnimation, (IntervalAnimation)delayedEvent.Data);
+				result = ((!eventAnimation.IsNot) ? result : (!result));
 				break;
 			case EventAnimation.EventAnimationType.EVENT_HIT:
-				result = IsHit(DOANBADPBGH, PEADINOKLKN, PEADINOKLKN.Owner.ReceivedCritical, PEADINOKLKN.Owner.IsInShock());
-				result = ((!DOANBADPBGH.IsNot) ? result : (!result));
+				result = IsHit(eventAnimation, delayedEvent, delayedEvent.Owner.ReceivedCritical, delayedEvent.Owner.IsInShock());
+				result = ((!eventAnimation.IsNot) ? result : (!result));
 				break;
 			case EventAnimation.EventAnimationType.EVENT_STRIKE:
-				result = IsHit(DOANBADPBGH, PEADINOKLKN, PEADINOKLKN.Owner.ReceivedCritical);
-				result = ((!DOANBADPBGH.IsNot) ? result : (!result));
+				result = IsHit(eventAnimation, delayedEvent, delayedEvent.Owner.ReceivedCritical);
+				result = ((!eventAnimation.IsNot) ? result : (!result));
 				break;
 			case EventAnimation.EventAnimationType.EVENT_EVERY_FRAME:
-				result = IsEveryFrameMatch(DOANBADPBGH);
-				result = ((!DOANBADPBGH.IsNot) ? result : (!result));
+				result = IsEveryFrameMatch(eventAnimation);
+				result = ((!eventAnimation.IsNot) ? result : (!result));
 				break;
 			case EventAnimation.EventAnimationType.EVENT_BIRTH:
-				result = IsBirthMatch(DOANBADPBGH);
-				result = ((!DOANBADPBGH.IsNot) ? result : (!result));
+				result = IsBirthMatch(eventAnimation);
+				result = ((!eventAnimation.IsNot) ? result : (!result));
 				break;
 			case EventAnimation.EventAnimationType.EVENT_MOD_EXPIRES:
 			{
-				string gOHIIMFFFJI = (string)PEADINOKLKN.Data;
-				result = IsModExpiresMatch(DOANBADPBGH, gOHIIMFFFJI);
-				result = ((!DOANBADPBGH.IsNot) ? result : (!result));
+				string modName = (string)delayedEvent.Data;
+				result = IsModExpiresMatch(eventAnimation, modName);
+				result = ((!eventAnimation.IsNot) ? result : (!result));
 				break;
 			}
 			}
@@ -604,40 +604,40 @@ public class SelectAnimation
 		return result;
 	}
 
-	private static bool IsRoundStageMatch(EventAnimation FOPOKALJIIJ, StageType.Stage LFLGCDNKNJI)
+	private static bool IsRoundStageMatch(EventAnimation eventAnimation, StageType.Stage stage)
 	{
-		EventRoundStage gBIJAGPBADA = (EventRoundStage)FOPOKALJIIJ;
-		return gBIJAGPBADA.GetStage() == LFLGCDNKNJI;
+		EventRoundStage roundStageEvent = (EventRoundStage)eventAnimation;
+		return roundStageEvent.GetStage() == stage;
 	}
 
-	private static bool IsKeyPressedMatch(EventAnimation FOPOKALJIIJ)
+	private static bool IsKeyPressedMatch(EventAnimation eventAnimation)
 	{
 		return true;
 	}
 
-	private static bool IsKeyReleasedMatch(EventAnimation FOPOKALJIIJ)
+	private static bool IsKeyReleasedMatch(EventAnimation eventAnimation)
 	{
 		return true;
 	}
 
-	private static bool IsAnimationStartMatch(EventAnimation FOPOKALJIIJ, ModelConditions conditions, EventModelDelayed PEADINOKLKN)
+	private static bool IsAnimationStartMatch(EventAnimation eventAnimation, ModelConditions conditions, EventModelDelayed delayedEvent)
 	{
-		if (string.IsNullOrEmpty(FOPOKALJIIJ.AnimationName))
+		if (string.IsNullOrEmpty(eventAnimation.AnimationName))
 		{
 			return true;
 		}
 		bool flag = false;
-		string lJICHLHMBFA = FOPOKALJIIJ.AnimationName;
-		if (lJICHLHMBFA != string.Empty)
+		string animationName = eventAnimation.AnimationName;
+		if (animationName != string.Empty)
 		{
 			List<string> list = null;
-			switch (FOPOKALJIIJ.TargetModel)
+			switch (eventAnimation.TargetModel)
 			{
 			case ModelType.ModelTargetType.MODEL_THIS:
 				list = conditions.SelfAnimationNames;
 				break;
 			case ModelType.ModelTargetType.MODEL_OTHER:
-				if (PEADINOKLKN.Owner.GetParentModel() != null)
+				if (delayedEvent.Owner.GetParentModel() != null)
 				{
 					return false;
 				}
@@ -654,7 +654,7 @@ public class SelectAnimation
 				break;
 			}
 			List<string> list2 = null;
-			if (lJICHLHMBFA == "$Move")
+			if (animationName == "$Move")
 			{
 				list2 = conditions.CandidateMoveNames;
 				int count = list.Count;
@@ -679,26 +679,26 @@ public class SelectAnimation
 			else
 			{
 				list2 = new List<string>();
-				list2.Add(lJICHLHMBFA);
+				list2.Add(animationName);
 			}
 			flag = IsNames(list, list2);
-			return (!FOPOKALJIIJ.IsNot) ? flag : (!flag);
+			return (!eventAnimation.IsNot) ? flag : (!flag);
 		}
 		return true;
 	}
 
-	private static bool IsNames(List<string> NIKHAICFGNM, List<string> MGNOPLPBOHC)
+	private static bool IsNames(List<string> requiredNames, List<string> candidateNames)
 	{
 		string text = null;
 		string text2 = null;
 		int i = 0;
-		for (int count = NIKHAICFGNM.Count; i < count; i++)
+		for (int count = requiredNames.Count; i < count; i++)
 		{
-			text = NIKHAICFGNM[i];
+			text = requiredNames[i];
 			int j = 0;
-			for (int count2 = MGNOPLPBOHC.Count; j < count2; j++)
+			for (int count2 = candidateNames.Count; j < count2; j++)
 			{
-				text2 = MGNOPLPBOHC[j];
+				text2 = candidateNames[j];
 				if (text == text2)
 				{
 					return true;
@@ -708,84 +708,84 @@ public class SelectAnimation
 		return false;
 	}
 
-	private static bool IsAnimationEndMatch(EventAnimation FOPOKALJIIJ, ModelConditions conditions, EventModelDelayed PEADINOKLKN)
+	private static bool IsAnimationEndMatch(EventAnimation eventAnimation, ModelConditions conditions, EventModelDelayed delayedEvent)
 	{
-		return IsAnimationStartMatch(FOPOKALJIIJ, conditions, PEADINOKLKN);
+		return IsAnimationStartMatch(eventAnimation, conditions, delayedEvent);
 	}
 
-	private static bool IsIntervalStartMatch(EventAnimation FOPOKALJIIJ, IntervalAnimation CHCGJBLDPML)
+	private static bool IsIntervalStartMatch(EventAnimation eventAnimation, IntervalAnimation intervalAnimation)
 	{
-		IntervalAnimation.IntervalType nGAJJDIEDGF = IntervalAnimation.IntervalType.INTERVAL_NONE;
-		if (FOPOKALJIIJ.HitType == "Attack")
+		IntervalAnimation.IntervalType intervalType = IntervalAnimation.IntervalType.INTERVAL_NONE;
+		if (eventAnimation.HitType == "Attack")
 		{
-			nGAJJDIEDGF = IntervalAnimation.IntervalType.INTERVAL_ATTACK;
+			intervalType = IntervalAnimation.IntervalType.INTERVAL_ATTACK;
 		}
-		else if (FOPOKALJIIJ.HitType == "Block")
+		else if (eventAnimation.HitType == "Block")
 		{
-			nGAJJDIEDGF = IntervalAnimation.IntervalType.INTERVAL_BLOCK;
+			intervalType = IntervalAnimation.IntervalType.INTERVAL_BLOCK;
 		}
-		else if (FOPOKALJIIJ.HitType == "Invulnerable")
+		else if (eventAnimation.HitType == "Invulnerable")
 		{
-			nGAJJDIEDGF = IntervalAnimation.IntervalType.INTERVAL_INVULNERABLE;
+			intervalType = IntervalAnimation.IntervalType.INTERVAL_INVULNERABLE;
 		}
-		if ((nGAJJDIEDGF == IntervalAnimation.IntervalType.INTERVAL_NONE || nGAJJDIEDGF == CHCGJBLDPML.Type) && (FOPOKALJIIJ.AnimationName == string.Empty || FOPOKALJIIJ.AnimationName == CHCGJBLDPML.Name))
+		if ((intervalType == IntervalAnimation.IntervalType.INTERVAL_NONE || intervalType == intervalAnimation.Type) && (eventAnimation.AnimationName == string.Empty || eventAnimation.AnimationName == intervalAnimation.Name))
 		{
 			return true;
 		}
 		return false;
 	}
 
-	private static bool IsIntervalEndMatch(EventAnimation FOPOKALJIIJ, IntervalAnimation CHCGJBLDPML)
+	private static bool IsIntervalEndMatch(EventAnimation eventAnimation, IntervalAnimation intervalAnimation)
 	{
-		return IsIntervalStartMatch(FOPOKALJIIJ, CHCGJBLDPML);
+		return IsIntervalStartMatch(eventAnimation, intervalAnimation);
 	}
 
-	private static bool IsHit(EventAnimation FOPOKALJIIJ, EventModelDelayed PEADINOKLKN, bool OOGIBOBMGJA = false, bool EPKEEMFHHFM = false)
+	private static bool IsHit(EventAnimation eventAnimation, EventModelDelayed delayedEvent, bool isCritical = false, bool isBlocked = false)
 	{
-		if (string.IsNullOrEmpty(FOPOKALJIIJ.HitType) || (FOPOKALJIIJ.HitType == "Critical" && OOGIBOBMGJA) || (FOPOKALJIIJ.HitType == "Shock" && EPKEEMFHHFM))
+		if (string.IsNullOrEmpty(eventAnimation.HitType) || (eventAnimation.HitType == "Critical" && isCritical) || (eventAnimation.HitType == "Shock" && isBlocked))
 		{
-			IntervalAnimation mNOIEOBBCMI = (IntervalAnimation)PEADINOKLKN.Data;
-			IntervalAttack hFIIPNLCIEE = mNOIEOBBCMI as IntervalAttack;
-			return string.IsNullOrEmpty(FOPOKALJIIJ.AnimationName) || hFIIPNLCIEE == null || FOPOKALJIIJ.AnimationName == hFIIPNLCIEE.GetReactionName(PEADINOKLKN.Target.GetReactionFrame());
+			IntervalAnimation intervalData = (IntervalAnimation)delayedEvent.Data;
+			IntervalAttack intervalAttack = intervalData as IntervalAttack;
+			return string.IsNullOrEmpty(eventAnimation.AnimationName) || intervalAttack == null || eventAnimation.AnimationName == intervalAttack.GetReactionName(delayedEvent.Target.GetReactionFrame());
 		}
 		return false;
 	}
 
-	private static bool IsEveryFrameMatch(EventAnimation FOPOKALJIIJ)
+	private static bool IsEveryFrameMatch(EventAnimation eventAnimation)
 	{
 		return true;
 	}
 
-	private static bool IsBirthMatch(EventAnimation FOPOKALJIIJ)
+	private static bool IsBirthMatch(EventAnimation eventAnimation)
 	{
 		return true;
 	}
 
-	private static bool IsModExpiresMatch(EventAnimation FOPOKALJIIJ, string name)
+	private static bool IsModExpiresMatch(EventAnimation eventAnimation, string name)
 	{
-		EventModExpires bEKAAGNGPFP = (EventModExpires)FOPOKALJIIJ;
-		return bEKAAGNGPFP.GetModName() == name;
+		EventModExpires modExpiresEvent = (EventModExpires)eventAnimation;
+		return modExpiresEvent.GetModName() == name;
 	}
 
-	private void UpdateConditions(ModelConditions conditions, Model ACENLMONNPA)
+	private void UpdateConditions(ModelConditions conditions, Model model)
 	{
-		Fight gDBOMJODDEA = Fight.GetCurrentFight();
-		Model fGCODGKLHED = ACENLMONNPA.GetCombatTarget();
-		Model fGCODGKLHED2 = ACENLMONNPA.GetModelByType(ModelType.ModelTargetType.MODEL_PARENT);
-		Model fGCODGKLHED3 = ACENLMONNPA.GetModelByType(ModelType.ModelTargetType.MODEL_CHILD);
+		Fight fight = Fight.GetCurrentFight();
+		Model targetModel = model.GetCombatTarget();
+		Model fGCODGKLHED2 = model.GetModelByType(ModelType.ModelTargetType.MODEL_PARENT);
+		Model fGCODGKLHED3 = model.GetModelByType(ModelType.ModelTargetType.MODEL_CHILD);
 		// A strike can delete a projectile and create its child in the same frame.
 		// The child may retain a parent reference after the parent's runtime rig is cleared.
-		if (fGCODGKLHED != null && fGCODGKLHED.GetPhysicsModule() == null) fGCODGKLHED = null;
+		if (targetModel != null && targetModel.GetPhysicsModule() == null) targetModel = null;
 		if (fGCODGKLHED2 != null && fGCODGKLHED2.GetPhysicsModule() == null) fGCODGKLHED2 = null;
 		if (fGCODGKLHED3 != null && fGCODGKLHED3.GetPhysicsModule() == null) fGCODGKLHED3 = null;
-		if (gDBOMJODDEA != null)
+		if (fight != null)
 		{
-			gDBOMJODDEA.GetPerksStage().CollectActiveActions(ACENLMONNPA, conditions.SelfActionPerks);
-			gDBOMJODDEA.GetPerksStage().CollectExpiredActions(ACENLMONNPA, conditions.SelfExpiredPerks);
-			if (fGCODGKLHED != null)
+			fight.GetPerksStage().CollectActiveActions(model, conditions.SelfActionPerks);
+			fight.GetPerksStage().CollectExpiredActions(model, conditions.SelfExpiredPerks);
+			if (targetModel != null)
 			{
-				gDBOMJODDEA.GetPerksStage().CollectActiveActions(fGCODGKLHED, conditions.OtherActionPerks);
-				gDBOMJODDEA.GetPerksStage().CollectActiveActions(fGCODGKLHED, conditions.OtherActionPerksSecondary);
+				fight.GetPerksStage().CollectActiveActions(targetModel, conditions.OtherActionPerks);
+				fight.GetPerksStage().CollectActiveActions(targetModel, conditions.OtherActionPerksSecondary);
 			}
 			else
 			{
@@ -793,138 +793,138 @@ public class SelectAnimation
 				conditions.OtherActionPerksSecondary.Clear();
 			}
 		}
-		conditions.SelfPerks = ACENLMONNPA.Parameters.Perks;
-		conditions.OtherPerks = ((fGCODGKLHED == null) ? null : fGCODGKLHED.Parameters.Perks);
-		conditions.StrikeResult = ACENLMONNPA.LastStrike;
-		conditions.HasOther = ((fGCODGKLHED != null) ? true : false);
-		conditions.SelfSign = ACENLMONNPA.GetFacingSign();
-		conditions.OtherSign = ((fGCODGKLHED == null) ? 1 : fGCODGKLHED.GetFacingSign());
+		conditions.SelfPerks = model.Parameters.Perks;
+		conditions.OtherPerks = ((targetModel == null) ? null : targetModel.Parameters.Perks);
+		conditions.StrikeResult = model.LastStrike;
+		conditions.HasOther = ((targetModel != null) ? true : false);
+		conditions.SelfSign = model.GetFacingSign();
+		conditions.OtherSign = ((targetModel == null) ? 1 : targetModel.GetFacingSign());
 		conditions.ParentSign = ((fGCODGKLHED2 == null) ? 1 : fGCODGKLHED2.GetFacingSign());
 		conditions.ChildSign = ((fGCODGKLHED3 == null) ? 1 : fGCODGKLHED3.GetFacingSign());
-		conditions.PressedKeys = ACENLMONNPA.GetKeyDataBySign(conditions.SelfSign);
-		conditions.Intervals = ACENLMONNPA.GetIntervals();
-		conditions.OtherIntervals = ((fGCODGKLHED == null) ? null : fGCODGKLHED.GetIntervals());
+		conditions.PressedKeys = model.GetKeyDataBySign(conditions.SelfSign);
+		conditions.Intervals = model.GetIntervals();
+		conditions.OtherIntervals = ((targetModel == null) ? null : targetModel.GetIntervals());
 		conditions.ParentIntervals = ((fGCODGKLHED2 == null) ? null : fGCODGKLHED2.GetIntervals());
-		conditions.IsPlayer = ACENLMONNPA.IsPlayerModel();
-		conditions.IsWeapon = ACENLMONNPA.IsWeapon();
-		conditions.RoundStage = ACENLMONNPA.RoundStage;
-		conditions.SelfIsPhysics = ACENLMONNPA.GetPhysicsModule().IsPhysics();
-		conditions.OtherIsPhysics = fGCODGKLHED != null && fGCODGKLHED.GetPhysicsModule().IsPhysics();
+		conditions.IsPlayer = model.IsPlayerModel();
+		conditions.IsWeapon = model.IsWeapon();
+		conditions.RoundStage = model.RoundStage;
+		conditions.SelfIsPhysics = model.GetPhysicsModule().IsPhysics();
+		conditions.OtherIsPhysics = targetModel != null && targetModel.GetPhysicsModule().IsPhysics();
 		conditions.ParentIsPhysics = fGCODGKLHED2 != null && fGCODGKLHED2.GetPhysicsModule().IsPhysics();
-		conditions.CurrentFrame = ACENLMONNPA.GetPhysicsModule().GetFrame();
-		conditions.RoundEnded = ACENLMONNPA.Parameters.RoundEnded;
-		conditions.IsWinner = ACENLMONNPA.Parameters.IsWinner;
-		conditions.EndRoundType = ACENLMONNPA.Parameters.EndRoundType;
-		conditions.IsKeyCheckEnabled = ACENLMONNPA.IsChildModel;
-		conditions.ImpulseX = (int)ACENLMONNPA.LastStrike.Impulse.GetX();
-		conditions.CurrentHealth = (ObscuredFloat)(ACENLMONNPA.Parameters.GetCurrentLife());
-		conditions.MaxHealth = ACENLMONNPA.Parameters.MaxLife;
-		conditions.NoRangedFlag = ACENLMONNPA.GetNoRangedFlag();
-		conditions.MagicCharges = ACENLMONNPA.GetMagicCharges();
-		conditions.RaidCharges = ACENLMONNPA.GetRaidBullets();
-		conditions.SelfNode = ACENLMONNPA.GetAnimationModule().GetPlayingNode();
-		conditions.OtherNode = ((fGCODGKLHED == null) ? null : fGCODGKLHED.GetAnimationModule().GetPlayingNode());
+		conditions.CurrentFrame = model.GetPhysicsModule().GetFrame();
+		conditions.RoundEnded = model.Parameters.RoundEnded;
+		conditions.IsWinner = model.Parameters.IsWinner;
+		conditions.EndRoundType = model.Parameters.EndRoundType;
+		conditions.IsKeyCheckEnabled = model.IsChildModel;
+		conditions.ImpulseX = (int)model.LastStrike.Impulse.GetX();
+		conditions.CurrentHealth = (ObscuredFloat)(model.Parameters.GetCurrentLife());
+		conditions.MaxHealth = model.Parameters.MaxLife;
+		conditions.NoRangedFlag = model.GetNoRangedFlag();
+		conditions.MagicCharges = model.GetMagicCharges();
+		conditions.RaidCharges = model.GetRaidBullets();
+		conditions.SelfNode = model.GetAnimationModule().GetPlayingNode();
+		conditions.OtherNode = ((targetModel == null) ? null : targetModel.GetAnimationModule().GetPlayingNode());
 		conditions.ParentNode = ((fGCODGKLHED2 == null) ? null : fGCODGKLHED2.GetAnimationModule().GetPlayingNode());
 		conditions.ChildNode = ((fGCODGKLHED3 == null) ? null : fGCODGKLHED3.GetAnimationModule().GetPlayingNode());
-		UpdateModelPositionInfo(ref conditions.SelfAnimationNames, conditions.SelfPositions, ACENLMONNPA);
+		UpdateModelPositionInfo(ref conditions.SelfAnimationNames, conditions.SelfPositions, model);
 		UpdateModelPositionInfo(ref conditions.ParentAnimationNames, conditions.ParentPositions, fGCODGKLHED2);
-		UpdateModelPositionInfo(ref conditions.OtherAnimationNames, conditions.OtherPositions, fGCODGKLHED);
+		UpdateModelPositionInfo(ref conditions.OtherAnimationNames, conditions.OtherPositions, targetModel);
 		UpdateModelPositionInfo(ref conditions.ChildAnimationNames, conditions.ChildPositions, fGCODGKLHED3);
 	}
 
-	private static void SetTransitions(Model ACENLMONNPA, ModelConditions conditions, InfoAnimation DBOLBEOCEME, int AOJJBKLCHJO)
+	private static void SetTransitions(Model model, ModelConditions conditions, InfoAnimation animation, int facingSign)
 	{
-		bool hHJGACBCGBP = false;
-		int bADKABIKMBD = -1;
-		List<TransitionAnimation> eLFBPNOBDKC = DBOLBEOCEME.MoveData.Transitions;
-		foreach (TransitionAnimation item in eLFBPNOBDKC)
+		bool isFrameShift = false;
+		int frameShift = -1;
+		List<TransitionAnimation> transitions = animation.MoveData.Transitions;
+		foreach (TransitionAnimation item in transitions)
 		{
 			if (item.AreConditionsMet(conditions))
 			{
 				if (item.IsFrameShift)
 				{
-					hHJGACBCGBP = true;
+					isFrameShift = true;
 				}
-				bADKABIKMBD = item.FrameShift;
+				frameShift = item.FrameShift;
 				break;
 			}
 		}
-		ACENLMONNPA.PlayAnimationDelay(DBOLBEOCEME, AOJJBKLCHJO, hHJGACBCGBP, bADKABIKMBD);
+		model.PlayAnimationDelay(animation, facingSign, isFrameShift, frameShift);
 	}
 
-	private static bool IsModelTypeMatch(Model CEDPFKAOGHN, Model DBPIIMHNKNN, ModelType.ModelTargetType LFLGCDNKNJI)
+	private static bool IsModelTypeMatch(Model otherModel, Model sourceModel, ModelType.ModelTargetType targetType)
 	{
-		return LFLGCDNKNJI == ModelType.ModelTargetType.MODEL_BOTH || (LFLGCDNKNJI == ModelType.ModelTargetType.MODEL_THIS && DBPIIMHNKNN == CEDPFKAOGHN) || (LFLGCDNKNJI == ModelType.ModelTargetType.MODEL_OTHER && DBPIIMHNKNN != CEDPFKAOGHN) || (LFLGCDNKNJI == ModelType.ModelTargetType.MODEL_PARENT && CEDPFKAOGHN == DBPIIMHNKNN.GetParentModel()) || (LFLGCDNKNJI == ModelType.ModelTargetType.MODEL_CHILD && CEDPFKAOGHN == DBPIIMHNKNN.GetModelByType(ModelType.ModelTargetType.MODEL_CHILD));
+		return targetType == ModelType.ModelTargetType.MODEL_BOTH || (targetType == ModelType.ModelTargetType.MODEL_THIS && sourceModel == otherModel) || (targetType == ModelType.ModelTargetType.MODEL_OTHER && sourceModel != otherModel) || (targetType == ModelType.ModelTargetType.MODEL_PARENT && otherModel == sourceModel.GetParentModel()) || (targetType == ModelType.ModelTargetType.MODEL_CHILD && otherModel == sourceModel.GetModelByType(ModelType.ModelTargetType.MODEL_CHILD));
 	}
 
-	private static void UpdateModelPositionInfo(ref List<string> IPFMIJKPABH, ModelConditions.ModelPositions LJKGOKDLAKL, Model ACENLMONNPA)
+	private static void UpdateModelPositionInfo(ref List<string> templateNames, ModelConditions.ModelPositions positions, Model model)
 	{
-		if (ACENLMONNPA == null)
+		if (model == null)
 		{
 			return;
 		}
-		if (!ACENLMONNPA.IsInPhysics())
+		if (!model.IsInPhysics())
 		{
-			InfoAnimation pJAHIOELGGD = ACENLMONNPA.GetCurrentAnimation();
-			if (pJAHIOELGGD != null)
+			InfoAnimation currentAnimation = model.GetCurrentAnimation();
+			if (currentAnimation != null)
 			{
-				IPFMIJKPABH = pJAHIOELGGD.GetTemplateNames();
+				templateNames = currentAnimation.GetTemplateNames();
 			}
 		}
 		else
 		{
-			List<string> list = ACENLMONNPA.GetPhysicsNames();
+			List<string> list = model.GetPhysicsNames();
 			if (list.Count > 0)
 			{
-				IPFMIJKPABH = list;
+				templateNames = list;
 			}
 		}
-		LJKGOKDLAKL.Body = ACENLMONNPA.GetBodyObject();
-		LJKGOKDLAKL.LeftWall.x = ACENLMONNPA.GetLeftWallX();
-		LJKGOKDLAKL.RightWall.x = ACENLMONNPA.GetRightWallX();
+		positions.Body = model.GetBodyObject();
+		positions.LeftWall.x = model.GetLeftWallX();
+		positions.RightWall.x = model.GetRightWallX();
 	}
 
-	private void CheckEventsForModels(List<Model> INNLAFHKJNI, List<List<SelectInfo>> GLEOPGKNDAO)
+	private void CheckEventsForModels(List<Model> models, List<List<SelectInfo>> selectInfosPerModel)
 	{
-		GLEOPGKNDAO.Clear();
-		GLEOPGKNDAO.Capacity = INNLAFHKJNI.Count;
-		for (int i = 0; i < INNLAFHKJNI.Count; i++)
+		selectInfosPerModel.Clear();
+		selectInfosPerModel.Capacity = models.Count;
+		for (int i = 0; i < models.Count; i++)
 		{
-			GLEOPGKNDAO.Add(new List<SelectInfo>());
+			selectInfosPerModel.Add(new List<SelectInfo>());
 		}
-		EventModelDelayed gBEJMGCOCOJ = null;
-		Model fGCODGKLHED = null;
+		EventModelDelayed pendingEvent = null;
+		Model currentModel = null;
 		for (int j = 0; j < _PendingEvents.Count; j++)
 		{
-			gBEJMGCOCOJ = _PendingEvents[j];
-			for (int k = 0; k < INNLAFHKJNI.Count; k++)
+			pendingEvent = _PendingEvents[j];
+			for (int k = 0; k < models.Count; k++)
 			{
-				fGCODGKLHED = INNLAFHKJNI[k];
-				fGCODGKLHED.LastEventType = EventAnimation.EventAnimationType.EVENT_NONE;
-				fGCODGKLHED.LastAnimationType = InfoAnimation.AnimationKind.AnimationNone;
-				List<InfoAnimation> mAHEJFLCCHP = fGCODGKLHED.AnimationEvents.GetListForEvent(gBEJMGCOCOJ.Type);
-				CheckAnimations(gBEJMGCOCOJ, fGCODGKLHED, mAHEJFLCCHP, k, GLEOPGKNDAO);
-				List<Trigger> cMHFKBKKKOK = fGCODGKLHED.TriggerEvents.GetListForEvent(gBEJMGCOCOJ.Type);
-				CheckTriggers(gBEJMGCOCOJ, fGCODGKLHED, cMHFKBKKKOK, k);
+				currentModel = models[k];
+				currentModel.LastEventType = EventAnimation.EventAnimationType.EVENT_NONE;
+				currentModel.LastAnimationType = InfoAnimation.AnimationKind.AnimationNone;
+				List<InfoAnimation> animations = currentModel.AnimationEvents.GetListForEvent(pendingEvent.Type);
+				CheckAnimations(pendingEvent, currentModel, animations, k, selectInfosPerModel);
+				List<Trigger> triggers = currentModel.TriggerEvents.GetListForEvent(pendingEvent.Type);
+				CheckTriggers(pendingEvent, currentModel, triggers, k);
 			}
 		}
 	}
 
-	private void CheckAnimations(EventModelDelayed PEADINOKLKN, Model ACENLMONNPA, List<InfoAnimation> MAHEJFLCCHP, int index, List<List<SelectInfo>> GLEOPGKNDAO)
+	private void CheckAnimations(EventModelDelayed delayedEvent, Model model, List<InfoAnimation> animations, int index, List<List<SelectInfo>> selectInfosPerModel)
 	{
-		InfoAnimation pJAHIOELGGD = null;
-		EventAnimation nFCCFMOMPHG = null;
+		InfoAnimation animation = null;
+		EventAnimation animationEvent = null;
 		string helperWeaponSubtype = string.Empty;
 		bool hasSubtypeLockedBirthMove = false;
-		if (PEADINOKLKN.Type == EventAnimation.EventAnimationType.EVENT_BIRTH && ACENLMONNPA is WeaponModel)
+		if (delayedEvent.Type == EventAnimation.EventAnimationType.EVENT_BIRTH && model is WeaponModel)
 		{
-			ItemInfo helperWeapon = ACENLMONNPA.Parameters.GetItemByType("Weapon");
+			ItemInfo helperWeapon = model.Parameters.GetItemByType("Weapon");
 			if (helperWeapon != null)
 			{
 				helperWeaponSubtype = helperWeapon.SubType;
-				for (int candidateIndex = 0; candidateIndex < MAHEJFLCCHP.Count; candidateIndex++)
+				for (int candidateIndex = 0; candidateIndex < animations.Count; candidateIndex++)
 				{
-					if (MAHEJFLCCHP[candidateIndex].IsItemRequired("Weapon", helperWeaponSubtype))
+					if (animations[candidateIndex].IsItemRequired("Weapon", helperWeaponSubtype))
 					{
 						hasSubtypeLockedBirthMove = true;
 						break;
@@ -932,82 +932,82 @@ public class SelectAnimation
 				}
 			}
 		}
-		for (int i = 0; i < MAHEJFLCCHP.Count; i++)
+		for (int i = 0; i < animations.Count; i++)
 		{
-			pJAHIOELGGD = MAHEJFLCCHP[i];
+			animation = animations[i];
 			// Old CreatePlayer entries do not always provide StartAnimation.  In
 			// that case choose only birth moves whose XML lock explicitly names the
 			// copied helper Weapon subtype.  This avoids equal-priority generic
 			// projectile moves being selected at random.
-			if (hasSubtypeLockedBirthMove && !pJAHIOELGGD.IsItemRequired("Weapon", helperWeaponSubtype))
+			if (hasSubtypeLockedBirthMove && !animation.IsItemRequired("Weapon", helperWeaponSubtype))
 			{
 				continue;
 			}
-			for (int j = 0; j < pJAHIOELGGD.MoveData.Events.Count; j++)
+			for (int j = 0; j < animation.MoveData.Events.Count; j++)
 			{
-				nFCCFMOMPHG = pJAHIOELGGD.MoveData.Events[j];
-				if (ContainsAnimation(pJAHIOELGGD, GLEOPGKNDAO[index]) || !IsModelTypeMatch(PEADINOKLKN.Owner, ACENLMONNPA, nFCCFMOMPHG.TargetModel) || !IsEventMatch(nFCCFMOMPHG, _ModelsConditions[index], PEADINOKLKN))
+				animationEvent = animation.MoveData.Events[j];
+				if (ContainsAnimation(animation, selectInfosPerModel[index]) || !IsModelTypeMatch(delayedEvent.Owner, model, animationEvent.TargetModel) || !IsEventMatch(animationEvent, _ModelsConditions[index], delayedEvent))
 				{
 					continue;
 				}
-				_ModelsConditions[index].CandidateMoveNames = pJAHIOELGGD.GetTemplateNames();
-				_ModelsConditions[index].AnimationSign = ((ACENLMONNPA.GetCombatTarget() == null) ? 1 : pJAHIOELGGD.GetDirection(_ModelsConditions[index], ACENLMONNPA.GetAnimationModule().GetSign()));
-				_ModelsConditions[index].PivotPairSelector = (int)pJAHIOELGGD.MoveData.AlignData.PivotSideKind;
-				if (PEADINOKLKN.Type == EventAnimation.EventAnimationType.EVENT_KEY_PRESSED && PEADINOKLKN.IsRandom)
+				_ModelsConditions[index].CandidateMoveNames = animation.GetTemplateNames();
+				_ModelsConditions[index].AnimationSign = ((model.GetCombatTarget() == null) ? 1 : animation.GetDirection(_ModelsConditions[index], model.GetAnimationModule().GetSign()));
+				_ModelsConditions[index].PivotPairSelector = (int)animation.MoveData.AlignData.PivotSideKind;
+				if (delayedEvent.Type == EventAnimation.EventAnimationType.EVENT_KEY_PRESSED && delayedEvent.IsRandom)
 				{
 					_ModelsConditions[index].IsKeyCheckEnabled = false;
 				}
-				if (nFCCFMOMPHG.Type == EventAnimation.EventAnimationType.EVENT_HIT)
+				if (animationEvent.Type == EventAnimation.EventAnimationType.EVENT_HIT)
 				{
-					if (PEADINOKLKN.Owner.ReceivedCritical)
+					if (delayedEvent.Owner.ReceivedCritical)
 					{
-						nFCCFMOMPHG.HitType = "Critical";
-						if (PEADINOKLKN.Owner.IsInShock())
+						animationEvent.HitType = "Critical";
+						if (delayedEvent.Owner.IsInShock())
 						{
-							nFCCFMOMPHG.HitType += "|Shock";
+							animationEvent.HitType += "|Shock";
 						}
 					}
-					else if (PEADINOKLKN.Owner.IsInShock())
+					else if (delayedEvent.Owner.IsInShock())
 					{
-						nFCCFMOMPHG.HitType = "Shock";
+						animationEvent.HitType = "Shock";
 					}
-					else if (PEADINOKLKN.Target.LastStrike.IsBlocked)
+					else if (delayedEvent.Target.LastStrike.IsBlocked)
 					{
-						nFCCFMOMPHG.HitType = "Block";
+						animationEvent.HitType = "Block";
 					}
 				}
-				if (pJAHIOELGGD.AreConditionsMet(ACENLMONNPA, null, nFCCFMOMPHG))
+				if (animation.AreConditionsMet(model, null, animationEvent))
 				{
-					if (PEADINOKLKN.IsRandom && pJAHIOELGGD.Type == InfoAnimation.AnimationKind.AnimationAttack)
+					if (delayedEvent.IsRandom && animation.Type == InfoAnimation.AnimationKind.AnimationAttack)
 					{
-						Model fGCODGKLHED = ACENLMONNPA.GetCombatTarget();
-						if (ACENLMONNPA.IsAiControlled() && ACENLMONNPA.Parameters.BeginnerCheat && fGCODGKLHED != null)
+						Model targetModel = model.GetCombatTarget();
+						if (model.IsAiControlled() && model.Parameters.BeginnerCheat && targetModel != null)
 						{
-							float num = (ObscuredFloat)(fGCODGKLHED.Parameters.GetCurrentLife());
-							float cIDCNCDFONA = fGCODGKLHED.Parameters.MaxLife;
-							float num2 = num / cIDCNCDFONA;
+							float num = (ObscuredFloat)(targetModel.Parameters.GetCurrentLife());
+							float maxLife = targetModel.Parameters.MaxLife;
+							float num2 = num / maxLife;
 							if (num2 <= GameUtils.RandomTactics.BeginnerCheat)
 							{
 								continue;
 							}
 						}
 					}
-					List<SelectInfo> list = GLEOPGKNDAO[index];
-					SelectInfo nKDNDLNDFJH = new SelectInfo();
-					nKDNDLNDFJH.Animation = pJAHIOELGGD;
-					nKDNDLNDFJH.FacingSign = _ModelsConditions[index].AnimationSign;
-					nKDNDLNDFJH.IsHit = PEADINOKLKN.Type == EventAnimation.EventAnimationType.EVENT_HIT;
-					nKDNDLNDFJH.EventType = PEADINOKLKN.Type;
-					nKDNDLNDFJH.IsRandom = PEADINOKLKN.IsRandom;
-					nKDNDLNDFJH.Index = index;
-					nKDNDLNDFJH.MatchedEvent = nFCCFMOMPHG;
-					list.Add(nKDNDLNDFJH);
+					List<SelectInfo> list = selectInfosPerModel[index];
+					SelectInfo newSelectInfo = new SelectInfo();
+					newSelectInfo.Animation = animation;
+					newSelectInfo.FacingSign = _ModelsConditions[index].AnimationSign;
+					newSelectInfo.IsHit = delayedEvent.Type == EventAnimation.EventAnimationType.EVENT_HIT;
+					newSelectInfo.EventType = delayedEvent.Type;
+					newSelectInfo.IsRandom = delayedEvent.IsRandom;
+					newSelectInfo.Index = index;
+					newSelectInfo.MatchedEvent = animationEvent;
+					list.Add(newSelectInfo);
 				}
-				if (nFCCFMOMPHG.Type == EventAnimation.EventAnimationType.EVENT_HIT)
+				if (animationEvent.Type == EventAnimation.EventAnimationType.EVENT_HIT)
 				{
-					nFCCFMOMPHG.HitType = string.Empty;
+					animationEvent.HitType = string.Empty;
 				}
-				if (PEADINOKLKN.Type == EventAnimation.EventAnimationType.EVENT_KEY_PRESSED && PEADINOKLKN.IsRandom)
+				if (delayedEvent.Type == EventAnimation.EventAnimationType.EVENT_KEY_PRESSED && delayedEvent.IsRandom)
 				{
 					_ModelsConditions[index].IsKeyCheckEnabled = true;
 				}
@@ -1015,56 +1015,56 @@ public class SelectAnimation
 		}
 	}
 
-	private void CheckTriggers(EventModelDelayed PEADINOKLKN, Model ACENLMONNPA, List<Trigger> CMHFKBKKKOK, int index)
+	private void CheckTriggers(EventModelDelayed delayedEvent, Model model, List<Trigger> triggers, int index)
 	{
-		Trigger cPFMGFAFAFB = null;
-		EventAnimation nFCCFMOMPHG = null;
-		for (int i = 0; i < CMHFKBKKKOK.Count; i++)
+		Trigger trigger = null;
+		EventAnimation triggerEvent = null;
+		for (int i = 0; i < triggers.Count; i++)
 		{
-			cPFMGFAFAFB = CMHFKBKKKOK[i];
-			for (int j = 0; j < cPFMGFAFAFB.Definition.Events.Count; j++)
+			trigger = triggers[i];
+			for (int j = 0; j < trigger.Definition.Events.Count; j++)
 			{
-				nFCCFMOMPHG = cPFMGFAFAFB.Definition.Events[j];
-				if (!IsModelTypeMatch(PEADINOKLKN.Owner, ACENLMONNPA, nFCCFMOMPHG.TargetModel) || !IsEventMatch(nFCCFMOMPHG, _ModelsConditions[index], PEADINOKLKN))
+				triggerEvent = trigger.Definition.Events[j];
+				if (!IsModelTypeMatch(delayedEvent.Owner, model, triggerEvent.TargetModel) || !IsEventMatch(triggerEvent, _ModelsConditions[index], delayedEvent))
 				{
 					continue;
 				}
-				if (PEADINOKLKN.Type == EventAnimation.EventAnimationType.EVENT_KEY_PRESSED && PEADINOKLKN.IsRandom)
+				if (delayedEvent.Type == EventAnimation.EventAnimationType.EVENT_KEY_PRESSED && delayedEvent.IsRandom)
 				{
 					_ModelsConditions[index].IsKeyCheckEnabled = false;
 				}
-				if (nFCCFMOMPHG.Type == EventAnimation.EventAnimationType.EVENT_HIT)
+				if (triggerEvent.Type == EventAnimation.EventAnimationType.EVENT_HIT)
 				{
-					if (PEADINOKLKN.Owner.ReceivedCritical)
+					if (delayedEvent.Owner.ReceivedCritical)
 					{
-						if (PEADINOKLKN.Owner.IsInShock())
+						if (delayedEvent.Owner.IsInShock())
 						{
-							nFCCFMOMPHG.HitType = "Critical|Shock";
+							triggerEvent.HitType = "Critical|Shock";
 						}
 						else
 						{
-							nFCCFMOMPHG.HitType = "Critical";
+							triggerEvent.HitType = "Critical";
 						}
 					}
-					else if (PEADINOKLKN.Owner.IsInShock())
+					else if (delayedEvent.Owner.IsInShock())
 					{
-						nFCCFMOMPHG.HitType = "Shock";
+						triggerEvent.HitType = "Shock";
 					}
-					else if (PEADINOKLKN.Owner.LastStrike.IsBlocked)
+					else if (delayedEvent.Owner.LastStrike.IsBlocked)
 					{
-						nFCCFMOMPHG.HitType = "Block";
+						triggerEvent.HitType = "Block";
 					}
 				}
-				if (cPFMGFAFAFB.CheckConditions(ACENLMONNPA, null, nFCCFMOMPHG))
+				if (trigger.CheckConditions(model, null, triggerEvent))
 				{
-					cPFMGFAFAFB.CheckConditions(ACENLMONNPA, null, nFCCFMOMPHG);
-					QueueTrigger(cPFMGFAFAFB, ACENLMONNPA);
+					trigger.CheckConditions(model, null, triggerEvent);
+					QueueTrigger(trigger, model);
 				}
-				if (nFCCFMOMPHG.Type == EventAnimation.EventAnimationType.EVENT_HIT)
+				if (triggerEvent.Type == EventAnimation.EventAnimationType.EVENT_HIT)
 				{
-					nFCCFMOMPHG.HitType = string.Empty;
+					triggerEvent.HitType = string.Empty;
 				}
-				if (PEADINOKLKN.Type == EventAnimation.EventAnimationType.EVENT_KEY_PRESSED && PEADINOKLKN.IsRandom)
+				if (delayedEvent.Type == EventAnimation.EventAnimationType.EVENT_KEY_PRESSED && delayedEvent.IsRandom)
 				{
 					_ModelsConditions[index].IsKeyCheckEnabled = true;
 				}
@@ -1072,22 +1072,22 @@ public class SelectAnimation
 		}
 	}
 
-	private void ChooseAnimations(List<Model> INNLAFHKJNI, List<List<SelectInfo>> GLEOPGKNDAO)
+	private void ChooseAnimations(List<Model> models, List<List<SelectInfo>> selectInfosPerModel)
 	{
 		int num = 0;
-		foreach (List<SelectInfo> item in GLEOPGKNDAO)
+		foreach (List<SelectInfo> item in selectInfosPerModel)
 		{
 			if (0 < item.Count)
 			{
-				PlayAnimation(INNLAFHKJNI[num], item);
+				PlayAnimation(models[num], item);
 			}
 			num++;
 		}
 	}
 
-	private void QueueTrigger(Trigger CPBHKJFPFJB, Model ACENLMONNPA)
+	private void QueueTrigger(Trigger trigger, Model model)
 	{
-		TriggerStruct item = new TriggerStruct(CPBHKJFPFJB, ACENLMONNPA);
+		TriggerStruct item = new TriggerStruct(trigger, model);
 		_PendingTriggers.Add(item);
 	}
 
@@ -1099,13 +1099,13 @@ public class SelectAnimation
 		_PendingTriggers.Clear();
 	}
 
-	private void RemoveEventsForModel(Model ACENLMONNPA, List<EventModelDelayed> CDIELLOLINA)
+	private void RemoveEventsForModel(Model model, List<EventModelDelayed> delayedEvents)
 	{
-		for (int num = CDIELLOLINA.Count - 1; num >= 0; num--)
+		for (int num = delayedEvents.Count - 1; num >= 0; num--)
 		{
-			if (CDIELLOLINA[num].Owner == ACENLMONNPA || CDIELLOLINA[num].Target == ACENLMONNPA)
+			if (delayedEvents[num].Owner == model || delayedEvents[num].Target == model)
 			{
-				CDIELLOLINA.RemoveAt(num);
+				delayedEvents.RemoveAt(num);
 			}
 		}
 	}

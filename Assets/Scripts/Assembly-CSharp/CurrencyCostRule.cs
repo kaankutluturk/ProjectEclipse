@@ -28,10 +28,10 @@ public class CurrencyCostRule : Rule
 		Parse(node);
 	}
 
-	public CurrencyCostRule(CurrencyCostRule HNBFMAKFJAM)
-		: base(HNBFMAKFJAM)
+	public CurrencyCostRule(CurrencyCostRule source)
+		: base(source)
 	{
-		_currencyName = HNBFMAKFJAM._currencyName;
+		_currencyName = source._currencyName;
 		_currencyValue = 999888777;
 	}
 

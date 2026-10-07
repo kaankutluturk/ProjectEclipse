@@ -9,47 +9,47 @@ public class TricksController : ITableViewDataSource, ITableViewDelegate
 
 	private TableView _tableView;
 
-	public TricksController(TableView OIDFBEAABBA, GameObject CGLPIDAECLH)
+	public TricksController(TableView tableView, GameObject cellPrefab)
 	{
-		_tableView = OIDFBEAABBA;
+		_tableView = tableView;
 		LoadTricks();
-		OIDFBEAABBA.set_CellPrefab(CGLPIDAECLH);
-		OIDFBEAABBA.Init(this, this);
+		tableView.set_CellPrefab(cellPrefab);
+		tableView.Init(this, this);
 	}
 
-	public int NumberOfRowsInTableView(TableView OIDFBEAABBA)
+	public int NumberOfRowsInTableView(TableView tableView)
 	{
 		return _tricks.Count;
 	}
 
-	public float SizeForRowInTableView(TableView OIDFBEAABBA, int IBAKGENOEPH)
+	public float SizeForRowInTableView(TableView tableView, int row)
 	{
 		return 268f;
 	}
 
-	public TableViewCell CellForRowInTableView(TableView OIDFBEAABBA, int IBAKGENOEPH)
+	public TableViewCell CellForRowInTableView(TableView tableView, int row)
 	{
-		Trick kPKPFFGEFGI = _tricks[IBAKGENOEPH];
-		TableViewCell tableViewCell = OIDFBEAABBA.ReusableCellForRow(IBAKGENOEPH);
+		Trick trick = _tricks[row];
+		TableViewCell tableViewCell = tableView.ReusableCellForRow(row);
 		TrickCell component = tableViewCell.GetComponent<TrickCell>();
-		component.Init(kPKPFFGEFGI, IBAKGENOEPH);
+		component.Init(trick, row);
 		return tableViewCell;
 	}
 
-	public void TableViewDidHighlightCellForRow(TableView OIDFBEAABBA, int IBAKGENOEPH)
+	public void TableViewDidHighlightCellForRow(TableView tableView, int row)
 	{
 	}
 
-	public void TableViewDidSelectCellForRow(TableView OIDFBEAABBA, int IBAKGENOEPH)
+	public void TableViewDidSelectCellForRow(TableView tableView, int row)
 	{
-		_tableView.ScrollToCell(IBAKGENOEPH, 0.5f);
+		_tableView.ScrollToCell(row, 0.5f);
 	}
 
 	private void LoadTricks()
 	{
 		_tricks.Clear();
 		_tricks = GameUtils.GetPlayerTricks(SceneTypes.SceneProfile);
-		_tricks.Sort((Trick KOOLDHKJHNH, Trick MHFCMOONCHB) => KOOLDHKJHNH.Rank.CompareTo(MHFCMOONCHB.Rank));
+		_tricks.Sort((Trick left, Trick right) => left.Rank.CompareTo(right.Rank));
 	}
 
 	public void Reload()
@@ -58,14 +58,14 @@ public class TricksController : ITableViewDataSource, ITableViewDelegate
 		_tableView.ReloadData();
 	}
 
-	public void SelectTrickByName(string JGEKHJIHNMF)
+	public void SelectTrickByName(string trickName)
 	{
 		int num = -1;
 		int i = 0;
 		for (int count = _tricks.Count; i < count; i++)
 		{
-			string mENAJEAJJBE = _tricks[i].Name;
-			if (mENAJEAJJBE == JGEKHJIHNMF)
+			string candidateName = _tricks[i].Name;
+			if (candidateName == trickName)
 			{
 				num = i;
 				break;

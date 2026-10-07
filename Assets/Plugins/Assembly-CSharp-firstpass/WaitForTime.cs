@@ -18,9 +18,9 @@ public class WaitForTime : CustomYieldInstruction
 		}
 	}
 
-	public WaitForTime(float KLOJJKNBHCL)
+	public WaitForTime(float duration)
 	{
-		SetTimeLeft(KLOJJKNBHCL);
+		SetTimeLeft(duration);
 	}
 
 	public float GetTimeLeft()

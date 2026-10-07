@@ -105,12 +105,12 @@ public sealed class SampleDescriptor
 		}
 	}
 
-	public SampleDescriptor(Type LFLGCDNKNJI, string IEJOMILJAOK, string EMDJGBHIAIA, string LCNMGAJENGL)
+	public SampleDescriptor(Type type, string displayName, string description, string codeBlock)
 	{
-		set_Type(LFLGCDNKNJI);
-		SetDisplayName(IEJOMILJAOK);
-		set_Description(EMDJGBHIAIA);
-		SetCodeBlock(LCNMGAJENGL);
+		set_Type(type);
+		SetDisplayName(displayName);
+		set_Description(description);
+		SetCodeBlock(codeBlock);
 	}
 
 	public bool GetIsLabel()

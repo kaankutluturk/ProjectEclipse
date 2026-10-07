@@ -20,9 +20,9 @@ public class YamlAliasAttribute : Attribute
 		}
 	}
 
-	public YamlAliasAttribute(string LOKLDPLAPOL)
+	public YamlAliasAttribute(string alias)
 	{
-		set_Alias(LOKLDPLAPOL);
+		set_Alias(alias);
 	}
 
 	public string GetAlias()

@@ -4,17 +4,17 @@ using Range = UnityEngine.SocialPlatforms.Range;
 
 public static class RangeExtension
 {
-	public static int GetLastIndex(this Range JMPCNIOBPAI)
+	public static int GetLastIndex(this Range range)
 	{
-		if (JMPCNIOBPAI.count == 0)
+		if (range.count == 0)
 		{
 			throw new InvalidOperationException("Range is invalid");
 		}
-		return JMPCNIOBPAI.from + JMPCNIOBPAI.count - 1;
+		return range.from + range.count - 1;
 	}
 
-	public static bool Contains(this Range JMPCNIOBPAI, int OMEDGJMNGKE)
+	public static bool Contains(this Range range, int index)
 	{
-		return OMEDGJMNGKE >= JMPCNIOBPAI.from && OMEDGJMNGKE < JMPCNIOBPAI.from + JMPCNIOBPAI.count;
+		return index >= range.from && index < range.from + range.count;
 	}
 }

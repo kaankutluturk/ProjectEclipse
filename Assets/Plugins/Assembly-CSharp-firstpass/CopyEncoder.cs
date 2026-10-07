@@ -6,18 +6,18 @@ internal class CopyEncoder
 
 	private const int MaxUncompressedBlockSize = 65536;
 
-	public void GetBlock(DeflateInput NILNDHEKNLJ, OutputBuffer output, bool JDHJLBBIKLM)
+	public void GetBlock(DeflateInput input, OutputBuffer output, bool isFinal)
 	{
 		int num = 0;
-		if (NILNDHEKNLJ != null)
+		if (input != null)
 		{
-			num = Math.Min(NILNDHEKNLJ.GetCount(), output.GetFreeBytes() - 5 - output.GetBitsInBuffer());
+			num = Math.Min(input.GetCount(), output.GetFreeBytes() - 5 - output.GetBitsInBuffer());
 			if (num > 65531)
 			{
 				num = 65531;
 			}
 		}
-		if (JDHJLBBIKLM)
+		if (isFinal)
 		{
 			output.WriteBits(3, 1u);
 		}
@@ -27,17 +27,17 @@ internal class CopyEncoder
 		}
 		output.FlushBits();
 		WriteLenNLen((ushort)num, output);
-		if (NILNDHEKNLJ != null && num > 0)
+		if (input != null && num > 0)
 		{
-			output.WriteBytes(NILNDHEKNLJ.GetBuffer(), NILNDHEKNLJ.GetStartIndex(), num);
-			NILNDHEKNLJ.ConsumeBytes(num);
+			output.WriteBytes(input.GetBuffer(), input.GetStartIndex(), num);
+			input.ConsumeBytes(num);
 		}
 	}
 
-	private void WriteLenNLen(ushort JCAJDBOMGOM, OutputBuffer output)
+	private void WriteLenNLen(ushort length, OutputBuffer output)
 	{
-		output.WriteUInt16(JCAJDBOMGOM);
-		ushort bAINMLLIKOL = (ushort)(~JCAJDBOMGOM);
-		output.WriteUInt16(bAINMLLIKOL);
+		output.WriteUInt16(length);
+		ushort notLength = (ushort)(~length);
+		output.WriteUInt16(notLength);
 	}
 }

@@ -3,12 +3,12 @@ using System.Xml;
 
 public static class PerksCompiler
 {
-	public static void CompilePerks(ref XmlDocument EELFNMOHGJL, string PMFEIPCHENB)
+	public static void CompilePerks(ref XmlDocument document, string resourceName)
 	{
-		EELFNMOHGJL = XmlUtils.OpenXMLDocument(PMFEIPCHENB, string.Empty, XmlUtils.XmlSourceMode.ForcedResourced);
-		if (EELFNMOHGJL != null)
+		document = XmlUtils.OpenXMLDocument(resourceName, string.Empty, XmlUtils.XmlSourceMode.ForcedResourced);
+		if (document != null)
 		{
-			XmlNode xmlNode = EELFNMOHGJL["Perks"];
+			XmlNode xmlNode = document["Perks"];
 			if (xmlNode != null)
 			{
 				foreach (XmlNode childNode in xmlNode.ChildNodes)
@@ -37,52 +37,52 @@ public static class PerksCompiler
 				}
 			}
 		}
-		AddIDs(EELFNMOHGJL);
+		AddIDs(document);
 		if (SystemProperties.IsDebug())
 		{
-			EELFNMOHGJL.Save(string.Format("{0}/{1}", SF2Paths.GetWritableGameDataPath(), "perks_result.xml"));
+			document.Save(string.Format("{0}/{1}", SF2Paths.GetWritableGameDataPath(), "perks_result.xml"));
 		}
 	}
 
-	private static XmlNode GetTemplateNode(XmlNode AFHNINCKJEE, string PAGGPPPLPGC)
+	private static XmlNode GetTemplateNode(XmlNode templatesNode, string templateName)
 	{
-		foreach (XmlNode childNode in AFHNINCKJEE.ChildNodes)
+		foreach (XmlNode childNode in templatesNode.ChildNodes)
 		{
 			if (childNode.Name.Equals("Perk"))
 			{
 				string value = childNode.Attributes["Name"].GetStringOrDefault();
-				if (PAGGPPPLPGC.Equals(value))
+				if (templateName.Equals(value))
 				{
 					return childNode;
 				}
 			}
 		}
-		GameLog.Error("Perks: tactics template '{0}' not found", PAGGPPPLPGC);
+		GameLog.Error("Perks: tactics template '{0}' not found", templateName);
 		return null;
 	}
 
-	private static void CopyMissingAttributes(XmlNode OEMALIFPGPO, XmlNode BBNKIBKPBLO)
+	private static void CopyMissingAttributes(XmlNode targetNode, XmlNode sourceNode)
 	{
-		foreach (XmlAttribute attribute in BBNKIBKPBLO.Attributes)
+		foreach (XmlAttribute attribute in sourceNode.Attributes)
 		{
 			string name = attribute.Name;
-			XmlAttribute xmlAttribute2 = OEMALIFPGPO.Attributes[name];
+			XmlAttribute xmlAttribute2 = targetNode.Attributes[name];
 			if (xmlAttribute2 == null)
 			{
-				OEMALIFPGPO.CopyAttribute(attribute);
+				targetNode.CopyAttribute(attribute);
 			}
 		}
 	}
 
-	private static void MergeTemplateChildren(XmlNode OEMALIFPGPO, XmlNode BBNKIBKPBLO)
+	private static void MergeTemplateChildren(XmlNode targetNode, XmlNode sourceNode)
 	{
-		foreach (XmlNode childNode in BBNKIBKPBLO.ChildNodes)
+		foreach (XmlNode childNode in sourceNode.ChildNodes)
 		{
 			string name = childNode.Name;
-			XmlNode xmlNode2 = OEMALIFPGPO["Set"];
+			XmlNode xmlNode2 = targetNode["Set"];
 			if (name == "Trigger" || (name == "Set" && xmlNode2 == null))
 			{
-				OEMALIFPGPO.AppendImportedClone(childNode);
+				targetNode.AppendImportedClone(childNode);
 			}
 			else if (name == "Set" && xmlNode2 != null)
 			{
@@ -91,10 +91,10 @@ public static class PerksCompiler
 		}
 	}
 
-	private static void ResolveTemplates(XmlNode OEMALIFPGPO, XmlNode BBNKIBKPBLO, List<string> KLFLOKHIPLN)
+	private static void ResolveTemplates(XmlNode node, XmlNode templatesNode, List<string> visitedTemplates)
 	{
 		List<string> list = new List<string>();
-		XmlAttribute xmlAttribute = OEMALIFPGPO.Attributes["Template"];
+		XmlAttribute xmlAttribute = node.Attributes["Template"];
 		if (xmlAttribute == null)
 		{
 			return;
@@ -104,22 +104,22 @@ public static class PerksCompiler
 		list = list.GetDistinct();
 		foreach (string item in list)
 		{
-			XmlNode xmlNode = GetTemplateNode(BBNKIBKPBLO, item);
+			XmlNode xmlNode = GetTemplateNode(templatesNode, item);
 			if (xmlNode != null)
 			{
-				XmlDocument mEEAKLDGLDF = new XmlDocument();
-				XmlNode xmlNode2 = mEEAKLDGLDF.AppendImportedClone(xmlNode);
-				ResolveTemplates(xmlNode2, BBNKIBKPBLO, KLFLOKHIPLN);
-				CopyMissingAttributes(OEMALIFPGPO, xmlNode2);
-				MergeTemplateChildren(OEMALIFPGPO, xmlNode2);
+				XmlDocument document = new XmlDocument();
+				XmlNode xmlNode2 = document.AppendImportedClone(xmlNode);
+				ResolveTemplates(xmlNode2, templatesNode, visitedTemplates);
+				CopyMissingAttributes(node, xmlNode2);
+				MergeTemplateChildren(node, xmlNode2);
 			}
-			KLFLOKHIPLN.Add(item);
+			visitedTemplates.Add(item);
 		}
 	}
 
-	private static void AddIDs(XmlDocument EELFNMOHGJL)
+	private static void AddIDs(XmlDocument document)
 	{
-		XmlNode xmlNode = EELFNMOHGJL["Perks"];
+		XmlNode xmlNode = document["Perks"];
 		int num = 0;
 		if (xmlNode == null)
 		{

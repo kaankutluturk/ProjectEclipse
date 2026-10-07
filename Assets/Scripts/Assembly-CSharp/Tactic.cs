@@ -20,10 +20,10 @@ public class Tactic
 		{
 		}
 
-		public Memory(Memory MOLELAFGIPG)
+		public Memory(Memory source)
 		{
-			Strikes = MOLELAFGIPG.Strikes;
-			RoundFactor = MOLELAFGIPG.RoundFactor;
+			Strikes = source.Strikes;
+			RoundFactor = source.RoundFactor;
 		}
 	}
 
@@ -85,48 +85,48 @@ public class Tactic
 	{
 	}
 
-	public Tactic(XmlNode AFHNINCKJEE)
+	public Tactic(XmlNode node)
 	{
-		_name = AFHNINCKJEE.Attributes["Name"].GetStringOrDefault(string.Empty);
-		_type = GetType(AFHNINCKJEE.Attributes["Type"].GetStringOrDefault(string.Empty));
-		XmlNode xmlNode = AFHNINCKJEE["Memory"];
+		_name = node.Attributes["Name"].GetStringOrDefault(string.Empty);
+		_type = GetType(node.Attributes["Type"].GetStringOrDefault(string.Empty));
+		XmlNode xmlNode = node["Memory"];
 		if (xmlNode != null)
 		{
 			MemoryConfig.Strikes = xmlNode.Attributes["Strikes"].ParseFloat();
 			MemoryConfig.RoundFactor = xmlNode.Attributes["RoundFactor"].ParseFloat();
 		}
-		XmlNode xmlNode2 = AFHNINCKJEE["UseDefense"];
+		XmlNode xmlNode2 = node["UseDefense"];
 		if (xmlNode2 != null)
 		{
 			_counterAttackChance.Parse(xmlNode2["CounterAttackChance"]);
 			_dodgeChance.Parse(xmlNode2["DodgeChance"]);
 			_blockChance.Parse(xmlNode2["BlockChance"]);
 		}
-		_useSafeAttackChance.Parse(AFHNINCKJEE["UseSafeAttackChance"]);
-		_tableAttackChance.Parse(AFHNINCKJEE["TableAttackChance"]);
-		ParseQuickAttacks(AFHNINCKJEE["QuickAttacks"]);
-		ParseEvades(AFHNINCKJEE["Evades"]);
-		_cautiousMovementsChance.Parse(AFHNINCKJEE["CautiousMovementsChance"]);
-		_dodgeMissilesChance.Parse(AFHNINCKJEE["DodgeMissilesChance"]);
-		_dodgeMagicChance.Parse(AFHNINCKJEE["DodgeMagicChance"]);
-		ParseInterval(AFHNINCKJEE["DistanceError"], _distanceError);
-		ParseInterval(AFHNINCKJEE["FrameError"], _frameError);
-		ParseInterval(AFHNINCKJEE["ResponseDelay"], _responseDelay);
-		ParseInterval(AFHNINCKJEE["EnemyResponseDelay"], _enemyResponseDelay);
-		XmlNode xmlNode3 = AFHNINCKJEE["AnimationWeights"];
+		_useSafeAttackChance.Parse(node["UseSafeAttackChance"]);
+		_tableAttackChance.Parse(node["TableAttackChance"]);
+		ParseQuickAttacks(node["QuickAttacks"]);
+		ParseEvades(node["Evades"]);
+		_cautiousMovementsChance.Parse(node["CautiousMovementsChance"]);
+		_dodgeMissilesChance.Parse(node["DodgeMissilesChance"]);
+		_dodgeMagicChance.Parse(node["DodgeMagicChance"]);
+		ParseInterval(node["DistanceError"], _distanceError);
+		ParseInterval(node["FrameError"], _frameError);
+		ParseInterval(node["ResponseDelay"], _responseDelay);
+		ParseInterval(node["EnemyResponseDelay"], _enemyResponseDelay);
+		XmlNode xmlNode3 = node["AnimationWeights"];
 		if (xmlNode3 != null)
 		{
 			foreach (XmlNode childNode in xmlNode3.ChildNodes)
 			{
 				if (childNode.Name == "Animation")
 				{
-					string gBCLEDJAOBM = childNode.Attributes["Name"].GetStringOrDefault(string.Empty);
-					TacticValue pOFHDGJAFMP = new TacticValue(childNode);
-					_animationWeights.Add(new global::Pair<string, TacticValue>(gBCLEDJAOBM, pOFHDGJAFMP));
+					string animationName = childNode.Attributes["Name"].GetStringOrDefault(string.Empty);
+					TacticValue tacticValue = new TacticValue(childNode);
+					_animationWeights.Add(new global::Pair<string, TacticValue>(animationName, tacticValue));
 				}
 			}
 		}
-		XmlNode xmlNode5 = AFHNINCKJEE["ExpectedWait"];
+		XmlNode xmlNode5 = node["ExpectedWait"];
 		if (xmlNode5 == null)
 		{
 			return;
@@ -142,27 +142,27 @@ public class Tactic
 		}
 	}
 
-	public Tactic(Tactic BJBIGPGJKIE)
+	public Tactic(Tactic source)
 	{
-		_name = BJBIGPGJKIE._name;
-		_type = BJBIGPGJKIE._type;
-		_counterAttackChance = BJBIGPGJKIE._counterAttackChance;
-		_dodgeChance = BJBIGPGJKIE._dodgeChance;
-		_blockChance = BJBIGPGJKIE._blockChance;
-		_useSafeAttackChance = BJBIGPGJKIE._useSafeAttackChance;
-		_tableAttackChance = BJBIGPGJKIE._tableAttackChance;
-		_cautiousMovementsChance = BJBIGPGJKIE._cautiousMovementsChance;
-		_dodgeMissilesChance = BJBIGPGJKIE._dodgeMissilesChance;
-		_dodgeMagicChance = BJBIGPGJKIE._dodgeMagicChance;
-		_distanceError = BJBIGPGJKIE._distanceError;
-		_frameError = BJBIGPGJKIE._frameError;
-		_responseDelay = BJBIGPGJKIE._responseDelay;
-		_enemyResponseDelay = BJBIGPGJKIE._enemyResponseDelay;
-		_animationWeights = BJBIGPGJKIE._animationWeights;
-		_expectedWaits = BJBIGPGJKIE._expectedWaits;
-		_quickAttacks = BJBIGPGJKIE._quickAttacks;
-		_evades = BJBIGPGJKIE._evades;
-		MemoryConfig = BJBIGPGJKIE.MemoryConfig;
+		_name = source._name;
+		_type = source._type;
+		_counterAttackChance = source._counterAttackChance;
+		_dodgeChance = source._dodgeChance;
+		_blockChance = source._blockChance;
+		_useSafeAttackChance = source._useSafeAttackChance;
+		_tableAttackChance = source._tableAttackChance;
+		_cautiousMovementsChance = source._cautiousMovementsChance;
+		_dodgeMissilesChance = source._dodgeMissilesChance;
+		_dodgeMagicChance = source._dodgeMagicChance;
+		_distanceError = source._distanceError;
+		_frameError = source._frameError;
+		_responseDelay = source._responseDelay;
+		_enemyResponseDelay = source._enemyResponseDelay;
+		_animationWeights = source._animationWeights;
+		_expectedWaits = source._expectedWaits;
+		_quickAttacks = source._quickAttacks;
+		_evades = source._evades;
+		MemoryConfig = source.MemoryConfig;
 	}
 
 	public TacticType get_Type()
@@ -185,55 +185,55 @@ public class Tactic
 		return _evades;
 	}
 
-	public float GetCounterAttackChance(TacticFactors FJCBLOKOBBD)
+	public float GetCounterAttackChance(TacticFactors factors)
 	{
-		return _counterAttackChance.GetValue(FJCBLOKOBBD);
+		return _counterAttackChance.GetValue(factors);
 	}
 
-	public float GetDodgeChance(TacticFactors FJCBLOKOBBD)
+	public float GetDodgeChance(TacticFactors factors)
 	{
-		return _dodgeChance.GetValue(FJCBLOKOBBD);
+		return _dodgeChance.GetValue(factors);
 	}
 
-	public float GetBlockChance(TacticFactors FJCBLOKOBBD)
+	public float GetBlockChance(TacticFactors factors)
 	{
-		return _blockChance.GetValue(FJCBLOKOBBD);
+		return _blockChance.GetValue(factors);
 	}
 
-	public float GetUseSafeAttackChance(TacticFactors FJCBLOKOBBD)
+	public float GetUseSafeAttackChance(TacticFactors factors)
 	{
-		return _useSafeAttackChance.GetValue(FJCBLOKOBBD);
+		return _useSafeAttackChance.GetValue(factors);
 	}
 
-	public float GetTableAttackChance(TacticFactors FJCBLOKOBBD)
+	public float GetTableAttackChance(TacticFactors factors)
 	{
-		return _tableAttackChance.GetValue(FJCBLOKOBBD);
+		return _tableAttackChance.GetValue(factors);
 	}
 
-	public float GetCautiousMovementsChance(TacticFactors FJCBLOKOBBD)
+	public float GetCautiousMovementsChance(TacticFactors factors)
 	{
-		return _cautiousMovementsChance.GetValue(FJCBLOKOBBD);
+		return _cautiousMovementsChance.GetValue(factors);
 	}
 
-	public float GetDodgeMissileChance(TacticFactors FJCBLOKOBBD)
+	public float GetDodgeMissileChance(TacticFactors factors)
 	{
-		return _dodgeMissilesChance.GetValue(FJCBLOKOBBD);
+		return _dodgeMissilesChance.GetValue(factors);
 	}
 
-	public float GetDodgeMagicChance(TacticFactors FJCBLOKOBBD)
+	public float GetDodgeMagicChance(TacticFactors factors)
 	{
-		return _dodgeMagicChance.GetValue(FJCBLOKOBBD);
+		return _dodgeMagicChance.GetValue(factors);
 	}
 
-	public float GetExpectedWait(InfoAnimation DBOLBEOCEME, TacticFactors FJCBLOKOBBD)
+	public float GetExpectedWait(InfoAnimation animation, TacticFactors factors)
 	{
-		if (DBOLBEOCEME != null)
+		if (animation != null)
 		{
 			foreach (global::Pair<string, TacticValue> item in _expectedWaits)
 			{
-				if (string.IsNullOrEmpty(item.First) || DBOLBEOCEME.HasName(item.First))
+				if (string.IsNullOrEmpty(item.First) || animation.HasName(item.First))
 				{
-					return item.Second.GetValue(FJCBLOKOBBD);
+					return item.Second.GetValue(factors);
 				}
 			}
 		}
@@ -243,7 +243,7 @@ public class Tactic
 			{
 				if (string.IsNullOrEmpty(item2.First))
 				{
-					return item2.Second.GetValue(FJCBLOKOBBD);
+					return item2.Second.GetValue(factors);
 				}
 			}
 		}
@@ -251,22 +251,22 @@ public class Tactic
 		return 1f;
 	}
 
-	public int SelectAnimationWithWeights(List<InfoAnimation> MAHEJFLCCHP, InfoAnimation HNCCGJECKLL, TacticFactors FJCBLOKOBBD)
+	public int SelectAnimationWithWeights(List<InfoAnimation> candidateAnimations, InfoAnimation fallbackAnimation, TacticFactors factors)
 	{
-		int count = MAHEJFLCCHP.Count;
+		int count = candidateAnimations.Count;
 		if (0 < count)
 		{
 			float num = 0f;
-			for (int i = 0; i < MAHEJFLCCHP.Count; i++)
+			for (int i = 0; i < candidateAnimations.Count; i++)
 			{
-				InfoAnimation pJAHIOELGGD = MAHEJFLCCHP[i];
-				if (pJAHIOELGGD == null && HNCCGJECKLL != null)
+				InfoAnimation candidateAnimation = candidateAnimations[i];
+				if (candidateAnimation == null && fallbackAnimation != null)
 				{
-					pJAHIOELGGD = HNCCGJECKLL;
+					candidateAnimation = fallbackAnimation;
 				}
-				if (pJAHIOELGGD != null)
+				if (candidateAnimation != null)
 				{
-					float num2 = GetWeight(pJAHIOELGGD, FJCBLOKOBBD);
+					float num2 = GetWeight(candidateAnimation, factors);
 					num += num2;
 				}
 			}
@@ -274,16 +274,16 @@ public class Tactic
 			{
 				float num3 = NekkiMath.randomFloat(num);
 				int num4 = 0;
-				for (int j = 0; j < MAHEJFLCCHP.Count; j++)
+				for (int j = 0; j < candidateAnimations.Count; j++)
 				{
-					InfoAnimation pJAHIOELGGD2 = MAHEJFLCCHP[j];
-					if (pJAHIOELGGD2 == null && HNCCGJECKLL != null)
+					InfoAnimation pJAHIOELGGD2 = candidateAnimations[j];
+					if (pJAHIOELGGD2 == null && fallbackAnimation != null)
 					{
-						pJAHIOELGGD2 = HNCCGJECKLL;
+						pJAHIOELGGD2 = fallbackAnimation;
 					}
 					if (pJAHIOELGGD2 != null)
 					{
-						float num5 = GetWeight(pJAHIOELGGD2, FJCBLOKOBBD);
+						float num5 = GetWeight(pJAHIOELGGD2, factors);
 						float num6 = num3 - num5;
 						if (num6 < 0f)
 						{
@@ -298,105 +298,105 @@ public class Tactic
 		return -1;
 	}
 
-	public float GetWeight(InfoAnimation DBOLBEOCEME, TacticFactors JCICKLIMBEF)
+	public float GetWeight(InfoAnimation animation, TacticFactors factors)
 	{
 		foreach (global::Pair<string, TacticValue> item in _animationWeights)
 		{
-			string lLHEDBIEHAA = item.First;
-			if (lLHEDBIEHAA == string.Empty || DBOLBEOCEME.HasName(lLHEDBIEHAA))
+			string animationName = item.First;
+			if (animationName == string.Empty || animation.HasName(animationName))
 			{
-				return item.Second.GetValue(JCICKLIMBEF);
+				return item.Second.GetValue(factors);
 			}
 		}
 		return 0f;
 	}
 
-	public float GetDistanceError(TacticFactors FJCBLOKOBBD)
+	public float GetDistanceError(TacticFactors factors)
 	{
-		float lHNCHOAEGEA = _distanceError.First.GetValue(FJCBLOKOBBD);
-		float kAEPJHHLLPK = _distanceError.Second.GetValue(FJCBLOKOBBD);
-		return GetValueFromInterval(lHNCHOAEGEA, kAEPJHHLLPK);
+		float minError = _distanceError.First.GetValue(factors);
+		float maxError = _distanceError.Second.GetValue(factors);
+		return GetValueFromInterval(minError, maxError);
 	}
 
-	public int GetFrameError(TacticFactors FJCBLOKOBBD)
+	public int GetFrameError(TacticFactors factors)
 	{
-		float lHNCHOAEGEA = _frameError.First.GetValue(FJCBLOKOBBD);
-		float kAEPJHHLLPK = _frameError.Second.GetValue(FJCBLOKOBBD);
-		return (int)GetValueFromInterval(lHNCHOAEGEA, kAEPJHHLLPK);
+		float minError = _frameError.First.GetValue(factors);
+		float maxError = _frameError.Second.GetValue(factors);
+		return (int)GetValueFromInterval(minError, maxError);
 	}
 
-	public int GetResponseDelay(TacticFactors FJCBLOKOBBD)
+	public int GetResponseDelay(TacticFactors factors)
 	{
-		float lHNCHOAEGEA = _responseDelay.First.GetValue(FJCBLOKOBBD);
-		float kAEPJHHLLPK = _responseDelay.Second.GetValue(FJCBLOKOBBD);
-		return (int)GetValueFromInterval(lHNCHOAEGEA, kAEPJHHLLPK);
+		float minDelay = _responseDelay.First.GetValue(factors);
+		float maxDelay = _responseDelay.Second.GetValue(factors);
+		return (int)GetValueFromInterval(minDelay, maxDelay);
 	}
 
-	public int GetEnemyResponseDelay(TacticFactors FJCBLOKOBBD)
+	public int GetEnemyResponseDelay(TacticFactors factors)
 	{
-		float lHNCHOAEGEA = _enemyResponseDelay.First.GetValue(FJCBLOKOBBD);
-		float kAEPJHHLLPK = _enemyResponseDelay.Second.GetValue(FJCBLOKOBBD);
-		return (int)GetValueFromInterval(lHNCHOAEGEA, kAEPJHHLLPK);
+		float minDelay = _enemyResponseDelay.First.GetValue(factors);
+		float maxDelay = _enemyResponseDelay.Second.GetValue(factors);
+		return (int)GetValueFromInterval(minDelay, maxDelay);
 	}
 
-	private void ParseQuickAttacks(XmlNode AFHNINCKJEE)
+	private void ParseQuickAttacks(XmlNode node)
 	{
 		int num = _quickAttacks.Count;
-		foreach (XmlNode childNode in AFHNINCKJEE.ChildNodes)
+		foreach (XmlNode childNode in node.ChildNodes)
 		{
 			if (childNode.Name == "QuickAttackChance")
 			{
-				string lLHEDBIEHAA = childNode.Attributes["Animation"].GetStringOrDefault(string.Empty);
+				string animationName = childNode.Attributes["Animation"].GetStringOrDefault(string.Empty);
 				_quickAttacks.Add(new global::Pair<string, TacticValue>(string.Empty, new TacticValue()));
-				_quickAttacks[num].First = lLHEDBIEHAA;
+				_quickAttacks[num].First = animationName;
 				_quickAttacks[num].Second.Parse(childNode);
 				num++;
 			}
 		}
 	}
 
-	private void ParseEvades(XmlNode AFHNINCKJEE)
+	private void ParseEvades(XmlNode node)
 	{
 		int num = _evades.Count;
-		foreach (XmlNode childNode in AFHNINCKJEE.ChildNodes)
+		foreach (XmlNode childNode in node.ChildNodes)
 		{
 			if (childNode.Name == "EvadeChance")
 			{
-				string lLHEDBIEHAA = childNode.Attributes["Animation"].GetStringOrDefault(string.Empty);
+				string animationName = childNode.Attributes["Animation"].GetStringOrDefault(string.Empty);
 				_evades.Add(new global::Pair<string, TacticValue>(string.Empty, new TacticValue()));
-				_evades[num].First = lLHEDBIEHAA;
+				_evades[num].First = animationName;
 				_evades[num].Second.Parse(childNode);
 				num++;
 			}
 		}
 	}
 
-	private static void ParseInterval(XmlNode AFHNINCKJEE, global::Pair<TacticValue, TacticValue> CHCGJBLDPML)
+	private static void ParseInterval(XmlNode node, global::Pair<TacticValue, TacticValue> interval)
 	{
-		if (AFHNINCKJEE != null)
+		if (node != null)
 		{
-			CHCGJBLDPML.First.Parse(AFHNINCKJEE["Min"]);
-			CHCGJBLDPML.Second.Parse(AFHNINCKJEE["Max"]);
+			interval.First.Parse(node["Min"]);
+			interval.Second.Parse(node["Max"]);
 		}
 	}
 
-	private static TacticType GetType(string CNKBLODAFDO)
+	private static TacticType GetType(string typeName)
 	{
-		if (CNKBLODAFDO == "Random")
+		if (typeName == "Random")
 		{
 			return TacticType.TacticRandom;
 		}
-		if (CNKBLODAFDO == "Tabular")
+		if (typeName == "Tabular")
 		{
 			return TacticType.TacticTabular;
 		}
-		GameLog.Error("Strange tactic type: %s", CNKBLODAFDO);
+		GameLog.Error("Strange tactic type: %s", typeName);
 		return TacticType.TacticNone;
 	}
 
-	private static float GetValueFromInterval(float LHNCHOAEGEA, float KAEPJHHLLPK)
+	private static float GetValueFromInterval(float minValue, float maxValue)
 	{
-		float num = NekkiMath.randomFloat() * (KAEPJHHLLPK - LHNCHOAEGEA);
-		return LHNCHOAEGEA + num;
+		float num = NekkiMath.randomFloat() * (maxValue - minValue);
+		return minValue + num;
 	}
 }

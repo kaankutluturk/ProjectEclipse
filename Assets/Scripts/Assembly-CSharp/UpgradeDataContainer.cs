@@ -8,9 +8,9 @@ public class UpgradeDataContainer
 
 	public void RandomizeObscuredVars()
 	{
-		Upgrades.ForEach((UpgradeData DHDMNHCIPEH) =>
+		Upgrades.ForEach((UpgradeData upgradeData) =>
 		{
-			DHDMNHCIPEH.RandomizeObscuredVars();
+			upgradeData.RandomizeObscuredVars();
 		});
 	}
 }

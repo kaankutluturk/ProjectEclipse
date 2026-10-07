@@ -3,26 +3,26 @@ using System.Text.RegularExpressions;
 
 internal static class StringExtensions
 {
-	private static string ToCamelOrPascalCase(string IGGFGLLIGCG, Func<char, char> BBGFDLJEEEL)
+	private static string ToCamelOrPascalCase(string input, Func<char, char> firstCharTransform)
 	{
-		string text = Regex.Replace(IGGFGLLIGCG, "([_\\-])(?<char>[a-z])", (System.Text.RegularExpressions.Match MLPEJKLNAKF) => MLPEJKLNAKF.Groups["char"].Value.ToUpperInvariant(), RegexOptions.IgnoreCase);
-		return BBGFDLJEEEL(text[0]) + text.Substring(1);
+		string text = Regex.Replace(input, "([_\\-])(?<char>[a-z])", (System.Text.RegularExpressions.Match match) => match.Groups["char"].Value.ToUpperInvariant(), RegexOptions.IgnoreCase);
+		return firstCharTransform(text[0]) + text.Substring(1);
 	}
 
-	public static string ToCamelCase(this string IGGFGLLIGCG)
+	public static string ToCamelCase(this string input)
 	{
-		return ToCamelOrPascalCase(IGGFGLLIGCG, char.ToLowerInvariant);
+		return ToCamelOrPascalCase(input, char.ToLowerInvariant);
 	}
 
-	public static string ToPascalCase(this string IGGFGLLIGCG)
+	public static string ToPascalCase(this string input)
 	{
-		return ToCamelOrPascalCase(IGGFGLLIGCG, char.ToUpperInvariant);
+		return ToCamelOrPascalCase(input, char.ToUpperInvariant);
 	}
 
-	public static string FromCamelCase(this string IGGFGLLIGCG, string LHCEONCBNPP)
+	public static string FromCamelCase(this string input, string separator)
 	{
-		IGGFGLLIGCG = char.ToLower(IGGFGLLIGCG[0]) + IGGFGLLIGCG.Substring(1);
-		IGGFGLLIGCG = Regex.Replace(IGGFGLLIGCG.ToCamelCase(), "(?<char>[A-Z])", (System.Text.RegularExpressions.Match MLPEJKLNAKF) => LHCEONCBNPP + MLPEJKLNAKF.Groups["char"].Value.ToLowerInvariant());
-		return IGGFGLLIGCG;
+		input = char.ToLower(input[0]) + input.Substring(1);
+		input = Regex.Replace(input.ToCamelCase(), "(?<char>[A-Z])", (System.Text.RegularExpressions.Match match) => separator + match.Groups["char"].Value.ToLowerInvariant());
+		return input;
 	}
 }

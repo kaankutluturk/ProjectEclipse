@@ -49,12 +49,12 @@ namespace Nekki.SF2.GUI
 			}
 		}
 
-		public void SetText(string BHJILACALPJ, string LNGIMAAHIFE)
+		public void SetText(string headerAlias, string descriptionAlias)
 		{
 			if (!(header == null) && !(description == null) && !(backgroudTransform == null) && !(backgroudLayout == null))
 			{
-				header.SetAlias(BHJILACALPJ);
-				description.SetAlias(LNGIMAAHIFE);
+				header.SetAlias(headerAlias);
+				description.SetAlias(descriptionAlias);
 				ResizeToContent();
 			}
 		}

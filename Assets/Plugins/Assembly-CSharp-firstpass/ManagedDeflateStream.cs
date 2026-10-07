@@ -5,7 +5,7 @@ using System.Threading;
 
 public class ManagedDeflateStream : Stream
 {
-	internal delegate void AsyncWriteDelegate(byte[] HFPDMGAEJJE, int IPCOBJBKNAO, int count, bool MHBDEKPKCPF);
+	internal delegate void AsyncWriteDelegate(byte[] array, int offset, int count, bool isAsync);
 
 	private enum WorkerType : byte
 	{
@@ -47,24 +47,24 @@ public class ManagedDeflateStream : Stream
 		}
 	}
 
-	public ManagedDeflateStream(Stream ABJIEFMMIEK, DeflateCompressionMode NMMPBADCFHK)
-		: this(ABJIEFMMIEK, NMMPBADCFHK, false)
+	public ManagedDeflateStream(Stream stream, DeflateCompressionMode compressionMode)
+		: this(stream, compressionMode, false)
 	{
 	}
 
-	public ManagedDeflateStream(Stream ABJIEFMMIEK, DeflateCompressionMode NMMPBADCFHK, bool LOLBAGJKKPH)
+	public ManagedDeflateStream(Stream stream, DeflateCompressionMode compressionMode, bool leaveOpen)
 	{
-		if (ABJIEFMMIEK == null)
+		if (stream == null)
 		{
 			throw new ArgumentNullException("stream");
 		}
-		if (NMMPBADCFHK != DeflateCompressionMode.Compress && NMMPBADCFHK != DeflateCompressionMode.Decompress)
+		if (compressionMode != DeflateCompressionMode.Compress && compressionMode != DeflateCompressionMode.Decompress)
 		{
 			throw new ArgumentException(SR.GetString("Argument out of range"), "mode");
 		}
-		_stream = ABJIEFMMIEK;
-		_mode = NMMPBADCFHK;
-		_leaveOpen = LOLBAGJKKPH;
+		_stream = stream;
+		_mode = compressionMode;
+		_leaveOpen = leaveOpen;
 		switch (_mode)
 		{
 		case DeflateCompressionMode.Decompress:
@@ -180,7 +180,7 @@ public class ManagedDeflateStream : Stream
 		}
 	}
 
-	public override long Seek(long IPCOBJBKNAO, SeekOrigin IKOOJMAOFOD)
+	public override long Seek(long offset, SeekOrigin origin)
 	{
 		throw new NotSupportedException(SR.GetString("Not supported"));
 	}
@@ -190,16 +190,16 @@ public class ManagedDeflateStream : Stream
 		throw new NotSupportedException(SR.GetString("Not supported"));
 	}
 
-	public override int Read(byte[] HFPDMGAEJJE, int IPCOBJBKNAO, int count)
+	public override int Read(byte[] array, int offset, int count)
 	{
 		EnsureDecompressionMode();
-		ValidateParameters(HFPDMGAEJJE, IPCOBJBKNAO, count);
+		ValidateParameters(array, offset, count);
 		EnsureNotDisposed();
-		int num = IPCOBJBKNAO;
+		int num = offset;
 		int num2 = count;
 		while (true)
 		{
-			int num3 = inflater.Inflate(HFPDMGAEJJE, num, num2);
+			int num3 = inflater.Inflate(array, num, num2);
 			num += num3;
 			num2 -= num3;
 			if (num2 == 0 || inflater.Finished())
@@ -216,13 +216,13 @@ public class ManagedDeflateStream : Stream
 		return count - num2;
 	}
 
-	private void ValidateParameters(byte[] HFPDMGAEJJE, int IPCOBJBKNAO, int count)
+	private void ValidateParameters(byte[] array, int offset, int count)
 	{
-		if (HFPDMGAEJJE == null)
+		if (array == null)
 		{
 			throw new ArgumentNullException("array");
 		}
-		if (IPCOBJBKNAO < 0)
+		if (offset < 0)
 		{
 			throw new ArgumentOutOfRangeException("offset");
 		}
@@ -230,7 +230,7 @@ public class ManagedDeflateStream : Stream
 		{
 			throw new ArgumentOutOfRangeException("count");
 		}
-		if (HFPDMGAEJJE.Length - IPCOBJBKNAO < count)
+		if (array.Length - offset < count)
 		{
 			throw new ArgumentException(SR.GetString("Invalid argument offset count"));
 		}
@@ -260,34 +260,34 @@ public class ManagedDeflateStream : Stream
 		}
 	}
 
-	public override IAsyncResult BeginRead(byte[] HFPDMGAEJJE, int IPCOBJBKNAO, int count, AsyncCallback FCLGHDMMEBC, object LEGPNOBHGIE)
+	public override IAsyncResult BeginRead(byte[] array, int offset, int count, AsyncCallback asyncCallback, object asyncState)
 	{
 		EnsureDecompressionMode();
 		if (asyncOperations != 0)
 		{
 			throw new InvalidOperationException(SR.GetString("Invalid begin call"));
 		}
-		ValidateParameters(HFPDMGAEJJE, IPCOBJBKNAO, count);
+		ValidateParameters(array, offset, count);
 		EnsureNotDisposed();
 		Interlocked.Increment(ref asyncOperations);
 		try
 		{
-			DeflateStreamAsyncResult bOJEBIGFIKA = new DeflateStreamAsyncResult(this, LEGPNOBHGIE, FCLGHDMMEBC, HFPDMGAEJJE, IPCOBJBKNAO, count);
-			bOJEBIGFIKA.isWrite = false;
-			int num = inflater.Inflate(HFPDMGAEJJE, IPCOBJBKNAO, count);
+			DeflateStreamAsyncResult deflateAsyncResult = new DeflateStreamAsyncResult(this, asyncState, asyncCallback, array, offset, count);
+			deflateAsyncResult.isWrite = false;
+			int num = inflater.Inflate(array, offset, count);
 			if (num != 0)
 			{
-				bOJEBIGFIKA.InvokeCallback(true, num);
-				return bOJEBIGFIKA;
+				deflateAsyncResult.InvokeCallback(true, num);
+				return deflateAsyncResult;
 			}
 			if (inflater.Finished())
 			{
-				bOJEBIGFIKA.InvokeCallback(true, 0);
-				return bOJEBIGFIKA;
+				deflateAsyncResult.InvokeCallback(true, 0);
+				return deflateAsyncResult;
 			}
-			_stream.BeginRead(buffer, 0, buffer.Length, m_CallBack, bOJEBIGFIKA);
-			bOJEBIGFIKA.m_CompletedSynchronously &= bOJEBIGFIKA.IsCompleted;
-			return bOJEBIGFIKA;
+			_stream.BeginRead(buffer, 0, buffer.Length, m_CallBack, deflateAsyncResult);
+			deflateAsyncResult.m_CompletedSynchronously &= deflateAsyncResult.IsCompleted;
+			return deflateAsyncResult;
 		}
 		catch
 		{
@@ -296,93 +296,93 @@ public class ManagedDeflateStream : Stream
 		}
 	}
 
-	private void ReadCallback(IAsyncResult KCLJLMAHPFI)
+	private void ReadCallback(IAsyncResult asyncResult)
 	{
-		DeflateStreamAsyncResult bOJEBIGFIKA = (DeflateStreamAsyncResult)KCLJLMAHPFI.AsyncState;
-		bOJEBIGFIKA.m_CompletedSynchronously &= KCLJLMAHPFI.CompletedSynchronously;
+		DeflateStreamAsyncResult deflateAsyncResult = (DeflateStreamAsyncResult)asyncResult.AsyncState;
+		deflateAsyncResult.m_CompletedSynchronously &= asyncResult.CompletedSynchronously;
 		int num = 0;
 		try
 		{
 			EnsureNotDisposed();
-			num = _stream.EndRead(KCLJLMAHPFI);
+			num = _stream.EndRead(asyncResult);
 			if (num <= 0)
 			{
-				bOJEBIGFIKA.InvokeCallback(0);
+				deflateAsyncResult.InvokeCallback(0);
 				return;
 			}
 			inflater.SetInput(buffer, 0, num);
-			num = inflater.Inflate(bOJEBIGFIKA.buffer, bOJEBIGFIKA.offset, bOJEBIGFIKA.count);
+			num = inflater.Inflate(deflateAsyncResult.buffer, deflateAsyncResult.offset, deflateAsyncResult.count);
 			if (num == 0 && !inflater.Finished())
 			{
-				_stream.BeginRead(buffer, 0, buffer.Length, m_CallBack, bOJEBIGFIKA);
+				_stream.BeginRead(buffer, 0, buffer.Length, m_CallBack, deflateAsyncResult);
 			}
 			else
 			{
-				bOJEBIGFIKA.InvokeCallback(num);
+				deflateAsyncResult.InvokeCallback(num);
 			}
 		}
-		catch (Exception dCJLKCFKCOM)
+		catch (Exception exception)
 		{
-			bOJEBIGFIKA.InvokeCallback(dCJLKCFKCOM);
+			deflateAsyncResult.InvokeCallback(exception);
 		}
 	}
 
-	public override int EndRead(IAsyncResult BHNNOKGCDEG)
+	public override int EndRead(IAsyncResult asyncResult)
 	{
 		EnsureDecompressionMode();
-		CheckEndXxxxLegalStateAndParams(BHNNOKGCDEG);
-		DeflateStreamAsyncResult bOJEBIGFIKA = (DeflateStreamAsyncResult)BHNNOKGCDEG;
-		AwaitAsyncIOCompletion(bOJEBIGFIKA);
-		Exception ex = bOJEBIGFIKA.GetResult() as Exception;
+		CheckEndXxxxLegalStateAndParams(asyncResult);
+		DeflateStreamAsyncResult deflateAsyncResult = (DeflateStreamAsyncResult)asyncResult;
+		AwaitAsyncIOCompletion(deflateAsyncResult);
+		Exception ex = deflateAsyncResult.GetResult() as Exception;
 		if (ex != null)
 		{
 			throw ex;
 		}
-		return (int)bOJEBIGFIKA.GetResult();
+		return (int)deflateAsyncResult.GetResult();
 	}
 
-	public override void Write(byte[] HFPDMGAEJJE, int IPCOBJBKNAO, int count)
+	public override void Write(byte[] array, int offset, int count)
 	{
 		EnsureCompressionMode();
-		ValidateParameters(HFPDMGAEJJE, IPCOBJBKNAO, count);
+		ValidateParameters(array, offset, count);
 		EnsureNotDisposed();
-		InternalWrite(HFPDMGAEJJE, IPCOBJBKNAO, count, false);
+		InternalWrite(array, offset, count, false);
 	}
 
-	internal void InternalWrite(byte[] HFPDMGAEJJE, int IPCOBJBKNAO, int count, bool MHBDEKPKCPF)
+	internal void InternalWrite(byte[] array, int offset, int count, bool isAsync)
 	{
-		DoMaintenance(HFPDMGAEJJE, IPCOBJBKNAO, count);
-		WriteDeflaterOutput(MHBDEKPKCPF);
-		deflater.SetInput(HFPDMGAEJJE, IPCOBJBKNAO, count);
-		WriteDeflaterOutput(MHBDEKPKCPF);
+		DoMaintenance(array, offset, count);
+		WriteDeflaterOutput(isAsync);
+		deflater.SetInput(array, offset, count);
+		WriteDeflaterOutput(isAsync);
 	}
 
-	private void WriteDeflaterOutput(bool MHBDEKPKCPF)
+	private void WriteDeflaterOutput(bool isAsync)
 	{
 		while (!deflater.NeedsInput())
 		{
 			int num = deflater.GetDeflateOutput(buffer);
 			if (num > 0)
 			{
-				DoWrite(buffer, 0, num, MHBDEKPKCPF);
+				DoWrite(buffer, 0, num, isAsync);
 			}
 		}
 	}
 
-	private void DoWrite(byte[] HFPDMGAEJJE, int IPCOBJBKNAO, int count, bool MHBDEKPKCPF)
+	private void DoWrite(byte[] array, int offset, int count, bool isAsync)
 	{
-		if (MHBDEKPKCPF)
+		if (isAsync)
 		{
-			IAsyncResult asyncResult = _stream.BeginWrite(HFPDMGAEJJE, IPCOBJBKNAO, count, null, null);
+			IAsyncResult asyncResult = _stream.BeginWrite(array, offset, count, null, null);
 			_stream.EndWrite(asyncResult);
 		}
 		else
 		{
-			_stream.Write(HFPDMGAEJJE, IPCOBJBKNAO, count);
+			_stream.Write(array, offset, count);
 		}
 	}
 
-	private void DoMaintenance(byte[] HFPDMGAEJJE, int IPCOBJBKNAO, int count)
+	private void DoMaintenance(byte[] data, int offset, int count)
 	{
 		if (count <= 0)
 		{
@@ -397,13 +397,13 @@ public class ManagedDeflateStream : Stream
 				_stream.Write(array, 0, array.Length);
 				wroteHeader = true;
 			}
-			formatWriter.UpdateWithBytesRead(HFPDMGAEJJE, IPCOBJBKNAO, count);
+			formatWriter.UpdateWithBytesRead(data, offset, count);
 		}
 	}
 
-	private void PurgeBuffers(bool KLCPNDHEBGP)
+	private void PurgeBuffers(bool disposing)
 	{
-		if (!KLCPNDHEBGP || _stream == null)
+		if (!disposing || _stream == null)
 		{
 			return;
 		}
@@ -418,11 +418,11 @@ public class ManagedDeflateStream : Stream
 			bool flag;
 			do
 			{
-				int GJBPPJIGAIG;
-				flag = deflater.Finish(buffer, out GJBPPJIGAIG);
-				if (GJBPPJIGAIG > 0)
+				int bytesProduced;
+				flag = deflater.Finish(buffer, out bytesProduced);
+				if (bytesProduced > 0)
 				{
-					DoWrite(buffer, 0, GJBPPJIGAIG, false);
+					DoWrite(buffer, 0, bytesProduced, false);
 				}
 			}
 			while (!flag);
@@ -434,17 +434,17 @@ public class ManagedDeflateStream : Stream
 		}
 	}
 
-	protected override void Dispose(bool KLCPNDHEBGP)
+	protected override void Dispose(bool disposing)
 	{
 		try
 		{
-			PurgeBuffers(KLCPNDHEBGP);
+			PurgeBuffers(disposing);
 		}
 		finally
 		{
 			try
 			{
-				if (KLCPNDHEBGP && !_leaveOpen && _stream != null)
+				if (disposing && !_leaveOpen && _stream != null)
 				{
 					_stream.Dispose();
 				}
@@ -462,29 +462,29 @@ public class ManagedDeflateStream : Stream
 				finally
 				{
 					deflater = null;
-					base.Dispose(KLCPNDHEBGP);
+					base.Dispose(disposing);
 				}
 			}
 		}
 	}
 
-	public override IAsyncResult BeginWrite(byte[] HFPDMGAEJJE, int IPCOBJBKNAO, int count, AsyncCallback FCLGHDMMEBC, object LEGPNOBHGIE)
+	public override IAsyncResult BeginWrite(byte[] array, int offset, int count, AsyncCallback asyncCallback, object asyncState)
 	{
 		EnsureCompressionMode();
 		if (asyncOperations != 0)
 		{
 			throw new InvalidOperationException(SR.GetString("Invalid begin call"));
 		}
-		ValidateParameters(HFPDMGAEJJE, IPCOBJBKNAO, count);
+		ValidateParameters(array, offset, count);
 		EnsureNotDisposed();
 		Interlocked.Increment(ref asyncOperations);
 		try
 		{
-			DeflateStreamAsyncResult bOJEBIGFIKA = new DeflateStreamAsyncResult(this, LEGPNOBHGIE, FCLGHDMMEBC, HFPDMGAEJJE, IPCOBJBKNAO, count);
-			bOJEBIGFIKA.isWrite = true;
-			m_AsyncWriterDelegate.BeginInvoke(HFPDMGAEJJE, IPCOBJBKNAO, count, true, m_CallBack, bOJEBIGFIKA);
-			bOJEBIGFIKA.m_CompletedSynchronously &= bOJEBIGFIKA.IsCompleted;
-			return bOJEBIGFIKA;
+			DeflateStreamAsyncResult deflateAsyncResult = new DeflateStreamAsyncResult(this, asyncState, asyncCallback, array, offset, count);
+			deflateAsyncResult.isWrite = true;
+			m_AsyncWriterDelegate.BeginInvoke(array, offset, count, true, m_CallBack, deflateAsyncResult);
+			deflateAsyncResult.m_CompletedSynchronously &= deflateAsyncResult.IsCompleted;
+			return deflateAsyncResult;
 		}
 		catch
 		{
@@ -493,66 +493,66 @@ public class ManagedDeflateStream : Stream
 		}
 	}
 
-	private void WriteCallback(IAsyncResult BHNNOKGCDEG)
+	private void WriteCallback(IAsyncResult asyncResult)
 	{
-		DeflateStreamAsyncResult bOJEBIGFIKA = (DeflateStreamAsyncResult)BHNNOKGCDEG.AsyncState;
-		bOJEBIGFIKA.m_CompletedSynchronously &= BHNNOKGCDEG.CompletedSynchronously;
+		DeflateStreamAsyncResult deflateAsyncResult = (DeflateStreamAsyncResult)asyncResult.AsyncState;
+		deflateAsyncResult.m_CompletedSynchronously &= asyncResult.CompletedSynchronously;
 		try
 		{
-			m_AsyncWriterDelegate.EndInvoke(BHNNOKGCDEG);
+			m_AsyncWriterDelegate.EndInvoke(asyncResult);
 		}
-		catch (Exception dCJLKCFKCOM)
+		catch (Exception exception)
 		{
-			bOJEBIGFIKA.InvokeCallback(dCJLKCFKCOM);
+			deflateAsyncResult.InvokeCallback(exception);
 			return;
 		}
-		bOJEBIGFIKA.InvokeCallback(null);
+		deflateAsyncResult.InvokeCallback(null);
 	}
 
-	public override void EndWrite(IAsyncResult BHNNOKGCDEG)
+	public override void EndWrite(IAsyncResult asyncResult)
 	{
 		EnsureCompressionMode();
-		CheckEndXxxxLegalStateAndParams(BHNNOKGCDEG);
-		DeflateStreamAsyncResult bOJEBIGFIKA = (DeflateStreamAsyncResult)BHNNOKGCDEG;
-		AwaitAsyncIOCompletion(bOJEBIGFIKA);
-		Exception ex = bOJEBIGFIKA.GetResult() as Exception;
+		CheckEndXxxxLegalStateAndParams(asyncResult);
+		DeflateStreamAsyncResult deflateAsyncResult = (DeflateStreamAsyncResult)asyncResult;
+		AwaitAsyncIOCompletion(deflateAsyncResult);
+		Exception ex = deflateAsyncResult.GetResult() as Exception;
 		if (ex != null)
 		{
 			throw ex;
 		}
 	}
 
-	private void CheckEndXxxxLegalStateAndParams(IAsyncResult BHNNOKGCDEG)
+	private void CheckEndXxxxLegalStateAndParams(IAsyncResult asyncResult)
 	{
 		if (asyncOperations != 1)
 		{
 			throw new InvalidOperationException(SR.GetString("Invalid end call"));
 		}
-		if (BHNNOKGCDEG == null)
+		if (asyncResult == null)
 		{
 			throw new ArgumentNullException("asyncResult");
 		}
 		EnsureNotDisposed();
-		DeflateStreamAsyncResult bOJEBIGFIKA = BHNNOKGCDEG as DeflateStreamAsyncResult;
-		if (bOJEBIGFIKA == null)
+		DeflateStreamAsyncResult deflateAsyncResult = asyncResult as DeflateStreamAsyncResult;
+		if (deflateAsyncResult == null)
 		{
 			throw new ArgumentNullException("asyncResult");
 		}
 	}
 
-	private void AwaitAsyncIOCompletion(DeflateStreamAsyncResult BHNNOKGCDEG)
+	private void AwaitAsyncIOCompletion(DeflateStreamAsyncResult asyncResult)
 	{
 		try
 		{
-			if (!BHNNOKGCDEG.IsCompleted)
+			if (!asyncResult.IsCompleted)
 			{
-				BHNNOKGCDEG.AsyncWaitHandle.WaitOne();
+				asyncResult.AsyncWaitHandle.WaitOne();
 			}
 		}
 		finally
 		{
 			Interlocked.Decrement(ref asyncOperations);
-			BHNNOKGCDEG.Close();
+			asyncResult.Close();
 		}
 	}
 }

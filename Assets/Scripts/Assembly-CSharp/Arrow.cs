@@ -20,9 +20,9 @@ public class Arrow : MonoBehaviour
 
 	protected bool _animationUp;
 
-	public void Init(float AONLJLDPMEE = 24f)
+	public void Init(float amplitude = 24f)
 	{
-		_amplitude = AONLJLDPMEE;
+		_amplitude = amplitude;
 		_step = 0.8f;
 		_maxSteps = (int)(_amplitude / 0.8f);
 	}

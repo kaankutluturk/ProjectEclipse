@@ -48,34 +48,34 @@ namespace Nekki.SF2.GUI.Shop
 			list.ForEach(Object.Destroy);
 		}
 
-		public virtual void SetPerks(List<PerkInfoItem> JOGBKOJCINM)
+		public virtual void SetPerks(List<PerkInfoItem> perks)
 		{
 			Clear();
-			if (JOGBKOJCINM != null)
+			if (perks != null)
 			{
-				JOGBKOJCINM.ForEach(CreatePerkItem);
+				perks.ForEach(CreatePerkItem);
 			}
 		}
 
-		public void CreatePerkItem(PerkInfoItem CBINHDDCIEA)
+		public void CreatePerkItem(PerkInfoItem perkItem)
 		{
-			if (CBINHDDCIEA != null && CBINHDDCIEA.ImageName != null && !CBINHDDCIEA.ImageName.Equals(string.Empty))
+			if (perkItem != null && perkItem.ImageName != null && !perkItem.ImageName.Equals(string.Empty))
 			{
-				GameObject AOMLCBHAJJH = new GameObject(CBINHDDCIEA.Name);
-				ResolutionImage resolutionImage = AOMLCBHAJJH.AddComponent<ResolutionImage>();
-				TouchHandler touchHandler = AOMLCBHAJJH.AddComponent<TouchHandler>();
-				LayoutElement layoutElement = AOMLCBHAJJH.AddComponent<LayoutElement>();
+				GameObject perkObject = new GameObject(perkItem.Name);
+				ResolutionImage resolutionImage = perkObject.AddComponent<ResolutionImage>();
+				TouchHandler touchHandler = perkObject.AddComponent<TouchHandler>();
+				LayoutElement layoutElement = perkObject.AddComponent<LayoutElement>();
 				touchHandler.transition = Selectable.Transition.None;
 				touchHandler.get_OnTouch().AddListener(() =>
 				{
-					Vector3 position = AOMLCBHAJJH.transform.position;
-					onPerksClick.Invoke(CBINHDDCIEA, position, hintOffset, AOMLCBHAJJH);
+					Vector3 position = perkObject.transform.position;
+					onPerksClick.Invoke(perkItem, position, hintOffset, perkObject);
 				});
-					string icon = CBINHDDCIEA.ImageName;
+					string icon = perkItem.ImageName;
 					resolutionImage.set_SpriteName((icon.IndexOf(':') > 0) ? icon : (iconAtlasPrefix + icon));
 				layoutElement.minHeight = resolutionImage.rectTransform.rect.height;
 				layoutElement.minWidth = resolutionImage.rectTransform.rect.width;
-				AOMLCBHAJJH.transform.SetParent(base.gameObject.transform, false);
+				perkObject.transform.SetParent(base.gameObject.transform, false);
 			}
 		}
 

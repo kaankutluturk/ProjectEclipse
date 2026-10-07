@@ -74,10 +74,10 @@ public class Hub : IHub
 	{
 	}
 
-	public Hub(string name, Connection BJGMPDIKEJC)
+	public Hub(string name, Connection hubConnection)
 	{
 		set_Name(name);
-		((IHub)this).GNLCPJFBAJE(BJGMPDIKEJC);
+		((IHub)this).GNLCPJFBAJE(hubConnection);
 	}
 
 	public string get_Name()
@@ -101,26 +101,26 @@ public class Hub : IHub
 
 	public void AddOnMethodCall(OnMethodCallDelegate value)
 	{
-		OnMethodCallDelegate kOBOMHLOBON = OnMethodCall;
+		OnMethodCallDelegate current = OnMethodCall;
 		OnMethodCallDelegate kOBOMHLOBON2;
 		do
 		{
-			kOBOMHLOBON2 = kOBOMHLOBON;
-			kOBOMHLOBON = Interlocked.CompareExchange(ref OnMethodCall, (OnMethodCallDelegate)Delegate.Combine(kOBOMHLOBON2, value), kOBOMHLOBON);
+			kOBOMHLOBON2 = current;
+			current = Interlocked.CompareExchange(ref OnMethodCall, (OnMethodCallDelegate)Delegate.Combine(kOBOMHLOBON2, value), current);
 		}
-		while ((object)kOBOMHLOBON != kOBOMHLOBON2);
+		while ((object)current != kOBOMHLOBON2);
 	}
 
 	public void RemoveOnMethodCall(OnMethodCallDelegate value)
 	{
-		OnMethodCallDelegate kOBOMHLOBON = OnMethodCall;
+		OnMethodCallDelegate current = OnMethodCall;
 		OnMethodCallDelegate kOBOMHLOBON2;
 		do
 		{
-			kOBOMHLOBON2 = kOBOMHLOBON;
-			kOBOMHLOBON = Interlocked.CompareExchange(ref OnMethodCall, (OnMethodCallDelegate)Delegate.Remove(kOBOMHLOBON2, value), kOBOMHLOBON);
+			kOBOMHLOBON2 = current;
+			current = Interlocked.CompareExchange(ref OnMethodCall, (OnMethodCallDelegate)Delegate.Remove(kOBOMHLOBON2, value), current);
 		}
-		while ((object)kOBOMHLOBON != kOBOMHLOBON2);
+		while ((object)current != kOBOMHLOBON2);
 	}
 
 	Connection IHub.PEBFDIFIMBO
@@ -140,61 +140,61 @@ public class Hub : IHub
 		connection = value;
 	}
 
-	public void On(string FJLOLCPJACB, OnMethodCallCallbackDelegate callback)
+	public void On(string method, OnMethodCallCallbackDelegate callback)
 	{
-		methodTable[FJLOLCPJACB] = callback;
+		methodTable[method] = callback;
 	}
 
-	public void Off(string FJLOLCPJACB)
+	public void Off(string method)
 	{
-		methodTable[FJLOLCPJACB] = null;
+		methodTable[method] = null;
 	}
 
-	public void Call(string FJLOLCPJACB, params object[] LKIOKGCNKHE)
+	public void Call(string method, params object[] args)
 	{
-		Call(FJLOLCPJACB, null, null, null, LKIOKGCNKHE);
+		Call(method, null, null, null, args);
 	}
 
-	public void Call(string FJLOLCPJACB, OnMethodResultDelegate KGLHKHHFNOO, params object[] LKIOKGCNKHE)
+	public void Call(string method, OnMethodResultDelegate onResult, params object[] args)
 	{
-		Call(FJLOLCPJACB, KGLHKHHFNOO, null, null, LKIOKGCNKHE);
+		Call(method, onResult, null, null, args);
 	}
 
-	public void Call(string FJLOLCPJACB, OnMethodResultDelegate KGLHKHHFNOO, OnMethodFailedDelegate PLEIBDIHIFO, params object[] LKIOKGCNKHE)
+	public void Call(string method, OnMethodResultDelegate onResult, OnMethodFailedDelegate onFailed, params object[] args)
 	{
-		Call(FJLOLCPJACB, KGLHKHHFNOO, PLEIBDIHIFO, null, LKIOKGCNKHE);
+		Call(method, onResult, onFailed, null, args);
 	}
 
-	public void Call(string FJLOLCPJACB, OnMethodResultDelegate KGLHKHHFNOO, OnMethodProgressDelegate LFAIENNBBMK, params object[] LKIOKGCNKHE)
+	public void Call(string method, OnMethodResultDelegate onResult, OnMethodProgressDelegate onProgress, params object[] args)
 	{
-		Call(FJLOLCPJACB, KGLHKHHFNOO, null, LFAIENNBBMK, LKIOKGCNKHE);
+		Call(method, onResult, null, onProgress, args);
 	}
 
-	public void Call(string FJLOLCPJACB, OnMethodResultDelegate KGLHKHHFNOO, OnMethodFailedDelegate PLEIBDIHIFO, OnMethodProgressDelegate LFAIENNBBMK, params object[] LKIOKGCNKHE)
+	public void Call(string method, OnMethodResultDelegate onResult, OnMethodFailedDelegate onFailed, OnMethodProgressDelegate onProgress, params object[] args)
 	{
 		lock (((IHub)this).HubConnection.SyncRoot)
 		{
-			Connection hDMLLEEKKLF = ((IHub)this).HubConnection;
-			hDMLLEEKKLF.set_ClientMessageCounter(hDMLLEEKKLF.GetClientMessageCounter() % ulong.MaxValue);
+			Connection hubConnection = ((IHub)this).HubConnection;
+			hubConnection.set_ClientMessageCounter(hubConnection.GetClientMessageCounter() % ulong.MaxValue);
 			Connection hDMLLEEKKLF2 = ((IHub)this).HubConnection;
-			ulong kKAADAAPLDC;
-			hDMLLEEKKLF2.set_ClientMessageCounter((kKAADAAPLDC = hDMLLEEKKLF2.GetClientMessageCounter()) + 1);
-			((IHub)this).Call(new ClientMessage(this, FJLOLCPJACB, LKIOKGCNKHE, kKAADAAPLDC, KGLHKHHFNOO, PLEIBDIHIFO, LFAIENNBBMK));
+			ulong callIndex;
+			hDMLLEEKKLF2.set_ClientMessageCounter((callIndex = hDMLLEEKKLF2.GetClientMessageCounter()) + 1);
+			((IHub)this).Call(new ClientMessage(this, method, args, callIndex, onResult, onFailed, onProgress));
 		}
 	}
 
-	void IHub.Call(ClientMessage CKEHOEGLMBM)
+	void IHub.Call(ClientMessage message)
 	{
 		lock (((IHub)this).HubConnection.SyncRoot)
 		{
-			sentMessages.Add(CKEHOEGLMBM.CallIdx, CKEHOEGLMBM);
-			((IHub)this).HubConnection.SendJson(BuildMessage(CKEHOEGLMBM));
+			sentMessages.Add(message.CallIdx, message);
+			((IHub)this).HubConnection.SendJson(BuildMessage(message));
 		}
 	}
 
-	bool IHub.HasSentMessageId(ulong OKNNNLIPODI)
+	bool IHub.HasSentMessageId(ulong messageId)
 	{
-		return sentMessages.ContainsKey(OKNNNLIPODI);
+		return sentMessages.ContainsKey(messageId);
 	}
 
 	void IHub.Close()
@@ -202,26 +202,26 @@ public class Hub : IHub
 		sentMessages.Clear();
 	}
 
-	void IHub.OnMethod(MethodCallMessage CKEHOEGLMBM)
+	void IHub.OnMethod(MethodCallMessage message)
 	{
-		MergeState(CKEHOEGLMBM.GetState());
+		MergeState(message.GetState());
 		if (OnMethodCall != null)
 		{
 			try
 			{
-				OnMethodCall(this, CKEHOEGLMBM.GetMethod(), CKEHOEGLMBM.GetArguments());
+				OnMethodCall(this, message.GetMethod(), message.GetArguments());
 			}
-			catch (Exception mPFFFAOGBJE)
+			catch (Exception ex)
 			{
-				HTTPManager.GetLogger().Exception("Hub - " + get_Name(), "IHub.OnMethod - OnMethodCall", mPFFFAOGBJE);
+				HTTPManager.GetLogger().Exception("Hub - " + get_Name(), "IHub.OnMethod - OnMethodCall", ex);
 			}
 		}
 		OnMethodCallCallbackDelegate value;
-		if (methodTable.TryGetValue(CKEHOEGLMBM.GetMethod(), out value) && value != null)
+		if (methodTable.TryGetValue(message.GetMethod(), out value) && value != null)
 		{
 			try
 			{
-				value(this, CKEHOEGLMBM);
+				value(this, message);
 				return;
 			}
 			catch (Exception mPFFFAOGBJE2)
@@ -230,38 +230,38 @@ public class Hub : IHub
 				return;
 			}
 		}
-		HTTPManager.GetLogger().Information("Hub - " + get_Name(), string.Format("[Client] {0}.{1} (args: {2})", get_Name(), CKEHOEGLMBM.GetMethod(), CKEHOEGLMBM.GetArguments().Length));
+		HTTPManager.GetLogger().Information("Hub - " + get_Name(), string.Format("[Client] {0}.{1} (args: {2})", get_Name(), message.GetMethod(), message.GetArguments().Length));
 	}
 
-	void IHub.OnMessage(IServerMessage CKEHOEGLMBM)
+	void IHub.OnMessage(IServerMessage message)
 	{
-		ulong key = (CKEHOEGLMBM as IHubMessage).GetInvocationId();
+		ulong key = (message as IHubMessage).GetInvocationId();
 		ClientMessage value;
 		if (!sentMessages.TryGetValue(key, out value))
 		{
 			HTTPManager.GetLogger().Warning("Hub - " + get_Name(), "OnMessage - Sent message not found with id: " + key);
 			return;
 		}
-		switch (CKEHOEGLMBM.get_Type())
+		switch (message.get_Type())
 		{
 		case MessageTypes.Result:
 		{
-			ResultMessage mKINDKDMCJO = CKEHOEGLMBM as ResultMessage;
-			MergeState(mKINDKDMCJO.GetState());
+			ResultMessage resultMessage = message as ResultMessage;
+			MergeState(resultMessage.GetState());
 			if (value.ResultCallback != null)
 			{
-				value.ResultCallback(this, value, mKINDKDMCJO);
+				value.ResultCallback(this, value, resultMessage);
 			}
 			sentMessages.Remove(key);
 			break;
 		}
 		case MessageTypes.Failure:
 		{
-			FailureMessage kGPJFMCLKDJ = CKEHOEGLMBM as FailureMessage;
-			MergeState(kGPJFMCLKDJ.GetState());
+			FailureMessage failureMessage = message as FailureMessage;
+			MergeState(failureMessage.GetState());
 			if (value.ResultErrorCallback != null)
 			{
-				value.ResultErrorCallback(this, value, kGPJFMCLKDJ);
+				value.ResultErrorCallback(this, value, failureMessage);
 			}
 			sentMessages.Remove(key);
 			break;
@@ -269,7 +269,7 @@ public class Hub : IHub
 		case MessageTypes.Progress:
 			if (value.ProgressCallback != null)
 			{
-				value.ProgressCallback(this, value, CKEHOEGLMBM as ProgressMessage);
+				value.ProgressCallback(this, value, message as ProgressMessage);
 			}
 			break;
 		}
@@ -287,33 +287,33 @@ public class Hub : IHub
 		}
 	}
 
-	private string BuildMessage(ClientMessage CKEHOEGLMBM)
+	private string BuildMessage(ClientMessage message)
 	{
 		try
 		{
 			builder.Append("{\"H\":\"");
 			builder.Append(get_Name());
 			builder.Append("\",\"M\":\"");
-			builder.Append(CKEHOEGLMBM.Method);
+			builder.Append(message.Method);
 			builder.Append("\",\"A\":");
 			string empty = string.Empty;
-			empty = ((CKEHOEGLMBM.Args == null || CKEHOEGLMBM.Args.Length <= 0) ? "[]" : ((IHub)this).HubConnection.GetJsonEncoder().Encode(CKEHOEGLMBM.Args));
+			empty = ((message.Args == null || message.Args.Length <= 0) ? "[]" : ((IHub)this).HubConnection.GetJsonEncoder().Encode(message.Args));
 			builder.Append(empty);
 			builder.Append(",\"I\":\"");
-			builder.Append(CKEHOEGLMBM.CallIdx.ToString());
+			builder.Append(message.CallIdx.ToString());
 			builder.Append("\"");
-			if (CKEHOEGLMBM.OwnerHub.state != null && CKEHOEGLMBM.OwnerHub.state.Count > 0)
+			if (message.OwnerHub.state != null && message.OwnerHub.state.Count > 0)
 			{
 				builder.Append(",\"S\":");
-				empty = ((IHub)this).HubConnection.GetJsonEncoder().Encode(CKEHOEGLMBM.OwnerHub.state);
+				empty = ((IHub)this).HubConnection.GetJsonEncoder().Encode(message.OwnerHub.state);
 				builder.Append(empty);
 			}
 			builder.Append("}");
 			return builder.ToString();
 		}
-		catch (Exception mPFFFAOGBJE)
+		catch (Exception ex)
 		{
-			HTTPManager.GetLogger().Exception("Hub - " + get_Name(), "Send", mPFFFAOGBJE);
+			HTTPManager.GetLogger().Exception("Hub - " + get_Name(), "Send", ex);
 			return null;
 		}
 		finally

@@ -2,7 +2,7 @@ using System;
 
 internal sealed class DeflateManager
 {
-	internal delegate BlockState CompressFunc(FlushType NGBJDNFAPKC);
+	internal delegate BlockState CompressFunc(FlushType flush);
 
 	internal class Config
 	{
@@ -18,13 +18,13 @@ internal sealed class DeflateManager
 
 		private static readonly Config[] Table;
 
-		private Config(int IAOAPAPPECC, int DEHAFDGLEOP, int AFEAHPCPHHI, int ENOGJBAJMCJ, DeflateFlavor CENOEIJNIAG)
+		private Config(int goodLength, int maxLazy, int niceLength, int maxChainLength, DeflateFlavor flavor)
 		{
-			GoodLength = IAOAPAPPECC;
-			MaxLazy = DEHAFDGLEOP;
-			NiceLength = AFEAHPCPHHI;
-			MaxChainLength = ENOGJBAJMCJ;
-			Flavor = CENOEIJNIAG;
+			GoodLength = goodLength;
+			MaxLazy = maxLazy;
+			NiceLength = niceLength;
+			MaxChainLength = maxChainLength;
+			Flavor = flavor;
 		}
 
 		static Config()
@@ -44,9 +44,9 @@ internal sealed class DeflateManager
 			};
 		}
 
-		public static Config Lookup(ZlibCompressionLevel GNLOCMLBNHF)
+		public static Config Lookup(ZlibCompressionLevel level)
 		{
-			return Table[(int)GNLOCMLBNHF];
+			return Table[(int)level];
 		}
 	}
 
@@ -276,36 +276,36 @@ internal sealed class DeflateManager
 		last_lit = (matches = 0);
 	}
 
-	internal void pqdownheap(short[] EDBPBGAMMDO, int KJBMNAEJIHG)
+	internal void pqdownheap(short[] tree, int k)
 	{
-		int num = heap[KJBMNAEJIHG];
-		for (int num2 = KJBMNAEJIHG << 1; num2 <= heap_len; num2 <<= 1)
+		int num = heap[k];
+		for (int num2 = k << 1; num2 <= heap_len; num2 <<= 1)
 		{
-			if (num2 < heap_len && _IsSmaller(EDBPBGAMMDO, heap[num2 + 1], heap[num2], depth))
+			if (num2 < heap_len && _IsSmaller(tree, heap[num2 + 1], heap[num2], depth))
 			{
 				num2++;
 			}
-			if (_IsSmaller(EDBPBGAMMDO, num, heap[num2], depth))
+			if (_IsSmaller(tree, num, heap[num2], depth))
 			{
 				break;
 			}
-			heap[KJBMNAEJIHG] = heap[num2];
-			KJBMNAEJIHG = num2;
+			heap[k] = heap[num2];
+			k = num2;
 		}
-		heap[KJBMNAEJIHG] = num;
+		heap[k] = num;
 	}
 
-	internal static bool _IsSmaller(short[] EDBPBGAMMDO, int HDKKKCDKFEE, int OFBGCEPCNOL, sbyte[] depth)
+	internal static bool _IsSmaller(short[] tree, int HDKKKCDKFEE, int m, sbyte[] depth)
 	{
-		short num = EDBPBGAMMDO[HDKKKCDKFEE * 2];
-		short num2 = EDBPBGAMMDO[OFBGCEPCNOL * 2];
-		return num < num2 || (num == num2 && depth[HDKKKCDKFEE] <= depth[OFBGCEPCNOL]);
+		short num = tree[HDKKKCDKFEE * 2];
+		short num2 = tree[m * 2];
+		return num < num2 || (num == num2 && depth[HDKKKCDKFEE] <= depth[m]);
 	}
 
-	internal void scan_tree(short[] EDBPBGAMMDO, int max_code)
+	internal void scan_tree(short[] tree, int max_code)
 	{
 		int num = -1;
-		int num2 = EDBPBGAMMDO[1];
+		int num2 = tree[1];
 		int num3 = 0;
 		int num4 = 7;
 		int num5 = 4;
@@ -314,11 +314,11 @@ internal sealed class DeflateManager
 			num4 = 138;
 			num5 = 3;
 		}
-		EDBPBGAMMDO[(max_code + 1) * 2 + 1] = short.MaxValue;
+		tree[(max_code + 1) * 2 + 1] = short.MaxValue;
 		for (int i = 0; i <= max_code; i++)
 		{
 			int num6 = num2;
-			num2 = EDBPBGAMMDO[(i + 1) * 2 + 1];
+			num2 = tree[(i + 1) * 2 + 1];
 			if (++num3 < num4 && num6 == num2)
 			{
 				continue;
@@ -377,23 +377,23 @@ internal sealed class DeflateManager
 		return num;
 	}
 
-	internal void send_all_trees(int EHFOCDNBFHI, int GNCJDCINAFE, int LPLODDOBOJK)
+	internal void send_all_trees(int lCodes, int dCodes, int blCodes)
 	{
-		send_bits(EHFOCDNBFHI - 257, 5);
-		send_bits(GNCJDCINAFE - 1, 5);
-		send_bits(LPLODDOBOJK - 4, 4);
-		for (int i = 0; i < LPLODDOBOJK; i++)
+		send_bits(lCodes - 257, 5);
+		send_bits(dCodes - 1, 5);
+		send_bits(blCodes - 4, 4);
+		for (int i = 0; i < blCodes; i++)
 		{
 			send_bits(bl_tree[ZTree.BlOrder[i] * 2 + 1], 3);
 		}
-		send_tree(dyn_ltree, EHFOCDNBFHI - 1);
-		send_tree(dyn_dtree, GNCJDCINAFE - 1);
+		send_tree(dyn_ltree, lCodes - 1);
+		send_tree(dyn_dtree, dCodes - 1);
 	}
 
-	internal void send_tree(short[] EDBPBGAMMDO, int max_code)
+	internal void send_tree(short[] tree, int max_code)
 	{
 		int num = -1;
-		int num2 = EDBPBGAMMDO[1];
+		int num2 = tree[1];
 		int num3 = 0;
 		int num4 = 7;
 		int num5 = 4;
@@ -405,7 +405,7 @@ internal sealed class DeflateManager
 		for (int i = 0; i <= max_code; i++)
 		{
 			int num6 = num2;
-			num2 = EDBPBGAMMDO[(i + 1) * 2 + 1];
+			num2 = tree[(i + 1) * 2 + 1];
 			if (++num3 < num4 && num6 == num2)
 			{
 				continue;
@@ -458,32 +458,32 @@ internal sealed class DeflateManager
 		}
 	}
 
-	private void put_bytes(byte[] PIIEECCHMAC, int ILENLCMAMBH, int JCAJDBOMGOM)
+	private void put_bytes(byte[] buffer, int offset, int length)
 	{
-		Array.Copy(PIIEECCHMAC, ILENLCMAMBH, pending, pendingCount, JCAJDBOMGOM);
-		pendingCount += JCAJDBOMGOM;
+		Array.Copy(buffer, offset, pending, pendingCount, length);
+		pendingCount += length;
 	}
 
-	internal void send_code(int ILHDJDNPFKH, short[] EDBPBGAMMDO)
+	internal void send_code(int ILHDJDNPFKH, short[] tree)
 	{
 		int num = ILHDJDNPFKH * 2;
-		send_bits(EDBPBGAMMDO[num] & 0xFFFF, EDBPBGAMMDO[num + 1] & 0xFFFF);
+		send_bits(tree[num] & 0xFFFF, tree[num + 1] & 0xFFFF);
 	}
 
-	internal void send_bits(int value, int BDBOAEGELMC)
+	internal void send_bits(int value, int length)
 	{
-		if (bi_valid > Buf_size - BDBOAEGELMC)
+		if (bi_valid > Buf_size - length)
 		{
 			bi_buf |= (short)((value << bi_valid) & 0xFFFF);
 			pending[pendingCount++] = (byte)bi_buf;
 			pending[pendingCount++] = (byte)(bi_buf >> 8);
 			bi_buf = (short)((uint)value >> Buf_size - bi_valid);
-			bi_valid += BDBOAEGELMC - Buf_size;
+			bi_valid += length - Buf_size;
 		}
 		else
 		{
 			bi_buf |= (short)((value << bi_valid) & 0xFFFF);
-			bi_valid += BDBOAEGELMC;
+			bi_valid += length;
 		}
 	}
 
@@ -501,22 +501,22 @@ internal sealed class DeflateManager
 		last_eob_len = 7;
 	}
 
-	internal bool _tr_tally(int CGIBMHPALCO, int LMHBHHENKHG)
+	internal bool _tr_tally(int dist, int lc)
 	{
-		pending[_distanceOffset + last_lit * 2] = (byte)((uint)CGIBMHPALCO >> 8);
-		pending[_distanceOffset + last_lit * 2 + 1] = (byte)CGIBMHPALCO;
-		pending[_lengthOffset + last_lit] = (byte)LMHBHHENKHG;
+		pending[_distanceOffset + last_lit * 2] = (byte)((uint)dist >> 8);
+		pending[_distanceOffset + last_lit * 2 + 1] = (byte)dist;
+		pending[_lengthOffset + last_lit] = (byte)lc;
 		last_lit++;
-		if (CGIBMHPALCO == 0)
+		if (dist == 0)
 		{
-			dyn_ltree[LMHBHHENKHG * 2]++;
+			dyn_ltree[lc * 2]++;
 		}
 		else
 		{
 			matches++;
-			CGIBMHPALCO--;
-			dyn_ltree[(ZTree.LengthCode[LMHBHHENKHG] + InternalConstants.LITERALS + 1) * 2]++;
-			dyn_dtree[ZTree.DistanceCode(CGIBMHPALCO) * 2]++;
+			dist--;
+			dyn_ltree[(ZTree.LengthCode[lc] + InternalConstants.LITERALS + 1) * 2]++;
+			dyn_dtree[ZTree.DistanceCode(dist) * 2]++;
 		}
 		if ((last_lit & 0x1FFF) == 0 && compressionLevel > ZlibCompressionLevel.Level2)
 		{
@@ -535,7 +535,7 @@ internal sealed class DeflateManager
 		return last_lit == lit_bufsize - 1 || last_lit == lit_bufsize;
 	}
 
-	internal void send_compressed_block(short[] JKLBBEFFMID, short[] JDFLHKFAEOD)
+	internal void send_compressed_block(short[] ltree, short[] dtree)
 	{
 		int num = 0;
 		if (last_lit != 0)
@@ -548,11 +548,11 @@ internal sealed class DeflateManager
 				num++;
 				if (num3 == 0)
 				{
-					send_code(num4, JKLBBEFFMID);
+					send_code(num4, ltree);
 					continue;
 				}
 				int num5 = ZTree.LengthCode[num4];
-				send_code(num5 + InternalConstants.LITERALS + 1, JKLBBEFFMID);
+				send_code(num5 + InternalConstants.LITERALS + 1, ltree);
 				int num6 = ZTree.ExtraLengthBits[num5];
 				if (num6 != 0)
 				{
@@ -561,7 +561,7 @@ internal sealed class DeflateManager
 				}
 				num3--;
 				num5 = ZTree.DistanceCode(num3);
-				send_code(num5, JDFLHKFAEOD);
+				send_code(num5, dtree);
 				num6 = ZTree.ExtraDistanceBits[num5];
 				if (num6 != 0)
 				{
@@ -571,8 +571,8 @@ internal sealed class DeflateManager
 			}
 			while (num < last_lit);
 		}
-		send_code(END_BLOCK, JKLBBEFFMID);
-		last_eob_len = JKLBBEFFMID[END_BLOCK * 2 + 1];
+		send_code(END_BLOCK, ltree);
+		last_eob_len = ltree[END_BLOCK * 2 + 1];
 	}
 
 	internal void set_data_type()
@@ -627,28 +627,28 @@ internal sealed class DeflateManager
 		bi_valid = 0;
 	}
 
-	internal void copy_block(int HLDLIFPJMOA, int JCAJDBOMGOM, bool HHAAFADDOJB)
+	internal void copy_block(int start, int length, bool header)
 	{
 		bi_windup();
 		last_eob_len = 8;
-		if (HHAAFADDOJB)
+		if (header)
 		{
-			pending[pendingCount++] = (byte)JCAJDBOMGOM;
-			pending[pendingCount++] = (byte)(JCAJDBOMGOM >> 8);
-			pending[pendingCount++] = (byte)(~JCAJDBOMGOM);
-			pending[pendingCount++] = (byte)(~JCAJDBOMGOM >> 8);
+			pending[pendingCount++] = (byte)length;
+			pending[pendingCount++] = (byte)(length >> 8);
+			pending[pendingCount++] = (byte)(~length);
+			pending[pendingCount++] = (byte)(~length >> 8);
 		}
-		put_bytes(window, HLDLIFPJMOA, JCAJDBOMGOM);
+		put_bytes(window, start, length);
 	}
 
-	internal void flush_block_only(bool MMCDBIAEFHO)
+	internal void flush_block_only(bool last)
 	{
-		_tr_flush_block((block_start < 0) ? (-1) : block_start, strstart - block_start, MMCDBIAEFHO);
+		_tr_flush_block((block_start < 0) ? (-1) : block_start, strstart - block_start, last);
 		block_start = strstart;
 		_codec.FlushPending();
 	}
 
-	internal BlockState DeflateNone(FlushType NGBJDNFAPKC)
+	internal BlockState DeflateNone(FlushType flush)
 	{
 		int num = 65535;
 		if (num > pending.Length - 5)
@@ -660,7 +660,7 @@ internal sealed class DeflateManager
 			if (lookahead <= 1)
 			{
 				_fillWindow();
-				if (lookahead == 0 && NGBJDNFAPKC == FlushType.None)
+				if (lookahead == 0 && flush == FlushType.None)
 				{
 					return BlockState.NeedMore;
 				}
@@ -691,21 +691,21 @@ internal sealed class DeflateManager
 				}
 			}
 		}
-		flush_block_only(NGBJDNFAPKC == FlushType.Finish);
+		flush_block_only(flush == FlushType.Finish);
 		if (_codec.AvailableBytesOut == 0)
 		{
-			return (NGBJDNFAPKC == FlushType.Finish) ? BlockState.FinishStarted : BlockState.NeedMore;
+			return (flush == FlushType.Finish) ? BlockState.FinishStarted : BlockState.NeedMore;
 		}
-		return (NGBJDNFAPKC != FlushType.Finish) ? BlockState.BlockDone : BlockState.FinishDone;
+		return (flush != FlushType.Finish) ? BlockState.BlockDone : BlockState.FinishDone;
 	}
 
-	internal void _tr_stored_block(int HLDLIFPJMOA, int PNFGGDAMONJ, bool MMCDBIAEFHO)
+	internal void _tr_stored_block(int buf, int storedLen, bool last)
 	{
-		send_bits((STORED_BLOCK << 1) + (MMCDBIAEFHO ? 1 : 0), 3);
-		copy_block(HLDLIFPJMOA, PNFGGDAMONJ, true);
+		send_bits((STORED_BLOCK << 1) + (last ? 1 : 0), 3);
+		copy_block(buf, storedLen, true);
 	}
 
-	internal void _tr_flush_block(int HLDLIFPJMOA, int PNFGGDAMONJ, bool MMCDBIAEFHO)
+	internal void _tr_flush_block(int buf, int storedLen, bool last)
 	{
 		int num = 0;
 		int num2;
@@ -728,25 +728,25 @@ internal sealed class DeflateManager
 		}
 		else
 		{
-			num2 = (num3 = PNFGGDAMONJ + 5);
+			num2 = (num3 = storedLen + 5);
 		}
-		if (PNFGGDAMONJ + 4 <= num2 && HLDLIFPJMOA != -1)
+		if (storedLen + 4 <= num2 && buf != -1)
 		{
-			_tr_stored_block(HLDLIFPJMOA, PNFGGDAMONJ, MMCDBIAEFHO);
+			_tr_stored_block(buf, storedLen, last);
 		}
 		else if (num3 == num2)
 		{
-			send_bits((STATIC_TREES << 1) + (MMCDBIAEFHO ? 1 : 0), 3);
+			send_bits((STATIC_TREES << 1) + (last ? 1 : 0), 3);
 			send_compressed_block(StaticTree.lengthAndLiteralsTreeCodes, StaticTree.distTreeCodes);
 		}
 		else
 		{
-			send_bits((DYN_TREES << 1) + (MMCDBIAEFHO ? 1 : 0), 3);
+			send_bits((DYN_TREES << 1) + (last ? 1 : 0), 3);
 			send_all_trees(treeLiterals.max_code + 1, treeDistances.max_code + 1, num + 1);
 			send_compressed_block(dyn_ltree, dyn_dtree);
 		}
 		_InitializeBlocks();
-		if (MMCDBIAEFHO)
+		if (last)
 		{
 			bi_windup();
 		}
@@ -805,7 +805,7 @@ internal sealed class DeflateManager
 		while (lookahead < MIN_LOOKAHEAD && _codec.AvailableBytesIn != 0);
 	}
 
-	internal BlockState DeflateFast(FlushType NGBJDNFAPKC)
+	internal BlockState DeflateFast(FlushType flush)
 	{
 		int num = 0;
 		while (true)
@@ -813,7 +813,7 @@ internal sealed class DeflateManager
 			if (lookahead < MIN_LOOKAHEAD)
 			{
 				_fillWindow();
-				if (lookahead < MIN_LOOKAHEAD && NGBJDNFAPKC == FlushType.None)
+				if (lookahead < MIN_LOOKAHEAD && flush == FlushType.None)
 				{
 					return BlockState.NeedMore;
 				}
@@ -875,19 +875,19 @@ internal sealed class DeflateManager
 				}
 			}
 		}
-		flush_block_only(NGBJDNFAPKC == FlushType.Finish);
+		flush_block_only(flush == FlushType.Finish);
 		if (_codec.AvailableBytesOut == 0)
 		{
-			if (NGBJDNFAPKC == FlushType.Finish)
+			if (flush == FlushType.Finish)
 			{
 				return BlockState.FinishStarted;
 			}
 			return BlockState.NeedMore;
 		}
-		return (NGBJDNFAPKC != FlushType.Finish) ? BlockState.BlockDone : BlockState.FinishDone;
+		return (flush != FlushType.Finish) ? BlockState.BlockDone : BlockState.FinishDone;
 	}
 
-	internal BlockState DeflateSlow(FlushType NGBJDNFAPKC)
+	internal BlockState DeflateSlow(FlushType flush)
 	{
 		int num = 0;
 		while (true)
@@ -895,7 +895,7 @@ internal sealed class DeflateManager
 			if (lookahead < MIN_LOOKAHEAD)
 			{
 				_fillWindow();
-				if (lookahead < MIN_LOOKAHEAD && NGBJDNFAPKC == FlushType.None)
+				if (lookahead < MIN_LOOKAHEAD && flush == FlushType.None)
 				{
 					return BlockState.NeedMore;
 				}
@@ -979,26 +979,26 @@ internal sealed class DeflateManager
 			bool flag = _tr_tally(0, window[strstart - 1] & 0xFF);
 			match_available = 0;
 		}
-		flush_block_only(NGBJDNFAPKC == FlushType.Finish);
+		flush_block_only(flush == FlushType.Finish);
 		if (_codec.AvailableBytesOut == 0)
 		{
-			if (NGBJDNFAPKC == FlushType.Finish)
+			if (flush == FlushType.Finish)
 			{
 				return BlockState.FinishStarted;
 			}
 			return BlockState.NeedMore;
 		}
-		return (NGBJDNFAPKC != FlushType.Finish) ? BlockState.BlockDone : BlockState.FinishDone;
+		return (flush != FlushType.Finish) ? BlockState.BlockDone : BlockState.FinishDone;
 	}
 
-	internal int longest_match(int FGDAGFCDECP)
+	internal int longest_match(int curMatch)
 	{
 		int num = config.MaxChainLength;
 		int num2 = strstart;
 		int num3 = prev_length;
 		int num4 = ((strstart > w_size - MIN_LOOKAHEAD) ? (strstart - (w_size - MIN_LOOKAHEAD)) : 0);
 		int num5 = config.NiceLength;
-		int bHAHBAHNDHM = w_mask;
+		int wmask = w_mask;
 		int num6 = strstart + MAX_MATCH;
 		byte b = window[num2 + num3 - 1];
 		byte b2 = window[num2 + num3];
@@ -1012,7 +1012,7 @@ internal sealed class DeflateManager
 		}
 		do
 		{
-			int num7 = FGDAGFCDECP;
+			int num7 = curMatch;
 			if (window[num7 + num3] != b2 || window[num7 + num3 - 1] != b || window[num7] != window[num2] || window[++num7] != window[num2 + 1])
 			{
 				continue;
@@ -1026,7 +1026,7 @@ internal sealed class DeflateManager
 			num2 = num6 - MAX_MATCH;
 			if (num8 > num3)
 			{
-				match_start = FGDAGFCDECP;
+				match_start = curMatch;
 				num3 = num8;
 				if (num8 >= num5)
 				{
@@ -1036,7 +1036,7 @@ internal sealed class DeflateManager
 				b2 = window[num2 + num3];
 			}
 		}
-		while ((FGDAGFCDECP = prev[FGDAGFCDECP & bHAHBAHNDHM] & 0xFFFF) > num4 && --num != 0);
+		while ((curMatch = prev[curMatch & wmask] & 0xFFFF) > num4 && --num != 0);
 		if (num3 <= lookahead)
 		{
 			return num3;
@@ -1054,50 +1054,50 @@ internal sealed class DeflateManager
 		_WantRfc1950HeaderBytes = value;
 	}
 
-	internal int Initialize(ZlibCodec HNJFOALABOA, ZlibCompressionLevel GNLOCMLBNHF)
+	internal int Initialize(ZlibCodec codec, ZlibCompressionLevel level)
 	{
-		return Initialize(HNJFOALABOA, GNLOCMLBNHF, 15);
+		return Initialize(codec, level, 15);
 	}
 
-	internal int Initialize(ZlibCodec HNJFOALABOA, ZlibCompressionLevel GNLOCMLBNHF, int HLFOKLCKNEE)
+	internal int Initialize(ZlibCodec codec, ZlibCompressionLevel level, int windowBits)
 	{
-		return Initialize(HNJFOALABOA, GNLOCMLBNHF, HLFOKLCKNEE, MEM_LEVEL_DEFAULT, CompressionStrategy.Default);
+		return Initialize(codec, level, windowBits, MEM_LEVEL_DEFAULT, CompressionStrategy.Default);
 	}
 
-	internal int Initialize(ZlibCodec HNJFOALABOA, ZlibCompressionLevel GNLOCMLBNHF, int HLFOKLCKNEE, CompressionStrategy IDOIMLPCFNP)
+	internal int Initialize(ZlibCodec codec, ZlibCompressionLevel level, int windowBits, CompressionStrategy strategy)
 	{
-		return Initialize(HNJFOALABOA, GNLOCMLBNHF, HLFOKLCKNEE, MEM_LEVEL_DEFAULT, IDOIMLPCFNP);
+		return Initialize(codec, level, windowBits, MEM_LEVEL_DEFAULT, strategy);
 	}
 
-	internal int Initialize(ZlibCodec HNJFOALABOA, ZlibCompressionLevel GNLOCMLBNHF, int KGFELFAKFIA, int GLEJJCGAOMO, CompressionStrategy FNLGJNHJCPL)
+	internal int Initialize(ZlibCodec codec, ZlibCompressionLevel level, int windowBits, int memLevel, CompressionStrategy strategy)
 	{
-		_codec = HNJFOALABOA;
+		_codec = codec;
 		_codec.Message = null;
-		if (KGFELFAKFIA < 9 || KGFELFAKFIA > 15)
+		if (windowBits < 9 || windowBits > 15)
 		{
 			throw new ZlibException("windowBits must be in the range 9..15.");
 		}
-		if (GLEJJCGAOMO < 1 || GLEJJCGAOMO > MEM_LEVEL_MAX)
+		if (memLevel < 1 || memLevel > MEM_LEVEL_MAX)
 		{
 			throw new ZlibException(string.Format("memLevel must be in the range 1.. {0}", MEM_LEVEL_MAX));
 		}
 		_codec.DeflateState = this;
-		w_bits = KGFELFAKFIA;
+		w_bits = windowBits;
 		w_size = 1 << w_bits;
 		w_mask = w_size - 1;
-		hash_bits = GLEJJCGAOMO + 7;
+		hash_bits = memLevel + 7;
 		hash_size = 1 << hash_bits;
 		hash_mask = hash_size - 1;
 		hash_shift = (hash_bits + MIN_MATCH - 1) / MIN_MATCH;
 		window = new byte[w_size * 2];
 		prev = new short[w_size];
 		head = new short[hash_size];
-		lit_bufsize = 1 << GLEJJCGAOMO + 6;
+		lit_bufsize = 1 << memLevel + 6;
 		pending = new byte[lit_bufsize * 4];
 		_distanceOffset = lit_bufsize;
 		_lengthOffset = 3 * lit_bufsize;
-		compressionLevel = GNLOCMLBNHF;
-		compressionStrategy = FNLGJNHJCPL;
+		compressionLevel = level;
+		compressionStrategy = strategy;
 		Reset();
 		return 0;
 	}
@@ -1145,21 +1145,21 @@ internal sealed class DeflateManager
 		}
 	}
 
-	internal int SetParams(ZlibCompressionLevel GNLOCMLBNHF, CompressionStrategy FNLGJNHJCPL)
+	internal int SetParams(ZlibCompressionLevel level, CompressionStrategy strategy)
 	{
 		int result = 0;
-		if (compressionLevel != GNLOCMLBNHF)
+		if (compressionLevel != level)
 		{
-			Config cLOGLEGLGGF = Config.Lookup(GNLOCMLBNHF);
-			if (cLOGLEGLGGF.Flavor != config.Flavor && _codec.TotalBytesIn != 0)
+			Config newConfig = Config.Lookup(level);
+			if (newConfig.Flavor != config.Flavor && _codec.TotalBytesIn != 0)
 			{
 				result = _codec.Deflate(FlushType.Partial);
 			}
-			compressionLevel = GNLOCMLBNHF;
-			config = cLOGLEGLGGF;
+			compressionLevel = level;
+			config = newConfig;
 			SetDeflater();
 		}
-		compressionStrategy = FNLGJNHJCPL;
+		compressionStrategy = strategy;
 		return result;
 	}
 
@@ -1195,9 +1195,9 @@ internal sealed class DeflateManager
 		return 0;
 	}
 
-	internal int Deflate(FlushType NGBJDNFAPKC)
+	internal int Deflate(FlushType flush)
 	{
-		if (_codec.OutputBuffer == null || (_codec.InputBuffer == null && _codec.AvailableBytesIn != 0) || (status == FINISH_STATE && NGBJDNFAPKC != FlushType.Finish))
+		if (_codec.OutputBuffer == null || (_codec.InputBuffer == null && _codec.AvailableBytesIn != 0) || (status == FINISH_STATE && flush != FlushType.Finish))
 		{
 			_codec.Message = _ErrorMessage[4];
 			throw new ZlibException(string.Format("Something is fishy. [{0}]", _codec.Message));
@@ -1207,8 +1207,8 @@ internal sealed class DeflateManager
 			_codec.Message = _ErrorMessage[7];
 			throw new ZlibException("OutputBuffer is full (AvailableBytesOut == 0)");
 		}
-		int kNACOPCPMJK = last_flush;
-		last_flush = (int)NGBJDNFAPKC;
+		int oldFlush = last_flush;
+		last_flush = (int)flush;
 		if (status == INIT_STATE)
 		{
 			int num = Z_DEFLATED + (w_bits - 8 << 4) << 8;
@@ -1244,7 +1244,7 @@ internal sealed class DeflateManager
 				return 0;
 			}
 		}
-		else if (_codec.AvailableBytesIn == 0 && (int)NGBJDNFAPKC <= kNACOPCPMJK && NGBJDNFAPKC != FlushType.Finish)
+		else if (_codec.AvailableBytesIn == 0 && (int)flush <= oldFlush && flush != FlushType.Finish)
 		{
 			return 0;
 		}
@@ -1253,14 +1253,14 @@ internal sealed class DeflateManager
 			_codec.Message = _ErrorMessage[7];
 			throw new ZlibException("status == FINISH_STATE && _codec.AvailableBytesIn != 0");
 		}
-		if (_codec.AvailableBytesIn != 0 || lookahead != 0 || (NGBJDNFAPKC != FlushType.None && status != FINISH_STATE))
+		if (_codec.AvailableBytesIn != 0 || lookahead != 0 || (flush != FlushType.None && status != FINISH_STATE))
 		{
-			BlockState hHLELELECLA = DeflateFunction(NGBJDNFAPKC);
-			if (hHLELELECLA == BlockState.FinishStarted || hHLELELECLA == BlockState.FinishDone)
+			BlockState bstate = DeflateFunction(flush);
+			if (bstate == BlockState.FinishStarted || bstate == BlockState.FinishDone)
 			{
 				status = FINISH_STATE;
 			}
-			switch (hHLELELECLA)
+			switch (bstate)
 			{
 			case BlockState.NeedMore:
 			case BlockState.FinishStarted:
@@ -1270,14 +1270,14 @@ internal sealed class DeflateManager
 				}
 				return 0;
 			case BlockState.BlockDone:
-				if (NGBJDNFAPKC == FlushType.Partial)
+				if (flush == FlushType.Partial)
 				{
 					_tr_align();
 				}
 				else
 				{
 					_tr_stored_block(0, 0, false);
-					if (NGBJDNFAPKC == FlushType.Full)
+					if (flush == FlushType.Full)
 					{
 						for (int i = 0; i < hash_size; i++)
 						{
@@ -1294,7 +1294,7 @@ internal sealed class DeflateManager
 				break;
 			}
 		}
-		if (NGBJDNFAPKC != FlushType.Finish)
+		if (flush != FlushType.Finish)
 		{
 			return 0;
 		}

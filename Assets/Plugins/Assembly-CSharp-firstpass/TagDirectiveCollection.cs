@@ -8,9 +8,9 @@ public class TagDirectiveCollection : KeyedCollection<string, TagDirective>
 	{
 	}
 
-	public TagDirectiveCollection(IEnumerable<TagDirective> FMCEHNBELJF)
+	public TagDirectiveCollection(IEnumerable<TagDirective> tagDirectives)
 	{
-		foreach (TagDirective item in FMCEHNBELJF)
+		foreach (TagDirective item in tagDirectives)
 		{
 			Add(item);
 		}
@@ -21,8 +21,8 @@ public class TagDirectiveCollection : KeyedCollection<string, TagDirective>
 		return item.Handle;
 	}
 
-	public bool Contains(TagDirective HNNCILOPICK)
+	public bool Contains(TagDirective directive)
 	{
-		return Contains(GetKeyForItem(HNNCILOPICK));
+		return Contains(GetKeyForItem(directive));
 	}
 }

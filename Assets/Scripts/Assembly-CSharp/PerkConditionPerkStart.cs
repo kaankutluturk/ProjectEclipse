@@ -6,21 +6,21 @@ public class PerkConditionPerkStart : PerkCondition
 
 	private bool IsPlayer;
 
-	public PerkConditionPerkStart(string OCIEELPKJKL, bool EKBOGDKIHIH)
+	public PerkConditionPerkStart(string perkName, bool isPlayer)
 	{
 		set_Type(PerkConditionType.CONDITION_PERK_START);
-		ParentPerkName = OCIEELPKJKL;
-		IsPlayer = EKBOGDKIHIH;
+		ParentPerkName = perkName;
+		IsPlayer = isPlayer;
 	}
 
-	public override bool IsEqual(Model ACENLMONNPA, List<string> NIKHAICFGNM)
+	public override bool IsEqual(Model model, List<string> args)
 	{
 		if (!GetPerk().GetOwnerModel().IsPlayerModel())
 		{
 			return true;
 		}
-		RaidModelParameters kAOPLEPILDH = GetPerk().GetOwnerModel().Parameters as RaidModelParameters;
-		if (kAOPLEPILDH == null)
+		RaidModelParameters raidParameters = GetPerk().GetOwnerModel().Parameters as RaidModelParameters;
+		if (raidParameters == null)
 		{
 			return true;
 		}

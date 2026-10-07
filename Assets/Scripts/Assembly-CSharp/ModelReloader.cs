@@ -3,24 +3,24 @@ using System.Xml;
 
 public static class ModelReloader
 {
-	public static void Reload(ModelObject ACENLMONNPA, List<string> CBHAEPCLDFG)
+	public static void Reload(ModelObject modelObject, List<string> fileNames)
 	{
-		if (CBHAEPCLDFG.Count > 0)
+		if (fileNames.Count > 0)
 		{
-			List<XmlNode> iLCCDINCICK = new List<XmlNode>();
-			if (Concat(ACENLMONNPA, iLCCDINCICK, CBHAEPCLDFG))
+			List<XmlNode> nodeSections = new List<XmlNode>();
+			if (Concat(modelObject, nodeSections, fileNames))
 			{
-				Parse(ACENLMONNPA, iLCCDINCICK);
+				Parse(modelObject, nodeSections);
 			}
 		}
 	}
 
-	private static bool Concat(ModelObject GIAMLEDNFJD, List<XmlNode> nodes, List<string> CBHAEPCLDFG)
+	private static bool Concat(ModelObject modelObject, List<XmlNode> nodes, List<string> fileNames)
 	{
 		int i = 0;
-		for (int count = CBHAEPCLDFG.Count; i < count; i++)
+		for (int count = fileNames.Count; i < count; i++)
 		{
-			XmlDocument xmlDocument = ModelLoader.DocumentCache.GetDocument(SF2Paths.GetModelsPath(), CBHAEPCLDFG[i]);
+			XmlDocument xmlDocument = ModelLoader.DocumentCache.GetDocument(SF2Paths.GetModelsPath(), fileNames[i]);
 			XmlNode xmlNode = ((xmlDocument == null) ? null : xmlDocument["Scene"]);
 			XmlNode xmlNode2 = ((xmlNode == null) ? null : xmlNode["Nodes"]);
 			if (xmlNode2 == null)
@@ -35,51 +35,51 @@ public static class ModelReloader
 		return nodes.Count > 0;
 	}
 
-	private static void Parse(ModelObject ACENLMONNPA, List<XmlNode> nodes)
+	private static void Parse(ModelObject modelObject, List<XmlNode> nodes)
 	{
-		if (!ReloadNodes(ACENLMONNPA, nodes))
+		if (!ReloadNodes(modelObject, nodes))
 		{
 			GameLog.Error("Nodes was not parsed");
 		}
 	}
 
-	private static bool ReloadNodes(ModelObject ACENLMONNPA, List<XmlNode> BMGDKMNOLLL)
+	private static bool ReloadNodes(ModelObject modelObject, List<XmlNode> nodeSections)
 	{
-		for (int i = 0; i < BMGDKMNOLLL.Count; i++)
+		for (int i = 0; i < nodeSections.Count; i++)
 		{
-			foreach (XmlNode childNode in BMGDKMNOLLL[i].ChildNodes)
+			foreach (XmlNode childNode in nodeSections[i].ChildNodes)
 			{
-				ModelNode modelNode = ACENLMONNPA.GetNodeByName(childNode.Name);
+				ModelNode modelNode = modelObject.GetNodeByName(childNode.Name);
 				if (modelNode != null)
 				{
-					ReloadNode(ACENLMONNPA, modelNode, childNode);
+					ReloadNode(modelObject, modelNode, childNode);
 				}
 			}
 		}
-		ACENLMONNPA.ResolveMacroNodeWeights();
+		modelObject.ResolveMacroNodeWeights();
 		return true;
 	}
 
-	private static void ReloadNode(ModelObject ACENLMONNPA, ModelNode NPDJNAMFIKD, XmlNode EABJIAHGLEO)
+	private static void ReloadNode(ModelObject modelObject, ModelNode modelNode, XmlNode xmlNode)
 	{
-		if (NPDJNAMFIKD.GetName() != EABJIAHGLEO.Name)
+		if (modelNode.GetName() != xmlNode.Name)
 		{
-			GameLog.Error("Model reload: {0} -- {1}", NPDJNAMFIKD.GetName(), EABJIAHGLEO.Name);
+			GameLog.Error("Model reload: {0} -- {1}", modelNode.GetName(), xmlNode.Name);
 		}
-		float lHNJJFDIJKK = EABJIAHGLEO.Attributes["X"].ParseFloat();
-		float fFFHIOALHGM = 0f - EABJIAHGLEO.Attributes["Y"].ParseFloat();
-		float pDCENMEKIAP = EABJIAHGLEO.Attributes["Z"].ParseFloat();
-		Vector3f bAINMLLIKOL = new Vector3f(lHNJJFDIJKK, fFFHIOALHGM, pDCENMEKIAP);
-		string text = EABJIAHGLEO.Attributes["Type"].GetStringOrDefault();
-		NPDJNAMFIKD.SetStart(bAINMLLIKOL);
-		NPDJNAMFIKD.SetEnd(bAINMLLIKOL);
+		float x = xmlNode.Attributes["X"].ParseFloat();
+		float y = 0f - xmlNode.Attributes["Y"].ParseFloat();
+		float z = xmlNode.Attributes["Z"].ParseFloat();
+		Vector3f bAINMLLIKOL = new Vector3f(x, y, z);
+		string text = xmlNode.Attributes["Type"].GetStringOrDefault();
+		modelNode.SetStart(bAINMLLIKOL);
+		modelNode.SetEnd(bAINMLLIKOL);
 		if (text == "Node")
 		{
-			NPDJNAMFIKD.SetCloth(EABJIAHGLEO.Attributes["Cloth"].ParseBool());
-			NPDJNAMFIKD.SetAttenuation(EABJIAHGLEO.Attributes["Attenuation"].ParseFloat());
+			modelNode.SetCloth(xmlNode.Attributes["Cloth"].ParseBool());
+			modelNode.SetAttenuation(xmlNode.Attributes["Attenuation"].ParseFloat());
 		}
-		NPDJNAMFIKD.SetMass(EABJIAHGLEO.Attributes["Mass"].ParseFloat());
-		NPDJNAMFIKD.SetFixed(EABJIAHGLEO.Attributes["Fixed"].ParseBool());
-		NPDJNAMFIKD.SetVisible(EABJIAHGLEO.Attributes["Visible"].ParseBool());
+		modelNode.SetMass(xmlNode.Attributes["Mass"].ParseFloat());
+		modelNode.SetFixed(xmlNode.Attributes["Fixed"].ParseBool());
+		modelNode.SetVisible(xmlNode.Attributes["Visible"].ParseBool());
 	}
 }

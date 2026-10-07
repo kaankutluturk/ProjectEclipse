@@ -9,11 +9,11 @@ public class CurrencyBaseValues
 
 		private List<CharProgLevel> levels;
 
-		public CurrencyBaseValue(XmlNode EBLIGDMALEA)
+		public CurrencyBaseValue(XmlNode node)
 		{
-			currencyName = EBLIGDMALEA.Attributes["Name"].GetStringOrDefault(string.Empty);
+			currencyName = node.Attributes["Name"].GetStringOrDefault(string.Empty);
 			levels = new List<CharProgLevel>();
-			foreach (XmlNode childNode in EBLIGDMALEA.ChildNodes)
+			foreach (XmlNode childNode in node.ChildNodes)
 			{
 				if (childNode.Name == "Level")
 				{
@@ -23,11 +23,11 @@ public class CurrencyBaseValues
 			}
 		}
 
-		public float GetBaseValue(int OMHDLKNHNMJ)
+		public float GetBaseValue(int level)
 		{
 			foreach (CharProgLevel item in levels)
 			{
-				if (OMHDLKNHNMJ >= item.Min && OMHDLKNHNMJ <= item.Max)
+				if (level >= item.Min && level <= item.Max)
 				{
 					return item.value;
 				}
@@ -57,8 +57,8 @@ public class CurrencyBaseValues
 		{
 			if (item.currencyName == currencyName)
 			{
-				int oMHDLKNHNMJ = ListSF.GetRoster().GetLevel();
-				return item.GetBaseValue(oMHDLKNHNMJ);
+				int playerLevel = ListSF.GetRoster().GetLevel();
+				return item.GetBaseValue(playerLevel);
 			}
 		}
 		return 0f;

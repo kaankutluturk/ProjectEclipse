@@ -49,11 +49,11 @@ public class ConditionModExists : ConditionAnimation
 			break;
 		}
 		bool flag = false;
-		PerksStage.ActionPerk oAJGINIDKJD = null;
+		PerksStage.ActionPerk actionPerk = null;
 		for (int i = 0; i < list.Count; i++)
 		{
-			oAJGINIDKJD = list[i];
-			if ((string.IsNullOrEmpty(_perk) || _perk.Equals(oAJGINIDKJD.GetPerkName())) && _Name.Equals(oAJGINIDKJD.GetModName()))
+			actionPerk = list[i];
+			if ((string.IsNullOrEmpty(_perk) || _perk.Equals(actionPerk.GetPerkName())) && _Name.Equals(actionPerk.GetModName()))
 			{
 				flag = true;
 				break;

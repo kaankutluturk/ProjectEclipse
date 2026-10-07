@@ -11,32 +11,32 @@ internal sealed class ObjectAnchorCollection
 	private readonly IDictionary<object, string> anchorsByObject = new Dictionary<object, string>();
 
 	// C# has no syntax for parameterized property 'DLKPBAJDHBO'.
-	public object get_DLKPBAJDHBO(string KOLNNNLOCFE)
+	public object get_DLKPBAJDHBO(string anchor)
 	{
-		return get_Item(KOLNNNLOCFE);
+		return get_Item(anchor);
 	}
 
-	public void Add(string KOLNNNLOCFE, object EGJFDKEKAJL)
+	public void Add(string anchor, object obj)
 	{
-		objectsByAnchor.Add(KOLNNNLOCFE, EGJFDKEKAJL);
-		if (EGJFDKEKAJL != null)
+		objectsByAnchor.Add(anchor, obj);
+		if (obj != null)
 		{
-			anchorsByObject.Add(EGJFDKEKAJL, KOLNNNLOCFE);
+			anchorsByObject.Add(obj, anchor);
 		}
 	}
 
-	public bool TryGetAnchor(object EGJFDKEKAJL, out string KOLNNNLOCFE)
+	public bool TryGetAnchor(object obj, out string anchor)
 	{
-		return anchorsByObject.TryGetValue(EGJFDKEKAJL, out KOLNNNLOCFE);
+		return anchorsByObject.TryGetValue(obj, out anchor);
 	}
 
-	public object get_Item(string KOLNNNLOCFE)
+	public object get_Item(string anchor)
 	{
 		object value;
-		if (objectsByAnchor.TryGetValue(KOLNNNLOCFE, out value))
+		if (objectsByAnchor.TryGetValue(anchor, out value))
 		{
 			return value;
 		}
-		throw new AnchorNotFoundException(string.Format(CultureInfo.InvariantCulture, "The anchor '{0}' does not exists", KOLNNNLOCFE));
+		throw new AnchorNotFoundException(string.Format(CultureInfo.InvariantCulture, "The anchor '{0}' does not exists", anchor));
 	}
 }

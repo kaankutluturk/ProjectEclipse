@@ -32,65 +32,65 @@ public class Json
 
 	private const int BUILDER_CAPACITY = 2000;
 
-	public static object Decode(string EMDHMHOKGFP)
+	public static object Decode(string json)
 	{
-		bool IBFAPIMOMBA = true;
-		return Decode(EMDHMHOKGFP, ref IBFAPIMOMBA);
+		bool success = true;
+		return Decode(json, ref success);
 	}
 
-	public static object Decode(string EMDHMHOKGFP, ref bool IBFAPIMOMBA)
+	public static object Decode(string json, ref bool success)
 	{
-		IBFAPIMOMBA = true;
-		if (EMDHMHOKGFP != null)
+		success = true;
+		if (json != null)
 		{
-			char[] eMDHMHOKGFP = EMDHMHOKGFP.ToCharArray();
+			char[] characters = json.ToCharArray();
 			int index = 0;
-			return ParseValue(eMDHMHOKGFP, ref index, ref IBFAPIMOMBA);
+			return ParseValue(characters, ref index, ref success);
 		}
 		return null;
 	}
 
-	public static string Encode(object EMDHMHOKGFP)
+	public static string Encode(object obj)
 	{
 		StringBuilder stringBuilder = new StringBuilder(2000);
-		return (!SerializeValue(EMDHMHOKGFP, stringBuilder)) ? null : stringBuilder.ToString();
+		return (!SerializeValue(obj, stringBuilder)) ? null : stringBuilder.ToString();
 	}
 
-	protected static Dictionary<string, object> ParseObject(char[] EMDHMHOKGFP, ref int index, ref bool IBFAPIMOMBA)
+	protected static Dictionary<string, object> ParseObject(char[] json, ref int index, ref bool success)
 	{
 		Dictionary<string, object> dictionary = new Dictionary<string, object>();
-		NextToken(EMDHMHOKGFP, ref index);
+		NextToken(json, ref index);
 		bool flag = false;
 		while (!flag)
 		{
-			switch (LookAhead(EMDHMHOKGFP, index))
+			switch (LookAhead(json, index))
 			{
 			case 0:
-				IBFAPIMOMBA = false;
+				success = false;
 				return null;
 			case 6:
-				NextToken(EMDHMHOKGFP, ref index);
+				NextToken(json, ref index);
 				continue;
 			case 2:
-				NextToken(EMDHMHOKGFP, ref index);
+				NextToken(json, ref index);
 				return dictionary;
 			}
-			string key = ParseString(EMDHMHOKGFP, ref index, ref IBFAPIMOMBA);
-			if (!IBFAPIMOMBA)
+			string key = ParseString(json, ref index, ref success);
+			if (!success)
 			{
-				IBFAPIMOMBA = false;
+				success = false;
 				return null;
 			}
-			int num = NextToken(EMDHMHOKGFP, ref index);
+			int num = NextToken(json, ref index);
 			if (num != 5)
 			{
-				IBFAPIMOMBA = false;
+				success = false;
 				return null;
 			}
-			object value = ParseValue(EMDHMHOKGFP, ref index, ref IBFAPIMOMBA);
-			if (!IBFAPIMOMBA)
+			object value = ParseValue(json, ref index, ref success);
+			if (!success)
 			{
-				IBFAPIMOMBA = false;
+				success = false;
 				return null;
 			}
 			dictionary[key] = value;
@@ -98,27 +98,27 @@ public class Json
 		return dictionary;
 	}
 
-	protected static List<object> ParseArray(char[] EMDHMHOKGFP, ref int index, ref bool IBFAPIMOMBA)
+	protected static List<object> ParseArray(char[] json, ref int index, ref bool success)
 	{
 		List<object> list = new List<object>();
-		NextToken(EMDHMHOKGFP, ref index);
+		NextToken(json, ref index);
 		bool flag = false;
 		while (!flag)
 		{
-			switch (LookAhead(EMDHMHOKGFP, index))
+			switch (LookAhead(json, index))
 			{
 			case 0:
-				IBFAPIMOMBA = false;
+				success = false;
 				return null;
 			case 6:
-				NextToken(EMDHMHOKGFP, ref index);
+				NextToken(json, ref index);
 				continue;
 			case 4:
 				break;
 			default:
 			{
-				object item = ParseValue(EMDHMHOKGFP, ref index, ref IBFAPIMOMBA);
-				if (!IBFAPIMOMBA)
+				object item = ParseValue(json, ref index, ref success);
+				if (!success)
 				{
 					return null;
 				}
@@ -126,48 +126,48 @@ public class Json
 				continue;
 			}
 			}
-			NextToken(EMDHMHOKGFP, ref index);
+			NextToken(json, ref index);
 			break;
 		}
 		return list;
 	}
 
-	protected static object ParseValue(char[] EMDHMHOKGFP, ref int index, ref bool IBFAPIMOMBA)
+	protected static object ParseValue(char[] json, ref int index, ref bool success)
 	{
-		switch (LookAhead(EMDHMHOKGFP, index))
+		switch (LookAhead(json, index))
 		{
 		case 7:
-			return ParseString(EMDHMHOKGFP, ref index, ref IBFAPIMOMBA);
+			return ParseString(json, ref index, ref success);
 		case 8:
-			return ParseNumber(EMDHMHOKGFP, ref index, ref IBFAPIMOMBA);
+			return ParseNumber(json, ref index, ref success);
 		case 1:
-			return ParseObject(EMDHMHOKGFP, ref index, ref IBFAPIMOMBA);
+			return ParseObject(json, ref index, ref success);
 		case 3:
-			return ParseArray(EMDHMHOKGFP, ref index, ref IBFAPIMOMBA);
+			return ParseArray(json, ref index, ref success);
 		case 9:
-			NextToken(EMDHMHOKGFP, ref index);
+			NextToken(json, ref index);
 			return true;
 		case 10:
-			NextToken(EMDHMHOKGFP, ref index);
+			NextToken(json, ref index);
 			return false;
 		case 11:
-			NextToken(EMDHMHOKGFP, ref index);
+			NextToken(json, ref index);
 			return null;
 		default:
-			IBFAPIMOMBA = false;
+			success = false;
 			return null;
 		}
 	}
 
-	protected static string ParseString(char[] EMDHMHOKGFP, ref int index, ref bool IBFAPIMOMBA)
+	protected static string ParseString(char[] json, ref int index, ref bool success)
 	{
 		StringBuilder stringBuilder = new StringBuilder(2000);
-		EatWhitespace(EMDHMHOKGFP, ref index);
-		char c = EMDHMHOKGFP[index++];
+		EatWhitespace(json, ref index);
+		char c = json[index++];
 		bool flag = false;
-		while (!flag && index != EMDHMHOKGFP.Length)
+		while (!flag && index != json.Length)
 		{
-			c = EMDHMHOKGFP[index++];
+			c = json[index++];
 			switch (c)
 			{
 			case '"':
@@ -175,11 +175,11 @@ public class Json
 				break;
 			case '\\':
 			{
-				if (index == EMDHMHOKGFP.Length)
+				if (index == json.Length)
 				{
 					break;
 				}
-				switch (EMDHMHOKGFP[index++])
+				switch (json[index++])
 				{
 				case '"':
 					stringBuilder.Append('"');
@@ -210,13 +210,13 @@ public class Json
 				default:
 					continue;
 				}
-				int num = EMDHMHOKGFP.Length - index;
+				int num = json.Length - index;
 				if (num < 4)
 				{
 					break;
 				}
 				uint result;
-				if (!(IBFAPIMOMBA = uint.TryParse(new string(EMDHMHOKGFP, index, 4), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out result)))
+				if (!(success = uint.TryParse(new string(json, index, 4), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out result)))
 				{
 					return string.Empty;
 				}
@@ -232,54 +232,54 @@ public class Json
 		}
 		if (!flag)
 		{
-			IBFAPIMOMBA = false;
+			success = false;
 			return null;
 		}
 		return stringBuilder.ToString();
 	}
 
-	protected static double ParseNumber(char[] EMDHMHOKGFP, ref int index, ref bool IBFAPIMOMBA)
+	protected static double ParseNumber(char[] json, ref int index, ref bool success)
 	{
-		EatWhitespace(EMDHMHOKGFP, ref index);
-		int num = GetLastIndexOfNumber(EMDHMHOKGFP, index);
+		EatWhitespace(json, ref index);
+		int num = GetLastIndexOfNumber(json, index);
 		int length = num - index + 1;
 		double result;
-		IBFAPIMOMBA = double.TryParse(new string(EMDHMHOKGFP, index, length), NumberStyles.Any, CultureInfo.InvariantCulture, out result);
+		success = double.TryParse(new string(json, index, length), NumberStyles.Any, CultureInfo.InvariantCulture, out result);
 		index = num + 1;
 		return result;
 	}
 
-	protected static int GetLastIndexOfNumber(char[] EMDHMHOKGFP, int index)
+	protected static int GetLastIndexOfNumber(char[] json, int index)
 	{
 		int i;
-		for (i = index; i < EMDHMHOKGFP.Length && "0123456789+-.eE".IndexOf(EMDHMHOKGFP[i]) != -1; i++)
+		for (i = index; i < json.Length && "0123456789+-.eE".IndexOf(json[i]) != -1; i++)
 		{
 		}
 		return i - 1;
 	}
 
-	protected static void EatWhitespace(char[] EMDHMHOKGFP, ref int index)
+	protected static void EatWhitespace(char[] json, ref int index)
 	{
-		while (index < EMDHMHOKGFP.Length && " \t\n\r".IndexOf(EMDHMHOKGFP[index]) != -1)
+		while (index < json.Length && " \t\n\r".IndexOf(json[index]) != -1)
 		{
 			index++;
 		}
 	}
 
-	protected static int LookAhead(char[] EMDHMHOKGFP, int index)
+	protected static int LookAhead(char[] json, int index)
 	{
 		int IHPMGHJPLBP2 = index;
-		return NextToken(EMDHMHOKGFP, ref IHPMGHJPLBP2);
+		return NextToken(json, ref IHPMGHJPLBP2);
 	}
 
-	protected static int NextToken(char[] EMDHMHOKGFP, ref int index)
+	protected static int NextToken(char[] json, ref int index)
 	{
-		EatWhitespace(EMDHMHOKGFP, ref index);
-		if (index == EMDHMHOKGFP.Length)
+		EatWhitespace(json, ref index);
+		if (index == json.Length)
 		{
 			return 0;
 		}
-		char c = EMDHMHOKGFP[index];
+		char c = json[index];
 		index++;
 		switch (c)
 		{
@@ -312,18 +312,18 @@ public class Json
 		default:
 		{
 			index--;
-			int num = EMDHMHOKGFP.Length - index;
-			if (num >= 5 && EMDHMHOKGFP[index] == 'f' && EMDHMHOKGFP[index + 1] == 'a' && EMDHMHOKGFP[index + 2] == 'l' && EMDHMHOKGFP[index + 3] == 's' && EMDHMHOKGFP[index + 4] == 'e')
+			int num = json.Length - index;
+			if (num >= 5 && json[index] == 'f' && json[index + 1] == 'a' && json[index + 2] == 'l' && json[index + 3] == 's' && json[index + 4] == 'e')
 			{
 				index += 5;
 				return 10;
 			}
-			if (num >= 4 && EMDHMHOKGFP[index] == 't' && EMDHMHOKGFP[index + 1] == 'r' && EMDHMHOKGFP[index + 2] == 'u' && EMDHMHOKGFP[index + 3] == 'e')
+			if (num >= 4 && json[index] == 't' && json[index + 1] == 'r' && json[index + 2] == 'u' && json[index + 3] == 'e')
 			{
 				index += 4;
 				return 9;
 			}
-			if (num >= 4 && EMDHMHOKGFP[index] == 'n' && EMDHMHOKGFP[index + 1] == 'u' && EMDHMHOKGFP[index + 2] == 'l' && EMDHMHOKGFP[index + 3] == 'l')
+			if (num >= 4 && json[index] == 'n' && json[index + 1] == 'u' && json[index + 2] == 'l' && json[index + 3] == 'l')
 			{
 				index += 4;
 				return 11;
@@ -371,20 +371,20 @@ public class Json
 		return result;
 	}
 
-	protected static bool SerializeObject(IDictionary LJAFGJIEFDK, StringBuilder builder)
+	protected static bool SerializeObject(IDictionary dictionary, StringBuilder builder)
 	{
 		builder.Append("{");
-		IDictionaryEnumerator enumerator = LJAFGJIEFDK.GetEnumerator();
+		IDictionaryEnumerator enumerator = dictionary.GetEnumerator();
 		bool flag = true;
 		while (enumerator.MoveNext())
 		{
-			string jMOLGHDKNME = enumerator.Key.ToString();
+			string key = enumerator.Key.ToString();
 			object value = enumerator.Value;
 			if (!flag)
 			{
 				builder.Append(", ");
 			}
-			SerializeString(jMOLGHDKNME, builder);
+			SerializeString(key, builder);
 			builder.Append(":");
 			if (!SerializeValue(value, builder))
 			{
@@ -396,18 +396,18 @@ public class Json
 		return true;
 	}
 
-	protected static bool SerializeArray(IList FGPLKJMKKBP, StringBuilder builder)
+	protected static bool SerializeArray(IList list, StringBuilder builder)
 	{
 		builder.Append("[");
 		bool flag = true;
-		for (int i = 0; i < FGPLKJMKKBP.Count; i++)
+		for (int i = 0; i < list.Count; i++)
 		{
-			object bAINMLLIKOL = FGPLKJMKKBP[i];
+			object item = list[i];
 			if (!flag)
 			{
 				builder.Append(", ");
 			}
-			if (!SerializeValue(bAINMLLIKOL, builder))
+			if (!SerializeValue(item, builder))
 			{
 				return false;
 			}
@@ -417,10 +417,10 @@ public class Json
 		return true;
 	}
 
-	protected static bool SerializeString(string JMOLGHDKNME, StringBuilder builder)
+	protected static bool SerializeString(string text, StringBuilder builder)
 	{
 		builder.Append("\"");
-		char[] array = JMOLGHDKNME.ToCharArray();
+		char[] array = text.ToCharArray();
 		foreach (char c in array)
 		{
 			switch (c)

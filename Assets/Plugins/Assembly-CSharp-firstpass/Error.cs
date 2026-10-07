@@ -20,10 +20,10 @@ public sealed class Error
 		}
 	}
 
-	public Error(SocketIOErrors KJPGKHJNOMC, string CKEHOEGLMBM)
+	public Error(SocketIOErrors code, string message)
 	{
-		SetCode(KJPGKHJNOMC);
-		set_Message(CKEHOEGLMBM);
+		SetCode(code);
+		set_Message(message);
 	}
 
 	public SocketIOErrors GetCode()

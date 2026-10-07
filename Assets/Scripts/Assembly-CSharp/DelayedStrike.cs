@@ -6,10 +6,10 @@ public class DelayedStrike
 
 	public bool IsStrikeResult;
 
-	public DelayedStrike(SliderType _type, ItemInfo KLIDPJCCAME = null, bool OEBJCEMHBON = false)
+	public DelayedStrike(SliderType _type, ItemInfo item = null, bool isStrikeResult = false)
 	{
-		Item = KLIDPJCCAME;
+		Item = item;
 		SliderType = _type;
-		IsStrikeResult = OEBJCEMHBON;
+		IsStrikeResult = isStrikeResult;
 	}
 }

@@ -29,8 +29,8 @@ public class RewardMoney : Rewardable
 	{
 		if (_valueEmpty)
 		{
-			int oMHDLKNHNMJ = ListSF.GetRoster().GetLevel();
-			long num = GameUtils.MoneyBaseValueTable.GetBaseValue(oMHDLKNHNMJ);
+			int level = ListSF.GetRoster().GetLevel();
+			long num = GameUtils.MoneyBaseValueTable.GetBaseValue(level);
 			_value = (long)valueMultiplier * num;
 			_valueEmpty = false;
 		}

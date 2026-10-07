@@ -11,9 +11,9 @@ internal class GZipFormatter : IFileFormatWriter
 	{
 	}
 
-	internal GZipFormatter(int CPOCBHJGICD)
+	internal GZipFormatter(int compressionLevel)
 	{
-		if (CPOCBHJGICD == 10)
+		if (compressionLevel == 10)
 		{
 			headerBytes[8] = 2;
 		}
@@ -24,10 +24,10 @@ internal class GZipFormatter : IFileFormatWriter
 		return headerBytes;
 	}
 
-	public void UpdateWithBytesRead(byte[] buffer, int IPCOBJBKNAO, int OGAPEFFEHIH)
+	public void UpdateWithBytesRead(byte[] buffer, int offset, int count)
 	{
-		_crc32 = Crc32Helper.UpdateCrc32(_crc32, buffer, IPCOBJBKNAO, OGAPEFFEHIH);
-		long num = _inputStreamSizeModulo + (uint)OGAPEFFEHIH;
+		_crc32 = Crc32Helper.UpdateCrc32(_crc32, buffer, offset, count);
+		long num = _inputStreamSizeModulo + (uint)count;
 		if (num >= 4294967296L)
 		{
 			num %= 4294967296L;
@@ -43,11 +43,11 @@ internal class GZipFormatter : IFileFormatWriter
 		return array;
 	}
 
-	internal void WriteUInt32(byte[] AAOIAEJJINO, uint value, int CAILGDNIKJD)
+	internal void WriteUInt32(byte[] buffer, uint value, int offset)
 	{
-		AAOIAEJJINO[CAILGDNIKJD] = (byte)value;
-		AAOIAEJJINO[CAILGDNIKJD + 1] = (byte)(value >> 8);
-		AAOIAEJJINO[CAILGDNIKJD + 2] = (byte)(value >> 16);
-		AAOIAEJJINO[CAILGDNIKJD + 3] = (byte)(value >> 24);
+		buffer[offset] = (byte)value;
+		buffer[offset + 1] = (byte)(value >> 8);
+		buffer[offset + 2] = (byte)(value >> 16);
+		buffer[offset + 3] = (byte)(value >> 24);
 	}
 }

@@ -2,25 +2,25 @@ using System;
 
 public class NekkiWebHelper
 {
-	public static NekkiWebRequest Download(string BEPKJNKCKPH, string path, Action<NekkiWebRequest> LMKFJLKEILL, Action<NekkiWebRequest> onError, Action<NekkiWebRequest> LFAIENNBBMK = null, object data = null, float DGDKHFPEHOG = 5f, bool GHIGJJCMEDI = true)
+	public static NekkiWebRequest Download(string url, string path, Action<NekkiWebRequest> onSuccess, Action<NekkiWebRequest> onError, Action<NekkiWebRequest> onProgress = null, object data = null, float timeoutSeconds = 5f, bool checkCertificate = true)
 	{
-		NekkiWebDownload iOGFNGLOCHL = new NekkiWebDownload(path, DGDKHFPEHOG);
-		iOGFNGLOCHL.AddOnSuccess(LMKFJLKEILL);
-		iOGFNGLOCHL.AddOnError(onError);
-		iOGFNGLOCHL.AddOnProgress(LFAIENNBBMK);
-		iOGFNGLOCHL.SetExternalData(data);
-		iOGFNGLOCHL.Send(BEPKJNKCKPH, GHIGJJCMEDI);
-		return iOGFNGLOCHL;
+		NekkiWebDownload download = new NekkiWebDownload(path, timeoutSeconds);
+		download.AddOnSuccess(onSuccess);
+		download.AddOnError(onError);
+		download.AddOnProgress(onProgress);
+		download.SetExternalData(data);
+		download.Send(url, checkCertificate);
+		return download;
 	}
 
-	public static NekkiWebRequest Request(string BEPKJNKCKPH, Action<NekkiWebRequest> LMKFJLKEILL, Action<NekkiWebRequest> onError, Action<NekkiWebRequest> LFAIENNBBMK = null, object data = null, float DGDKHFPEHOG = 5f, bool GHIGJJCMEDI = true)
+	public static NekkiWebRequest Request(string url, Action<NekkiWebRequest> onSuccess, Action<NekkiWebRequest> onError, Action<NekkiWebRequest> onProgress = null, object data = null, float timeoutSeconds = 5f, bool checkCertificate = true)
 	{
-		NekkiWebRequest aHEFDBHFHOM = new NekkiWebRequest(DGDKHFPEHOG);
-		aHEFDBHFHOM.AddOnSuccess(LMKFJLKEILL);
-		aHEFDBHFHOM.AddOnError(onError);
-		aHEFDBHFHOM.AddOnProgress(LFAIENNBBMK);
-		aHEFDBHFHOM.SetExternalData(data);
-		aHEFDBHFHOM.Send(BEPKJNKCKPH, GHIGJJCMEDI);
-		return aHEFDBHFHOM;
+		NekkiWebRequest request = new NekkiWebRequest(timeoutSeconds);
+		request.AddOnSuccess(onSuccess);
+		request.AddOnError(onError);
+		request.AddOnProgress(onProgress);
+		request.SetExternalData(data);
+		request.Send(url, checkCertificate);
+		return request;
 	}
 }

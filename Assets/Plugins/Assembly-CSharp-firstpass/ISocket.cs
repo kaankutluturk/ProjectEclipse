@@ -2,13 +2,13 @@ internal interface ISocket
 {
 	void Open();
 
-	void Disconnect(bool GGONLJPAABO);
+	void Disconnect(bool removeFromManager);
 
-	void OnPacket(Packet NPKADBPBKIG);
+	void OnPacket(Packet packet);
 
-	void EmitEvent(SocketIOEventType LFLGCDNKNJI, params object[] LKIOKGCNKHE);
+	void EmitEvent(SocketIOEventType eventType, params object[] args);
 
-	void EmitEvent(string DOPHKKGNAEF, params object[] LKIOKGCNKHE);
+	void EmitEvent(string eventName, params object[] args);
 
-	void EmitError(SocketIOErrors GNKCGOGKAEK, string CKEHOEGLMBM);
+	void EmitError(SocketIOErrors errorType, string message);
 }

@@ -163,13 +163,13 @@ public class MatchMinMax
 		maxFunction = value;
 	}
 
-	public void Parse(XmlNode node, PerkCondition IOFGGOCEIAM, PerkInfoItem IOHONODPIIO)
+	public void Parse(XmlNode node, PerkCondition condition, PerkInfoItem perk)
 	{
-		XmlAttribute cJBEMNNNHDM = node.Attributes["Min"];
-		if (!cJBEMNNNHDM.Empty())
+		XmlAttribute minAttribute = node.Attributes["Min"];
+		if (!minAttribute.Empty())
 		{
-			string bLLCOEAOJGF = cJBEMNNNHDM.GetStringOrDefault(string.Empty);
-			GetMinFunction().Parse(bLLCOEAOJGF);
+			string minExpression = minAttribute.GetStringOrDefault(string.Empty);
+			GetMinFunction().Parse(minExpression);
 			SetMinUnbounded(false);
 		}
 		XmlAttribute cJBEMNNNHDM2 = node.Attributes["Max"];
@@ -179,19 +179,19 @@ public class MatchMinMax
 			GetMaxFunction().Parse(bLLCOEAOJGF2);
 			SetMaxUnbounded(false);
 		}
-		GetMinFunction().SetFunctionCallback(IOHONODPIIO.EvaluateFunctionCallback);
-		GetMinFunction().SetVariableCallback(IOHONODPIIO.OnFunctionPreCallback);
-		GetMinFunction().set_Target(IOFGGOCEIAM);
-		GetMaxFunction().SetFunctionCallback(IOHONODPIIO.EvaluateFunctionCallback);
-		GetMaxFunction().SetVariableCallback(IOHONODPIIO.OnFunctionPreCallback);
-		GetMaxFunction().set_Target(IOFGGOCEIAM);
+		GetMinFunction().SetFunctionCallback(perk.EvaluateFunctionCallback);
+		GetMinFunction().SetVariableCallback(perk.OnFunctionPreCallback);
+		GetMinFunction().set_Target(condition);
+		GetMaxFunction().SetFunctionCallback(perk.EvaluateFunctionCallback);
+		GetMaxFunction().SetVariableCallback(perk.OnFunctionPreCallback);
+		GetMaxFunction().set_Target(condition);
 	}
 
 	public void EvaluateFunctions()
 	{
-		FunctionResult dEIHAOLOPLC = GetMinFunction().Calculate();
+		FunctionResult result = GetMinFunction().Calculate();
 		FunctionResult dEIHAOLOPLC2 = GetMaxFunction().Calculate();
-		SetMinValue(dEIHAOLOPLC.Value.ToFloat());
+		SetMinValue(result.Value.ToFloat());
 		SetMaxValue(dEIHAOLOPLC2.Value.ToFloat());
 	}
 }

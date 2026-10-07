@@ -10,9 +10,9 @@ internal class RangeDecoder
 
 	public Stream Stream;
 
-	public void Init(Stream ABJIEFMMIEK)
+	public void Init(Stream stream)
 	{
-		Stream = ABJIEFMMIEK;
+		Stream = stream;
 		Code = 0u;
 		Range = uint.MaxValue;
 		for (int i = 0; i < 5; i++)
@@ -49,24 +49,24 @@ internal class RangeDecoder
 		}
 	}
 
-	public uint GetThreshold(uint ADLMOFDBBMG)
+	public uint GetThreshold(uint total)
 	{
-		return Code / (Range /= ADLMOFDBBMG);
+		return Code / (Range /= total);
 	}
 
-	public void Decode(uint ILENLCMAMBH, uint PEEOEOMEBFG, uint ADLMOFDBBMG)
+	public void Decode(uint start, uint size, uint total)
 	{
-		Code -= ILENLCMAMBH * Range;
-		Range *= PEEOEOMEBFG;
+		Code -= start * Range;
+		Range *= size;
 		Normalize();
 	}
 
-	public uint DecodeDirectBits(int HEGEFMNECOF)
+	public uint DecodeDirectBits(int numTotalBits)
 	{
 		uint num = Range;
 		uint num2 = Code;
 		uint num3 = 0u;
-		for (int num4 = HEGEFMNECOF; num4 > 0; num4--)
+		for (int num4 = numTotalBits; num4 > 0; num4--)
 		{
 			num >>= 1;
 			uint num5 = num2 - num >> 31;
@@ -83,9 +83,9 @@ internal class RangeDecoder
 		return num3;
 	}
 
-	public uint DecodeBit(uint DOONDFDPDFH, int HEGEFMNECOF)
+	public uint DecodeBit(uint probability, int numTotalBits)
 	{
-		uint num = (Range >> HEGEFMNECOF) * DOONDFDPDFH;
+		uint num = (Range >> numTotalBits) * probability;
 		uint result;
 		if (Code < num)
 		{

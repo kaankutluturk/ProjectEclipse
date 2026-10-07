@@ -44,24 +44,24 @@ public class GameCenter_Emulator : GameCenterAbstract
 		Log("[GameCenter_Emulator]: Free");
 	}
 
-	private void HandleAuthenticated(bool BPEIMKJIMOF)
+	private void HandleAuthenticated(bool isAuthenticated)
 	{
-		Log("[GameCenter_Emulator]: CB_Authenticate, authed = " + BPEIMKJIMOF);
+		Log("[GameCenter_Emulator]: CB_Authenticate, authed = " + isAuthenticated);
 	}
 
-	private void HandleAchievementsLoaded(IAchievement[] HELFDCAIJNE)
+	private void HandleAchievementsLoaded(IAchievement[] achievements)
 	{
 		Log("[GameCenter_Emulator]: CB_LoadAchievements");
 	}
 
-	private void HandleAchievementUnlocked(string OKNNNLIPODI)
+	private void HandleAchievementUnlocked(string achievementId)
 	{
-		Log("[GameCenter_Emulator]: CB_AchievementUnlocked, id = " + OKNNNLIPODI);
+		Log("[GameCenter_Emulator]: CB_AchievementUnlocked, id = " + achievementId);
 	}
 
-	private void HandleAchievementProgress(string HMDBGGEMICE, int EPFBHJBNIHK)
+	private void HandleAchievementProgress(string achievementId, int progress)
 	{
-		Log("[GameCenter_Emulator]: OnAchievementProgess id = " + HMDBGGEMICE + " progress = " + EPFBHJBNIHK);
+		Log("[GameCenter_Emulator]: OnAchievementProgess id = " + achievementId + " progress = " + progress);
 	}
 
 	public override bool GetIsSupported()
@@ -109,13 +109,13 @@ public class GameCenter_Emulator : GameCenterAbstract
 		GameCenterAbstract.OnResetAchievements(true);
 	}
 
-	public override void UnlockAchievement(string OKNNNLIPODI)
+	public override void UnlockAchievement(string achievementId)
 	{
-		Log("[GameCenter_Emulator]: UnlockAchievement " + OKNNNLIPODI);
+		Log("[GameCenter_Emulator]: UnlockAchievement " + achievementId);
 	}
 
-	public override void ReportAchievementProgress(string OKNNNLIPODI, double EPFBHJBNIHK)
+	public override void ReportAchievementProgress(string achievementId, double progress)
 	{
-		Log("[GameCenter_Emulator]: AchievementProgress id = " + OKNNNLIPODI + " ,progress = " + EPFBHJBNIHK);
+		Log("[GameCenter_Emulator]: AchievementProgress id = " + achievementId + " ,progress = " + progress);
 	}
 }

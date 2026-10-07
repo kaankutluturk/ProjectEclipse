@@ -21,12 +21,12 @@ namespace Nekki.SF2.GUI.Map
 
 		private void Update()
 		{
-			FightList jDIPBIHBGPF = ListSF.GetFightById(fightId);
-			if (jDIPBIHBGPF != null)
+			FightList fight = ListSF.GetFightById(fightId);
+			if (fight != null)
 			{
-				if (!jDIPBIHBGPF.IsReplayAvailable() && _lblTime != null)
+				if (!fight.IsReplayAvailable() && _lblTime != null)
 				{
-					long num = jDIPBIHBGPF.RepeatTime - jDIPBIHBGPF.GetRosterFight().GetElapsedSinceCompletion();
+					long num = fight.RepeatTime - fight.GetRosterFight().GetElapsedSinceCompletion();
 					TimeSpan timeSpan = TimeSpan.FromSeconds(num);
 					string empty = string.Empty;
 					empty = ((timeSpan.Hours <= 0) ? string.Format("{0:D2}:{1:D2}", timeSpan.Minutes, timeSpan.Seconds) : string.Format("{0:D2}:{1:D2}:{2:D2}", timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds));
@@ -39,13 +39,13 @@ namespace Nekki.SF2.GUI.Map
 			}
 		}
 
-		public void Init(Battle DPOOIONCEOA, FightIDS MMEJHKCKFDD)
+		public void Init(Battle newBattle, FightIDS ids)
 		{
-			battle = DPOOIONCEOA;
-			fightId = new FightIDS(MMEJHKCKFDD);
-			bool flag = DPOOIONCEOA.GetStatus() == ConditionStatus.StatusComplete;
+			battle = newBattle;
+			fightId = new FightIDS(ids);
+			bool flag = newBattle.GetStatus() == ConditionStatus.StatusComplete;
 			string empty = string.Empty;
-			empty = ((DPOOIONCEOA.GetFightCount() != 0) ? ((!flag) ? "battleLocked" : "battleCompleted") : "battleComingSoon");
+			empty = ((newBattle.GetFightCount() != 0) ? ((!flag) ? "battleLocked" : "battleCompleted") : "battleComingSoon");
 			_lblLocked.SetAlias(empty);
 			if (_lblTime != null)
 			{
@@ -53,7 +53,7 @@ namespace Nekki.SF2.GUI.Map
 			}
 			_btnPlayVideo.onClick.RemoveListener(OnPlayVideoClicked);
 			_btnPlayVideo.onClick.AddListener(OnPlayVideoClicked);
-			if (DPOOIONCEOA.get_Type() == BattleType.FightFinal || DPOOIONCEOA.get_Type() == BattleType.FightFinalTitan)
+			if (newBattle.get_Type() == BattleType.FightFinal || newBattle.get_Type() == BattleType.FightFinalTitan)
 			{
 				_btnPlayVideo.gameObject.SetActive(true);
 			}

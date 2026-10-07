@@ -9,22 +9,22 @@ public class PerkSetAttributes
 		Values = new Dictionary<string, string>();
 	}
 
-	public PerkSetAttributes(PerkSetAttributes NOLFMPDGCOC)
+	public PerkSetAttributes(PerkSetAttributes source)
 	{
 		Values = new Dictionary<string, string>();
-		foreach (KeyValuePair<string, string> item in NOLFMPDGCOC.Values)
+		foreach (KeyValuePair<string, string> item in source.Values)
 		{
 			Values.Add(item.Key, item.Value);
 		}
 	}
 
-	public void AddRange(PerkSetAttributes NOLFMPDGCOC)
+	public void AddRange(PerkSetAttributes other)
 	{
-		if (NOLFMPDGCOC == null)
+		if (other == null)
 		{
 			return;
 		}
-		foreach (KeyValuePair<string, string> item in NOLFMPDGCOC.Values)
+		foreach (KeyValuePair<string, string> item in other.Values)
 		{
 			Values[item.Key] = item.Value;
 		}

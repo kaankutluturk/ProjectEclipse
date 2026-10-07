@@ -1,1 +1,1 @@
-public delegate void OnRequestFinishedDelegate(HTTPRequest BPMCLBNFEDK, HTTPResponse GIHDDAKBMHE);
+public delegate void OnRequestFinishedDelegate(HTTPRequest request, HTTPResponse response);

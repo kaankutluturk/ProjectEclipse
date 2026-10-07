@@ -12,9 +12,9 @@ public class QuestActionEclipseMode : QuestAction
 			value.Equals("True", System.StringComparison.OrdinalIgnoreCase) || value == "1";
 	}
 
-	public override void Execute(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters parameters)
 	{
-		base.Execute(GFIHPBCEEOB);
+		base.Execute(parameters);
 		Roster roster = ListSF.GetRoster();
 		if (roster != null)
 		{

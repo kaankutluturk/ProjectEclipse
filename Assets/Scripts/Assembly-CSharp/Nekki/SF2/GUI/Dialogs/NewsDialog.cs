@@ -42,10 +42,10 @@ namespace Nekki.SF2.GUI.Dialogs
 
 		public override void Init(object data)
 		{
-			NewsDialogInfo oFOJGCFHJKD = (NewsDialogInfo)data;
-			if (oFOJGCFHJKD != null)
+			NewsDialogInfo newsInfo = (NewsDialogInfo)data;
+			if (newsInfo != null)
 			{
-				newsItems = oFOJGCFHJKD.Items;
+				newsItems = newsInfo.Items;
 			}
 			IsQuestDialog = true;
 			_picture.GetComponent<SFButton>().AddEventListener(0, OnPictureClicked);
@@ -68,23 +68,23 @@ namespace Nekki.SF2.GUI.Dialogs
 			_picture.gameObject.SetActive(newsItems.Count > 0);
 			if (newsItems.Count > 0)
 			{
-				NewsItem pONDDFBMFOO = newsItems[0];
-				SetupHeader(pONDDFBMFOO.Title);
-				imagePath = pONDDFBMFOO.LocalImagePath;
-				externalUrl = pONDDFBMFOO.Url;
-				if (pONDDFBMFOO.GoShop)
+				NewsItem newsItem = newsItems[0];
+				SetupHeader(newsItem.Title);
+				imagePath = newsItem.LocalImagePath;
+				externalUrl = newsItem.Url;
+				if (newsItem.GoShop)
 				{
 					GoShopAfterClose = true;
-					RedirectShopAfterClose = pONDDFBMFOO.RedirectShop;
+					RedirectShopAfterClose = newsItem.RedirectShop;
 				}
 				Texture2D texture2D = null;
-				if (File.Exists(pONDDFBMFOO.LocalImagePath))
+				if (File.Exists(newsItem.LocalImagePath))
 				{
-					byte[] data = File.ReadAllBytes(pONDDFBMFOO.LocalImagePath);
+					byte[] data = File.ReadAllBytes(newsItem.LocalImagePath);
 					texture2D = new Texture2D(2, 2);
 					texture2D.LoadImage(data);
 				}
-				newsItems.Remove(pONDDFBMFOO);
+				newsItems.Remove(newsItem);
 				if (texture2D != null)
 				{
 					_picture.sprite = Sprite.Create(texture2D, new Rect(0f, 0f, texture2D.width, texture2D.height), new Vector2(0.5f, 0.5f));
@@ -103,9 +103,9 @@ namespace Nekki.SF2.GUI.Dialogs
 			_bottomStripe.transform.SetLocalY(-640f);
 		}
 
-		protected override void SetupFooter(FooterType HJNAHNICGMH)
+		protected override void SetupFooter(FooterType footer)
 		{
-			base.SetupFooter(HJNAHNICGMH);
+			base.SetupFooter(footer);
 			SetupNewsButtons();
 		}
 
@@ -116,14 +116,14 @@ namespace Nekki.SF2.GUI.Dialogs
 			{
 				if ((!BuyItemAfterClose || !(RedirectShopAfterClose != string.Empty)) && GoShopAfterClose)
 				{
-					QuestParameters hHKLFIIBIFF = ListSF.GetInstance().GetQuestParameters();
-					GameUtils.NotifyTabChanged(GameUtils.GetSliderTypeByName(hHKLFIIBIFF.currentTabName), SliderType.SliderRuby);
-					DelayedStrike dDFFCNPELBC = new DelayedStrike(SliderType.SliderRuby);
+					QuestParameters questParameters = ListSF.GetInstance().GetQuestParameters();
+					GameUtils.NotifyTabChanged(GameUtils.GetSliderTypeByName(questParameters.currentTabName), SliderType.SliderRuby);
+					DelayedStrike delayedStrike = new DelayedStrike(SliderType.SliderRuby);
 					if (RedirectShopAfterClose != string.Empty)
 					{
-						dDFFCNPELBC.Item = ListSF.FindAvailableItemByGroup(RedirectShopAfterClose, 0L);
+						delayedStrike.Item = ListSF.FindAvailableItemByGroup(RedirectShopAfterClose, 0L);
 					}
-					Module.OpenScreen(ScreenType.ModuleShop, dDFFCNPELBC);
+					Module.OpenScreen(ScreenType.ModuleShop, delayedStrike);
 				}
 				base.OnClose(data);
 			}
@@ -154,14 +154,14 @@ namespace Nekki.SF2.GUI.Dialogs
 			{
 				return;
 			}
-			NewsItem pONDDFBMFOO = newsItems[0];
-			List<NewsButton> dHKDOHFKOOJ = pONDDFBMFOO.Buttons;
-			int count = dHKDOHFKOOJ.Count;
+			NewsItem newsItem = newsItems[0];
+			List<NewsButton> buttons = newsItem.Buttons;
+			int count = buttons.Count;
 			_btnOK.gameObject.SetActive(true);
 			_btnOK.RemoveAllEventListener();
-			_btnOK.AddEventListener(2, (object NPKMJMCLDAH) =>
+			_btnOK.AddEventListener(2, (object result) =>
 			{
-				OnClose(NPKMJMCLDAH);
+				OnClose(result);
 				_btnOK.RemoveAllEventListener();
 			});
 			if (count <= 0)
@@ -169,15 +169,15 @@ namespace Nekki.SF2.GUI.Dialogs
 				return;
 			}
 			_btnOK.gameObject.SetActive(false);
-			float gBCONNBABLL = -530f;
-			float num = 1680 / (dHKDOHFKOOJ.Count + 1);
-			float fNDOOJNDJDC = -840f + num;
+			float buttonY = -530f;
+			float num = 1680 / (buttons.Count + 1);
+			float buttonX = -840f + num;
 			if (count == 1)
 			{
-				fNDOOJNDJDC = _btnOK.transform.localPosition.x;
+				buttonX = _btnOK.transform.localPosition.x;
 			}
-			buttonMaker.Init(fNDOOJNDJDC, gBCONNBABLL, num, base.gameObject, OnClose, this);
-			foreach (NewsButton item in dHKDOHFKOOJ)
+			buttonMaker.Init(buttonX, buttonY, num, base.gameObject, OnClose, this);
+			foreach (NewsButton item in buttons)
 			{
 				buttonMaker.AddButton(item);
 			}
@@ -191,9 +191,9 @@ namespace Nekki.SF2.GUI.Dialogs
 			}
 		}
 
-		protected override void SetupHeader(string HCPNFPMHFCM)
+		protected override void SetupHeader(string headerText)
 		{
-			_header.set_text((!(HCPNFPMHFCM == string.Empty)) ? HCPNFPMHFCM : LocalizationManager.GetString("dlgNewsTitle"));
+			_header.set_text((!(headerText == string.Empty)) ? headerText : LocalizationManager.GetString("dlgNewsTitle"));
 			_header.transform.SetLocalY(-25f + _topStripe.transform.localPosition.y);
 		}
 	}

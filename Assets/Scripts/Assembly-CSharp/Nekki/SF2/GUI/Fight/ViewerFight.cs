@@ -254,11 +254,11 @@ namespace Nekki.SF2.GUI.Fight
 			timeSeconds.RandomizeCryptoKey();
 		}
 
-		public void PreInit(ComboStatistic AIOMDIAFHGB, ComboStatistic MJOHDCPCCKB)
+		public void PreInit(ComboStatistic leftCombo, ComboStatistic rightCombo)
 		{
             if (btnPause != null) Eclipse.UI.BattleTouchControls.ApplyPlatformVisibility(btnPause.gameObject);
-			SetLeftStatistic(AIOMDIAFHGB);
-			SetRightStatistic(MJOHDCPCCKB);
+			SetLeftStatistic(leftCombo);
+			SetRightStatistic(rightCombo);
 			set_Round(null);
 			SetIsPlaying(false);
 			SetIsPauseAllowed(true);
@@ -270,15 +270,15 @@ namespace Nekki.SF2.GUI.Fight
 			ApplicationController.remove_OnPause(OnApplicationPaused);
 		}
 
-		private void OnApplicationPaused(bool OIBJJLBCEHA)
+		private void OnApplicationPaused(bool paused)
 		{
-			if (OIBJJLBCEHA)
+			if (paused)
 			{
 				PausePress();
 			}
 		}
 
-		public void Init(Round round, ModelParameters GKCDEPEKKEL, ModelParameters GJMOIENEDPB, bool ENCAKAAMEPN = true)
+		public void Init(Round round, ModelParameters leftParameters, ModelParameters rightParameters, bool showRounds = true)
 		{
 			if (roundTimer != null)
 			{
@@ -288,8 +288,8 @@ namespace Nekki.SF2.GUI.Fight
 			}
 			set_Round(round);
 			DisablePauseButton();
-			InitModel(leftModel, GKCDEPEKKEL, ENCAKAAMEPN, leftModelPosition, "LeftModel");
-			InitModel(rightModel, GJMOIENEDPB, ENCAKAAMEPN, rightModelPosition, "RightModel");
+			InitModel(leftModel, leftParameters, showRounds, leftModelPosition, "LeftModel");
+			InitModel(rightModel, rightParameters, showRounds, rightModelPosition, "RightModel");
 			if (GetLeftStatistic() != null && leftModel != null)
 			{
 				leftModel.Statistic = GetLeftStatistic();
@@ -332,17 +332,17 @@ namespace Nekki.SF2.GUI.Fight
 			button.onClick.AddListener(OnBenchmarkClicked);
 		}
 
-		private void InitModel(ScreenModel ACENLMONNPA, ModelParameters KKNOCIPBIIK, bool ENCAKAAMEPN, Vector2 LCCLEFMKLPB, string name)
+		private void InitModel(ScreenModel screenModel, ModelParameters parameters, bool showRounds, Vector2 LCCLEFMKLPB, string name)
 		{
-			KKNOCIPBIIK.RoundTotal = GetRound().roundTotal;
-			ACENLMONNPA.Init(KKNOCIPBIIK, ENCAKAAMEPN);
-			ACENLMONNPA.AddEventListener(2, OnClickCheat);
+			parameters.RoundTotal = GetRound().roundTotal;
+			screenModel.Init(parameters, showRounds);
+			screenModel.AddEventListener(2, OnClickCheat);
 		}
 
 		private void OnClickCheat(object data)
 		{
-			ViewerButton pLGDCJPCLPN = (((ScreenModel.ScreenSide)data != ScreenModel.ScreenSide.TYPE_LEFT) ? ViewerButton.ButtonCheatLoseFight : ViewerButton.ButtonCheatWinFight);
-			CallEvent(0, pLGDCJPCLPN);
+			ViewerButton buttonType = (((ScreenModel.ScreenSide)data != ScreenModel.ScreenSide.TYPE_LEFT) ? ViewerButton.ButtonCheatLoseFight : ViewerButton.ButtonCheatWinFight);
+			CallEvent(0, buttonType);
 		}
 
 		private void OnBenchmarkClicked()
@@ -438,30 +438,30 @@ namespace Nekki.SF2.GUI.Fight
 			}
 		}
 
-		public void Strike(InfoAnimation IFPDGKDKJOD, float CKKFKEIELCP, int LFLGCDNKNJI, bool isFirstStrike, bool FABADFPDLPG, bool OOGIBOBMGJA, bool OOCLHFGEPML, bool EPKEEMFHHFM)
+		public void Strike(InfoAnimation animation, float damage, int attackerIndex, bool isFirstStrike, bool isHeadStrike, bool isCritical, bool isBlocked, bool isShock)
 		{
 			if (leftModel == null || rightModel == null)
 			{
 				return;
 			}
-			ScreenModel screenModel = ((LFLGCDNKNJI != 0) ? leftModel : rightModel);
-			ScreenModel screenModel2 = ((LFLGCDNKNJI != 0) ? rightModel : leftModel);
-			if (EPKEEMFHHFM)
+			ScreenModel screenModel = ((attackerIndex != 0) ? leftModel : rightModel);
+			ScreenModel screenModel2 = ((attackerIndex != 0) ? rightModel : leftModel);
+			if (isShock)
 			{
 				screenModel.AddShockCombo();
 			}
-			if (OOGIBOBMGJA)
+			if (isCritical)
 			{
 				screenModel.AddCriticalCombo();
 			}
-			if (!OOCLHFGEPML)
+			if (!isBlocked)
 			{
-				screenModel.UpdateStyle(IFPDGKDKJOD);
+				screenModel.UpdateStyle(animation);
 				if (isFirstStrike)
 				{
 					screenModel.AddFirstStrikeCombo();
 				}
-				if (FABADFPDLPG)
+				if (isHeadStrike)
 				{
 					screenModel.AddHeadStrikeCombo();
 				}
@@ -508,9 +508,9 @@ namespace Nekki.SF2.GUI.Fight
 			CallEvent(0, ViewerButton.ButtonPause);
 		}
 
-		public void UpdateHotGroundTimer(int time, RuleAppliance EJPOJJKKICO)
+		public void UpdateHotGroundTimer(int time, RuleAppliance appliance)
 		{
-			switch (EJPOJJKKICO)
+			switch (appliance)
 			{
 			case RuleAppliance.ApplianceAll:
 				if (leftModel != null)
@@ -549,9 +549,9 @@ namespace Nekki.SF2.GUI.Fight
 			}
 		}
 
-		public void SetHealthBarVisible(RuleAppliance EJPOJJKKICO, bool value)
+		public void SetHealthBarVisible(RuleAppliance appliance, bool value)
 		{
-			switch (EJPOJJKKICO)
+			switch (appliance)
 			{
 			case RuleAppliance.AppliancePlayer:
 				if (leftModel != null)
@@ -589,24 +589,24 @@ namespace Nekki.SF2.GUI.Fight
 			return (screenModel == null) ? null : screenModel.Statistic;
 		}
 
-		public void CreatePointsTable(float FNDOOJNDJDC, float GBCONNBABLL, int CFMPJLLNCFF, PointsTableType GLBPKPEIOKE, int LOMKKEAMMIG)
+		public void CreatePointsTable(float x, float y, int width, PointsTableType tableType, int maxPoints)
 		{
 			if (pointsTable == null && _pointsTablePrefab != null)
 			{
 				pointsTable = Object.Instantiate(_pointsTablePrefab).GetComponent<PointsTable>();
 				pointsTable.transform.SetParent(base.transform, false);
-				pointsTable.Init(GLBPKPEIOKE, LOMKKEAMMIG, CFMPJLLNCFF);
+				pointsTable.Init(tableType, maxPoints, width);
 			}
 		}
 
-		public void UpdatePointsTable(int BBNOPLBAOCF, int HBIKJBGFFBM)
+		public void UpdatePointsTable(int leftScore, int rightScore)
 		{
 			if (pointsTable != null)
 			{
-				pointsTable.set_LeftScore(BBNOPLBAOCF);
+				pointsTable.set_LeftScore(leftScore);
 				if (pointsTable.get_Type() == PointsTableType.POINTS_TABLE_CONTEST)
 				{
-					pointsTable.set_RightScore(HBIKJBGFFBM);
+					pointsTable.set_RightScore(rightScore);
 				}
 			}
 		}
@@ -621,27 +621,27 @@ namespace Nekki.SF2.GUI.Fight
 			}
 		}
 
-		public void SetLockLifeUpdate(bool EKBOGDKIHIH, bool value)
+		public void SetLockLifeUpdate(bool isLeft, bool value)
 		{
-			ScreenModel screenModel = ((!EKBOGDKIHIH) ? rightModel : leftModel);
+			ScreenModel screenModel = ((!isLeft) ? rightModel : leftModel);
 			if (screenModel != null)
 			{
 				screenModel.SetLifeUpdateLocked(value);
 			}
 		}
 
-		public void UpdateCombo(bool EKBOGDKIHIH, int value, int HFMKKLJGPPN)
+		public void UpdateCombo(bool isLeft, int value, int countOffset)
 		{
-			if (EKBOGDKIHIH)
+			if (isLeft)
 			{
 				if (leftModel != null)
 				{
-					leftModel.UpdateCombo(value, HFMKKLJGPPN);
+					leftModel.UpdateCombo(value, countOffset);
 				}
 			}
 			else if (rightModel != null)
 			{
-				rightModel.UpdateCombo(value, HFMKKLJGPPN);
+				rightModel.UpdateCombo(value, countOffset);
 			}
 		}
 

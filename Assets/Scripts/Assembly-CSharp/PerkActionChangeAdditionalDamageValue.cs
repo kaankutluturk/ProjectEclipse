@@ -23,10 +23,10 @@ public class PerkActionChangeAdditionalDamageValue : PerkActionModificator
 		set_AdditionalDamageValue(0f);
 	}
 
-	public PerkActionChangeAdditionalDamageValue(PerkActionChangeAdditionalDamageValue NOLFMPDGCOC)
-		: base(NOLFMPDGCOC)
+	public PerkActionChangeAdditionalDamageValue(PerkActionChangeAdditionalDamageValue source)
+		: base(source)
 	{
-		set_AdditionalDamageValue(NOLFMPDGCOC.GetAdditionalDamageValue());
+		set_AdditionalDamageValue(source.GetAdditionalDamageValue());
 	}
 
 	public float GetAdditionalDamageValue()

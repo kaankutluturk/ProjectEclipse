@@ -19,25 +19,25 @@ public class Routiner : MonoBehaviour
 		}
 	}
 
-	public static Coroutine Go(IEnumerator DCOLKHNLFNI)
+	public static Coroutine Go(IEnumerator routine)
 	{
 		Init();
-		return instance.StartCoroutine(DCOLKHNLFNI);
+		return instance.StartCoroutine(routine);
 	}
 
-	public static void Stop(Coroutine DCOLKHNLFNI)
+	public static void Stop(Coroutine coroutine)
 	{
-		if (!(instance == null) && DCOLKHNLFNI != null)
+		if (!(instance == null) && coroutine != null)
 		{
-			instance.StopCoroutine(DCOLKHNLFNI);
+			instance.StopCoroutine(coroutine);
 		}
 	}
 
-	public static void AddUpdate(Action IBODMPMJELJ)
+	public static void AddUpdate(Action action)
 	{
 		Init();
-		Routiner eDAPJLKMFPC = instance;
-		eDAPJLKMFPC.onUpdate = (Action)Delegate.Combine(eDAPJLKMFPC.onUpdate, IBODMPMJELJ);
+		Routiner routiner = instance;
+		routiner.onUpdate = (Action)Delegate.Combine(routiner.onUpdate, action);
 	}
 
 	private void Update()
@@ -48,45 +48,45 @@ public class Routiner : MonoBehaviour
 		}
 	}
 
-	public static Coroutine GoDelayed(Action IBODMPMJELJ, float IHDMLLNEGIK)
+	public static Coroutine GoDelayed(Action action, float delay)
 	{
 		Init();
-		return instance.StartCoroutine(instance.DelayedRoutine(IBODMPMJELJ, IHDMLLNEGIK));
+		return instance.StartCoroutine(instance.DelayedRoutine(action, delay));
 	}
 
-	private IEnumerator DelayedRoutine(Action IBODMPMJELJ, float IHDMLLNEGIK)
+	private IEnumerator DelayedRoutine(Action action, float delay)
 	{
-		IEnumerator enumerator = WaitRealtime(IHDMLLNEGIK);
+		IEnumerator enumerator = WaitRealtime(delay);
 		while (enumerator.MoveNext())
 		{
 			yield return enumerator.Current;
 		}
-		IBODMPMJELJ();
+		action();
 	}
 
-	public static Coroutine GoDelayed(IEnumerator DCOLKHNLFNI, float IHDMLLNEGIK)
+	public static Coroutine GoDelayed(IEnumerator routine, float delay)
 	{
 		Init();
-		return instance.StartCoroutine(instance.DelayedRoutine(DCOLKHNLFNI, IHDMLLNEGIK));
+		return instance.StartCoroutine(instance.DelayedRoutine(routine, delay));
 	}
 
-	private IEnumerator DelayedRoutine(IEnumerator DCOLKHNLFNI, float IHDMLLNEGIK)
+	private IEnumerator DelayedRoutine(IEnumerator routine, float delay)
 	{
-		IEnumerator enumerator = WaitRealtime(IHDMLLNEGIK);
+		IEnumerator enumerator = WaitRealtime(delay);
 		while (enumerator.MoveNext())
 		{
 			yield return enumerator.Current;
 		}
-		while (DCOLKHNLFNI.MoveNext())
+		while (routine.MoveNext())
 		{
-			yield return DCOLKHNLFNI.Current;
+			yield return routine.Current;
 		}
 	}
 
-	private static IEnumerator WaitRealtime(float IHDMLLNEGIK)
+	private static IEnumerator WaitRealtime(float seconds)
 	{
 		float realtimeSinceStartup = Time.realtimeSinceStartup;
-		while (Time.realtimeSinceStartup <= realtimeSinceStartup + IHDMLLNEGIK + 0.0001f)
+		while (Time.realtimeSinceStartup <= realtimeSinceStartup + seconds + 0.0001f)
 		{
 			yield return null;
 		}

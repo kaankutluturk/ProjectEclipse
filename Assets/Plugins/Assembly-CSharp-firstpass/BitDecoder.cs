@@ -8,15 +8,15 @@ internal struct BitDecoder
 
 	private uint Prob;
 
-	public void UpdateModel(int EGMENJEPBNH, uint symbol)
+	public void UpdateModel(int numMoveBits, uint symbol)
 	{
 		if (symbol == 0)
 		{
-			Prob += 2048 - Prob >> EGMENJEPBNH;
+			Prob += 2048 - Prob >> numMoveBits;
 		}
 		else
 		{
-			Prob -= Prob >> EGMENJEPBNH;
+			Prob -= Prob >> numMoveBits;
 		}
 	}
 
@@ -25,27 +25,27 @@ internal struct BitDecoder
 		Prob = 1024u;
 	}
 
-	public uint Decode(RangeDecoder HELKEOGALEA)
+	public uint Decode(RangeDecoder rangeDecoder)
 	{
-		uint num = (HELKEOGALEA.Range >> 11) * Prob;
-		if (HELKEOGALEA.Code < num)
+		uint num = (rangeDecoder.Range >> 11) * Prob;
+		if (rangeDecoder.Code < num)
 		{
-			HELKEOGALEA.Range = num;
+			rangeDecoder.Range = num;
 			Prob += 2048 - Prob >> 5;
-			if (HELKEOGALEA.Range < 16777216)
+			if (rangeDecoder.Range < 16777216)
 			{
-				HELKEOGALEA.Code = (HELKEOGALEA.Code << 8) | (byte)HELKEOGALEA.Stream.ReadByte();
-				HELKEOGALEA.Range <<= 8;
+				rangeDecoder.Code = (rangeDecoder.Code << 8) | (byte)rangeDecoder.Stream.ReadByte();
+				rangeDecoder.Range <<= 8;
 			}
 			return 0u;
 		}
-		HELKEOGALEA.Range -= num;
-		HELKEOGALEA.Code -= num;
+		rangeDecoder.Range -= num;
+		rangeDecoder.Code -= num;
 		Prob -= Prob >> 5;
-		if (HELKEOGALEA.Range < 16777216)
+		if (rangeDecoder.Range < 16777216)
 		{
-			HELKEOGALEA.Code = (HELKEOGALEA.Code << 8) | (byte)HELKEOGALEA.Stream.ReadByte();
-			HELKEOGALEA.Range <<= 8;
+			rangeDecoder.Code = (rangeDecoder.Code << 8) | (byte)rangeDecoder.Stream.ReadByte();
+			rangeDecoder.Range <<= 8;
 		}
 		return 1u;
 	}

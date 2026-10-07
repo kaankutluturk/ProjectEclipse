@@ -301,14 +301,14 @@ namespace CodeStage.AntiCheat.Detectors
 			StartDetection(callback, GetOrCreate().spawnPosition);
 		}
 
-		public static void StartDetection(UnityAction callback, Vector3 PBPJOBANACG)
+		public static void StartDetection(UnityAction callback, Vector3 spawnPosition)
 		{
-			StartDetection(callback, PBPJOBANACG, GetOrCreate().maxFalsePositives);
+			StartDetection(callback, spawnPosition, GetOrCreate().maxFalsePositives);
 		}
 
-		public static void StartDetection(UnityAction callback, Vector3 PBPJOBANACG, byte JKBEIPOFGCI)
+		public static void StartDetection(UnityAction callback, Vector3 spawnPosition, byte allowedFalsePositives)
 		{
-			GetOrCreate().StartDetectionInternal(callback, PBPJOBANACG, JKBEIPOFGCI);
+			GetOrCreate().StartDetectionInternal(callback, spawnPosition, allowedFalsePositives);
 		}
 
 		public static void StopDetection()
@@ -384,7 +384,7 @@ namespace CodeStage.AntiCheat.Detectors
 			instancesInScene--;
 		}
 
-		private void OnSceneLoaded(Scene MHOCFOODLLL, LoadSceneMode NMMPBADCFHK)
+		private void OnSceneLoaded(Scene scene, LoadSceneMode loadMode)
 		{
 			OnLevelLoadedCallback();
 		}
@@ -435,7 +435,7 @@ namespace CodeStage.AntiCheat.Detectors
 			}
 		}
 
-		private void StartDetectionInternal(UnityAction callback, Vector3 MDCJBPDNAOG, byte OPBFDLIKAKP)
+		private void StartDetectionInternal(UnityAction callback, Vector3 MDCJBPDNAOG, byte allowedFalsePositives)
 		{
 			if (isRunning)
 			{
@@ -459,7 +459,7 @@ namespace CodeStage.AntiCheat.Detectors
 			}
 			detectionAction = callback;
 			spawnPosition = MDCJBPDNAOG;
-			maxFalsePositives = OPBFDLIKAKP;
+			maxFalsePositives = allowedFalsePositives;
 			rigidbodyDetections = 0;
 			controllerDetections = 0;
 			wireframeDetections = 0;
@@ -953,9 +953,9 @@ namespace CodeStage.AntiCheat.Detectors
 			return new Color32((byte)UnityEngine.Random.Range(0, 256), (byte)UnityEngine.Random.Range(0, 256), (byte)UnityEngine.Random.Range(0, 256), byte.MaxValue);
 		}
 
-		private static bool ColorsSimilar(Color32 OHLMPFPIFMB, Color32 GJOGACNLCDC, int NKABGNCLCJP)
+		private static bool ColorsSimilar(Color32 first, Color32 second, int tolerance)
 		{
-			return Math.Abs(OHLMPFPIFMB.r - GJOGACNLCDC.r) < NKABGNCLCJP && Math.Abs(OHLMPFPIFMB.g - GJOGACNLCDC.g) < NKABGNCLCJP && Math.Abs(OHLMPFPIFMB.b - GJOGACNLCDC.b) < NKABGNCLCJP;
+			return Math.Abs(first.r - second.r) < tolerance && Math.Abs(first.g - second.g) < tolerance && Math.Abs(first.b - second.b) < tolerance;
 		}
 	}
 }

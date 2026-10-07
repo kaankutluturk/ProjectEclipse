@@ -21,8 +21,8 @@ public class DocumentEnd : ParsingEvent
 		}
 	}
 
-	public DocumentEnd(bool isImplicit, Mark ILENLCMAMBH, Mark PCLFFOBJJFO)
-		: base(ILENLCMAMBH, PCLFFOBJJFO)
+	public DocumentEnd(bool isImplicit, Mark start, Mark end)
+		: base(start, end)
 	{
 		this.isImplicit = isImplicit;
 	}
@@ -52,8 +52,8 @@ public class DocumentEnd : ParsingEvent
 		return string.Format(CultureInfo.InvariantCulture, "Document end [isImplicit = {0}]", isImplicit);
 	}
 
-	public override void Accept(IParsingEventVisitor NKECMANOOEM)
+	public override void Accept(IParsingEventVisitor visitor)
 	{
-		NKECMANOOEM.Visit(this);
+		visitor.Visit(this);
 	}
 }

@@ -86,7 +86,7 @@ public class JsonMockWrapper : IDictionary, IList, IEnumerable, ICollection, IOr
 		}
 	}
 
-	object IDictionary.this[object KGBGENDIMBC]
+	object IDictionary.this[object key]
 	{
 		get
 		{
@@ -98,14 +98,14 @@ public class JsonMockWrapper : IDictionary, IList, IEnumerable, ICollection, IOr
 	}
 
 	// C# has no syntax for parameterized property 'IOrderedDictionary.Item'.
-	object IOrderedDictionary.get_Item(int OOPOEMNCCGH)
+	object IOrderedDictionary.get_Item(int index)
 	{
-		return LitJson_002EIOrderedDictionary_002Eget_Item(OOPOEMNCCGH);
+		return LitJson_002EIOrderedDictionary_002Eget_Item(index);
 	}
 
-	void IOrderedDictionary.set_Item(int OOPOEMNCCGH, object value)
+	void IOrderedDictionary.set_Item(int index, object value)
 	{
-		LitJson_002EIOrderedDictionary_002Eset_Item(OOPOEMNCCGH, value);
+		LitJson_002EIOrderedDictionary_002Eset_Item(index, value);
 	}
 
 	public bool IsArray
@@ -239,27 +239,27 @@ public class JsonMockWrapper : IDictionary, IList, IEnumerable, ICollection, IOr
 		return string.Empty;
 	}
 
-	public void SetBoolean(bool PKHDLOGJKAD)
+	public void SetBoolean(bool boolValue)
 	{
 	}
 
-	public void SetDouble(double PKHDLOGJKAD)
+	public void SetDouble(double doubleValue)
 	{
 	}
 
-	public void SetInt(int PKHDLOGJKAD)
+	public void SetInt(int intValue)
 	{
 	}
 
-	public void SetJsonType(JsonType LFLGCDNKNJI)
+	public void SetJsonType(JsonType jsonType)
 	{
 	}
 
-	public void SetLong(long PKHDLOGJKAD)
+	public void SetLong(long longValue)
 	{
 	}
 
-	public void SetString(string PKHDLOGJKAD)
+	public void SetString(string stringValue)
 	{
 	}
 
@@ -291,7 +291,7 @@ public class JsonMockWrapper : IDictionary, IList, IEnumerable, ICollection, IOr
 		return -1;
 	}
 
-	void IList.Insert(int i, object AFIEJABPAKA)
+	void IList.Insert(int i, object item)
 	{
 	}
 
@@ -303,7 +303,7 @@ public class JsonMockWrapper : IDictionary, IList, IEnumerable, ICollection, IOr
 	{
 	}
 
-	void ICollection.CopyTo(Array HFPDMGAEJJE, int index)
+	void ICollection.CopyTo(Array array, int index)
 	{
 	}
 
@@ -312,7 +312,7 @@ public class JsonMockWrapper : IDictionary, IList, IEnumerable, ICollection, IOr
 		return null;
 	}
 
-	void IDictionary.Add(object KJBMNAEJIHG, object AFIEJABPAKA)
+	void IDictionary.Add(object key, object entryValue)
 	{
 	}
 
@@ -320,12 +320,12 @@ public class JsonMockWrapper : IDictionary, IList, IEnumerable, ICollection, IOr
 	{
 	}
 
-	bool IDictionary.Contains(object KGBGENDIMBC)
+	bool IDictionary.Contains(object key)
 	{
 		return false;
 	}
 
-	void IDictionary.Remove(object KGBGENDIMBC)
+	void IDictionary.Remove(object key)
 	{
 	}
 
@@ -334,12 +334,12 @@ public class JsonMockWrapper : IDictionary, IList, IEnumerable, ICollection, IOr
 		return null;
 	}
 
-	private object LitJson_002EIOrderedDictionary_002Eget_Item(int OOPOEMNCCGH)
+	private object LitJson_002EIOrderedDictionary_002Eget_Item(int index)
 	{
 		return null;
 	}
 
-	private void LitJson_002EIOrderedDictionary_002Eset_Item(int OOPOEMNCCGH, object value)
+	private void LitJson_002EIOrderedDictionary_002Eset_Item(int index, object value)
 	{
 	}
 
@@ -348,7 +348,7 @@ public class JsonMockWrapper : IDictionary, IList, IEnumerable, ICollection, IOr
 		return null;
 	}
 
-	void IOrderedDictionary.Insert(int i, object KJBMNAEJIHG, object AFIEJABPAKA)
+	void IOrderedDictionary.Insert(int i, object key, object entryValue)
 	{
 	}
 

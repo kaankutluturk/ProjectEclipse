@@ -20,7 +20,7 @@ namespace UIFigures
 			}
 		}
 
-		protected override void OnPopulateMesh(VertexHelper DHJBOKKAOJK)
+		protected override void OnPopulateMesh(VertexHelper vertexHelper)
 		{
 			_LowerLeft = new Vector2(0f - base.rectTransform.pivot.x, 0f - base.rectTransform.pivot.y);
 			_UpperRight = new Vector2(1f - base.rectTransform.pivot.x, 1f - base.rectTransform.pivot.y);

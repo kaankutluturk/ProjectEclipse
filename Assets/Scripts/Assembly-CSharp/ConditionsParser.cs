@@ -93,16 +93,16 @@ public class ConditionsParser
 		return result;
 	}
 
-	public static void ParseInside(List<ConditionAnimation> DCJLKCFKCOM, XmlNode nodes)
+	public static void ParseInside(List<ConditionAnimation> conditions, XmlNode nodes)
 	{
-		DCJLKCFKCOM.Clear();
+		conditions.Clear();
 		foreach (XmlNode childNode in nodes.ChildNodes)
 		{
-			ConditionAnimation iIDOLPHMOGA = Create(childNode);
-			if (iIDOLPHMOGA != null)
+			ConditionAnimation condition = Create(childNode);
+			if (condition != null)
 			{
-				iIDOLPHMOGA.Parse(childNode);
-				DCJLKCFKCOM.Add(iIDOLPHMOGA);
+				condition.Parse(childNode);
+				conditions.Add(condition);
 			}
 		}
 	}

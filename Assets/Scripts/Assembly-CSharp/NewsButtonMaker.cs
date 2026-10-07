@@ -25,15 +25,15 @@ public class NewsButtonMaker : global::EventDispatcher<object>
 
 	private LabelButton _labelButtonPrefab;
 
-	public void Init(float FNDOOJNDJDC, float GBCONNBABLL, float KDGOIIIHPCL, GameObject KPAICOOKACB, Action<object> ODDEOFKLIAG, NewsDialog MDOHPMBJFIL)
+	public void Init(float nextButtonX, float buttonY, float buttonSpacing, GameObject parent, Action<object> callback, NewsDialog dialog)
 	{
-		_nextButtonX = FNDOOJNDJDC;
-		_buttonY = GBCONNBABLL;
-		_buttonSpacing = KDGOIIIHPCL;
-		_parent = KPAICOOKACB;
+		_nextButtonX = nextButtonX;
+		_buttonY = buttonY;
+		_buttonSpacing = buttonSpacing;
+		_parent = parent;
 		_buttons.Clear();
-		_dlg = ODDEOFKLIAG;
-		_dialog = MDOHPMBJFIL;
+		_dlg = callback;
+		_dialog = dialog;
 		_id = 0;
 	}
 
@@ -47,7 +47,7 @@ public class NewsButtonMaker : global::EventDispatcher<object>
 		_labelButtons.Clear();
 	}
 
-	public void AddButton(NewsButton HJNAHNICGMH)
+	public void AddButton(NewsButton newsButton)
 	{
 		if (_labelButtonPrefab == null)
 		{
@@ -57,8 +57,8 @@ public class NewsButtonMaker : global::EventDispatcher<object>
 		{
 			LabelButton labelButton = UnityEngine.Object.Instantiate(_labelButtonPrefab);
 			labelButton.name = "LabelButton";
-			labelButton.SetColor(HJNAHNICGMH.Color);
-			labelButton.SetAlias(HJNAHNICGMH.LabelAliasName);
+			labelButton.SetColor(newsButton.Color);
+			labelButton.SetAlias(newsButton.LabelAliasName);
 			labelButton.ButtonId = _id;
 			labelButton.AddEventListener(2, OnClickButton);
 			labelButton.transform.SetParent(_parent.transform);
@@ -67,7 +67,7 @@ public class NewsButtonMaker : global::EventDispatcher<object>
 			labelButton.transform.localScale = new Vector3(1f, 1f, 1f);
 			_id++;
 			_nextButtonX += _buttonSpacing;
-			_buttons.Add(HJNAHNICGMH);
+			_buttons.Add(newsButton);
 			_labelButtons.Add(labelButton);
 		}
 	}
@@ -75,29 +75,29 @@ public class NewsButtonMaker : global::EventDispatcher<object>
 	private void OnClickButton(object data)
 	{
 		int num = (int)data;
-		NewsButton fBKMFDJBJIB = null;
+		NewsButton button = null;
 		if (_buttons.Count > num)
 		{
-			fBKMFDJBJIB = _buttons[num];
+			button = _buttons[num];
 		}
-		if (fBKMFDJBJIB == null)
+		if (button == null)
 		{
 			return;
 		}
-		if (fBKMFDJBJIB.Url != string.Empty)
+		if (button.Url != string.Empty)
 		{
-			OfflineServices.OpenExternalUrl(fBKMFDJBJIB.Url);
+			OfflineServices.OpenExternalUrl(button.Url);
 			return;
 		}
-		if (fBKMFDJBJIB.GoShop && _dialog != null)
+		if (button.GoShop && _dialog != null)
 		{
 			_dialog.GoShopAfterClose = true;
-			_dialog.RedirectShopAfterClose = fBKMFDJBJIB.RedirectShop;
+			_dialog.RedirectShopAfterClose = button.RedirectShop;
 		}
-		if (fBKMFDJBJIB.BuyItem && _dialog != null)
+		if (button.BuyItem && _dialog != null)
 		{
 			_dialog.BuyItemAfterClose = true;
-			_dialog.RedirectShopAfterClose = fBKMFDJBJIB.RedirectShop;
+			_dialog.RedirectShopAfterClose = button.RedirectShop;
 		}
 		_dlg(data);
 	}

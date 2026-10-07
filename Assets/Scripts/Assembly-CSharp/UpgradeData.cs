@@ -51,7 +51,7 @@ public class UpgradeData : IComparable<UpgradeData>
 
 	public int UpgradeIndex;
 
-	public UpgradeData(XmlNode node, string LFLGCDNKNJI)
+	public UpgradeData(XmlNode node, string itemType)
 	{
 		HasValues.HasBonusDeliveryPrice = false;
 		HasValues.HasBonusPrice = false;
@@ -68,10 +68,10 @@ public class UpgradeData : IComparable<UpgradeData>
 		Values.Level = 0;
 		Values.Milestone = 0;
 		Values.UpgradeLevel = 0;
-		Values.ItemType = LFLGCDNKNJI;
+		Values.ItemType = itemType;
 		Values.Attributes = new Attributes();
-		List<WarriorAttribute> iBLHIAHECLK = GameUtils.WarriorAttributeList.AttributeList;
-		foreach (WarriorAttribute item in iBLHIAHECLK)
+		List<WarriorAttribute> attributes = GameUtils.WarriorAttributeList.AttributeList;
+		foreach (WarriorAttribute item in attributes)
 		{
 			XmlAttribute xmlAttribute = node.Attributes[item.get_Name()];
 			if (xmlAttribute != null)
@@ -92,7 +92,7 @@ public class UpgradeData : IComparable<UpgradeData>
 			Values.BonusDeliveryPrice = (ObscuredLong)(xmlAttribute3.ParseLong(0L));
 		}
 		HasValues.HasType = true;
-		Values.ItemType = LFLGCDNKNJI;
+		Values.ItemType = itemType;
 		XmlAttribute xmlAttribute4 = node.Attributes["Price"];
 		if (xmlAttribute4 != null)
 		{
@@ -125,30 +125,30 @@ public class UpgradeData : IComparable<UpgradeData>
 		}
 	}
 
-	public UpgradeData(UpgradeData NOLFMPDGCOC)
+	public UpgradeData(UpgradeData source)
 	{
-		HasValues.HasBonusDeliveryPrice = NOLFMPDGCOC.HasValues.HasBonusDeliveryPrice;
-		HasValues.HasBonusPrice = NOLFMPDGCOC.HasValues.HasBonusPrice;
-		HasValues.HasDeliveryTime = NOLFMPDGCOC.HasValues.HasDeliveryTime;
-		HasValues.Level = NOLFMPDGCOC.HasValues.Level;
-		HasValues.HasMilestone = NOLFMPDGCOC.HasValues.HasMilestone;
-		HasValues.HasPrice = NOLFMPDGCOC.HasValues.HasPrice;
-		HasValues.HasUpgradeLevel = NOLFMPDGCOC.HasValues.HasUpgradeLevel;
-		HasValues.HasType = NOLFMPDGCOC.HasValues.HasType;
-		Values.Attributes = NOLFMPDGCOC.Values.Attributes;
-		Values.BonusDeliveryPrice = NOLFMPDGCOC.Values.BonusDeliveryPrice;
-		Values.BonusPrice = NOLFMPDGCOC.Values.BonusPrice;
-		Values.DeliveryTime = NOLFMPDGCOC.Values.DeliveryTime;
-		Values.Level = NOLFMPDGCOC.Values.Level;
-		Values.Milestone = NOLFMPDGCOC.Values.Milestone;
-		Values.Price = NOLFMPDGCOC.Values.Price;
-		Values.UpgradeLevel = NOLFMPDGCOC.Values.UpgradeLevel;
-		Values.ItemType = NOLFMPDGCOC.Values.ItemType;
+		HasValues.HasBonusDeliveryPrice = source.HasValues.HasBonusDeliveryPrice;
+		HasValues.HasBonusPrice = source.HasValues.HasBonusPrice;
+		HasValues.HasDeliveryTime = source.HasValues.HasDeliveryTime;
+		HasValues.Level = source.HasValues.Level;
+		HasValues.HasMilestone = source.HasValues.HasMilestone;
+		HasValues.HasPrice = source.HasValues.HasPrice;
+		HasValues.HasUpgradeLevel = source.HasValues.HasUpgradeLevel;
+		HasValues.HasType = source.HasValues.HasType;
+		Values.Attributes = source.Values.Attributes;
+		Values.BonusDeliveryPrice = source.Values.BonusDeliveryPrice;
+		Values.BonusPrice = source.Values.BonusPrice;
+		Values.DeliveryTime = source.Values.DeliveryTime;
+		Values.Level = source.Values.Level;
+		Values.Milestone = source.Values.Milestone;
+		Values.Price = source.Values.Price;
+		Values.UpgradeLevel = source.Values.UpgradeLevel;
+		Values.ItemType = source.Values.ItemType;
 	}
 
-	public int CompareTo(UpgradeData NOLFMPDGCOC)
+	public int CompareTo(UpgradeData other)
 	{
-		return (Values.UpgradeLevel >= NOLFMPDGCOC.Values.UpgradeLevel) ? 1 : (-1);
+		return (Values.UpgradeLevel >= other.Values.UpgradeLevel) ? 1 : (-1);
 	}
 
 	public void RandomizeObscuredVars()

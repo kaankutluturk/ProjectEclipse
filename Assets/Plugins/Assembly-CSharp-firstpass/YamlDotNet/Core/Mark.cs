@@ -19,23 +19,23 @@ namespace YamlDotNet.Core
 			Column = 1;
 		}
 
-		public Mark(int index, int MGPBPJOHMLH, int DLPJJBPDNDE)
+		public Mark(int index, int line, int column)
 		{
 			if (index < 0)
 			{
 				throw new ArgumentOutOfRangeException("index", "Index must be greater than or equal to zero.");
 			}
-			if (MGPBPJOHMLH < 1)
+			if (line < 1)
 			{
 				throw new ArgumentOutOfRangeException("line", "Line must be greater than or equal to 1.");
 			}
-			if (DLPJJBPDNDE < 1)
+			if (column < 1)
 			{
 				throw new ArgumentOutOfRangeException("column", "Column must be greater than or equal to 1.");
 			}
 			Index = index;
-			Line = MGPBPJOHMLH;
-			Column = DLPJJBPDNDE;
+			Line = line;
+			Column = column;
 		}
 
 		public override string ToString()
@@ -43,14 +43,14 @@ namespace YamlDotNet.Core
 			return string.Format("Line: {0}, Col: {1}, Idx: {2}", Line, Column, Index);
 		}
 
-		public override bool Equals(object AOMLCBHAJJH)
+		public override bool Equals(object obj)
 		{
-			return Equals(AOMLCBHAJJH as Mark);
+			return Equals(obj as Mark);
 		}
 
-		public bool Equals(Mark NOLFMPDGCOC)
+		public bool Equals(Mark other)
 		{
-			return NOLFMPDGCOC != null && Index == NOLFMPDGCOC.Index && Line == NOLFMPDGCOC.Line && Column == NOLFMPDGCOC.Column;
+			return other != null && Index == other.Index && Line == other.Line && Column == other.Column;
 		}
 
 		public override int GetHashCode()
@@ -58,25 +58,25 @@ namespace YamlDotNet.Core
 			return HashCode.CombineHashCodes(Index.GetHashCode(), HashCode.CombineHashCodes(Line.GetHashCode(), Column.GetHashCode()));
 		}
 
-		public int CompareTo(object AOMLCBHAJJH)
+		public int CompareTo(object obj)
 		{
-			if (AOMLCBHAJJH == null)
+			if (obj == null)
 			{
 				throw new ArgumentNullException("obj");
 			}
-			return CompareTo(AOMLCBHAJJH as Mark);
+			return CompareTo(obj as Mark);
 		}
 
-		public int CompareTo(Mark NOLFMPDGCOC)
+		public int CompareTo(Mark other)
 		{
-			if (NOLFMPDGCOC == null)
+			if (other == null)
 			{
 				throw new ArgumentNullException("other");
 			}
-			int num = Line.CompareTo(NOLFMPDGCOC.Line);
+			int num = Line.CompareTo(other.Line);
 			if (num == 0)
 			{
-				num = Column.CompareTo(NOLFMPDGCOC.Column);
+				num = Column.CompareTo(other.Column);
 			}
 			return num;
 		}

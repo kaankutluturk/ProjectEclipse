@@ -244,39 +244,39 @@ namespace Nekki.SF2.GUI
 			set_text(GetTimeString(_currentTime, IsSeconds, IsMinutes, IsHours, IsDays, Delimiter, DaysString, UseDaysDelimiter, IsSecondsZero, IsMinutesZero, IsHoursZero, IsDaysZero, HoursString, MinutesString, SecondsString, SegmentsDate));
 		}
 
-		public static string GetTimeString(long time, bool OEIFDLECBPO = true, bool BGDHLOMPPJB = true, bool LMBINLCHPAL = true, bool ANLFBBLJMJH = false, string OBABIEFGCAK = ":", string CNINNGINAEN = "", bool INCHCBDKMIP = true, bool AOGNIMJAMMJ = true, bool DINFJGFHNEC = true, bool DJBAELOAHIC = true, bool FAFKECJEOIH = true, string GOOEIOKNPBK = "", string HCLLKPNBOBO = "", string OHKCBFJCINL = "", int IEFLCNGMHBM = 3)
+		public static string GetTimeString(long time, bool showSeconds = true, bool showMinutes = true, bool showHours = true, bool showDays = false, string delimiter = ":", string daysSuffix = "", bool useDaysDelimiter = true, bool padSeconds = true, bool padMinutes = true, bool padHours = true, bool padDays = true, string hoursSuffix = "", string minutesSuffix = "", string secondsSuffix = "", int maxSegments = 3)
 		{
 			TimeSpan timeSpan = TimeSpan.FromSeconds(time);
 			List<object> list = new List<object>();
 			StringBuilder stringBuilder = new StringBuilder();
 			int num = 0;
-			bool flag = ANLFBBLJMJH && timeSpan.TotalDays >= 1.0 && IEFLCNGMHBM > num;
+			bool flag = showDays && timeSpan.TotalDays >= 1.0 && maxSegments > num;
 			if (flag)
 			{
 				num++;
 			}
-			bool flag2 = LMBINLCHPAL && timeSpan.TotalHours >= 1.0 && IEFLCNGMHBM > num;
+			bool flag2 = showHours && timeSpan.TotalHours >= 1.0 && maxSegments > num;
 			if (flag2)
 			{
 				num++;
 			}
-			bool flag3 = BGDHLOMPPJB && IEFLCNGMHBM > num;
+			bool flag3 = showMinutes && maxSegments > num;
 			if (flag3)
 			{
 				num++;
 			}
-			bool flag4 = OEIFDLECBPO && IEFLCNGMHBM > num;
+			bool flag4 = showSeconds && maxSegments > num;
 			int num2 = 0;
 			if (flag)
 			{
 				list.Add(timeSpan.Days);
 				stringBuilder.Append('{');
 				stringBuilder.Append(num2++);
-				stringBuilder.Append((!FAFKECJEOIH) ? ":D}" : ":D2}");
-				stringBuilder.Append(CNINNGINAEN);
-				if (INCHCBDKMIP && (flag2 || flag3 || flag4))
+				stringBuilder.Append((!padDays) ? ":D}" : ":D2}");
+				stringBuilder.Append(daysSuffix);
+				if (useDaysDelimiter && (flag2 || flag3 || flag4))
 				{
-					stringBuilder.Append(OBABIEFGCAK);
+					stringBuilder.Append(delimiter);
 				}
 			}
 			if (flag2)
@@ -284,11 +284,11 @@ namespace Nekki.SF2.GUI
 				list.Add(timeSpan.Hours);
 				stringBuilder.Append('{');
 				stringBuilder.Append(num2++);
-				stringBuilder.Append((!DJBAELOAHIC) ? ":D}" : ":D2}");
-				stringBuilder.Append(GOOEIOKNPBK);
+				stringBuilder.Append((!padHours) ? ":D}" : ":D2}");
+				stringBuilder.Append(hoursSuffix);
 				if (flag3 || flag4)
 				{
-					stringBuilder.Append(OBABIEFGCAK);
+					stringBuilder.Append(delimiter);
 				}
 			}
 			if (flag3)
@@ -296,11 +296,11 @@ namespace Nekki.SF2.GUI
 				list.Add(timeSpan.Minutes);
 				stringBuilder.Append('{');
 				stringBuilder.Append(num2++);
-				stringBuilder.Append((!DINFJGFHNEC) ? ":D}" : ":D2}");
-				stringBuilder.Append(HCLLKPNBOBO);
+				stringBuilder.Append((!padMinutes) ? ":D}" : ":D2}");
+				stringBuilder.Append(minutesSuffix);
 				if (flag4)
 				{
-					stringBuilder.Append(OBABIEFGCAK);
+					stringBuilder.Append(delimiter);
 				}
 			}
 			if (flag4)
@@ -308,8 +308,8 @@ namespace Nekki.SF2.GUI
 				list.Add(timeSpan.Seconds);
 				stringBuilder.Append('{');
 				stringBuilder.Append(num2++);
-				stringBuilder.Append((!AOGNIMJAMMJ) ? ":D}" : ":D2}");
-				stringBuilder.Append(OHKCBFJCINL);
+				stringBuilder.Append((!padSeconds) ? ":D}" : ":D2}");
+				stringBuilder.Append(secondsSuffix);
 			}
 			return string.Format(stringBuilder.ToString(), list.ToArray());
 		}

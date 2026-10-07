@@ -183,17 +183,17 @@ namespace Nekki.SF2.GUI
             Eclipse.UI.SplitImageLayout.Apply(this, _SpriteName);
 		}
 
-		public static Sprite GetSprite(string texturePath, string JGIGOMLGLPN)
+		public static Sprite GetSprite(string texturePath, string spriteName)
 			{
-				if (string.IsNullOrEmpty(JGIGOMLGLPN))
+				if (string.IsNullOrEmpty(spriteName))
 				{
 					return null;
 				}
 				// Qualified mod sprites already contain their complete namespace/path. A shop
 				// prefab's recovered _TexturePath must not be prepended to that logical ID.
-				if (JGIGOMLGLPN.IndexOf(':') > 0)
+				if (spriteName.IndexOf(':') > 0)
 				{
-					Sprite qualified = ResourcesAndBundles.Load<Sprite>(JGIGOMLGLPN);
+					Sprite qualified = ResourcesAndBundles.Load<Sprite>(spriteName);
 					if (qualified != null)
 					{
 						return qualified;
@@ -205,22 +205,22 @@ namespace Nekki.SF2.GUI
 			// this normalization UI/Skills/IconFoo is searched from the Resources
 			// root, bypassing both the exact skill assets and their compatibility
 			// fallback, which leaves the icon as a white/blank image.
-			string normalizedName = JGIGOMLGLPN.Replace('\\', '/');
+			string normalizedName = spriteName.Replace('\\', '/');
 			if (normalizedName.IndexOf('/') >= 0)
 			{
 				int num = normalizedName.LastIndexOf('/');
 				if (num >= 0)
 				{
 					texturePath = normalizedName.Substring(0, num + 1);
-					JGIGOMLGLPN = normalizedName.Substring(num + 1);
+					spriteName = normalizedName.Substring(num + 1);
 				}
 			}
 			// Control packs also apply to the standalone recovered sprite path. AtlasCache
 			// preserves mod replacement priority and supplies original sizing for the pack.
-			if (JGIGOMLGLPN.StartsWith("FightButtons.", System.StringComparison.OrdinalIgnoreCase) &&
+			if (spriteName.StartsWith("FightButtons.", System.StringComparison.OrdinalIgnoreCase) &&
 				(texturePath ?? string.Empty).Replace('\\', '/').TrimEnd('/').Equals("UI/Atlases", System.StringComparison.OrdinalIgnoreCase))
 			{
-				Sprite control = AtlasCache.GetSpriteFromAtlas("UI/Atlases/FightButtons", JGIGOMLGLPN);
+				Sprite control = AtlasCache.GetSpriteFromAtlas("UI/Atlases/FightButtons", spriteName);
 				if (control != null) return control;
 			}
 			// Shop panels prepend Enchantments. to XML names such as
@@ -228,9 +228,9 @@ namespace Nekki.SF2.GUI
 			// before generic atlas/member lookups: the recovered art also contains
 			// framed skill cards with the same member name. Load the exact local
 			// resource here because ResourcesAndBundles permits basename matches.
-			if (JGIGOMLGLPN.StartsWith("Enchantments.", System.StringComparison.OrdinalIgnoreCase))
+			if (spriteName.StartsWith("Enchantments.", System.StringComparison.OrdinalIgnoreCase))
 			{
-				string member = JGIGOMLGLPN.Substring(JGIGOMLGLPN.LastIndexOf('.') + 1);
+				string member = spriteName.Substring(spriteName.LastIndexOf('.') + 1);
 				Sprite enchantment = Resources.Load<Sprite>("UI/Enchantments/" + member);
 				if (enchantment != null)
 				{
@@ -242,15 +242,15 @@ namespace Nekki.SF2.GUI
 			// (VS_Fon_left.img, Map1.1, Weapon1.img_weapon_...), so a dot alone is
 			// not enough to identify an atlas reference.  Try the exact standalone
 			// asset first and only use the original atlas lookup as a fallback.
-			Sprite sprite = LoadStandaloneSprite(texturePath, JGIGOMLGLPN);
+			Sprite sprite = LoadStandaloneSprite(texturePath, spriteName);
 			if (sprite != null)
 			{
 				return sprite;
 			}
-			string[] array = JGIGOMLGLPN.Split('.');
+			string[] array = spriteName.Split('.');
 			if (array.Length > 1)
 			{
-				sprite = LoadAtlasSprite(texturePath, JGIGOMLGLPN);
+				sprite = LoadAtlasSprite(texturePath, spriteName);
 				if (sprite != null)
 				{
 					return sprite;
@@ -273,10 +273,10 @@ namespace Nekki.SF2.GUI
 					}
 				}
 			}
-			sprite = GetCompatibilitySprite(texturePath, JGIGOMLGLPN);
+			sprite = GetCompatibilitySprite(texturePath, spriteName);
 			if (sprite == null)
 			{
-				string missingKey = ((texturePath ?? string.Empty) + JGIGOMLGLPN).Replace('\\', '/');
+				string missingKey = ((texturePath ?? string.Empty) + spriteName).Replace('\\', '/');
 				if (LoggedCompatibilitySprites.Add("missing:" + missingKey))
 				{
 					Debug.LogWarning("[UI] Missing sprite '" + missingKey + "'.");
@@ -401,11 +401,11 @@ namespace Nekki.SF2.GUI
 			return null;
 		}
 
-		private static Sprite LoadStandaloneSprite(string texturePath, string JGIGOMLGLPN)
+		private static Sprite LoadStandaloneSprite(string texturePath, string rawSpriteName)
 		{
-			string spriteName = NormalizeSpriteName(JGIGOMLGLPN);
+			string spriteName = NormalizeSpriteName(rawSpriteName);
 			string normalizedTexturePath = (texturePath ?? string.Empty).Replace('\\', '/');
-			string oNEIGMLOGDC = normalizedTexturePath + spriteName;
+			string resourcePath = normalizedTexturePath + spriteName;
 			int dot = spriteName.IndexOf('.');
 			if (dot > 0 && !normalizedTexturePath.EndsWith("/", System.StringComparison.Ordinal))
 			{
@@ -414,10 +414,10 @@ namespace Nekki.SF2.GUI
 				string textureName = (slash < 0) ? normalizedTexturePath : normalizedTexturePath.Substring(slash + 1);
 				if (textureName.Equals(atlasName, System.StringComparison.OrdinalIgnoreCase))
 				{
-					oNEIGMLOGDC = ((slash < 0) ? string.Empty : normalizedTexturePath.Substring(0, slash + 1)) + spriteName;
+					resourcePath = ((slash < 0) ? string.Empty : normalizedTexturePath.Substring(0, slash + 1)) + spriteName;
 				}
 			}
-			return RepairInvalidRecoveredSprite(ResourcesAndBundles.Load<Sprite>(oNEIGMLOGDC));
+			return RepairInvalidRecoveredSprite(ResourcesAndBundles.Load<Sprite>(resourcePath));
 		}
 
 		private static Sprite RepairInvalidRecoveredSprite(Sprite sprite)
@@ -472,30 +472,30 @@ namespace Nekki.SF2.GUI
 			return repaired;
 		}
 
-		private static Sprite LoadAtlasSprite(string texturePath, string JGIGOMLGLPN)
+		private static Sprite LoadAtlasSprite(string texturePath, string spriteName)
 		{
-			string[] array = JGIGOMLGLPN.Split('.');
+			string[] array = spriteName.Split('.');
 			string text = array[0];
 			if (text.Equals("Attributes"))
 			{
 				int num = 0;
 			}
-			Sprite sprite = AtlasCache.GetSpriteFromAtlas(texturePath + NormalizeAtlasName(text), JGIGOMLGLPN);
+			Sprite sprite = AtlasCache.GetSpriteFromAtlas(texturePath + NormalizeAtlasName(text), spriteName);
 			if (sprite == null)
 			{
-				sprite = AtlasCache.GetSpriteFromAtlas("UI/Atlases/" + NormalizeAtlasName(text), JGIGOMLGLPN);
+				sprite = AtlasCache.GetSpriteFromAtlas("UI/Atlases/" + NormalizeAtlasName(text), spriteName);
 			}
 			return RepairInvalidRecoveredSprite(sprite);
 		}
 
-		protected static string NormalizeSpriteName(string JGIGOMLGLPN)
+		protected static string NormalizeSpriteName(string spriteName)
 		{
-			return JGIGOMLGLPN;
+			return spriteName;
 		}
 
-		protected static string NormalizeAtlasName(string JLEKBBJBLOE)
+		protected static string NormalizeAtlasName(string atlasName)
 		{
-			return JLEKBBJBLOE;
+			return atlasName;
 		}
 
 		public override void SetNativeSize()

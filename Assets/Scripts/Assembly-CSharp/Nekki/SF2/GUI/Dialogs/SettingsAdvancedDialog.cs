@@ -250,20 +250,20 @@ namespace Nekki.SF2.GUI.Dialogs
 			_content.transform.SetLocalY(num);
 		}
 
-		protected void OnSoundVolumeChanged(float JIJAJFEJJHK)
+		protected void OnSoundVolumeChanged(float volume)
 		{
 			bool flag = SoundController.GetSoundMuted();
-			SoundController.SetSoundVolume(JIJAJFEJJHK);
+			SoundController.SetSoundVolume(volume);
 			if (flag != SoundController.GetSoundMuted())
 			{
 				RefreshSoundButton();
 			}
 		}
 
-		protected void OnMusicVolumeChanged(float JIJAJFEJJHK)
+		protected void OnMusicVolumeChanged(float volume)
 		{
 			bool flag = SoundController.GetMusicMuted();
-			SoundController.SetMusicVolume(JIJAJFEJJHK);
+			SoundController.SetMusicVolume(volume);
 			if (flag != SoundController.GetMusicMuted())
 			{
 				RefreshMusicButton();
@@ -310,11 +310,11 @@ namespace Nekki.SF2.GUI.Dialogs
 
 		protected void ExpandButtonTouchZones()
 		{
-			float jMLAKAKDBBL = 1500f;
-			ChangeButtonTouchZone(btnGraphics, jMLAKAKDBBL);
-			ChangeButtonTouchZone(GetDesktopRenderSettings().FrameRateButton, jMLAKAKDBBL);
-			ChangeButtonTouchZone(GetDesktopRenderSettings().MotionBlurButton, jMLAKAKDBBL);
-			ChangeButtonTouchZone(btnController, jMLAKAKDBBL);
+			float touchZoneSize = 1500f;
+			ChangeButtonTouchZone(btnGraphics, touchZoneSize);
+			ChangeButtonTouchZone(GetDesktopRenderSettings().FrameRateButton, touchZoneSize);
+			ChangeButtonTouchZone(GetDesktopRenderSettings().MotionBlurButton, touchZoneSize);
+			ChangeButtonTouchZone(btnController, touchZoneSize);
 		}
 
 		private DesktopRenderSettingsControls GetDesktopRenderSettings()
@@ -341,10 +341,10 @@ namespace Nekki.SF2.GUI.Dialogs
 
 		protected string GetGraphicsQualityAlias()
 		{
-			string gOHIIMFFFJI = GraphicsController.GetEffectiveQualityCondition();
-			QualityOption.QualityLevel hPNJCDGIHLI = QualityOption.ParseQualityLevel(gOHIIMFFFJI);
+			string qualityName = GraphicsController.GetEffectiveQualityCondition();
+			QualityOption.QualityLevel qualityLevel = QualityOption.ParseQualityLevel(qualityName);
 			string empty = string.Empty;
-			switch (hPNJCDGIHLI)
+			switch (qualityLevel)
 			{
 			case QualityOption.QualityLevel.QUALITY_LOW:
 				return "Settings_Graphics_Low";
@@ -371,22 +371,22 @@ namespace Nekki.SF2.GUI.Dialogs
 			}
 		}
 
-		protected void SetupSlider(Slider KFKCPEALPDL, float value, Vector2 MGMMDGFPBLP, UnityAction<float> ODDEOFKLIAG)
+		protected void SetupSlider(Slider slider, float value, Vector2 MGMMDGFPBLP, UnityAction<float> onValueChanged)
 		{
-			KFKCPEALPDL.gameObject.SetActive(true);
-			KFKCPEALPDL.onValueChanged.AddListener(ODDEOFKLIAG);
-			KFKCPEALPDL.minValue = 0f;
-			KFKCPEALPDL.maxValue = 1f;
-			KFKCPEALPDL.value = value;
-			KFKCPEALPDL.transform.SetLocalX(MGMMDGFPBLP.x);
-			KFKCPEALPDL.transform.SetLocalY(MGMMDGFPBLP.y);
+			slider.gameObject.SetActive(true);
+			slider.onValueChanged.AddListener(onValueChanged);
+			slider.minValue = 0f;
+			slider.maxValue = 1f;
+			slider.value = value;
+			slider.transform.SetLocalX(MGMMDGFPBLP.x);
+			slider.transform.SetLocalY(MGMMDGFPBLP.y);
 		}
 
-		protected void ChangeButtonTouchZone(Button GAMILDJHFDB, LabelAlias NCJDCOLEFHG)
+		protected void ChangeButtonTouchZone(Button button, LabelAlias label)
 		{
 		}
 
-		protected void ChangeButtonTouchZone(Button GAMILDJHFDB, float JMLAKAKDBBL)
+		protected void ChangeButtonTouchZone(Button button, float size)
 		{
 		}
 

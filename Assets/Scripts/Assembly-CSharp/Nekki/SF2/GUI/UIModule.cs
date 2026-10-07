@@ -109,20 +109,20 @@ namespace Nekki.SF2.GUI
 			while ((object)action != action2);
 		}
 
-		public static UIModule MountModule(UIModule ILLLNBPALIO, Transform PKHKBAJOHHF, bool CMDIBEFNCOE)
+		public static UIModule MountModule(UIModule module, Transform parent, bool isActive)
 		{
-			if (ILLLNBPALIO == null)
+			if (module == null)
 			{
 				return null;
 			}
-			GameObject gameObject = UnityEngine.Object.Instantiate(ILLLNBPALIO.gameObject);
-			gameObject.name = ILLLNBPALIO.gameObject.name;
-			gameObject.transform.SetParent(PKHKBAJOHHF, false);
+			GameObject gameObject = UnityEngine.Object.Instantiate(module.gameObject);
+			gameObject.name = module.gameObject.name;
+			gameObject.transform.SetParent(parent, false);
 			gameObject.transform.localScale = Vector3.one;
 			gameObject.SetActive(false);
 			UIModule component = gameObject.GetComponent<UIModule>();
-			component._sceneCanvas = PKHKBAJOHHF.GetComponent<Canvas>();
-			if (CMDIBEFNCOE)
+			component._sceneCanvas = parent.GetComponent<Canvas>();
+			if (isActive)
 			{
 				component.Activate();
 			}
@@ -141,11 +141,11 @@ namespace Nekki.SF2.GUI
 			return (T)null;
 		}
 
-		public static UIModule GetModuleByName(string JLEKBBJBLOE)
+		public static UIModule GetModuleByName(string moduleName)
 		{
 			for (int i = 0; i < _modules.Count; i++)
 			{
-				if (_modules[i].name == JLEKBBJBLOE)
+				if (_modules[i].name == moduleName)
 				{
 					return _modules[i];
 				}

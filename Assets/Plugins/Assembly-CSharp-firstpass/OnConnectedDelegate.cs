@@ -1,1 +1,1 @@
-public delegate void OnConnectedDelegate(Connection MDGFGCDPGFI);
+public delegate void OnConnectedDelegate(Connection connection);

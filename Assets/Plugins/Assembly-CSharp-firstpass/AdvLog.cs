@@ -58,31 +58,31 @@ public static class AdvLog
 		}
 	}
 
-	private static void ApplicationLogSubsctiption(string IOFGGOCEIAM, string HHLCHHIFDCM, LogType LFLGCDNKNJI)
+	private static void ApplicationLogSubsctiption(string condition, string stackTrace, LogType logType)
 	{
-		switch (LFLGCDNKNJI)
+		switch (logType)
 		{
 		case LogType.Log:
-			WriteToFile(LogLevel.Log, IOFGGOCEIAM + " - " + HHLCHHIFDCM);
+			WriteToFile(LogLevel.Log, condition + " - " + stackTrace);
 			break;
 		case LogType.Warning:
-			WriteToFile(LogLevel.Warn, IOFGGOCEIAM + " - " + HHLCHHIFDCM);
+			WriteToFile(LogLevel.Warn, condition + " - " + stackTrace);
 			break;
 		case LogType.Error:
 		case LogType.Assert:
 		case LogType.Exception:
-			WriteToFile(LogLevel.Error, IOFGGOCEIAM + " - " + HHLCHHIFDCM);
+			WriteToFile(LogLevel.Error, condition + " - " + stackTrace);
 			break;
 		}
 	}
 
-	public static void EmailLog(string CCELBJICOKG, string IEJOMILJAOK)
+	public static void EmailLog(string recipient, string senderName)
 	{
 		if (!string.IsNullOrEmpty(_filePath))
 		{
 			MailMessage mailMessage = new MailMessage();
-			mailMessage.From = new MailAddress("logs@nekkimobile.ru", IEJOMILJAOK);
-			mailMessage.To.Add(CCELBJICOKG);
+			mailMessage.From = new MailAddress("logs@nekkimobile.ru", senderName);
+			mailMessage.To.Add(recipient);
 			mailMessage.Attachments.Add(new Attachment(_filePath));
 			mailMessage.Subject = string.Format("Log from [{0}:{1}:{2}] {3}", SystemInfo.deviceModel, SystemInfo.deviceName, SystemInfo.deviceType, SystemInfo.deviceUniqueIdentifier);
 			mailMessage.Body = "see log in attachment";
@@ -90,152 +90,152 @@ public static class AdvLog
 			smtpClient.Port = 587;
 			smtpClient.Credentials = new NetworkCredential("logs@nekkimobile.ru", "o99hSASo") as ICredentialsByHost;
 			smtpClient.EnableSsl = true;
-			ServicePointManager.ServerCertificateValidationCallback = (object JDCCBCNFENK, X509Certificate POHBEPBAMIO, X509Chain GCONPBMJDFL, SslPolicyErrors BFOEIHJDKEL) => true;
+			ServicePointManager.ServerCertificateValidationCallback = (object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors) => true;
 			smtpClient.Send(mailMessage);
 			Debug.Log("success");
 		}
 	}
 
-	private static void WriteToFile(LogLevel GNLOCMLBNHF, object LIOGIBJBHAH)
+	private static void WriteToFile(LogLevel logLevel, object message)
 	{
-		if (LIOGIBJBHAH != null && !string.IsNullOrEmpty(LIOGIBJBHAH.ToString()) && GetLogNow())
+		if (message != null && !string.IsNullOrEmpty(message.ToString()) && GetLogNow())
 		{
-			PushToFile(string.Format("[{0}:{1}] {2}", DateTime.Now, GNLOCMLBNHF, LIOGIBJBHAH));
+			PushToFile(string.Format("[{0}:{1}] {2}", DateTime.Now, logLevel, message));
 		}
 	}
 
-	private static void PushToFile(string LIOGIBJBHAH)
+	private static void PushToFile(string text)
 	{
-		File.AppendAllText(_filePath, LIOGIBJBHAH);
+		File.AppendAllText(_filePath, text);
 	}
 
-	public static void Log(object LIOGIBJBHAH)
+	public static void Log(object message)
 	{
 		if (GetLogNow())
 		{
-			Debug.Log(LIOGIBJBHAH);
+			Debug.Log(message);
 		}
 	}
 
-	public static void Log(object LIOGIBJBHAH, UnityEngine.Object PDCAHMPCPOC)
+	public static void Log(object message, UnityEngine.Object context)
 	{
 		if (GetLogNow())
 		{
-			Debug.Log(LIOGIBJBHAH, PDCAHMPCPOC);
+			Debug.Log(message, context);
 		}
 	}
 
-	public static void LogFormat(UnityEngine.Object PDCAHMPCPOC, string LBOHOKIBHOH, params object[] LKIOKGCNKHE)
+	public static void LogFormat(UnityEngine.Object context, string format, params object[] args)
 	{
 		if (GetLogNow())
 		{
-			Debug.LogFormat(PDCAHMPCPOC, LBOHOKIBHOH, LKIOKGCNKHE);
+			Debug.LogFormat(context, format, args);
 		}
 	}
 
-	public static void LogFormat(string LBOHOKIBHOH, params object[] LKIOKGCNKHE)
+	public static void LogFormat(string format, params object[] args)
 	{
 		if (GetLogNow())
 		{
-			Debug.LogFormat(LBOHOKIBHOH, LKIOKGCNKHE);
+			Debug.LogFormat(format, args);
 		}
 	}
 
-	public static void LogWarning(object LIOGIBJBHAH)
+	public static void LogWarning(object message)
 	{
 		if (GetLogNow())
 		{
-			Debug.LogWarning(LIOGIBJBHAH);
+			Debug.LogWarning(message);
 		}
 	}
 
-	public static void LogWarning(object LIOGIBJBHAH, UnityEngine.Object PDCAHMPCPOC)
+	public static void LogWarning(object message, UnityEngine.Object context)
 	{
 		if (GetLogNow())
 		{
-			Debug.LogWarning(LIOGIBJBHAH, PDCAHMPCPOC);
+			Debug.LogWarning(message, context);
 		}
 	}
 
-	public static void LogWarningFormat(UnityEngine.Object PDCAHMPCPOC, string LBOHOKIBHOH, params object[] LKIOKGCNKHE)
+	public static void LogWarningFormat(UnityEngine.Object context, string format, params object[] args)
 	{
 		if (GetLogNow())
 		{
-			Debug.LogWarningFormat(PDCAHMPCPOC, LBOHOKIBHOH, LKIOKGCNKHE);
+			Debug.LogWarningFormat(context, format, args);
 		}
 	}
 
-	public static void LogWarningFormat(string LBOHOKIBHOH, params object[] LKIOKGCNKHE)
+	public static void LogWarningFormat(string format, params object[] args)
 	{
 		if (GetLogNow())
 		{
-			Debug.LogWarningFormat(LBOHOKIBHOH, LKIOKGCNKHE);
+			Debug.LogWarningFormat(format, args);
 		}
 	}
 
-	public static void LogError(object LIOGIBJBHAH)
+	public static void LogError(object message)
 	{
 		if (GetLogNow())
 		{
-			Debug.LogError(LIOGIBJBHAH);
+			Debug.LogError(message);
 		}
 	}
 
-	public static void LogError(object LIOGIBJBHAH, UnityEngine.Object PDCAHMPCPOC)
+	public static void LogError(object message, UnityEngine.Object context)
 	{
 		if (GetLogNow())
 		{
-			Debug.LogError(LIOGIBJBHAH, PDCAHMPCPOC);
+			Debug.LogError(message, context);
 		}
 	}
 
-	public static void LogErrorFormat(UnityEngine.Object PDCAHMPCPOC, string LBOHOKIBHOH, params object[] LKIOKGCNKHE)
+	public static void LogErrorFormat(UnityEngine.Object context, string format, params object[] args)
 	{
 		if (GetLogNow())
 		{
-			Debug.LogErrorFormat(PDCAHMPCPOC, LBOHOKIBHOH, LKIOKGCNKHE);
+			Debug.LogErrorFormat(context, format, args);
 		}
 	}
 
-	public static void LogErrorFormat(string LBOHOKIBHOH, params object[] LKIOKGCNKHE)
+	public static void LogErrorFormat(string format, params object[] args)
 	{
 		if (GetLogNow())
 		{
-			Debug.LogErrorFormat(LBOHOKIBHOH, LKIOKGCNKHE);
+			Debug.LogErrorFormat(format, args);
 		}
 	}
 
-	public static void LogException(Exception MPFFFAOGBJE)
+	public static void LogException(Exception exception)
 	{
 		if (GetLogNow())
 		{
-			Debug.LogException(MPFFFAOGBJE);
+			Debug.LogException(exception);
 		}
 	}
 
-	public static void LogException(Exception MPFFFAOGBJE, UnityEngine.Object PDCAHMPCPOC)
+	public static void LogException(Exception exception, UnityEngine.Object context)
 	{
 		if (GetLogNow())
 		{
-			Debug.LogException(MPFFFAOGBJE, PDCAHMPCPOC);
+			Debug.LogException(exception, context);
 		}
 	}
 
-	public static void Assert(bool IOFGGOCEIAM)
-	{
-		if (GetLogNow())
-		{
-		}
-	}
-
-	public static void Assert(bool IOFGGOCEIAM, string LIOGIBJBHAH)
+	public static void Assert(bool condition)
 	{
 		if (GetLogNow())
 		{
 		}
 	}
 
-	public static void Assert(bool IOFGGOCEIAM, string LBOHOKIBHOH, params object[] LKIOKGCNKHE)
+	public static void Assert(bool condition, string message)
+	{
+		if (GetLogNow())
+		{
+		}
+	}
+
+	public static void Assert(bool condition, string format, params object[] args)
 	{
 		if (GetLogNow())
 		{

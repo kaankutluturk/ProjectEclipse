@@ -114,13 +114,13 @@ namespace Nekki.SF2.GUI
 			}
 		}
 
-		private void MoveTo(Vector2 LCCLEFMKLPB, float _Duration)
+		private void MoveTo(Vector2 targetPosition, float _Duration)
 		{
 			KillTween();
 			_tween = DOTween.To(() => GetContentPosition(), (Vector2Wrapper HBLGAEMOHAL) =>
 			{
 				SetContentPosition(HBLGAEMOHAL);
-			}, LCCLEFMKLPB, _Duration);
+			}, targetPosition, _Duration);
 			_tween.OnComplete(OnTweenComplete);
 		}
 
@@ -186,17 +186,17 @@ namespace Nekki.SF2.GUI
             onScrollEnd.Invoke();
         }
 
-        public override void OnBeginDrag(PointerEventData BHOLFGOGPCP)
+        public override void OnBeginDrag(PointerEventData eventData)
 		{
-			base.OnBeginDrag(BHOLFGOGPCP);
+			base.OnBeginDrag(eventData);
 			KillTween();
 			isDragging = true;
 			onDragBegin.Invoke();
 		}
 
-		public override void OnEndDrag(PointerEventData BHOLFGOGPCP)
+		public override void OnEndDrag(PointerEventData eventData)
 		{
-			base.OnEndDrag(BHOLFGOGPCP);
+			base.OnEndDrag(eventData);
 			isDragging = false;
 			if (AutoscrollIsOn && Math.Abs(get_velocity().magnitude) != 0f)
 			{
@@ -210,10 +210,10 @@ namespace Nekki.SF2.GUI
 					num = get_velocity().y * 0.5f;
 				}
 				BaseScrollItem selectedItem = scrollContent.SelectedItem;
-				BaseScrollItem mBIJKDIEFIF = ((!(Math.Abs(get_velocity().magnitude) > Math.Abs(get_MinScrollVelocity()))) ? selectedItem : scrollContent.GetNearestItem(0f - num));
-				num = scrollContent.GetDistanceToCenter(mBIJKDIEFIF);
-				float dFNBHOEGAHO = Mathf.Min(0.5f, Mathf.Abs(Mathf.Ceil(num / get_velocity().magnitude)));
-				ScrollToItem(mBIJKDIEFIF, dFNBHOEGAHO);
+				BaseScrollItem targetItem = ((!(Math.Abs(get_velocity().magnitude) > Math.Abs(get_MinScrollVelocity()))) ? selectedItem : scrollContent.GetNearestItem(0f - num));
+				num = scrollContent.GetDistanceToCenter(targetItem);
+				float duration = Mathf.Min(0.5f, Mathf.Abs(Mathf.Ceil(num / get_velocity().magnitude)));
+				ScrollToItem(targetItem, duration);
 			}
 		}
 

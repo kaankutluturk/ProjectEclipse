@@ -4,7 +4,7 @@ using System.Text;
 
 internal class Lexer
 {
-	private delegate bool StateHandler(FsmContext IEBDPKGBOGJ);
+	private delegate bool StateHandler(FsmContext context);
 
 	private static int[] fsm_return_table;
 
@@ -135,9 +135,9 @@ internal class Lexer
 		return string_value;
 	}
 
-	private static int HexValue(int BMLBINLPOOE)
+	private static int HexValue(int digit)
 	{
-		switch (BMLBINLPOOE)
+		switch (digit)
 		{
 		case 65:
 		case 97:
@@ -158,7 +158,7 @@ internal class Lexer
 		case 102:
 			return 15;
 		default:
-			return BMLBINLPOOE - 48;
+			return digit - 48;
 		}
 	}
 
@@ -178,15 +178,15 @@ internal class Lexer
 		};
 	}
 
-	private static char ProcessEscChar(int NLHEKGPGAME)
+	private static char ProcessEscChar(int escapedChar)
 	{
-		switch (NLHEKGPGAME)
+		switch (escapedChar)
 		{
 		case 34:
 		case 39:
 		case 47:
 		case 92:
-			return Convert.ToChar(NLHEKGPGAME);
+			return Convert.ToChar(escapedChar);
 		case 110:
 			return '\n';
 		case 116:
@@ -202,25 +202,25 @@ internal class Lexer
 		}
 	}
 
-	private static bool State1(FsmContext IEBDPKGBOGJ)
+	private static bool State1(FsmContext context)
 	{
-		while (IEBDPKGBOGJ.L.GetChar())
+		while (context.L.GetChar())
 		{
-			if (IEBDPKGBOGJ.L.input_char == 32 || (IEBDPKGBOGJ.L.input_char >= 9 && IEBDPKGBOGJ.L.input_char <= 13))
+			if (context.L.input_char == 32 || (context.L.input_char >= 9 && context.L.input_char <= 13))
 			{
 				continue;
 			}
-			if (IEBDPKGBOGJ.L.input_char >= 49 && IEBDPKGBOGJ.L.input_char <= 57)
+			if (context.L.input_char >= 49 && context.L.input_char <= 57)
 			{
-				IEBDPKGBOGJ.L.string_buffer.Append((char)IEBDPKGBOGJ.L.input_char);
-				IEBDPKGBOGJ.NextState = 3;
+				context.L.string_buffer.Append((char)context.L.input_char);
+				context.NextState = 3;
 				return true;
 			}
-			switch (IEBDPKGBOGJ.L.input_char)
+			switch (context.L.input_char)
 			{
 			case 34:
-				IEBDPKGBOGJ.NextState = 19;
-				IEBDPKGBOGJ.Return = true;
+				context.NextState = 19;
+				context.Return = true;
 				return true;
 			case 44:
 			case 58:
@@ -228,41 +228,41 @@ internal class Lexer
 			case 93:
 			case 123:
 			case 125:
-				IEBDPKGBOGJ.NextState = 1;
-				IEBDPKGBOGJ.Return = true;
+				context.NextState = 1;
+				context.Return = true;
 				return true;
 			case 45:
-				IEBDPKGBOGJ.L.string_buffer.Append((char)IEBDPKGBOGJ.L.input_char);
-				IEBDPKGBOGJ.NextState = 2;
+				context.L.string_buffer.Append((char)context.L.input_char);
+				context.NextState = 2;
 				return true;
 			case 48:
-				IEBDPKGBOGJ.L.string_buffer.Append((char)IEBDPKGBOGJ.L.input_char);
-				IEBDPKGBOGJ.NextState = 4;
+				context.L.string_buffer.Append((char)context.L.input_char);
+				context.NextState = 4;
 				return true;
 			case 102:
-				IEBDPKGBOGJ.NextState = 12;
+				context.NextState = 12;
 				return true;
 			case 110:
-				IEBDPKGBOGJ.NextState = 16;
+				context.NextState = 16;
 				return true;
 			case 116:
-				IEBDPKGBOGJ.NextState = 9;
+				context.NextState = 9;
 				return true;
 			case 39:
-				if (!IEBDPKGBOGJ.L.allow_single_quoted_strings)
+				if (!context.L.allow_single_quoted_strings)
 				{
 					return false;
 				}
-				IEBDPKGBOGJ.L.input_char = 34;
-				IEBDPKGBOGJ.NextState = 23;
-				IEBDPKGBOGJ.Return = true;
+				context.L.input_char = 34;
+				context.NextState = 23;
+				context.Return = true;
 				return true;
 			case 47:
-				if (!IEBDPKGBOGJ.L.allow_comments)
+				if (!context.L.allow_comments)
 				{
 					return false;
 				}
-				IEBDPKGBOGJ.NextState = 25;
+				context.NextState = 25;
 				return true;
 			default:
 				return false;
@@ -271,57 +271,57 @@ internal class Lexer
 		return true;
 	}
 
-	private static bool State2(FsmContext IEBDPKGBOGJ)
+	private static bool State2(FsmContext context)
 	{
-		IEBDPKGBOGJ.L.GetChar();
-		if (IEBDPKGBOGJ.L.input_char >= 49 && IEBDPKGBOGJ.L.input_char <= 57)
+		context.L.GetChar();
+		if (context.L.input_char >= 49 && context.L.input_char <= 57)
 		{
-			IEBDPKGBOGJ.L.string_buffer.Append((char)IEBDPKGBOGJ.L.input_char);
-			IEBDPKGBOGJ.NextState = 3;
+			context.L.string_buffer.Append((char)context.L.input_char);
+			context.NextState = 3;
 			return true;
 		}
-		int lJJGFHFKGHN = IEBDPKGBOGJ.L.input_char;
-		if (lJJGFHFKGHN == 48)
+		int inputChar = context.L.input_char;
+		if (inputChar == 48)
 		{
-			IEBDPKGBOGJ.L.string_buffer.Append((char)IEBDPKGBOGJ.L.input_char);
-			IEBDPKGBOGJ.NextState = 4;
+			context.L.string_buffer.Append((char)context.L.input_char);
+			context.NextState = 4;
 			return true;
 		}
 		return false;
 	}
 
-	private static bool State3(FsmContext IEBDPKGBOGJ)
+	private static bool State3(FsmContext context)
 	{
-		while (IEBDPKGBOGJ.L.GetChar())
+		while (context.L.GetChar())
 		{
-			if (IEBDPKGBOGJ.L.input_char >= 48 && IEBDPKGBOGJ.L.input_char <= 57)
+			if (context.L.input_char >= 48 && context.L.input_char <= 57)
 			{
-				IEBDPKGBOGJ.L.string_buffer.Append((char)IEBDPKGBOGJ.L.input_char);
+				context.L.string_buffer.Append((char)context.L.input_char);
 				continue;
 			}
-			if (IEBDPKGBOGJ.L.input_char == 32 || (IEBDPKGBOGJ.L.input_char >= 9 && IEBDPKGBOGJ.L.input_char <= 13))
+			if (context.L.input_char == 32 || (context.L.input_char >= 9 && context.L.input_char <= 13))
 			{
-				IEBDPKGBOGJ.Return = true;
-				IEBDPKGBOGJ.NextState = 1;
+				context.Return = true;
+				context.NextState = 1;
 				return true;
 			}
-			switch (IEBDPKGBOGJ.L.input_char)
+			switch (context.L.input_char)
 			{
 			case 44:
 			case 93:
 			case 125:
-				IEBDPKGBOGJ.L.UngetChar();
-				IEBDPKGBOGJ.Return = true;
-				IEBDPKGBOGJ.NextState = 1;
+				context.L.UngetChar();
+				context.Return = true;
+				context.NextState = 1;
 				return true;
 			case 46:
-				IEBDPKGBOGJ.L.string_buffer.Append((char)IEBDPKGBOGJ.L.input_char);
-				IEBDPKGBOGJ.NextState = 5;
+				context.L.string_buffer.Append((char)context.L.input_char);
+				context.NextState = 5;
 				return true;
 			case 69:
 			case 101:
-				IEBDPKGBOGJ.L.string_buffer.Append((char)IEBDPKGBOGJ.L.input_char);
-				IEBDPKGBOGJ.NextState = 7;
+				context.L.string_buffer.Append((char)context.L.input_char);
+				context.NextState = 7;
 				return true;
 			default:
 				return false;
@@ -330,78 +330,78 @@ internal class Lexer
 		return true;
 	}
 
-	private static bool State4(FsmContext IEBDPKGBOGJ)
+	private static bool State4(FsmContext context)
 	{
-		IEBDPKGBOGJ.L.GetChar();
-		if (IEBDPKGBOGJ.L.input_char == 32 || (IEBDPKGBOGJ.L.input_char >= 9 && IEBDPKGBOGJ.L.input_char <= 13))
+		context.L.GetChar();
+		if (context.L.input_char == 32 || (context.L.input_char >= 9 && context.L.input_char <= 13))
 		{
-			IEBDPKGBOGJ.Return = true;
-			IEBDPKGBOGJ.NextState = 1;
+			context.Return = true;
+			context.NextState = 1;
 			return true;
 		}
-		switch (IEBDPKGBOGJ.L.input_char)
+		switch (context.L.input_char)
 		{
 		case 44:
 		case 93:
 		case 125:
-			IEBDPKGBOGJ.L.UngetChar();
-			IEBDPKGBOGJ.Return = true;
-			IEBDPKGBOGJ.NextState = 1;
+			context.L.UngetChar();
+			context.Return = true;
+			context.NextState = 1;
 			return true;
 		case 46:
-			IEBDPKGBOGJ.L.string_buffer.Append((char)IEBDPKGBOGJ.L.input_char);
-			IEBDPKGBOGJ.NextState = 5;
+			context.L.string_buffer.Append((char)context.L.input_char);
+			context.NextState = 5;
 			return true;
 		case 69:
 		case 101:
-			IEBDPKGBOGJ.L.string_buffer.Append((char)IEBDPKGBOGJ.L.input_char);
-			IEBDPKGBOGJ.NextState = 7;
+			context.L.string_buffer.Append((char)context.L.input_char);
+			context.NextState = 7;
 			return true;
 		default:
 			return false;
 		}
 	}
 
-	private static bool State5(FsmContext IEBDPKGBOGJ)
+	private static bool State5(FsmContext context)
 	{
-		IEBDPKGBOGJ.L.GetChar();
-		if (IEBDPKGBOGJ.L.input_char >= 48 && IEBDPKGBOGJ.L.input_char <= 57)
+		context.L.GetChar();
+		if (context.L.input_char >= 48 && context.L.input_char <= 57)
 		{
-			IEBDPKGBOGJ.L.string_buffer.Append((char)IEBDPKGBOGJ.L.input_char);
-			IEBDPKGBOGJ.NextState = 6;
+			context.L.string_buffer.Append((char)context.L.input_char);
+			context.NextState = 6;
 			return true;
 		}
 		return false;
 	}
 
-	private static bool State6(FsmContext IEBDPKGBOGJ)
+	private static bool State6(FsmContext context)
 	{
-		while (IEBDPKGBOGJ.L.GetChar())
+		while (context.L.GetChar())
 		{
-			if (IEBDPKGBOGJ.L.input_char >= 48 && IEBDPKGBOGJ.L.input_char <= 57)
+			if (context.L.input_char >= 48 && context.L.input_char <= 57)
 			{
-				IEBDPKGBOGJ.L.string_buffer.Append((char)IEBDPKGBOGJ.L.input_char);
+				context.L.string_buffer.Append((char)context.L.input_char);
 				continue;
 			}
-			if (IEBDPKGBOGJ.L.input_char == 32 || (IEBDPKGBOGJ.L.input_char >= 9 && IEBDPKGBOGJ.L.input_char <= 13))
+			if (context.L.input_char == 32 || (context.L.input_char >= 9 && context.L.input_char <= 13))
 			{
-				IEBDPKGBOGJ.Return = true;
-				IEBDPKGBOGJ.NextState = 1;
+				context.Return = true;
+				context.NextState = 1;
 				return true;
 			}
-			switch (IEBDPKGBOGJ.L.input_char)
+			switch (context.L.input_char)
 			{
 			case 44:
 			case 93:
 			case 125:
-				IEBDPKGBOGJ.L.UngetChar();
-				IEBDPKGBOGJ.Return = true;
-				IEBDPKGBOGJ.NextState = 1;
+				context.L.UngetChar();
+				context.Return = true;
+				context.NextState = 1;
 				return true;
 			case 69:
 			case 101:
-				IEBDPKGBOGJ.L.string_buffer.Append((char)IEBDPKGBOGJ.L.input_char);
-				IEBDPKGBOGJ.NextState = 7;
+				context.L.string_buffer.Append((char)context.L.input_char);
+				context.NextState = 7;
 				return true;
 			default:
 				return false;
@@ -410,46 +410,46 @@ internal class Lexer
 		return true;
 	}
 
-	private static bool State7(FsmContext IEBDPKGBOGJ)
+	private static bool State7(FsmContext context)
 	{
-		IEBDPKGBOGJ.L.GetChar();
-		if (IEBDPKGBOGJ.L.input_char >= 48 && IEBDPKGBOGJ.L.input_char <= 57)
+		context.L.GetChar();
+		if (context.L.input_char >= 48 && context.L.input_char <= 57)
 		{
-			IEBDPKGBOGJ.L.string_buffer.Append((char)IEBDPKGBOGJ.L.input_char);
-			IEBDPKGBOGJ.NextState = 8;
+			context.L.string_buffer.Append((char)context.L.input_char);
+			context.NextState = 8;
 			return true;
 		}
-		int lJJGFHFKGHN = IEBDPKGBOGJ.L.input_char;
-		if (lJJGFHFKGHN == 43 || lJJGFHFKGHN == 45)
+		int inputChar = context.L.input_char;
+		if (inputChar == 43 || inputChar == 45)
 		{
-			IEBDPKGBOGJ.L.string_buffer.Append((char)IEBDPKGBOGJ.L.input_char);
-			IEBDPKGBOGJ.NextState = 8;
+			context.L.string_buffer.Append((char)context.L.input_char);
+			context.NextState = 8;
 			return true;
 		}
 		return false;
 	}
 
-	private static bool State8(FsmContext IEBDPKGBOGJ)
+	private static bool State8(FsmContext context)
 	{
-		while (IEBDPKGBOGJ.L.GetChar())
+		while (context.L.GetChar())
 		{
-			if (IEBDPKGBOGJ.L.input_char >= 48 && IEBDPKGBOGJ.L.input_char <= 57)
+			if (context.L.input_char >= 48 && context.L.input_char <= 57)
 			{
-				IEBDPKGBOGJ.L.string_buffer.Append((char)IEBDPKGBOGJ.L.input_char);
+				context.L.string_buffer.Append((char)context.L.input_char);
 				continue;
 			}
-			if (IEBDPKGBOGJ.L.input_char == 32 || (IEBDPKGBOGJ.L.input_char >= 9 && IEBDPKGBOGJ.L.input_char <= 13))
+			if (context.L.input_char == 32 || (context.L.input_char >= 9 && context.L.input_char <= 13))
 			{
-				IEBDPKGBOGJ.Return = true;
-				IEBDPKGBOGJ.NextState = 1;
+				context.Return = true;
+				context.NextState = 1;
 				return true;
 			}
-			int lJJGFHFKGHN = IEBDPKGBOGJ.L.input_char;
-			if (lJJGFHFKGHN == 44 || lJJGFHFKGHN == 93 || lJJGFHFKGHN == 125)
+			int inputChar = context.L.input_char;
+			if (inputChar == 44 || inputChar == 93 || inputChar == 125)
 			{
-				IEBDPKGBOGJ.L.UngetChar();
-				IEBDPKGBOGJ.Return = true;
-				IEBDPKGBOGJ.NextState = 1;
+				context.L.UngetChar();
+				context.Return = true;
+				context.NextState = 1;
 				return true;
 			}
 			return false;
@@ -457,170 +457,170 @@ internal class Lexer
 		return true;
 	}
 
-	private static bool State9(FsmContext IEBDPKGBOGJ)
+	private static bool State9(FsmContext context)
 	{
-		IEBDPKGBOGJ.L.GetChar();
-		int lJJGFHFKGHN = IEBDPKGBOGJ.L.input_char;
-		if (lJJGFHFKGHN == 114)
+		context.L.GetChar();
+		int inputChar = context.L.input_char;
+		if (inputChar == 114)
 		{
-			IEBDPKGBOGJ.NextState = 10;
+			context.NextState = 10;
 			return true;
 		}
 		return false;
 	}
 
-	private static bool State10(FsmContext IEBDPKGBOGJ)
+	private static bool State10(FsmContext context)
 	{
-		IEBDPKGBOGJ.L.GetChar();
-		int lJJGFHFKGHN = IEBDPKGBOGJ.L.input_char;
-		if (lJJGFHFKGHN == 117)
+		context.L.GetChar();
+		int inputChar = context.L.input_char;
+		if (inputChar == 117)
 		{
-			IEBDPKGBOGJ.NextState = 11;
+			context.NextState = 11;
 			return true;
 		}
 		return false;
 	}
 
-	private static bool State11(FsmContext IEBDPKGBOGJ)
+	private static bool State11(FsmContext context)
 	{
-		IEBDPKGBOGJ.L.GetChar();
-		int lJJGFHFKGHN = IEBDPKGBOGJ.L.input_char;
-		if (lJJGFHFKGHN == 101)
+		context.L.GetChar();
+		int inputChar = context.L.input_char;
+		if (inputChar == 101)
 		{
-			IEBDPKGBOGJ.Return = true;
-			IEBDPKGBOGJ.NextState = 1;
+			context.Return = true;
+			context.NextState = 1;
 			return true;
 		}
 		return false;
 	}
 
-	private static bool State12(FsmContext IEBDPKGBOGJ)
+	private static bool State12(FsmContext context)
 	{
-		IEBDPKGBOGJ.L.GetChar();
-		int lJJGFHFKGHN = IEBDPKGBOGJ.L.input_char;
-		if (lJJGFHFKGHN == 97)
+		context.L.GetChar();
+		int inputChar = context.L.input_char;
+		if (inputChar == 97)
 		{
-			IEBDPKGBOGJ.NextState = 13;
+			context.NextState = 13;
 			return true;
 		}
 		return false;
 	}
 
-	private static bool State13(FsmContext IEBDPKGBOGJ)
+	private static bool State13(FsmContext context)
 	{
-		IEBDPKGBOGJ.L.GetChar();
-		int lJJGFHFKGHN = IEBDPKGBOGJ.L.input_char;
-		if (lJJGFHFKGHN == 108)
+		context.L.GetChar();
+		int inputChar = context.L.input_char;
+		if (inputChar == 108)
 		{
-			IEBDPKGBOGJ.NextState = 14;
+			context.NextState = 14;
 			return true;
 		}
 		return false;
 	}
 
-	private static bool State14(FsmContext IEBDPKGBOGJ)
+	private static bool State14(FsmContext context)
 	{
-		IEBDPKGBOGJ.L.GetChar();
-		int lJJGFHFKGHN = IEBDPKGBOGJ.L.input_char;
-		if (lJJGFHFKGHN == 115)
+		context.L.GetChar();
+		int inputChar = context.L.input_char;
+		if (inputChar == 115)
 		{
-			IEBDPKGBOGJ.NextState = 15;
+			context.NextState = 15;
 			return true;
 		}
 		return false;
 	}
 
-	private static bool State15(FsmContext IEBDPKGBOGJ)
+	private static bool State15(FsmContext context)
 	{
-		IEBDPKGBOGJ.L.GetChar();
-		int lJJGFHFKGHN = IEBDPKGBOGJ.L.input_char;
-		if (lJJGFHFKGHN == 101)
+		context.L.GetChar();
+		int inputChar = context.L.input_char;
+		if (inputChar == 101)
 		{
-			IEBDPKGBOGJ.Return = true;
-			IEBDPKGBOGJ.NextState = 1;
+			context.Return = true;
+			context.NextState = 1;
 			return true;
 		}
 		return false;
 	}
 
-	private static bool State16(FsmContext IEBDPKGBOGJ)
+	private static bool State16(FsmContext context)
 	{
-		IEBDPKGBOGJ.L.GetChar();
-		int lJJGFHFKGHN = IEBDPKGBOGJ.L.input_char;
-		if (lJJGFHFKGHN == 117)
+		context.L.GetChar();
+		int inputChar = context.L.input_char;
+		if (inputChar == 117)
 		{
-			IEBDPKGBOGJ.NextState = 17;
+			context.NextState = 17;
 			return true;
 		}
 		return false;
 	}
 
-	private static bool State17(FsmContext IEBDPKGBOGJ)
+	private static bool State17(FsmContext context)
 	{
-		IEBDPKGBOGJ.L.GetChar();
-		int lJJGFHFKGHN = IEBDPKGBOGJ.L.input_char;
-		if (lJJGFHFKGHN == 108)
+		context.L.GetChar();
+		int inputChar = context.L.input_char;
+		if (inputChar == 108)
 		{
-			IEBDPKGBOGJ.NextState = 18;
+			context.NextState = 18;
 			return true;
 		}
 		return false;
 	}
 
-	private static bool State18(FsmContext IEBDPKGBOGJ)
+	private static bool State18(FsmContext context)
 	{
-		IEBDPKGBOGJ.L.GetChar();
-		int lJJGFHFKGHN = IEBDPKGBOGJ.L.input_char;
-		if (lJJGFHFKGHN == 108)
+		context.L.GetChar();
+		int inputChar = context.L.input_char;
+		if (inputChar == 108)
 		{
-			IEBDPKGBOGJ.Return = true;
-			IEBDPKGBOGJ.NextState = 1;
+			context.Return = true;
+			context.NextState = 1;
 			return true;
 		}
 		return false;
 	}
 
-	private static bool State19(FsmContext IEBDPKGBOGJ)
+	private static bool State19(FsmContext context)
 	{
-		while (IEBDPKGBOGJ.L.GetChar())
+		while (context.L.GetChar())
 		{
-			switch (IEBDPKGBOGJ.L.input_char)
+			switch (context.L.input_char)
 			{
 			case 34:
-				IEBDPKGBOGJ.L.UngetChar();
-				IEBDPKGBOGJ.Return = true;
-				IEBDPKGBOGJ.NextState = 20;
+				context.L.UngetChar();
+				context.Return = true;
+				context.NextState = 20;
 				return true;
 			case 92:
-				IEBDPKGBOGJ.StateStack = 19;
-				IEBDPKGBOGJ.NextState = 21;
+				context.StateStack = 19;
+				context.NextState = 21;
 				return true;
 			}
-			IEBDPKGBOGJ.L.string_buffer.Append((char)IEBDPKGBOGJ.L.input_char);
+			context.L.string_buffer.Append((char)context.L.input_char);
 		}
 		return true;
 	}
 
-	private static bool State20(FsmContext IEBDPKGBOGJ)
+	private static bool State20(FsmContext context)
 	{
-		IEBDPKGBOGJ.L.GetChar();
-		int lJJGFHFKGHN = IEBDPKGBOGJ.L.input_char;
-		if (lJJGFHFKGHN == 34)
+		context.L.GetChar();
+		int inputChar = context.L.input_char;
+		if (inputChar == 34)
 		{
-			IEBDPKGBOGJ.Return = true;
-			IEBDPKGBOGJ.NextState = 1;
+			context.Return = true;
+			context.NextState = 1;
 			return true;
 		}
 		return false;
 	}
 
-	private static bool State21(FsmContext IEBDPKGBOGJ)
+	private static bool State21(FsmContext context)
 	{
-		IEBDPKGBOGJ.L.GetChar();
-		switch (IEBDPKGBOGJ.L.input_char)
+		context.L.GetChar();
+		switch (context.L.input_char)
 		{
 		case 117:
-			IEBDPKGBOGJ.NextState = 22;
+			context.NextState = 22;
 			return true;
 		case 34:
 		case 39:
@@ -631,30 +631,30 @@ internal class Lexer
 		case 110:
 		case 114:
 		case 116:
-			IEBDPKGBOGJ.L.string_buffer.Append(ProcessEscChar(IEBDPKGBOGJ.L.input_char));
-			IEBDPKGBOGJ.NextState = IEBDPKGBOGJ.StateStack;
+			context.L.string_buffer.Append(ProcessEscChar(context.L.input_char));
+			context.NextState = context.StateStack;
 			return true;
 		default:
 			return false;
 		}
 	}
 
-	private static bool State22(FsmContext IEBDPKGBOGJ)
+	private static bool State22(FsmContext context)
 	{
 		int num = 0;
 		int num2 = 4096;
-		IEBDPKGBOGJ.L.unichar = 0;
-		while (IEBDPKGBOGJ.L.GetChar())
+		context.L.unichar = 0;
+		while (context.L.GetChar())
 		{
-			if ((IEBDPKGBOGJ.L.input_char >= 48 && IEBDPKGBOGJ.L.input_char <= 57) || (IEBDPKGBOGJ.L.input_char >= 65 && IEBDPKGBOGJ.L.input_char <= 70) || (IEBDPKGBOGJ.L.input_char >= 97 && IEBDPKGBOGJ.L.input_char <= 102))
+			if ((context.L.input_char >= 48 && context.L.input_char <= 57) || (context.L.input_char >= 65 && context.L.input_char <= 70) || (context.L.input_char >= 97 && context.L.input_char <= 102))
 			{
-				IEBDPKGBOGJ.L.unichar += HexValue(IEBDPKGBOGJ.L.input_char) * num2;
+				context.L.unichar += HexValue(context.L.input_char) * num2;
 				num++;
 				num2 /= 16;
 				if (num == 4)
 				{
-					IEBDPKGBOGJ.L.string_buffer.Append(Convert.ToChar(IEBDPKGBOGJ.L.unichar));
-					IEBDPKGBOGJ.NextState = IEBDPKGBOGJ.StateStack;
+					context.L.string_buffer.Append(Convert.ToChar(context.L.unichar));
+					context.NextState = context.StateStack;
 					return true;
 				}
 				continue;
@@ -664,97 +664,97 @@ internal class Lexer
 		return true;
 	}
 
-	private static bool State23(FsmContext IEBDPKGBOGJ)
+	private static bool State23(FsmContext context)
 	{
-		while (IEBDPKGBOGJ.L.GetChar())
+		while (context.L.GetChar())
 		{
-			switch (IEBDPKGBOGJ.L.input_char)
+			switch (context.L.input_char)
 			{
 			case 39:
-				IEBDPKGBOGJ.L.UngetChar();
-				IEBDPKGBOGJ.Return = true;
-				IEBDPKGBOGJ.NextState = 24;
+				context.L.UngetChar();
+				context.Return = true;
+				context.NextState = 24;
 				return true;
 			case 92:
-				IEBDPKGBOGJ.StateStack = 23;
-				IEBDPKGBOGJ.NextState = 21;
+				context.StateStack = 23;
+				context.NextState = 21;
 				return true;
 			}
-			IEBDPKGBOGJ.L.string_buffer.Append((char)IEBDPKGBOGJ.L.input_char);
+			context.L.string_buffer.Append((char)context.L.input_char);
 		}
 		return true;
 	}
 
-	private static bool State24(FsmContext IEBDPKGBOGJ)
+	private static bool State24(FsmContext context)
 	{
-		IEBDPKGBOGJ.L.GetChar();
-		int lJJGFHFKGHN = IEBDPKGBOGJ.L.input_char;
-		if (lJJGFHFKGHN == 39)
+		context.L.GetChar();
+		int inputChar = context.L.input_char;
+		if (inputChar == 39)
 		{
-			IEBDPKGBOGJ.L.input_char = 34;
-			IEBDPKGBOGJ.Return = true;
-			IEBDPKGBOGJ.NextState = 1;
+			context.L.input_char = 34;
+			context.Return = true;
+			context.NextState = 1;
 			return true;
 		}
 		return false;
 	}
 
-	private static bool State25(FsmContext IEBDPKGBOGJ)
+	private static bool State25(FsmContext context)
 	{
-		IEBDPKGBOGJ.L.GetChar();
-		switch (IEBDPKGBOGJ.L.input_char)
+		context.L.GetChar();
+		switch (context.L.input_char)
 		{
 		case 42:
-			IEBDPKGBOGJ.NextState = 27;
+			context.NextState = 27;
 			return true;
 		case 47:
-			IEBDPKGBOGJ.NextState = 26;
+			context.NextState = 26;
 			return true;
 		default:
 			return false;
 		}
 	}
 
-	private static bool State26(FsmContext IEBDPKGBOGJ)
+	private static bool State26(FsmContext context)
 	{
-		while (IEBDPKGBOGJ.L.GetChar())
+		while (context.L.GetChar())
 		{
-			if (IEBDPKGBOGJ.L.input_char == 10)
+			if (context.L.input_char == 10)
 			{
-				IEBDPKGBOGJ.NextState = 1;
+				context.NextState = 1;
 				return true;
 			}
 		}
 		return true;
 	}
 
-	private static bool State27(FsmContext IEBDPKGBOGJ)
+	private static bool State27(FsmContext context)
 	{
-		while (IEBDPKGBOGJ.L.GetChar())
+		while (context.L.GetChar())
 		{
-			if (IEBDPKGBOGJ.L.input_char == 42)
+			if (context.L.input_char == 42)
 			{
-				IEBDPKGBOGJ.NextState = 28;
+				context.NextState = 28;
 				return true;
 			}
 		}
 		return true;
 	}
 
-	private static bool State28(FsmContext IEBDPKGBOGJ)
+	private static bool State28(FsmContext context)
 	{
-		while (IEBDPKGBOGJ.L.GetChar())
+		while (context.L.GetChar())
 		{
-			if (IEBDPKGBOGJ.L.input_char == 42)
+			if (context.L.input_char == 42)
 			{
 				continue;
 			}
-			if (IEBDPKGBOGJ.L.input_char == 47)
+			if (context.L.input_char == 47)
 			{
-				IEBDPKGBOGJ.NextState = 1;
+				context.NextState = 1;
 				return true;
 			}
-			IEBDPKGBOGJ.NextState = 27;
+			context.NextState = 27;
 			return true;
 		}
 		return true;
@@ -774,9 +774,9 @@ internal class Lexer
 	{
 		if (input_buffer != 0)
 		{
-			int kCLLHLMNMKO = input_buffer;
+			int bufferedChar = input_buffer;
 			input_buffer = 0;
-			return kCLLHLMNMKO;
+			return bufferedChar;
 		}
 		return reader.Read();
 	}
@@ -786,8 +786,8 @@ internal class Lexer
 		fsm_context.Return = false;
 		while (true)
 		{
-			StateHandler mGLALMHHOGL = fsm_handler_table[state - 1];
-			if (!mGLALMHHOGL(fsm_context))
+			StateHandler handler = fsm_handler_table[state - 1];
+			if (!handler(fsm_context))
 			{
 				throw new JsonException(input_char);
 			}

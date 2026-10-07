@@ -20,38 +20,38 @@ public static class GUIHelper
 		}
 	}
 
-	public static void DrawArea(Rect FKAFENMANAB, bool CDKGMDNIECB, Action IBODMPMJELJ)
+	public static void DrawArea(Rect area, bool showTitle, Action drawContent)
 	{
 		Setup();
-		GUI.Box(FKAFENMANAB, string.Empty);
-		GUILayout.BeginArea(FKAFENMANAB);
-		if (CDKGMDNIECB)
+		GUI.Box(area, string.Empty);
+		GUILayout.BeginArea(area);
+		if (showTitle)
 		{
 			DrawCenteredText(SampleSelector.SelectedSample.GetDisplayName());
 			GUILayout.Space(5f);
 		}
-		if (IBODMPMJELJ != null)
+		if (drawContent != null)
 		{
-			IBODMPMJELJ();
+			drawContent();
 		}
 		GUILayout.EndArea();
 	}
 
-	public static void DrawCenteredText(string CKEHOEGLMBM)
+	public static void DrawCenteredText(string text)
 	{
 		Setup();
 		GUILayout.BeginHorizontal();
 		GUILayout.FlexibleSpace();
-		GUILayout.Label(CKEHOEGLMBM, centerAlignedLabel);
+		GUILayout.Label(text, centerAlignedLabel);
 		GUILayout.FlexibleSpace();
 		GUILayout.EndHorizontal();
 	}
 
-	public static void DrawRow(string KGBGENDIMBC, string value)
+	public static void DrawRow(string label, string value)
 	{
 		Setup();
 		GUILayout.BeginHorizontal();
-		GUILayout.Label(KGBGENDIMBC);
+		GUILayout.Label(label);
 		GUILayout.FlexibleSpace();
 		GUILayout.Label(value, rightAlignedLabel);
 		GUILayout.FlexibleSpace();

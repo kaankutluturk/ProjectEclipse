@@ -34,37 +34,37 @@ namespace Nekki.SF2.GUI.Fight
 		}
 
 		// Perk icons are presentation and are not rebuilt by rollback re-simulation.
-		public void AddEffectPerk(PerksStage.ActionPerk CKOEFOCPMGK, PerksStage.ActionPerk IBODMPMJELJ)
+		public void AddEffectPerk(PerksStage.ActionPerk otherPerk, PerksStage.ActionPerk actionPerk)
 		{
 			if (Eclipse.Multiplayer.VersusTickDriver.IsResimulating)
 			{
 				return;
 			}
-			PerkActionSetModEffect fBLKPCHKAHM = (PerkActionSetModEffect)IBODMPMJELJ.Action;
-			PerkActionSetModEffect.ModEffectType cOLPJOBKGEI = fBLKPCHKAHM.GetEffectType();
+			PerkActionSetModEffect effectAction = (PerkActionSetModEffect)actionPerk.Action;
+			PerkActionSetModEffect.ModEffectType effectType = effectAction.GetEffectType();
 			foreach (ActivePerkItem item in _activePerks)
 			{
 				PerksStage.ActionPerk action = item.get_Action();
-				if (action == CKOEFOCPMGK && cOLPJOBKGEI == PerkActionSetModEffect.ModEffectType.EFFECT_PULSE)
+				if (action == otherPerk && effectType == PerkActionSetModEffect.ModEffectType.EFFECT_PULSE)
 				{
 					item.set_PulseCount(item.get_PulseCount() + 1);
 				}
 			}
 		}
 
-		public void AddActivePerkItem(PerksStage.ActionPerk IBODMPMJELJ)
+		public void AddActivePerkItem(PerksStage.ActionPerk actionPerk)
 		{
 			if (Eclipse.Multiplayer.VersusTickDriver.IsResimulating)
 			{
 				return;
 			}
-			if (IBODMPMJELJ != null)
+			if (actionPerk != null)
 			{
-				CreateActivePerkItem(IBODMPMJELJ);
+				CreateActivePerkItem(actionPerk);
 			}
 		}
 
-		private void CreateActivePerkItem(PerksStage.ActionPerk IBODMPMJELJ)
+		private void CreateActivePerkItem(PerksStage.ActionPerk actionPerk)
 		{
 			if (_activePerkItemPrefab == null)
 			{
@@ -77,12 +77,12 @@ namespace Nekki.SF2.GUI.Fight
 				GameLog.Error("ActivePerkModel.CreateActivePerkItem: item is null");
 				return;
 			}
-			component.Init(IBODMPMJELJ);
-			string FMHAGIPOIBJ = IBODMPMJELJ.StackKey;
+			component.Init(actionPerk);
+			string stackKey = actionPerk.StackKey;
 			ActivePerkItemContainer activePerkItemContainer = null;
-			if (!FMHAGIPOIBJ.Equals(string.Empty))
+			if (!stackKey.Equals(string.Empty))
 			{
-				activePerkItemContainer = _activePerksContainer.Find((ActivePerkItemContainer DHDMNHCIPEH) => DHDMNHCIPEH.get_Stack().Equals(FMHAGIPOIBJ));
+				activePerkItemContainer = _activePerksContainer.Find((ActivePerkItemContainer container) => container.get_Stack().Equals(stackKey));
 			}
 			if (activePerkItemContainer == null)
 			{
@@ -103,22 +103,22 @@ namespace Nekki.SF2.GUI.Fight
 				}
 				activePerkItemContainer.transform.SetParent(base.transform, false);
 				activePerkItemContainer.Init(PerkGUI.GetStackShiftX(), PerkGUI.GetStackShiftY());
-				activePerkItemContainer.set_Stack(FMHAGIPOIBJ);
+				activePerkItemContainer.set_Stack(stackKey);
 				_activePerksContainer.Add(activePerkItemContainer);
 			}
 			activePerkItemContainer.AddActivePerk(component);
 			_activePerks.Add(component);
 		}
 
-		public void RemoveActivePerkItem(PerksStage.ActionPerk IBODMPMJELJ)
+		public void RemoveActivePerkItem(PerksStage.ActionPerk actionPerk)
 		{
-			if (IBODMPMJELJ == null)
+			if (actionPerk == null)
 			{
 				return;
 			}
 			foreach (ActivePerkItem item in _activePerks)
 			{
-				if (item.get_Action() == IBODMPMJELJ)
+				if (item.get_Action() == actionPerk)
 				{
 					item.set_Show(false);
 					break;
@@ -128,22 +128,22 @@ namespace Nekki.SF2.GUI.Fight
 
 		public void RemoveAllActivePerkItem()
 		{
-			_activePerks.ForEach((ActivePerkItem DHDMNHCIPEH) =>
+			_activePerks.ForEach((ActivePerkItem perkItem) =>
 			{
-				DHDMNHCIPEH.set_Show(false);
+				perkItem.set_Show(false);
 			});
 		}
 
 		public void DestroyAllPerkItems()
 		{
-			_activePerks.ForEach((ActivePerkItem DHDMNHCIPEH) =>
+			_activePerks.ForEach((ActivePerkItem perkItem) =>
 			{
-				DHDMNHCIPEH.Destroy();
+				perkItem.Destroy();
 			});
 			_activePerks.Clear();
-			_activePerksContainer.ForEach((ActivePerkItemContainer DHDMNHCIPEH) =>
+			_activePerksContainer.ForEach((ActivePerkItemContainer container) =>
 			{
-				DHDMNHCIPEH.Destroy();
+				container.Destroy();
 			});
 			_activePerksContainer.Clear();
 		}

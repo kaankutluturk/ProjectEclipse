@@ -9,10 +9,10 @@ public class ImpossibleDialogInfo
 
 	public object Content;
 
-	public ImpossibleDialogInfo(ImpossibleDialog.ImpossibleDialogType CBFFIFKAHHN, Action<object> _dlg = null, object GCGGIJDKKKO = null)
+	public ImpossibleDialogInfo(ImpossibleDialog.ImpossibleDialogType reason, Action<object> _dlg = null, object content = null)
 	{
 		Dlg = _dlg;
-		Reason = CBFFIFKAHHN;
-		Content = GCGGIJDKKKO;
+		Reason = reason;
+		Content = content;
 	}
 }

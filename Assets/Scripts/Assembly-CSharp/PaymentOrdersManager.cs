@@ -4,35 +4,35 @@ using SimpleJSON;
 
 public class PaymentOrdersManager : ITransactionChangeListener
 {
-	public void OnTransactionsChanged(bool AJAJBBKANGD)
+	public void OnTransactionsChanged(bool success)
 	{
-		ListSF.GetInstance().HandleAuthenticateResult(AJAJBBKANGD);
+		ListSF.GetInstance().HandleAuthenticateResult(success);
 	}
 
-	public bool LoadLegacyPaymentOrders(XmlAttribute GICKLJAIHFC)
+	public bool LoadLegacyPaymentOrders(XmlAttribute attribute)
 	{
-		if (GICKLJAIHFC == null)
+		if (attribute == null)
 		{
 			return false;
 		}
-		ParseLegacyPaymentOrders(GICKLJAIHFC.Value);
-		GICKLJAIHFC.OwnerElement.RemoveAttributeNode(GICKLJAIHFC);
+		ParseLegacyPaymentOrders(attribute.Value);
+		attribute.OwnerElement.RemoveAttributeNode(attribute);
 		OnTransactionsChanged(true);
 		return true;
 	}
 
-	private void ParseLegacyPaymentOrders(string GHDPPHAAPCA)
+	private void ParseLegacyPaymentOrders(string json)
 	{
 		List<PaymentInfo> list = PaymentManager.GetInProgressPayments();
 		List<PaymentInfo> list2 = PaymentManager.GetCompletedPayments();
 		list.Clear();
 		list2.Clear();
-		JSONNode jSONNode = JSON.Parse(GHDPPHAAPCA);
-		bool NPEJDEBKFDA = false;
+		JSONNode jSONNode = JSON.Parse(json);
+		bool isInProgress = false;
 		foreach (JSONClass child in jSONNode.Children)
 		{
-			PaymentInfo item = ParsePaymentFromJson(child, ref NPEJDEBKFDA);
-			if (NPEJDEBKFDA)
+			PaymentInfo item = ParsePaymentFromJson(child, ref isInProgress);
+			if (isInProgress)
 			{
 				list.Add(item);
 			}
@@ -43,14 +43,14 @@ public class PaymentOrdersManager : ITransactionChangeListener
 		}
 	}
 
-	public void LoadFromXml(XmlNode MEEAKLDGLDF)
+	public void LoadFromXml(XmlNode node)
 	{
 		List<PaymentInfo> list = PaymentManager.GetInProgressPayments();
 		List<PaymentInfo> list2 = PaymentManager.GetCompletedPayments();
 		list.Clear();
 		list2.Clear();
-		XmlNode xmlNode = MEEAKLDGLDF["InProgress"];
-		XmlNode xmlNode2 = MEEAKLDGLDF["Completed"];
+		XmlNode xmlNode = node["InProgress"];
+		XmlNode xmlNode2 = node["Completed"];
 		if (xmlNode != null)
 		{
 			foreach (XmlNode item2 in xmlNode)
@@ -70,14 +70,14 @@ public class PaymentOrdersManager : ITransactionChangeListener
 		}
 	}
 
-	public void SaveToXml(XmlNode MEEAKLDGLDF)
+	public void SaveToXml(XmlNode node)
 	{
 		List<PaymentInfo> list = PaymentManager.GetInProgressPayments();
 		List<PaymentInfo> list2 = PaymentManager.GetCompletedPayments();
-		MEEAKLDGLDF.RemoveAll();
+		node.RemoveAll();
 		if (list.Count > 0)
 		{
-			XmlNode xmlNode = MEEAKLDGLDF["InProgress"] ?? MEEAKLDGLDF.AppendElement("InProgress");
+			XmlNode xmlNode = node["InProgress"] ?? node.AppendElement("InProgress");
 			xmlNode.RemoveAll();
 			int i = 0;
 			for (int count = list.Count; i < count; i++)
@@ -87,7 +87,7 @@ public class PaymentOrdersManager : ITransactionChangeListener
 		}
 		if (list2.Count > 0)
 		{
-			XmlNode xmlNode2 = MEEAKLDGLDF["Completed"] ?? MEEAKLDGLDF.AppendElement("Completed");
+			XmlNode xmlNode2 = node["Completed"] ?? node.AppendElement("Completed");
 			xmlNode2.RemoveAll();
 			int j = 0;
 			for (int count2 = list2.Count; j < count2; j++)
@@ -97,103 +97,103 @@ public class PaymentOrdersManager : ITransactionChangeListener
 		}
 	}
 
-	private static PaymentInfo ParsePaymentFromJson(JSONClass MEEAKLDGLDF, ref bool NPEJDEBKFDA)
+	private static PaymentInfo ParsePaymentFromJson(JSONClass paymentJson, ref bool isInProgress)
 	{
-		string bGMLFNGKDHI = ((!MEEAKLDGLDF.HasValue("orderID")) ? string.Empty : MEEAKLDGLDF["orderID"].Value);
-		string oDJCLFJHKFP = ((!MEEAKLDGLDF.HasValue("productID")) ? string.Empty : MEEAKLDGLDF["productID"].Value);
-		string dNHKNDPBGNM = ((!MEEAKLDGLDF.HasValue("receipt")) ? string.Empty : MEEAKLDGLDF["receipt"].Value);
-		string text = ((!MEEAKLDGLDF.HasValue("dataSignature")) ? null : MEEAKLDGLDF["dataSignature"].Value);
-		text = ((text != null || !MEEAKLDGLDF.HasValue("data") || !MEEAKLDGLDF["data"].HasValue("signature")) ? null : MEEAKLDGLDF["data"]["signature"].Value);
-		string pPJBKHKCONC = ((!MEEAKLDGLDF.HasValue("data") || !MEEAKLDGLDF["data"].HasValue("receiptPurchaseDate")) ? string.Empty : MEEAKLDGLDF["data"]["receiptPurchaseDate"].Value);
-		bool flag = MEEAKLDGLDF.HasValue("isConfirmed") && MEEAKLDGLDF["isConfirmed"].AsBool;
-		bool flag2 = MEEAKLDGLDF.HasValue("isDelivered") && MEEAKLDGLDF["isDelivered"].AsBool;
-		bool flag3 = MEEAKLDGLDF.HasValue("isRestore") && MEEAKLDGLDF["isRestore"].AsBool;
-		bool flag4 = MEEAKLDGLDF.HasValue("isInProgress") && MEEAKLDGLDF["isInProgress"].AsBool;
-		bool flag5 = MEEAKLDGLDF.HasValue("isVerificationFail") && MEEAKLDGLDF["isVerificationFail"].AsBool;
-		PaymentInfo jLDHCFFAIPK;
+		string orderId = ((!paymentJson.HasValue("orderID")) ? string.Empty : paymentJson["orderID"].Value);
+		string productId = ((!paymentJson.HasValue("productID")) ? string.Empty : paymentJson["productID"].Value);
+		string receipt = ((!paymentJson.HasValue("receipt")) ? string.Empty : paymentJson["receipt"].Value);
+		string text = ((!paymentJson.HasValue("dataSignature")) ? null : paymentJson["dataSignature"].Value);
+		text = ((text != null || !paymentJson.HasValue("data") || !paymentJson["data"].HasValue("signature")) ? null : paymentJson["data"]["signature"].Value);
+		string purchaseDate = ((!paymentJson.HasValue("data") || !paymentJson["data"].HasValue("receiptPurchaseDate")) ? string.Empty : paymentJson["data"]["receiptPurchaseDate"].Value);
+		bool flag = paymentJson.HasValue("isConfirmed") && paymentJson["isConfirmed"].AsBool;
+		bool flag2 = paymentJson.HasValue("isDelivered") && paymentJson["isDelivered"].AsBool;
+		bool flag3 = paymentJson.HasValue("isRestore") && paymentJson["isRestore"].AsBool;
+		bool flag4 = paymentJson.HasValue("isInProgress") && paymentJson["isInProgress"].AsBool;
+		bool flag5 = paymentJson.HasValue("isVerificationFail") && paymentJson["isVerificationFail"].AsBool;
+		PaymentInfo payment;
 		if (!flag && (flag4 || flag2))
 		{
-			jLDHCFFAIPK = ((!flag2) ? PaymentInfo.CreateNotVerified(oDJCLFJHKFP, bGMLFNGKDHI, dNHKNDPBGNM, text) : PaymentInfo.CreateVerified(oDJCLFJHKFP, bGMLFNGKDHI, dNHKNDPBGNM, text, pPJBKHKCONC));
-			NPEJDEBKFDA = true;
+			payment = ((!flag2) ? PaymentInfo.CreateNotVerified(productId, orderId, receipt, text) : PaymentInfo.CreateVerified(productId, orderId, receipt, text, purchaseDate));
+			isInProgress = true;
 		}
 		else
 		{
-			jLDHCFFAIPK = (flag2 ? PaymentInfo.CreateVerifiedConfirmed(oDJCLFJHKFP, bGMLFNGKDHI, dNHKNDPBGNM, text, pPJBKHKCONC) : ((!flag5) ? PaymentInfo.CreateNotVerifiedProcessed(oDJCLFJHKFP, bGMLFNGKDHI, dNHKNDPBGNM, text) : PaymentInfo.CreateVerificationFailed(oDJCLFJHKFP, bGMLFNGKDHI, dNHKNDPBGNM, text)));
-			NPEJDEBKFDA = false;
+			payment = (flag2 ? PaymentInfo.CreateVerifiedConfirmed(productId, orderId, receipt, text, purchaseDate) : ((!flag5) ? PaymentInfo.CreateNotVerifiedProcessed(productId, orderId, receipt, text) : PaymentInfo.CreateVerificationFailed(productId, orderId, receipt, text)));
+			isInProgress = false;
 		}
-		jLDHCFFAIPK.SetIsCheating(false);
-		return jLDHCFFAIPK;
+		payment.SetIsCheating(false);
+		return payment;
 	}
 
-	private static PaymentInfo ParseInProgressPayment(XmlNode MEEAKLDGLDF)
+	private static PaymentInfo ParseInProgressPayment(XmlNode node)
 	{
-		string bGMLFNGKDHI = MEEAKLDGLDF.Attributes["Id"].GetStringOrDefault(string.Empty);
-		string oDJCLFJHKFP = MEEAKLDGLDF.Attributes["ProductId"].GetStringOrDefault(string.Empty);
-		string dNHKNDPBGNM = MEEAKLDGLDF.Attributes["Receipt"].GetStringOrDefault(string.Empty);
-		string bGLGHEMMANM = MEEAKLDGLDF.Attributes["Signature"].GetStringOrDefault();
-		string pPJBKHKCONC = MEEAKLDGLDF.Attributes["Date"].GetStringOrDefault(string.Empty);
-		bool flag = MEEAKLDGLDF.Attributes["Verified"].ParseBool();
-		bool bAINMLLIKOL = MEEAKLDGLDF.Attributes["Cheating"].ParseBool();
-		PaymentInfo jLDHCFFAIPK = ((!flag) ? PaymentInfo.CreateNotVerified(oDJCLFJHKFP, bGMLFNGKDHI, dNHKNDPBGNM, bGLGHEMMANM) : PaymentInfo.CreateVerified(oDJCLFJHKFP, bGMLFNGKDHI, dNHKNDPBGNM, bGLGHEMMANM, pPJBKHKCONC));
-		jLDHCFFAIPK.SetIsCheating(bAINMLLIKOL);
-		return jLDHCFFAIPK;
+		string orderId = node.Attributes["Id"].GetStringOrDefault(string.Empty);
+		string productId = node.Attributes["ProductId"].GetStringOrDefault(string.Empty);
+		string receipt = node.Attributes["Receipt"].GetStringOrDefault(string.Empty);
+		string signature = node.Attributes["Signature"].GetStringOrDefault();
+		string purchaseDate = node.Attributes["Date"].GetStringOrDefault(string.Empty);
+		bool flag = node.Attributes["Verified"].ParseBool();
+		bool isCheating = node.Attributes["Cheating"].ParseBool();
+		PaymentInfo payment = ((!flag) ? PaymentInfo.CreateNotVerified(productId, orderId, receipt, signature) : PaymentInfo.CreateVerified(productId, orderId, receipt, signature, purchaseDate));
+		payment.SetIsCheating(isCheating);
+		return payment;
 	}
 
-	private static PaymentInfo ParseCompletedPayment(XmlNode MEEAKLDGLDF)
+	private static PaymentInfo ParseCompletedPayment(XmlNode node)
 	{
-		string bGMLFNGKDHI = MEEAKLDGLDF.Attributes["Id"].GetStringOrDefault(string.Empty);
-		string oDJCLFJHKFP = MEEAKLDGLDF.Attributes["ProductId"].GetStringOrDefault(string.Empty);
-		string dNHKNDPBGNM = MEEAKLDGLDF.Attributes["Receipt"].GetStringOrDefault(string.Empty);
-		string bGLGHEMMANM = MEEAKLDGLDF.Attributes["Signature"].GetStringOrDefault();
-		string pPJBKHKCONC = MEEAKLDGLDF.Attributes["Date"].GetStringOrDefault(string.Empty);
-		bool flag = MEEAKLDGLDF.Attributes["Verified"].ParseBool();
-		bool bAINMLLIKOL = MEEAKLDGLDF.Attributes["Cheating"].ParseBool();
-		PaymentInfo jLDHCFFAIPK = (flag ? PaymentInfo.CreateVerifiedConfirmed(oDJCLFJHKFP, bGMLFNGKDHI, dNHKNDPBGNM, bGLGHEMMANM, pPJBKHKCONC) : ((MEEAKLDGLDF.Attributes["VerificationFailed"] == null) ? PaymentInfo.CreateNotVerifiedProcessed(oDJCLFJHKFP, bGMLFNGKDHI, dNHKNDPBGNM, bGLGHEMMANM) : PaymentInfo.CreateVerificationFailed(oDJCLFJHKFP, bGMLFNGKDHI, dNHKNDPBGNM, bGLGHEMMANM)));
-		jLDHCFFAIPK.SetIsCheating(bAINMLLIKOL);
-		return jLDHCFFAIPK;
+		string orderId = node.Attributes["Id"].GetStringOrDefault(string.Empty);
+		string productId = node.Attributes["ProductId"].GetStringOrDefault(string.Empty);
+		string receipt = node.Attributes["Receipt"].GetStringOrDefault(string.Empty);
+		string signature = node.Attributes["Signature"].GetStringOrDefault();
+		string purchaseDate = node.Attributes["Date"].GetStringOrDefault(string.Empty);
+		bool flag = node.Attributes["Verified"].ParseBool();
+		bool isCheating = node.Attributes["Cheating"].ParseBool();
+		PaymentInfo payment = (flag ? PaymentInfo.CreateVerifiedConfirmed(productId, orderId, receipt, signature, purchaseDate) : ((node.Attributes["VerificationFailed"] == null) ? PaymentInfo.CreateNotVerifiedProcessed(productId, orderId, receipt, signature) : PaymentInfo.CreateVerificationFailed(productId, orderId, receipt, signature)));
+		payment.SetIsCheating(isCheating);
+		return payment;
 	}
 
-	private static void WriteInProgressPayment(PaymentInfo PAENLDALDGB, XmlNode JIIIKGLGCBJ)
+	private static void WriteInProgressPayment(PaymentInfo payment, XmlNode parent)
 	{
-		XmlElement xmlElement = JIIIKGLGCBJ.AppendElement("Payment");
-		xmlElement.SetAttribute("Id", PAENLDALDGB.GetPaymentId());
-		xmlElement.SetAttribute("ProductId", PAENLDALDGB.GetProductId());
-		xmlElement.SetAttribute("Receipt", PAENLDALDGB.GetReceipt());
-		xmlElement.SetAttribute("Verified", (!PAENLDALDGB.GetIsVerified()) ? "0" : "1");
-		if (PAENLDALDGB.GetSignature() != null)
+		XmlElement xmlElement = parent.AppendElement("Payment");
+		xmlElement.SetAttribute("Id", payment.GetPaymentId());
+		xmlElement.SetAttribute("ProductId", payment.GetProductId());
+		xmlElement.SetAttribute("Receipt", payment.GetReceipt());
+		xmlElement.SetAttribute("Verified", (!payment.GetIsVerified()) ? "0" : "1");
+		if (payment.GetSignature() != null)
 		{
-			xmlElement.SetAttribute("Signature", PAENLDALDGB.GetSignature());
+			xmlElement.SetAttribute("Signature", payment.GetSignature());
 		}
-		if (PAENLDALDGB.GetIsCheating())
+		if (payment.GetIsCheating())
 		{
 			xmlElement.SetAttribute("Cheating", "1");
 		}
-		if (PAENLDALDGB.GetIsVerified())
+		if (payment.GetIsVerified())
 		{
-			xmlElement.SetAttribute("Date", PAENLDALDGB.GetPurchaseDate());
+			xmlElement.SetAttribute("Date", payment.GetPurchaseDate());
 		}
 	}
 
-	public void WriteCompletedPayment(PaymentInfo PAENLDALDGB, XmlNode JIIIKGLGCBJ)
+	public void WriteCompletedPayment(PaymentInfo payment, XmlNode parent)
 	{
-		XmlElement xmlElement = JIIIKGLGCBJ.AppendElement("Payment");
-		xmlElement.SetAttribute("Id", PAENLDALDGB.GetPaymentId());
-		xmlElement.SetAttribute("ProductId", PAENLDALDGB.GetProductId());
-		xmlElement.SetAttribute("Receipt", PAENLDALDGB.GetReceipt());
-		xmlElement.SetAttribute("Verified", (!PAENLDALDGB.GetIsVerified()) ? "0" : "1");
-		if (PAENLDALDGB.GetSignature() != null)
+		XmlElement xmlElement = parent.AppendElement("Payment");
+		xmlElement.SetAttribute("Id", payment.GetPaymentId());
+		xmlElement.SetAttribute("ProductId", payment.GetProductId());
+		xmlElement.SetAttribute("Receipt", payment.GetReceipt());
+		xmlElement.SetAttribute("Verified", (!payment.GetIsVerified()) ? "0" : "1");
+		if (payment.GetSignature() != null)
 		{
-			xmlElement.SetAttribute("Signature", PAENLDALDGB.GetSignature());
+			xmlElement.SetAttribute("Signature", payment.GetSignature());
 		}
-		if (PAENLDALDGB.GetIsCheating())
+		if (payment.GetIsCheating())
 		{
 			xmlElement.SetAttribute("Cheating", "1");
 		}
-		if (PAENLDALDGB.GetIsVerified())
+		if (payment.GetIsVerified())
 		{
-			xmlElement.SetAttribute("Date", PAENLDALDGB.GetPurchaseDate());
+			xmlElement.SetAttribute("Date", payment.GetPurchaseDate());
 		}
-		else if (PAENLDALDGB.GetIsVerificationFailed())
+		else if (payment.GetIsVerificationFailed())
 		{
 			xmlElement.SetAttribute("VerificationFailed", "1");
 		}

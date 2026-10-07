@@ -8,13 +8,13 @@ public class CertificateValidator
 
 	private const string TrustedUrlPattern = "^https://([^\\/]+\\.|)nekkimobile\\.ru(:[0-9]*)*(\\/([a-zA-Z0-9\\-\\.\\?\\,\\'\\/\\\\\\+&amp;%\\$#_]*)?|)$";
 
-	public static bool IsTrustedUrl(string BEPKJNKCKPH)
+	public static bool IsTrustedUrl(string url)
 	{
-		return MatchesTrustedUrl(BEPKJNKCKPH);
+		return MatchesTrustedUrl(url);
 	}
 
-	private static bool MatchesTrustedUrl(string BEPKJNKCKPH)
+	private static bool MatchesTrustedUrl(string url)
 	{
-		return new Regex("^https://([^\\/]+\\.|)nekkimobile\\.ru(:[0-9]*)*(\\/([a-zA-Z0-9\\-\\.\\?\\,\\'\\/\\\\\\+&amp;%\\$#_]*)?|)$").Matches(BEPKJNKCKPH).Count == 1;
+		return new Regex("^https://([^\\/]+\\.|)nekkimobile\\.ru(:[0-9]*)*(\\/([a-zA-Z0-9\\-\\.\\?\\,\\'\\/\\\\\\+&amp;%\\$#_]*)?|)$").Matches(url).Count == 1;
 	}
 }

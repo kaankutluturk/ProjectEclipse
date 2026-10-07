@@ -379,91 +379,91 @@ public static class Sound
 		currentMusicName = value;
 	}
 
-	public static void SetPaths(string EGPPPNJHNMF, string ADLELPHJADH)
+	public static void SetPaths(string newSoundsPath, string newMusicPath)
 	{
-		SetSoundsPath(EGPPPNJHNMF);
-		SetMusicPath(ADLELPHJADH);
+		SetSoundsPath(newSoundsPath);
+		SetMusicPath(newMusicPath);
 	}
 
-	public static void SetExtensions(string IBFNOCDNNDB, string NHAKIADKLPG)
+	public static void SetExtensions(string newSoundExtension, string newMusicExtension)
 	{
-		SetSoundExtension(IBFNOCDNNDB);
-		SetMusicExtension(NHAKIADKLPG);
+		SetSoundExtension(newSoundExtension);
+		SetMusicExtension(newMusicExtension);
 	}
 
-	public static void SetVolume(float MJDCMAEEIPJ, float FEFBNAOBBBE)
+	public static void SetVolume(float newSoundVolume, float newMusicVolume)
 	{
-		SetSoundVolume(MJDCMAEEIPJ);
-		SetMusicVolume(FEFBNAOBBBE);
+		SetSoundVolume(newSoundVolume);
+		SetMusicVolume(newMusicVolume);
 	}
 
-	private static void ApplySoundVolumeToChannels(float MJDCMAEEIPJ)
+	private static void ApplySoundVolumeToChannels(float newSoundVolume)
 	{
 		for (int i = FirstSoundChannel; i <= LastSoundChannel; i++)
 		{
-			SetVolumeToChannel(i, MJDCMAEEIPJ, isSoundMuted);
+			SetVolumeToChannel(i, newSoundVolume, isSoundMuted);
 		}
 	}
 
-	private static void SetVolumeToChannel(int LMGPAGINHGD, float ONHAHMIHGJC, bool NGHNGOJHJDE)
+	private static void SetVolumeToChannel(int channel, float volume, bool muted)
 	{
-		AudioManager.SetVolume(ONHAHMIHGJC, LMGPAGINHGD);
-		SetMuteToChannel(LMGPAGINHGD, NGHNGOJHJDE);
+		AudioManager.SetVolume(volume, channel);
+		SetMuteToChannel(channel, muted);
 	}
 
-	private static void ApplySoundMuteToChannels(bool JFIDKIMPPDH)
+	private static void ApplySoundMuteToChannels(bool muted)
 	{
 		for (int i = FirstSoundChannel; i <= LastSoundChannel; i++)
 		{
-			SetMuteToChannel(i, JFIDKIMPPDH);
+			SetMuteToChannel(i, muted);
 		}
 	}
 
-	private static void SetMuteToChannel(int ADNDLGKIJJK, bool JFIDKIMPPDH)
+	private static void SetMuteToChannel(int channel, bool muted)
 	{
-		if (JFIDKIMPPDH)
+		if (muted)
 		{
-			AudioManager.Mute(ADNDLGKIJJK);
+			AudioManager.Mute(channel);
 		}
 		else
 		{
-			AudioManager.UnMute(ADNDLGKIJJK);
+			AudioManager.UnMute(channel);
 		}
 	}
 
-	public static int PlaySound(string DPBKBKDCIOI, bool KKHJAJFEPPA = false, float JIJAJFEJJHK = 1f)
+	public static int PlaySound(string soundName, bool isLooping = false, float volume = 1f)
 	{
-		if (Eclipse.Multiplayer.SpectatorInputSource.SuppressAudio && !KKHJAJFEPPA) return -1;
-		if (KKHJAJFEPPA)
+		if (Eclipse.Multiplayer.SpectatorInputSource.SuppressAudio && !isLooping) return -1;
+		if (isLooping)
 		{
-			var loop = FindLoopingSound(DPBKBKDCIOI);
+			var loop = FindLoopingSound(soundName);
 			if (loop.Key != string.Empty && AudioManager.IsPlaying((int)loop.Value)) return (int)loop.Value;
 		}
 		if (Fight.GetCurrentFight()?.IsTitleSparring == true)
 		{
-			Eclipse.UI.EclipseUiAudio.PlayTitleFightSound(DPBKBKDCIOI, KKHJAJFEPPA, JIJAJFEJJHK, LoadSoundClip);
+			Eclipse.UI.EclipseUiAudio.PlayTitleFightSound(soundName, isLooping, volume, LoadSoundClip);
 			return -1;
 		}
 		// A rollback re-simulation replays ticks whose one-shot sounds already played.
-		if (!KKHJAJFEPPA && Eclipse.Multiplayer.VersusTickDriver.IsResimulating)
+		if (!isLooping && Eclipse.Multiplayer.VersusTickDriver.IsResimulating)
 		{
 			return -1;
 		}
-		bool flag = AudioManager.CheckAudioLoaded(DPBKBKDCIOI);
+		bool flag = AudioManager.CheckAudioLoaded(soundName);
 		if (!flag)
 		{
-			flag = LoadSound(DPBKBKDCIOI, JIJAJFEJJHK);
+			flag = LoadSound(soundName, volume);
 		}
 		int num = -1;
 		if (flag)
 		{
 			num = GetFreeChannel();
-			PlayOnChannel(num, DPBKBKDCIOI, KKHJAJFEPPA, isSoundMuted);
-			TrackPlayingSound(DPBKBKDCIOI, (uint)num);
-			if (KKHJAJFEPPA)
+			PlayOnChannel(num, soundName, isLooping, isSoundMuted);
+			TrackPlayingSound(soundName, (uint)num);
+			if (isLooping)
 			{
-				TrackLoopingSound(DPBKBKDCIOI, (uint)num);
-				Eclipse.Multiplayer.Rollback.RollbackObjects.LoopStarted(DPBKBKDCIOI);
+				TrackLoopingSound(soundName, (uint)num);
+				Eclipse.Multiplayer.Rollback.RollbackObjects.LoopStarted(soundName);
 			}
 		}
 		else
@@ -472,7 +472,7 @@ public static class Sound
 			// were not present in the recovered client. Missing sound effects must
 			// not be treated as gameplay errors (or be logged every animation
 			// frame), but retain one useful diagnostic with the real resource name.
-			string text = string.IsNullOrEmpty(DPBKBKDCIOI) ? "<empty>" : DPBKBKDCIOI;
+			string text = string.IsNullOrEmpty(soundName) ? "<empty>" : soundName;
 			if (MissingAudioWarnings.Add("sound:" + text))
 			{
 				UnityEngine.Debug.LogWarning("[Audio] Missing optional sound '" + text + "'; skipping it.");
@@ -481,9 +481,9 @@ public static class Sound
 		return num;
 	}
 
-	public static int PlaySound(string DPBKBKDCIOI, float JIJAJFEJJHK)
+	public static int PlaySound(string soundName, float volume)
 	{
-		return PlaySound(DPBKBKDCIOI, false, JIJAJFEJJHK);
+		return PlaySound(soundName, false, volume);
 	}
 
 	public static void StopAllSounds()
@@ -527,9 +527,9 @@ public static class Sound
 		}
 	}
 
-	private static void StopSound(int LMGPAGINHGD)
+	private static void StopSound(int channel)
 	{
-		AudioManager.Stop(LMGPAGINHGD);
+		AudioManager.Stop(channel);
 	}
 
 	public static void StopSound(string path)
@@ -555,41 +555,41 @@ public static class Sound
 		}
 	}
 
-	public static void PlayMusic(string LOJOJHIFCBL, bool KKHJAJFEPPA = true)
+	public static void PlayMusic(string musicName, bool isLooping = true)
 	{
 		StopMusic();
-		if (string.IsNullOrEmpty(LOJOJHIFCBL))
+		if (string.IsNullOrEmpty(musicName))
 		{
 			if (MissingAudioWarnings.Add("music:<empty>"))
 			{
 				UnityEngine.Debug.LogWarning("[Audio] Fight requested an empty music name; using the recovered default track.");
 			}
-			LOJOJHIFCBL = "fight1_samurai_spirit";
+			musicName = "fight1_samurai_spirit";
 		}
 		AudioClip audioClip;
-		if (Eclipse.Modding.ModAssetBinding.TryLoadAudio(LOJOJHIFCBL, out audioClip))
+		if (Eclipse.Modding.ModAssetBinding.TryLoadAudio(musicName, out audioClip))
 		{
-			AudioManager.AddAudio(audioClip, LOJOJHIFCBL, 1f);
-			PlayOnChannel(MusicChannel, LOJOJHIFCBL, KKHJAJFEPPA, isMusicMuted);
-			SetCurrentMusicName(LOJOJHIFCBL);
+			AudioManager.AddAudio(audioClip, musicName, 1f);
+			PlayOnChannel(MusicChannel, musicName, isLooping, isMusicMuted);
+			SetCurrentMusicName(musicName);
 			return;
 		}
-		if (Eclipse.Modding.ModAssetBinding.IsQualified(LOJOJHIFCBL))
+		if (Eclipse.Modding.ModAssetBinding.IsQualified(musicName))
 		{
-			if (MissingAudioWarnings.Add("music-mod-missing:" + LOJOJHIFCBL))
+			if (MissingAudioWarnings.Add("music-mod-missing:" + musicName))
 			{
-				UnityEngine.Debug.LogWarning("[Audio] Missing mod music '" + LOJOJHIFCBL + "'; continuing without music.");
+				UnityEngine.Debug.LogWarning("[Audio] Missing mod music '" + musicName + "'; continuing without music.");
 			}
 			return;
 		}
-		string bLMBLOKPMEC = musicPath;
-		string text = LOJOJHIFCBL;
+		string musicClipPath = musicPath;
+		string text = musicName;
 		bool flag = text.EndsWith(".ogg", System.StringComparison.OrdinalIgnoreCase);
-		bLMBLOKPMEC = ((!flag && !SF2Paths.UseBundledResources) ? (bLMBLOKPMEC + LOJOJHIFCBL + musicExtension) : (bLMBLOKPMEC + LOJOJHIFCBL));
-		audioClip = ResourceManager.GetAudioClip(bLMBLOKPMEC);
+		musicClipPath = ((!flag && !SF2Paths.UseBundledResources) ? (musicClipPath + musicName + musicExtension) : (musicClipPath + musicName));
+		audioClip = ResourceManager.GetAudioClip(musicClipPath);
 		if (audioClip == null)
 		{
-			string fallback = ResolveRecoveredMusicName(LOJOJHIFCBL);
+			string fallback = ResolveRecoveredMusicName(musicName);
 			audioClip = ResourceManager.GetAudioClip(BuildMusicPath(fallback));
 			if (audioClip == null)
 			{
@@ -598,20 +598,20 @@ public static class Sound
 			}
 			if (audioClip == null)
 			{
-				if (MissingAudioWarnings.Add("music-missing:" + LOJOJHIFCBL))
+				if (MissingAudioWarnings.Add("music-missing:" + musicName))
 				{
-					UnityEngine.Debug.LogWarning("[Audio] Missing music '" + LOJOJHIFCBL + "'; continuing without music.");
+					UnityEngine.Debug.LogWarning("[Audio] Missing music '" + musicName + "'; continuing without music.");
 				}
 				return;
 			}
-			if (MissingAudioWarnings.Add("music-fallback:" + LOJOJHIFCBL))
+			if (MissingAudioWarnings.Add("music-fallback:" + musicName))
 			{
-				UnityEngine.Debug.Log("[Audio] Resolved music '" + LOJOJHIFCBL + "' to recovered track '" + fallback + "'.");
+				UnityEngine.Debug.Log("[Audio] Resolved music '" + musicName + "' to recovered track '" + fallback + "'.");
 			}
 		}
-		AudioManager.AddAudio(audioClip, LOJOJHIFCBL, 1f);
-		PlayOnChannel(MusicChannel, LOJOJHIFCBL, KKHJAJFEPPA, isMusicMuted);
-		SetCurrentMusicName(LOJOJHIFCBL);
+		AudioManager.AddAudio(audioClip, musicName, 1f);
+		PlayOnChannel(MusicChannel, musicName, isLooping, isMusicMuted);
+		SetCurrentMusicName(musicName);
 	}
 
 	private static string ResolveRecoveredMusicName(string requested)
@@ -635,10 +635,10 @@ public static class Sound
 		return musicPath + musicName + ((!SF2Paths.UseBundledResources) ? musicExtension : string.Empty);
 	}
 
-	public static void PlayOnChannel(int ADNDLGKIJJK, string DPBKBKDCIOI, bool KKHJAJFEPPA, bool KPCIIDFJCOB)
+	public static void PlayOnChannel(int channel, string clipName, bool isLooping, bool startMuted)
 	{
-		AudioManager.Play(ADNDLGKIJJK, DPBKBKDCIOI, KKHJAJFEPPA, true);
-		SetMuteToChannel(ADNDLGKIJJK, KPCIIDFJCOB);
+		AudioManager.Play(channel, clipName, isLooping, true);
+		SetMuteToChannel(channel, startMuted);
 	}
 
 	// best guess for name
@@ -671,34 +671,34 @@ public static class Sound
 		}
 	}
 
-	public static void PreloadSounds(List<string> NAECCPFPEHC)
+	public static void PreloadSounds(List<string> soundNames)
 	{
-		foreach (string item in NAECCPFPEHC)
+		foreach (string item in soundNames)
 		{
 			LoadSound(item, GetSoundVolume());
 		}
 	}
 
-	public static bool LoadSound(string DPBKBKDCIOI, float JIJAJFEJJHK = 1f)
+	public static bool LoadSound(string soundName, float volume = 1f)
 	{
-		AudioClip audioClip = LoadSoundClip(DPBKBKDCIOI);
-		if (audioClip != null) AudioManager.AddAudio(audioClip, DPBKBKDCIOI, JIJAJFEJJHK);
+		AudioClip audioClip = LoadSoundClip(soundName);
+		if (audioClip != null) AudioManager.AddAudio(audioClip, soundName, volume);
 		return audioClip != null;
 	}
 
-	private static AudioClip LoadSoundClip(string DPBKBKDCIOI)
+	private static AudioClip LoadSoundClip(string soundName)
 	{
 		AudioClip externalClip;
-		if (Eclipse.Modding.ModAssetBinding.TryLoadAudio(DPBKBKDCIOI, out externalClip))
+		if (Eclipse.Modding.ModAssetBinding.TryLoadAudio(soundName, out externalClip))
 		{
 			return externalClip;
 		}
-		if (Eclipse.Modding.ModAssetBinding.IsQualified(DPBKBKDCIOI))
+		if (Eclipse.Modding.ModAssetBinding.IsQualified(soundName))
 		{
 			return null;
 		}
 		string text = GetSoundsPath();
-		text += DPBKBKDCIOI;
+		text += soundName;
 		if (!SF2Paths.UseBundledResources)
 		{
 			text += GetSoundExtension();
@@ -706,9 +706,9 @@ public static class Sound
 		return ResourceManager.GetAudioClip(text);
 	}
 
-	private static void TrackPlayingSound(string path, uint OKNNNLIPODI)
+	private static void TrackPlayingSound(string path, uint playbackId)
 	{
-		KeyValuePair<string, uint> item = new KeyValuePair<string, uint>(path, OKNNNLIPODI);
+		KeyValuePair<string, uint> item = new KeyValuePair<string, uint>(path, playbackId);
 		if (playingSounds.Count == MaxPlayableSounds)
 		{
 			playingSounds.Remove(playingSounds[0]);
@@ -716,9 +716,9 @@ public static class Sound
 		playingSounds.Add(item);
 	}
 
-	private static void TrackLoopingSound(string path, uint OKNNNLIPODI)
+	private static void TrackLoopingSound(string path, uint playbackId)
 	{
-		KeyValuePair<string, uint> item = new KeyValuePair<string, uint>(path, OKNNNLIPODI);
+		KeyValuePair<string, uint> item = new KeyValuePair<string, uint>(path, playbackId);
 		loopingSounds.Add(item);
 	}
 

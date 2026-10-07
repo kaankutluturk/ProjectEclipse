@@ -28,11 +28,11 @@ namespace Nekki.SF2.GUI.Shop
 		{
 		}
 
-		public void SetItemInfo(ItemInfo PJDAGCBPLJE)
+		public void SetItemInfo(ItemInfo itemInfo)
 		{
-			if (_propertiesPanel != null && PJDAGCBPLJE != null)
+			if (_propertiesPanel != null && itemInfo != null)
 			{
-				List<PerkInfoItem> list = ListSF.GetItemEnchantments(PJDAGCBPLJE);
+				List<PerkInfoItem> list = ListSF.GetItemEnchantments(itemInfo);
 				if (list.Count > 0)
 				{
 					_propertiesPanel.gameObject.SetActive(true);

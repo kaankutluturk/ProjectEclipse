@@ -43,14 +43,14 @@ public class PressButton : Button
 		return rectTransform;
 	}
 
-	public void SetImages(string AOIODPAABDM, string OMDLMOMCPLG, string texturePath = "")
+	public void SetImages(string normalImageName, string pressImageName, string texturePath = "")
 	{
-		if (AOIODPAABDM == null)
+		if (normalImageName == null)
 		{
 			GameLog.Error("PressButton.Init normalImage is null");
 			return;
 		}
-		if (OMDLMOMCPLG == null)
+		if (pressImageName == null)
 		{
 			GameLog.Error("PressButton.Init pressImage is null");
 			return;
@@ -65,8 +65,8 @@ public class PressButton : Button
 			normalImage.set_TexturePath(texturePath);
 			pressImage.set_TexturePath(texturePath);
 		}
-		normalImage.set_SpriteName(AOIODPAABDM);
-		pressImage.set_SpriteName(OMDLMOMCPLG);
+		normalImage.set_SpriteName(normalImageName);
+		pressImage.set_SpriteName(pressImageName);
 		normalImage.SetNativeSize();
 		pressImage.SetNativeSize();
 		Vector2 size = normalImage.rectTransform.rect.size;
@@ -75,9 +75,9 @@ public class PressButton : Button
 		layoutElement.minHeight = size.y;
 	}
 
-	protected override void DoStateTransition(SelectionState state, bool PJHFBFHIGNN)
+	protected override void DoStateTransition(SelectionState state, bool instant)
 	{
-		base.DoStateTransition(state, PJHFBFHIGNN);
+		base.DoStateTransition(state, instant);
 		if (state == SelectionState.Pressed)
 		{
 			ShowPressedState();

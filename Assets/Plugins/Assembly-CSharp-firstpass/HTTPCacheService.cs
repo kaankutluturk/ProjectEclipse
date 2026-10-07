@@ -167,17 +167,17 @@ public static class HTTPCacheService
 	{
 		lock (GetLibrary())
 		{
-			ulong kDIGFPPHJDL = NextNameIDX;
+			ulong nameIndex = NextNameIDX;
 			do
 			{
 				NextNameIDX = ++NextNameIDX % ulong.MaxValue;
 			}
 			while (usedIndexes.ContainsKey(NextNameIDX));
-			return kDIGFPPHJDL;
+			return nameIndex;
 		}
 	}
 
-	internal static bool HasEntity(Uri KJHNCLAJMLO)
+	internal static bool HasEntity(Uri uri)
 	{
 		if (!GetIsSupported())
 		{
@@ -185,17 +185,17 @@ public static class HTTPCacheService
 		}
 		lock (GetLibrary())
 		{
-			return GetLibrary().ContainsKey(KJHNCLAJMLO);
+			return GetLibrary().ContainsKey(uri);
 		}
 	}
 
-	internal static bool DeleteEntity(Uri KJHNCLAJMLO, bool IPHPJPNKPMD = true)
+	internal static bool DeleteEntity(Uri uri, bool removeFromLibrary = true)
 	{
 		if (!GetIsSupported())
 		{
 			return false;
 		}
-		object obj = HTTPCacheFileLock.Acquire(KJHNCLAJMLO);
+		object obj = HTTPCacheFileLock.Acquire(uri);
 		lock (obj)
 		{
 			try
@@ -203,14 +203,14 @@ public static class HTTPCacheService
 				lock (GetLibrary())
 				{
 					HTTPCacheFileInfo value;
-					bool flag = GetLibrary().TryGetValue(KJHNCLAJMLO, out value);
+					bool flag = GetLibrary().TryGetValue(uri, out value);
 					if (flag)
 					{
 						value.Delete();
 					}
-					if (flag && IPHPJPNKPMD)
+					if (flag && removeFromLibrary)
 					{
-						GetLibrary().Remove(KJHNCLAJMLO);
+						GetLibrary().Remove(uri);
 						usedIndexes.Remove(value.GetMappedNameIdx());
 					}
 					return true;
@@ -222,7 +222,7 @@ public static class HTTPCacheService
 		}
 	}
 
-	internal static bool IsCachedEntityExpiresInTheFuture(HTTPRequest ONOCIELLAPL)
+	internal static bool IsCachedEntityExpiresInTheFuture(HTTPRequest request)
 	{
 		if (!GetIsSupported())
 		{
@@ -231,7 +231,7 @@ public static class HTTPCacheService
 		lock (GetLibrary())
 		{
 			HTTPCacheFileInfo value;
-			if (GetLibrary().TryGetValue(ONOCIELLAPL.GetCurrentUri(), out value))
+			if (GetLibrary().TryGetValue(request.GetCurrentUri(), out value))
 			{
 				return value.WillExpireInTheFuture();
 			}
@@ -239,7 +239,7 @@ public static class HTTPCacheService
 		return false;
 	}
 
-	internal static void SetHeaders(HTTPRequest ONOCIELLAPL)
+	internal static void SetHeaders(HTTPRequest request)
 	{
 		if (!GetIsSupported())
 		{
@@ -248,16 +248,16 @@ public static class HTTPCacheService
 		lock (GetLibrary())
 		{
 			HTTPCacheFileInfo value;
-			if (GetLibrary().TryGetValue(ONOCIELLAPL.GetCurrentUri(), out value))
+			if (GetLibrary().TryGetValue(request.GetCurrentUri(), out value))
 			{
-				value.SetUpRevalidationHeaders(ONOCIELLAPL);
+				value.SetUpRevalidationHeaders(request);
 			}
 		}
 	}
 
-	internal static Stream GetBody(Uri KJHNCLAJMLO, out int BDBOAEGELMC)
+	internal static Stream GetBody(Uri uri, out int length)
 	{
-		BDBOAEGELMC = 0;
+		length = 0;
 		if (!GetIsSupported())
 		{
 			return null;
@@ -265,15 +265,15 @@ public static class HTTPCacheService
 		lock (GetLibrary())
 		{
 			HTTPCacheFileInfo value;
-			if (GetLibrary().TryGetValue(KJHNCLAJMLO, out value))
+			if (GetLibrary().TryGetValue(uri, out value))
 			{
-				return value.GetBodyStream(out BDBOAEGELMC);
+				return value.GetBodyStream(out length);
 			}
 		}
 		return null;
 	}
 
-	internal static HTTPResponse GetFullResponse(HTTPRequest ONOCIELLAPL)
+	internal static HTTPResponse GetFullResponse(HTTPRequest request)
 	{
 		if (!GetIsSupported())
 		{
@@ -282,55 +282,55 @@ public static class HTTPCacheService
 		lock (GetLibrary())
 		{
 			HTTPCacheFileInfo value;
-			if (GetLibrary().TryGetValue(ONOCIELLAPL.GetCurrentUri(), out value))
+			if (GetLibrary().TryGetValue(request.GetCurrentUri(), out value))
 			{
-				return value.ReadResponseTo(ONOCIELLAPL);
+				return value.ReadResponseTo(request);
 			}
 		}
 		return null;
 	}
 
-	internal static bool IsCacheble(Uri KJHNCLAJMLO, HTTPMethods FJLOLCPJACB, HTTPResponse GIHDDAKBMHE)
+	internal static bool IsCacheble(Uri uri, HTTPMethods method, HTTPResponse response)
 	{
 		if (!GetIsSupported())
 		{
 			return false;
 		}
-		if (FJLOLCPJACB != HTTPMethods.Get)
+		if (method != HTTPMethods.Get)
 		{
 			return false;
 		}
-		if (GIHDDAKBMHE == null)
+		if (response == null)
 		{
 			return false;
 		}
-		if (GIHDDAKBMHE.GetStatusCode() == 304)
+		if (response.GetStatusCode() == 304)
 		{
 			return false;
 		}
-		if (GIHDDAKBMHE.GetStatusCode() < 200 || GIHDDAKBMHE.GetStatusCode() >= 400)
+		if (response.GetStatusCode() < 200 || response.GetStatusCode() >= 400)
 		{
 			return false;
 		}
-		List<string> list = GIHDDAKBMHE.GetHeaderValues("cache-control");
-		if (list != null && list.Exists((string PNJNBBFLCAH) =>
+		List<string> list = response.GetHeaderValues("cache-control");
+		if (list != null && list.Exists((string header) =>
 		{
-			string text = PNJNBBFLCAH.ToLower();
+			string text = header.ToLower();
 			return text.Contains("no-store") || text.Contains("no-cache");
 		}))
 		{
 			return false;
 		}
-		List<string> list2 = GIHDDAKBMHE.GetHeaderValues("pragma");
-		if (list2 != null && list2.Exists((string PNJNBBFLCAH) =>
+		List<string> list2 = response.GetHeaderValues("pragma");
+		if (list2 != null && list2.Exists((string header) =>
 		{
-			string text = PNJNBBFLCAH.ToLower();
+			string text = header.ToLower();
 			return text.Contains("no-store") || text.Contains("no-cache");
 		}))
 		{
 			return false;
 		}
-		List<string> list3 = GIHDDAKBMHE.GetHeaderValues("content-range");
+		List<string> list3 = response.GetHeaderValues("content-range");
 		if (list3 != null)
 		{
 			return false;
@@ -338,9 +338,9 @@ public static class HTTPCacheService
 		return true;
 	}
 
-	internal static HTTPCacheFileInfo Store(Uri KJHNCLAJMLO, HTTPMethods FJLOLCPJACB, HTTPResponse GIHDDAKBMHE)
+	internal static HTTPCacheFileInfo Store(Uri uri, HTTPMethods method, HTTPResponse response)
 	{
-		if (GIHDDAKBMHE == null || GIHDDAKBMHE.GetData() == null || GIHDDAKBMHE.GetData().Length == 0)
+		if (response == null || response.GetData() == null || response.GetData().Length == 0)
 		{
 			return null;
 		}
@@ -351,25 +351,25 @@ public static class HTTPCacheService
 		HTTPCacheFileInfo value = null;
 		lock (GetLibrary())
 		{
-			if (!GetLibrary().TryGetValue(KJHNCLAJMLO, out value))
+			if (!GetLibrary().TryGetValue(uri, out value))
 			{
-				GetLibrary().Add(KJHNCLAJMLO, value = new HTTPCacheFileInfo(KJHNCLAJMLO));
+				GetLibrary().Add(uri, value = new HTTPCacheFileInfo(uri));
 				usedIndexes.Add(value.GetMappedNameIdx(), value);
 			}
 			try
 			{
-				value.Store(GIHDDAKBMHE);
+				value.Store(response);
 				return value;
 			}
 			catch
 			{
-				DeleteEntity(KJHNCLAJMLO);
+				DeleteEntity(uri);
 				throw;
 			}
 		}
 	}
 
-	internal static Stream PrepareStreamed(Uri KJHNCLAJMLO, HTTPResponse GIHDDAKBMHE)
+	internal static Stream PrepareStreamed(Uri uri, HTTPResponse response)
 	{
 		if (!GetIsSupported())
 		{
@@ -378,18 +378,18 @@ public static class HTTPCacheService
 		lock (GetLibrary())
 		{
 			HTTPCacheFileInfo value;
-			if (!GetLibrary().TryGetValue(KJHNCLAJMLO, out value))
+			if (!GetLibrary().TryGetValue(uri, out value))
 			{
-				GetLibrary().Add(KJHNCLAJMLO, value = new HTTPCacheFileInfo(KJHNCLAJMLO));
+				GetLibrary().Add(uri, value = new HTTPCacheFileInfo(uri));
 				usedIndexes.Add(value.GetMappedNameIdx(), value);
 			}
 			try
 			{
-				return value.GetSaveStream(GIHDDAKBMHE);
+				return value.GetSaveStream(response);
 			}
 			catch
 			{
-				DeleteEntity(KJHNCLAJMLO);
+				DeleteEntity(uri);
 				throw;
 			}
 		}
@@ -405,7 +405,7 @@ public static class HTTPCacheService
 		}
 	}
 
-	private static void ClearImpl(object KKNOCIPBIIK)
+	private static void ClearImpl(object state)
 	{
 		if (!GetIsSupported())
 		{
@@ -435,9 +435,9 @@ public static class HTTPCacheService
 		}
 	}
 
-	public static void BeginMaintainence(HTTPCacheMaintananceParams HFBDNDCABLM)
+	public static void BeginMaintainence(HTTPCacheMaintananceParams maintananceParams)
 	{
-		if (HFBDNDCABLM == null)
+		if (maintananceParams == null)
 		{
 			throw new ArgumentNullException("maintananceParams == null");
 		}
@@ -447,13 +447,13 @@ public static class HTTPCacheService
 		}
 		inMaintainenceThread = true;
 		SetupCacheFolder();
-		new Thread((object KKNOCIPBIIK) =>
+		new Thread((object state) =>
 		{
 			try
 			{
 				lock (GetLibrary())
 				{
-					DateTime dateTime = DateTime.UtcNow - HFBDNDCABLM.GetDeleteOlder();
+					DateTime dateTime = DateTime.UtcNow - maintananceParams.GetDeleteOlder();
 					List<HTTPCacheFileInfo> list = new List<HTTPCacheFileInfo>();
 					foreach (KeyValuePair<Uri, HTTPCacheFileInfo> item in GetLibrary())
 					{
@@ -469,7 +469,7 @@ public static class HTTPCacheService
 					}
 					list.Clear();
 					ulong num = GetCacheSize();
-					if (num > HFBDNDCABLM.GetMaxCacheSize())
+					if (num > maintananceParams.GetMaxCacheSize())
 					{
 						List<HTTPCacheFileInfo> list2 = new List<HTTPCacheFileInfo>(library.Count);
 						foreach (KeyValuePair<Uri, HTTPCacheFileInfo> item2 in library)
@@ -478,13 +478,13 @@ public static class HTTPCacheService
 						}
 						list2.Sort();
 						int num2 = 0;
-						while (num >= HFBDNDCABLM.GetMaxCacheSize() && num2 < list2.Count)
+						while (num >= maintananceParams.GetMaxCacheSize() && num2 < list2.Count)
 						{
 							try
 							{
-								HTTPCacheFileInfo aEMMGBPFAHD = list2[num2];
-								ulong num3 = (ulong)aEMMGBPFAHD.GetBodyLength();
-								DeleteEntity(aEMMGBPFAHD.GetUri());
+								HTTPCacheFileInfo fileInfo = list2[num2];
+								ulong num3 = (ulong)fileInfo.GetBodyLength();
+								DeleteEntity(fileInfo.GetUri());
 								num -= num3;
 							}
 							catch
@@ -570,13 +570,13 @@ public static class HTTPCacheService
 						for (int i = 0; i < num2; i++)
 						{
 							Uri uri = new Uri(binaryReader.ReadString());
-							HTTPCacheFileInfo aEMMGBPFAHD = new HTTPCacheFileInfo(uri, binaryReader, num);
-							if (aEMMGBPFAHD.IsExists())
+							HTTPCacheFileInfo fileInfo = new HTTPCacheFileInfo(uri, binaryReader, num);
+							if (fileInfo.IsExists())
 							{
-								library.Add(uri, aEMMGBPFAHD);
+								library.Add(uri, fileInfo);
 								if (num > 1)
 								{
-									usedIndexes.Add(aEMMGBPFAHD.GetMappedNameIdx(), aEMMGBPFAHD);
+									usedIndexes.Add(fileInfo.GetMappedNameIdx(), fileInfo);
 								}
 							}
 						}
@@ -628,7 +628,7 @@ public static class HTTPCacheService
 		}
 	}
 
-	internal static void SetBodyLength(Uri KJHNCLAJMLO, int DEFBMELCOHO)
+	internal static void SetBodyLength(Uri uri, int length)
 	{
 		if (!GetIsSupported())
 		{
@@ -637,12 +637,12 @@ public static class HTTPCacheService
 		lock (GetLibrary())
 		{
 			HTTPCacheFileInfo value;
-			if (GetLibrary().TryGetValue(KJHNCLAJMLO, out value))
+			if (GetLibrary().TryGetValue(uri, out value))
 			{
-				value.set_BodyLength(DEFBMELCOHO);
+				value.set_BodyLength(length);
 				return;
 			}
-			GetLibrary().Add(KJHNCLAJMLO, value = new HTTPCacheFileInfo(KJHNCLAJMLO, DateTime.UtcNow, DEFBMELCOHO));
+			GetLibrary().Add(uri, value = new HTTPCacheFileInfo(uri, DateTime.UtcNow, length));
 			usedIndexes.Add(value.GetMappedNameIdx(), value);
 		}
 	}

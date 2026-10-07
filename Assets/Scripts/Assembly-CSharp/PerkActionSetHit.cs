@@ -82,14 +82,14 @@ public class PerkActionSetHit : PerkAction
 	{
 	}
 
-	public PerkActionSetHit(PerkActionSetHit NOLFMPDGCOC)
-		: base(NOLFMPDGCOC)
+	public PerkActionSetHit(PerkActionSetHit source)
+		: base(source)
 	{
-		SetCritical(NOLFMPDGCOC.GetCritical());
-		SetBlock(NOLFMPDGCOC.GetBlock());
-		SetShock(NOLFMPDGCOC.GetShock());
-		SetDisarm(NOLFMPDGCOC.GetDisarm());
-		SetDamage(NOLFMPDGCOC.GetDamage());
+		SetCritical(source.GetCritical());
+		SetBlock(source.GetBlock());
+		SetShock(source.GetShock());
+		SetDisarm(source.GetDisarm());
+		SetDamage(source.GetDamage());
 	}
 
 	public int GetCritical()

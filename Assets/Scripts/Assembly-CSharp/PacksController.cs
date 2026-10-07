@@ -55,19 +55,19 @@ public class PacksController
 		}
 		foreach (XmlNode item in xmlNode)
 		{
-			DownloadPack jBKAOMLJCEL = ParsePack(item);
-			AddBundle(jBKAOMLJCEL);
-			_packs.Add(jBKAOMLJCEL);
+			DownloadPack downloadPack = ParsePack(item);
+			AddBundle(downloadPack);
+			_packs.Add(downloadPack);
 		}
 	}
 
-	private void AddBundle(DownloadPack LMHLLOBNKMB)
+	private void AddBundle(DownloadPack pack)
 	{
-		if (LMHLLOBNKMB.Attach)
+		if (pack.Attach)
 		{
 			try
 			{
-				BundleManager.AddBundle(LMHLLOBNKMB.Name);
+				BundleManager.AddBundle(pack.Name);
 			}
 			catch (Exception ex)
 			{
@@ -78,24 +78,24 @@ public class PacksController
 
 	private DownloadPack ParsePack(XmlNode node)
 	{
-		DownloadPack jBKAOMLJCEL = new DownloadPack();
-		jBKAOMLJCEL.Name = node.Attributes["Name"].GetStringOrDefault();
-		jBKAOMLJCEL.Url = node.Attributes["Url"].GetStringOrDefault();
-		jBKAOMLJCEL.Version = node.Attributes["Version"].ParseInt();
-		jBKAOMLJCEL.Size = node.Attributes["Size"].GetStringOrDefault();
-		jBKAOMLJCEL.Reload = node.Attributes["Reload"].ParseBool();
-		jBKAOMLJCEL.Attach = node.Attributes["Attach"].ParseBool();
-		return jBKAOMLJCEL;
+		DownloadPack downloadPack = new DownloadPack();
+		downloadPack.Name = node.Attributes["Name"].GetStringOrDefault();
+		downloadPack.Url = node.Attributes["Url"].GetStringOrDefault();
+		downloadPack.Version = node.Attributes["Version"].ParseInt();
+		downloadPack.Size = node.Attributes["Size"].GetStringOrDefault();
+		downloadPack.Reload = node.Attributes["Reload"].ParseBool();
+		downloadPack.Attach = node.Attributes["Attach"].ParseBool();
+		return downloadPack;
 	}
 
 	public bool IsPackByName(string name)
 	{
-		DownloadPack jBKAOMLJCEL = GeneralConfig.DownloadPacks.FindPack(name);
+		DownloadPack downloadPack = GeneralConfig.DownloadPacks.FindPack(name);
 		foreach (DownloadPack item in _packs)
 		{
 			if (item.Name.Equals(name))
 			{
-				return jBKAOMLJCEL == null || jBKAOMLJCEL.Url.Equals(item.Url);
+				return downloadPack == null || downloadPack.Url.Equals(item.Url);
 			}
 		}
 		return false;
@@ -103,10 +103,10 @@ public class PacksController
 
 	public DownloadPack FindPack(string name)
 	{
-		return _packs.Find((DownloadPack DHDMNHCIPEH) => DHDMNHCIPEH.Name.Equals(name));
+		return _packs.Find((DownloadPack entry) => entry.Name.Equals(name));
 	}
 
-	public void AddPack(string name, string BEPKJNKCKPH, string version, long NKKKMPPEMKE, bool AHDLCJFCJMJ)
+	public void AddPack(string name, string url, string version, long endDate, bool attach)
 	{
 		if (_docPacks == null)
 		{
@@ -127,30 +127,30 @@ public class PacksController
 				list.Add(childNode);
 			}
 		}
-		list.ForEach((XmlNode DHDMNHCIPEH) =>
+		list.ForEach((XmlNode packNode) =>
 		{
-			packsXML.RemoveChild(DHDMNHCIPEH);
+			packsXML.RemoveChild(packNode);
 		});
 		XmlNode xmlNode2 = packsXML.AppendElement("Pack");
 		xmlNode2.AppendAttribute("Name").Value = name;
-		xmlNode2.AppendAttribute("Url").Value = BEPKJNKCKPH;
+		xmlNode2.AppendAttribute("Url").Value = url;
 		xmlNode2.AppendAttribute("Version").Value = version;
-		xmlNode2.AppendAttribute("Attach").Value = ((!AHDLCJFCJMJ) ? "0" : "1");
-		if (NKKKMPPEMKE >= 0)
+		xmlNode2.AppendAttribute("Attach").Value = ((!attach) ? "0" : "1");
+		if (endDate >= 0)
 		{
-			xmlNode2.AppendAttribute("EndDate").Value = NKKKMPPEMKE.ToString();
+			xmlNode2.AppendAttribute("EndDate").Value = endDate.ToString();
 		}
 		_docPacks.Save(SF2Paths.GetPacksFilePath());
-		DownloadPack jBKAOMLJCEL = _packs.Find((DownloadPack DHDMNHCIPEH) => DHDMNHCIPEH.Name.Equals(name));
-		if (jBKAOMLJCEL != null)
+		DownloadPack downloadPack = _packs.Find((DownloadPack entry) => entry.Name.Equals(name));
+		if (downloadPack != null)
 		{
-			_packs.Remove(jBKAOMLJCEL);
+			_packs.Remove(downloadPack);
 		}
-		jBKAOMLJCEL = ParsePack(xmlNode2);
-		if (jBKAOMLJCEL != null)
+		downloadPack = ParsePack(xmlNode2);
+		if (downloadPack != null)
 		{
-			_packs.Add(jBKAOMLJCEL);
-			AddBundle(jBKAOMLJCEL);
+			_packs.Add(downloadPack);
+			AddBundle(downloadPack);
 		}
 	}
 
@@ -175,10 +175,10 @@ public class PacksController
 			}
 		}
 		_docPacks.Save(SF2Paths.GetPacksFilePath());
-		DownloadPack jBKAOMLJCEL = _packs.Find((DownloadPack DHDMNHCIPEH) => DHDMNHCIPEH.Name.Equals(name));
-		if (jBKAOMLJCEL != null)
+		DownloadPack downloadPack = _packs.Find((DownloadPack entry) => entry.Name.Equals(name));
+		if (downloadPack != null)
 		{
-			_packs.Remove(jBKAOMLJCEL);
+			_packs.Remove(downloadPack);
 		}
 	}
 

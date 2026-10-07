@@ -1,1 +1,1 @@
-public delegate void OnNonHubMessageDelegate(Connection MDGFGCDPGFI, object data);
+public delegate void OnNonHubMessageDelegate(Connection connection, object data);

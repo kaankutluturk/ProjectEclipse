@@ -7,43 +7,43 @@ public class Evaluation
 
 	public float Shift;
 
-	public static int ParseAttributes(XmlNode BLLNKKNDNII, List<Evaluation> PNKJPOHEOJB)
+	public static int ParseAttributes(XmlNode node, List<Evaluation> evaluations)
 	{
-		return Parse(BLLNKKNDNII, PNKJPOHEOJB, "Attribute");
+		return Parse(node, evaluations, "Attribute");
 	}
 
-	public static float ParseAverageQuantity(XmlNode BLLNKKNDNII, RatingEvaluation PNKJPOHEOJB)
+	public static float ParseAverageQuantity(XmlNode node, RatingEvaluation rating)
 	{
-		PNKJPOHEOJB.averageQuantity = XmlUtils.ParseFloat(BLLNKKNDNII.Attributes["AverageQuantity"]);
-		return PNKJPOHEOJB.averageQuantity;
+		rating.averageQuantity = XmlUtils.ParseFloat(node.Attributes["AverageQuantity"]);
+		return rating.averageQuantity;
 	}
 
-	public static float ParseAverageDamageAndRecharge(XmlNode BLLNKKNDNII, RatingEvaluation PNKJPOHEOJB)
+	public static float ParseAverageDamageAndRecharge(XmlNode node, RatingEvaluation rating)
 	{
-		PNKJPOHEOJB.averageBaseDamage = XmlUtils.ParseFloat(BLLNKKNDNII.Attributes["AverageBaseDamage"]);
-		PNKJPOHEOJB.rechargeRate = XmlUtils.ParseFloat(BLLNKKNDNII.Attributes["RechargeRate"]);
-		PNKJPOHEOJB.magicRechargeRate = XmlUtils.ParseFloat(BLLNKKNDNII.Attributes["MagicRechargeRate"]);
-		return PNKJPOHEOJB.averageBaseDamage;
+		rating.averageBaseDamage = XmlUtils.ParseFloat(node.Attributes["AverageBaseDamage"]);
+		rating.rechargeRate = XmlUtils.ParseFloat(node.Attributes["RechargeRate"]);
+		rating.magicRechargeRate = XmlUtils.ParseFloat(node.Attributes["MagicRechargeRate"]);
+		return rating.averageBaseDamage;
 	}
 
-	private void Parse(XmlNode MEEAKLDGLDF)
+	private void Parse(XmlNode node)
 	{
-		Name = XmlUtils.ParseString(MEEAKLDGLDF.Attributes["Name"]);
-		Shift = XmlUtils.ParseFloat(MEEAKLDGLDF.Attributes["Shift"]);
+		Name = XmlUtils.ParseString(node.Attributes["Name"]);
+		Shift = XmlUtils.ParseFloat(node.Attributes["Shift"]);
 	}
 
-	private static int Parse(XmlNode BLLNKKNDNII, List<Evaluation> PNKJPOHEOJB, string JLEKBBJBLOE)
+	private static int Parse(XmlNode node, List<Evaluation> evaluations, string childName)
 	{
-		int count = PNKJPOHEOJB.Count;
-		foreach (XmlNode childNode in BLLNKKNDNII.ChildNodes)
+		int count = evaluations.Count;
+		foreach (XmlNode childNode in node.ChildNodes)
 		{
-			if (childNode.Name == JLEKBBJBLOE)
+			if (childNode.Name == childName)
 			{
-				Evaluation bAEELPHJKBD = new Evaluation();
-				bAEELPHJKBD.Parse(childNode);
-				PNKJPOHEOJB.Add(bAEELPHJKBD);
+				Evaluation evaluation = new Evaluation();
+				evaluation.Parse(childNode);
+				evaluations.Add(evaluation);
 			}
 		}
-		return PNKJPOHEOJB.Count - count;
+		return evaluations.Count - count;
 	}
 }

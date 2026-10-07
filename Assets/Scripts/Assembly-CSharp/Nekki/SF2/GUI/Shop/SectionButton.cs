@@ -104,13 +104,13 @@ namespace Nekki.SF2.GUI.Shop
 			return null;
 		}
 
-		protected override void DoStateTransition(SelectionState state, bool PJHFBFHIGNN)
+		protected override void DoStateTransition(SelectionState state, bool instant)
 		{
 			if (!_spritesResolved)
 			{
 				ResolveStateSprites();
 			}
-			base.DoStateTransition(state, PJHFBFHIGNN);
+			base.DoStateTransition(state, instant);
 		}
 	}
 }

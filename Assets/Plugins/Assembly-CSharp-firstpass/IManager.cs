@@ -1,24 +1,24 @@
 internal interface IManager
 {
-	void Remove(Socket JLEACANCMJF);
+	void Remove(Socket socket);
 
-	void Close(bool IEPJILJMNDN = true);
+	void Close(bool removeSockets = true);
 
 	void TryToReconnect();
 
-	bool OnTransportConnected(ITransport CHMELBKHOPP);
+	bool OnTransportConnected(ITransport transport);
 
-	void OnTransportError(ITransport DLAOOGHJGBI, string KEPBNIIECPN);
+	void OnTransportError(ITransport transport, string error);
 
-	void SendPacket(Packet NPKADBPBKIG);
+	void SendPacket(Packet packet);
 
-	void OnPacket(Packet NPKADBPBKIG);
+	void OnPacket(Packet packet);
 
-	void EmitEvent(string DOPHKKGNAEF, params object[] LKIOKGCNKHE);
+	void EmitEvent(string eventName, params object[] args);
 
-	void EmitEvent(SocketIOEventType LFLGCDNKNJI, params object[] LKIOKGCNKHE);
+	void EmitEvent(SocketIOEventType eventType, params object[] args);
 
-	void EmitError(SocketIOErrors GNKCGOGKAEK, string CKEHOEGLMBM);
+	void EmitError(SocketIOErrors errorCode, string message);
 
-	void EmitAll(string DOPHKKGNAEF, params object[] LKIOKGCNKHE);
+	void EmitAll(string eventName, params object[] args);
 }

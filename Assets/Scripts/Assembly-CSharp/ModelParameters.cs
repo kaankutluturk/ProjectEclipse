@@ -475,83 +475,83 @@ public partial class ModelParameters
 		obscuredValueB = (ObscuredInt)(-1);
 	}
 
-	public ModelParameters(ModelParameters NBMGOEMJJAF)
+	public ModelParameters(ModelParameters source)
 	{
-		Perks = new List<PerkInfoItem>(NBMGOEMJJAF.Perks);
-		WarriorPerks = new List<PerkInfoItem>(NBMGOEMJJAF.WarriorPerks);
-		LearnedPerks = new List<PerkInfoItem>(NBMGOEMJJAF.LearnedPerks);
-		FinalAttributes = new Attributes(NBMGOEMJJAF.FinalAttributes);
-		BaseAttributes = new Attributes(NBMGOEMJJAF.BaseAttributes);
-		SetLevel(NBMGOEMJJAF.GetLevel());
-		FirstName = NBMGOEMJJAF.FirstName;
-		Avatar = NBMGOEMJJAF.Avatar;
-		Skeleton = NBMGOEMJJAF.Skeleton;
-        EclipseBodyModel = NBMGOEMJJAF.EclipseBodyModel;
-        EclipseCharacterId = NBMGOEMJJAF.EclipseCharacterId;
-        EclipseSkinModels = (string[])NBMGOEMJJAF.EclipseSkinModels.Clone();
-        EclipseRosterPlayer = NBMGOEMJJAF.EclipseRosterPlayer;
-        EclipseVersusLook = NBMGOEMJJAF.EclipseVersusLook;
-        _eclipseHiddenFigures.UnionWith(NBMGOEMJJAF._eclipseHiddenFigures);
-        _eclipseAppearanceSkins = NBMGOEMJJAF._eclipseAppearanceSkins;
-        _eclipseAppearanceVoice = NBMGOEMJJAF._eclipseAppearanceVoice;
-		Weapon = NBMGOEMJJAF.Weapon;
-		Armor = NBMGOEMJJAF.Armor;
-		Helm = NBMGOEMJJAF.Helm;
-		Ranged = NBMGOEMJJAF.Ranged;
-		Magic = NBMGOEMJJAF.Magic;
-		ModelDocuments.AddRange(NBMGOEMJJAF.ModelDocuments);
-		ExcludedMoveNames.AddRange(NBMGOEMJJAF.ExcludedMoveNames);
-		ExcludedPerkNames.AddRange(NBMGOEMJJAF.ExcludedPerkNames);
-		IsPlayer = NBMGOEMJJAF.IsPlayer;
-		AiControlled = NBMGOEMJJAF.AiControlled;
-		UserControlled = NBMGOEMJJAF.UserControlled;
-		IsWinner = NBMGOEMJJAF.IsWinner;
-		RoundEnded = NBMGOEMJJAF.RoundEnded;
-		IsDead = NBMGOEMJJAF.IsDead;
-		RewardsEnabled = NBMGOEMJJAF.RewardsEnabled;
-		AnimationEnabled = NBMGOEMJJAF.AnimationEnabled;
-		EndRoundType = NBMGOEMJJAF.EndRoundType;
-		OpponentCount = NBMGOEMJJAF.OpponentCount;
-		SavedLife = NBMGOEMJJAF.SavedLife;
-		MaxLife = NBMGOEMJJAF.MaxLife;
-		RoundsWon = NBMGOEMJJAF.RoundsWon;
-		RoundTotal = NBMGOEMJJAF.RoundTotal;
-		Dan = NBMGOEMJJAF.Dan;
-		WarriorPower = NBMGOEMJJAF.WarriorPower;
-		ShieldTotal = NBMGOEMJJAF.ShieldTotal;
-		HasShieldTotalOverride = NBMGOEMJJAF.HasShieldTotalOverride;
-		RatingCorrection = NBMGOEMJJAF.RatingCorrection;
-		LotteryLevel = NBMGOEMJJAF.LotteryLevel;
-		Damage = NBMGOEMJJAF.Damage;
-		Difficulty = NBMGOEMJJAF.Difficulty;
-		OpponentIndex = NBMGOEMJJAF.OpponentIndex;
-		BeginnerCheat = NBMGOEMJJAF.BeginnerCheat;
-		UnknownFlag = NBMGOEMJJAF.BeginnerCheat;
-		Voice = NBMGOEMJJAF.Voice;
-		NoDoubles = NBMGOEMJJAF.NoDoubles;
-		FightTactic = NBMGOEMJJAF.FightTactic;
-		HasSourceNode = NBMGOEMJJAF.HasSourceNode;
-		Node = NBMGOEMJJAF.Node;
-		UnusedRoundFlag = NBMGOEMJJAF.UnusedRoundFlag;
-		AutoTuneFactor = NBMGOEMJJAF.AutoTuneFactor;
-		SpawnPosition = new Vector3f(NBMGOEMJJAF.SpawnPosition);
-		RandomValue = NBMGOEMJJAF.RandomValue;
-		Seal = NBMGOEMJJAF.Seal;
-		IsUntouched = NBMGOEMJJAF.IsUntouched;
-		MovesInitialized = NBMGOEMJJAF.MovesInitialized;
-		SceneType = NBMGOEMJJAF.SceneType;
-		playerRating = NBMGOEMJJAF.playerRating;
-		enemyRating = NBMGOEMJJAF.enemyRating;
-		playerRatingMagic = NBMGOEMJJAF.playerRatingMagic;
-		enemyRatingMagic = NBMGOEMJJAF.enemyRatingMagic;
-		playerRatingRanged = NBMGOEMJJAF.playerRatingRanged;
-		enemyRatingRanged = NBMGOEMJJAF.enemyRatingRanged;
-		_CurrentLife = NBMGOEMJJAF._CurrentLife;
-		RecoverableLife = NBMGOEMJJAF.RecoverableLife;
-		baseHealth = NBMGOEMJJAF.baseHealth;
-		obscuredValueA = NBMGOEMJJAF.obscuredValueA;
-		obscuredValueB = NBMGOEMJJAF.obscuredValueB;
-		AttributeAlignments = new List<AttributesAlign>(NBMGOEMJJAF.AttributeAlignments);
+		Perks = new List<PerkInfoItem>(source.Perks);
+		WarriorPerks = new List<PerkInfoItem>(source.WarriorPerks);
+		LearnedPerks = new List<PerkInfoItem>(source.LearnedPerks);
+		FinalAttributes = new Attributes(source.FinalAttributes);
+		BaseAttributes = new Attributes(source.BaseAttributes);
+		SetLevel(source.GetLevel());
+		FirstName = source.FirstName;
+		Avatar = source.Avatar;
+		Skeleton = source.Skeleton;
+        EclipseBodyModel = source.EclipseBodyModel;
+        EclipseCharacterId = source.EclipseCharacterId;
+        EclipseSkinModels = (string[])source.EclipseSkinModels.Clone();
+        EclipseRosterPlayer = source.EclipseRosterPlayer;
+        EclipseVersusLook = source.EclipseVersusLook;
+        _eclipseHiddenFigures.UnionWith(source._eclipseHiddenFigures);
+        _eclipseAppearanceSkins = source._eclipseAppearanceSkins;
+        _eclipseAppearanceVoice = source._eclipseAppearanceVoice;
+		Weapon = source.Weapon;
+		Armor = source.Armor;
+		Helm = source.Helm;
+		Ranged = source.Ranged;
+		Magic = source.Magic;
+		ModelDocuments.AddRange(source.ModelDocuments);
+		ExcludedMoveNames.AddRange(source.ExcludedMoveNames);
+		ExcludedPerkNames.AddRange(source.ExcludedPerkNames);
+		IsPlayer = source.IsPlayer;
+		AiControlled = source.AiControlled;
+		UserControlled = source.UserControlled;
+		IsWinner = source.IsWinner;
+		RoundEnded = source.RoundEnded;
+		IsDead = source.IsDead;
+		RewardsEnabled = source.RewardsEnabled;
+		AnimationEnabled = source.AnimationEnabled;
+		EndRoundType = source.EndRoundType;
+		OpponentCount = source.OpponentCount;
+		SavedLife = source.SavedLife;
+		MaxLife = source.MaxLife;
+		RoundsWon = source.RoundsWon;
+		RoundTotal = source.RoundTotal;
+		Dan = source.Dan;
+		WarriorPower = source.WarriorPower;
+		ShieldTotal = source.ShieldTotal;
+		HasShieldTotalOverride = source.HasShieldTotalOverride;
+		RatingCorrection = source.RatingCorrection;
+		LotteryLevel = source.LotteryLevel;
+		Damage = source.Damage;
+		Difficulty = source.Difficulty;
+		OpponentIndex = source.OpponentIndex;
+		BeginnerCheat = source.BeginnerCheat;
+		UnknownFlag = source.BeginnerCheat;
+		Voice = source.Voice;
+		NoDoubles = source.NoDoubles;
+		FightTactic = source.FightTactic;
+		HasSourceNode = source.HasSourceNode;
+		Node = source.Node;
+		UnusedRoundFlag = source.UnusedRoundFlag;
+		AutoTuneFactor = source.AutoTuneFactor;
+		SpawnPosition = new Vector3f(source.SpawnPosition);
+		RandomValue = source.RandomValue;
+		Seal = source.Seal;
+		IsUntouched = source.IsUntouched;
+		MovesInitialized = source.MovesInitialized;
+		SceneType = source.SceneType;
+		playerRating = source.playerRating;
+		enemyRating = source.enemyRating;
+		playerRatingMagic = source.playerRatingMagic;
+		enemyRatingMagic = source.enemyRatingMagic;
+		playerRatingRanged = source.playerRatingRanged;
+		enemyRatingRanged = source.enemyRatingRanged;
+		_CurrentLife = source._CurrentLife;
+		RecoverableLife = source.RecoverableLife;
+		baseHealth = source.baseHealth;
+		obscuredValueA = source.obscuredValueA;
+		obscuredValueB = source.obscuredValueB;
+		AttributeAlignments = new List<AttributesAlign>(source.AttributeAlignments);
 	}
 
 	public ObscuredInt GetLevel()
@@ -588,53 +588,53 @@ public partial class ModelParameters
 		ConditionItems.AddIfNotExist(item);
 	}
 
-	public void AddWarriorPerk(PerkInfoItem AEFFHJGMNFI)
+	public void AddWarriorPerk(PerkInfoItem perk)
 	{
-		WarriorPerks.AddIfNotExist(AEFFHJGMNFI);
+		WarriorPerks.AddIfNotExist(perk);
 	}
 
 	public List<ItemInfo> GetEquippedItemsByType()
 	{
 		List<ItemInfo> list = new List<ItemInfo>();
-		ItemInfo dJKEECEOCJB = GetItemByType("Skeleton");
-		if (dJKEECEOCJB != null)
+		ItemInfo equippedItem = GetItemByType("Skeleton");
+		if (equippedItem != null)
 		{
-			list.Add(dJKEECEOCJB);
+			list.Add(equippedItem);
 		}
-		dJKEECEOCJB = GetItemByType("Weapon");
-		if (dJKEECEOCJB != null)
+		equippedItem = GetItemByType("Weapon");
+		if (equippedItem != null)
 		{
-			list.Add(dJKEECEOCJB);
+			list.Add(equippedItem);
 		}
-		dJKEECEOCJB = GetItemByType("Ranged");
-		if (dJKEECEOCJB != null)
+		equippedItem = GetItemByType("Ranged");
+		if (equippedItem != null)
 		{
-			list.Add(dJKEECEOCJB);
+			list.Add(equippedItem);
 		}
-		dJKEECEOCJB = GetItemByType("Magic");
-		if (dJKEECEOCJB != null)
+		equippedItem = GetItemByType("Magic");
+		if (equippedItem != null)
 		{
-			list.Add(dJKEECEOCJB);
+			list.Add(equippedItem);
 		}
-		dJKEECEOCJB = GetItemByType("RaidConsumable");
-		if (dJKEECEOCJB != null)
+		equippedItem = GetItemByType("RaidConsumable");
+		if (equippedItem != null)
 		{
-			list.Add(dJKEECEOCJB);
+			list.Add(equippedItem);
 		}
-		dJKEECEOCJB = GetItemByType("Armor");
-		if (dJKEECEOCJB != null)
+		equippedItem = GetItemByType("Armor");
+		if (equippedItem != null)
 		{
-			list.Add(dJKEECEOCJB);
+			list.Add(equippedItem);
 		}
-		dJKEECEOCJB = GetItemByType("Helm");
-		if (dJKEECEOCJB != null)
+		equippedItem = GetItemByType("Helm");
+		if (equippedItem != null)
 		{
-			list.Add(dJKEECEOCJB);
+			list.Add(equippedItem);
 		}
-		dJKEECEOCJB = GetItemByType("Cheat");
-		if (dJKEECEOCJB != null)
+		equippedItem = GetItemByType("Cheat");
+		if (equippedItem != null)
 		{
-			list.Add(dJKEECEOCJB);
+			list.Add(equippedItem);
 		}
 		return list;
 	}
@@ -669,9 +669,9 @@ public partial class ModelParameters
 		return list;
 	}
 
-	public ItemInfo GetItemByType(string LMNNBBKHMEI)
+	public ItemInfo GetItemByType(string itemType)
 	{
-		switch (LMNNBBKHMEI)
+		switch (itemType)
 		{
 		case "Skeleton":
 			return Skeleton;
@@ -690,9 +690,9 @@ public partial class ModelParameters
 		}
 	}
 
-	public void SetItemByType(string LMNNBBKHMEI, ItemInfo item)
+	public void SetItemByType(string itemType, ItemInfo item)
 	{
-		switch (LMNNBBKHMEI)
+		switch (itemType)
 		{
 		case "Skeleton":
 			Skeleton = item;
@@ -715,9 +715,9 @@ public partial class ModelParameters
 		}
 	}
 
-	private string GetItemNameByAttribute(string LMNNBBKHMEI)
+	private string GetItemNameByAttribute(string attributeName)
 	{
-		switch (LMNNBBKHMEI)
+		switch (attributeName)
 		{
 		case "HeadDefense":
 			return Helm.Name;
@@ -736,9 +736,9 @@ public partial class ModelParameters
 		}
 	}
 
-	private ItemInfo GetItemByAttribute(string LMNNBBKHMEI)
+	private ItemInfo GetItemByAttribute(string attributeName)
 	{
-		switch (LMNNBBKHMEI)
+		switch (attributeName)
 		{
 		case "HeadDefense":
 			return Helm;
@@ -795,38 +795,38 @@ public partial class ModelParameters
             ModelDocuments.Add(EclipseModelPath(skin));
 	}
 
-	public int SumItemAttribute(string name, ref bool GMEMHMOHFGG)
+	public int SumItemAttribute(string name, ref bool hasValue)
 	{
-		List<ItemInfo> hELFDCAIJNE = GetEquippedItems();
-		return SumItemAttribute(name, hELFDCAIJNE, ref GMEMHMOHFGG);
+		List<ItemInfo> equippedItems = GetEquippedItems();
+		return SumItemAttribute(name, equippedItems, ref hasValue);
 	}
 
-	public int SumItemAttribute(string name, List<ItemInfo> HELFDCAIJNE, ref bool GMEMHMOHFGG)
+	public int SumItemAttribute(string name, List<ItemInfo> items, ref bool hasValue)
 	{
-		GMEMHMOHFGG = false;
+		hasValue = false;
 		int num = 0;
-		for (int i = 0; i < HELFDCAIJNE.Count; i++)
+		for (int i = 0; i < items.Count; i++)
 		{
-			int OEMALIFPGPO = 0;
-			if (HELFDCAIJNE[i].ItemAttributes.Get(name, ref OEMALIFPGPO))
+			int attributeValue = 0;
+			if (items[i].ItemAttributes.Get(name, ref attributeValue))
 			{
-				GMEMHMOHFGG = true;
-				num += OEMALIFPGPO;
+				hasValue = true;
+				num += attributeValue;
 			}
 		}
 		return num;
 	}
 
-	private int SumPerkAttribute(string name, ref bool GMEMHMOHFGG)
+	private int SumPerkAttribute(string name, ref bool hasValue)
 	{
 		int num = 0;
 		for (int i = 0; i < Perks.Count; i++)
 		{
-			int OEMALIFPGPO = 0;
-			if (Perks[i].AttributeValues.Get(name, ref OEMALIFPGPO))
+			int attributeValue = 0;
+			if (Perks[i].AttributeValues.Get(name, ref attributeValue))
 			{
-				GMEMHMOHFGG = true;
-				num += OEMALIFPGPO;
+				hasValue = true;
+				num += attributeValue;
 			}
 		}
 		return num;
@@ -835,34 +835,34 @@ public partial class ModelParameters
 	public void CalculateAttributes()
 	{
 		ClearAttributes();
-		List<ItemInfo> hELFDCAIJNE = GetEquippedItems();
-		List<WarriorAttribute> iBLHIAHECLK = GameUtils.WarriorAttributeList.AttributeList;
-		for (int i = 0; i < iBLHIAHECLK.Count; i++)
+		List<ItemInfo> equippedItems = GetEquippedItems();
+		List<WarriorAttribute> warriorAttributes = GameUtils.WarriorAttributeList.AttributeList;
+		for (int i = 0; i < warriorAttributes.Count; i++)
 		{
-			string text = iBLHIAHECLK[i].get_Name();
-			int OEMALIFPGPO = 0;
-			if (BaseAttributes.Get(text, ref OEMALIFPGPO))
+			string text = warriorAttributes[i].get_Name();
+			int attributeValue = 0;
+			if (BaseAttributes.Get(text, ref attributeValue))
 			{
-				FinalAttributes.Set(text, OEMALIFPGPO, true);
+				FinalAttributes.Set(text, attributeValue, true);
 				continue;
 			}
 			int num = 0;
-			bool GMEMHMOHFGG = false;
-			num += SumItemAttribute(text, hELFDCAIJNE, ref GMEMHMOHFGG);
-			num += SumPerkAttribute(text, ref GMEMHMOHFGG);
+			bool hasValue = false;
+			num += SumItemAttribute(text, equippedItems, ref hasValue);
+			num += SumPerkAttribute(text, ref hasValue);
 			int OEMALIFPGPO2 = 0;
 			if (GameUtils.StartingAttributes.Gains.Get(text, ref OEMALIFPGPO2))
 			{
 				num += OEMALIFPGPO2;
-				GMEMHMOHFGG = true;
+				hasValue = true;
 			}
 			int OEMALIFPGPO3 = 0;
 			if (GameUtils.LevelAttributeGains.Gains.Get(text, ref OEMALIFPGPO3))
 			{
 				num += (ObscuredInt)(level) * OEMALIFPGPO3;
-				GMEMHMOHFGG = true;
+				hasValue = true;
 			}
-			if (GMEMHMOHFGG || !iBLHIAHECLK[i].UnusedFlag)
+			if (hasValue || !warriorAttributes[i].UnusedFlag)
 			{
 				FinalAttributes.Set(text, num, true);
 			}
@@ -878,18 +878,18 @@ public partial class ModelParameters
 		List<ItemInfo> list2 = GetEquippedItems();
 		foreach (ItemInfo item in list2)
 		{
-			bool bAINMLLIKOL = item.Type == "Weapon";
+			bool isWeaponPerk = item.Type == "Weapon";
 			foreach (PerkInfoItem item2 in item.InnatePerks)
 			{
-				item2.SetIsWeaponPerk(bAINMLLIKOL);
+				item2.SetIsWeaponPerk(isWeaponPerk);
 				list.Add(item2);
 			}
 			if (item.IgnoreInventoryEnchantments || !IsPlayer)
 			{
 				continue;
 			}
-			UserItem dKCHDHMLKHN = ListSF.GetRoster().GetInventory().FindItem(item);
-			if (dKCHDHMLKHN == null)
+			UserItem userItem = ListSF.GetRoster().GetInventory().FindItem(item);
+			if (userItem == null)
 			{
 				continue;
 			}
@@ -900,13 +900,13 @@ public partial class ModelParameters
 				{
 					if (item.Type == "Weapon" && GameUtils.IsPerkCompatibleWithEquipment(item3))
 					{
-						item3.SetIsWeaponPerk(bAINMLLIKOL);
+						item3.SetIsWeaponPerk(isWeaponPerk);
 						list.Add(item3);
 					}
 				}
 				else
 				{
-					item3.SetIsWeaponPerk(bAINMLLIKOL);
+					item3.SetIsWeaponPerk(isWeaponPerk);
 					list.Add(item3);
 				}
 			}
@@ -932,23 +932,23 @@ public partial class ModelParameters
 		return string.Format("User ID='{0}' SilhouetteItemID='{1}' WeaponID='{2}' Dan='{3}' Damage='{4}' Difficulty='{5}' FirstName='{6}' LastName='{7}'  Level='{8}' LotteryLevel='{9}' ", 0, Armor.ItemId, (Weapon != null) ? Weapon.ItemId : 0, Dan, Damage, Difficulty, FirstName, LastName, level, LotteryLevel);
 	}
 
-	public static void ParseRatingConfig(XmlNode AFHNINCKJEE)
+	public static void ParseRatingConfig(XmlNode configNode)
 	{
-		impossibleRatio = XmlUtils.ParseFloat(AFHNINCKJEE.Attributes["ImpossibleRatio"]);
-		easyRatio = XmlUtils.ParseFloat(AFHNINCKJEE.Attributes["EasyRatio"]);
+		impossibleRatio = XmlUtils.ParseFloat(configNode.Attributes["ImpossibleRatio"]);
+		easyRatio = XmlUtils.ParseFloat(configNode.Attributes["EasyRatio"]);
 		ratingEvaluations.Clear();
-		perkAspectParameter = XmlUtils.ParseString(AFHNINCKJEE.Attributes["PerkAspectParameter"]);
-		foreach (XmlNode childNode in AFHNINCKJEE.ChildNodes)
+		perkAspectParameter = XmlUtils.ParseString(configNode.Attributes["PerkAspectParameter"]);
+		foreach (XmlNode childNode in configNode.ChildNodes)
 		{
-			RatingEvaluation dCAFHLLHFJO = new RatingEvaluation();
-			ratingEvaluations.Add(dCAFHLLHFJO);
-			dCAFHLLHFJO.nodeName = childNode.Name;
-			dCAFHLLHFJO.evaluationName = XmlUtils.ParseString(childNode.Attributes["Name"]);
-			Evaluation.ParseAttributes(childNode, dCAFHLLHFJO.evaluations);
-			Evaluation.ParseAverageQuantity(childNode, dCAFHLLHFJO);
-			Evaluation.ParseAverageDamageAndRecharge(childNode, dCAFHLLHFJO);
-			dCAFHLLHFJO.cancellingItem = XmlUtils.ParseString(childNode.Attributes["CancellingItem"]);
-			Defense.Parse(childNode, dCAFHLLHFJO.defenses);
+			RatingEvaluation evaluation = new RatingEvaluation();
+			ratingEvaluations.Add(evaluation);
+			evaluation.nodeName = childNode.Name;
+			evaluation.evaluationName = XmlUtils.ParseString(childNode.Attributes["Name"]);
+			Evaluation.ParseAttributes(childNode, evaluation.evaluations);
+			Evaluation.ParseAverageQuantity(childNode, evaluation);
+			Evaluation.ParseAverageDamageAndRecharge(childNode, evaluation);
+			evaluation.cancellingItem = XmlUtils.ParseString(childNode.Attributes["CancellingItem"]);
+			Defense.Parse(childNode, evaluation.defenses);
 		}
 	}
 
@@ -968,24 +968,24 @@ public partial class ModelParameters
 
 	private float GetParametersValue(string name)
 	{
-		int OEMALIFPGPO = 0;
-		if (FinalAttributes.Get(name, ref OEMALIFPGPO))
+		int attributeValue = 0;
+		if (FinalAttributes.Get(name, ref attributeValue))
 		{
-			return OEMALIFPGPO;
+			return attributeValue;
 		}
 		Debug.LogErrorFormat("Parameter \"{0}\" not found!", name);
 		return float.MinValue;
 	}
 
-	private float GetParametersValue(List<string> NIKHAICFGNM)
+	private float GetParametersValue(List<string> attributeNames)
 	{
 		float num = float.MinValue;
-		foreach (string item in NIKHAICFGNM)
+		foreach (string item in attributeNames)
 		{
-			int OEMALIFPGPO = 0;
-			if (FinalAttributes.Get(item, ref OEMALIFPGPO) && num < (float)OEMALIFPGPO)
+			int attributeValue = 0;
+			if (FinalAttributes.Get(item, ref attributeValue) && num < (float)attributeValue)
 			{
-				num = OEMALIFPGPO;
+				num = attributeValue;
 			}
 		}
 		if (num == float.MinValue)
@@ -995,12 +995,12 @@ public partial class ModelParameters
 		return num;
 	}
 
-	private float GetMaxEvaluationValue(List<Evaluation> EKJDIGGGEBH, ModelParameters JCICKLIMBEF)
+	private float GetMaxEvaluationValue(List<Evaluation> evaluations, ModelParameters parameters)
 	{
 		float num = float.MinValue;
-		foreach (Evaluation item in EKJDIGGGEBH)
+		foreach (Evaluation item in evaluations)
 		{
-			float num2 = JCICKLIMBEF.GetParametersValue(item.Name) + item.Shift;
+			float num2 = parameters.GetParametersValue(item.Name) + item.Shift;
 			if (num < num2)
 			{
 				num = num2;
@@ -1009,7 +1009,7 @@ public partial class ModelParameters
 		return num;
 	}
 
-	public float CalculateDamageRating(ModelParameters AKBNKDBHCEO, List<global::Pair<string, float>> PNLMJFLBGMA)
+	public float CalculateDamageRating(ModelParameters opponentParameters, List<global::Pair<string, float>> shifts)
 	{
 		float num = 0f;
 		List<global::Pair<string, float>> list = new List<global::Pair<string, float>>();
@@ -1019,19 +1019,19 @@ public partial class ModelParameters
 			{
 				continue;
 			}
-			RatingEvaluation dCAFHLLHFJO = item;
-			if (HasItem(dCAFHLLHFJO.cancellingItem))
+			RatingEvaluation ratingEvaluation = item;
+			if (HasItem(ratingEvaluation.cancellingItem))
 			{
 				continue;
 			}
-			float cDCIEOFCKNO = dCAFHLLHFJO.averageBaseDamage;
+			float averageBaseDamage = ratingEvaluation.averageBaseDamage;
 			list.Clear();
-			CollectEvaluationAttributes(list, dCAFHLLHFJO.evaluations);
-			AddShiftsToPairs(list, PNLMJFLBGMA);
-			List<Defense> cKJBFNJEDHH = dCAFHLLHFJO.defenses;
-			ApplyDefenseShiftsToOpponent(AKBNKDBHCEO, cKJBFNJEDHH, PNLMJFLBGMA);
+			CollectEvaluationAttributes(list, ratingEvaluation.evaluations);
+			AddShiftsToPairs(list, shifts);
+			List<Defense> defenses = ratingEvaluation.defenses;
+			ApplyDefenseShiftsToOpponent(opponentParameters, defenses, shifts);
 			float num2 = 0f;
-			foreach (Defense item2 in cKJBFNJEDHH)
+			foreach (Defense item2 in defenses)
 			{
 				if (item2.Evaluations.Count != 1)
 				{
@@ -1041,19 +1041,19 @@ public partial class ModelParameters
 				{
 					continue;
 				}
-				float num3 = GameUtils.GetAttributesHitMultiplier(IsPlayer, this, AKBNKDBHCEO, list, item2.Evaluations[0].Name);
-				num3 = Mathf.Min(1f, cDCIEOFCKNO * num3);
+				float num3 = GameUtils.GetAttributesHitMultiplier(IsPlayer, this, opponentParameters, list, item2.Evaluations[0].Name);
+				num3 = Mathf.Min(1f, averageBaseDamage * num3);
 				List<PerkInfoItem> list2 = GetAllPerks();
 				foreach (PerkInfoItem item3 in list2)
 				{
-					List<Rating> mLMLENHGNDJ = item3.Ratings;
-					if (mLMLENHGNDJ.Count == 0)
+					List<Rating> ratings = item3.Ratings;
+					if (ratings.Count == 0)
 					{
 						continue;
 					}
-					foreach (Rating item4 in mLMLENHGNDJ)
+					foreach (Rating item4 in ratings)
 					{
-						if (!(item4.player != "Me") && (string.IsNullOrEmpty(item4.damageType) || item4.damageType == dCAFHLLHFJO.evaluationName) && (string.IsNullOrEmpty(item4.defenseType) || item4.defenseType == item2.DefenseName))
+						if (!(item4.player != "Me") && (string.IsNullOrEmpty(item4.damageType) || item4.damageType == ratingEvaluation.evaluationName) && (string.IsNullOrEmpty(item4.defenseType) || item4.defenseType == item2.DefenseName))
 						{
 							float num4 = 0f;
 							if (!string.IsNullOrEmpty(perkAspectParameter))
@@ -1061,11 +1061,11 @@ public partial class ModelParameters
 								string s = item3.GetSetValue(perkAspectParameter);
 								num4 = float.Parse(s);
 							}
-							num3 *= 1f + (item4.Multiplier - 1f) * PerkInfoItem.AspectToMultiplier(num4 - AKBNKDBHCEO.GetParametersValue(item4.enemyAttribute));
+							num3 *= 1f + (item4.Multiplier - 1f) * PerkInfoItem.AspectToMultiplier(num4 - opponentParameters.GetParametersValue(item4.enemyAttribute));
 						}
 					}
 				}
-				List<PerkInfoItem> list3 = AKBNKDBHCEO.GetAllPerks();
+				List<PerkInfoItem> list3 = opponentParameters.GetAllPerks();
 				foreach (PerkInfoItem item5 in list3)
 				{
 					List<Rating> mLMLENHGNDJ2 = item5.Ratings;
@@ -1075,7 +1075,7 @@ public partial class ModelParameters
 					}
 					foreach (Rating item6 in mLMLENHGNDJ2)
 					{
-						if (!(item6.player != "Enemy") && (string.IsNullOrEmpty(item6.damageType) || item6.damageType == dCAFHLLHFJO.evaluationName) && (string.IsNullOrEmpty(item6.defenseType) || item6.defenseType == item2.DefenseName))
+						if (!(item6.player != "Enemy") && (string.IsNullOrEmpty(item6.damageType) || item6.damageType == ratingEvaluation.evaluationName) && (string.IsNullOrEmpty(item6.defenseType) || item6.defenseType == item2.DefenseName))
 						{
 							float num5 = 0f;
 							if (!string.IsNullOrEmpty(perkAspectParameter))
@@ -1083,32 +1083,32 @@ public partial class ModelParameters
 								string s2 = item5.GetSetValue(perkAspectParameter);
 								num5 = float.Parse(s2);
 							}
-							num3 /= 1f + (item6.Multiplier - 1f) * PerkInfoItem.AspectToMultiplier(num5 - AKBNKDBHCEO.GetParametersValue(item6.enemyAttribute));
+							num3 /= 1f + (item6.Multiplier - 1f) * PerkInfoItem.AspectToMultiplier(num5 - opponentParameters.GetParametersValue(item6.enemyAttribute));
 						}
 					}
 				}
 				num2 += item2.Weight * num3;
 			}
-			if (dCAFHLLHFJO.magicRechargeRate > 0f)
+			if (ratingEvaluation.magicRechargeRate > 0f)
 			{
-				float oFHGAJDLIDB = dCAFHLLHFJO.magicRechargeRate;
+				float magicRechargeRate = ratingEvaluation.magicRechargeRate;
 				float num6 = GameUtils.MagicConfig.GetPainRecharge();
 				float num7 = GameUtils.MagicConfig.GetDamageRecharge();
 				float num8 = GameUtils.MagicConfig.GetPainRecharge(this);
 				float num9 = GameUtils.MagicConfig.GetDamageRecharge(this);
-				num2 *= oFHGAJDLIDB * (num6 * num8 + num7 * num9);
+				num2 *= magicRechargeRate * (num6 * num8 + num7 * num9);
 			}
 			num += num2;
 		}
 		return num;
 	}
 
-	private bool HasItem(string OHCGEEEKEJH)
+	private bool HasItem(string itemName)
 	{
 		List<ItemInfo> list = GetEquippedItems();
 		foreach (ItemInfo item in list)
 		{
-			if (item.Name == OHCGEEEKEJH)
+			if (item.Name == itemName)
 			{
 				return true;
 			}
@@ -1116,78 +1116,78 @@ public partial class ModelParameters
 		return false;
 	}
 
-	private void AddShiftsToPairs(List<global::Pair<string, float>> FFJLHDENIEB, List<global::Pair<string, float>> PNLMJFLBGMA)
+	private void AddShiftsToPairs(List<global::Pair<string, float>> targetShifts, List<global::Pair<string, float>> sourceShifts)
 	{
-		if (PNLMJFLBGMA == null)
+		if (sourceShifts == null)
 		{
 			return;
 		}
-		foreach (global::Pair<string, float> item in PNLMJFLBGMA)
+		foreach (global::Pair<string, float> item in sourceShifts)
 		{
-			string lLHEDBIEHAA = item.First;
-			float nFNBFHCDEGG = item.Second;
-			for (int i = 0; i < FFJLHDENIEB.Count; i++)
+			string shiftName = item.First;
+			float shiftValue = item.Second;
+			for (int i = 0; i < targetShifts.Count; i++)
 			{
-				if (FFJLHDENIEB[i].First == lLHEDBIEHAA)
+				if (targetShifts[i].First == shiftName)
 				{
-					FFJLHDENIEB[i] = new global::Pair<string, float>(FFJLHDENIEB[i].First, FFJLHDENIEB[i].Second + nFNBFHCDEGG);
+					targetShifts[i] = new global::Pair<string, float>(targetShifts[i].First, targetShifts[i].Second + shiftValue);
 					break;
 				}
 			}
 		}
 	}
 
-	private void ApplyDefenseShiftsToOpponent(ModelParameters AKBNKDBHCEO, List<Defense> PLPANBKKOEN, List<global::Pair<string, float>> PNLMJFLBGMA)
+	private void ApplyDefenseShiftsToOpponent(ModelParameters opponentParameters, List<Defense> defenses, List<global::Pair<string, float>> shifts)
 	{
-		if (PNLMJFLBGMA == null)
+		if (shifts == null)
 		{
 			return;
 		}
-		foreach (global::Pair<string, float> item in PNLMJFLBGMA)
+		foreach (global::Pair<string, float> item in shifts)
 		{
-			string lLHEDBIEHAA = item.First;
-			float nFNBFHCDEGG = item.Second;
-			for (int i = 0; i < PLPANBKKOEN.Count; i++)
+			string attributeName = item.First;
+			float shiftValue = item.Second;
+			for (int i = 0; i < defenses.Count; i++)
 			{
-				foreach (Evaluation item2 in PLPANBKKOEN[i].Evaluations)
+				foreach (Evaluation item2 in defenses[i].Evaluations)
 				{
-					if (item2.Name == lLHEDBIEHAA)
+					if (item2.Name == attributeName)
 					{
-						int OEMALIFPGPO = 0;
-						AKBNKDBHCEO.FinalAttributes.Get(lLHEDBIEHAA, ref OEMALIFPGPO);
-						AKBNKDBHCEO.FinalAttributes.Set(lLHEDBIEHAA, (int)((float)OEMALIFPGPO + nFNBFHCDEGG));
+						int attributeValue = 0;
+						opponentParameters.FinalAttributes.Get(attributeName, ref attributeValue);
+						opponentParameters.FinalAttributes.Set(attributeName, (int)((float)attributeValue + shiftValue));
 					}
 				}
 			}
 		}
 	}
 
-	public void RemovePerksByNames(List<PerkInfoItem> JOGBKOJCINM, List<string> NIKHAICFGNM)
+	public void RemovePerksByNames(List<PerkInfoItem> perks, List<string> perkNames)
 	{
-		foreach (string item in NIKHAICFGNM)
+		foreach (string item in perkNames)
 		{
-			for (int num = JOGBKOJCINM.Count - 1; num >= 0; num--)
+			for (int num = perks.Count - 1; num >= 0; num--)
 			{
-				if (IsPerkInNames(JOGBKOJCINM[num], item))
+				if (IsPerkInNames(perks[num], item))
 				{
-					JOGBKOJCINM.RemoveAt(num);
+					perks.RemoveAt(num);
 				}
 			}
 		}
 	}
 
-	private bool IsPerkInNames(PerkInfoItem AEFFHJGMNFI, string name)
+	private bool IsPerkInNames(PerkInfoItem perk, string name)
 	{
-		if (AEFFHJGMNFI == null)
+		if (perk == null)
 		{
 			return false;
 		}
-		return AEFFHJGMNFI.IsPerkByNames(name);
+		return perk.IsPerkByNames(name);
 	}
 
-	public bool UpdateLife(float DLEDDPFNPOH)
+	public bool UpdateLife(float lifeDelta)
 	{
-		ChangeLife(DLEDDPFNPOH);
+		ChangeLife(lifeDelta);
 		if (GetLifeDepleted())
 		{
 			IsDead = true;
@@ -1242,9 +1242,9 @@ public partial class ModelParameters
 		SetCurrentLife(next);
 	}
 
-	private int CollectEvaluationAttributes(string name, List<string> OEMALIFPGPO)
+	private int CollectEvaluationAttributes(string name, List<string> attributeNames)
 	{
-		int count = OEMALIFPGPO.Count;
+		int count = attributeNames.Count;
 		foreach (RatingEvaluation item in ratingEvaluations)
 		{
 			if (!(item.nodeName == name))
@@ -1253,15 +1253,15 @@ public partial class ModelParameters
 			}
 			foreach (Evaluation item2 in item.evaluations)
 			{
-				OEMALIFPGPO.AddIfNotExist(item2.Name);
+				attributeNames.AddIfNotExist(item2.Name);
 			}
 		}
-		return OEMALIFPGPO.Count - count;
+		return attributeNames.Count - count;
 	}
 
-	private int CollectDefenseAttributes(string name, List<string> OEMALIFPGPO)
+	private int CollectDefenseAttributes(string name, List<string> attributeNames)
 	{
-		int count = OEMALIFPGPO.Count;
+		int count = attributeNames.Count;
 		foreach (RatingEvaluation item in ratingEvaluations)
 		{
 			if (!(item.nodeName == name))
@@ -1272,51 +1272,51 @@ public partial class ModelParameters
 			{
 				foreach (Evaluation item3 in item2.Evaluations)
 				{
-					OEMALIFPGPO.AddIfNotExist(item3.Name);
+					attributeNames.AddIfNotExist(item3.Name);
 				}
 			}
 		}
-		return OEMALIFPGPO.Count - count;
+		return attributeNames.Count - count;
 	}
 
-	private int CollectEvaluationAttributes(List<global::Pair<string, float>> OEMALIFPGPO, List<Evaluation> JMMIKHLIKOE)
+	private int CollectEvaluationAttributes(List<global::Pair<string, float>> shifts, List<Evaluation> evaluations)
 	{
-		int count = OEMALIFPGPO.Count;
-		foreach (Evaluation item in JMMIKHLIKOE)
+		int count = shifts.Count;
+		foreach (Evaluation item in evaluations)
 		{
-			OEMALIFPGPO.Add(new global::Pair<string, float>(item.Name, item.Shift));
+			shifts.Add(new global::Pair<string, float>(item.Name, item.Shift));
 		}
-		return OEMALIFPGPO.Count - count;
+		return shifts.Count - count;
 	}
 
-	private int CollectDamageAttributes(List<string> OEMALIFPGPO)
+	private int CollectDamageAttributes(List<string> attributeNames)
 	{
-		return CollectEvaluationAttributes("Damage", OEMALIFPGPO);
+		return CollectEvaluationAttributes("Damage", attributeNames);
 	}
 
-	private int CollectMagicAttributes(List<string> OEMALIFPGPO)
+	private int CollectMagicAttributes(List<string> attributeNames)
 	{
-		return CollectEvaluationAttributes("Magic", OEMALIFPGPO);
+		return CollectEvaluationAttributes("Magic", attributeNames);
 	}
 
-	private int CollectRangedAttributes(List<string> OEMALIFPGPO)
+	private int CollectRangedAttributes(List<string> attributeNames)
 	{
-		return CollectEvaluationAttributes("Ranged", OEMALIFPGPO);
+		return CollectEvaluationAttributes("Ranged", attributeNames);
 	}
 
-	private int CollectDamageDefenseAttributes(List<string> OEMALIFPGPO)
+	private int CollectDamageDefenseAttributes(List<string> attributeNames)
 	{
-		return CollectDefenseAttributes("Damage", OEMALIFPGPO);
+		return CollectDefenseAttributes("Damage", attributeNames);
 	}
 
-	private int CollectMagicDefenseAttributes(List<string> OEMALIFPGPO)
+	private int CollectMagicDefenseAttributes(List<string> attributeNames)
 	{
-		return CollectDefenseAttributes("Magic", OEMALIFPGPO);
+		return CollectDefenseAttributes("Magic", attributeNames);
 	}
 
-	private int CollectRangedDefenseAttributes(List<string> OEMALIFPGPO)
+	private int CollectRangedDefenseAttributes(List<string> attributeNames)
 	{
-		return CollectDefenseAttributes("Ranged", OEMALIFPGPO);
+		return CollectDefenseAttributes("Ranged", attributeNames);
 	}
 
 	public void SaveCurrentLife()
@@ -1334,10 +1334,10 @@ public partial class ModelParameters
 		return (ObscuredFloat)(_CurrentLife) <= 0f;
 	}
 
-	public void AddLife(float AOGLLMEFEJB = 1f)
+	public void AddLife(float lifeAmount = 1f)
 	{
 		float num = (ObscuredFloat)(_CurrentLife);
-		num += AOGLLMEFEJB;
+		num += lifeAmount;
 		num = Mathf.Min(num, MaxLife);
 		num = Mathf.Max(0f, num);
 		SetCurrentLife(num);
@@ -1363,31 +1363,31 @@ public partial class ModelParameters
 		FinalAttributes.Clear();
 	}
 
-	private void SetAttributes(ModelParameters IHEFAMAFBIA)
+	private void SetAttributes(ModelParameters source)
 	{
-		FinalAttributes = IHEFAMAFBIA.FinalAttributes;
+		FinalAttributes = source.FinalAttributes;
 	}
 
-	public void CopyEquippedItemsTo(EquippedItemsStruct HELFDCAIJNE)
+	public void CopyEquippedItemsTo(EquippedItemsStruct equippedItems)
 	{
-		HELFDCAIJNE.Armor = Armor;
-		HELFDCAIJNE.Helm = Helm;
-		HELFDCAIJNE.Seal = Seal;
-		HELFDCAIJNE.Skeleton = Skeleton;
-		HELFDCAIJNE.Weapon = Weapon;
-		HELFDCAIJNE.Magic = Magic;
-		HELFDCAIJNE.Ranged = Ranged;
+		equippedItems.Armor = Armor;
+		equippedItems.Helm = Helm;
+		equippedItems.Seal = Seal;
+		equippedItems.Skeleton = Skeleton;
+		equippedItems.Weapon = Weapon;
+		equippedItems.Magic = Magic;
+		equippedItems.Ranged = Ranged;
 	}
 
-	public void SetEquippedItemsFrom(EquippedItemsStruct HELFDCAIJNE)
+	public void SetEquippedItemsFrom(EquippedItemsStruct equippedItems)
 	{
-		Armor = HELFDCAIJNE.Armor;
-		Helm = HELFDCAIJNE.Helm;
-		Seal = HELFDCAIJNE.Seal;
-		Skeleton = HELFDCAIJNE.Skeleton;
-		Weapon = HELFDCAIJNE.Weapon;
-		Magic = HELFDCAIJNE.Magic;
-		Ranged = HELFDCAIJNE.Ranged;
+		Armor = equippedItems.Armor;
+		Helm = equippedItems.Helm;
+		Seal = equippedItems.Seal;
+		Skeleton = equippedItems.Skeleton;
+		Weapon = equippedItems.Weapon;
+		Magic = equippedItems.Magic;
+		Ranged = equippedItems.Ranged;
 	}
 
 	private float GetImpossibleRatio()
@@ -1423,33 +1423,33 @@ public partial class ModelParameters
 		GameLog.Write("- RangedQuantity: {0}", num7);
 	}
 
-	public void SetItemsFromRules(List<ItemRule> GEEJLFGCKNJ, bool FFBFPLODJME, int round = 0)
+	public void SetItemsFromRules(List<ItemRule> rules, bool respectNoAttributeChange, int round = 0)
 	{
-		Roster nKGLHEGIKKP = ListSF.GetRoster();
-		foreach (ItemRule item in GEEJLFGCKNJ)
+		Roster roster = ListSF.GetRoster();
+		foreach (ItemRule item in rules)
 		{
 			if (round > 0 && !item.AppliesToRound(round))
 			{
 				continue;
 			}
-			UserItem dKCHDHMLKHN = item.get_Item();
-			if (dKCHDHMLKHN == null)
+			UserItem userItem = item.get_Item();
+			if (userItem == null)
 			{
 				GameLog.Error(" ModelParameters::setItemsFromRules - UserItem not found ");
 				continue;
 			}
-			ItemInfo dJKEECEOCJB = dKCHDHMLKHN.GetInfo();
-			string text = dKCHDHMLKHN.get_Name();
+			ItemInfo itemInfo = userItem.GetInfo();
+			string text = userItem.get_Name();
 			if (string.IsNullOrEmpty(text))
 			{
 				continue;
 			}
-			UserItem dKCHDHMLKHN2 = nKGLHEGIKKP.GetInventory().FindItem(text);
-			dJKEECEOCJB = null;
+			UserItem dKCHDHMLKHN2 = roster.GetInventory().FindItem(text);
+			itemInfo = null;
 			if (dKCHDHMLKHN2 == null)
 			{
-				dJKEECEOCJB = ListSF.GetItems().GetItemByName(text);
-				if (dJKEECEOCJB == null)
+				itemInfo = ListSF.GetItems().GetItemByName(text);
+				if (itemInfo == null)
 				{
 					GameLog.Error(" Model::equipRulesItems - item not found \"{0}\"", text);
 					continue;
@@ -1457,18 +1457,18 @@ public partial class ModelParameters
 			}
 			else
 			{
-				dJKEECEOCJB = dKCHDHMLKHN2.GetInfo();
+				itemInfo = dKCHDHMLKHN2.GetInfo();
 			}
-			if ((dJKEECEOCJB == null || !nKGLHEGIKKP.GetInventory().HasItem(dJKEECEOCJB)) && !item.GetIsEquipRule())
+			if ((itemInfo == null || !roster.GetInventory().HasItem(itemInfo)) && !item.GetIsEquipRule())
 			{
-				dJKEECEOCJB = null;
+				itemInfo = null;
 			}
-			if (dJKEECEOCJB != null && (!FFBFPLODJME || !item.GetNoAttributeChange()))
+			if (itemInfo != null && (!respectNoAttributeChange || !item.GetNoAttributeChange()))
 			{
-				ItemInfo dJKEECEOCJB2 = GetItemByType(dJKEECEOCJB.Type);
-				ItemInfo dJKEECEOCJB3 = dJKEECEOCJB.Clone();
+				ItemInfo dJKEECEOCJB2 = GetItemByType(itemInfo.Type);
+				ItemInfo dJKEECEOCJB3 = itemInfo.Clone();
 				dJKEECEOCJB3.IgnoreInventoryEnchantments = true;
-				SetItemByType(dJKEECEOCJB.Type, dJKEECEOCJB3);
+				SetItemByType(itemInfo.Type, dJKEECEOCJB3);
 			}
 		}
 	}
@@ -1555,18 +1555,18 @@ public partial class ModelParameters
 		}
 	}
 
-	public void AddAttributeShifts(List<global::Pair<string, float>> LHGAKDLAPJB)
+	public void AddAttributeShifts(List<global::Pair<string, float>> shifts)
 	{
 		int i = 0;
-		for (int count = LHGAKDLAPJB.Count; i < count; i++)
+		for (int count = shifts.Count; i < count; i++)
 		{
-			global::Pair<string, float> cCKLNOPEKHO = LHGAKDLAPJB[i];
-			string lLHEDBIEHAA = cCKLNOPEKHO.First;
-			float nFNBFHCDEGG = cCKLNOPEKHO.Second;
-			int OEMALIFPGPO = 0;
-			if (FinalAttributes.Get(lLHEDBIEHAA, ref OEMALIFPGPO))
+			global::Pair<string, float> shift = shifts[i];
+			string attributeName = shift.First;
+			float shiftValue = shift.Second;
+			int attributeValue = 0;
+			if (FinalAttributes.Get(attributeName, ref attributeValue))
 			{
-				FinalAttributes.Set(lLHEDBIEHAA, (int)((float)OEMALIFPGPO + nFNBFHCDEGG));
+				FinalAttributes.Set(attributeName, (int)((float)attributeValue + shiftValue));
 			}
 		}
 	}

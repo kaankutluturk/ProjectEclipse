@@ -182,12 +182,12 @@ namespace Nekki.SF2.Core.Fights.Controller
 				keyboardInput.IsEnabled = _deviceInputEnabled && !enabled;
 		}
 
-		public void Init(bool DFDCOMCCEEP = true, bool GJHOPBBMHDA = true, bool BIMHGOMADEJ = true)
+		public void Init(bool enablePunch = true, bool enableKick = true, bool enableStick = true)
 		{
 			_actionButtons.Init();
-			punchEnabled = DFDCOMCCEEP;
-			kickEnabled = GJHOPBBMHDA;
-			stickEnabled = BIMHGOMADEJ;
+			punchEnabled = enablePunch;
+			kickEnabled = enableKick;
+			stickEnabled = enableStick;
 			InitController();
 		}
 
@@ -228,12 +228,12 @@ namespace Nekki.SF2.Core.Fights.Controller
 			return _actionButtons;
 		}
 
-		public void IsShowController(bool HHFKEDNEOIL)
+		public void IsShowController(bool visible)
 		{
-			base.gameObject.SetActive(HHFKEDNEOIL);
-			_joystick.gameObject.SetActive(HHFKEDNEOIL);
-			_actionButtons.gameObject.SetActive(HHFKEDNEOIL);
-			if (!HHFKEDNEOIL)
+			base.gameObject.SetActive(visible);
+			_joystick.gameObject.SetActive(visible);
+			_actionButtons.gameObject.SetActive(visible);
+			if (!visible)
 			{
 				if (!stickEnabled)
 				{
@@ -305,17 +305,17 @@ namespace Nekki.SF2.Core.Fights.Controller
 			keyboardInput.AddKey(Eclipse.Input.FightKeyBindings.Get(KeyCode.J), FightCID.RaidChargeButton);
 		}
 
-		public bool IsQuadrantEnabled(FightCID KGBGENDIMBC)
+		public bool IsQuadrantEnabled(FightCID control)
 		{
-			if (!punchEnabled && KGBGENDIMBC == FightCID.Punch)
+			if (!punchEnabled && control == FightCID.Punch)
 			{
 				return false;
 			}
-			if (!kickEnabled && KGBGENDIMBC == FightCID.Kick)
+			if (!kickEnabled && control == FightCID.Kick)
 			{
 				return false;
 			}
-			if (!stickEnabled && IsDirectionQuadrantNonZero(KGBGENDIMBC))
+			if (!stickEnabled && IsDirectionQuadrantNonZero(control))
 			{
 				return false;
 			}
@@ -344,9 +344,9 @@ namespace Nekki.SF2.Core.Fights.Controller
 			}
 		}
 
-		public static bool IsDirectionQuadrant(FightCID DFOLKDCLLLN)
+		public static bool IsDirectionQuadrant(FightCID control)
 		{
-			return DFOLKDCLLLN >= FightCID.QuadrantZero && DFOLKDCLLLN <= FightCID.QuadrantUpBack;
+			return control >= FightCID.QuadrantZero && control <= FightCID.QuadrantUpBack;
 		}
 
 		private void AddJoystickListeners()
@@ -359,14 +359,14 @@ namespace Nekki.SF2.Core.Fights.Controller
 			_joystick.AddEventListener(2, HandleControlReleased);
 		}
 
-		private void AddActionButtonListeners(bool DFDCOMCCEEP = true, bool GJHOPBBMHDA = true)
+		private void AddActionButtonListeners(bool enablePunch = true, bool enableKick = true)
 		{
 			_actionButtons.RemoveEventListener(1, HandleControlPressed);
 			_actionButtons.AddEventListener(1, HandleControlPressed);
 			_actionButtons.RemoveEventListener(2, HandleControlReleased);
 			_actionButtons.AddEventListener(2, HandleControlReleased);
-			_actionButtons.SetPunchEnabled(DFDCOMCCEEP);
-			_actionButtons.SetKickEnabled(GJHOPBBMHDA);
+			_actionButtons.SetPunchEnabled(enablePunch);
+			_actionButtons.SetKickEnabled(enableKick);
 		}
 
 		private void InitKeyboardInput()
@@ -532,63 +532,63 @@ namespace Nekki.SF2.Core.Fights.Controller
 
 		private void HandleControlPressed(object data)
 		{
-			FightControlEventData cBBEIGACPPD = (FightControlEventData)data;
+			FightControlEventData eventData = (FightControlEventData)data;
 			// Touch presses reach a versus fight through the tick driver, not as events.
-			if (_localVersusInputEnabled) _versusTouch = Eclipse.Multiplayer.VersusInputSampler.ApplyControl(_versusTouch, 0, cBBEIGACPPD.Control);
-			if (cBBEIGACPPD.Control != FightCID.QuadrantZero && IsQuadrantEnabled(cBBEIGACPPD.Control))
+			if (_localVersusInputEnabled) _versusTouch = Eclipse.Multiplayer.VersusInputSampler.ApplyControl(_versusTouch, 0, eventData.Control);
+			if (eventData.Control != FightCID.QuadrantZero && IsQuadrantEnabled(eventData.Control))
 			{
-				EmitControl(0, cBBEIGACPPD);
+				EmitControl(0, eventData);
 			}
 		}
 
 		private void HandleControlReleased(object data)
 		{
-			FightControlEventData cBBEIGACPPD = (FightControlEventData)data;
-			if (_localVersusInputEnabled) _versusTouch = Eclipse.Multiplayer.VersusInputSampler.ApplyControl(_versusTouch, 1, cBBEIGACPPD.Control);
-			if (IsQuadrantEnabled(cBBEIGACPPD.Control))
+			FightControlEventData eventData = (FightControlEventData)data;
+			if (_localVersusInputEnabled) _versusTouch = Eclipse.Multiplayer.VersusInputSampler.ApplyControl(_versusTouch, 1, eventData.Control);
+			if (IsQuadrantEnabled(eventData.Control))
 			{
-				EmitControl(1, cBBEIGACPPD);
+				EmitControl(1, eventData);
 			}
 		}
 
 		private void HandleKeyPressed(object data)
 		{
-			FightControlEventData cBBEIGACPPD = (FightControlEventData)data;
-			if (!AssemblyController.GetMarket().GetIsWinStoreMarket() || !IsDirectionQuadrant(cBBEIGACPPD.Control))
+			FightControlEventData eventData = (FightControlEventData)data;
+			if (!AssemblyController.GetMarket().GetIsWinStoreMarket() || !IsDirectionQuadrant(eventData.Control))
 			{
-				if (cBBEIGACPPD.Control != FightCID.QuadrantZero && IsQuadrantEnabled(cBBEIGACPPD.Control))
+				if (eventData.Control != FightCID.QuadrantZero && IsQuadrantEnabled(eventData.Control))
 				{
-					EmitControl(0, cBBEIGACPPD);
+					EmitControl(0, eventData);
 				}
 			}
 			else
 			{
-				UpdateKeyboardDirection(cBBEIGACPPD);
+				UpdateKeyboardDirection(eventData);
 			}
 		}
 
 		private void HandleKeyReleased(object data)
 		{
-			FightControlEventData cBBEIGACPPD = (FightControlEventData)data;
-			if (!AssemblyController.GetMarket().GetIsWinStoreMarket() || !IsDirectionQuadrant(cBBEIGACPPD.Control))
+			FightControlEventData eventData = (FightControlEventData)data;
+			if (!AssemblyController.GetMarket().GetIsWinStoreMarket() || !IsDirectionQuadrant(eventData.Control))
 			{
-				if (IsQuadrantEnabled(cBBEIGACPPD.Control))
+				if (IsQuadrantEnabled(eventData.Control))
 				{
-					EmitControl(1, cBBEIGACPPD);
+					EmitControl(1, eventData);
 				}
 			}
 			else
 			{
-				UpdateKeyboardDirection(cBBEIGACPPD);
+				UpdateKeyboardDirection(eventData);
 			}
 		}
 
-		private bool IsDirectionQuadrantNonZero(FightCID KGBGENDIMBC)
+		private bool IsDirectionQuadrantNonZero(FightCID control)
 		{
-			return KGBGENDIMBC > FightCID.QuadrantZero && KGBGENDIMBC <= FightCID.QuadrantUpBack;
+			return control > FightCID.QuadrantZero && control <= FightCID.QuadrantUpBack;
 		}
 
-		private void UpdateKeyboardDirection(FightControlEventData DFIBLGKFAHN)
+		private void UpdateKeyboardDirection(FightControlEventData eventData)
 		{
 			List<FightCID> list = new List<FightCID>();
 			int i = 0;
@@ -607,15 +607,15 @@ namespace Nekki.SF2.Core.Fights.Controller
 					else if (item.isActive)
 					{
 						item.isActive = false;
-						DFIBLGKFAHN.Control = item.Index;
-						EmitControl(1, DFIBLGKFAHN);
+						eventData.Control = item.Index;
+						EmitControl(1, eventData);
 					}
 				}
 			}
-			FightCID eCHINOPKGGI = FightCID.QuadrantZero;
+			FightCID direction = FightCID.QuadrantZero;
 			if (list.Count == 1)
 			{
-				eCHINOPKGGI = list[0];
+				direction = list[0];
 			}
 			else if (list.Count > 1)
 			{
@@ -627,10 +627,10 @@ namespace Nekki.SF2.Core.Fights.Controller
 					switch (eCHINOPKGGI3)
 					{
 					case FightCID.QuadrantForward:
-						eCHINOPKGGI = FightCID.QuadrantUpForward;
+						direction = FightCID.QuadrantUpForward;
 						break;
 					case FightCID.QuadrantBack:
-						eCHINOPKGGI = FightCID.QuadrantUpBack;
+						direction = FightCID.QuadrantUpBack;
 						break;
 					}
 					break;
@@ -638,10 +638,10 @@ namespace Nekki.SF2.Core.Fights.Controller
 					switch (eCHINOPKGGI3)
 					{
 					case FightCID.QuadrantUp:
-						eCHINOPKGGI = FightCID.QuadrantUpForward;
+						direction = FightCID.QuadrantUpForward;
 						break;
 					case FightCID.QuadrantDown:
-						eCHINOPKGGI = FightCID.QuadrantDownForward;
+						direction = FightCID.QuadrantDownForward;
 						break;
 					}
 					break;
@@ -649,10 +649,10 @@ namespace Nekki.SF2.Core.Fights.Controller
 					switch (eCHINOPKGGI3)
 					{
 					case FightCID.QuadrantForward:
-						eCHINOPKGGI = FightCID.QuadrantDownForward;
+						direction = FightCID.QuadrantDownForward;
 						break;
 					case FightCID.QuadrantBack:
-						eCHINOPKGGI = FightCID.QuadrantDownBack;
+						direction = FightCID.QuadrantDownBack;
 						break;
 					}
 					break;
@@ -660,35 +660,35 @@ namespace Nekki.SF2.Core.Fights.Controller
 					switch (eCHINOPKGGI3)
 					{
 					case FightCID.QuadrantUp:
-						eCHINOPKGGI = FightCID.QuadrantUpBack;
+						direction = FightCID.QuadrantUpBack;
 						break;
 					case FightCID.QuadrantDown:
-						eCHINOPKGGI = FightCID.QuadrantDownBack;
+						direction = FightCID.QuadrantDownBack;
 						break;
 					}
 					break;
 				}
 			}
-			if (keyboardDirection != eCHINOPKGGI)
+			if (keyboardDirection != direction)
 			{
 				if (keyboardDirection != FightCID.QuadrantZero)
 				{
-					DFIBLGKFAHN.Control = keyboardDirection;
-					EmitControl(1, DFIBLGKFAHN);
+					eventData.Control = keyboardDirection;
+					EmitControl(1, eventData);
 				}
-				keyboardDirection = eCHINOPKGGI;
-				if (eCHINOPKGGI != FightCID.QuadrantZero)
+				keyboardDirection = direction;
+				if (direction != FightCID.QuadrantZero)
 				{
-					DFIBLGKFAHN.Control = eCHINOPKGGI;
-					EmitControl(0, DFIBLGKFAHN);
+					eventData.Control = direction;
+					EmitControl(0, eventData);
 				}
 			}
 		}
 
-		public void SetScale(float BDEMEIHKADI)
+		public void SetScale(float scale)
 		{
-			_leftContainer.transform.localScale = new Vector3(BDEMEIHKADI, BDEMEIHKADI);
-			_actionButtons.transform.localScale = new Vector3(BDEMEIHKADI, BDEMEIHKADI);
+			_leftContainer.transform.localScale = new Vector3(scale, scale);
+			_actionButtons.transform.localScale = new Vector3(scale, scale);
 		}
 	}
 }

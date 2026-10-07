@@ -16,14 +16,14 @@ public class AchievementInfo
 
 	public bool IsCompleted;
 
-	public AchievementInfo(string PGAFPNEHHLB, string EFBADJCNDMG, int MJBFFBPLAGC, int BDONIKLHFLJ, Action<object> _dlg = null, bool BODCOGFGHAD = false, bool DPJOPMHPGKG = false)
+	public AchievementInfo(string title, string description, int moneyPrize, int bonusPrize, Action<object> _dlg = null, bool canTakeReward = false, bool isCompleted = false)
 	{
-		Title = PGAFPNEHHLB;
-		Description = EFBADJCNDMG;
-		MoneyPrize = MJBFFBPLAGC;
-		BonusPrize = BDONIKLHFLJ;
+		Title = title;
+		Description = description;
+		MoneyPrize = moneyPrize;
+		BonusPrize = bonusPrize;
 		OnTakeReward = _dlg;
-		CanTakeReward = BODCOGFGHAD;
-		IsCompleted = DPJOPMHPGKG;
+		CanTakeReward = canTakeReward;
+		IsCompleted = isCompleted;
 	}
 }

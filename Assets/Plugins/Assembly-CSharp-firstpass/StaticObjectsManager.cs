@@ -74,32 +74,32 @@ public class StaticObjectsManager : MonoBehaviour
 		return instance;
 	}
 
-	public static void AddObject(GameObject ODMLDMOAOLN, bool DLIBCKLEOFM = true)
+	public static void AddObject(GameObject gameObject, bool attachToManager = true)
 	{
-		if (!GetInstance()._staticObjects.Contains(ODMLDMOAOLN))
+		if (!GetInstance()._staticObjects.Contains(gameObject))
 		{
-			if (DLIBCKLEOFM)
+			if (attachToManager)
 			{
-				ODMLDMOAOLN.transform.parent = GetInstance()._transform;
+				gameObject.transform.parent = GetInstance()._transform;
 			}
 			else
 			{
-				UnityEngine.Object.DontDestroyOnLoad(ODMLDMOAOLN);
+				UnityEngine.Object.DontDestroyOnLoad(gameObject);
 			}
-			if (ODMLDMOAOLN.name[0] != '_')
+			if (gameObject.name[0] != '_')
 			{
-				ODMLDMOAOLN.name = "_" + ODMLDMOAOLN.name;
+				gameObject.name = "_" + gameObject.name;
 			}
-			GetInstance()._staticObjects.Add(ODMLDMOAOLN);
+			GetInstance()._staticObjects.Add(gameObject);
 		}
 	}
 
-	public static void RemoveObject(GameObject ODMLDMOAOLN)
+	public static void RemoveObject(GameObject gameObject)
 	{
-		if (GetInstance()._staticObjects.Contains(ODMLDMOAOLN))
+		if (GetInstance()._staticObjects.Contains(gameObject))
 		{
-			GetInstance()._staticObjects.Remove(ODMLDMOAOLN);
-			UnityEngine.Object.Destroy(ODMLDMOAOLN);
+			GetInstance()._staticObjects.Remove(gameObject);
+			UnityEngine.Object.Destroy(gameObject);
 		}
 	}
 

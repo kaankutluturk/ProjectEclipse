@@ -58,9 +58,9 @@ internal sealed class InflateManager
 	{
 	}
 
-	public InflateManager(bool FOCCBLONFOF)
+	public InflateManager(bool expectRfc1950HeaderBytes)
 	{
-		_handleRfc1950HeaderBytes = FOCCBLONFOF;
+		_handleRfc1950HeaderBytes = expectRfc1950HeaderBytes;
 	}
 
 	internal bool GetHandleRfc1950HeaderBytes()
@@ -92,23 +92,23 @@ internal sealed class InflateManager
 		return 0;
 	}
 
-	internal int Initialize(ZlibCodec HNJFOALABOA, int OKPHBCHECPI)
+	internal int Initialize(ZlibCodec codec, int windowBits)
 	{
-		_codec = HNJFOALABOA;
+		_codec = codec;
 		_codec.Message = null;
 		blocks = null;
-		if (OKPHBCHECPI < 8 || OKPHBCHECPI > 15)
+		if (windowBits < 8 || windowBits > 15)
 		{
 			End();
 			throw new ZlibException("Bad window size.");
 		}
-		wbits = OKPHBCHECPI;
-		blocks = new InflateBlocks(HNJFOALABOA, (!GetHandleRfc1950HeaderBytes()) ? null : this, 1 << OKPHBCHECPI);
+		wbits = windowBits;
+		blocks = new InflateBlocks(codec, (!GetHandleRfc1950HeaderBytes()) ? null : this, 1 << windowBits);
 		Reset();
 		return 0;
 	}
 
-	internal int Inflate(FlushType NGBJDNFAPKC)
+	internal int Inflate(FlushType flushType)
 	{
 		if (_codec.InputBuffer == null)
 		{
@@ -309,7 +309,7 @@ internal sealed class InflateManager
 
 	internal int SetDictionary(byte[] dictionary)
 	{
-		int iLENLCMAMBH = 0;
+		int dictionaryStart = 0;
 		int num = dictionary.Length;
 		if (mode != InflateManagerMode.DICT0)
 		{
@@ -323,9 +323,9 @@ internal sealed class InflateManager
 		if (num >= 1 << wbits)
 		{
 			num = (1 << wbits) - 1;
-			iLENLCMAMBH = dictionary.Length - num;
+			dictionaryStart = dictionary.Length - num;
 		}
-		blocks.SetDictionary(dictionary, iLENLCMAMBH, num);
+		blocks.SetDictionary(dictionary, dictionaryStart, num);
 		mode = InflateManagerMode.BLOCKS;
 		return 0;
 	}
@@ -358,16 +358,16 @@ internal sealed class InflateManager
 		{
 			return -3;
 		}
-		long aLJBBHPGGPA = _codec.TotalBytesIn;
-		long hCDKLJJLMOD = _codec.TotalBytesOut;
+		long totalBytesIn = _codec.TotalBytesIn;
+		long totalBytesOut = _codec.TotalBytesOut;
 		Reset();
-		_codec.TotalBytesIn = aLJBBHPGGPA;
-		_codec.TotalBytesOut = hCDKLJJLMOD;
+		_codec.TotalBytesIn = totalBytesIn;
+		_codec.TotalBytesOut = totalBytesOut;
 		mode = InflateManagerMode.BLOCKS;
 		return 0;
 	}
 
-	internal int SyncPoint(ZlibCodec LKPCKJOLJDO)
+	internal int SyncPoint(ZlibCodec codec)
 	{
 		return blocks.SyncPoint();
 	}

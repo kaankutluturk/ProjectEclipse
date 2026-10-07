@@ -10,20 +10,20 @@ public sealed class TagMappings
 		mappings = new Dictionary<string, Type>();
 	}
 
-	public TagMappings(IDictionary<string, Type> INONLMCLKPG)
+	public TagMappings(IDictionary<string, Type> sourceMappings)
 	{
-		this.mappings = new Dictionary<string, Type>(INONLMCLKPG);
+		this.mappings = new Dictionary<string, Type>(sourceMappings);
 	}
 
-	public void Add(string EDLADAAKMDF, Type JPEFEBICPFI)
+	public void Add(string tag, Type type)
 	{
-		mappings.Add(EDLADAAKMDF, JPEFEBICPFI);
+		mappings.Add(tag, type);
 	}
 
-	internal Type GetMapping(string EDLADAAKMDF)
+	internal Type GetMapping(string tag)
 	{
 		Type value;
-		if (mappings.TryGetValue(EDLADAAKMDF, out value))
+		if (mappings.TryGetValue(tag, out value))
 		{
 			return value;
 		}

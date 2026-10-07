@@ -8,8 +8,8 @@ public class AntichitingModule : LoadingModule
 		{
 			GameSettings.LoadAssemblySettings();
 			SystemProperties.InitDeviceInfo();
-			XmlDocument jFJPKEONJIJ = XmlUtils.OpenXMLDocument(SF2Paths.GetGameDataPath(), "devices.xml");
-			SystemProperties.LoadDevicesConfig(jFJPKEONJIJ);
+			XmlDocument devicesConfig = XmlUtils.OpenXMLDocument(SF2Paths.GetGameDataPath(), "devices.xml");
+			SystemProperties.LoadDevicesConfig(devicesConfig);
 			GameCenterController.Init();
 			isFinished = true;
 		}

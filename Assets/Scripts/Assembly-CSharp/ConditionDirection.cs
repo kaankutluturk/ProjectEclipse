@@ -33,10 +33,10 @@ public class ConditionDirection : ConditionAnimation
 		return (!IsNot) ? flag : (!flag);
 	}
 
-	public void UpdateNodes(ModelObject OECPEDPMKCD, bool EKBOGDKIHIH, ModelNode AECCPADGGPG, bool PHADJMAONJG, ModelObject MJCGOJBGFIE = null)
+	public void UpdateNodes(ModelObject rootModel, bool isPlayer, ModelNode pivotNode, bool isChildPoint, ModelObject childModel = null)
 	{
-		_direction.FromPoint.UpdateNode(OECPEDPMKCD, EKBOGDKIHIH, AECCPADGGPG, PHADJMAONJG, MJCGOJBGFIE);
-		_direction.ToPoint.UpdateNode(OECPEDPMKCD, EKBOGDKIHIH, AECCPADGGPG, PHADJMAONJG, MJCGOJBGFIE);
+		_direction.FromPoint.UpdateNode(rootModel, isPlayer, pivotNode, isChildPoint, childModel);
+		_direction.ToPoint.UpdateNode(rootModel, isPlayer, pivotNode, isChildPoint, childModel);
 	}
 
 	public void ResetNodes()
@@ -45,12 +45,12 @@ public class ConditionDirection : ConditionAnimation
 		_direction.ToPoint.ClearChildPoints();
 	}
 
-	public override Model ResolveTargetModel(Model BPBMKGHEEBI, ModelType.ModelTargetType LFLGCDNKNJI)
+	public override Model ResolveTargetModel(Model model, ModelType.ModelTargetType targetType)
 	{
-		return BPBMKGHEEBI;
+		return model;
 	}
 
-	public override void ApplyTargetModelType(ModelType.ModelTargetType LFLGCDNKNJI)
+	public override void ApplyTargetModelType(ModelType.ModelTargetType targetType)
 	{
 	}
 }

@@ -7,26 +7,26 @@ internal sealed class HTTPCacheFileLock
 
 	private static object SyncRoot = new object();
 
-	internal static object Acquire(Uri KJHNCLAJMLO)
+	internal static object Acquire(Uri uri)
 	{
 		lock (SyncRoot)
 		{
 			object value;
-			if (!FileLocks.TryGetValue(KJHNCLAJMLO, out value))
+			if (!FileLocks.TryGetValue(uri, out value))
 			{
-				FileLocks.Add(KJHNCLAJMLO, value = new object());
+				FileLocks.Add(uri, value = new object());
 			}
 			return value;
 		}
 	}
 
-	internal static void Remove(Uri KJHNCLAJMLO)
+	internal static void Remove(Uri uri)
 	{
 		lock (SyncRoot)
 		{
-			if (FileLocks.ContainsKey(KJHNCLAJMLO))
+			if (FileLocks.ContainsKey(uri))
 			{
-				FileLocks.Remove(KJHNCLAJMLO);
+				FileLocks.Remove(uri);
 			}
 		}
 	}

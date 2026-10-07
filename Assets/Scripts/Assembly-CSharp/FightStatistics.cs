@@ -56,9 +56,9 @@ public class FightStatistics
 		style = (FightStyle)Mathf.Max((int)style, (int)value);
 	}
 
-	public void RegisterWinIfEqual(float JNNBEHPCCOB, float FEMPIBLJEAP)
+	public void RegisterWinIfEqual(float left, float right)
 	{
-		if (JNNBEHPCCOB == FEMPIBLJEAP)
+		if (left == right)
 		{
 			winCount++;
 		}

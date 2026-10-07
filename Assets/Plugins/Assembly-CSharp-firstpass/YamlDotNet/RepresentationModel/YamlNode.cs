@@ -21,72 +21,72 @@ namespace YamlDotNet.RepresentationModel
 		{
 		}
 
-		internal void Load(NodeEvent CAJDINOLOJH, DocumentLoadingState state)
+		internal void Load(NodeEvent nodeEvent, DocumentLoadingState state)
 		{
-			Tag = CAJDINOLOJH.GetTag();
-			if (CAJDINOLOJH.GetAnchor() != null)
+			Tag = nodeEvent.GetTag();
+			if (nodeEvent.GetAnchor() != null)
 			{
-				Anchor = CAJDINOLOJH.GetAnchor();
+				Anchor = nodeEvent.GetAnchor();
 				state.AddAnchor(this);
 			}
-			Start = CAJDINOLOJH.GetStart();
-			End = CAJDINOLOJH.GetEnd();
+			Start = nodeEvent.GetStart();
+			End = nodeEvent.GetEnd();
 		}
 
-		internal static YamlNode ParseNode(EventReader DNBFFLFBDOB, DocumentLoadingState state)
+		internal static YamlNode ParseNode(EventReader reader, DocumentLoadingState state)
 		{
-			if (DNBFFLFBDOB.Accept<Scalar>())
+			if (reader.Accept<Scalar>())
 			{
-				return new YamlScalarNode(DNBFFLFBDOB, state);
+				return new YamlScalarNode(reader, state);
 			}
-			if (DNBFFLFBDOB.Accept<SequenceStart>())
+			if (reader.Accept<SequenceStart>())
 			{
-				return new YamlSequenceNode(DNBFFLFBDOB, state);
+				return new YamlSequenceNode(reader, state);
 			}
-			if (DNBFFLFBDOB.Accept<MappingStart>())
+			if (reader.Accept<MappingStart>())
 			{
-				return new YamlMappingNode(DNBFFLFBDOB, state);
+				return new YamlMappingNode(reader, state);
 			}
-			if (DNBFFLFBDOB.Accept<AnchorAlias>())
+			if (reader.Accept<AnchorAlias>())
 			{
-				AnchorAlias mBEGNNDMDKH = DNBFFLFBDOB.Expect<AnchorAlias>();
-				return state.GetNode(mBEGNNDMDKH.GetValue(), false, mBEGNNDMDKH.GetStart(), mBEGNNDMDKH.GetEnd()) ?? new YamlAliasNode(mBEGNNDMDKH.GetValue());
+				AnchorAlias aliasEvent = reader.Expect<AnchorAlias>();
+				return state.GetNode(aliasEvent.GetValue(), false, aliasEvent.GetStart(), aliasEvent.GetEnd()) ?? new YamlAliasNode(aliasEvent.GetValue());
 			}
 			throw new ArgumentException("The current event is of an unsupported type.", "events");
 		}
 
 		internal abstract void ResolveAliases(DocumentLoadingState state);
 
-		internal void Save(IEmitter NPIDIMCLNEM, EmitterState state)
+		internal void Save(IEmitter emitter, EmitterState state)
 		{
 			if (!string.IsNullOrEmpty(Anchor) && !state.GetEmittedAnchors().Add(Anchor))
 			{
-				NPIDIMCLNEM.Emit(new AnchorAlias(Anchor));
+				emitter.Emit(new AnchorAlias(Anchor));
 			}
 			else
 			{
-				Emit(NPIDIMCLNEM, state);
+				Emit(emitter, state);
 			}
 		}
 
-		internal abstract void Emit(IEmitter NPIDIMCLNEM, EmitterState state);
+		internal abstract void Emit(IEmitter emitter, EmitterState state);
 
-		public abstract void Accept(IYamlVisitor NKECMANOOEM);
+		public abstract void Accept(IYamlVisitor visitor);
 
-		protected bool Equals(YamlNode NOLFMPDGCOC)
+		protected bool Equals(YamlNode other)
 		{
-			return SafeEquals(Tag, NOLFMPDGCOC.Tag);
+			return SafeEquals(Tag, other.Tag);
 		}
 
-		protected static bool SafeEquals(object NMBEADHHHFH, object OKCKNALOCCK)
+		protected static bool SafeEquals(object left, object right)
 		{
-			if (NMBEADHHHFH != null)
+			if (left != null)
 			{
-				return NMBEADHHHFH.Equals(OKCKNALOCCK);
+				return left.Equals(right);
 			}
-			if (OKCKNALOCCK != null)
+			if (right != null)
 			{
-				return OKCKNALOCCK.Equals(NMBEADHHHFH);
+				return right.Equals(left);
 			}
 			return true;
 		}
@@ -101,9 +101,9 @@ namespace YamlDotNet.RepresentationModel
 			return (value != null) ? value.GetHashCode() : 0;
 		}
 
-		protected static int CombineHashCodes(int PKKJJLDNHAC, int AKJPBJPEDCF)
+		protected static int CombineHashCodes(int hash1, int hash2)
 		{
-			return ((PKKJJLDNHAC << 5) + PKKJJLDNHAC) ^ AKJPBJPEDCF;
+			return ((hash1 << 5) + hash1) ^ hash2;
 		}
 
 		public abstract YamlNode Clone();

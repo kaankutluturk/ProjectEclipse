@@ -103,11 +103,11 @@ public class LocationSelector
 		}
 	}
 
-	public LocationSelector(int DFIDNHKKNMB)
+	public LocationSelector(int depth)
 	{
-		layerDepth = DFIDNHKKNMB;
+		layerDepth = depth;
 		_UnityObject = new GameObject("Layer");
-		_UnityObject.transform.localPosition = new Vector3(0f, 0f, DFIDNHKKNMB);
+		_UnityObject.transform.localPosition = new Vector3(0f, 0f, depth);
 		_UnityObject.transform.localScale = new Vector3(1f, 1f, 1f);
 	}
 
@@ -171,54 +171,54 @@ public class LocationSelector
 		return _type == 2;
 	}
 
-	public void AddImage(GameObject CJBKCEPFIAM, int EELGIMCJLAI)
+	public void AddImage(GameObject image, int index)
 	{
-		CJBKCEPFIAM.transform.SetParent(_UnityObject.transform, false);
-		Vector3 localPosition = CJBKCEPFIAM.transform.localPosition;
+		image.transform.SetParent(_UnityObject.transform, false);
+		Vector3 localPosition = image.transform.localPosition;
 		localPosition.z = nextChildDepth;
-		CJBKCEPFIAM.transform.localPosition = localPosition;
+		image.transform.localPosition = localPosition;
 		nextChildDepth += -0.01f;
 	}
 
-	public void AddSimpleEffect(ChangingSprite CJBKCEPFIAM, int EELGIMCJLAI)
+	public void AddSimpleEffect(ChangingSprite effect, int index)
 	{
-		if (!(CJBKCEPFIAM.SpriteObject == null))
+		if (!(effect.SpriteObject == null))
 		{
-			CJBKCEPFIAM.SpriteObject.transform.SetParent(_UnityObject.transform, false);
-			effects.Add(CJBKCEPFIAM);
-			Vector3 localPosition = CJBKCEPFIAM.SpriteObject.transform.localPosition;
+			effect.SpriteObject.transform.SetParent(_UnityObject.transform, false);
+			effects.Add(effect);
+			Vector3 localPosition = effect.SpriteObject.transform.localPosition;
 			localPosition.z = nextChildDepth;
-			CJBKCEPFIAM.SpriteObject.transform.localPosition = localPosition;
+			effect.SpriteObject.transform.localPosition = localPosition;
 			nextChildDepth += -0.01f;
 		}
 	}
 
-	public void AddParticleEffect(ChangingSprite DDMFNILHHMD, int EELGIMCJLAI)
+	public void AddParticleEffect(ChangingSprite effect, int index)
 	{
-		DDMFNILHHMD.Particles.transform.SetParent(_UnityObject.transform, false);
-		effects.Add(DDMFNILHHMD);
-		Vector3 localPosition = DDMFNILHHMD.Particles.transform.localPosition;
+		effect.Particles.transform.SetParent(_UnityObject.transform, false);
+		effects.Add(effect);
+		Vector3 localPosition = effect.Particles.transform.localPosition;
 		localPosition.z = nextChildDepth;
-		DDMFNILHHMD.Particles.transform.localPosition = localPosition;
+		effect.Particles.transform.localPosition = localPosition;
 		nextChildDepth += -0.099999994f;
 	}
 
-	public void AddChangingSprite(ChangingSprite DDMFNILHHMD, int EELGIMCJLAI)
+	public void AddChangingSprite(ChangingSprite effect, int index)
 	{
-		DDMFNILHHMD.SpriteObject.transform.SetParent(_UnityObject.transform, false);
-		effects.Add(DDMFNILHHMD);
-		Vector3 localPosition = DDMFNILHHMD.SpriteObject.transform.localPosition;
+		effect.SpriteObject.transform.SetParent(_UnityObject.transform, false);
+		effects.Add(effect);
+		Vector3 localPosition = effect.SpriteObject.transform.localPosition;
 		localPosition.z = nextChildDepth;
-		DDMFNILHHMD.SpriteObject.transform.localPosition = localPosition;
+		effect.SpriteObject.transform.localPosition = localPosition;
 		nextChildDepth += -0.01f;
 	}
 
-	public void RemoveChangingSprite(ChangingSprite DLGLPGBABHC)
+	public void RemoveChangingSprite(ChangingSprite effect)
 	{
-		if (DLGLPGBABHC != null)
+		if (effect != null)
 		{
-			effects.Remove(DLGLPGBABHC);
-			UnityEngine.Object.Destroy(DLGLPGBABHC.SpriteObject.gameObject);
+			effects.Remove(effect);
+			UnityEngine.Object.Destroy(effect.SpriteObject.gameObject);
 		}
 	}
 
@@ -231,22 +231,22 @@ public class LocationSelector
 		}
 	}
 
-	public void SetScale(float ECDGDBADCKD)
+	public void SetScale(float scale)
 	{
-		_UnityObject.transform.localScale = new Vector3(ECDGDBADCKD, ECDGDBADCKD, 1f);
+		_UnityObject.transform.localScale = new Vector3(scale, scale, 1f);
 	}
 
-	public void SetPositionX(float LIAILCGJBDK)
+	public void SetPositionX(float positionX)
 	{
 		Vector3 localPosition = _UnityObject.transform.localPosition;
-		localPosition.x = (float)Math.Round(LIAILCGJBDK, 2, MidpointRounding.AwayFromZero);
+		localPosition.x = (float)Math.Round(positionX, 2, MidpointRounding.AwayFromZero);
 		_UnityObject.transform.localPosition = localPosition;
 	}
 
-	public void SetPositionY(float LIAILCGJBDK)
+	public void SetPositionY(float positionY)
 	{
 		Vector3 localPosition = _UnityObject.transform.localPosition;
-		localPosition.y = (float)Math.Round(LIAILCGJBDK, 2, MidpointRounding.AwayFromZero);
+		localPosition.y = (float)Math.Round(positionY, 2, MidpointRounding.AwayFromZero);
 		_UnityObject.transform.localPosition = localPosition;
 	}
 }

@@ -224,15 +224,15 @@ public sealed class Connection : IHeartbeat, IConnection
 	}
 
 	// C# has no syntax for parameterized property 'DLKPBAJDHBO'.
-	public Hub get_DLKPBAJDHBO(int OOPOEMNCCGH)
+	public Hub get_DLKPBAJDHBO(int index)
 	{
-		return get_Item(OOPOEMNCCGH);
+		return get_Item(index);
 	}
 
 	// C# has no syntax for parameterized property 'DLKPBAJDHBO'.
-	public Hub get_DLKPBAJDHBO(string KKNJICFENMD)
+	public Hub get_DLKPBAJDHBO(string name)
 	{
-		return get_Item(KKNJICFENMD);
+		return get_Item(name);
 	}
 
 	internal ulong ClientMessageIdCounter
@@ -355,36 +355,36 @@ public sealed class Connection : IHeartbeat, IConnection
 		}
 	}
 
-	public Connection(Uri KJHNCLAJMLO, params string[] KMDACKIILBI)
-		: this(KJHNCLAJMLO)
+	public Connection(Uri uri, params string[] hubNames)
+		: this(uri)
 	{
-		if (KMDACKIILBI != null && KMDACKIILBI.Length > 0)
+		if (hubNames != null && hubNames.Length > 0)
 		{
-			SetHubs(new Hub[KMDACKIILBI.Length]);
-			for (int i = 0; i < KMDACKIILBI.Length; i++)
+			SetHubs(new Hub[hubNames.Length]);
+			for (int i = 0; i < hubNames.Length; i++)
 			{
-				GetHubs()[i] = new Hub(KMDACKIILBI[i], this);
+				GetHubs()[i] = new Hub(hubNames[i], this);
 			}
 		}
 	}
 
-	public Connection(Uri KJHNCLAJMLO, params Hub[] EOAEFLODECF)
-		: this(KJHNCLAJMLO)
+	public Connection(Uri uri, params Hub[] hubs)
+		: this(uri)
 	{
-		SetHubs(EOAEFLODECF);
-		if (EOAEFLODECF != null)
+		SetHubs(hubs);
+		if (hubs != null)
 		{
-			for (int i = 0; i < EOAEFLODECF.Length; i++)
+			for (int i = 0; i < hubs.Length; i++)
 			{
-				((IHub)EOAEFLODECF[i]).GNLCPJFBAJE(this);
+				((IHub)hubs[i]).GNLCPJFBAJE(this);
 			}
 		}
 	}
 
-	public Connection(Uri KJHNCLAJMLO)
+	public Connection(Uri uri)
 	{
 		set_State(ConnectionStates.Initial);
-		set_Uri(KJHNCLAJMLO);
+		set_Uri(uri);
 		SetJsonEncoder(DefaultEncoder);
 		PingInterval = TimeSpan.FromMinutes(5.0);
 	}
@@ -406,11 +406,11 @@ public sealed class Connection : IHeartbeat, IConnection
 
 	private void set_State(ConnectionStates value)
 	{
-		ConnectionStates mAFFNGPOMJD = state;
+		ConnectionStates oldState = state;
 		state = value;
 		if (OnStateChanged != null)
 		{
-			OnStateChanged(this, mAFFNGPOMJD, state);
+			OnStateChanged(this, oldState, state);
 		}
 	}
 
@@ -486,170 +486,170 @@ public sealed class Connection : IHeartbeat, IConnection
 
 	public void AddConnectedHandler(OnConnectedDelegate value)
 	{
-		OnConnectedDelegate pILIPIHGBEG = OnConnected;
+		OnConnectedDelegate currentHandler = OnConnected;
 		OnConnectedDelegate pILIPIHGBEG2;
 		do
 		{
-			pILIPIHGBEG2 = pILIPIHGBEG;
-			pILIPIHGBEG = Interlocked.CompareExchange(ref OnConnected, (OnConnectedDelegate)Delegate.Combine(pILIPIHGBEG2, value), pILIPIHGBEG);
+			pILIPIHGBEG2 = currentHandler;
+			currentHandler = Interlocked.CompareExchange(ref OnConnected, (OnConnectedDelegate)Delegate.Combine(pILIPIHGBEG2, value), currentHandler);
 		}
-		while ((object)pILIPIHGBEG != pILIPIHGBEG2);
+		while ((object)currentHandler != pILIPIHGBEG2);
 	}
 
 	public void RemoveConnectedHandler(OnConnectedDelegate value)
 	{
-		OnConnectedDelegate pILIPIHGBEG = OnConnected;
+		OnConnectedDelegate currentHandler = OnConnected;
 		OnConnectedDelegate pILIPIHGBEG2;
 		do
 		{
-			pILIPIHGBEG2 = pILIPIHGBEG;
-			pILIPIHGBEG = Interlocked.CompareExchange(ref OnConnected, (OnConnectedDelegate)Delegate.Remove(pILIPIHGBEG2, value), pILIPIHGBEG);
+			pILIPIHGBEG2 = currentHandler;
+			currentHandler = Interlocked.CompareExchange(ref OnConnected, (OnConnectedDelegate)Delegate.Remove(pILIPIHGBEG2, value), currentHandler);
 		}
-		while ((object)pILIPIHGBEG != pILIPIHGBEG2);
+		while ((object)currentHandler != pILIPIHGBEG2);
 	}
 
 	public void AddClosedHandler(OnClosedDelegate value)
 	{
-		OnClosedDelegate kMBJIOLJJCE = onClosedField;
+		OnClosedDelegate currentHandler = onClosedField;
 		OnClosedDelegate kMBJIOLJJCE2;
 		do
 		{
-			kMBJIOLJJCE2 = kMBJIOLJJCE;
-			kMBJIOLJJCE = Interlocked.CompareExchange(ref onClosedField, (OnClosedDelegate)Delegate.Combine(kMBJIOLJJCE2, value), kMBJIOLJJCE);
+			kMBJIOLJJCE2 = currentHandler;
+			currentHandler = Interlocked.CompareExchange(ref onClosedField, (OnClosedDelegate)Delegate.Combine(kMBJIOLJJCE2, value), currentHandler);
 		}
-		while ((object)kMBJIOLJJCE != kMBJIOLJJCE2);
+		while ((object)currentHandler != kMBJIOLJJCE2);
 	}
 
 	public void RemoveClosedHandler(OnClosedDelegate value)
 	{
-		OnClosedDelegate kMBJIOLJJCE = onClosedField;
+		OnClosedDelegate currentHandler = onClosedField;
 		OnClosedDelegate kMBJIOLJJCE2;
 		do
 		{
-			kMBJIOLJJCE2 = kMBJIOLJJCE;
-			kMBJIOLJJCE = Interlocked.CompareExchange(ref onClosedField, (OnClosedDelegate)Delegate.Remove(kMBJIOLJJCE2, value), kMBJIOLJJCE);
+			kMBJIOLJJCE2 = currentHandler;
+			currentHandler = Interlocked.CompareExchange(ref onClosedField, (OnClosedDelegate)Delegate.Remove(kMBJIOLJJCE2, value), currentHandler);
 		}
-		while ((object)kMBJIOLJJCE != kMBJIOLJJCE2);
+		while ((object)currentHandler != kMBJIOLJJCE2);
 	}
 
 	public void AddErrorHandler(OnConnectionErrorDelegate value)
 	{
-		OnConnectionErrorDelegate dHGLHLDFDAC = onErrorField;
+		OnConnectionErrorDelegate currentHandler = onErrorField;
 		OnConnectionErrorDelegate dHGLHLDFDAC2;
 		do
 		{
-			dHGLHLDFDAC2 = dHGLHLDFDAC;
-			dHGLHLDFDAC = Interlocked.CompareExchange(ref onErrorField, (OnConnectionErrorDelegate)Delegate.Combine(dHGLHLDFDAC2, value), dHGLHLDFDAC);
+			dHGLHLDFDAC2 = currentHandler;
+			currentHandler = Interlocked.CompareExchange(ref onErrorField, (OnConnectionErrorDelegate)Delegate.Combine(dHGLHLDFDAC2, value), currentHandler);
 		}
-		while ((object)dHGLHLDFDAC != dHGLHLDFDAC2);
+		while ((object)currentHandler != dHGLHLDFDAC2);
 	}
 
 	public void RemoveErrorHandler(OnConnectionErrorDelegate value)
 	{
-		OnConnectionErrorDelegate dHGLHLDFDAC = onErrorField;
+		OnConnectionErrorDelegate currentHandler = onErrorField;
 		OnConnectionErrorDelegate dHGLHLDFDAC2;
 		do
 		{
-			dHGLHLDFDAC2 = dHGLHLDFDAC;
-			dHGLHLDFDAC = Interlocked.CompareExchange(ref onErrorField, (OnConnectionErrorDelegate)Delegate.Remove(dHGLHLDFDAC2, value), dHGLHLDFDAC);
+			dHGLHLDFDAC2 = currentHandler;
+			currentHandler = Interlocked.CompareExchange(ref onErrorField, (OnConnectionErrorDelegate)Delegate.Remove(dHGLHLDFDAC2, value), currentHandler);
 		}
-		while ((object)dHGLHLDFDAC != dHGLHLDFDAC2);
+		while ((object)currentHandler != dHGLHLDFDAC2);
 	}
 
 	public void AddReconnectingHandler(OnConnectedDelegate value)
 	{
-		OnConnectedDelegate pILIPIHGBEG = OnReconnecting;
+		OnConnectedDelegate currentHandler = OnReconnecting;
 		OnConnectedDelegate pILIPIHGBEG2;
 		do
 		{
-			pILIPIHGBEG2 = pILIPIHGBEG;
-			pILIPIHGBEG = Interlocked.CompareExchange(ref OnReconnecting, (OnConnectedDelegate)Delegate.Combine(pILIPIHGBEG2, value), pILIPIHGBEG);
+			pILIPIHGBEG2 = currentHandler;
+			currentHandler = Interlocked.CompareExchange(ref OnReconnecting, (OnConnectedDelegate)Delegate.Combine(pILIPIHGBEG2, value), currentHandler);
 		}
-		while ((object)pILIPIHGBEG != pILIPIHGBEG2);
+		while ((object)currentHandler != pILIPIHGBEG2);
 	}
 
 	public void RemoveReconnectingHandler(OnConnectedDelegate value)
 	{
-		OnConnectedDelegate pILIPIHGBEG = OnReconnecting;
+		OnConnectedDelegate currentHandler = OnReconnecting;
 		OnConnectedDelegate pILIPIHGBEG2;
 		do
 		{
-			pILIPIHGBEG2 = pILIPIHGBEG;
-			pILIPIHGBEG = Interlocked.CompareExchange(ref OnReconnecting, (OnConnectedDelegate)Delegate.Remove(pILIPIHGBEG2, value), pILIPIHGBEG);
+			pILIPIHGBEG2 = currentHandler;
+			currentHandler = Interlocked.CompareExchange(ref OnReconnecting, (OnConnectedDelegate)Delegate.Remove(pILIPIHGBEG2, value), currentHandler);
 		}
-		while ((object)pILIPIHGBEG != pILIPIHGBEG2);
+		while ((object)currentHandler != pILIPIHGBEG2);
 	}
 
 	public void AddReconnectedHandler(OnConnectedDelegate value)
 	{
-		OnConnectedDelegate pILIPIHGBEG = OnReconnected;
+		OnConnectedDelegate currentHandler = OnReconnected;
 		OnConnectedDelegate pILIPIHGBEG2;
 		do
 		{
-			pILIPIHGBEG2 = pILIPIHGBEG;
-			pILIPIHGBEG = Interlocked.CompareExchange(ref OnReconnected, (OnConnectedDelegate)Delegate.Combine(pILIPIHGBEG2, value), pILIPIHGBEG);
+			pILIPIHGBEG2 = currentHandler;
+			currentHandler = Interlocked.CompareExchange(ref OnReconnected, (OnConnectedDelegate)Delegate.Combine(pILIPIHGBEG2, value), currentHandler);
 		}
-		while ((object)pILIPIHGBEG != pILIPIHGBEG2);
+		while ((object)currentHandler != pILIPIHGBEG2);
 	}
 
 	public void RemoveReconnectedHandler(OnConnectedDelegate value)
 	{
-		OnConnectedDelegate pILIPIHGBEG = OnReconnected;
+		OnConnectedDelegate currentHandler = OnReconnected;
 		OnConnectedDelegate pILIPIHGBEG2;
 		do
 		{
-			pILIPIHGBEG2 = pILIPIHGBEG;
-			pILIPIHGBEG = Interlocked.CompareExchange(ref OnReconnected, (OnConnectedDelegate)Delegate.Remove(pILIPIHGBEG2, value), pILIPIHGBEG);
+			pILIPIHGBEG2 = currentHandler;
+			currentHandler = Interlocked.CompareExchange(ref OnReconnected, (OnConnectedDelegate)Delegate.Remove(pILIPIHGBEG2, value), currentHandler);
 		}
-		while ((object)pILIPIHGBEG != pILIPIHGBEG2);
+		while ((object)currentHandler != pILIPIHGBEG2);
 	}
 
 	public void AddStateChangedHandler(OnConnectionStateChangedDelegate value)
 	{
-		OnConnectionStateChangedDelegate aIBCPDGLFPB = OnStateChanged;
+		OnConnectionStateChangedDelegate currentHandler = OnStateChanged;
 		OnConnectionStateChangedDelegate aIBCPDGLFPB2;
 		do
 		{
-			aIBCPDGLFPB2 = aIBCPDGLFPB;
-			aIBCPDGLFPB = Interlocked.CompareExchange(ref OnStateChanged, (OnConnectionStateChangedDelegate)Delegate.Combine(aIBCPDGLFPB2, value), aIBCPDGLFPB);
+			aIBCPDGLFPB2 = currentHandler;
+			currentHandler = Interlocked.CompareExchange(ref OnStateChanged, (OnConnectionStateChangedDelegate)Delegate.Combine(aIBCPDGLFPB2, value), currentHandler);
 		}
-		while ((object)aIBCPDGLFPB != aIBCPDGLFPB2);
+		while ((object)currentHandler != aIBCPDGLFPB2);
 	}
 
 	public void RemoveStateChangedHandler(OnConnectionStateChangedDelegate value)
 	{
-		OnConnectionStateChangedDelegate aIBCPDGLFPB = OnStateChanged;
+		OnConnectionStateChangedDelegate currentHandler = OnStateChanged;
 		OnConnectionStateChangedDelegate aIBCPDGLFPB2;
 		do
 		{
-			aIBCPDGLFPB2 = aIBCPDGLFPB;
-			aIBCPDGLFPB = Interlocked.CompareExchange(ref OnStateChanged, (OnConnectionStateChangedDelegate)Delegate.Remove(aIBCPDGLFPB2, value), aIBCPDGLFPB);
+			aIBCPDGLFPB2 = currentHandler;
+			currentHandler = Interlocked.CompareExchange(ref OnStateChanged, (OnConnectionStateChangedDelegate)Delegate.Remove(aIBCPDGLFPB2, value), currentHandler);
 		}
-		while ((object)aIBCPDGLFPB != aIBCPDGLFPB2);
+		while ((object)currentHandler != aIBCPDGLFPB2);
 	}
 
 	public void AddNonHubMessageHandler(OnNonHubMessageDelegate value)
 	{
-		OnNonHubMessageDelegate gAGJEANDJEK = OnNonHubMessage;
+		OnNonHubMessageDelegate currentHandler = OnNonHubMessage;
 		OnNonHubMessageDelegate gAGJEANDJEK2;
 		do
 		{
-			gAGJEANDJEK2 = gAGJEANDJEK;
-			gAGJEANDJEK = Interlocked.CompareExchange(ref OnNonHubMessage, (OnNonHubMessageDelegate)Delegate.Combine(gAGJEANDJEK2, value), gAGJEANDJEK);
+			gAGJEANDJEK2 = currentHandler;
+			currentHandler = Interlocked.CompareExchange(ref OnNonHubMessage, (OnNonHubMessageDelegate)Delegate.Combine(gAGJEANDJEK2, value), currentHandler);
 		}
-		while ((object)gAGJEANDJEK != gAGJEANDJEK2);
+		while ((object)currentHandler != gAGJEANDJEK2);
 	}
 
 	public void RemoveNonHubMessageHandler(OnNonHubMessageDelegate value)
 	{
-		OnNonHubMessageDelegate gAGJEANDJEK = OnNonHubMessage;
+		OnNonHubMessageDelegate currentHandler = OnNonHubMessage;
 		OnNonHubMessageDelegate gAGJEANDJEK2;
 		do
 		{
-			gAGJEANDJEK2 = gAGJEANDJEK;
-			gAGJEANDJEK = Interlocked.CompareExchange(ref OnNonHubMessage, (OnNonHubMessageDelegate)Delegate.Remove(gAGJEANDJEK2, value), gAGJEANDJEK);
+			gAGJEANDJEK2 = currentHandler;
+			currentHandler = Interlocked.CompareExchange(ref OnNonHubMessage, (OnNonHubMessageDelegate)Delegate.Remove(gAGJEANDJEK2, value), currentHandler);
 		}
-		while ((object)gAGJEANDJEK != gAGJEANDJEK2);
+		while ((object)currentHandler != gAGJEANDJEK2);
 	}
 
 	public OnPrepareRequestDelegate GetRequestPreparator()
@@ -662,19 +662,19 @@ public sealed class Connection : IHeartbeat, IConnection
 		requestPreparator = value;
 	}
 
-	public Hub get_Item(int OOPOEMNCCGH)
+	public Hub get_Item(int index)
 	{
-		return GetHubs()[OOPOEMNCCGH];
+		return GetHubs()[index];
 	}
 
-	public Hub get_Item(string KKNJICFENMD)
+	public Hub get_Item(string name)
 	{
 		for (int i = 0; i < GetHubs().Length; i++)
 		{
-			Hub hGCBNOGDDPB = GetHubs()[i];
-			if (hGCBNOGDDPB.get_Name().Equals(KKNJICFENMD, StringComparison.OrdinalIgnoreCase))
+			Hub hub = GetHubs()[i];
+			if (hub.get_Name().Equals(name, StringComparison.OrdinalIgnoreCase))
 			{
-				return hGCBNOGDDPB;
+				return hub;
 			}
 		}
 		return null;
@@ -761,16 +761,16 @@ public sealed class Connection : IHeartbeat, IConnection
 		}
 	}
 
-	private void OnAuthenticationSucceeded(IAuthenticationProvider EEGMFLOPLLH)
+	private void OnAuthenticationSucceeded(IAuthenticationProvider provider)
 	{
-		EEGMFLOPLLH.RemoveAuthenticationSucceeded(OnAuthenticationSucceeded);
+		provider.RemoveAuthenticationSucceeded(OnAuthenticationSucceeded);
 		StartImpl();
 	}
 
-	private void OnAuthenticationFailed(IAuthenticationProvider EEGMFLOPLLH, string NEPOLDCKNJL)
+	private void OnAuthenticationFailed(IAuthenticationProvider provider, string error)
 	{
-		EEGMFLOPLLH.RemoveAuthenticationFailed(OnAuthenticationFailed);
-		((IConnection)this).Error(NEPOLDCKNJL);
+		provider.RemoveAuthenticationFailed(OnAuthenticationFailed);
+		((IConnection)this).Error(error);
 	}
 
 	private void StartImpl()
@@ -799,9 +799,9 @@ public sealed class Connection : IHeartbeat, IConnection
 		GetTransport().Connect();
 	}
 
-	private void OnNegotiationError(NegotiationData data, string JDONBAPIJCG)
+	private void OnNegotiationError(NegotiationData data, string error)
 	{
-		((IConnection)this).Error(JDONBAPIJCG);
+		((IConnection)this).Error(error);
 	}
 
 	public void Close()
@@ -841,16 +841,16 @@ public sealed class Connection : IHeartbeat, IConnection
 		{
 			onClosedField(this);
 		}
-		catch (Exception mPFFFAOGBJE)
+		catch (Exception exception)
 		{
-			HTTPManager.GetLogger().Exception("SignalR Connection", "OnClosed", mPFFFAOGBJE);
+			HTTPManager.GetLogger().Exception("SignalR Connection", "OnClosed", exception);
 		}
 	}
 
 	public void Reconnect()
 	{
-		DateTime? jNPJOFDOAAG = reconnectStartedAt;
-		if (jNPJOFDOAAG.HasValue)
+		DateTime? reconnectStart = reconnectStartedAt;
+		if (reconnectStart.HasValue)
 		{
 			return;
 		}
@@ -870,15 +870,15 @@ public sealed class Connection : IHeartbeat, IConnection
 		{
 			OnReconnecting(this);
 		}
-		catch (Exception mPFFFAOGBJE)
+		catch (Exception exception)
 		{
-			HTTPManager.GetLogger().Exception("SignalR Connection", "OnReconnecting", mPFFFAOGBJE);
+			HTTPManager.GetLogger().Exception("SignalR Connection", "OnReconnecting", exception);
 		}
 	}
 
-	public void Send(object EHCLMBADLKH)
+	public void Send(object data)
 	{
-		if (EHCLMBADLKH == null)
+		if (data == null)
 		{
 			throw new ArgumentNullException("arg");
 		}
@@ -886,15 +886,15 @@ public sealed class Connection : IHeartbeat, IConnection
 		{
 			if (GetState() == ConnectionStates.Connected)
 			{
-				string dGNLDMDLKDA = GetJsonEncoder().Encode(EHCLMBADLKH);
-				GetTransport().Send(dGNLDMDLKDA);
+				string json = GetJsonEncoder().Encode(data);
+				GetTransport().Send(json);
 			}
 		}
 	}
 
-	public void SendJson(string EMDHMHOKGFP)
+	public void SendJson(string json)
 	{
-		if (EMDHMHOKGFP == null)
+		if (json == null)
 		{
 			throw new ArgumentNullException("json");
 		}
@@ -902,12 +902,12 @@ public sealed class Connection : IHeartbeat, IConnection
 		{
 			if (GetState() == ConnectionStates.Connected)
 			{
-				GetTransport().Send(EMDHMHOKGFP);
+				GetTransport().Send(json);
 			}
 		}
 	}
 
-	void IConnection.OnMessage(IServerMessage CKEHOEGLMBM)
+	void IConnection.OnMessage(IServerMessage message)
 	{
 		if (GetState() == ConnectionStates.Closed)
 		{
@@ -919,14 +919,14 @@ public sealed class Connection : IHeartbeat, IConnection
 			{
 				bufferedMessages = new List<IServerMessage>();
 			}
-			bufferedMessages.Add(CKEHOEGLMBM);
+			bufferedMessages.Add(message);
 			return;
 		}
 		lastMessageReceivedAt = DateTime.UtcNow;
-		switch (CKEHOEGLMBM.get_Type())
+		switch (message.get_Type())
 		{
 		case MessageTypes.Multiple:
-			lastReceivedMessage = CKEHOEGLMBM as MultiMessage;
+			lastReceivedMessage = message as MultiMessage;
 			if (lastReceivedMessage.GetIsInitialization())
 			{
 				HTTPManager.GetLogger().Information("SignalR Connection", "OnMessage - Init");
@@ -950,15 +950,15 @@ public sealed class Connection : IHeartbeat, IConnection
 			break;
 		case MessageTypes.MethodCall:
 		{
-			MethodCallMessage iFKLAELFLJL = CKEHOEGLMBM as MethodCallMessage;
-			Hub hGCBNOGDDPB = get_Item(iFKLAELFLJL.GetHub());
-			if (hGCBNOGDDPB != null)
+			MethodCallMessage methodCall = message as MethodCallMessage;
+			Hub hub = get_Item(methodCall.GetHub());
+			if (hub != null)
 			{
-				((IHub)hGCBNOGDDPB).OnMethod(iFKLAELFLJL);
+				((IHub)hub).OnMethod(methodCall);
 			}
 			else
 			{
-				HTTPManager.GetLogger().Warning("SignalR Connection", string.Format("Hub \"{0}\" not found!", iFKLAELFLJL.GetHub()));
+				HTTPManager.GetLogger().Warning("SignalR Connection", string.Format("Hub \"{0}\" not found!", methodCall.GetHub()));
 			}
 			break;
 		}
@@ -966,28 +966,28 @@ public sealed class Connection : IHeartbeat, IConnection
 		case MessageTypes.Failure:
 		case MessageTypes.Progress:
 		{
-			ulong eJPBNFMDJBJ = (CKEHOEGLMBM as IHubMessage).GetInvocationId();
-			Hub hGCBNOGDDPB = FindHub(eJPBNFMDJBJ);
-			if (hGCBNOGDDPB != null)
+			ulong messageId = (message as IHubMessage).GetInvocationId();
+			Hub hub = FindHub(messageId);
+			if (hub != null)
 			{
-				((IHub)hGCBNOGDDPB).OnMessage(CKEHOEGLMBM);
+				((IHub)hub).OnMessage(message);
 			}
 			else
 			{
-				HTTPManager.GetLogger().Warning("SignalR Connection", string.Format("No Hub found for Progress message! Id: {0}", eJPBNFMDJBJ.ToString()));
+				HTTPManager.GetLogger().Warning("SignalR Connection", string.Format("No Hub found for Progress message! Id: {0}", messageId.ToString()));
 			}
 			break;
 		}
 		case MessageTypes.Data:
 			if (OnNonHubMessage != null)
 			{
-				OnNonHubMessage(this, (CKEHOEGLMBM as DataMessage).GetData());
+				OnNonHubMessage(this, (message as DataMessage).GetData());
 			}
 			break;
 		case MessageTypes.KeepAlive:
 			break;
 		default:
-			HTTPManager.GetLogger().Warning("SignalR Connection", "Unknown message type received: " + CKEHOEGLMBM.get_Type());
+			HTTPManager.GetLogger().Warning("SignalR Connection", "Unknown message type received: " + message.get_Type());
 			break;
 		}
 	}
@@ -1005,9 +1005,9 @@ public sealed class Connection : IHeartbeat, IConnection
 			{
 				OnConnected(this);
 			}
-			catch (Exception mPFFFAOGBJE)
+			catch (Exception exception)
 			{
-				HTTPManager.GetLogger().Exception("SignalR Connection", "OnOpened", mPFFFAOGBJE);
+				HTTPManager.GetLogger().Exception("SignalR Connection", "OnOpened", exception);
 			}
 		}
 		if (bufferedMessages != null)
@@ -1037,9 +1037,9 @@ public sealed class Connection : IHeartbeat, IConnection
 		{
 			OnReconnected(this);
 		}
-		catch (Exception mPFFFAOGBJE)
+		catch (Exception exception)
 		{
-			HTTPManager.GetLogger().Exception("SignalR Connection", "OnReconnected", mPFFFAOGBJE);
+			HTTPManager.GetLogger().Exception("SignalR Connection", "OnReconnected", exception);
 		}
 	}
 
@@ -1048,14 +1048,14 @@ public sealed class Connection : IHeartbeat, IConnection
 		Close();
 	}
 
-	void IConnection.Error(string NEPOLDCKNJL)
+	void IConnection.Error(string error)
 	{
 		if (GetState() != ConnectionStates.Closed)
 		{
-			HTTPManager.GetLogger().Error("SignalR Connection", NEPOLDCKNJL);
+			HTTPManager.GetLogger().Error("SignalR Connection", error);
 			if (onErrorField != null)
 			{
-				onErrorField(this, NEPOLDCKNJL);
+				onErrorField(this, error);
 			}
 			if (GetState() == ConnectionStates.Connected || GetState() == ConnectionStates.Reconnecting)
 			{
@@ -1068,12 +1068,12 @@ public sealed class Connection : IHeartbeat, IConnection
 		}
 	}
 
-	Uri IConnection.BuildUri(SignalRRequestType LFLGCDNKNJI)
+	Uri IConnection.BuildUri(SignalRRequestType requestType)
 	{
-		return ((IConnection)this).BuildUri(LFLGCDNKNJI, (TransportBase)null);
+		return ((IConnection)this).BuildUri(requestType, (TransportBase)null);
 	}
 
-	Uri IConnection.BuildUri(SignalRRequestType LFLGCDNKNJI, TransportBase CHMELBKHOPP)
+	Uri IConnection.BuildUri(SignalRRequestType requestType, TransportBase transport)
 	{
 		lock (SyncRoot)
 		{
@@ -1084,13 +1084,13 @@ public sealed class Connection : IHeartbeat, IConnection
 				uriBuilder.Path += "/";
 			}
 			requestCounter %= ulong.MaxValue;
-			switch (LFLGCDNKNJI)
+			switch (requestType)
 			{
 			case SignalRRequestType.Negotiate:
 				uriBuilder.Path += "negotiate";
 				goto default;
 			case SignalRRequestType.Connect:
-				if (CHMELBKHOPP != null && CHMELBKHOPP.get_Type() == TransportTypes.WebSocket)
+				if (transport != null && transport.get_Type() == TransportTypes.WebSocket)
 				{
 					uriBuilder.Scheme = ((!HTTPProtocolFactory.IsSecureProtocol(GetUri())) ? "ws" : "wss");
 				}
@@ -1111,7 +1111,7 @@ public sealed class Connection : IHeartbeat, IConnection
 				uriBuilder.Path += "send";
 				goto default;
 			case SignalRRequestType.Reconnect:
-				if (CHMELBKHOPP != null && CHMELBKHOPP.get_Type() == TransportTypes.WebSocket)
+				if (transport != null && transport.get_Type() == TransportTypes.WebSocket)
 				{
 					uriBuilder.Scheme = ((!HTTPProtocolFactory.IsSecureProtocol(GetUri())) ? "ws" : "wss");
 				}
@@ -1150,10 +1150,10 @@ public sealed class Connection : IHeartbeat, IConnection
 				queryBuilder.Append(requestCounter++.ToString());
 				queryBuilder.Append("&_=");
 				queryBuilder.Append(GetTimestamp().ToString());
-				if (CHMELBKHOPP != null)
+				if (transport != null)
 				{
 					queryBuilder.Append("&transport=");
-					queryBuilder.Append(CHMELBKHOPP.get_Name());
+					queryBuilder.Append(transport.get_Name());
 				}
 				queryBuilder.Append("&clientProtocol=");
 				queryBuilder.Append(clientProtocol);
@@ -1179,40 +1179,40 @@ public sealed class Connection : IHeartbeat, IConnection
 		}
 	}
 
-	HTTPRequest IConnection.PrepareRequest(HTTPRequest CGOIOKHEGOE, SignalRRequestType LFLGCDNKNJI)
+	HTTPRequest IConnection.PrepareRequest(HTTPRequest request, SignalRRequestType requestType)
 	{
-		if (CGOIOKHEGOE != null && GetAuthenticationProvider() != null)
+		if (request != null && GetAuthenticationProvider() != null)
 		{
-			GetAuthenticationProvider().PrepareRequest(CGOIOKHEGOE, LFLGCDNKNJI);
+			GetAuthenticationProvider().PrepareRequest(request, requestType);
 		}
 		if (GetRequestPreparator() != null)
 		{
-			GetRequestPreparator()(this, CGOIOKHEGOE, LFLGCDNKNJI);
+			GetRequestPreparator()(this, request, requestType);
 		}
-		return CGOIOKHEGOE;
+		return request;
 	}
 
-	string IConnection.ParseResponse(string GHCCHADLAEK)
+	string IConnection.ParseResponse(string response)
 	{
-		Dictionary<string, object> dictionary = Json.Decode(GHCCHADLAEK) as Dictionary<string, object>;
+		Dictionary<string, object> dictionary = Json.Decode(response) as Dictionary<string, object>;
 		if (dictionary == null)
 		{
-			((IConnection)this).Error("Failed to parse Start response: " + GHCCHADLAEK);
+			((IConnection)this).Error("Failed to parse Start response: " + response);
 			return string.Empty;
 		}
 		object value;
 		if (!dictionary.TryGetValue("Response", out value) || value == null)
 		{
-			((IConnection)this).Error("No 'Response' key found in response: " + GHCCHADLAEK);
+			((IConnection)this).Error("No 'Response' key found in response: " + response);
 			return string.Empty;
 		}
 		return value.ToString();
 	}
 
-	void IHeartbeat.OnHeartbeatUpdate(TimeSpan OJOKANCMPLG)
+	void IHeartbeat.OnHeartbeatUpdate(TimeSpan elapsed)
 	{
-		ConnectionStates oHLFKFFAOMF = GetState();
-		if (oHLFKFFAOMF == ConnectionStates.Connected)
+		ConnectionStates state = GetState();
+		if (state == ConnectionStates.Connected)
 		{
 			if (GetTransport().GetSupportsKeepAlive() && GetNegotiationResult().GetKeepAliveTimeout().HasValue)
 			{
@@ -1228,8 +1228,8 @@ public sealed class Connection : IHeartbeat, IConnection
 			}
 			return;
 		}
-		DateTime? jEAPOHAGCLL = transportConnectionStartedAt;
-		if (jEAPOHAGCLL.HasValue)
+		DateTime? transportStart = transportConnectionStartedAt;
+		if (transportStart.HasValue)
 		{
 			DateTime? jEAPOHAGCLL2 = transportConnectionStartedAt;
 			TimeSpan? timeSpan2 = ((!jEAPOHAGCLL2.HasValue) ? ((TimeSpan?)null) : new TimeSpan?(DateTime.UtcNow - jEAPOHAGCLL2.GetValueOrDefault()));
@@ -1239,8 +1239,8 @@ public sealed class Connection : IHeartbeat, IConnection
 				((IConnection)this).Error("Transport failed to connect in the given time!");
 			}
 		}
-		DateTime? jNPJOFDOAAG = reconnectStartedAt;
-		if (jNPJOFDOAAG.HasValue)
+		DateTime? reconnectStart = reconnectStartedAt;
+		if (reconnectStart.HasValue)
 		{
 			DateTime? jNPJOFDOAAG2 = reconnectStartedAt;
 			TimeSpan? timeSpan3 = ((!jNPJOFDOAAG2.HasValue) ? ((TimeSpan?)null) : new TimeSpan?(DateTime.UtcNow - jNPJOFDOAAG2.GetValueOrDefault()));
@@ -1262,13 +1262,13 @@ public sealed class Connection : IHeartbeat, IConnection
 		HTTPManager.GetHeartbeats().Subscribe(this);
 	}
 
-	private Hub FindHub(ulong EJPBNFMDJBJ)
+	private Hub FindHub(ulong messageId)
 	{
 		if (GetHubs() != null)
 		{
 			for (int i = 0; i < GetHubs().Length; i++)
 			{
-				if (((IHub)GetHubs()[i]).HasSentMessageId(EJPBNFMDJBJ))
+				if (((IHub)GetHubs()[i]).HasSentMessageId(messageId))
 				{
 					return GetHubs()[i];
 				}
@@ -1320,16 +1320,16 @@ public sealed class Connection : IHeartbeat, IConnection
 		lastPingSentAt = DateTime.UtcNow;
 	}
 
-	private void OnPingRequestFinished(HTTPRequest CGOIOKHEGOE, HTTPResponse BEIGFGCBICO)
+	private void OnPingRequestFinished(HTTPRequest request, HTTPResponse response)
 	{
 		pingRequest = null;
 		string text = string.Empty;
-		switch (CGOIOKHEGOE.GetState())
+		switch (request.GetState())
 		{
 		case HTTPRequestStates.Finished:
-			if (BEIGFGCBICO.GetIsSuccess())
+			if (response.GetIsSuccess())
 			{
-				string text2 = ((IConnection)this).ParseResponse(BEIGFGCBICO.GetDataAsText());
+				string text2 = ((IConnection)this).ParseResponse(response.GetDataAsText());
 				if (text2 != "pong")
 				{
 					text = "Wrong answer for ping request: " + text2;
@@ -1341,11 +1341,11 @@ public sealed class Connection : IHeartbeat, IConnection
 			}
 			else
 			{
-				text = string.Format("Ping - Request Finished Successfully, but the server sent an error. Status Code: {0}-{1} Message: {2}", BEIGFGCBICO.GetStatusCode(), BEIGFGCBICO.GetMessage(), BEIGFGCBICO.GetDataAsText());
+				text = string.Format("Ping - Request Finished Successfully, but the server sent an error. Status Code: {0}-{1} Message: {2}", response.GetStatusCode(), response.GetMessage(), response.GetDataAsText());
 			}
 			break;
 		case HTTPRequestStates.Error:
-			text = "Ping - Request Finished with Error! " + ((CGOIOKHEGOE.GetException() == null) ? "No Exception" : (CGOIOKHEGOE.GetException().Message + "\n" + CGOIOKHEGOE.GetException().StackTrace));
+			text = "Ping - Request Finished with Error! " + ((request.GetException() == null) ? "No Exception" : (request.GetException().Message + "\n" + request.GetException().StackTrace));
 			break;
 		case HTTPRequestStates.ConnectionTimedOut:
 			text = "Ping - Connection Timed Out!";

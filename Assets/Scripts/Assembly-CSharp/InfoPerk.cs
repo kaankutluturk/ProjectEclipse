@@ -95,15 +95,15 @@ public partial class InfoPerk
 		while (num < activeActions.Count)
 		{
 			count = activeActions.Count;
-			PerksStage.ActionPerk oAJGINIDKJD = activeActions[num];
-			ApplyHealthChangeTick(oAJGINIDKJD);
-			if (oAJGINIDKJD.DurationFrames > 0)
+			PerksStage.ActionPerk actionPerk = activeActions[num];
+			ApplyHealthChangeTick(actionPerk);
+			if (actionPerk.DurationFrames > 0)
 			{
-				if (oAJGINIDKJD.ElapsedFrames >= oAJGINIDKJD.DurationFrames || oAJGINIDKJD.IsExpired)
+				if (actionPerk.ElapsedFrames >= actionPerk.DurationFrames || actionPerk.IsExpired)
 				{
-					ExpireAction(oAJGINIDKJD);
+					ExpireAction(actionPerk);
 				}
-				oAJGINIDKJD.ElapsedFrames++;
+				actionPerk.ElapsedFrames++;
 			}
 			if (count == activeActions.Count)
 			{
@@ -112,11 +112,11 @@ public partial class InfoPerk
 		}
 	}
 
-	private void ApplyHealthChangeTick(PerksStage.ActionPerk IBODMPMJELJ)
+	private void ApplyHealthChangeTick(PerksStage.ActionPerk actionPerk)
 	{
-		if (IBODMPMJELJ.Action.get_Type() == ActionType.ACTION_MOD_HEALTH_CHANGE)
+		if (actionPerk.Action.get_Type() == ActionType.ACTION_MOD_HEALTH_CHANGE)
 		{
-			ApplyHealthChange(IBODMPMJELJ);
+			ApplyHealthChange(actionPerk);
 		}
 	}
 
@@ -129,143 +129,143 @@ public partial class InfoPerk
 		}
 	}
 
-	private void LogModEvent(PerksStage.ActionPerk IBODMPMJELJ, bool PENNHKHFEOM)
+	private void LogModEvent(PerksStage.ActionPerk actionPerk, bool isStart)
 	{
 		StringBuilder stringBuilder = new StringBuilder();
 		stringBuilder.Append("PERK ----- ");
-		stringBuilder.Append((!PENNHKHFEOM) ? "ModDestruction " : "ModStart ");
+		stringBuilder.Append((!isStart) ? "ModDestruction " : "ModStart ");
 		stringBuilder.Append("PerkName: {0} ModName: {1} ModXML: {2}");
 		if (LogRules.GetInstance().GetLogPerks())
 		{
-			GameLog.Info(stringBuilder.ToString(), IBODMPMJELJ.Action.GetTrigger().GetPerk().Name, IBODMPMJELJ.Action.get_Name(), IBODMPMJELJ.Action.GetElementName());
+			GameLog.Info(stringBuilder.ToString(), actionPerk.Action.GetTrigger().GetPerk().Name, actionPerk.Action.get_Name(), actionPerk.Action.GetElementName());
 		}
 	}
 
-	public void ExecuteActions(List<PerksStage.ActionPerk> AFENHJFICNN)
+	public void ExecuteActions(List<PerksStage.ActionPerk> perkActions)
 	{
-		foreach (PerksStage.ActionPerk item in AFENHJFICNN)
+		foreach (PerksStage.ActionPerk item in perkActions)
 		{
-			PerksStage.ActionPerk oAJGINIDKJD = ((!item.Action.GetModificator()) ? item : new PerksStage.ActionPerk(item));
+			PerksStage.ActionPerk actionPerk = ((!item.Action.GetModificator()) ? item : new PerksStage.ActionPerk(item));
 			switch (item.Action.get_Type())
 			{
 			case ActionType.ACTION_SHOW_ICONS:
-				ApplyShowIcon(oAJGINIDKJD, false);
+				ApplyShowIcon(actionPerk, false);
 				break;
 			case ActionType.ACTION_MOD_HEALTH_CHANGE:
-				ApplyHealthChangeStart(oAJGINIDKJD, false);
+				ApplyHealthChangeStart(actionPerk, false);
 				break;
 			case ActionType.ACTION_SET_ATTRIBUTES:
-				ApplySetAttributes(oAJGINIDKJD, false);
+				ApplySetAttributes(actionPerk, false);
 				break;
 			case ActionType.ACTION_INVISIBILITY:
-				ApplyInvisibility(oAJGINIDKJD, false);
+				ApplyInvisibility(actionPerk, false);
 				break;
 			case ActionType.ACTION_DISABLE_INTERVAL:
-				ApplyDisableInterval(oAJGINIDKJD);
+				ApplyDisableInterval(actionPerk);
 				break;
 			case ActionType.ACTION_SET_HIT:
-				ApplySetHit(oAJGINIDKJD);
+				ApplySetHit(actionPerk);
 				break;
 			case ActionType.ACTION_LIFE_STEAL:
-				ApplyLifeSteal(oAJGINIDKJD);
+				ApplyLifeSteal(actionPerk);
 				break;
 			case ActionType.ACTION_ADD_BULLETS:
-				ApplyAddBullets(oAJGINIDKJD);
+				ApplyAddBullets(actionPerk);
 				break;
 			case ActionType.ACTION_ADD_MAGIC:
-				ApplyAddMagicCharge(oAJGINIDKJD);
+				ApplyAddMagicCharge(actionPerk);
 				break;
 			case ActionType.ACTION_SET_MOD_FRAMES:
-				ApplySetModFrames(oAJGINIDKJD);
+				ApplySetModFrames(actionPerk);
 				break;
 			case ActionType.ACTION_MOD_EFFECT:
-				ApplySetModEffect(oAJGINIDKJD);
+				ApplySetModEffect(actionPerk);
 				break;
 			case ActionType.ACTION_PROVOKE:
-				ApplyProvoke(oAJGINIDKJD);
+				ApplyProvoke(actionPerk);
 				break;
 			case ActionType.ACTION_SET_TACTICS:
-				ApplySetTactics(oAJGINIDKJD);
+				ApplySetTactics(actionPerk);
 				break;
 			case ActionType.ACTION_CLEAR_ACTION:
-				ApplyClearAction(oAJGINIDKJD);
+				ApplyClearAction(actionPerk);
 				break;
 			case ActionType.ACTION_VARIABLE:
-				ApplyVariable(oAJGINIDKJD);
+				ApplyVariable(actionPerk);
 				break;
 			case ActionType.ACTION_SET_VARIABLE:
-				ApplySetVariable(oAJGINIDKJD);
+				ApplySetVariable(actionPerk);
 				break;
 			case ActionType.ACTION_SET_COOLDOWN:
-				ApplySetCooldown(oAJGINIDKJD);
+				ApplySetCooldown(actionPerk);
 				break;
 			case ActionType.ACTION_CHANGE_IMPULSE:
-				ApplyChangeImpulse(oAJGINIDKJD, false);
+				ApplyChangeImpulse(actionPerk, false);
 				break;
 			case ActionType.ACTION_CHANGE_HIT_EFFECT_SCALE:
-				ApplyChangeHitEffectScale(oAJGINIDKJD, false);
+				ApplyChangeHitEffectScale(actionPerk, false);
 				break;
 			case ActionType.ACTION_CHANGE_ADD_DAMAGE_VALUE:
-				ApplyChangeAdditionalDamage(oAJGINIDKJD, false);
+				ApplyChangeAdditionalDamage(actionPerk, false);
 				break;
 			case ActionType.ACTION_CHANGE_MODEL_COLOR:
-				ApplyChangeModelColor(oAJGINIDKJD, false);
+				ApplyChangeModelColor(actionPerk, false);
 				break;
 			case ActionType.ACTION_SLOW_MODEL:
-				ApplySlowModel(oAJGINIDKJD, false);
+				ApplySlowModel(actionPerk, false);
 				break;
 			case ActionType.ACTION_TURN_OFF_COLLISION:
-				ApplyTurnOffCollision(oAJGINIDKJD, false);
+				ApplyTurnOffCollision(actionPerk, false);
 				break;
 			case ActionType.ACTION_SWITCH:
-				ApplySwitch(oAJGINIDKJD);
+				ApplySwitch(actionPerk);
 				break;
 			case ActionType.ACTION_MARK_PERK_USED:
 				PerksStage.IncrementPerkUse(Data.PerkInfo.Name);
 				break;
 			case ActionType.ACTION_PERK_AREA:
-				ApplyPerkArea(oAJGINIDKJD, false);
+				ApplyPerkArea(actionPerk, false);
 				break;
 			case ActionType.ACTION_MOVE_MODEL:
-				ApplyMoveModel(oAJGINIDKJD);
+				ApplyMoveModel(actionPerk);
 				break;
 			case ActionType.ACTION_SET_MOVES_VARIABLE:
-				ApplySetMovesVariable(oAJGINIDKJD);
+				ApplySetMovesVariable(actionPerk);
 				break;
 			case ActionType.ACTION_STEAL_MAGIC:
-				ApplyStealMagic(oAJGINIDKJD, false);
+				ApplyStealMagic(actionPerk, false);
 				break;
 			}
 			if (item.Action.GetModificator())
 			{
-				activeActions.Add(oAJGINIDKJD);
-				activeActionNames.Add(oAJGINIDKJD.Action.get_Name());
-				PerkActionModificator cKCICHAIMFL = (PerkActionModificator)oAJGINIDKJD.Action;
-				if (cKCICHAIMFL.GetNamespace() != string.Empty)
+				activeActions.Add(actionPerk);
+				activeActionNames.Add(actionPerk.Action.get_Name());
+				PerkActionModificator modificator = (PerkActionModificator)actionPerk.Action;
+				if (modificator.GetNamespace() != string.Empty)
 				{
-					PerksStage.RegisterNamespaceAction(oAJGINIDKJD);
+					PerksStage.RegisterNamespaceAction(actionPerk);
 				}
 			}
 			LogModEvent(item, true);
 		}
-		AFENHJFICNN.Clear();
+		perkActions.Clear();
 		ClearActions();
 	}
 
-	private void ApplyShowIcon(PerksStage.ActionPerk IBODMPMJELJ, bool CCBEDPIHKAD)
+	private void ApplyShowIcon(PerksStage.ActionPerk actionPerk, bool isRemoval)
 	{
-		if (!CCBEDPIHKAD)
+		if (!isRemoval)
 		{
 			MarkPerkUsed();
 		}
-		PerkActionShowIcon fMJDHMBCMKL = (PerkActionShowIcon)IBODMPMJELJ.Action;
-		string image = (fMJDHMBCMKL.GetImage() != string.Empty)
-			? fMJDHMBCMKL.GetImage()
+		PerkActionShowIcon showIconAction = (PerkActionShowIcon)actionPerk.Action;
+		string image = (showIconAction.GetImage() != string.Empty)
+			? showIconAction.GetImage()
 			: Data.PerkInfo.ImageName;
-		IBODMPMJELJ.IconPath = ResolveIconPath(image);
-		IBODMPMJELJ.ShowExpiration = fMJDHMBCMKL.GetShowExpiration();
-		IBODMPMJELJ.ExpirationVersion = fMJDHMBCMKL.GetExpirationVer();
-		IBODMPMJELJ.TargetModel.NotifyPerkAction(IBODMPMJELJ, CCBEDPIHKAD);
+		actionPerk.IconPath = ResolveIconPath(image);
+		actionPerk.ShowExpiration = showIconAction.GetShowExpiration();
+		actionPerk.ExpirationVersion = showIconAction.GetExpirationVer();
+		actionPerk.TargetModel.NotifyPerkAction(actionPerk, isRemoval);
 	}
 
 	private static string ResolveIconPath(string image)
@@ -277,21 +277,21 @@ public partial class InfoPerk
 			: string.Format("{0}{1}", SF2Paths.GetSkillsUiPath(), image ?? string.Empty);
 	}
 
-	private void ApplyHealthChangeStart(PerksStage.ActionPerk IBODMPMJELJ, bool CCBEDPIHKAD)
+	private void ApplyHealthChangeStart(PerksStage.ActionPerk actionPerk, bool isRemoval)
 	{
 	}
 
-	private void ApplySetAttributes(PerksStage.ActionPerk IBODMPMJELJ, bool CCBEDPIHKAD)
+	private void ApplySetAttributes(PerksStage.ActionPerk actionPerk, bool isRemoval)
 	{
-		int num = ((!CCBEDPIHKAD) ? 1 : (-1));
-		PerkActionSetAttributes aHFKENAALLF = (PerkActionSetAttributes)IBODMPMJELJ.Action;
-        var applied = CCBEDPIHKAD ? IBODMPMJELJ.AppliedAttributes : null;
+		int num = ((!isRemoval) ? 1 : (-1));
+		PerkActionSetAttributes setAttributesAction = (PerkActionSetAttributes)actionPerk.Action;
+        var applied = isRemoval ? actionPerk.AppliedAttributes : null;
         if (applied == null)
         {
             // Resolve every expression before mutation, and retain the normalized
             // deltas so expiry does not reevaluate a changed combat context.
             applied = new Dictionary<string, int>();
-            foreach (var item in aHFKENAALLF.GetAttributes())
+            foreach (var item in setAttributesAction.GetAttributes())
             {
                 var attributes = new Attributes();
                 attributes.Set(item.Key, item.Value.Calculate().ToInt());
@@ -300,18 +300,18 @@ public partial class InfoPerk
                 applied.Add(item.Key, amount);
             }
         }
-        if (!CCBEDPIHKAD) IBODMPMJELJ.AppliedAttributes = applied;
+        if (!isRemoval) actionPerk.AppliedAttributes = applied;
 		foreach (var item in applied)
 		{
 			string key = item.Key;
-			int OEMALIFPGPO = item.Value;
+			int attributeDelta = item.Value;
 			int OEMALIFPGPO2 = 0;
-			IBODMPMJELJ.TargetModel.Parameters.FinalAttributes.Get(key, ref OEMALIFPGPO2, false, true);
-			IBODMPMJELJ.TargetModel.Parameters.FinalAttributes.Set(key, OEMALIFPGPO2 + OEMALIFPGPO * num, true);
-			if (key == "DamageFactor" && !CCBEDPIHKAD && GetIsOwnerPlayer())
+			actionPerk.TargetModel.Parameters.FinalAttributes.Get(key, ref OEMALIFPGPO2, false, true);
+			actionPerk.TargetModel.Parameters.FinalAttributes.Set(key, OEMALIFPGPO2 + attributeDelta * num, true);
+			if (key == "DamageFactor" && !isRemoval && GetIsOwnerPlayer())
 			{
-				Model.StrikeResult gHHCDAFIKJE = IBODMPMJELJ.SourceModel.LastStrike;
-				gHHCDAFIKJE.AddProcedPerk(Data.PerkInfo.Id);
+				Model.StrikeResult strikeResult = actionPerk.SourceModel.LastStrike;
+				strikeResult.AddProcedPerk(Data.PerkInfo.Id);
 			}
 		}
 	}
@@ -368,50 +368,50 @@ public partial class InfoPerk
         };
     }
 
-	private void ApplyChangeImpulse(PerksStage.ActionPerk IBODMPMJELJ, bool CCBEDPIHKAD)
+	private void ApplyChangeImpulse(PerksStage.ActionPerk actionPerk, bool isRemoval)
 	{
-		PerkActionChangeImpulse nKPJIECMIJB = (PerkActionChangeImpulse)IBODMPMJELJ.Action;
-		float dHDMNHCIPEH = nKPJIECMIJB.GetMultiplierX();
-		float bGEEALIPKCC = nKPJIECMIJB.GetMultiplierY();
-		float lKPCKJOLJDO = nKPJIECMIJB.GetMultiplierZ();
-		if (CCBEDPIHKAD)
+		PerkActionChangeImpulse changeImpulseAction = (PerkActionChangeImpulse)actionPerk.Action;
+		float multiplierX = changeImpulseAction.GetMultiplierX();
+		float multiplierY = changeImpulseAction.GetMultiplierY();
+		float multiplierZ = changeImpulseAction.GetMultiplierZ();
+		if (isRemoval)
 		{
-			IBODMPMJELJ.TargetModel.ResetImpulseFactor();
+			actionPerk.TargetModel.ResetImpulseFactor();
 		}
 		else
 		{
-			IBODMPMJELJ.TargetModel.SetImpulseFactor(dHDMNHCIPEH, bGEEALIPKCC, lKPCKJOLJDO);
+			actionPerk.TargetModel.SetImpulseFactor(multiplierX, multiplierY, multiplierZ);
 		}
 	}
 
-	private void ApplyChangeHitEffectScale(PerksStage.ActionPerk IBODMPMJELJ, bool CCBEDPIHKAD)
+	private void ApplyChangeHitEffectScale(PerksStage.ActionPerk actionPerk, bool isRemoval)
 	{
-		PerkActionChangeHitEffectScale aCEHLJCDLKB = (PerkActionChangeHitEffectScale)IBODMPMJELJ.Action;
-		float bAINMLLIKOL = aCEHLJCDLKB.GetHitEffectScale();
-		if (CCBEDPIHKAD)
+		PerkActionChangeHitEffectScale hitEffectScaleAction = (PerkActionChangeHitEffectScale)actionPerk.Action;
+		float hitEffectScale = hitEffectScaleAction.GetHitEffectScale();
+		if (isRemoval)
 		{
-			IBODMPMJELJ.TargetModel.ResetHitEffectScale();
+			actionPerk.TargetModel.ResetHitEffectScale();
 		}
 		else
 		{
-			IBODMPMJELJ.TargetModel.set_HitEffectScale(bAINMLLIKOL);
+			actionPerk.TargetModel.set_HitEffectScale(hitEffectScale);
 		}
 	}
 
-	private void ApplyChangeAdditionalDamage(PerksStage.ActionPerk IBODMPMJELJ, bool CCBEDPIHKAD)
+	private void ApplyChangeAdditionalDamage(PerksStage.ActionPerk actionPerk, bool isRemoval)
 	{
-		PerkActionChangeAdditionalDamageValue dMPBHHGACBP = (PerkActionChangeAdditionalDamageValue)IBODMPMJELJ.Action;
-		float bAINMLLIKOL = dMPBHHGACBP.GetAdditionalDamageValue();
-		if (CCBEDPIHKAD)
+		PerkActionChangeAdditionalDamageValue additionalDamageAction = (PerkActionChangeAdditionalDamageValue)actionPerk.Action;
+		float additionalDamage = additionalDamageAction.GetAdditionalDamageValue();
+		if (isRemoval)
 		{
-			IBODMPMJELJ.TargetModel.SetAdditionalDamageToOne();
+			actionPerk.TargetModel.SetAdditionalDamageToOne();
 			return;
 		}
-		IBODMPMJELJ.TargetModel.set_AdditionalDamageValue(bAINMLLIKOL);
+		actionPerk.TargetModel.set_AdditionalDamageValue(additionalDamage);
 		if (GetIsOwnerPlayer())
 		{
-			Model.StrikeResult gHHCDAFIKJE = IBODMPMJELJ.SourceModel.LastStrike;
-			gHHCDAFIKJE.AddProcedPerk(Data.PerkInfo.Id);
+			Model.StrikeResult strikeResult = actionPerk.SourceModel.LastStrike;
+			strikeResult.AddProcedPerk(Data.PerkInfo.Id);
 		}
 	}
 
@@ -511,226 +511,226 @@ public partial class InfoPerk
 		}
 	}
 
-	private void ApplyInvisibility(PerksStage.ActionPerk IBODMPMJELJ, bool CCBEDPIHKAD)
+	private void ApplyInvisibility(PerksStage.ActionPerk actionPerk, bool isRemoval)
 	{
-		Fight gDBOMJODDEA = Fight.GetCurrentFight();
-		if (gDBOMJODDEA != null)
+		Fight fight = Fight.GetCurrentFight();
+		if (fight != null)
 		{
-			gDBOMJODDEA.SetModelVisible(IBODMPMJELJ.TargetModel, CCBEDPIHKAD);
+			fight.SetModelVisible(actionPerk.TargetModel, isRemoval);
 		}
 	}
 
-	private void ApplyDisableInterval(PerksStage.ActionPerk IBODMPMJELJ)
+	private void ApplyDisableInterval(PerksStage.ActionPerk actionPerk)
 	{
-		PerkActionDisableInterval dDALHNPFHAO = (PerkActionDisableInterval)IBODMPMJELJ.Action;
-		if (dDALHNPFHAO.GetIntervalType() != string.Empty)
+		PerkActionDisableInterval disableIntervalAction = (PerkActionDisableInterval)actionPerk.Action;
+		if (disableIntervalAction.GetIntervalType() != string.Empty)
 		{
-			IntervalAnimation.IntervalType lFLGCDNKNJI = IntervalAnimation.ParseIntervalType(dDALHNPFHAO.GetIntervalType());
-			IBODMPMJELJ.TargetModel.RemoveInterval(lFLGCDNKNJI);
+			IntervalAnimation.IntervalType intervalType = IntervalAnimation.ParseIntervalType(disableIntervalAction.GetIntervalType());
+			actionPerk.TargetModel.RemoveInterval(intervalType);
 		}
-		else if (dDALHNPFHAO.GetIntervalName() != string.Empty)
+		else if (disableIntervalAction.GetIntervalName() != string.Empty)
 		{
-			IBODMPMJELJ.TargetModel.RemoveInterval(dDALHNPFHAO.GetIntervalName());
-		}
-	}
-
-	private void ApplyLifeSteal(PerksStage.ActionPerk IBODMPMJELJ)
-	{
-		Fight gDBOMJODDEA = Fight.GetCurrentFight();
-		if (gDBOMJODDEA != null)
-		{
-			PerkActionLifesteal gGFKBGKDALP = (PerkActionLifesteal)IBODMPMJELJ.Action;
-			Model.StrikeResult gHHCDAFIKJE = IBODMPMJELJ.SourceModel.LastStrike;
-			float num = (ObscuredFloat)(IBODMPMJELJ.TargetModel.Parameters.GetCurrentLife());
-			float aACBFABMADJ = gGFKBGKDALP.GetDamagePart() * gHHCDAFIKJE.FinalDamage * (IBODMPMJELJ.TargetModel.GetCombatTarget().GetPowerMultiplier() / gHHCDAFIKJE.Victim.GetPowerMultiplier());
-			gDBOMJODDEA.UpdateLife(IBODMPMJELJ.TargetModel, aACBFABMADJ);
+			actionPerk.TargetModel.RemoveInterval(disableIntervalAction.GetIntervalName());
 		}
 	}
 
-	private void ApplySetHit(PerksStage.ActionPerk IBODMPMJELJ)
+	private void ApplyLifeSteal(PerksStage.ActionPerk actionPerk)
 	{
-		PerkActionSetHit jLKGFCFBJGE = (PerkActionSetHit)IBODMPMJELJ.Action;
-		Model bIKLKJMNGKP = IBODMPMJELJ.SourceModel;
-		Model.StrikeResult gHHCDAFIKJE = bIKLKJMNGKP.LastStrike;
+		Fight fight = Fight.GetCurrentFight();
+		if (fight != null)
+		{
+			PerkActionLifesteal lifestealAction = (PerkActionLifesteal)actionPerk.Action;
+			Model.StrikeResult strikeResult = actionPerk.SourceModel.LastStrike;
+			float num = (ObscuredFloat)(actionPerk.TargetModel.Parameters.GetCurrentLife());
+			float healAmount = lifestealAction.GetDamagePart() * strikeResult.FinalDamage * (actionPerk.TargetModel.GetCombatTarget().GetPowerMultiplier() / strikeResult.Victim.GetPowerMultiplier());
+			fight.UpdateLife(actionPerk.TargetModel, healAmount);
+		}
+	}
+
+	private void ApplySetHit(PerksStage.ActionPerk actionPerk)
+	{
+		PerkActionSetHit setHitAction = (PerkActionSetHit)actionPerk.Action;
+		Model sourceModel = actionPerk.SourceModel;
+		Model.StrikeResult strikeResult = sourceModel.LastStrike;
 		bool flag = true;
-		if (jLKGFCFBJGE.GetCritical() > -1)
+		if (setHitAction.GetCritical() > -1)
 		{
-			gHHCDAFIKJE.IsCritical = jLKGFCFBJGE.GetCritical() > 0;
-			if (!gHHCDAFIKJE.IsCritical)
+			strikeResult.IsCritical = setHitAction.GetCritical() > 0;
+			if (!strikeResult.IsCritical)
 			{
 				flag = false;
 			}
 		}
-		if (jLKGFCFBJGE.GetShock() > -1)
+		if (setHitAction.GetShock() > -1)
 		{
-			gHHCDAFIKJE.IsShock = jLKGFCFBJGE.GetShock() > 0;
+			strikeResult.IsShock = setHitAction.GetShock() > 0;
 		}
-		if (jLKGFCFBJGE.GetDisarm() > -1)
+		if (setHitAction.GetDisarm() > -1)
 		{
-			gHHCDAFIKJE.IsDisarm = jLKGFCFBJGE.GetDisarm() > 0;
+			strikeResult.IsDisarm = setHitAction.GetDisarm() > 0;
 		}
-		if (jLKGFCFBJGE.GetBlock() > -1)
+		if (setHitAction.GetBlock() > -1)
 		{
-			gHHCDAFIKJE.IsBlocked = jLKGFCFBJGE.GetBlock() > 0;
+			strikeResult.IsBlocked = setHitAction.GetBlock() > 0;
 		}
-		if (jLKGFCFBJGE.GetDamage() != null)
+		if (setHitAction.GetDamage() != null)
 		{
-			FunctionResult dEIHAOLOPLC = jLKGFCFBJGE.GetDamage().Calculate();
-			gHHCDAFIKJE.RawDamage = dEIHAOLOPLC.ToFloat();
-			gHHCDAFIKJE.FinalDamage = dEIHAOLOPLC.ToFloat();
+			FunctionResult damageResult = setHitAction.GetDamage().Calculate();
+			strikeResult.RawDamage = damageResult.ToFloat();
+			strikeResult.FinalDamage = damageResult.ToFloat();
 		}
 		if (GetIsOwnerPlayer() && flag)
 		{
-			gHHCDAFIKJE.AddProcedPerk(Data.PerkInfo.Id);
+			strikeResult.AddProcedPerk(Data.PerkInfo.Id);
 		}
 	}
 
-	private void ApplySetTactics(PerksStage.ActionPerk IBODMPMJELJ)
+	private void ApplySetTactics(PerksStage.ActionPerk actionPerk)
 	{
-		PerkActionSetTactics fBDAHEODOGP = (PerkActionSetTactics)IBODMPMJELJ.Action;
-		IBODMPMJELJ.TargetModel.ChangeAiTactic(fBDAHEODOGP.GetTactics());
+		PerkActionSetTactics setTacticsAction = (PerkActionSetTactics)actionPerk.Action;
+		actionPerk.TargetModel.ChangeAiTactic(setTacticsAction.GetTactics());
 	}
 
-	private void ApplyAddBullets(PerksStage.ActionPerk IBODMPMJELJ)
+	private void ApplyAddBullets(PerksStage.ActionPerk actionPerk)
 	{
-		PerkActionAddBullets cLBEGGLEHMB = (PerkActionAddBullets)IBODMPMJELJ.Action;
-		FunctionResult dEIHAOLOPLC = cLBEGGLEHMB.GetValue().Calculate();
-		int fOIPKLDNGDL = dEIHAOLOPLC.ToInt();
-		if (cLBEGGLEHMB.GetBulletType() == "MagicBullet")
+		PerkActionAddBullets addBulletsAction = (PerkActionAddBullets)actionPerk.Action;
+		FunctionResult bulletsResult = addBulletsAction.GetValue().Calculate();
+		int bulletCount = bulletsResult.ToInt();
+		if (addBulletsAction.GetBulletType() == "MagicBullet")
 		{
-			IBODMPMJELJ.TargetModel.AddMagicCharges(fOIPKLDNGDL);
-			IBODMPMJELJ.TargetModel.UpdateMagicButton();
+			actionPerk.TargetModel.AddMagicCharges(bulletCount);
+			actionPerk.TargetModel.UpdateMagicButton();
 		}
 	}
 
-	private void ApplyAddMagicCharge(PerksStage.ActionPerk IBODMPMJELJ)
+	private void ApplyAddMagicCharge(PerksStage.ActionPerk actionPerk)
 	{
-		PerkActionAddMagicCharge aMOILMJLADC = (PerkActionAddMagicCharge)IBODMPMJELJ.Action;
-		FunctionResult dEIHAOLOPLC = aMOILMJLADC.GetValue().Calculate();
-		float fOIPKLDNGDL = dEIHAOLOPLC.ToFloat();
-		IBODMPMJELJ.TargetModel.AddMagicChargeFraction(fOIPKLDNGDL);
-		IBODMPMJELJ.TargetModel.UpdateMagicButton();
+		PerkActionAddMagicCharge addMagicChargeAction = (PerkActionAddMagicCharge)actionPerk.Action;
+		FunctionResult chargeResult = addMagicChargeAction.GetValue().Calculate();
+		float chargeFraction = chargeResult.ToFloat();
+		actionPerk.TargetModel.AddMagicChargeFraction(chargeFraction);
+		actionPerk.TargetModel.UpdateMagicButton();
 	}
 
-	private void ApplySetModFrames(PerksStage.ActionPerk IBODMPMJELJ)
+	private void ApplySetModFrames(PerksStage.ActionPerk actionPerk)
 	{
 		MarkPerkUsed();
-		PerkActionSetModFrames iGDDHFCDELM = (PerkActionSetModFrames)IBODMPMJELJ.Action;
-		iGDDHFCDELM.GetModFrames().Calculate();
-		FunctionResult dEIHAOLOPLC = iGDDHFCDELM.GetModFrames().Calculate();
-		int fLNLMIHEDCI = dEIHAOLOPLC.ToInt();
+		PerkActionSetModFrames setModFramesAction = (PerkActionSetModFrames)actionPerk.Action;
+		setModFramesAction.GetModFrames().Calculate();
+		FunctionResult framesResult = setModFramesAction.GetModFrames().Calculate();
+		int durationFrames = framesResult.ToInt();
 		foreach (PerksStage.ActionPerk item in activeActions)
 		{
-			if (iGDDHFCDELM.GetModName() == item.Action.get_Name())
+			if (setModFramesAction.GetModName() == item.Action.get_Name())
 			{
-				item.DurationFrames = fLNLMIHEDCI;
+				item.DurationFrames = durationFrames;
 				item.ElapsedFrames = 0;
 			}
 		}
-		if (iGDDHFCDELM.GetNamespace() == null || !(iGDDHFCDELM.GetNamespace() != string.Empty))
+		if (setModFramesAction.GetNamespace() == null || !(setModFramesAction.GetNamespace() != string.Empty))
 		{
 			return;
 		}
-		List<PerksStage.ActionPerk> list = PerksStage.GetNamespaceActions(iGDDHFCDELM.GetNamespace());
+		List<PerksStage.ActionPerk> list = PerksStage.GetNamespaceActions(setModFramesAction.GetNamespace());
 		if (list == null)
 		{
 			return;
 		}
 		foreach (PerksStage.ActionPerk item2 in list)
 		{
-			if (iGDDHFCDELM.GetModName().Equals(item2.Action.get_Name()))
+			if (setModFramesAction.GetModName().Equals(item2.Action.get_Name()))
 			{
-				item2.DurationFrames = fLNLMIHEDCI;
+				item2.DurationFrames = durationFrames;
 				item2.ElapsedFrames = 0;
 			}
 		}
 	}
 
-	private void ApplySetModEffect(PerksStage.ActionPerk IBODMPMJELJ)
+	private void ApplySetModEffect(PerksStage.ActionPerk actionPerk)
 	{
-		PerkActionSetModEffect fBLKPCHKAHM = (PerkActionSetModEffect)IBODMPMJELJ.Action;
-		string text = fBLKPCHKAHM.GetNamespace();
+		PerkActionSetModEffect setModEffectAction = (PerkActionSetModEffect)actionPerk.Action;
+		string text = setModEffectAction.GetNamespace();
 		if (text != null && text != string.Empty)
 		{
-			PerksStage.ActionPerk oAJGINIDKJD = PerksStage.FindNamespaceAction(fBLKPCHKAHM.GetModName(), text);
-			if (oAJGINIDKJD != null)
+			PerksStage.ActionPerk replacedAction = PerksStage.FindNamespaceAction(setModEffectAction.GetModName(), text);
+			if (replacedAction != null)
 			{
-				oAJGINIDKJD.TargetModel.NotifyPerkActionReplaced(oAJGINIDKJD, IBODMPMJELJ);
+				replacedAction.TargetModel.NotifyPerkActionReplaced(replacedAction, actionPerk);
 			}
 			return;
 		}
 		foreach (PerksStage.ActionPerk item in activeActions)
 		{
-			if (fBLKPCHKAHM.GetModName() == item.Action.get_Name())
+			if (setModEffectAction.GetModName() == item.Action.get_Name())
 			{
-				item.TargetModel.NotifyPerkActionReplaced(item, IBODMPMJELJ);
+				item.TargetModel.NotifyPerkActionReplaced(item, actionPerk);
 			}
 		}
 	}
 
-	private void ApplyProvoke(PerksStage.ActionPerk IBODMPMJELJ)
+	private void ApplyProvoke(PerksStage.ActionPerk actionPerk)
 	{
-		Fight gDBOMJODDEA = Fight.GetCurrentFight();
-		if (gDBOMJODDEA == null)
+		Fight fight = Fight.GetCurrentFight();
+		if (fight == null)
 		{
 			return;
 		}
-		PerkActionProvoke bLAIFJHNJIO = (PerkActionProvoke)IBODMPMJELJ.Action;
-		PerkInfoItem aCONCDFDNJH = bLAIFJHNJIO.GetTrigger().GetPerk();
-		InfoPerk bPDFFLADJMJ = gDBOMJODDEA.GetPerksStage().FindInfoPerk(IBODMPMJELJ.TargetModel, aCONCDFDNJH);
-		if (bPDFFLADJMJ != null)
+		PerkActionProvoke provokeAction = (PerkActionProvoke)actionPerk.Action;
+		PerkInfoItem triggerPerk = provokeAction.GetTrigger().GetPerk();
+		InfoPerk provokedInfoPerk = fight.GetPerksStage().FindInfoPerk(actionPerk.TargetModel, triggerPerk);
+		if (provokedInfoPerk != null)
 		{
-			List<string> list = bPDFFLADJMJ.GetActiveActionNames();
+			List<string> list = provokedInfoPerk.GetActiveActionNames();
 		}
 		List<PerkTrigger> list2 = new List<PerkTrigger>();
-		foreach (PerkTrigger item in aCONCDFDNJH.GetTriggers())
+		foreach (PerkTrigger item in triggerPerk.GetTriggers())
 		{
-			if (item.get_Name() == bLAIFJHNJIO.GetProvokeTrigger() && item.AreConditionsMet(IBODMPMJELJ.TargetModel, GetActiveActionNames()))
+			if (item.get_Name() == provokeAction.GetProvokeTrigger() && item.AreConditionsMet(actionPerk.TargetModel, GetActiveActionNames()))
 			{
 				list2.Add(item);
 			}
 		}
 		foreach (PerkTrigger item2 in list2)
 		{
-			gDBOMJODDEA.GetPerksStage().ExecuteTriggerActions(IBODMPMJELJ.TargetModel, item2, true);
+			fight.GetPerksStage().ExecuteTriggerActions(actionPerk.TargetModel, item2, true);
 		}
 	}
 
-	private void ApplyClearAction(PerksStage.ActionPerk IBODMPMJELJ)
+	private void ApplyClearAction(PerksStage.ActionPerk actionPerk)
 	{
-		PerkActionClearAction hHMDDFCJDEO = (PerkActionClearAction)IBODMPMJELJ.Action;
+		PerkActionClearAction clearAction = (PerkActionClearAction)actionPerk.Action;
 		foreach (PerksStage.ActionPerk item in activeActions)
 		{
-			if (hHMDDFCJDEO.GetNameAction() == string.Empty || hHMDDFCJDEO.GetNameAction() == item.Action.get_Name())
+			if (clearAction.GetNameAction() == string.Empty || clearAction.GetNameAction() == item.Action.get_Name())
 			{
 				item.IsExpired = true;
 			}
 		}
-		if (hHMDDFCJDEO.GetNamespace() == null || !(hHMDDFCJDEO.GetNamespace() != string.Empty))
+		if (clearAction.GetNamespace() == null || !(clearAction.GetNamespace() != string.Empty))
 		{
 			return;
 		}
-		List<PerksStage.ActionPerk> list = PerksStage.GetNamespaceActions(hHMDDFCJDEO.GetNamespace());
+		List<PerksStage.ActionPerk> list = PerksStage.GetNamespaceActions(clearAction.GetNamespace());
 		if (list == null)
 		{
 			return;
 		}
 		foreach (PerksStage.ActionPerk item2 in list)
 		{
-			if (hHMDDFCJDEO.GetNameAction() == null || hHMDDFCJDEO.GetNameAction().Equals(string.Empty) || hHMDDFCJDEO.GetNameAction().Equals(item2.Action.get_Name()))
+			if (clearAction.GetNameAction() == null || clearAction.GetNameAction().Equals(string.Empty) || clearAction.GetNameAction().Equals(item2.Action.get_Name()))
 			{
 				item2.IsExpired = true;
 			}
 		}
 	}
 
-	private void ApplyHealthChange(PerksStage.ActionPerk IBODMPMJELJ)
+	private void ApplyHealthChange(PerksStage.ActionPerk actionPerk)
 	{
-		Fight gDBOMJODDEA = Fight.GetCurrentFight();
-		if (gDBOMJODDEA != null)
+		Fight fight = Fight.GetCurrentFight();
+		if (fight != null)
 		{
-			ModHealthChange eFIMNMBMCIJ = (ModHealthChange)IBODMPMJELJ.Action;
-			gDBOMJODDEA.UpdateLife(IBODMPMJELJ.TargetModel, eFIMNMBMCIJ.GetPerFrameValue());
+			ModHealthChange healthChange = (ModHealthChange)actionPerk.Action;
+			fight.UpdateLife(actionPerk.TargetModel, healthChange.GetPerFrameValue());
 		}
 	}
 
@@ -738,8 +738,8 @@ public partial class InfoPerk
 	{
 		if (GetIsOwnerPlayer())
 		{
-			Fight gDBOMJODDEA = Fight.GetCurrentFight();
-			if (gDBOMJODDEA != null)
+			Fight fight = Fight.GetCurrentFight();
+			if (fight != null)
 			{
 				PerksStage.IncrementPerkUse(Data.PerkInfo.Name);
 			}
@@ -750,85 +750,85 @@ public partial class InfoPerk
 		}
 	}
 
-	private void ExpireAction(PerksStage.ActionPerk IBODMPMJELJ)
+	private void ExpireAction(PerksStage.ActionPerk actionPerk)
 	{
-		IBODMPMJELJ.DurationFrames = 0;
-		if (IBODMPMJELJ.Action.GetFrames() != null)
+		actionPerk.DurationFrames = 0;
+		if (actionPerk.Action.GetFrames() != null)
 		{
-			FunctionResult dEIHAOLOPLC = IBODMPMJELJ.Action.GetFrames().Calculate();
-			IBODMPMJELJ.DurationFrames = dEIHAOLOPLC.ToInt();
+			FunctionResult framesResult = actionPerk.Action.GetFrames().Calculate();
+			actionPerk.DurationFrames = framesResult.ToInt();
 		}
-		switch (IBODMPMJELJ.Action.get_Type())
+		switch (actionPerk.Action.get_Type())
 		{
 		case ActionType.ACTION_SHOW_ICONS:
-			ApplyShowIcon(IBODMPMJELJ, true);
+			ApplyShowIcon(actionPerk, true);
 			break;
 		case ActionType.ACTION_SET_ATTRIBUTES:
-			ApplySetAttributes(IBODMPMJELJ, true);
+			ApplySetAttributes(actionPerk, true);
 			break;
 		case ActionType.ACTION_CHANGE_IMPULSE:
-			ApplyChangeImpulse(IBODMPMJELJ, true);
+			ApplyChangeImpulse(actionPerk, true);
 			break;
 		case ActionType.ACTION_CHANGE_HIT_EFFECT_SCALE:
-			ApplyChangeHitEffectScale(IBODMPMJELJ, true);
+			ApplyChangeHitEffectScale(actionPerk, true);
 			break;
 		case ActionType.ACTION_CHANGE_ADD_DAMAGE_VALUE:
-			ApplyChangeAdditionalDamage(IBODMPMJELJ, true);
+			ApplyChangeAdditionalDamage(actionPerk, true);
 			break;
 		case ActionType.ACTION_CHANGE_MODEL_COLOR:
-			ApplyChangeModelColor(IBODMPMJELJ, true);
+			ApplyChangeModelColor(actionPerk, true);
 			break;
 		case ActionType.ACTION_SLOW_MODEL:
-			ApplySlowModel(IBODMPMJELJ, true);
+			ApplySlowModel(actionPerk, true);
 			break;
 		case ActionType.ACTION_TURN_OFF_COLLISION:
-			ApplyTurnOffCollision(IBODMPMJELJ, true);
+			ApplyTurnOffCollision(actionPerk, true);
 			break;
 		case ActionType.ACTION_PERK_AREA:
-			ApplyPerkArea(IBODMPMJELJ, true);
+			ApplyPerkArea(actionPerk, true);
 			break;
 		case ActionType.ACTION_STEAL_MAGIC:
-			ApplyStealMagic(IBODMPMJELJ, true);
+			ApplyStealMagic(actionPerk, true);
 			break;
 		case ActionType.ACTION_INVISIBILITY:
-			ApplyInvisibility(IBODMPMJELJ, true);
+			ApplyInvisibility(actionPerk, true);
 			break;
 		}
-		LogModEvent(IBODMPMJELJ, false);
-		bool flag = IBODMPMJELJ.Action.GetModificator();
-		string value = IBODMPMJELJ.Action.get_Name();
-		Model kJDFJPBIGJC = IBODMPMJELJ.TargetModel;
-		RemoveActiveAction(IBODMPMJELJ);
+		LogModEvent(actionPerk, false);
+		bool flag = actionPerk.Action.GetModificator();
+		string value = actionPerk.Action.get_Name();
+		Model targetModel = actionPerk.TargetModel;
+		RemoveActiveAction(actionPerk);
 		if (!flag)
 		{
 			return;
 		}
-		Fight gDBOMJODDEA = Fight.GetCurrentFight();
-		if (gDBOMJODDEA != null)
+		Fight fight = Fight.GetCurrentFight();
+		if (fight != null)
 		{
-			PerkActionModificator cKCICHAIMFL = (PerkActionModificator)IBODMPMJELJ.Action;
-			if (cKCICHAIMFL.GetNamespace() != null && cKCICHAIMFL.GetNamespace() != string.Empty)
+			PerkActionModificator modificator = (PerkActionModificator)actionPerk.Action;
+			if (modificator.GetNamespace() != null && modificator.GetNamespace() != string.Empty)
 			{
-				PerksStage.UnregisterNamespaceAction(IBODMPMJELJ);
+				PerksStage.UnregisterNamespaceAction(actionPerk);
 			}
-			string text = (string)gDBOMJODDEA.GetPerksStage().GetPerkMap()["ModExpires"];
+			string text = (string)fight.GetPerksStage().GetPerkMap()["ModExpires"];
 			if (text != null)
 			{
 				GetExpiredModNames().Add(text);
 			}
-			gDBOMJODDEA.GetPerksStage().GetPerkMap()["ModExpires"] = value;
-			gDBOMJODDEA.GetPerksStage().GetPerkMap()["Namespace"] = cKCICHAIMFL.GetNamespace();
-			gDBOMJODDEA.GetPerksStage().GetPerkMap()["ParentPerk"] = cKCICHAIMFL.GetPerk();
-			gDBOMJODDEA.GetPerksStage().FireEvent(kJDFJPBIGJC, PerkEvent.PerkEventType.EVENT_MOD_EXPIRES, true);
-			gDBOMJODDEA.GetPerksStage().AddExpiredAction(IBODMPMJELJ);
+			fight.GetPerksStage().GetPerkMap()["ModExpires"] = value;
+			fight.GetPerksStage().GetPerkMap()["Namespace"] = modificator.GetNamespace();
+			fight.GetPerksStage().GetPerkMap()["ParentPerk"] = modificator.GetPerk();
+			fight.GetPerksStage().FireEvent(targetModel, PerkEvent.PerkEventType.EVENT_MOD_EXPIRES, true);
+			fight.GetPerksStage().AddExpiredAction(actionPerk);
 		}
 	}
 
-	private void RemoveActiveAction(PerksStage.ActionPerk DIMEFLGFIME)
+	private void RemoveActiveAction(PerksStage.ActionPerk removedAction)
 	{
 		foreach (PerksStage.ActionPerk item in activeActions)
 		{
-			if (DIMEFLGFIME == item)
+			if (removedAction == item)
 			{
 				activeActions.Remove(item);
 				activeActionNames.Remove(item.Action.get_Name());
@@ -837,70 +837,70 @@ public partial class InfoPerk
 		}
 	}
 
-	private void ApplyVariable(PerksStage.ActionPerk IBODMPMJELJ)
+	private void ApplyVariable(PerksStage.ActionPerk actionPerk)
 	{
-		PerkActionVariable nMCKMGOCCBO = (PerkActionVariable)IBODMPMJELJ.Action;
-		string key = nMCKMGOCCBO.get_Name();
-		FunctionResult dEIHAOLOPLC = nMCKMGOCCBO.GetValue().Calculate();
+		PerkActionVariable variableAction = (PerkActionVariable)actionPerk.Action;
+		string key = variableAction.get_Name();
+		FunctionResult valueResult = variableAction.GetValue().Calculate();
 		float value;
-		if (float.TryParse(dEIHAOLOPLC.Value, out value))
+		if (float.TryParse(valueResult.Value, out value))
 		{
-			IBODMPMJELJ.TargetModel.GetConditions().PerkVariables[key] = value;
-			IBODMPMJELJ.TargetModel.GetConditions().PerkStringVariables.Remove(key);
+			actionPerk.TargetModel.GetConditions().PerkVariables[key] = value;
+			actionPerk.TargetModel.GetConditions().PerkStringVariables.Remove(key);
 		}
 		else
 		{
-			IBODMPMJELJ.TargetModel.GetConditions().PerkStringVariables[key] =
-				dEIHAOLOPLC.Value ?? string.Empty;
+			actionPerk.TargetModel.GetConditions().PerkStringVariables[key] =
+				valueResult.Value ?? string.Empty;
 		}
 	}
 
-	private void ApplySetVariable(PerksStage.ActionPerk IBODMPMJELJ)
+	private void ApplySetVariable(PerksStage.ActionPerk actionPerk)
 	{
-		PerkActionSetVariable lBGDPLDCKFJ = (PerkActionSetVariable)IBODMPMJELJ.Action;
-		string text = lBGDPLDCKFJ.get_Name();
-		FunctionResult dEIHAOLOPLC = lBGDPLDCKFJ.GetValue().Calculate();
-		float num = dEIHAOLOPLC.ToFloat();
-		if (lBGDPLDCKFJ.GetHasMinValue())
+		PerkActionSetVariable setVariableAction = (PerkActionSetVariable)actionPerk.Action;
+		string text = setVariableAction.get_Name();
+		FunctionResult valueResult = setVariableAction.GetValue().Calculate();
+		float num = valueResult.ToFloat();
+		if (setVariableAction.GetHasMinValue())
 		{
-			FunctionResult dEIHAOLOPLC2 = lBGDPLDCKFJ.GetMinValue().Calculate();
+			FunctionResult dEIHAOLOPLC2 = setVariableAction.GetMinValue().Calculate();
 			float num2 = dEIHAOLOPLC2.ToFloat();
 			if (num < num2)
 			{
 				num = num2;
 			}
 		}
-		if (lBGDPLDCKFJ.GetHasMaxValue())
+		if (setVariableAction.GetHasMaxValue())
 		{
-			FunctionResult dEIHAOLOPLC3 = lBGDPLDCKFJ.GetMaxValue().Calculate();
+			FunctionResult dEIHAOLOPLC3 = setVariableAction.GetMaxValue().Calculate();
 			float num3 = dEIHAOLOPLC3.ToFloat();
 			if (num > num3)
 			{
 				num = num3;
 			}
 		}
-		IBODMPMJELJ.TargetModel.GetConditions().PerkVariables[text] = num;
+		actionPerk.TargetModel.GetConditions().PerkVariables[text] = num;
 		if (SystemProperties.IsDebug())
 		{
 			GameLog.Info("SetVariable {0} = {1}", text, num);
 		}
 	}
 
-	private void ApplySetCooldown(PerksStage.ActionPerk IBODMPMJELJ)
+	private void ApplySetCooldown(PerksStage.ActionPerk actionPerk)
 	{
-		PerkActionSetCooldown bHPLOIHAPFP = (PerkActionSetCooldown)IBODMPMJELJ.Action;
-		int num = bHPLOIHAPFP.GetCooldownFrames();
-		string bAINMLLIKOL = bHPLOIHAPFP.GetButtonName();
-		FightCID dDNBGEJJGMG = (FightCID)MovesMaps.GetMappedIndex(MovesMaps.MapType.KEY_TYPE, bAINMLLIKOL);
-		IBODMPMJELJ.TargetModel.ResetButtonCooldown(dDNBGEJJGMG, 0);
-		IBODMPMJELJ.TargetModel.StartButtonCooldown(dDNBGEJJGMG, num);
+		PerkActionSetCooldown cooldownAction = (PerkActionSetCooldown)actionPerk.Action;
+		int num = cooldownAction.GetCooldownFrames();
+		string buttonName = cooldownAction.GetButtonName();
+		FightCID buttonId = (FightCID)MovesMaps.GetMappedIndex(MovesMaps.MapType.KEY_TYPE, buttonName);
+		actionPerk.TargetModel.ResetButtonCooldown(buttonId, 0);
+		actionPerk.TargetModel.StartButtonCooldown(buttonId, num);
 		if (SystemProperties.IsDebug())
 		{
-			GameLog.Info("SetCooldown button = {0}, frames = {1}", bHPLOIHAPFP.GetButtonName(), num);
+			GameLog.Info("SetCooldown button = {0}, frames = {1}", cooldownAction.GetButtonName(), num);
 		}
 	}
 
-	public void ClearActions(bool GIBIGPCELOB = false)
+	public void ClearActions(bool forceExpire = false)
 	{
 		if (activeActions.Count <= 0)
 		{
@@ -911,10 +911,10 @@ public partial class InfoPerk
 		while (num < activeActions.Count)
 		{
 			count = activeActions.Count;
-			PerksStage.ActionPerk oAJGINIDKJD = activeActions[num];
-			if (GIBIGPCELOB || oAJGINIDKJD.IsExpired)
+			PerksStage.ActionPerk actionPerk = activeActions[num];
+			if (forceExpire || actionPerk.IsExpired)
 			{
-				ExpireAction(oAJGINIDKJD);
+				ExpireAction(actionPerk);
 			}
 			if (count == activeActions.Count)
 			{
@@ -926,10 +926,10 @@ public partial class InfoPerk
 	public void ResetExpiredMods()
 	{
 		expiredModNames.Clear();
-		Fight gDBOMJODDEA = Fight.GetCurrentFight();
-		if (gDBOMJODDEA != null)
+		Fight fight = Fight.GetCurrentFight();
+		if (fight != null)
 		{
-			gDBOMJODDEA.GetPerksStage().GetPerkMap()["ModExpires"] = null;
+			fight.GetPerksStage().GetPerkMap()["ModExpires"] = null;
 		}
 	}
 }

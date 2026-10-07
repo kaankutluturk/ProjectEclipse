@@ -27,88 +27,88 @@ public class EffectsRunning
 		return _UnityObject;
 	}
 
-	private void StopEffect(string name, Model ACENLMONNPA)
+	private void StopEffect(string name, Model owner)
 	{
 		int i = 0;
 		for (int count = runningEffects.Count; i < count; i++)
 		{
-			CurrentEffect bNGLFPIBAIM = runningEffects[i];
-			if (ACENLMONNPA == bNGLFPIBAIM.Owner && (name == bNGLFPIBAIM.Effect.get_Name() || name == string.Empty))
+			CurrentEffect currentEffect = runningEffects[i];
+			if (owner == currentEffect.Owner && (name == currentEffect.Effect.get_Name() || name == string.Empty))
 			{
-				RemoveEffect(bNGLFPIBAIM, i);
+				RemoveEffect(currentEffect, i);
 				break;
 			}
 		}
 	}
 
-	private void RemoveEffect(CurrentEffect LLOLBKJMKNC, int index)
+	private void RemoveEffect(CurrentEffect currentEffect, int index)
 	{
-		Object.Destroy(LLOLBKJMKNC.EffectObject);
-		if (LLOLBKJMKNC.Owner != null)
+		Object.Destroy(currentEffect.EffectObject);
+		if (currentEffect.Owner != null)
 		{
-			LLOLBKJMKNC.Owner.RemoveCurrentEffect(LLOLBKJMKNC);
+			currentEffect.Owner.RemoveCurrentEffect(currentEffect);
 		}
 		runningEffects.RemoveAt(index);
 	}
 
-	private void stopFollowEffect(string name, Model ACENLMONNPA)
+	private void stopFollowEffect(string name, Model owner)
 	{
 		int i = 0;
 		for (int count = runningEffects.Count; i < count; i++)
 		{
-			CurrentEffect bNGLFPIBAIM = runningEffects[i];
-			if (ACENLMONNPA == bNGLFPIBAIM.Owner && name == bNGLFPIBAIM.Effect.get_Name())
+			CurrentEffect currentEffect = runningEffects[i];
+			if (owner == currentEffect.Owner && name == currentEffect.Effect.get_Name())
 			{
-				bNGLFPIBAIM.stopFollowEffect = true;
+				currentEffect.stopFollowEffect = true;
 				break;
 			}
 		}
 	}
 
-	public void StartEffect(ActionEffect IBODMPMJELJ, Model ACENLMONNPA)
+	public void StartEffect(ActionEffect action, Model owner)
 	{
-		ModelConditions dGJJDPIAEAO = ACENLMONNPA.GetConditions();
-		dGJJDPIAEAO.AnimationSign = ACENLMONNPA.GetAnimationModule().GetSign();
-		Vector3f eMAFACPEPDK = Vector3f.op_Implicit(IBODMPMJELJ.GetPosition().GetPosition(dGJJDPIAEAO));
+		ModelConditions conditions = owner.GetConditions();
+		conditions.AnimationSign = owner.GetAnimationModule().GetSign();
+		Vector3f eMAFACPEPDK = Vector3f.op_Implicit(action.GetPosition().GetPosition(conditions));
 		// Effects are presentation; a rollback re-simulation does not spawn them twice.
 		if (Eclipse.Multiplayer.VersusTickDriver.IsResimulating)
 		{
 			return;
 		}
-		GameObject gameObject = new GameObject(IBODMPMJELJ.get_Name());
+		GameObject gameObject = new GameObject(action.get_Name());
 		gameObject.transform.localPosition = new Vector3(eMAFACPEPDK.GetX(), eMAFACPEPDK.GetY(), eMAFACPEPDK.GetZ());
 		Quaternion attachmentRotation = Quaternion.identity;
-		if (IBODMPMJELJ.Attachment != null)
+		if (action.Attachment != null)
 		{
 			Vector3 attachmentPosition;
-			if (!IBODMPMJELJ.Attachment.TryGetTransform(ACENLMONNPA, out attachmentPosition, out attachmentRotation))
+			if (!action.Attachment.TryGetTransform(owner, out attachmentPosition, out attachmentRotation))
 			{
-				Debug.LogWarning("[EffectAttach] Missing live anchor for " + IBODMPMJELJ.get_Name() + " on " + ACENLMONNPA.get_Name());
+				Debug.LogWarning("[EffectAttach] Missing live anchor for " + action.get_Name() + " on " + owner.get_Name());
 				Object.Destroy(gameObject);
 				return;
 			}
 			gameObject.transform.localPosition = attachmentPosition;
 		}
-		if (IBODMPMJELJ.GetIsOnBackground())
+		if (action.GetIsOnBackground())
 			gameObject.transform.localPosition += new Vector3(0f, 0f, 0.1f);
-		Vector3 localScale = new Vector3((float)dGJJDPIAEAO.AnimationSign * IBODMPMJELJ.GetScaleX(), 0f - IBODMPMJELJ.GetScaleY(), 1f);
+		Vector3 localScale = new Vector3((float)conditions.AnimationSign * action.GetScaleX(), 0f - action.GetScaleY(), 1f);
 		gameObject.transform.localScale = localScale;
-		gameObject.transform.localRotation = IBODMPMJELJ.Attachment == null
-			? Quaternion.Euler(0f, 0f, IBODMPMJELJ.GetStartRotation()) : attachmentRotation;
+		gameObject.transform.localRotation = action.Attachment == null
+			? Quaternion.Euler(0f, 0f, action.GetStartRotation()) : attachmentRotation;
 		gameObject.transform.SetParent(_UnityObject.transform, false);
-		float changeSpriteTime = IBODMPMJELJ.GetTimeScale() / 60f;
-		string oNNKJLOGHGH = "Textures/Effects/Magic/" + IBODMPMJELJ.GetSequence();
+		float changeSpriteTime = action.GetTimeScale() / 60f;
+		string texturePath = "Textures/Effects/Magic/" + action.GetSequence();
 		CocosAnimation cocosAnimation = gameObject.AddComponent<CocosAnimation>();
-		bool effectLoaded = cocosAnimation.Init(oNNKJLOGHGH, true);
+		bool effectLoaded = cocosAnimation.Init(texturePath, true);
 		// The recovered -10 background order puts effects behind every location
 		// sprite in Unity. Keep their order with the arena and use model depth;
 		// an authored positive Priority (vanilla OrbOfHungerEffect1) still applies.
-		cocosAnimation.SetSortingOrder(IBODMPMJELJ.GetIsOnBackground() ? Mathf.Max(0, IBODMPMJELJ.GetPriority()) : IBODMPMJELJ.GetPriority());
+		cocosAnimation.SetSortingOrder(action.GetIsOnBackground() ? Mathf.Max(0, action.GetPriority()) : action.GetPriority());
 		if (!effectLoaded)
 		{
-			GameLog.Write("Effect NO " + oNNKJLOGHGH);
+			GameLog.Write("Effect NO " + texturePath);
 		}
-		if (IBODMPMJELJ.GetIsLooped())
+		if (action.GetIsLooped())
 		{
 			cocosAnimation.set_Iterations(-1);
 		}
@@ -120,9 +120,9 @@ public class EffectsRunning
 		cocosAnimation.set_ChangeSpriteTime(changeSpriteTime);
 		// A rollback that undoes this tick destroys the effect.
 		Eclipse.Multiplayer.Rollback.RollbackObjects.Created(gameObject);
-		CurrentEffect bNGLFPIBAIM = new CurrentEffect(ACENLMONNPA, IBODMPMJELJ, gameObject, cocosAnimation);
-		runningEffects.Add(bNGLFPIBAIM);
-		ACENLMONNPA.AddCurrentEffect(bNGLFPIBAIM);
+		CurrentEffect currentEffect = new CurrentEffect(owner, action, gameObject, cocosAnimation);
+		runningEffects.Add(currentEffect);
+		owner.AddCurrentEffect(currentEffect);
 	}
 
 	public void UpdateEffects()
@@ -136,38 +136,38 @@ public class EffectsRunning
 		int i = 0;
 		for (int num2 = runningEffects.Count; i < num2; i++)
 		{
-			CurrentEffect bNGLFPIBAIM = runningEffects[i];
-			if (bNGLFPIBAIM.EffectObject == null)
+			CurrentEffect currentEffect = runningEffects[i];
+			if (currentEffect.EffectObject == null)
 			{
 				// Destroyed by a rollback: drop it from the running list.
-				RemoveEffect(bNGLFPIBAIM, i);
+				RemoveEffect(currentEffect, i);
 				num2--;
 				i--;
 				continue;
 			}
-			if (!bNGLFPIBAIM.Animation.get_IsWork() || (bNGLFPIBAIM.Effect.GetIsFollowObject() && bNGLFPIBAIM.Owner == null && !bNGLFPIBAIM.stopFollowEffect))
+			if (!currentEffect.Animation.get_IsWork() || (currentEffect.Effect.GetIsFollowObject() && currentEffect.Owner == null && !currentEffect.stopFollowEffect))
 			{
-				StopEffect(bNGLFPIBAIM.Effect.get_Name(), bNGLFPIBAIM.Owner);
+				StopEffect(currentEffect.Effect.get_Name(), currentEffect.Owner);
 				num2--;
 				i--;
 				continue;
 			}
-			if (bNGLFPIBAIM.Effect.GetIsFollowObject() && !bNGLFPIBAIM.stopFollowEffect)
+			if (currentEffect.Effect.GetIsFollowObject() && !currentEffect.stopFollowEffect)
 			{
-				bNGLFPIBAIM.UpdateFollow();
+				currentEffect.UpdateFollow();
 			}
-			bNGLFPIBAIM.Animation.Render(1f / 60f * num);
+			currentEffect.Animation.Render(1f / 60f * num);
 		}
 	}
 
-	public void StopEffect(ActionStopEffect IBODMPMJELJ, Model ACENLMONNPA)
+	public void StopEffect(ActionStopEffect action, Model owner)
 	{
-		StopEffect(IBODMPMJELJ.get_Name(), ACENLMONNPA);
+		StopEffect(action.get_Name(), owner);
 	}
 
-	public void stopFollowEffect(ActionStopFollowEffect IBODMPMJELJ, Model ACENLMONNPA)
+	public void stopFollowEffect(ActionStopFollowEffect action, Model owner)
 	{
-		stopFollowEffect(IBODMPMJELJ.get_Name(), ACENLMONNPA);
+		stopFollowEffect(action.get_Name(), owner);
 	}
 
 	public void RemoveAllEffects()

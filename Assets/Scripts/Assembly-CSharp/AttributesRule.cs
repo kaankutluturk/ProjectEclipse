@@ -5,8 +5,8 @@ public class AttributesRule : InFightRule
 {
 	private Dictionary<string, float> attributeValues = new Dictionary<string, float>();
 
-	public AttributesRule(XmlNode node, RuleAppliance EJPOJJKKICO)
-		: base(RuleType.RuleAttributes, EJPOJJKKICO, node)
+	public AttributesRule(XmlNode node, RuleAppliance ruleAppliance)
+		: base(RuleType.RuleAttributes, ruleAppliance, node)
 	{
 		foreach (GameUtils.AlignTargetAttribute item in GameUtils.AlignTargetAttributes)
 		{
@@ -17,7 +17,7 @@ public class AttributesRule : InFightRule
 
 	public override void InitRule(object data)
 	{
-		RuleInitData oIFPCFEGFOB = (RuleInitData)data;
+		RuleInitData initData = (RuleInitData)data;
 		foreach (KeyValuePair<string, float> item in attributeValues)
 		{
 			float value = item.Value;
@@ -26,15 +26,15 @@ public class AttributesRule : InFightRule
 			case RuleAppliance.AppliancePlayer:
 			{
 				int OEMALIFPGPO2 = 0;
-				oIFPCFEGFOB.PlayerParameters.FinalAttributes.Get(item.Key, ref OEMALIFPGPO2);
-				oIFPCFEGFOB.PlayerParameters.FinalAttributes.Set(item.Key, OEMALIFPGPO2 + (int)value);
+				initData.PlayerParameters.FinalAttributes.Get(item.Key, ref OEMALIFPGPO2);
+				initData.PlayerParameters.FinalAttributes.Set(item.Key, OEMALIFPGPO2 + (int)value);
 				break;
 			}
 			case RuleAppliance.ApplianceOpponent:
 			{
-				int OEMALIFPGPO = 0;
-				oIFPCFEGFOB.OpponentParameters.FinalAttributes.Get(item.Key, ref OEMALIFPGPO);
-				oIFPCFEGFOB.OpponentParameters.FinalAttributes.Set(item.Key, OEMALIFPGPO + (int)value);
+				int currentValue = 0;
+				initData.OpponentParameters.FinalAttributes.Get(item.Key, ref currentValue);
+				initData.OpponentParameters.FinalAttributes.Set(item.Key, currentValue + (int)value);
 				break;
 			}
 			default:
@@ -83,11 +83,11 @@ public class AttributesRule : InFightRule
 
 	public override InFightRule Copy()
 	{
-		InFightRule aAJIFBJLJOA = null;
-		RuleAppliance eJPOJJKKICO = GetAppliance();
-		XmlNode hKPPBKPJOEO = GetXmlSource().GetNode();
-		aAJIFBJLJOA = new AttributesRule(hKPPBKPJOEO, eJPOJJKKICO);
-		aAJIFBJLJOA.IsRandom = IsRandom;
-		return aAJIFBJLJOA;
+		InFightRule copy = null;
+		RuleAppliance ruleAppliance = GetAppliance();
+		XmlNode sourceNode = GetXmlSource().GetNode();
+		copy = new AttributesRule(sourceNode, ruleAppliance);
+		copy.IsRandom = IsRandom;
+		return copy;
 	}
 }

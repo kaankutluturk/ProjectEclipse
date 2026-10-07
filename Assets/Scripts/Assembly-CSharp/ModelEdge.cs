@@ -213,10 +213,10 @@ public class ModelEdge : Segment3D
 		}
 	}
 
-	public ModelEdge(ModelNode ILENLCMAMBH, ModelNode BFDAHEHCAGK)
+	public ModelEdge(ModelNode startNode, ModelNode endNode)
 	{
-		AttachStartNode(ILENLCMAMBH);
-		AttachEndNode(BFDAHEHCAGK);
+		AttachStartNode(startNode);
+		AttachEndNode(endNode);
 	}
 
 	public string get_Name()
@@ -362,12 +362,12 @@ public class ModelEdge : Segment3D
 		return collisionEnd;
 	}
 
-	public EdgeRender CreateUI(Transform GLKEHHPBGKP)
+	public EdgeRender CreateUI(Transform parent)
 	{
 		GameObject gameObject = new GameObject(_Name);
 		EdgeRender edgeRender = gameObject.AddComponent<EdgeRender>();
 		edgeRender.set_Edge(this);
-		gameObject.transform.SetParent(GLKEHHPBGKP, false);
+		gameObject.transform.SetParent(parent, false);
 		return edgeRender;
 	}
 
@@ -383,19 +383,19 @@ public class ModelEdge : Segment3D
 		AttachEndNode(node);
 	}
 
-	public void Iterative(Vector3f MGMMDGFPBLP)
+	public void Iterative(Vector3f offset)
 	{
 		float num = StartNode.GetWeight();
 		float num2 = EndNode.GetWeight();
-		Vector3f eMAFACPEPDK = StartNode.GetStart();
+		Vector3f startPoint = StartNode.GetStart();
 		Vector3f eMAFACPEPDK2 = EndNode.GetStart();
-		float num3 = length / Vector3f.Distance(eMAFACPEPDK, eMAFACPEPDK2);
+		float num3 = length / Vector3f.Distance(startPoint, eMAFACPEPDK2);
 		float num4 = (1f - num3) / (num + num2);
 		float num5 = num * num4;
 		float num6 = num2 * num4;
-		MGMMDGFPBLP.SetX(MGMMDGFPBLP.GetX() * num3 + eMAFACPEPDK.GetX() * num5 + eMAFACPEPDK2.GetX() * num6);
-		MGMMDGFPBLP.SetY(MGMMDGFPBLP.GetY() * num3 + eMAFACPEPDK.GetY() * num5 + eMAFACPEPDK2.GetY() * num6);
-		MGMMDGFPBLP.SetZ(MGMMDGFPBLP.GetZ() * num3 + eMAFACPEPDK.GetZ() * num5 + eMAFACPEPDK2.GetZ() * num6);
+		offset.SetX(offset.GetX() * num3 + startPoint.GetX() * num5 + eMAFACPEPDK2.GetX() * num6);
+		offset.SetY(offset.GetY() * num3 + startPoint.GetY() * num5 + eMAFACPEPDK2.GetY() * num6);
+		offset.SetZ(offset.GetZ() * num3 + startPoint.GetZ() * num5 + eMAFACPEPDK2.GetZ() * num6);
 	}
 
 	public void Iterative()
@@ -404,24 +404,24 @@ public class ModelEdge : Segment3D
 		{
 			float num = StartNode.GetWeight();
 			float num2 = EndNode.GetWeight();
-			Vector3f eMAFACPEPDK = StartNode.GetStart();
+			Vector3f startPoint = StartNode.GetStart();
 			Vector3f eMAFACPEPDK2 = EndNode.GetStart();
-			float num3 = length / Vector3f.Distance(eMAFACPEPDK, eMAFACPEPDK2);
+			float num3 = length / Vector3f.Distance(startPoint, eMAFACPEPDK2);
 			float num4 = (1f - num3) / (num + num2);
 			float num5 = num * num4;
 			float num6 = num2 * num4;
-			float lHNJJFDIJKK = eMAFACPEPDK.GetX() * num5 + eMAFACPEPDK2.GetX() * num6;
-			float fFFHIOALHGM = eMAFACPEPDK.GetY() * num5 + eMAFACPEPDK2.GetY() * num6;
-			float pDCENMEKIAP = eMAFACPEPDK.GetZ() * num5 + eMAFACPEPDK2.GetZ() * num6;
+			float offsetX = startPoint.GetX() * num5 + eMAFACPEPDK2.GetX() * num6;
+			float offsetY = startPoint.GetY() * num5 + eMAFACPEPDK2.GetY() * num6;
+			float offsetZ = startPoint.GetZ() * num5 + eMAFACPEPDK2.GetZ() * num6;
 			if (StartNode.IsPhysicsActive())
 			{
-				eMAFACPEPDK.Multiply(num3);
-				eMAFACPEPDK.Add(lHNJJFDIJKK, fFFHIOALHGM, pDCENMEKIAP);
+				startPoint.Multiply(num3);
+				startPoint.Add(offsetX, offsetY, offsetZ);
 			}
 			if (EndNode.IsPhysicsActive())
 			{
 				eMAFACPEPDK2.Multiply(num3);
-				eMAFACPEPDK2.Add(lHNJJFDIJKK, fFFHIOALHGM, pDCENMEKIAP);
+				eMAFACPEPDK2.Add(offsetX, offsetY, offsetZ);
 			}
 		}
 	}
@@ -439,10 +439,10 @@ public class ModelEdge : Segment3D
 
 	public void UpdateCollisionPoints()
 	{
-		Vector3f lHBNIMGFKIB = GetStartPosition();
-		Vector3f aAOIAEJJINO = GetEndPosition();
-		Vector3f.GetDivisionPoint3D(lHBNIMGFKIB, aAOIAEJJINO, startMargin, collisionStart);
-		Vector3f.GetDivisionPoint3D(lHBNIMGFKIB, aAOIAEJJINO, 1f - endMargin, collisionEnd);
+		Vector3f startPosition = GetStartPosition();
+		Vector3f endPosition = GetEndPosition();
+		Vector3f.GetDivisionPoint3D(startPosition, endPosition, startMargin, collisionStart);
+		Vector3f.GetDivisionPoint3D(startPosition, endPosition, 1f - endMargin, collisionEnd);
 	}
 
 	public Vector3f GetStartPosition()

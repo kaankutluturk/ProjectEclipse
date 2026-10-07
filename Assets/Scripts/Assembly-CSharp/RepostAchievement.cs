@@ -12,9 +12,9 @@ public class RepostAchievement
 		_name = node.Attributes["Name"].GetStringOrDefault();
 	}
 
-	public RepostAchievement(XmlNode FMBDAPOMFGN, string name)
+	public RepostAchievement(XmlNode parentNode, string name)
 	{
-		_node = FMBDAPOMFGN.AppendElement("RepostAchievement");
+		_node = parentNode.AppendElement("RepostAchievement");
 		set_Name(name);
 	}
 

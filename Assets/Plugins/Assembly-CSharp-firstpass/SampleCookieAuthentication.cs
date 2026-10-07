@@ -116,12 +116,12 @@ public sealed class SampleCookieAuthentication : IAuthenticationProvider
 		}
 	}
 
-	public SampleCookieAuthentication(Uri EJLKINNHGHN, string KEJDJHAGBMK, string JMKKKMKEAMI, string NNMKKAKIJCP)
+	public SampleCookieAuthentication(Uri authUri, string userName, string password, string userRoles)
 	{
-		set_AuthUri(EJLKINNHGHN);
-		SetUserName(KEJDJHAGBMK);
-		SetPassword(JMKKKMKEAMI);
-		SetUserRoles(NNMKKAKIJCP);
+		set_AuthUri(authUri);
+		SetUserName(userName);
+		SetPassword(password);
+		SetUserRoles(userRoles);
 		set_IsPreAuthRequired(true);
 	}
 
@@ -177,50 +177,50 @@ public sealed class SampleCookieAuthentication : IAuthenticationProvider
 
 	public void AddAuthenticationSucceeded(OnAuthenticationSuccededDelegate value)
 	{
-		OnAuthenticationSuccededDelegate lACLODBGJEI = OnAuthenticationSucceded;
+		OnAuthenticationSuccededDelegate currentHandler = OnAuthenticationSucceded;
 		OnAuthenticationSuccededDelegate lACLODBGJEI2;
 		do
 		{
-			lACLODBGJEI2 = lACLODBGJEI;
-			lACLODBGJEI = Interlocked.CompareExchange(ref OnAuthenticationSucceded, (OnAuthenticationSuccededDelegate)Delegate.Combine(lACLODBGJEI2, value), lACLODBGJEI);
+			lACLODBGJEI2 = currentHandler;
+			currentHandler = Interlocked.CompareExchange(ref OnAuthenticationSucceded, (OnAuthenticationSuccededDelegate)Delegate.Combine(lACLODBGJEI2, value), currentHandler);
 		}
-		while ((object)lACLODBGJEI != lACLODBGJEI2);
+		while ((object)currentHandler != lACLODBGJEI2);
 	}
 
 	public void RemoveAuthenticationSucceeded(OnAuthenticationSuccededDelegate value)
 	{
-		OnAuthenticationSuccededDelegate lACLODBGJEI = OnAuthenticationSucceded;
+		OnAuthenticationSuccededDelegate currentHandler = OnAuthenticationSucceded;
 		OnAuthenticationSuccededDelegate lACLODBGJEI2;
 		do
 		{
-			lACLODBGJEI2 = lACLODBGJEI;
-			lACLODBGJEI = Interlocked.CompareExchange(ref OnAuthenticationSucceded, (OnAuthenticationSuccededDelegate)Delegate.Remove(lACLODBGJEI2, value), lACLODBGJEI);
+			lACLODBGJEI2 = currentHandler;
+			currentHandler = Interlocked.CompareExchange(ref OnAuthenticationSucceded, (OnAuthenticationSuccededDelegate)Delegate.Remove(lACLODBGJEI2, value), currentHandler);
 		}
-		while ((object)lACLODBGJEI != lACLODBGJEI2);
+		while ((object)currentHandler != lACLODBGJEI2);
 	}
 
 	public void AddAuthenticationFailed(OnAuthenticationFailedDelegate value)
 	{
-		OnAuthenticationFailedDelegate bCHANFGJONF = OnAuthenticationFailed;
+		OnAuthenticationFailedDelegate currentHandler = OnAuthenticationFailed;
 		OnAuthenticationFailedDelegate bCHANFGJONF2;
 		do
 		{
-			bCHANFGJONF2 = bCHANFGJONF;
-			bCHANFGJONF = Interlocked.CompareExchange(ref OnAuthenticationFailed, (OnAuthenticationFailedDelegate)Delegate.Combine(bCHANFGJONF2, value), bCHANFGJONF);
+			bCHANFGJONF2 = currentHandler;
+			currentHandler = Interlocked.CompareExchange(ref OnAuthenticationFailed, (OnAuthenticationFailedDelegate)Delegate.Combine(bCHANFGJONF2, value), currentHandler);
 		}
-		while ((object)bCHANFGJONF != bCHANFGJONF2);
+		while ((object)currentHandler != bCHANFGJONF2);
 	}
 
 	public void RemoveAuthenticationFailed(OnAuthenticationFailedDelegate value)
 	{
-		OnAuthenticationFailedDelegate bCHANFGJONF = OnAuthenticationFailed;
+		OnAuthenticationFailedDelegate currentHandler = OnAuthenticationFailed;
 		OnAuthenticationFailedDelegate bCHANFGJONF2;
 		do
 		{
-			bCHANFGJONF2 = bCHANFGJONF;
-			bCHANFGJONF = Interlocked.CompareExchange(ref OnAuthenticationFailed, (OnAuthenticationFailedDelegate)Delegate.Remove(bCHANFGJONF2, value), bCHANFGJONF);
+			bCHANFGJONF2 = currentHandler;
+			currentHandler = Interlocked.CompareExchange(ref OnAuthenticationFailed, (OnAuthenticationFailedDelegate)Delegate.Remove(bCHANFGJONF2, value), currentHandler);
 		}
-		while ((object)bCHANFGJONF != bCHANFGJONF2);
+		while ((object)currentHandler != bCHANFGJONF2);
 	}
 
 	public void StartAuthentication()
@@ -232,21 +232,21 @@ public sealed class SampleCookieAuthentication : IAuthenticationProvider
 		authRequest.Send();
 	}
 
-	public void PrepareRequest(HTTPRequest ONOCIELLAPL, SignalRRequestType LFLGCDNKNJI)
+	public void PrepareRequest(HTTPRequest request, SignalRRequestType requestType)
 	{
-		ONOCIELLAPL.GetCookies().Add(cookie);
+		request.GetCookies().Add(cookie);
 	}
 
-	private void OnAuthRequestFinished(HTTPRequest CGOIOKHEGOE, HTTPResponse BEIGFGCBICO)
+	private void OnAuthRequestFinished(HTTPRequest request, HTTPResponse response)
 	{
 		authRequest = null;
-		string nEPOLDCKNJL = string.Empty;
-		switch (CGOIOKHEGOE.GetState())
+		string reason = string.Empty;
+		switch (request.GetState())
 		{
 		case HTTPRequestStates.Finished:
-			if (BEIGFGCBICO.GetIsSuccess())
+			if (response.GetIsSuccess())
 			{
-				cookie = ((BEIGFGCBICO.GetCookies() == null) ? null : BEIGFGCBICO.GetCookies().Find((Cookie ILHDJDNPFKH) => ILHDJDNPFKH.get_Name().Equals(".ASPXAUTH")));
+				cookie = ((response.GetCookies() == null) ? null : response.GetCookies().Find((Cookie existingCookie) => existingCookie.get_Name().Equals(".ASPXAUTH")));
 				if (cookie != null)
 				{
 					HTTPManager.GetLogger().Information("CookieAuthentication", "Auth. Cookie found!");
@@ -256,29 +256,29 @@ public sealed class SampleCookieAuthentication : IAuthenticationProvider
 					}
 					return;
 				}
-				HTTPManager.GetLogger().Warning("CookieAuthentication", nEPOLDCKNJL = "Auth. Cookie NOT found!");
+				HTTPManager.GetLogger().Warning("CookieAuthentication", reason = "Auth. Cookie NOT found!");
 			}
 			else
 			{
-				HTTPManager.GetLogger().Warning("CookieAuthentication", nEPOLDCKNJL = string.Format("Request Finished Successfully, but the server sent an error. Status Code: {0}-{1} Message: {2}", BEIGFGCBICO.GetStatusCode(), BEIGFGCBICO.GetMessage(), BEIGFGCBICO.GetDataAsText()));
+				HTTPManager.GetLogger().Warning("CookieAuthentication", reason = string.Format("Request Finished Successfully, but the server sent an error. Status Code: {0}-{1} Message: {2}", response.GetStatusCode(), response.GetMessage(), response.GetDataAsText()));
 			}
 			break;
 		case HTTPRequestStates.Error:
-			HTTPManager.GetLogger().Warning("CookieAuthentication", nEPOLDCKNJL = "Request Finished with Error! " + ((CGOIOKHEGOE.GetException() == null) ? "No Exception" : (CGOIOKHEGOE.GetException().Message + "\n" + CGOIOKHEGOE.GetException().StackTrace)));
+			HTTPManager.GetLogger().Warning("CookieAuthentication", reason = "Request Finished with Error! " + ((request.GetException() == null) ? "No Exception" : (request.GetException().Message + "\n" + request.GetException().StackTrace)));
 			break;
 		case HTTPRequestStates.Aborted:
-			HTTPManager.GetLogger().Warning("CookieAuthentication", nEPOLDCKNJL = "Request Aborted!");
+			HTTPManager.GetLogger().Warning("CookieAuthentication", reason = "Request Aborted!");
 			break;
 		case HTTPRequestStates.ConnectionTimedOut:
-			HTTPManager.GetLogger().Error("CookieAuthentication", nEPOLDCKNJL = "Connection Timed Out!");
+			HTTPManager.GetLogger().Error("CookieAuthentication", reason = "Connection Timed Out!");
 			break;
 		case HTTPRequestStates.TimedOut:
-			HTTPManager.GetLogger().Error("CookieAuthentication", nEPOLDCKNJL = "Processing the request Timed Out!");
+			HTTPManager.GetLogger().Error("CookieAuthentication", reason = "Processing the request Timed Out!");
 			break;
 		}
 		if (OnAuthenticationFailed != null)
 		{
-			OnAuthenticationFailed(this, nEPOLDCKNJL);
+			OnAuthenticationFailed(this, reason);
 		}
 	}
 }

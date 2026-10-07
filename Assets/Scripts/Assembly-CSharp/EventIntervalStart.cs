@@ -11,17 +11,17 @@ public class EventIntervalStart : EventAnimation
 		intervalType = IntervalAnimation.IntervalType.INTERVAL_NONE;
 	}
 
-	protected override bool Compare(EventAnimation FOPOKALJIIJ)
+	protected override bool Compare(EventAnimation other)
 	{
-		EventIntervalStart nBFEDMCCKPJ = FOPOKALJIIJ as EventIntervalStart;
-		List<IntervalAnimation> cAANBJEPGAA = nBFEDMCCKPJ.Conditions.Intervals;
-		bool flag = HasMatchingInterval(cAANBJEPGAA);
+		EventIntervalStart otherEvent = other as EventIntervalStart;
+		List<IntervalAnimation> intervals = otherEvent.Conditions.Intervals;
+		bool flag = HasMatchingInterval(intervals);
 		return (!IsNot) ? flag : (!flag);
 	}
 
-	protected override void Parse(XmlNode MEEAKLDGLDF)
+	protected override void Parse(XmlNode node)
 	{
-		switch (MEEAKLDGLDF.Attributes["Type"].GetStringOrDefault(string.Empty))
+		switch (node.Attributes["Type"].GetStringOrDefault(string.Empty))
 		{
 		case "Attack":
 			intervalType = IntervalAnimation.IntervalType.INTERVAL_ATTACK;
@@ -38,13 +38,13 @@ public class EventIntervalStart : EventAnimation
 		}
 	}
 
-	private bool HasMatchingInterval(List<IntervalAnimation> NFLDEGMEJAK)
+	private bool HasMatchingInterval(List<IntervalAnimation> intervals)
 	{
 		int i = 0;
-		for (int count = NFLDEGMEJAK.Count; i < count; i++)
+		for (int count = intervals.Count; i < count; i++)
 		{
-			IntervalAnimation mNOIEOBBCMI = NFLDEGMEJAK[i];
-			if ((intervalType == IntervalAnimation.IntervalType.INTERVAL_NONE || intervalType == mNOIEOBBCMI.Type) && (AnimationName == string.Empty || AnimationName == mNOIEOBBCMI.Name))
+			IntervalAnimation interval = intervals[i];
+			if ((intervalType == IntervalAnimation.IntervalType.INTERVAL_NONE || intervalType == interval.Type) && (AnimationName == string.Empty || AnimationName == interval.Name))
 			{
 				return true;
 			}

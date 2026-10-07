@@ -177,15 +177,15 @@ public class ActionEffect : ActionAnimation
 		return _Vector;
 	}
 
-	public override void Visit(Model ACENLMONNPA)
+	public override void Visit(Model model)
 	{
-		ACENLMONNPA.StartAction(this);
+		model.StartAction(this);
 	}
 
-	public void UpdateNodes(ModelObject OECPEDPMKCD, bool EKBOGDKIHIH, ModelNode AECCPADGGPG, bool PHADJMAONJG, ModelObject MJCGOJBGFIE = null)
+	public void UpdateNodes(ModelObject modelObject, bool isPlayer, ModelNode pivotNode, bool isChild, ModelObject childOwner = null)
 	{
-		_Position.UpdateNode(OECPEDPMKCD, EKBOGDKIHIH, AECCPADGGPG, PHADJMAONJG, MJCGOJBGFIE);
-		_Vector.UpdateNodes(OECPEDPMKCD, EKBOGDKIHIH, AECCPADGGPG, PHADJMAONJG, MJCGOJBGFIE);
+		_Position.UpdateNode(modelObject, isPlayer, pivotNode, isChild, childOwner);
+		_Vector.UpdateNodes(modelObject, isPlayer, pivotNode, isChild, childOwner);
 	}
 
 	public void ResetNodes()

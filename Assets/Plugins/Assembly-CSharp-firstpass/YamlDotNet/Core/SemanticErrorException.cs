@@ -10,23 +10,23 @@ namespace YamlDotNet.Core
 		{
 		}
 
-		public SemanticErrorException(string LIOGIBJBHAH)
-			: base(LIOGIBJBHAH)
+		public SemanticErrorException(string message)
+			: base(message)
 		{
 		}
 
-		public SemanticErrorException(Mark ILENLCMAMBH, Mark PCLFFOBJJFO, string LIOGIBJBHAH)
-			: base(ILENLCMAMBH, PCLFFOBJJFO, LIOGIBJBHAH)
+		public SemanticErrorException(Mark startMark, Mark endMark, string message)
+			: base(startMark, endMark, message)
 		{
 		}
 
-		public SemanticErrorException(string LIOGIBJBHAH, Exception LEPEAKBGHLB)
-			: base(LIOGIBJBHAH, LEPEAKBGHLB)
+		public SemanticErrorException(string message, Exception innerException)
+			: base(message, innerException)
 		{
 		}
 
-		protected SemanticErrorException(SerializationInfo EMBBNNBFODN, StreamingContext PDCAHMPCPOC)
-			: base(EMBBNNBFODN, PDCAHMPCPOC)
+		protected SemanticErrorException(SerializationInfo info, StreamingContext context)
+			: base(info, context)
 		{
 		}
 	}

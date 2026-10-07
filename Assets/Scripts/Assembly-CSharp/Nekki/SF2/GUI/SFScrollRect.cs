@@ -712,13 +712,13 @@ namespace Nekki.SF2.GUI
 			m_ScrollFactor = value;
 		}
 
-		public virtual void Rebuild(CanvasUpdate FLAKOEEDOAF)
+		public virtual void Rebuild(CanvasUpdate update)
 		{
-			if (FLAKOEEDOAF == CanvasUpdate.Prelayout)
+			if (update == CanvasUpdate.Prelayout)
 			{
 				UpdateCachedData();
 			}
-			if (FLAKOEEDOAF == CanvasUpdate.PostLayout)
+			if (update == CanvasUpdate.PostLayout)
 			{
 				UpdateBounds();
 				UpdateScrollbars(Vector2.zero);
@@ -877,39 +877,39 @@ namespace Nekki.SF2.GUI
 			wheelLast = m_Content.anchoredPosition;
 		}
 
-		public virtual void OnInitializePotentialDrag(PointerEventData BHOLFGOGPCP)
+		public virtual void OnInitializePotentialDrag(PointerEventData eventData)
 		{
-			if (BHOLFGOGPCP.button == PointerEventData.InputButton.Left)
+			if (eventData.button == PointerEventData.InputButton.Left)
 			{
 				m_Velocity = Vector2.zero;
 			}
 		}
 
-		public virtual void OnBeginDrag(PointerEventData BHOLFGOGPCP)
+		public virtual void OnBeginDrag(PointerEventData eventData)
 		{
-			if (BHOLFGOGPCP.button == PointerEventData.InputButton.Left && IsActive())
+			if (eventData.button == PointerEventData.InputButton.Left && IsActive())
 			{
 				UpdateBounds();
 				m_PointerStartLocalCursor = Vector2.zero;
-				RectTransformUtility.ScreenPointToLocalPointInRectangle(GetViewRect(), BHOLFGOGPCP.position, BHOLFGOGPCP.pressEventCamera, out m_PointerStartLocalCursor);
+				RectTransformUtility.ScreenPointToLocalPointInRectangle(GetViewRect(), eventData.position, eventData.pressEventCamera, out m_PointerStartLocalCursor);
 				m_ContentStartPosition = m_Content.anchoredPosition;
 				m_Dragging = true;
 				wheelActive = false;
 			}
 		}
 
-		public virtual void OnEndDrag(PointerEventData BHOLFGOGPCP)
+		public virtual void OnEndDrag(PointerEventData eventData)
 		{
-			if (BHOLFGOGPCP.button == PointerEventData.InputButton.Left)
+			if (eventData.button == PointerEventData.InputButton.Left)
 			{
 				m_Dragging = false;
 			}
 		}
 
-		public virtual void OnDrag(PointerEventData BHOLFGOGPCP)
+		public virtual void OnDrag(PointerEventData eventData)
 		{
 			Vector2 localPoint;
-			if (BHOLFGOGPCP.button != PointerEventData.InputButton.Left || !IsActive() || !RectTransformUtility.ScreenPointToLocalPointInRectangle(GetViewRect(), BHOLFGOGPCP.position, BHOLFGOGPCP.pressEventCamera, out localPoint))
+			if (eventData.button != PointerEventData.InputButton.Left || !IsActive() || !RectTransformUtility.ScreenPointToLocalPointInRectangle(GetViewRect(), eventData.position, eventData.pressEventCamera, out localPoint))
 			{
 				return;
 			}
@@ -1027,13 +1027,13 @@ namespace Nekki.SF2.GUI
 			m_PrevContentBounds = m_ContentBounds;
 		}
 
-		private void UpdateScrollbars(Vector2 IPCOBJBKNAO)
+		private void UpdateScrollbars(Vector2 offset)
 		{
 			if ((bool)m_HorizontalScrollbar)
 			{
 				if (m_ContentBounds.size.x > 0f)
 				{
-					m_HorizontalScrollbar.size = Mathf.Clamp01((m_ViewBounds.size.x - Mathf.Abs(IPCOBJBKNAO.x)) / m_ContentBounds.size.x);
+					m_HorizontalScrollbar.size = Mathf.Clamp01((m_ViewBounds.size.x - Mathf.Abs(offset.x)) / m_ContentBounds.size.x);
 				}
 				else
 				{
@@ -1045,7 +1045,7 @@ namespace Nekki.SF2.GUI
 			{
 				if (m_ContentBounds.size.y > 0f)
 				{
-					m_VerticalScrollbar.size = Mathf.Clamp01((m_ViewBounds.size.y - Mathf.Abs(IPCOBJBKNAO.y)) / m_ContentBounds.size.y);
+					m_VerticalScrollbar.size = Mathf.Clamp01((m_ViewBounds.size.y - Mathf.Abs(offset.y)) / m_ContentBounds.size.y);
 				}
 				else
 				{
@@ -1106,26 +1106,26 @@ namespace Nekki.SF2.GUI
 			SetNormalizedPosition(value, 1);
 		}
 
-		private void SetNormalizedPosition(float value, int NMADGDHJBGB)
+		private void SetNormalizedPosition(float value, int axis)
 		{
 			EnsureLayoutHasRebuilt();
 			UpdateBounds();
-			float num = m_ContentBounds.size[NMADGDHJBGB] - m_ViewBounds.size[NMADGDHJBGB];
-			float num2 = m_ViewBounds.min[NMADGDHJBGB] - value * num;
-			float num3 = m_Content.localPosition[NMADGDHJBGB] + num2 - m_ContentBounds.min[NMADGDHJBGB];
+			float num = m_ContentBounds.size[axis] - m_ViewBounds.size[axis];
+			float num2 = m_ViewBounds.min[axis] - value * num;
+			float num3 = m_Content.localPosition[axis] + num2 - m_ContentBounds.min[axis];
 			Vector3 localPosition = m_Content.localPosition;
-			if (Mathf.Abs(localPosition[NMADGDHJBGB] - num3) > 0.01f)
+			if (Mathf.Abs(localPosition[axis] - num3) > 0.01f)
 			{
-				localPosition[NMADGDHJBGB] = num3;
+				localPosition[axis] = num3;
 				m_Content.localPosition = localPosition;
-				m_Velocity[NMADGDHJBGB] = 0f;
+				m_Velocity[axis] = 0f;
 				UpdateBounds();
 			}
 		}
 
-		private static float RubberDelta(float LLKABJBFHKJ, float HHOGGNHEFEG)
+		private static float RubberDelta(float overStretching, float viewSize)
 		{
-			return (1f - 1f / (Mathf.Abs(LLKABJBFHKJ) * 0.55f / HHOGGNHEFEG + 1f)) * HHOGGNHEFEG * Mathf.Sign(LLKABJBFHKJ);
+			return (1f - 1f / (Mathf.Abs(overStretching) * 0.55f / viewSize + 1f)) * viewSize * Mathf.Sign(overStretching);
 		}
 
 		protected override void OnRectTransformDimensionsChange()
@@ -1371,7 +1371,7 @@ namespace Nekki.SF2.GUI
 			return result;
 		}
 
-		private Vector2 CalculateOffset(Vector2 FOIPKLDNGDL)
+		private Vector2 CalculateOffset(Vector2 delta)
 		{
 			Vector2 zero = Vector2.zero;
 			if (m_MovementType == ScrollMovementType.Unrestricted)
@@ -1382,8 +1382,8 @@ namespace Nekki.SF2.GUI
 			Vector2 vector2 = m_ContentBounds.max;
 			if (m_Horizontal)
 			{
-				vector.x += FOIPKLDNGDL.x;
-				vector2.x += FOIPKLDNGDL.x;
+				vector.x += delta.x;
+				vector2.x += delta.x;
 				if (vector.x > m_ViewBounds.min.x)
 				{
 					zero.x = m_ViewBounds.min.x - vector.x;
@@ -1395,8 +1395,8 @@ namespace Nekki.SF2.GUI
 			}
 			if (m_Vertical)
 			{
-				vector.y += FOIPKLDNGDL.y;
-				vector2.y += FOIPKLDNGDL.y;
+				vector.y += delta.y;
+				vector2.y += delta.y;
 				if (vector2.y < m_ViewBounds.max.y)
 				{
 					zero.y = m_ViewBounds.max.y - vector2.y;

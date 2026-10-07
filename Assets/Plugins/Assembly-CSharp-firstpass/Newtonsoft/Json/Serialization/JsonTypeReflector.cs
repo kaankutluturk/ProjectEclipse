@@ -71,14 +71,14 @@ namespace Newtonsoft.Json.Serialization
 
 		public static DataContractAttribute GetDataContractAttribute(Type type)
 		{
-			DataContractAttribute pKEPKNKOLBH = null;
+			DataContractAttribute dataContract = null;
 			Type type2 = type;
-			while (pKEPKNKOLBH == null && type2 != null)
+			while (dataContract == null && type2 != null)
 			{
-				pKEPKNKOLBH = CachedAttributeGetter<DataContractAttribute>.GetAttribute(type2);
+				dataContract = CachedAttributeGetter<DataContractAttribute>.GetAttribute(type2);
 				type2 = type2.BaseType;
 			}
-			return pKEPKNKOLBH;
+			return dataContract;
 		}
 
 		public static DataMemberAttribute GetDataMemberAttribute(MemberInfo memberInfo)

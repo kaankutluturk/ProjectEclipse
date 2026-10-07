@@ -163,9 +163,9 @@ internal sealed class HTTPConnection : IDisposable
 		}
 	}
 
-	internal HTTPConnection(string FDFCPOOHGLE)
+	internal HTTPConnection(string serverAddress)
 	{
-		set_ServerAddress(FDFCPOOHGLE);
+		set_ServerAddress(serverAddress);
 		set_State(HTTPConnectionStates.Initial);
 		lastProcessTime = DateTime.UtcNow;
 	}
@@ -260,7 +260,7 @@ internal sealed class HTTPConnection : IDisposable
 		lastProcessedUri = value;
 	}
 
-	internal void Process(HTTPRequest ONOCIELLAPL)
+	internal void Process(HTTPRequest request)
 	{
 		if (GetState() == HTTPConnectionStates.Processing)
 		{
@@ -268,7 +268,7 @@ internal sealed class HTTPConnection : IDisposable
 		}
 		SetStartTime(DateTime.MaxValue);
 		set_State(HTTPConnectionStates.Processing);
-		SetCurrentRequest(ONOCIELLAPL);
+		SetCurrentRequest(request);
 		new System.Threading.Thread(ThreadFunc).Start();
 	}
 
@@ -282,11 +282,11 @@ internal sealed class HTTPConnection : IDisposable
 		SetCurrentRequest(null);
 	}
 
-	private void ThreadFunc(object KKNOCIPBIIK)
+	private void ThreadFunc(object threadState)
 	{
 		bool flag = false;
 		bool flag2 = false;
-		RetryCauses aKALLIGHOHC = RetryCauses.None;
+		RetryCauses retryCause = RetryCauses.None;
 		try
 		{
 			if (!GetHasProxy() && GetCurrentRequest().GetHasProxy())
@@ -303,13 +303,13 @@ internal sealed class HTTPConnection : IDisposable
 			}
 			do
 			{
-				if (aKALLIGHOHC == RetryCauses.Reconnect)
+				if (retryCause == RetryCauses.Reconnect)
 				{
 					Close();
 					System.Threading.Thread.Sleep(100);
 				}
 				set_LastProcessedUri(GetCurrentRequest().GetCurrentUri());
-				aKALLIGHOHC = RetryCauses.None;
+				retryCause = RetryCauses.None;
 				Connect();
 				if (GetState() == HTTPConnectionStates.AbortRequested)
 				{
@@ -337,7 +337,7 @@ internal sealed class HTTPConnection : IDisposable
 						throw ex;
 					}
 					flag = true;
-					aKALLIGHOHC = RetryCauses.Reconnect;
+					retryCause = RetryCauses.Reconnect;
 				}
 				if (!flag3)
 				{
@@ -351,7 +351,7 @@ internal sealed class HTTPConnection : IDisposable
 				if (!flag4 && !flag && !GetCurrentRequest().GetDisableRetry())
 				{
 					flag = true;
-					aKALLIGHOHC = RetryCauses.Reconnect;
+					retryCause = RetryCauses.Reconnect;
 				}
 				if (GetCurrentRequest().GetResponse() == null)
 				{
@@ -368,7 +368,7 @@ internal sealed class HTTPConnection : IDisposable
 						kHNAPCOOAEF2.ParseChallange(text3);
 						if (GetCurrentRequest().GetCredentials() != null && kHNAPCOOAEF2.IsUriProtected(GetCurrentRequest().GetCurrentUri()) && (!GetCurrentRequest().HasHeader("Authorization") || kHNAPCOOAEF2.GetStale()))
 						{
-							aKALLIGHOHC = RetryCauses.Authenticate;
+							retryCause = RetryCauses.Authenticate;
 						}
 					}
 					break;
@@ -382,11 +382,11 @@ internal sealed class HTTPConnection : IDisposable
 					string text2 = DigestStore.FindBest(GetCurrentRequest().GetResponse().GetHeaderValues("proxy-authenticate"));
 					if (!string.IsNullOrEmpty(text2))
 					{
-						Digest kHNAPCOOAEF = DigestStore.GetOrCreate(GetCurrentRequest().GetProxy().GetAddress());
-						kHNAPCOOAEF.ParseChallange(text2);
-						if (GetCurrentRequest().GetProxy().GetCredentials() != null && kHNAPCOOAEF.IsUriProtected(GetCurrentRequest().GetProxy().GetAddress()) && (!GetCurrentRequest().HasHeader("Proxy-Authorization") || kHNAPCOOAEF.GetStale()))
+						Digest proxyDigest = DigestStore.GetOrCreate(GetCurrentRequest().GetProxy().GetAddress());
+						proxyDigest.ParseChallange(text2);
+						if (GetCurrentRequest().GetProxy().GetCredentials() != null && proxyDigest.IsUriProtected(GetCurrentRequest().GetProxy().GetAddress()) && (!GetCurrentRequest().HasHeader("Proxy-Authorization") || proxyDigest.GetStale()))
 						{
-							aKALLIGHOHC = RetryCauses.ProxyAuthenticate;
+							retryCause = RetryCauses.ProxyAuthenticate;
 						}
 					}
 					break;
@@ -397,8 +397,8 @@ internal sealed class HTTPConnection : IDisposable
 				case 308:
 					if (GetCurrentRequest().GetRedirectCount() < GetCurrentRequest().GetMaxRedirects())
 					{
-						HTTPRequest iPLGNIDJDCF = GetCurrentRequest();
-						iPLGNIDJDCF.SetRedirectCount(iPLGNIDJDCF.GetRedirectCount() + 1);
+						HTTPRequest request = GetCurrentRequest();
+						request.SetRedirectCount(request.GetRedirectCount() + 1);
 						string text = GetCurrentRequest().GetResponse().GetFirstHeaderValue("location");
 						if (string.IsNullOrEmpty(text))
 						{
@@ -430,12 +430,12 @@ internal sealed class HTTPConnection : IDisposable
 					Close();
 				}
 			}
-			while (aKALLIGHOHC != RetryCauses.None);
+			while (retryCause != RetryCauses.None);
 		}
-		catch (TimeoutException bAINMLLIKOL)
+		catch (TimeoutException ex)
 		{
 			GetCurrentRequest().SetResponse(null);
-			GetCurrentRequest().set_Exception(bAINMLLIKOL);
+			GetCurrentRequest().set_Exception(ex);
 			GetCurrentRequest().set_State(HTTPRequestStates.ConnectionTimedOut);
 			Close();
 		}
@@ -557,10 +557,10 @@ internal sealed class HTTPConnection : IDisposable
 					case AuthenticationTypes.Unknown:
 					case AuthenticationTypes.Digest:
 					{
-						Digest kHNAPCOOAEF = DigestStore.Get(GetProxy().GetAddress());
-						if (kHNAPCOOAEF != null)
+						Digest proxyDigest = DigestStore.Get(GetProxy().GetAddress());
+						if (proxyDigest != null)
 						{
-							string text = kHNAPCOOAEF.GenerateResponseHeader(GetCurrentRequest(), GetProxy().GetCredentials());
+							string text = proxyDigest.GenerateResponseHeader(GetCurrentRequest(), GetProxy().GetCredentials());
 							if (!string.IsNullOrEmpty(text))
 							{
 								binaryWriter.Write(string.Format("Proxy-Authorization: {0}", text).GetASCIIBytes());
@@ -614,7 +614,7 @@ internal sealed class HTTPConnection : IDisposable
 				Stream = tlsClientProtocol.Stream;
 				return;
 			}
-			SslStream sslStream = new SslStream(Client.GetStream(), false, (object ABONPDBPJBA, X509Certificate DBCFDLIJOBD, X509Chain GCONPBMJDFL, SslPolicyErrors FKDNIHKLCGP) => GetCurrentRequest().CallCustomCertificationValidator(DBCFDLIJOBD, GCONPBMJDFL));
+			SslStream sslStream = new SslStream(Client.GetStream(), false, (object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors) => GetCurrentRequest().CallCustomCertificationValidator(certificate, chain));
 			if (!sslStream.IsAuthenticated)
 			{
 				sslStream.AuthenticateAsClient(GetCurrentRequest().GetCurrentUri().Host);
@@ -629,8 +629,8 @@ internal sealed class HTTPConnection : IDisposable
 
 	private bool Receive()
 	{
-		SupportedProtocols eNLHAIGCCBO = ((GetCurrentRequest().GetProtocolHandler() != SupportedProtocols.Unknown) ? GetCurrentRequest().GetProtocolHandler() : HTTPProtocolFactory.GetProtocolFromUri(GetCurrentRequest().GetCurrentUri()));
-		GetCurrentRequest().SetResponse(HTTPProtocolFactory.Get(eNLHAIGCCBO, GetCurrentRequest(), Stream, GetCurrentRequest().GetUseStreaming(), false));
+		SupportedProtocols protocol = ((GetCurrentRequest().GetProtocolHandler() != SupportedProtocols.Unknown) ? GetCurrentRequest().GetProtocolHandler() : HTTPProtocolFactory.GetProtocolFromUri(GetCurrentRequest().GetCurrentUri()));
+		GetCurrentRequest().SetResponse(HTTPProtocolFactory.Get(protocol, GetCurrentRequest(), Stream, GetCurrentRequest().GetUseStreaming(), false));
 		if (!GetCurrentRequest().GetResponse().Receive())
 		{
 			GetCurrentRequest().SetResponse(null);
@@ -638,15 +638,15 @@ internal sealed class HTTPConnection : IDisposable
 		}
 		if (GetCurrentRequest().GetResponse().GetStatusCode() == 304)
 		{
-			int BDBOAEGELMC;
-			using (Stream aBJIEFMMIEK = HTTPCacheService.GetBody(GetCurrentRequest().GetCurrentUri(), out BDBOAEGELMC))
+			int length;
+			using (Stream bodyStream = HTTPCacheService.GetBody(GetCurrentRequest().GetCurrentUri(), out length))
 			{
 				if (!GetCurrentRequest().GetResponse().HasHeader("content-length"))
 				{
-					GetCurrentRequest().GetResponse().GetHeaders().Add("content-length", new List<string>(1) { BDBOAEGELMC.ToString() });
+					GetCurrentRequest().GetResponse().GetHeaders().Add("content-length", new List<string>(1) { length.ToString() });
 				}
 				GetCurrentRequest().GetResponse().SetIsFromCache(true);
-				GetCurrentRequest().GetResponse().ReadRaw(aBJIEFMMIEK, BDBOAEGELMC);
+				GetCurrentRequest().GetResponse().ReadRaw(bodyStream, length);
 			}
 		}
 		return true;
@@ -684,17 +684,17 @@ internal sealed class HTTPConnection : IDisposable
 		}
 	}
 
-	private Uri GetRedirectUri(string LPJNEDFCBOI)
+	private Uri GetRedirectUri(string location)
 	{
 		Uri uri = null;
 		try
 		{
-			return new Uri(LPJNEDFCBOI);
+			return new Uri(location);
 		}
 		catch (UriFormatException)
 		{
 			Uri uri2 = GetCurrentRequest().GetUri();
-			UriBuilder uriBuilder = new UriBuilder(uri2.Scheme, uri2.Host, uri2.Port, LPJNEDFCBOI);
+			UriBuilder uriBuilder = new UriBuilder(uri2.Scheme, uri2.Host, uri2.Port, location);
 			return uriBuilder.Uri;
 		}
 	}
@@ -707,9 +707,9 @@ internal sealed class HTTPConnection : IDisposable
 			{
 				GetCurrentRequest().OnProgress(GetCurrentRequest(), GetCurrentRequest().GetDownloaded(), GetCurrentRequest().GetDownloadLength());
 			}
-			catch (Exception mPFFFAOGBJE)
+			catch (Exception ex)
 			{
-				HTTPManager.GetLogger().Exception("HTTPManager", "HandleProgressCallback - OnProgress", mPFFFAOGBJE);
+				HTTPManager.GetLogger().Exception("HTTPManager", "HandleProgressCallback - OnProgress", ex);
 			}
 			GetCurrentRequest().SetDownloadProgressChanged(false);
 		}
@@ -745,17 +745,17 @@ internal sealed class HTTPConnection : IDisposable
 				GetCurrentRequest().CallCallback();
 			}
 		}
-		catch (Exception mPFFFAOGBJE)
+		catch (Exception ex)
 		{
-			HTTPManager.GetLogger().Exception("HTTPManager", "HandleCallback", mPFFFAOGBJE);
+			HTTPManager.GetLogger().Exception("HTTPManager", "HandleCallback", ex);
 		}
 	}
 
-	internal void Abort(HTTPConnectionStates MPJEMGJIBBD)
+	internal void Abort(HTTPConnectionStates newState)
 	{
-		set_State(MPJEMGJIBBD);
-		HTTPConnectionStates aHFEJIOPFGP = GetState();
-		if (aHFEJIOPFGP == HTTPConnectionStates.TimedOut)
+		set_State(newState);
+		HTTPConnectionStates currentState = GetState();
+		if (currentState == HTTPConnectionStates.TimedOut)
 		{
 			SetTimedOutStart(DateTime.UtcNow);
 		}

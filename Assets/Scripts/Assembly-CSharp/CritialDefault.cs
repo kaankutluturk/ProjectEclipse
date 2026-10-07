@@ -16,22 +16,22 @@ public class CritialDefault
 		_Damage.Second = xmlNode2.Attributes["Attribute"].GetStringOrDefault(string.Empty);
 	}
 
-	public float GetProbability(Model ACENLMONNPA)
+	public float GetProbability(Model model)
 	{
-		int OEMALIFPGPO = 0;
-		if (ACENLMONNPA.Parameters.FinalAttributes.Get(_Probability.Second, ref OEMALIFPGPO) && !string.IsNullOrEmpty(_Probability.Second))
+		int attributeValue = 0;
+		if (model.Parameters.FinalAttributes.Get(_Probability.Second, ref attributeValue) && !string.IsNullOrEmpty(_Probability.Second))
 		{
-			return _Probability.First * (float)OEMALIFPGPO;
+			return _Probability.First * (float)attributeValue;
 		}
 		return _Probability.First;
 	}
 
-	public float GetDamage(Model ACENLMONNPA)
+	public float GetDamage(Model model)
 	{
-		int OEMALIFPGPO = 0;
-		if (ACENLMONNPA.Parameters.FinalAttributes.Get(_Damage.Second, ref OEMALIFPGPO) && !string.IsNullOrEmpty(_Damage.Second))
+		int attributeValue = 0;
+		if (model.Parameters.FinalAttributes.Get(_Damage.Second, ref attributeValue) && !string.IsNullOrEmpty(_Damage.Second))
 		{
-			return _Damage.First * (float)OEMALIFPGPO;
+			return _Damage.First * (float)attributeValue;
 		}
 		return _Damage.First;
 	}

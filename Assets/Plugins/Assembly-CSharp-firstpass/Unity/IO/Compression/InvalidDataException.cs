@@ -11,18 +11,18 @@ namespace Unity.IO.Compression
 		{
 		}
 
-		public InvalidDataException(string LIOGIBJBHAH)
-			: base(LIOGIBJBHAH)
+		public InvalidDataException(string message)
+			: base(message)
 		{
 		}
 
-		public InvalidDataException(string LIOGIBJBHAH, Exception OLABPFGLNFC)
-			: base(LIOGIBJBHAH, OLABPFGLNFC)
+		public InvalidDataException(string message, Exception innerException)
+			: base(message, innerException)
 		{
 		}
 
-		internal InvalidDataException(SerializationInfo EMBBNNBFODN, StreamingContext PDCAHMPCPOC)
-			: base(EMBBNNBFODN, PDCAHMPCPOC)
+		internal InvalidDataException(SerializationInfo info, StreamingContext context)
+			: base(info, context)
 		{
 		}
 	}

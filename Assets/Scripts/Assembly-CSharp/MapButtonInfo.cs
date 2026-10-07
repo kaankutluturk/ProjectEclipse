@@ -46,18 +46,18 @@ public class MapButtonInfo
 	{
 	}
 
-	public MapButtonInfo(string _name, string NCKCDCODNHA, string KMFDBBKMLOO, Vector2 LGDMCAAHPOC, bool _AutoPosition = false, string Atlas = "", string IOKOBBFCIGE = "IMAGE", float AMEGCDJDGPB = 0f, float JDDJEAGMNMP = 0f, string BFBFKHHANJG = "Story", float anchorMinX = 0.5f, float anchorMaxX = 0.5f)
+	public MapButtonInfo(string _name, string imageName, string timer, Vector2 LGDMCAAHPOC, bool _AutoPosition = false, string Atlas = "", string typeName = "IMAGE", float speed = 0f, float pause = 0f, string showTypeName = "Story", float anchorMinX = 0.5f, float anchorMaxX = 0.5f)
 	{
 		Name = _name;
-		ImageName = NCKCDCODNHA;
-		Timer = KMFDBBKMLOO;
+		ImageName = imageName;
+		Timer = timer;
 		AtlasName = Atlas;
-		TypeName = IOKOBBFCIGE;
+		TypeName = typeName;
 		Position = LGDMCAAHPOC;
 		AutoPosition = _AutoPosition;
-		Speed = AMEGCDJDGPB;
-		Pause = JDDJEAGMNMP;
-		ShowTypeName = BFBFKHHANJG;
+		Speed = speed;
+		Pause = pause;
+		ShowTypeName = showTypeName;
 		AnchorMinX = anchorMinX;
 		AnchorMaxX = anchorMaxX;
 	}

@@ -1,1 +1,1 @@
-public delegate void OnPrepareRequestDelegate(Connection MDGFGCDPGFI, HTTPRequest CGOIOKHEGOE, SignalRRequestType LFLGCDNKNJI);
+public delegate void OnPrepareRequestDelegate(Connection connection, HTTPRequest request, SignalRRequestType requestType);

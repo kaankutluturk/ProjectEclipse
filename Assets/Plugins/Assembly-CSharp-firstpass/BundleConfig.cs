@@ -63,20 +63,20 @@ public class BundleConfig
 
 	public void Save(string path)
 	{
-		string dMNBDBJNKME = JsonConvert.SerializeObject(this, Formatting.Indented);
-		FileUtils.WriteText(path, dMNBDBJNKME);
+		string json = JsonConvert.SerializeObject(this, Formatting.Indented);
+		FileUtils.WriteText(path, json);
 	}
 
-	public bool Equal(Hash128 HDPBNCNCMOH)
+	public bool Equal(Hash128 hash)
 	{
-		return Equal(HDPBNCNCMOH.ToString());
+		return Equal(hash.ToString());
 	}
 
-	public bool Equal(string HDPBNCNCMOH)
+	public bool Equal(string hash)
 	{
 		foreach (KeyValuePair<string, BundleData> bundle in Bundles)
 		{
-			if (bundle.Value.Hash.Equals(HDPBNCNCMOH))
+			if (bundle.Value.Hash.Equals(hash))
 			{
 				return true;
 			}

@@ -2,9 +2,9 @@ using System;
 
 public interface IYamlTypeConverter
 {
-	bool Accepts(Type LFLGCDNKNJI);
+	bool Accepts(Type type);
 
-	object ReadYaml(IParser BPGMNGAJMKK, Type LFLGCDNKNJI);
+	object ReadYaml(IParser parser, Type type);
 
-	void WriteYaml(IEmitter NPIDIMCLNEM, object value, Type LFLGCDNKNJI);
+	void WriteYaml(IEmitter emitter, object value, Type type);
 }

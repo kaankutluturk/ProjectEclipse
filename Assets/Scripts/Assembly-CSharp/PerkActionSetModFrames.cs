@@ -37,11 +37,11 @@ public class PerkActionSetModFrames : PerkAction
 	{
 	}
 
-	public PerkActionSetModFrames(PerkActionSetModFrames NOLFMPDGCOC)
-		: base(NOLFMPDGCOC)
+	public PerkActionSetModFrames(PerkActionSetModFrames source)
+		: base(source)
 	{
-		set_ModName(NOLFMPDGCOC.GetModName());
-		SetModFrames(NOLFMPDGCOC.GetModFrames());
+		set_ModName(source.GetModName());
+		SetModFrames(source.GetModFrames());
 	}
 
 	public string GetModName()

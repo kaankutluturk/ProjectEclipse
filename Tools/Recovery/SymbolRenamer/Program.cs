@@ -278,6 +278,12 @@ sealed class ProjectModel
                 }
                 return ev;
             case IParameterSymbol parameter:
+                if (parameter.ContainingSymbol is IMethodSymbol { AssociatedSymbol: IPropertySymbol { IsIndexer: true } indexer }
+                    && parameter.Ordinal < indexer.Parameters.Length)
+                {
+                    // Indexer accessors carry their own copies of the indexer's parameters.
+                    return Normalize(indexer.Parameters[parameter.Ordinal]);
+                }
                 if (parameter.ContainingSymbol is IMethodSymbol owner && owner.ReducedFrom != null)
                 {
                     return owner.ReducedFrom.OriginalDefinition.Parameters[parameter.Ordinal + 1];

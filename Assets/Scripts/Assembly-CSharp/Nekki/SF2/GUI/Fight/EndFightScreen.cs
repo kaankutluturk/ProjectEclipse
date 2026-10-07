@@ -30,7 +30,7 @@ namespace Nekki.SF2.GUI.Fight
 
 		private string timesUpSpriteName = "FightUI.Label_Timesup";
 
-		public void Init(FightResult HEIADONEACH)
+		public void Init(FightResult result)
 		{
 			// The recovered shadow is a fixed-width strip scaled 22x. Fill the
 			// actual viewport so wide windows do not leave a bright uncovered edge.
@@ -43,7 +43,7 @@ namespace Nekki.SF2.GUI.Fight
 				background.offsetMin = background.offsetMax = Vector2.zero;
 			}
 			EnableFinishButton(false);
-			fightResult = HEIADONEACH;
+			fightResult = result;
 			if (_resultHeader != null)
 			{
 				bool flag = fightResult.IsWinner();
@@ -68,11 +68,11 @@ namespace Nekki.SF2.GUI.Fight
 			}
 		}
 
-		private void EnableFinishButton(bool IJHFJPBBNEJ)
+		private void EnableFinishButton(bool enabled)
 		{
 			if (_animationFinishButton != null)
 			{
-				_animationFinishButton.gameObject.SetActive(IJHFJPBBNEJ);
+				_animationFinishButton.gameObject.SetActive(enabled);
 			}
 		}
 
@@ -100,7 +100,7 @@ namespace Nekki.SF2.GUI.Fight
 			BackKeyManager.get_Instance().RemoveBackKeyController(this);
 		}
 
-		public void OnBackKeyClicked(object GHDPPHAAPCA)
+		public void OnBackKeyClicked(object sender)
 		{
 			GameUtils.HandleSurrender(fightResult);
 		}

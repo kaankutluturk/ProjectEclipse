@@ -148,10 +148,10 @@ namespace Nekki.SF2.GUI
 			currentOpacity = value;
 		}
 
-		public override void OnPointerClick(PointerEventData BHOLFGOGPCP)
+		public override void OnPointerClick(PointerEventData eventData)
 		{
-			base.OnPointerClick(BHOLFGOGPCP);
-			if (BHOLFGOGPCP.clickCount > 1)
+			base.OnPointerClick(eventData);
+			if (eventData.clickCount > 1)
 			{
 				get_onDoubleClick().Invoke();
 			}

@@ -14,12 +14,12 @@ public class IntervalAttack : IntervalAnimation
 
 		public float FactorMultiplier;
 
-		public Factors(float IOGMPFJOCPE = 1f, float BEMFHMKCJOK = 1f, bool BBBPANLHLEM = false, bool LNJNGGBCPFH = false)
+		public Factors(float factor = 1f, float factorMultiplier = 1f, bool isFactorSet = false, bool isMultiplierSet = false)
 		{
-			IsFactorSet = BBBPANLHLEM;
-			IsMultiplierSet = LNJNGGBCPFH;
-			Factor = IOGMPFJOCPE;
-			FactorMultiplier = BEMFHMKCJOK;
+			IsFactorSet = isFactorSet;
+			IsMultiplierSet = isMultiplierSet;
+			Factor = factor;
+			FactorMultiplier = factorMultiplier;
 		}
 
 		public void UpdateFactor()
@@ -47,11 +47,11 @@ public class IntervalAttack : IntervalAnimation
 		{
 		}
 
-		public Reaction(string _name, int IKJGMFDONPK, int BBFNPCJLJIM)
+		public Reaction(string _name, int start, int endFrame)
 		{
 			Name = _name;
-			Start = IKJGMFDONPK;
-			EndFrameValue = BBFNPCJLJIM;
+			Start = start;
+			EndFrameValue = endFrame;
 		}
 	}
 
@@ -313,13 +313,13 @@ public class IntervalAttack : IntervalAnimation
 		return defenseTypes;
 	}
 
-	public string GetReactionName(int BJNCGLPAMMF)
+	public string GetReactionName(int frame)
 	{
 		foreach (Reaction item in hitReactions)
 		{
-			int bOPAEEBGFAN = item.Start;
-			int pLHPGFGAGKJ = item.EndFrameValue;
-			if (bOPAEEBGFAN <= BJNCGLPAMMF && BJNCGLPAMMF <= pLHPGFGAGKJ)
+			int reactionStart = item.Start;
+			int reactionEnd = item.EndFrameValue;
+			if (reactionStart <= frame && frame <= reactionEnd)
 			{
 				return item.Name;
 			}
@@ -327,14 +327,14 @@ public class IntervalAttack : IntervalAnimation
 		return string.Empty;
 	}
 
-	public static float GetItemFactor(float CKKFKEIELCP, float JMMCOMOIDNN, float KEOGNFIOEIB)
+	public static float GetItemFactor(float attributeValue, float baseValue, float doublingRange)
 	{
-		return Mathf.Pow(2f, (CKKFKEIELCP - JMMCOMOIDNN) / KEOGNFIOEIB);
+		return Mathf.Pow(2f, (attributeValue - baseValue) / doublingRange);
 	}
 
-	public void UpdateFactor(RuleAppliance EJPOJJKKICO)
+	public void UpdateFactor(RuleAppliance ruleAppliance)
 	{
-		switch (EJPOJJKKICO)
+		switch (ruleAppliance)
 		{
 		case RuleAppliance.AppliancePlayer:
 			playerFactors.UpdateFactor();
@@ -349,9 +349,9 @@ public class IntervalAttack : IntervalAnimation
 		}
 	}
 
-	public Factors GetFactors(RuleAppliance EJPOJJKKICO)
+	public Factors GetFactors(RuleAppliance ruleAppliance)
 	{
-		switch (EJPOJJKKICO)
+		switch (ruleAppliance)
 		{
 		case RuleAppliance.AppliancePlayer:
 			return playerFactors;
@@ -426,16 +426,16 @@ public class IntervalAttack : IntervalAnimation
 		ParseFactorAndDefenseItems(xmlNode6);
 	}
 
-	private void ParseFactorAndDefenseItems(XmlNode KPOOAIGIDPL)
+	private void ParseFactorAndDefenseItems(XmlNode node)
 	{
-		foreach (XmlNode childNode in KPOOAIGIDPL.ChildNodes)
+		foreach (XmlNode childNode in node.ChildNodes)
 		{
 			string name = childNode.Name;
 			string text = childNode.Attributes["Type"].GetStringOrDefault(string.Empty);
-			float pOFHDGJAFMP = childNode.Attributes["Shift"].ParseFloat();
+			float shift = childNode.Attributes["Shift"].ParseFloat();
 			if (name == "Damage")
 			{
-				damageAttributes.Add(new global::Pair<string, float>(text, pOFHDGJAFMP));
+				damageAttributes.Add(new global::Pair<string, float>(text, shift));
 				// Ranged and magic damage remain unblockable even in cast/follow-up
 				// intervals that omit IgnoresBlock. Ordinary melee keeps its XML rules.
 				if (!ignoresBlock && (text == "RangedDamage" || text == "MagicDamage"))

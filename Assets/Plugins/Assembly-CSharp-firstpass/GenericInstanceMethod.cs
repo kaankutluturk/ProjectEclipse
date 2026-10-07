@@ -6,21 +6,21 @@ public sealed class GenericInstanceMethod<TInstance>
 {
 	private readonly MethodInfo methodToCall;
 
-	public GenericInstanceMethod(Expression<Action<TInstance>> BOPGDKGIGHM)
+	public GenericInstanceMethod(Expression<Action<TInstance>> expression)
 	{
-		MethodCallExpression methodCallExpression = (MethodCallExpression)BOPGDKGIGHM.Body;
+		MethodCallExpression methodCallExpression = (MethodCallExpression)expression.Body;
 		methodToCall = methodCallExpression.Method.GetGenericMethodDefinition();
 	}
 
-	public object Invoke(Type[] GIAFINCFDLC, TInstance instance, params object[] arguments)
+	public object Invoke(Type[] genericArguments, TInstance instance, params object[] arguments)
 	{
 		try
 		{
-			return methodToCall.MakeGenericMethod(GIAFINCFDLC).Invoke(instance, arguments);
+			return methodToCall.MakeGenericMethod(genericArguments).Invoke(instance, arguments);
 		}
-		catch (TargetInvocationException mPFFFAOGBJE)
+		catch (TargetInvocationException ex)
 		{
-			throw mPFFFAOGBJE.Unwrap();
+			throw ex.Unwrap();
 		}
 	}
 }

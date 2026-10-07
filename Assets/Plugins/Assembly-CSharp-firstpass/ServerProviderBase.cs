@@ -38,13 +38,13 @@ public abstract class ServerProviderBase : MonoBehaviour
 			}
 		}
 
-		public SelectQuery(string BFGHBIMJHAK, string[] KHGIIFDIHHA, QueryCondition[] conditions, string[] order, int? LOHCIKNKDEI)
+		public SelectQuery(string table, string[] fields, QueryCondition[] conditions, string[] order, int? limit)
 		{
-			_table = BFGHBIMJHAK;
-			SetFields(KHGIIFDIHHA);
+			_table = table;
+			SetFields(fields);
 			_conditions = conditions;
 			providerOrder = order;
-			_limit = LOHCIKNKDEI;
+			_limit = limit;
 		}
 
 		public string[] GetFields()
@@ -59,8 +59,8 @@ public abstract class ServerProviderBase : MonoBehaviour
 
 		private Form ToForm()
 		{
-			Form lBFANOCPALF = new Form();
-			lBFANOCPALF.Add("table", _table);
+			Form form = new Form();
+			form.Add("table", _table);
 			StringBuilder stringBuilder = new StringBuilder();
 			stringBuilder.Append("[");
 			for (int i = 0; i < GetFields().Length; i++)
@@ -72,10 +72,10 @@ public abstract class ServerProviderBase : MonoBehaviour
 				}
 			}
 			stringBuilder.Append("]");
-			lBFANOCPALF.Add("fields", stringBuilder.ToString());
+			form.Add("fields", stringBuilder.ToString());
 			if (_conditions != null)
 			{
-				lBFANOCPALF.Add("where", QueryCondition.ToJson(_conditions));
+				form.Add("where", QueryCondition.ToJson(_conditions));
 			}
 			if (providerOrder != null)
 			{
@@ -90,20 +90,20 @@ public abstract class ServerProviderBase : MonoBehaviour
 					}
 				}
 				stringBuilder2.Append("]");
-				lBFANOCPALF.Add("order", stringBuilder2.ToString());
+				form.Add("order", stringBuilder2.ToString());
 			}
-			int? eDEKKCMHGEN = _limit;
-			if (eDEKKCMHGEN.HasValue)
+			int? limitValue = _limit;
+			if (limitValue.HasValue)
 			{
-				lBFANOCPALF.Add("limit", _limit.Value);
+				form.Add("limit", _limit.Value);
 			}
-			return lBFANOCPALF;
+			return form;
 		}
 
 		[SpecialName]
-		public static WWWForm op_Implicit(SelectQuery JHELEGOAKFH)
+		public static WWWForm op_Implicit(SelectQuery query)
 		{
-			return Form.op_Implicit(JHELEGOAKFH.ToForm());
+			return Form.op_Implicit(query.ToForm());
 		}
 	}
 
@@ -119,40 +119,40 @@ public abstract class ServerProviderBase : MonoBehaviour
 		{
 		}
 
-		public static QueryCondition Greater(string FEEOCAFHHFP, object value)
+		public static QueryCondition Greater(string fieldName, object value)
 		{
-			QueryCondition dHBAMBIHOEC = new QueryCondition();
-			dHBAMBIHOEC.field = FEEOCAFHHFP;
-			dHBAMBIHOEC.op = ">";
-			dHBAMBIHOEC.value = value.ToString();
-			return dHBAMBIHOEC;
+			QueryCondition condition = new QueryCondition();
+			condition.field = fieldName;
+			condition.op = ">";
+			condition.value = value.ToString();
+			return condition;
 		}
 
-		public static QueryCondition Less(string FEEOCAFHHFP, object value)
+		public static QueryCondition Less(string fieldName, object value)
 		{
-			QueryCondition dHBAMBIHOEC = new QueryCondition();
-			dHBAMBIHOEC.field = FEEOCAFHHFP;
-			dHBAMBIHOEC.op = "<";
-			dHBAMBIHOEC.value = value.ToString();
-			return dHBAMBIHOEC;
+			QueryCondition condition = new QueryCondition();
+			condition.field = fieldName;
+			condition.op = "<";
+			condition.value = value.ToString();
+			return condition;
 		}
 
-		public static QueryCondition Equals(string FEEOCAFHHFP, object value)
+		public static QueryCondition Equals(string fieldName, object value)
 		{
-			QueryCondition dHBAMBIHOEC = new QueryCondition();
-			dHBAMBIHOEC.field = FEEOCAFHHFP;
-			dHBAMBIHOEC.op = "=";
-			dHBAMBIHOEC.value = value.ToString();
-			return dHBAMBIHOEC;
+			QueryCondition condition = new QueryCondition();
+			condition.field = fieldName;
+			condition.op = "=";
+			condition.value = value.ToString();
+			return condition;
 		}
 
-		public static QueryCondition Custom(string FEEOCAFHHFP, string LADOAFMFCGL, object value)
+		public static QueryCondition Custom(string fieldName, string operatorSymbol, object value)
 		{
-			QueryCondition dHBAMBIHOEC = new QueryCondition();
-			dHBAMBIHOEC.field = FEEOCAFHHFP;
-			dHBAMBIHOEC.op = LADOAFMFCGL;
-			dHBAMBIHOEC.value = value.ToString();
-			return dHBAMBIHOEC;
+			QueryCondition condition = new QueryCondition();
+			condition.field = fieldName;
+			condition.op = operatorSymbol;
+			condition.value = value.ToString();
+			return condition;
 		}
 
 		public string ToJson()
@@ -240,9 +240,9 @@ public abstract class ServerProviderBase : MonoBehaviour
 			return get_Item(index);
 		}
 
-		public QueryRow(Dictionary<string, QueryValue> DMNBDBJNKME)
+		public QueryRow(Dictionary<string, QueryValue> rowValues)
 		{
-			values = DMNBDBJNKME;
+			values = rowValues;
 		}
 
 		public QueryValue get_Item(string index)
@@ -282,14 +282,14 @@ public abstract class ServerProviderBase : MonoBehaviour
 			}
 		}
 
-		public QueryResult(JSONArray EMDHMHOKGFP, SelectQuery JHELEGOAKFH)
+		public QueryResult(JSONArray rows, SelectQuery query)
 		{
-			for (int i = 0; i < EMDHMHOKGFP.Count; i++)
+			for (int i = 0; i < rows.Count; i++)
 			{
 				Dictionary<string, QueryValue> dictionary = new Dictionary<string, QueryValue>();
-				for (int j = 0; j < JHELEGOAKFH.GetFields().Length; j++)
+				for (int j = 0; j < query.GetFields().Length; j++)
 				{
-					dictionary.Add(JHELEGOAKFH.GetFields()[j].ToLower(), new QueryValue(EMDHMHOKGFP[i].AsArray[j]));
+					dictionary.Add(query.GetFields()[j].ToLower(), new QueryValue(rows[i].AsArray[j]));
 				}
 				_data.Add(new QueryRow(dictionary));
 			}
@@ -343,11 +343,11 @@ public abstract class ServerProviderBase : MonoBehaviour
 			}
 		}
 
-		public FileData(string BBNKIBKPBLO, string NOLDJLJIPOG, string GNIBJBFNGAD)
+		public FileData(string sourcePath, string dataFileName, string dataMimeType)
 		{
-			_source = BBNKIBKPBLO;
-			fileName = NOLDJLJIPOG;
-			mimeType = GNIBJBFNGAD;
+			_source = sourcePath;
+			fileName = dataFileName;
+			mimeType = dataMimeType;
 		}
 
 		public string GetMimeType()
@@ -401,33 +401,33 @@ public abstract class ServerProviderBase : MonoBehaviour
 			_key = value;
 		}
 
-		public void Add(string KGBGENDIMBC, object value)
+		public void Add(string key, object value)
 		{
-			_data.Add(new KeyValuePair<string, string>(KGBGENDIMBC, value.ToString()));
+			_data.Add(new KeyValuePair<string, string>(key, value.ToString()));
 		}
 
-		public void AddFile(string KGBGENDIMBC, FileData OONGGDBLOHH)
+		public void AddFile(string key, FileData fileData)
 		{
-			KeyValuePair<string, FileData> item = new KeyValuePair<string, FileData>(KGBGENDIMBC, OONGGDBLOHH);
+			KeyValuePair<string, FileData> item = new KeyValuePair<string, FileData>(key, fileData);
 			files.Add(item);
 		}
 
 		[SpecialName]
-		public static WWWForm op_Implicit(Form HOELLMLEBAK)
+		public static WWWForm op_Implicit(Form form)
 		{
-			HOELLMLEBAK._data.Sort(CompareByKey);
+			form._data.Sort(CompareByKey);
 			WWWForm wWWForm = new WWWForm();
 			StringBuilder stringBuilder = new StringBuilder();
-			for (int i = 0; i < HOELLMLEBAK._data.Count; i++)
+			for (int i = 0; i < form._data.Count; i++)
 			{
-				stringBuilder.Append(string.Format("{0}={1}", HOELLMLEBAK._data[i].Key, HOELLMLEBAK._data[i].Value));
-				wWWForm.AddField(HOELLMLEBAK._data[i].Key, HOELLMLEBAK._data[i].Value);
+				stringBuilder.Append(string.Format("{0}={1}", form._data[i].Key, form._data[i].Value));
+				wWWForm.AddField(form._data[i].Key, form._data[i].Value);
 			}
-			foreach (KeyValuePair<string, FileData> item in HOELLMLEBAK.files)
+			foreach (KeyValuePair<string, FileData> item in form.files)
 			{
 				string key = item.Key;
-				string iFKJHHPJPLP = item.Value.GetSource();
-				byte[] contents = FileUtils.ReadAllBytes(iFKJHHPJPLP);
+				string filePath = item.Value.GetSource();
+				byte[] contents = FileUtils.ReadAllBytes(filePath);
 				string fileName = item.Value.GetFileName();
 				string mimeType = item.Value.GetMimeType();
 				wWWForm.AddBinaryData(key, contents, fileName, mimeType);
@@ -439,9 +439,9 @@ public abstract class ServerProviderBase : MonoBehaviour
 			return wWWForm;
 		}
 
-		private static int CompareByKey(KeyValuePair<string, string> DIHJILMHNGB, KeyValuePair<string, string> KBEKLNMPDDE)
+		private static int CompareByKey(KeyValuePair<string, string> left, KeyValuePair<string, string> right)
 		{
-			return string.Compare(DIHJILMHNGB.Key, KBEKLNMPDDE.Key, StringComparison.Ordinal);
+			return string.Compare(left.Key, right.Key, StringComparison.Ordinal);
 		}
 
 		public JSONClass ToJsonClass()
@@ -471,9 +471,9 @@ public abstract class ServerProviderBase : MonoBehaviour
 
 		public string JDONBAPIJCG;
 
-		public static ServerResponse Get(string EMDHMHOKGFP)
+		public static ServerResponse Get(string json)
 		{
-			return JsonConvert.DeserializeObject<ServerResponse>(EMDHMHOKGFP);
+			return JsonConvert.DeserializeObject<ServerResponse>(json);
 		}
 	}
 
@@ -579,35 +579,35 @@ public abstract class ServerProviderBase : MonoBehaviour
 		yield break;
 	}
 
-	public virtual void SaveData(string LOKLDPLAPOL, string data, Action onDone, Action<string> onError)
+	public virtual void SaveData(string key, string data, Action onDone, Action<string> onError)
 	{
 		onError?.Invoke("offline build");
 	}
 
-	protected virtual IEnumerator SaveDataRoutine(string LOKLDPLAPOL, string data, Action onDone, Action<string> onError)
-	{
-		onError?.Invoke("offline build");
-		yield break;
-	}
-
-	public virtual void LoadData(string LOKLDPLAPOL, Action<string> onDone, Action<string> onError)
-	{
-		onError?.Invoke("offline build");
-	}
-
-	protected virtual IEnumerator LoadDataRoutine(string LOKLDPLAPOL, Action<string> onDone, Action<string> onError)
+	protected virtual IEnumerator SaveDataRoutine(string key, string data, Action onDone, Action<string> onError)
 	{
 		onError?.Invoke("offline build");
 		yield break;
 	}
 
-	protected string Unescape(string DCJLKCFKCOM)
+	public virtual void LoadData(string key, Action<string> onDone, Action<string> onError)
 	{
-		if (string.IsNullOrEmpty(DCJLKCFKCOM))
+		onError?.Invoke("offline build");
+	}
+
+	protected virtual IEnumerator LoadDataRoutine(string key, Action<string> onDone, Action<string> onError)
+	{
+		onError?.Invoke("offline build");
+		yield break;
+	}
+
+	protected string Unescape(string text)
+	{
+		if (string.IsNullOrEmpty(text))
 		{
 			return string.Empty;
 		}
-		return DCJLKCFKCOM.Replace("\\/", "/").Replace("\\\"", "\"").Replace("\\r\\n", "\n");
+		return text.Replace("\\/", "/").Replace("\\\"", "\"").Replace("\\r\\n", "\n");
 	}
 
 	public virtual void TimeSync(Action<long> onDone, Action<string> onError)
@@ -632,17 +632,17 @@ public abstract class ServerProviderBase : MonoBehaviour
 		yield break;
 	}
 
-	public virtual QueryResult Query(SelectQuery KOGEDGJJMPO)
+	public virtual QueryResult Query(SelectQuery query)
 	{
 		throw new NotSupportedException("Remote queries are disabled in the offline build.");
 	}
 
-	public virtual void Query(SelectQuery KOGEDGJJMPO, Action<QueryResult> onDone, Action<string> onError)
+	public virtual void Query(SelectQuery query, Action<QueryResult> onDone, Action<string> onError)
 	{
 		onError?.Invoke("offline build");
 	}
 
-	protected virtual IEnumerator QueryRoutine(SelectQuery KOGEDGJJMPO, Action<QueryResult> onDone, Action<string> onError)
+	protected virtual IEnumerator QueryRoutine(SelectQuery query, Action<QueryResult> onDone, Action<string> onError)
 	{
 		onError?.Invoke("offline build");
 		yield break;

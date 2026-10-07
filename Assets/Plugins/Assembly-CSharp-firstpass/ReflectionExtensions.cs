@@ -6,57 +6,57 @@ internal static class ReflectionExtensions
 {
 	private static readonly FieldInfo remoteStackTraceField = typeof(Exception).GetField("_remoteStackTraceString", BindingFlags.Instance | BindingFlags.NonPublic);
 
-	public static bool IsValueTypeCheck(this Type LFLGCDNKNJI)
+	public static bool IsValueTypeCheck(this Type type)
 	{
-		return LFLGCDNKNJI.IsValueType;
+		return type.IsValueType;
 	}
 
-	public static bool IsGenericTypeCheck(this Type LFLGCDNKNJI)
+	public static bool IsGenericTypeCheck(this Type type)
 	{
-		return LFLGCDNKNJI.IsGenericType;
+		return type.IsGenericType;
 	}
 
-	public static bool IsInterfaceCheck(this Type LFLGCDNKNJI)
+	public static bool IsInterfaceCheck(this Type type)
 	{
-		return LFLGCDNKNJI.IsInterface;
+		return type.IsInterface;
 	}
 
-	public static bool IsEnumCheck(this Type LFLGCDNKNJI)
+	public static bool IsEnumCheck(this Type type)
 	{
-		return LFLGCDNKNJI.IsEnum;
+		return type.IsEnum;
 	}
 
-	public static bool HasDefaultConstructor(this Type LFLGCDNKNJI)
+	public static bool HasDefaultConstructor(this Type type)
 	{
-		return LFLGCDNKNJI.IsValueType || LFLGCDNKNJI.GetConstructor(BindingFlags.Instance | BindingFlags.Public, null, Type.EmptyTypes, null) != null;
+		return type.IsValueType || type.GetConstructor(BindingFlags.Instance | BindingFlags.Public, null, Type.EmptyTypes, null) != null;
 	}
 
-	public static TypeCode GetTypeCode(this Type LFLGCDNKNJI)
+	public static TypeCode GetTypeCode(this Type type)
 	{
-		return Type.GetTypeCode(LFLGCDNKNJI);
+		return Type.GetTypeCode(type);
 	}
 
-	public static IEnumerable<PropertyInfo> GetPublicProperties(this Type LFLGCDNKNJI)
+	public static IEnumerable<PropertyInfo> GetPublicProperties(this Type type)
 	{
-		return LFLGCDNKNJI.GetProperties(BindingFlags.Instance | BindingFlags.Public);
+		return type.GetProperties(BindingFlags.Instance | BindingFlags.Public);
 	}
 
-	public static IEnumerable<MethodInfo> GetPublicMethods(this Type LFLGCDNKNJI)
+	public static IEnumerable<MethodInfo> GetPublicMethods(this Type type)
 	{
-		return LFLGCDNKNJI.GetMethods(BindingFlags.Static | BindingFlags.Public);
+		return type.GetMethods(BindingFlags.Static | BindingFlags.Public);
 	}
 
-	public static MethodInfo GetPublicStaticMethod(this Type LFLGCDNKNJI, string name, params Type[] PEECGJDIAIK)
+	public static MethodInfo GetPublicStaticMethod(this Type type, string name, params Type[] parameterTypes)
 	{
-		return LFLGCDNKNJI.GetMethod(name, BindingFlags.Static | BindingFlags.Public, null, PEECGJDIAIK, null);
+		return type.GetMethod(name, BindingFlags.Static | BindingFlags.Public, null, parameterTypes, null);
 	}
 
-	public static Exception Unwrap(this TargetInvocationException MPFFFAOGBJE)
+	public static Exception Unwrap(this TargetInvocationException exception)
 	{
-		Exception innerException = MPFFFAOGBJE.InnerException;
+		Exception innerException = exception.InnerException;
 		if (remoteStackTraceField != null)
 		{
-			remoteStackTraceField.SetValue(MPFFFAOGBJE.InnerException, MPFFFAOGBJE.InnerException.StackTrace + "\r\n");
+			remoteStackTraceField.SetValue(exception.InnerException, exception.InnerException.StackTrace + "\r\n");
 		}
 		return innerException;
 	}

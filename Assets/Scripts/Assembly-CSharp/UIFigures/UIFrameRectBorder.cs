@@ -14,9 +14,9 @@ namespace UIFigures
 
 		private List<Vector2> _Points = new List<Vector2>();
 
-		protected override void OnPopulateMesh(VertexHelper DHJBOKKAOJK)
+		protected override void OnPopulateMesh(VertexHelper vertexHelper)
 		{
-			base.OnPopulateMesh(DHJBOKKAOJK);
+			base.OnPopulateMesh(vertexHelper);
 			Vector2 vector = new Vector2(base.rectTransform.rect.width, base.rectTransform.rect.height) * 0.5f;
 			vector.x -= _Width / 2f;
 			vector.y -= _Width / 2f;
@@ -31,7 +31,7 @@ namespace UIFigures
 			_Points.Add(new Vector2(0f - vector.x, vector.y - (_AngelSize - _Width / 2f * 0.585786f)));
 			_Points.Add(new Vector2(0f - vector.x + (_AngelSize - _Width / 2f * 0.585786f), vector.y));
 			_Points.Add(new Vector2(0f, vector.y));
-			DrawFunctions.DrawLine(DHJBOKKAOJK, _Points, _Width, color);
+			DrawFunctions.DrawLine(vertexHelper, _Points, _Width, color);
 		}
 	}
 }

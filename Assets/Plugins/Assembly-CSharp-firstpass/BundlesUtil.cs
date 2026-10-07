@@ -9,9 +9,9 @@ public class BundlesUtil
 
 	private static BundleConfig currentConfig;
 
-	public static void InitConfig(BundleConfig IBBOLEEKAOM)
+	public static void InitConfig(BundleConfig config)
 	{
-		currentConfig = IBBOLEEKAOM;
+		currentConfig = config;
 		UnloadDependencies();
 		LoadDependencies();
 	}
@@ -73,9 +73,9 @@ public class BundlesUtil
 		return null;
 	}
 
-	public static void UnloadAsset(Object AOMLCBHAJJH)
+	public static void UnloadAsset(Object asset)
 	{
-		ResourcesUtil.UnloadAsset(AOMLCBHAJJH);
+		ResourcesUtil.UnloadAsset(asset);
 	}
 
 	public static void UnloadUnusedAssets()

@@ -133,21 +133,21 @@ public class RosterPerk
 		perkInfo = value;
 	}
 
-	public void AppendNodeChild(Dictionary<string, string> MPEHGKBJPEN)
+	public void AppendNodeChild(Dictionary<string, string> attributes)
 	{
 		XmlNode xmlNode = _node["Set"];
 		if (xmlNode != null)
 		{
 			_node.RemoveChild(xmlNode);
 		}
-		if (MPEHGKBJPEN.Count == 0)
+		if (attributes.Count == 0)
 		{
 			return;
 		}
-		XmlNode mEEAKLDGLDF = _node.AppendElement("Set");
-		foreach (KeyValuePair<string, string> item in MPEHGKBJPEN)
+		XmlNode setNode = _node.AppendElement("Set");
+		foreach (KeyValuePair<string, string> item in attributes)
 		{
-			mEEAKLDGLDF.AppendAttribute(item.Key).Value = item.Value;
+			setNode.AppendAttribute(item.Key).Value = item.Value;
 		}
 	}
 }

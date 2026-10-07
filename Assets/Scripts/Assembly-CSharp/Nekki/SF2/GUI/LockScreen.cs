@@ -30,7 +30,7 @@ namespace Nekki.SF2.GUI
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		private static LockScreen instance;
 
-		public static LockScreen BPCBBHAKFDM
+		public static LockScreen Current
 		{
 			get
 			{
@@ -69,41 +69,41 @@ namespace Nekki.SF2.GUI
 			Object.DontDestroyOnLoad(base.gameObject);
 		}
 
-		public static bool Lock(bool IJHFJPBBNEJ, bool KFIECNIMAOA = false)
+		public static bool Lock(bool locked, bool visible = false)
 		{
 			if (get_Instance() != null)
 			{
-				get_Instance().SetLocked(IJHFJPBBNEJ, KFIECNIMAOA);
+				get_Instance().SetLocked(locked, visible);
 				return true;
 			}
 			return false;
 		}
 
-		private void SetLocked(bool IJHFJPBBNEJ, bool KFIECNIMAOA = false)
+		private void SetLocked(bool locked, bool visible = false)
 		{
 			if (base.gameObject != null)
 			{
-				base.gameObject.SetActive(IJHFJPBBNEJ);
+				base.gameObject.SetActive(locked);
 			}
-			if (IJHFJPBBNEJ)
+			if (locked)
 			{
-				background.color = ((!KFIECNIMAOA) ? invisibleColor : visibleColor);
+				background.color = ((!visible) ? invisibleColor : visibleColor);
 			}
 			if (rotateImg != null)
 			{
-				rotateImg.gameObject.SetActive(IJHFJPBBNEJ && KFIECNIMAOA);
-				SetSpinnerRotating(IJHFJPBBNEJ && KFIECNIMAOA);
+				rotateImg.gameObject.SetActive(locked && visible);
+				SetSpinnerRotating(locked && visible);
 			}
 		}
 
-		private void SetSpinnerRotating(bool IJHFJPBBNEJ)
+		private void SetSpinnerRotating(bool rotating)
 		{
 			if (tween != null)
 			{
 				tween.Kill();
 				tween = null;
 			}
-			if (IJHFJPBBNEJ)
+			if (rotating)
 			{
 				tween = DOTween.Sequence().AppendInterval(rotationInterval).AppendCallback(() =>
 				{

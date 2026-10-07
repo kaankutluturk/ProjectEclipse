@@ -24,7 +24,7 @@ internal class DemoHubSample : MonoBehaviour
 		vbDemoHub = new Hub("vbdemo");
 		signalRConnection = new Connection(URI, demoHub, typedDemoHub, vbDemoHub);
 		signalRConnection.SetJsonEncoder(new LitJsonEncoder());
-		signalRConnection.AddConnectedHandler((Connection MDGFGCDPGFI) =>
+		signalRConnection.AddConnectedHandler((Connection connection) =>
 		{
 			var anon = new
 			{
@@ -53,9 +53,9 @@ internal class DemoHubSample : MonoBehaviour
 			demoHub.PlainTask();
 			demoHub.GenericTaskWithContinueWith();
 			typedDemoHub.Echo("Typed echo callback");
-			vbDemoHub.Call("readStateValue", (Hub CGFIJCNNCKP, ClientMessage CKEHOEGLMBM, ResultMessage DCJLKCFKCOM) =>
+			vbDemoHub.Call("readStateValue", (Hub hub, ClientMessage clientMessage, ResultMessage resultMessage) =>
 			{
-				vbReadStateResult = string.Format("Read some state from VB.NET! => {0}", (DCJLKCFKCOM.GetReturnValue() != null) ? DCJLKCFKCOM.GetReturnValue().ToString() : "undefined");
+				vbReadStateResult = string.Format("Read some state from VB.NET! => {0}", (resultMessage.GetReturnValue() != null) ? resultMessage.GetReturnValue().ToString() : "undefined");
 			});
 		});
 		signalRConnection.OpenConnection();

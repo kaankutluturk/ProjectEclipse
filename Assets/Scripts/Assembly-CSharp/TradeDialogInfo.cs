@@ -13,12 +13,12 @@ public class TradeDialogInfo
 
 	public long DeliverySeconds;
 
-	public TradeDialogInfo(TradeDialog.TradeAction CBFFIFKAHHN, GameValueType _value = GameValueType.Gold, long JIBAGOMMNKE = 0L, Action<object> _dlg = null, long IGMDKDOGGNA = 0L)
+	public TradeDialogInfo(TradeDialog.TradeAction tradeType, GameValueType _value = GameValueType.Gold, long price = 0L, Action<object> _dlg = null, long deliverySeconds = 0L)
 	{
-		TradeType = CBFFIFKAHHN;
+		TradeType = tradeType;
 		Value = _value;
-		Price = JIBAGOMMNKE;
+		Price = price;
 		Dlg = _dlg;
-		DeliverySeconds = IGMDKDOGGNA;
+		DeliverySeconds = deliverySeconds;
 	}
 }

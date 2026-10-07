@@ -10,27 +10,27 @@ public static class ButtonStateExtensions
 		PressPressed = 3
 	}
 
-	public static void SetPressType(this Button GAMILDJHFDB, ButtonPressType BGFHMJMEGEE, bool GHJGPAEDIHG = true)
+	public static void SetPressType(this Button button, ButtonPressType pressType, bool isEnabled = true)
 	{
-		switch (BGFHMJMEGEE)
+		switch (pressType)
 		{
 		case ButtonPressType.PressNormal:
-			GAMILDJHFDB.interactable = true;
+			button.interactable = true;
 			break;
 		case ButtonPressType.PressSelected:
 			break;
 		case ButtonPressType.PressInactive:
-			GAMILDJHFDB.interactable = false;
+			button.interactable = false;
 			break;
 		case ButtonPressType.PressPressed:
-			GAMILDJHFDB.Select();
+			button.Select();
 			break;
 		}
 	}
 
-	public static ButtonPressType GetPressType(this Button GAMILDJHFDB)
+	public static ButtonPressType GetPressType(this Button button)
 	{
-		if (GAMILDJHFDB.interactable)
+		if (button.interactable)
 		{
 			return ButtonPressType.PressNormal;
 		}

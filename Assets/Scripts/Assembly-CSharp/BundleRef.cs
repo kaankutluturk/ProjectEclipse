@@ -31,9 +31,9 @@ public class BundleRef
 		}
 	}
 
-	public BundleRef(string BKKKEENLEDP)
+	public BundleRef(string bundleId)
 	{
-		_BundleId = BKKKEENLEDP;
+		_BundleId = bundleId;
 	}
 
 	public string GetFilePath()
@@ -77,21 +77,21 @@ public class BundleRef
 		}
 	}
 
-	public T LoadAsset<T>(string JHEMALDDIFN) where T : Object
+	public T LoadAsset<T>(string assetName) where T : Object
 	{
 		if (_UnityBundle == null)
 		{
 			return (T)null;
 		}
-		return _UnityBundle.LoadAsset<T>(JHEMALDDIFN);
+		return _UnityBundle.LoadAsset<T>(assetName);
 	}
 
-	public T[] LoadAssetWithSubAssets<T>(string JHEMALDDIFN) where T : Object
+	public T[] LoadAssetWithSubAssets<T>(string assetName) where T : Object
 	{
 		if (_UnityBundle == null)
 		{
 			return null;
 		}
-		return _UnityBundle.LoadAssetWithSubAssets<T>(JHEMALDDIFN);
+		return _UnityBundle.LoadAssetWithSubAssets<T>(assetName);
 	}
 }

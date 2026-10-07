@@ -52,25 +52,25 @@ namespace Nekki.SF2.GUI.Dialogs
 		public override void Init(object data)
 		{
 			_useLiteralText = false;
-			string dIKEFIIPNBE = string.Empty;
-			FooterType hJNAHNICGMH = FooterType.FOOTER_NONE;
+			string title = string.Empty;
+			FooterType footer = FooterType.FOOTER_NONE;
 			if (data != null)
 			{
-				SimpleDialogInfo jJMIOMABAKK = (SimpleDialogInfo)data;
-				_useLiteralText = jJMIOMABAKK.UseLiteralText;
-				defaultOkButtonAlias = jJMIOMABAKK.OkButtonText;
-				cancelButtonAlias = jJMIOMABAKK.CancelButtonText;
-				okButtonColor = jJMIOMABAKK.OkButtonStyle;
-				cancelButtonColor = jJMIOMABAKK.CancelButtonStyle;
-				_dlg = jJMIOMABAKK.Dlg;
-				messageText = jJMIOMABAKK.Message;
-				hasCheckBox = jJMIOMABAKK.ShowCheckBox;
-				checkBoxInitialValue = jJMIOMABAKK.CheckBoxChecked;
-				checkBoxText = jJMIOMABAKK.CheckBoxText;
-				dIKEFIIPNBE = jJMIOMABAKK.Title;
-				hJNAHNICGMH = jJMIOMABAKK.FooterType;
+				SimpleDialogInfo info = (SimpleDialogInfo)data;
+				_useLiteralText = info.UseLiteralText;
+				defaultOkButtonAlias = info.OkButtonText;
+				cancelButtonAlias = info.CancelButtonText;
+				okButtonColor = info.OkButtonStyle;
+				cancelButtonColor = info.CancelButtonStyle;
+				_dlg = info.Dlg;
+				messageText = info.Message;
+				hasCheckBox = info.ShowCheckBox;
+				checkBoxInitialValue = info.CheckBoxChecked;
+				checkBoxText = info.CheckBoxText;
+				title = info.Title;
+				footer = info.FooterType;
 			}
-			base.Init(dIKEFIIPNBE, defaultOkButtonAlias, cancelButtonAlias, hJNAHNICGMH);
+			base.Init(title, defaultOkButtonAlias, cancelButtonAlias, footer);
 		}
 
 		protected override void Start()
@@ -104,15 +104,15 @@ namespace Nekki.SF2.GUI.Dialogs
 
 		private void LayoutContent()
 		{
-			float jMLAKAKDBBL = Math.Min(Math.Max(CalculateRequiredFooterWidth(), 1100f), 1680f);
-			SetFooterWidth(jMLAKAKDBBL);
+			float width = Math.Min(Math.Max(CalculateRequiredFooterWidth(), 1100f), 1680f);
+			SetFooterWidth(width);
 			PositionFooterButtons();
 			_content.GetComponent<RectTransform>().sizeDelta = new Vector2(_content.GetComponent<RectTransform>().rect.width, _label.preferredHeight);
 		}
 
-		private void SetFooterWidth(float JMLAKAKDBBL)
+		private void SetFooterWidth(float width)
 		{
-			footerWidth = JMLAKAKDBBL;
+			footerWidth = width;
 		}
 
 		private void PositionFooterButtons()
@@ -161,19 +161,19 @@ namespace Nekki.SF2.GUI.Dialogs
 			PositionStripesAndButtons();
 		}
 
-		private void CreateCheckBox(bool EPHHGNKDPEG, string DOEEIGAHKEN)
+		private void CreateCheckBox(bool isChecked, string labelAlias)
 		{
 			float num = _checkBox.GetComponent<RectTransform>().rect.height / 4f;
-			float bAINMLLIKOL = (0f - _label.preferredHeight) / 2f - 2f * num;
-			_checkBox.transform.SetLocalY(bAINMLLIKOL);
+			float localY = (0f - _label.preferredHeight) / 2f - 2f * num;
+			_checkBox.transform.SetLocalY(localY);
 			_label.transform.SetLocalY(_label.transform.localPosition.y + num);
-			_checkBox.isOn = EPHHGNKDPEG;
+			_checkBox.isOn = isChecked;
 			_checkBox.onValueChanged.RemoveListener(OnCheckBoxChanged);
 			_checkBox.onValueChanged.AddListener(OnCheckBoxChanged);
 			_checkBoxLabel.set_LabelFontSize(103);
 			_checkBoxLabel.color = Constants.DialogTextColor;
-			_checkBoxLabel.set_Alias(DOEEIGAHKEN);
-			_checkBoxLabel.transform.SetLocalY(bAINMLLIKOL);
+			_checkBoxLabel.set_Alias(labelAlias);
+			_checkBoxLabel.transform.SetLocalY(localY);
 			float num2 = _checkBox.GetComponent<RectTransform>().rect.width + _checkBoxLabel.preferredWidth;
 			num2 = _checkBoxLabel.preferredWidth;
 			_checkBox.transform.SetLocalX((0f - num2) / 2f);
@@ -202,12 +202,12 @@ namespace Nekki.SF2.GUI.Dialogs
 			}
 		}
 
-		protected override void SetupButton(LabelButton GAMILDJHFDB, FooterType MOPOCBKIKBI)
+		protected override void SetupButton(LabelButton button, FooterType footer)
 		{
 			string alias = string.Empty;
 			int buttonId = 0;
 			LabelButton.ButtonColor color = LabelButton.ButtonColor.BUTTON_WHITE;
-			switch (MOPOCBKIKBI)
+			switch (footer)
 			{
 			case FooterType.FOOTER_CANCEL:
 				alias = cancelButtonAlias;
@@ -220,12 +220,12 @@ namespace Nekki.SF2.GUI.Dialogs
 				buttonId = 1;
 				break;
 			}
-			GAMILDJHFDB.SetColor(color);
-			GAMILDJHFDB.SetAlias(_useLiteralText ? string.Empty : alias);
-			if (_useLiteralText) GAMILDJHFDB.SetText(alias);
-			GAMILDJHFDB.ButtonId = buttonId;
-			GAMILDJHFDB.RemoveEventListener(2, OnClose);
-			GAMILDJHFDB.AddEventListener(2, OnClose);
+			button.SetColor(color);
+			button.SetAlias(_useLiteralText ? string.Empty : alias);
+			if (_useLiteralText) button.SetText(alias);
+			button.ButtonId = buttonId;
+			button.RemoveEventListener(2, OnClose);
+			button.AddEventListener(2, OnClose);
 		}
 	}
 }

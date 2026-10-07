@@ -14,29 +14,29 @@ public class QuestActionShop : QuestAction
 
 	private ItemInfo itemInfo;
 
-	public override void Parse(XmlNode EPKLCPOEELO)
+	public override void Parse(XmlNode node)
 	{
-		base.Parse(EPKLCPOEELO);
-		tabExpression = EPKLCPOEELO.Attributes["Tab"].GetStringOrDefault(string.Empty);
-		item = EPKLCPOEELO.Attributes["Item"].GetStringOrDefault(string.Empty);
+		base.Parse(node);
+		tabExpression = node.Attributes["Tab"].GetStringOrDefault(string.Empty);
+		item = node.Attributes["Item"].GetStringOrDefault(string.Empty);
 	}
 
-	public override void Execute(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters parameters)
 	{
-		base.Execute(GFIHPBCEEOB);
-		ConditionExtension.CompareResult lNIDLHOIHIM = new ConditionExtension.CompareResult();
+		base.Execute(parameters);
+		ConditionExtension.CompareResult result = new ConditionExtension.CompareResult();
 		ConditionExtension.CompareResult lNIDLHOIHIM2 = new ConditionExtension.CompareResult();
-		QuestCondition kKDGLNECFHA = new QuestCondition();
-		kKDGLNECFHA.SetParameters(GFIHPBCEEOB);
+		QuestCondition condition = new QuestCondition();
+		condition.SetParameters(parameters);
 		if (!string.IsNullOrEmpty(tabExpression))
 		{
-			kKDGLNECFHA.SetValue(tabExpression, lNIDLHOIHIM);
+			condition.SetValue(tabExpression, result);
 		}
 		if (!string.IsNullOrEmpty(item))
 		{
-			kKDGLNECFHA.SetValue(item, lNIDLHOIHIM2);
+			condition.SetValue(item, lNIDLHOIHIM2);
 		}
-		_sliderType = ParseSliderType(lNIDLHOIHIM.ToString());
+		_sliderType = ParseSliderType(result.ToString());
 		itemName = lNIDLHOIHIM2.ToString();
 		itemInfo = ListSF.GetItems().GetItemByName(itemName);
 		ShowShopItem();
@@ -86,10 +86,10 @@ public class QuestActionShop : QuestAction
 
 	private void ShowShopItem()
 	{
-		ScreenType iPKNDMINFMJ = Module.GetInstance().GetCurrentScreenType();
+		ScreenType currentScreen = Module.GetInstance().GetCurrentScreenType();
 		ShopScene current = Scene<ShopScene>.get_Current();
 		bool flag = current != null;
-		bool flag2 = iPKNDMINFMJ == ScreenType.ModuleShop;
+		bool flag2 = currentScreen == ScreenType.ModuleShop;
 		if (flag && _sliderType != SliderType.SliderNone)
 		{
 			current.ScrollToItemByName(_sliderType, itemName);

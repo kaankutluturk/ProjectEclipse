@@ -21,8 +21,8 @@ $runtime = Get-Content -Raw -Encoding UTF8 (Join-Path $root 'Assets/Scripts/Ecli
 
 # Exact native ordering is part of the contract: recovered perk processing first,
 # then Eclipse phase dispatch, and PostHit remains before the later DamageDealing seam.
-$postCrit = Extract-Block $fight 'public void OnModelPostCrit(Model.EventModel EGHPHELLOGO)'
-$postHit = Extract-Block $fight 'public void OnModelHit(Model.EventModel EGHPHELLOGO)'
+$postCrit = Extract-Block $fight 'public void OnModelPostCrit(Model.EventModel eventModel)'
+$postHit = Extract-Block $fight 'public void OnModelHit(Model.EventModel eventModel)'
 if ($postCrit.IndexOf('EVENT_HIT_POSTCRIT') -lt 0 -or
     $postCrit.IndexOf('DispatchEclipseHitPhase') -le $postCrit.IndexOf('EVENT_HIT_POSTCRIT')) {
     throw 'HitPostCrit callback must follow recovered EVENT_HIT_POSTCRIT processing.'
@@ -31,7 +31,7 @@ if ($postHit.IndexOf('EVENT_POST_HIT') -lt 0 -or
     $postHit.IndexOf('DispatchEclipseHitPhase') -le $postHit.IndexOf('EVENT_POST_HIT')) {
     throw 'PostHit callback must follow recovered EVENT_POST_HIT processing.'
 }
-$nativeHit = $fight.IndexOf('DispatchEclipseHitPhase(EGHPHELLOGO, gHHCDAFIKJE, ModEffectEvent.PostHit, eclipseAttackSource)')
+$nativeHit = $fight.IndexOf('DispatchEclipseHitPhase(eventModel, strikeResult, ModEffectEvent.PostHit, eclipseAttackSource)')
 $laterDamage = $fight.IndexOf('DispatchEclipseCombatEvent(ModEffectEvent.DamageDealing', $nativeHit)
 if ($nativeHit -lt 0 -or $laterDamage -le $nativeHit) { throw 'PostHit callback moved after the existing outgoing-damage seam.' }
 
@@ -76,7 +76,7 @@ public sealed class Model {
     public string Name;
     public Model Owner; public Model GetRootModel()=>Owner==null?this:Owner.GetRootModel();
     public float Health=1; public float GetLife()=>Health;
-    public sealed class EventModel { public Model KJDFJPBIGJC; public Model Opponent; }
+    public sealed class EventModel { public Model sourceModel; public Model Opponent; }
     public sealed class StrikeResult { public Model AttackerModel; public InfoAnimation AttackAnimation; public float FinalDamage; public bool IsBlocked; public bool IsCritical; }
 }
 public static class PerksStage { public sealed class ActionPerk { public Model TargetModel; public Model SourceModel; public string IconPath=""; public bool ShowExpiration; public int ElapsedFrames; public int DurationFrames; public int EclipseStackCount; } }
@@ -101,13 +101,13 @@ $clear
 $update
     public void Hit(Model.EventModel e,Model.StrikeResult s,Eclipse.Modding.ModEffectEvent type)=>DispatchEclipseHitPhase(e,s,type);
     sealed class Round { public int round=1; } readonly Round round=new Round();
-    public void Outgoing(Model.EventModel EGHPHELLOGO,Model.StrikeResult gHHCDAFIKJE) {
-        Model eclipseAttacker=(gHHCDAFIKJE.AttackerModel??EGHPHELLOGO.Opponent)?.GetRootModel();
+    public void Outgoing(Model.EventModel eventModel,Model.StrikeResult strikeResult) {
+        Model eclipseAttacker=(strikeResult.AttackerModel??eventModel.Opponent)?.GetRootModel();
         ModAttackSource eclipseAttackSource=null;
 $outgoing
     }
-    public void Resolved(Model.EventModel EGHPHELLOGO,Model.StrikeResult gHHCDAFIKJE,float eclipseHealthBefore) {
-        Model eclipseAttacker=(gHHCDAFIKJE.AttackerModel??EGHPHELLOGO.Opponent)?.GetRootModel();
+    public void Resolved(Model.EventModel eventModel,Model.StrikeResult strikeResult,float eclipseHealthBefore) {
+        Model eclipseAttacker=(strikeResult.AttackerModel??eventModel.Opponent)?.GetRootModel();
         ModAttackSource eclipseAttackSource=null;
 $resolved
     }
@@ -140,8 +140,8 @@ if ($fight -notmatch 'EclipseFighterOperations[^\r\n]*IModFighterStatusIcons' -o
 $perkStage = Get-Content -Raw -Encoding UTF8 (Join-Path $root 'Assets/Scripts/Assembly-CSharp/PerksStage.cs')
 $activePerk = Get-Content -Raw -Encoding UTF8 (Join-Path $root 'Assets/Scripts/Assembly-CSharp/Nekki/SF2/GUI/Fight/ActivePerkItem.cs')
 if ($perkStage -notmatch 'public int EclipseStackCount;' -or
-    $perkStage -notmatch 'EclipseStackCount = IBODMPMJELJ\.EclipseStackCount;' -or
-    $activePerk -notmatch 'SetEclipseStackCount\(IBODMPMJELJ\.EclipseStackCount\);' -or
+    $perkStage -notmatch 'EclipseStackCount = source\.EclipseStackCount;' -or
+    $activePerk -notmatch 'SetEclipseStackCount\(actionPerk\.EclipseStackCount\);' -or
     $activePerk -notmatch 'void SetEclipseStackCount\(int count\)' -or
     $activePerk -notmatch 'count <= 0' -or
     $activePerk -notmatch 'LabelAlias' -or

@@ -112,10 +112,10 @@ namespace Nekki.SF2.GUI.Fight
 			}
 		}
 
-		public void Init(ModelParameters JCICKLIMBEF, bool ENCAKAAMEPN = true)
+		public void Init(ModelParameters parameters, bool showRounds = true)
 		{
-			_parameters = JCICKLIMBEF;
-			_showRounds = ENCAKAAMEPN;
+			_parameters = parameters;
+			_showRounds = showRounds;
 			if (_roundsPanel != null)
 				_roundsPanel.gameObject.SetActive(_showRounds);
 			IsNoBlock = true;
@@ -224,11 +224,11 @@ namespace Nekki.SF2.GUI.Fight
 			_activePerkModel.Init();
 		}
 
-		public void UpdateStyle(InfoAnimation IFPDGKDKJOD)
+		public void UpdateStyle(InfoAnimation animation)
 		{
 			if (_stylePanel != null)
 			{
-				_stylePanel.UpdateStyle(IFPDGKDKJOD);
+				_stylePanel.UpdateStyle(animation);
 				_comboModel.AddCrazyStyle(_stylePanel.get_CurrentStyleStrip());
 				RaiseStyleChanged(true);
 			}
@@ -301,7 +301,7 @@ namespace Nekki.SF2.GUI.Fight
 			}
 		}
 
-		public void Render(bool DCAOOMFBFIO)
+		public void Render(bool renderStylePanel)
 		{
 			if (_lifeBar != null)
 			{
@@ -311,7 +311,7 @@ namespace Nekki.SF2.GUI.Fight
 			{
 				_raidShields.UpdateBar((float)_parameters.GetCurrentLife());
 			}
-			if (_stylePanel != null && DCAOOMFBFIO)
+			if (_stylePanel != null && renderStylePanel)
 			{
 				_stylePanel.Render();
 				RaiseStyleChanged(false);
@@ -383,11 +383,11 @@ namespace Nekki.SF2.GUI.Fight
 			}
 		}
 
-		public void UpdateCombo(int value, int HFMKKLJGPPN)
+		public void UpdateCombo(int value, int countOffset)
 		{
 			if (_comboModel != null)
 			{
-				_comboModel.UpdateCombo(value, HFMKKLJGPPN);
+				_comboModel.UpdateCombo(value, countOffset);
 			}
 		}
 
@@ -399,27 +399,27 @@ namespace Nekki.SF2.GUI.Fight
 			}
 		}
 
-		public void AddActivePerk(PerksStage.ActionPerk IBODMPMJELJ)
+		public void AddActivePerk(PerksStage.ActionPerk actionPerk)
 		{
 			if (_activePerkModel != null)
 			{
-				_activePerkModel.AddActivePerkItem(IBODMPMJELJ);
+				_activePerkModel.AddActivePerkItem(actionPerk);
 			}
 		}
 
-		public void AddEffectPerk(PerksStage.ActionPerk CKOEFOCPMGK, PerksStage.ActionPerk IBODMPMJELJ)
+		public void AddEffectPerk(PerksStage.ActionPerk actionPerk, PerksStage.ActionPerk otherPerk)
 		{
 			if (_activePerkModel != null)
 			{
-				_activePerkModel.AddEffectPerk(CKOEFOCPMGK, IBODMPMJELJ);
+				_activePerkModel.AddEffectPerk(actionPerk, otherPerk);
 			}
 		}
 
-		public void RemoveActivePerk(PerksStage.ActionPerk IBODMPMJELJ)
+		public void RemoveActivePerk(PerksStage.ActionPerk actionPerk)
 		{
 			if (_activePerkModel != null)
 			{
-				_activePerkModel.RemoveActivePerkItem(IBODMPMJELJ);
+				_activePerkModel.RemoveActivePerkItem(actionPerk);
 			}
 		}
 
@@ -439,22 +439,22 @@ namespace Nekki.SF2.GUI.Fight
 			}
 		}
 
-		private void RaiseStyleChanged(bool GOAGDIANENH)
+		private void RaiseStyleChanged(bool isHit)
 		{
-			ModelStyleChange lONCJPNBHEA = new ModelStyleChange();
-			lONCJPNBHEA.Side = _Type;
-			lONCJPNBHEA.StyleIndex = CurrentStyleStrip;
-			lONCJPNBHEA.StyleName = CurrentStyleName;
-			lONCJPNBHEA.StyleGain = CurrentStyleValue;
-			lONCJPNBHEA.IsHit = GOAGDIANENH;
-			CallEvent(0, lONCJPNBHEA);
+			ModelStyleChange styleChange = new ModelStyleChange();
+			styleChange.Side = _Type;
+			styleChange.StyleIndex = CurrentStyleStrip;
+			styleChange.StyleName = CurrentStyleName;
+			styleChange.StyleGain = CurrentStyleValue;
+			styleChange.IsHit = isHit;
+			CallEvent(0, styleChange);
 		}
 
-		private void OnComboChanged(ComboModel.ComboChangeInfo EMBBNNBFODN)
+		private void OnComboChanged(ComboModel.ComboChangeInfo info)
 		{
 			CallEvent(1, new ComboChangedEventData
 			{
-				Info = EMBBNNBFODN
+				Info = info
 			});
 		}
 	}

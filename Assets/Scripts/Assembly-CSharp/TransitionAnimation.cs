@@ -27,9 +27,9 @@ public class TransitionAnimation
 		_conditions = value;
 	}
 
-	public void AddCondition(ConditionAnimation IOFGGOCEIAM)
+	public void AddCondition(ConditionAnimation condition)
 	{
-		_conditions.Add(IOFGGOCEIAM);
+		_conditions.Add(condition);
 	}
 
 	public bool AreConditionsMet(ModelConditions conditions)

@@ -14,15 +14,15 @@ public class PerkConditionPain : PerkConditionMatchMinMax
 		minMax.Parse(node, this, GetPerk());
 	}
 
-	public override bool IsEqual(Model ACENLMONNPA, List<string> NIKHAICFGNM)
+	public override bool IsEqual(Model model, List<string> args)
 	{
-		Model fGCODGKLHED = ResolveTargetModel(ACENLMONNPA);
-		if (ACENLMONNPA == null)
+		Model targetModel = ResolveTargetModel(model);
+		if (model == null)
 		{
 			return false;
 		}
 		minMax.EvaluateFunctions();
-		float num = fGCODGKLHED.GetPain();
+		float num = targetModel.GetPain();
 		if (!minMax.GetMinUnbounded() && minMax.GetMinValue() > num)
 		{
 			return false;

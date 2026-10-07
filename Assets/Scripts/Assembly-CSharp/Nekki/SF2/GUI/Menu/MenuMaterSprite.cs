@@ -23,14 +23,14 @@ namespace Nekki.SF2.GUI.Menu
 		{
 		}
 
-		public void Init(GameCurrency MDDNHLBDJBN)
+		public void Init(GameCurrency newCurrency)
 		{
-			currency = MDDNHLBDJBN;
+			currency = newCurrency;
 			_value = ListSF.GetRoster().GetCurrencyCount(currency);
-			string mJBPMLCLMFN = currency.Icon;
+			string iconName = currency.Icon;
 			if (_icon != null)
 			{
-				_icon.sprite = Nekki.SF2.GUI.ResolutionImage.GetSprite("UI/Atlases/", mJBPMLCLMFN);
+				_icon.sprite = Nekki.SF2.GUI.ResolutionImage.GetSprite("UI/Atlases/", iconName);
 			}
 			if (_valueLbl != null)
 			{

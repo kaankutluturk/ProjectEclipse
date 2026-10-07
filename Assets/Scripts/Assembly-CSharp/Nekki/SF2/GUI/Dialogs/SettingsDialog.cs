@@ -326,10 +326,10 @@ namespace Nekki.SF2.GUI.Dialogs
 			bool flag2 = SoundController.GetSoundMuted();
 			SetupButton(btnSound, (!flag2) ? "SettingsButtons.sound" : "SettingsButtons.sound_off", (!flag2) ? "SettingsButtons.sound_selected" : "SettingsButtons.sound_off_selected", -670f, 0f, SettingsButtonId.BTN_SOUND);
 			SetupButton(btnCredits, "SettingsButtons.credits", "SettingsButtons.credits_selected", -670f, -200f, SettingsButtonId.BTN_CREDITS);
-			string mMBELNEBNBM = LocalizationManager.CurrentLanguage.IconSprite;
-			string oKGJAMBPDGO = LocalizationManager.CurrentLanguage.SelectedIconSprite;
-			oKGJAMBPDGO = ((!(oKGJAMBPDGO == string.Empty)) ? oKGJAMBPDGO : mMBELNEBNBM);
-			SetupButton(btnLanguage, mMBELNEBNBM, oKGJAMBPDGO, 0f, 200f, SettingsButtonId.BTN_LANGUAGE);
+			string iconSprite = LocalizationManager.CurrentLanguage.IconSprite;
+			string selectedIconSprite = LocalizationManager.CurrentLanguage.SelectedIconSprite;
+			selectedIconSprite = ((!(selectedIconSprite == string.Empty)) ? selectedIconSprite : iconSprite);
+			SetupButton(btnLanguage, iconSprite, selectedIconSprite, 0f, 200f, SettingsButtonId.BTN_LANGUAGE);
 			Eclipse.UI.LanguageGlobeIcon.Apply(btnLanguage);
 			SetupLabel(lblLanguage, LocalizationManager.CurrentLanguage.Alias);
 			if (AssemblyController.GetMarket().GetIsAmazonMarket())
@@ -341,8 +341,8 @@ namespace Nekki.SF2.GUI.Dialogs
 			}
 			else if (AssemblyController.GetMarket().GetIsAmazonMobileMarket())
 			{
-				float bAINMLLIKOL = ((!AssemblyController.GetMarket().GetIsChinaMarket()) ? 200 : 200);
-				btnLanguage.transform.SetLocalY(bAINMLLIKOL);
+				float localY = ((!AssemblyController.GetMarket().GetIsChinaMarket()) ? 200 : 200);
+				btnLanguage.transform.SetLocalY(localY);
 				SetupAmazonButtons();
 			}
 			else if (AssemblyController.GetMarket().GetIsChinaMarket())
@@ -393,9 +393,9 @@ namespace Nekki.SF2.GUI.Dialogs
 			}
 		}
 
-		protected override void SetupFooter(FooterType HJNAHNICGMH)
+		protected override void SetupFooter(FooterType footer)
 		{
-			base.SetupFooter(HJNAHNICGMH);
+			base.SetupFooter(footer);
 			float num = _bottomStripe.transform.localPosition.y - -70f;
 			if (_btnOK.gameObject.activeSelf)
 			{
@@ -411,11 +411,11 @@ namespace Nekki.SF2.GUI.Dialogs
 			}
 		}
 
-		protected override void SetupHeader(string HCPNFPMHFCM)
+		protected override void SetupHeader(string headerText)
 		{
-			base.SetupHeader(HCPNFPMHFCM);
-			float bAINMLLIKOL = _topStripe.transform.localPosition.y - 110f;
-			_header.transform.SetLocalY(bAINMLLIKOL);
+			base.SetupHeader(headerText);
+			float localY = _topStripe.transform.localPosition.y - 110f;
+			_header.transform.SetLocalY(localY);
 		}
 
 		private void Update()
@@ -443,8 +443,8 @@ namespace Nekki.SF2.GUI.Dialogs
 			lblUserId.set_Alias(string.Empty);
 			lblUserId.set_text(string.Empty);
 			lblUserId.set_LabelFontSize(101);
-			float bAINMLLIKOL = ((!AssemblyController.GetMarket().GetIsChinaMarket()) ? (-516f) : (-356f));
-			lblUserId.transform.SetLocalY(bAINMLLIKOL);
+			float localY = ((!AssemblyController.GetMarket().GetIsChinaMarket()) ? (-516f) : (-356f));
+			lblUserId.transform.SetLocalY(localY);
 			lblUserId.color = Constants.DialogTextColor;
 			string text = ListSF.GetRoster().GetServerUserId();
 			lblUserId.set_text(LocalizationManager.GetString("Settings_UserID") + ": " + text);
@@ -483,43 +483,43 @@ namespace Nekki.SF2.GUI.Dialogs
 			}
 		}
 
-		protected void SetupButton(ResolutionButton GAMILDJHFDB, string CGNJEDIFEKJ, string AOFLEGLGGAC, float DHDMNHCIPEH, float BGEEALIPKCC, SettingsButtonId OKNNNLIPODI)
+		protected void SetupButton(ResolutionButton button, string iconSprite, string selectedIconSprite, float x, float y, SettingsButtonId buttonId)
 		{
 			// Desktop prefabs can omit the legacy credits/support controls.
-			if (GAMILDJHFDB == null)
+			if (button == null)
 			{
 				return;
 			}
-			if (OKNNNLIPODI == SettingsButtonId.BTN_GAMECENTER || OKNNNLIPODI == SettingsButtonId.BTN_ITUNES)
+			if (buttonId == SettingsButtonId.BTN_GAMECENTER || buttonId == SettingsButtonId.BTN_ITUNES)
 			{
-				if (GAMILDJHFDB != null) GAMILDJHFDB.gameObject.SetActive(false);
+				if (button != null) button.gameObject.SetActive(false);
 				return;
 			}
-			GAMILDJHFDB.SetNormalSprite("UI/Atlases/", CGNJEDIFEKJ);
-			GAMILDJHFDB.SetPressedSprite("UI/Atlases/", (!UsesSelectedSprites()) ? CGNJEDIFEKJ : AOFLEGLGGAC);
-			GAMILDJHFDB.ButtonId = (int)OKNNNLIPODI;
-			GAMILDJHFDB.RemoveEventListener(2, OnClickButton);
-			GAMILDJHFDB.AddEventListener(2, OnClickButton);
-			GAMILDJHFDB.transform.localPosition = new Vector2(DHDMNHCIPEH, BGEEALIPKCC);
-			GAMILDJHFDB.gameObject.SetActive(true);
+			button.SetNormalSprite("UI/Atlases/", iconSprite);
+			button.SetPressedSprite("UI/Atlases/", (!UsesSelectedSprites()) ? iconSprite : selectedIconSprite);
+			button.ButtonId = (int)buttonId;
+			button.RemoveEventListener(2, OnClickButton);
+			button.AddEventListener(2, OnClickButton);
+			button.transform.localPosition = new Vector2(x, y);
+			button.gameObject.SetActive(true);
 		}
 
-		protected void SetupLabel(LabelAlias NCJDCOLEFHG, string LOKLDPLAPOL)
+		protected void SetupLabel(LabelAlias label, string alias)
 		{
-			if (NCJDCOLEFHG == null)
+			if (label == null)
 			{
 				return;
 			}
-			if (NCJDCOLEFHG == lblGameCenter || NCJDCOLEFHG == lblItunes)
+			if (label == lblGameCenter || label == lblItunes)
 			{
-				if (NCJDCOLEFHG != null) NCJDCOLEFHG.gameObject.SetActive(false);
+				if (label != null) label.gameObject.SetActive(false);
 				return;
 			}
-			NCJDCOLEFHG.gameObject.SetActive(true);
-			NCJDCOLEFHG.set_Alias(LOKLDPLAPOL);
-			NCJDCOLEFHG.alignment = TextAnchor.MiddleLeft;
-			NCJDCOLEFHG.set_LabelFontSize(101);
-			NCJDCOLEFHG.color = Constants.DialogTextColor;
+			label.gameObject.SetActive(true);
+			label.set_Alias(alias);
+			label.alignment = TextAnchor.MiddleLeft;
+			label.set_LabelFontSize(101);
+			label.color = Constants.DialogTextColor;
 		}
 
 		protected void SetupPlatformButtonsNoOp()
@@ -555,16 +555,16 @@ namespace Nekki.SF2.GUI.Dialogs
 
 		private void SetupSupportButtonCompact()
 		{
-			float dHDMNHCIPEH = ((!AssemblyController.GetMarket().GetIsChinaMarket()) ? (-670) : 50);
-			float bGEEALIPKCC = 0f;
-			SetupButton(btnSupport, "SettingsButtons.support", "SettingsButtons.support", dHDMNHCIPEH, bGEEALIPKCC, SettingsButtonId.BTN_SUPPORT);
+			float x = ((!AssemblyController.GetMarket().GetIsChinaMarket()) ? (-670) : 50);
+			float y = 0f;
+			SetupButton(btnSupport, "SettingsButtons.support", "SettingsButtons.support", x, y, SettingsButtonId.BTN_SUPPORT);
 		}
 
 		private void SetupAmazonButtons()
 		{
-			float dHDMNHCIPEH = 50f;
-			float bGEEALIPKCC = 0f;
-			SetupButton(btnSupport, "SettingsButtons.support", "SettingsButtons.support", dHDMNHCIPEH, bGEEALIPKCC, SettingsButtonId.BTN_SUPPORT);
+			float x = 50f;
+			float y = 0f;
+			SetupButton(btnSupport, "SettingsButtons.support", "SettingsButtons.support", x, y, SettingsButtonId.BTN_SUPPORT);
 			SetupButton(btnItunes, "SettingsButtons.amazon_mp3", "SettingsButtons.amazon_mp3", -670f, -196f, SettingsButtonId.BTN_ITUNES);
 		}
 
@@ -761,8 +761,8 @@ namespace Nekki.SF2.GUI.Dialogs
 				break;
 			case SettingsButtonId.BTN_RESOLUTION_SET:
 			{
-				XmlDocument jFJPKEONJIJ = XmlUtils.OpenXMLDocument(SF2Paths.GetGameDataPath(), "devices.xml");
-				SystemProperties.LoadDevicesConfig(jFJPKEONJIJ);
+				XmlDocument devicesConfig = XmlUtils.OpenXMLDocument(SF2Paths.GetGameDataPath(), "devices.xml");
+				SystemProperties.LoadDevicesConfig(devicesConfig);
 				SystemProperties.ApplyResolution(selectedResolutionIndex);
 				GameUtils.StartFight();
 				break;
@@ -781,30 +781,30 @@ namespace Nekki.SF2.GUI.Dialogs
 				break;
 			case SettingsButtonId.BTN_FACEBOOK:
 			{
-				QuestParameters hHKLFIIBIFF = ListSF.GetInstance().GetQuestParameters();
-				FightIDS jLGLBLDPAAF = hHKLFIIBIFF.fightIds;
-				hHKLFIIBIFF.fightIds = FightIDS.Empty();
-				hHKLFIIBIFF.fightResult = string.Empty;
-				hHKLFIIBIFF.raidResult = string.Empty;
-				hHKLFIIBIFF.purchasedItem = null;
+				QuestParameters questParameters = ListSF.GetInstance().GetQuestParameters();
+				FightIDS savedFightIds = questParameters.fightIds;
+				questParameters.fightIds = FightIDS.Empty();
+				questParameters.fightResult = string.Empty;
+				questParameters.raidResult = string.Empty;
+				questParameters.purchasedItem = null;
 				if (ListSF.GetInstance().RaiseQuestEvent(QuestEvent.QuestEventType.QUEST_EVENT_LOGIN_FB))
 				{
 					ListSF.GetInstance().RunQuestActions();
 				}
-				hHKLFIIBIFF.fightIds = jLGLBLDPAAF;
+				questParameters.fightIds = savedFightIds;
 				break;
 			}
 			case SettingsButtonId.BTN_LANGUAGE:
 			{
-				LocalizationManager.Language pPNFBAFOOAH = LocalizationManager.GetNextLanguage(pendingLanguage);
-				string mMBELNEBNBM = pPNFBAFOOAH.IconSprite;
-				string oKGJAMBPDGO = pPNFBAFOOAH.SelectedIconSprite;
-				oKGJAMBPDGO = ((!(oKGJAMBPDGO == string.Empty)) ? oKGJAMBPDGO : mMBELNEBNBM);
-				SetupButton(btnLanguage, mMBELNEBNBM, oKGJAMBPDGO, btnLanguage.transform.localPosition.x, btnLanguage.transform.localPosition.y, SettingsButtonId.BTN_LANGUAGE);
+				LocalizationManager.Language language = LocalizationManager.GetNextLanguage(pendingLanguage);
+				string iconSprite = language.IconSprite;
+				string selectedIconSprite = language.SelectedIconSprite;
+				selectedIconSprite = ((!(selectedIconSprite == string.Empty)) ? selectedIconSprite : iconSprite);
+				SetupButton(btnLanguage, iconSprite, selectedIconSprite, btnLanguage.transform.localPosition.x, btnLanguage.transform.localPosition.y, SettingsButtonId.BTN_LANGUAGE);
 				Eclipse.UI.LanguageGlobeIcon.Apply(btnLanguage);
-				SetupLabel(lblLanguage, pPNFBAFOOAH.Alias);
+				SetupLabel(lblLanguage, language.Alias);
 				languageChangePending = true;
-				pendingLanguage = pPNFBAFOOAH;
+				pendingLanguage = language;
 				languageChangeFrames = 0;
 				break;
 			}
@@ -854,9 +854,9 @@ namespace Nekki.SF2.GUI.Dialogs
 			}
 		}
 
-		protected void OnAuthenticate(bool CELFBNLILMA)
+		protected void OnAuthenticate(bool isAuthenticated)
 		{
-			if (CELFBNLILMA)
+			if (isAuthenticated)
 			{
 				OnGameCenterSignedIn();
 				ListSF.GetInstance().OnAuthenticateSucceeded();
@@ -915,8 +915,8 @@ namespace Nekki.SF2.GUI.Dialogs
 
 		protected void ApplyLanguageChange()
 		{
-			QuestParameters hHKLFIIBIFF = ListSF.GetInstance().GetQuestParameters();
-			hHKLFIIBIFF.chosenLanguage = pendingLanguage;
+			QuestParameters questParameters = ListSF.GetInstance().GetQuestParameters();
+			questParameters.chosenLanguage = pendingLanguage;
 			if (ListSF.GetInstance().RaiseQuestEvent(QuestEvent.QuestEventType.QUEST_EVENT_LANGUAGE_SWITCH))
 			{
 				ListSF.GetInstance().RunQuestActions();
@@ -931,17 +931,17 @@ namespace Nekki.SF2.GUI.Dialogs
 			return AssemblyController.GetGamepadEnabled();
 		}
 
-		protected void SetMainButtonsHidden(bool JILGHDDEMPE)
+		protected void SetMainButtonsHidden(bool hidden)
 		{
-			btnSound.gameObject.SetActive(!JILGHDDEMPE);
-			btnMusic.gameObject.SetActive(!JILGHDDEMPE);
-			if (btnCredits != null) btnCredits.gameObject.SetActive(!JILGHDDEMPE);
-			btnLanguage.gameObject.SetActive(!JILGHDDEMPE);
+			btnSound.gameObject.SetActive(!hidden);
+			btnMusic.gameObject.SetActive(!hidden);
+			if (btnCredits != null) btnCredits.gameObject.SetActive(!hidden);
+			btnLanguage.gameObject.SetActive(!hidden);
 			if (SystemProperties.IsWp8Platform())
 			{
-				btnGameCenter.interactable = !JILGHDDEMPE;
+				btnGameCenter.interactable = !hidden;
 			}
-			if (btnSupport != null) btnSupport.gameObject.SetActive(!JILGHDDEMPE);
+			if (btnSupport != null) btnSupport.gameObject.SetActive(!hidden);
 		}
 	}
 }

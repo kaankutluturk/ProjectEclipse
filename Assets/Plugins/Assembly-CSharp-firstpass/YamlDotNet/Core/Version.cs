@@ -9,15 +9,15 @@ namespace YamlDotNet.Core
 
 		public int Minor { get; private set; }
 
-		public Version(int IBGMIGIFNJM, int LDKAECLLDNG)
+		public Version(int major, int minor)
 		{
-			Major = IBGMIGIFNJM;
-			Minor = LDKAECLLDNG;
+			Major = major;
+			Minor = minor;
 		}
 
-		public override bool Equals(object AOMLCBHAJJH)
+		public override bool Equals(object obj)
 		{
-			Version version = AOMLCBHAJJH as Version;
+			Version version = obj as Version;
 			return version != null && Major == version.Major && Minor == version.Minor;
 		}
 

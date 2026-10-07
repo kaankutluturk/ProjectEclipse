@@ -15,41 +15,41 @@ namespace YamlDotNet.Core
 		{
 		}
 
-		public YamlException(string LIOGIBJBHAH)
-			: base(LIOGIBJBHAH)
+		public YamlException(string message)
+			: base(message)
 		{
 		}
 
-		public YamlException(Mark ILENLCMAMBH, Mark PCLFFOBJJFO, string LIOGIBJBHAH)
-			: this(ILENLCMAMBH, PCLFFOBJJFO, LIOGIBJBHAH, null)
+		public YamlException(Mark startMark, Mark endMark, string message)
+			: this(startMark, endMark, message, null)
 		{
 		}
 
-		public YamlException(Mark ILENLCMAMBH, Mark PCLFFOBJJFO, string LIOGIBJBHAH, Exception OLABPFGLNFC)
-			: base(string.Format("({0}) - ({1}): {2}", ILENLCMAMBH, PCLFFOBJJFO, LIOGIBJBHAH), OLABPFGLNFC)
+		public YamlException(Mark startMark, Mark endMark, string message, Exception innerException)
+			: base(string.Format("({0}) - ({1}): {2}", startMark, endMark, message), innerException)
 		{
-			Start = ILENLCMAMBH;
-			End = PCLFFOBJJFO;
+			Start = startMark;
+			End = endMark;
 		}
 
-		public YamlException(string LIOGIBJBHAH, Exception LEPEAKBGHLB)
-			: base(LIOGIBJBHAH, LEPEAKBGHLB)
+		public YamlException(string message, Exception innerException)
+			: base(message, innerException)
 		{
 		}
 
-		protected YamlException(SerializationInfo EMBBNNBFODN, StreamingContext PDCAHMPCPOC)
-			: base(EMBBNNBFODN, PDCAHMPCPOC)
+		protected YamlException(SerializationInfo info, StreamingContext context)
+			: base(info, context)
 		{
-			Start = (Mark)EMBBNNBFODN.GetValue("Start", typeof(Mark));
-			End = (Mark)EMBBNNBFODN.GetValue("End", typeof(Mark));
+			Start = (Mark)info.GetValue("Start", typeof(Mark));
+			End = (Mark)info.GetValue("End", typeof(Mark));
 		}
 
 		[SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.SerializationFormatter)]
-		public override void GetObjectData(SerializationInfo EMBBNNBFODN, StreamingContext PDCAHMPCPOC)
+		public override void GetObjectData(SerializationInfo info, StreamingContext context)
 		{
-			base.GetObjectData(EMBBNNBFODN, PDCAHMPCPOC);
-			EMBBNNBFODN.AddValue("Start", Start);
-			EMBBNNBFODN.AddValue("End", End);
+			base.GetObjectData(info, context);
+			info.AddValue("Start", Start);
+			info.AddValue("End", End);
 		}
 	}
 }

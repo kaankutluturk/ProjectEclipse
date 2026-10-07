@@ -33,29 +33,29 @@ public sealed class AnchorAssigner : IAliasProvider, IObjectGraphVisitor
 		return true;
 	}
 
-	bool IObjectGraphVisitor.EnterMapping(IObjectDescriptor KGBGENDIMBC, IObjectDescriptor value)
+	bool IObjectGraphVisitor.EnterMapping(IObjectDescriptor key, IObjectDescriptor value)
 	{
 		return true;
 	}
 
-	bool IObjectGraphVisitor.EnterMapping(IPropertyDescriptor KGBGENDIMBC, IObjectDescriptor value)
+	bool IObjectGraphVisitor.EnterMapping(IPropertyDescriptor key, IObjectDescriptor value)
 	{
 		return true;
 	}
 
-	void IObjectGraphVisitor.VisitScalar(IObjectDescriptor ADDIBOMFCNH)
+	void IObjectGraphVisitor.VisitScalar(IObjectDescriptor scalar)
 	{
 	}
 
-	void IObjectGraphVisitor.VisitMappingStart(IObjectDescriptor JPEFEBICPFI, Type FHNELPLPIPI, Type EJGJHBGMCDM)
+	void IObjectGraphVisitor.VisitMappingStart(IObjectDescriptor mapping, Type keyType, Type valueType)
 	{
 	}
 
-	void IObjectGraphVisitor.VisitMappingEnd(IObjectDescriptor JPEFEBICPFI)
+	void IObjectGraphVisitor.VisitMappingEnd(IObjectDescriptor mapping)
 	{
 	}
 
-	void IObjectGraphVisitor.VisitSequenceStart(IObjectDescriptor sequence, Type LKAAAFHOAGD)
+	void IObjectGraphVisitor.VisitSequenceStart(IObjectDescriptor sequence, Type elementType)
 	{
 	}
 

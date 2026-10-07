@@ -53,9 +53,9 @@ public sealed class YamlMemberAttribute : Attribute
 	{
 	}
 
-	public YamlMemberAttribute(Type JDBOFNJPMPH)
+	public YamlMemberAttribute(Type serializeAs)
 	{
-		set_SerializeAs(JDBOFNJPMPH);
+		set_SerializeAs(serializeAs);
 	}
 
 	public Type GetSerializeAs()

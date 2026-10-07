@@ -2,11 +2,11 @@ using System;
 
 public sealed class NullNodeDeserializer : INodeDeserializer
 {
-	bool INodeDeserializer.Deserialize(EventReader reader, Type MBLGNMBFHBI, Func<EventReader, Type, object> IJBAEAEDMCC, out object value)
+	bool INodeDeserializer.Deserialize(EventReader reader, Type expectedType, Func<EventReader, Type, object> nestedObjectDeserializer, out object value)
 	{
 		value = null;
-		NodeEvent dGMPGIHHKCN = reader.Peek<NodeEvent>();
-		bool flag = dGMPGIHHKCN != null && NodeIsNull(dGMPGIHHKCN);
+		NodeEvent nodeEvent = reader.Peek<NodeEvent>();
+		bool flag = nodeEvent != null && NodeIsNull(nodeEvent);
 		if (flag)
 		{
 			reader.SkipThisAndNestedEvents();
@@ -14,18 +14,18 @@ public sealed class NullNodeDeserializer : INodeDeserializer
 		return flag;
 	}
 
-	private bool NodeIsNull(NodeEvent ABOEBNGCALL)
+	private bool NodeIsNull(NodeEvent nodeEvent)
 	{
-		if (ABOEBNGCALL.GetTag() == "tag:yaml.org,2002:null")
+		if (nodeEvent.GetTag() == "tag:yaml.org,2002:null")
 		{
 			return true;
 		}
-		Scalar lEACOCDHICF = ABOEBNGCALL as Scalar;
-		if (lEACOCDHICF == null || lEACOCDHICF.GetStyle() != ScalarStyle.Plain)
+		Scalar scalar = nodeEvent as Scalar;
+		if (scalar == null || scalar.GetStyle() != ScalarStyle.Plain)
 		{
 			return false;
 		}
-		string text = lEACOCDHICF.GetValue();
+		string text = scalar.GetValue();
 		if (text == string.Empty)
 		{
 			goto IL_0086;

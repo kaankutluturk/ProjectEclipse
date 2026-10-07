@@ -38,44 +38,44 @@ public class RsaPublicKeyDecryptor
 		nField = new BigInteger(array);
 	}
 
-	private static string BytesToStringSkippingLeadingZeros(byte[] AAOIAEJJINO)
+	private static string BytesToStringSkippingLeadingZeros(byte[] bytes)
 	{
 		int i;
-		for (i = 0; i < AAOIAEJJINO.Length && AAOIAEJJINO[i] == 0; i++)
+		for (i = 0; i < bytes.Length && bytes[i] == 0; i++)
 		{
 		}
-		if (i != AAOIAEJJINO.Length)
+		if (i != bytes.Length)
 		{
-			byte[] array = new byte[AAOIAEJJINO.Length - i];
-			Buffer.BlockCopy(AAOIAEJJINO, i, array, 0, AAOIAEJJINO.Length - i);
+			byte[] array = new byte[bytes.Length - i];
+			Buffer.BlockCopy(bytes, i, array, 0, bytes.Length - i);
 			return Encoding.UTF8.GetString(array);
 		}
 		return string.Empty;
 	}
 
-	public static string Decrypt(byte[] KPAMPCLHCEN, bool KKJCGBFKBGD)
+	public static string Decrypt(byte[] encryptedData, bool trimEnds)
 	{
-		if (KPAMPCLHCEN.Length == blockLengthField)
+		if (encryptedData.Length == blockLengthField)
 		{
-			BigInteger bigInteger = new BigInteger(KPAMPCLHCEN);
+			BigInteger bigInteger = new BigInteger(encryptedData);
 			byte[] bytes = bigInteger.ModPow(exponentField, nField).GetBytes();
 			string text = BytesToStringSkippingLeadingZeros(bytes);
-			if (KKJCGBFKBGD)
+			if (trimEnds)
 			{
 				return text.Substring(1, text.Length - 2);
 			}
 			return text;
 		}
 		StringBuilder stringBuilder = new StringBuilder();
-		for (int i = 0; i < KPAMPCLHCEN.Length / blockLengthField; i++)
+		for (int i = 0; i < encryptedData.Length / blockLengthField; i++)
 		{
 			byte[] array = new byte[blockLengthField];
-			Buffer.BlockCopy(KPAMPCLHCEN, i * blockLengthField, array, 0, blockLengthField);
+			Buffer.BlockCopy(encryptedData, i * blockLengthField, array, 0, blockLengthField);
 			BigInteger bigInteger2 = new BigInteger(array);
 			byte[] bytes2 = bigInteger2.ModPow(exponentField, nField).GetBytes();
 			stringBuilder.Append(BytesToStringSkippingLeadingZeros(bytes2));
 		}
-		if (KKJCGBFKBGD)
+		if (trimEnds)
 		{
 			string text2 = stringBuilder.ToString();
 			return text2.Substring(1, text2.Length - 2);

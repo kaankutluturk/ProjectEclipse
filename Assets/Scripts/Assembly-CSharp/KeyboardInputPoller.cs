@@ -35,10 +35,10 @@ public class KeyboardInputPoller : global::EventDispatcher<object>
 		}
 	}
 
-	public void AddKey(KeyCode KGBGENDIMBC, FightCID index, int JAMPAODJGGL = 0)
+	public void AddKey(KeyCode keyCode, FightCID index, int playerIndex = 0)
 	{
-		FightControlEventData.KeyboardBinding item = new FightControlEventData.KeyboardBinding(KGBGENDIMBC, index, JAMPAODJGGL);
-		keyBindingsByPlayer[JAMPAODJGGL].Add(item);
+		FightControlEventData.KeyboardBinding item = new FightControlEventData.KeyboardBinding(keyCode, index, playerIndex);
+		keyBindingsByPlayer[playerIndex].Add(item);
 	}
 
 	public void Clear()
@@ -51,28 +51,28 @@ public class KeyboardInputPoller : global::EventDispatcher<object>
 		keyBindingsByPlayer.Clear();
 	}
 
-	private void PollKey(FightControlEventData.KeyboardBinding KGBGENDIMBC)
+	private void PollKey(FightControlEventData.KeyboardBinding binding)
 	{
-		if (Eclipse.Input.EclipseInput.GetKeyDown(KGBGENDIMBC.Key) || Eclipse.Input.EclipseInput.GetKey(KGBGENDIMBC.Key))
+		if (Eclipse.Input.EclipseInput.GetKeyDown(binding.Key) || Eclipse.Input.EclipseInput.GetKey(binding.Key))
 		{
-			if (!KGBGENDIMBC.isActive)
+			if (!binding.isActive)
 			{
-				KGBGENDIMBC.isActive = true;
-				DispatchKeyEvent(0, KGBGENDIMBC);
+				binding.isActive = true;
+				DispatchKeyEvent(0, binding);
 			}
 		}
-		else if (KGBGENDIMBC.isActive)
+		else if (binding.isActive)
 		{
-			KGBGENDIMBC.isActive = false;
-			DispatchKeyEvent(1, KGBGENDIMBC);
+			binding.isActive = false;
+			DispatchKeyEvent(1, binding);
 		}
 	}
 
-	private void DispatchKeyEvent(int DOPHKKGNAEF, FightControlEventData.KeyboardBinding KGBGENDIMBC)
+	private void DispatchKeyEvent(int eventType, FightControlEventData.KeyboardBinding binding)
 	{
-		FightControlEventData cBBEIGACPPD = new FightControlEventData();
-		cBBEIGACPPD.Index = KGBGENDIMBC.count;
-		cBBEIGACPPD.Control = KGBGENDIMBC.Index;
-		CallEvent(DOPHKKGNAEF, cBBEIGACPPD);
+		FightControlEventData eventData = new FightControlEventData();
+		eventData.Index = binding.count;
+		eventData.Control = binding.Index;
+		CallEvent(eventType, eventData);
 	}
 }

@@ -3,10 +3,10 @@ $root = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $PSScriptRoot
 $fightSource = Get-Content -Raw -Encoding UTF8 (Join-Path $root 'Assets/Scripts/Assembly-CSharp/Fight.cs')
 $hitStart = $fightSource.IndexOf('public void OnModelHit(')
 $outgoing = $fightSource.IndexOf('ModEffectEvent.DamageDealing', $hitStart)
-$invulnerable = $fightSource.IndexOf('if (EGHPHELLOGO.KJDFJPBIGJC.IsDamageImmune())', $outgoing)
+$invulnerable = $fightSource.IndexOf('if (eventModel.sourceModel.IsDamageImmune())', $outgoing)
 $shield = $fightSource.IndexOf('_eclipseShields.TryGetValue', $invulnerable)
 $incoming = $fightSource.IndexOf('ModEffectEvent.DamageResolving', $shield)
-$apply = $fightSource.IndexOf('UpdateLife(EGHPHELLOGO.KJDFJPBIGJC', $incoming)
+$apply = $fightSource.IndexOf('UpdateLife(eventModel.sourceModel', $incoming)
 if ($hitStart -lt 0 -or $outgoing -le $hitStart -or $invulnerable -le $outgoing -or $shield -le $invulnerable -or $incoming -le $shield -or $apply -le $incoming) {
     throw 'Hit ordering must be outgoing modifiers, invulnerability, shields, incoming modifiers, health application.'
 }

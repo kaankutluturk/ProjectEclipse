@@ -9,40 +9,40 @@ public class QuestActionGivePerk : QuestAction
 
 	private XmlDocument _node = new XmlDocument();
 
-	public override void Parse(XmlNode EPKLCPOEELO)
+	public override void Parse(XmlNode node)
 	{
-		base.Parse(EPKLCPOEELO);
-		applyToExpression = EPKLCPOEELO.Attributes["ApplyTo"].GetStringOrDefault(string.Empty);
-		itemExpression = EPKLCPOEELO.Attributes["Item"].GetStringOrDefault(string.Empty);
-		CopyNodeToNode(EPKLCPOEELO, _node);
+		base.Parse(node);
+		applyToExpression = node.Attributes["ApplyTo"].GetStringOrDefault(string.Empty);
+		itemExpression = node.Attributes["Item"].GetStringOrDefault(string.Empty);
+		CopyNodeToNode(node, _node);
 	}
 
-	private void CopyNodeToNode(XmlNode node, XmlNode EAFDAPNLMJD)
+	private void CopyNodeToNode(XmlNode node, XmlNode targetNode)
 	{
 		foreach (XmlNode childNode in node.ChildNodes)
 		{
-			EAFDAPNLMJD.AppendImportedClone(childNode);
+			targetNode.AppendImportedClone(childNode);
 		}
 	}
 
-	public override void Execute(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters parameters)
 	{
-		base.Execute(GFIHPBCEEOB);
+		base.Execute(parameters);
 		try
 		{
-			ConditionExtension.CompareResult lNIDLHOIHIM = new ConditionExtension.CompareResult();
-			QuestCondition kKDGLNECFHA = new QuestCondition();
-			kKDGLNECFHA.SetParameters(GFIHPBCEEOB);
-			lNIDLHOIHIM.Clear();
-			kKDGLNECFHA.SetValue(applyToExpression, lNIDLHOIHIM);
-			string text = lNIDLHOIHIM.ToString();
+			ConditionExtension.CompareResult result = new ConditionExtension.CompareResult();
+			QuestCondition condition = new QuestCondition();
+			condition.SetParameters(parameters);
+			result.Clear();
+			condition.SetValue(applyToExpression, result);
+			string text = result.ToString();
 			if (text == "Player")
 			{
-				ApplyPerksToPlayer(lNIDLHOIHIM, kKDGLNECFHA);
+				ApplyPerksToPlayer(result, condition);
 			}
 			else if (text == "Item")
 			{
-				ApplyPerksToItem(lNIDLHOIHIM, kKDGLNECFHA);
+				ApplyPerksToItem(result, condition);
 			}
 		}
 		catch (System.Exception exception)
@@ -63,26 +63,26 @@ public class QuestActionGivePerk : QuestAction
 		}
 	}
 
-	private void ApplyPerksToPlayer(ConditionExtension.CompareResult DCJLKCFKCOM, QuestCondition IOFGGOCEIAM)
+	private void ApplyPerksToPlayer(ConditionExtension.CompareResult result, QuestCondition condition)
 	{
 		XmlDocument xmlDocument = new XmlDocument();
 		CopyNodeToNode(_node, xmlDocument);
-		ResolveNodeAttributes(xmlDocument, DCJLKCFKCOM, IOFGGOCEIAM);
+		ResolveNodeAttributes(xmlDocument, result, condition);
 		GameUtils.PerkItemList.ParseUserPerks(xmlDocument, false);
 		AddPlayerPerks(xmlDocument);
 	}
 
-	private void ResolveNodeAttributes(XmlNode node, ConditionExtension.CompareResult DCJLKCFKCOM, QuestCondition IOFGGOCEIAM)
+	private void ResolveNodeAttributes(XmlNode node, ConditionExtension.CompareResult result, QuestCondition condition)
 	{
 		foreach (XmlNode childNode in node.ChildNodes)
 		{
 			foreach (XmlAttribute attribute in childNode.Attributes)
 			{
-				DCJLKCFKCOM.Clear();
-				IOFGGOCEIAM.SetValue(attribute.Value, DCJLKCFKCOM);
-				attribute.Value = DCJLKCFKCOM.ToString();
+				result.Clear();
+				condition.SetValue(attribute.Value, result);
+				attribute.Value = result.ToString();
 			}
-			ResolveNodeAttributes(childNode, DCJLKCFKCOM, IOFGGOCEIAM);
+			ResolveNodeAttributes(childNode, result, condition);
 		}
 	}
 
@@ -91,22 +91,22 @@ public class QuestActionGivePerk : QuestAction
 		foreach (XmlNode childNode in node.ChildNodes)
 		{
 			string text = childNode.Attributes["Name"].GetStringOrDefault(string.Empty);
-			int gCAPLEJMMPM = childNode.Attributes["Level"].ParseInt();
-			int aKKLOMFOLNO = childNode.Attributes["UpgradeLevel"].ParseInt();
-			PerkInfoItem aCONCDFDNJH = FindPerkInfo(text);
-			if (aCONCDFDNJH != null)
+			int level = childNode.Attributes["Level"].ParseInt();
+			int upgradeLevel = childNode.Attributes["UpgradeLevel"].ParseInt();
+			PerkInfoItem perkInfo = FindPerkInfo(text);
+			if (perkInfo != null)
 			{
-				RosterPerkInfo gAKDPKLHHFF = new RosterPerkInfo();
-				gAKDPKLHHFF.Name = text;
-				gAKDPKLHHFF.Level = gCAPLEJMMPM;
-				gAKDPKLHHFF.UpgradeLevel = aKKLOMFOLNO;
-				ReadPerkPairs(childNode, gAKDPKLHHFF);
-				ListSF.GetRoster().GetPerks().AddOrUpgradePerk(gAKDPKLHHFF);
+				RosterPerkInfo rosterPerkInfo = new RosterPerkInfo();
+				rosterPerkInfo.Name = text;
+				rosterPerkInfo.Level = level;
+				rosterPerkInfo.UpgradeLevel = upgradeLevel;
+				ReadPerkPairs(childNode, rosterPerkInfo);
+				ListSF.GetRoster().GetPerks().AddOrUpgradePerk(rosterPerkInfo);
 			}
 		}
 	}
 
-	private void ReadPerkPairs(XmlNode node, RosterPerkInfo EMBBNNBFODN)
+	private void ReadPerkPairs(XmlNode node, RosterPerkInfo rosterPerkInfo)
 	{
 		XmlNode xmlNode = node["Set"];
 		if (xmlNode == null)
@@ -115,37 +115,37 @@ public class QuestActionGivePerk : QuestAction
 		}
 		foreach (XmlAttribute attribute in xmlNode.Attributes)
 		{
-			EMBBNNBFODN.Pairs[attribute.Name] = attribute.Value;
+			rosterPerkInfo.Pairs[attribute.Name] = attribute.Value;
 		}
 	}
 
 	private PerkInfoItem FindPerkInfo(string name)
 	{
-		PerkInfoItem aCONCDFDNJH = GameUtils.PerkItemList.FindUserPerk(name);
-		if (aCONCDFDNJH == null)
+		PerkInfoItem perkInfo = GameUtils.PerkItemList.FindUserPerk(name);
+		if (perkInfo == null)
 		{
-			aCONCDFDNJH = GameUtils.PerkItemList.FindProgressionPerk(name);
+			perkInfo = GameUtils.PerkItemList.FindProgressionPerk(name);
 		}
-		if (aCONCDFDNJH == null)
+		if (perkInfo == null)
 		{
-			aCONCDFDNJH = GameUtils.PerkItemList.FindBasePerk(name);
+			perkInfo = GameUtils.PerkItemList.FindBasePerk(name);
 		}
-		return aCONCDFDNJH;
+		return perkInfo;
 	}
 
-	private void ApplyPerksToItem(ConditionExtension.CompareResult DCJLKCFKCOM, QuestCondition IOFGGOCEIAM)
+	private void ApplyPerksToItem(ConditionExtension.CompareResult result, QuestCondition condition)
 	{
 		XmlDocument xmlDocument = new XmlDocument();
 		CopyNodeToNode(_node, xmlDocument);
-		ResolveNodeAttributes(xmlDocument, DCJLKCFKCOM, IOFGGOCEIAM);
-		List<PerkStruct> hALHGEGADKA = ParsePerkStructs(xmlDocument);
-		DCJLKCFKCOM.Clear();
-		IOFGGOCEIAM.SetValue(itemExpression, DCJLKCFKCOM);
-		string gOHIIMFFFJI = DCJLKCFKCOM.ToString();
-		UserItem dKCHDHMLKHN = ListSF.GetRoster().GetInventory().FindItem(gOHIIMFFFJI);
-		if (dKCHDHMLKHN != null)
+		ResolveNodeAttributes(xmlDocument, result, condition);
+		List<PerkStruct> enchantments = ParsePerkStructs(xmlDocument);
+		result.Clear();
+		condition.SetValue(itemExpression, result);
+		string itemName = result.ToString();
+		UserItem userItem = ListSF.GetRoster().GetInventory().FindItem(itemName);
+		if (userItem != null)
 		{
-			dKCHDHMLKHN.ReplaceEnchantments(hALHGEGADKA, dKCHDHMLKHN.GetUpgradeLevel(), ListSF.GetRoster().GetLevel());
+			userItem.ReplaceEnchantments(enchantments, userItem.GetUpgradeLevel(), ListSF.GetRoster().GetLevel());
 		}
 	}
 

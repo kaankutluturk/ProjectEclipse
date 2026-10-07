@@ -5,7 +5,7 @@ public class EventKeyPressed : EventAnimation
 	{
 	}
 
-	protected override bool Compare(EventAnimation FOPOKALJIIJ)
+	protected override bool Compare(EventAnimation other)
 	{
 		return true;
 	}

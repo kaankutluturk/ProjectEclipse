@@ -33,12 +33,12 @@ namespace Nekki.SF2.GUI.Dialogs
 
 		public override void Init(object data)
 		{
-			ImpossibleDialogInfo fHBGDNBFPLG = (ImpossibleDialogInfo)data;
-			dialogType = fHBGDNBFPLG.Reason;
-			_contentData = fHBGDNBFPLG.Content;
-			if (fHBGDNBFPLG.Dlg != null)
+			ImpossibleDialogInfo info = (ImpossibleDialogInfo)data;
+			dialogType = info.Reason;
+			_contentData = info.Content;
+			if (info.Dlg != null)
 			{
-				AddEventListener(0, fHBGDNBFPLG.Dlg);
+				AddEventListener(0, info.Dlg);
 			}
 			switch (dialogType)
 			{
@@ -70,12 +70,12 @@ namespace Nekki.SF2.GUI.Dialogs
 			SetupBuyDialog(ImpossibleDialogType.A_NOT_ENOUGH_RUBY);
 		}
 
-		protected virtual void SetupBuyDialog(ImpossibleDialogType IBODMPMJELJ)
+		protected virtual void SetupBuyDialog(ImpossibleDialogType reason)
 		{
 			defaultOkButtonAlias = "shopBuy";
 			footerType = FooterType.FOOTER_BOTH;
 			string empty = string.Empty;
-			switch (IBODMPMJELJ)
+			switch (reason)
 			{
 			default:
 				return;
@@ -92,7 +92,7 @@ namespace Nekki.SF2.GUI.Dialogs
 			SetupMessageAlias(empty);
 		}
 
-		protected virtual void SetupErrorDialog(ImpossibleDialogType IBODMPMJELJ)
+		protected virtual void SetupErrorDialog(ImpossibleDialogType reason)
 		{
 			defaultOkButtonAlias = "ok";
 			footerType = FooterType.FOOTER_OK;
@@ -109,12 +109,12 @@ namespace Nekki.SF2.GUI.Dialogs
 				string empty = string.Empty;
 				string empty2 = string.Empty;
 				int num = 0;
-				NotEnoughEnergyDialogInfo oJJHNNJPMCI = (NotEnoughEnergyDialogInfo)_contentData;
-				empty = TimerLabel.GetTimeString(oJJHNNJPMCI.WaitSeconds, true, true, true, false, ":", string.Empty, true, true, true, true, true, string.Empty, string.Empty, string.Empty);
-				num = oJJHNNJPMCI.Value;
-				GameValueType hGIKOMLPBMJ = oJJHNNJPMCI.ValueType;
+				NotEnoughEnergyDialogInfo energyInfo = (NotEnoughEnergyDialogInfo)_contentData;
+				empty = TimerLabel.GetTimeString(energyInfo.WaitSeconds, true, true, true, false, ":", string.Empty, true, true, true, true, true, string.Empty, string.Empty, string.Empty);
+				num = energyInfo.Value;
+				GameValueType valueType = energyInfo.ValueType;
 				string empty3 = string.Empty;
-				switch (hGIKOMLPBMJ)
+				switch (valueType)
 				{
 				case GameValueType.Gems:
 					empty3 = "MiscSprites.ruby";
@@ -147,20 +147,20 @@ namespace Nekki.SF2.GUI.Dialogs
 			}
 		}
 
-		protected override void SetupHeader(string HCPNFPMHFCM)
+		protected override void SetupHeader(string headerText)
 		{
-			base.SetupHeader(HCPNFPMHFCM);
+			base.SetupHeader(headerText);
 			_header.set_LabelFontSize(135);
 		}
 
-		protected virtual void SetupMessageAlias(string APFHJLHOCEN)
+		protected virtual void SetupMessageAlias(string messageAlias)
 		{
 			_text.alignment = TextAnchor.MiddleCenter;
 			_text.transform.SetLocalX(0f);
 			_text.transform.SetLocalY(70f);
 			_text.set_LabelFontSize(122);
 			_text.color = Constants.DialogTextColor;
-			_text.set_Alias(APFHJLHOCEN);
+			_text.set_Alias(messageAlias);
 		}
 	}
 }

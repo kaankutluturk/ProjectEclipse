@@ -30,16 +30,16 @@ namespace YamlDotNet.Core.Tokens
 		{
 		}
 
-		public Scalar(string value, ScalarStyle KIGNIBIMLKK)
-			: this(value, KIGNIBIMLKK, Mark.Empty, Mark.Empty)
+		public Scalar(string value, ScalarStyle scalarStyle)
+			: this(value, scalarStyle, Mark.Empty, Mark.Empty)
 		{
 		}
 
-		public Scalar(string value, ScalarStyle KIGNIBIMLKK, Mark ILENLCMAMBH, Mark PCLFFOBJJFO)
-			: base(ILENLCMAMBH, PCLFFOBJJFO)
+		public Scalar(string value, ScalarStyle scalarStyle, Mark startMark, Mark endMark)
+			: base(startMark, endMark)
 		{
 			value = value;
-			style = KIGNIBIMLKK;
+			style = scalarStyle;
 		}
 	}
 }

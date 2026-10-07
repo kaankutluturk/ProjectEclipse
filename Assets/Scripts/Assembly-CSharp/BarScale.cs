@@ -15,42 +15,42 @@ public class BarScale
 
 	public float MinPower;
 
-	public Limit GetItemLimitForLevel(int GNLOCMLBNHF)
+	public Limit GetItemLimitForLevel(int level)
 	{
-		return ItemLimits.Find((Limit DHDMNHCIPEH) => DHDMNHCIPEH.Levels.Contains(GNLOCMLBNHF));
+		return ItemLimits.Find((Limit limit) => limit.Levels.Contains(level));
 	}
 
 	public Limit GetDefaultItemLimit()
 	{
-		return ItemLimits.Find((Limit DHDMNHCIPEH) => DHDMNHCIPEH.Levels.Count == 0);
+		return ItemLimits.Find((Limit limit) => limit.Levels.Count == 0);
 	}
 
-	public Limit GetAttributeLimitForLevel(int GNLOCMLBNHF)
+	public Limit GetAttributeLimitForLevel(int level)
 	{
-		return AttributeLimits.Find((Limit DHDMNHCIPEH) => DHDMNHCIPEH.Levels.Contains(GNLOCMLBNHF));
+		return AttributeLimits.Find((Limit limit) => limit.Levels.Contains(level));
 	}
 
 	public Limit GetDefaultAttributeLimit()
 	{
-		return AttributeLimits.Find((Limit DHDMNHCIPEH) => DHDMNHCIPEH.Levels.Count == 0);
+		return AttributeLimits.Find((Limit limit) => limit.Levels.Count == 0);
 	}
 
-	public void ParseLimits(XmlNode OEOOHNMCBOC, List<Limit> AJKECEDPPDC)
+	public void ParseLimits(XmlNode node, List<Limit> limits)
 	{
-		if (OEOOHNMCBOC == null)
+		if (node == null)
 		{
 			return;
 		}
-		foreach (XmlNode childNode in OEOOHNMCBOC.ChildNodes)
+		foreach (XmlNode childNode in node.ChildNodes)
 		{
-			Limit pEKGEPHFCMN = new Limit();
-			XmlAttribute cJBEMNNNHDM = childNode.Attributes["LeftLimit"];
+			Limit limit = new Limit();
+			XmlAttribute leftLimitAttribute = childNode.Attributes["LeftLimit"];
 			XmlAttribute cJBEMNNNHDM2 = childNode.Attributes["RightLimit"];
 			XmlAttribute xmlAttribute = childNode.Attributes["Level"];
 			XmlAttribute cJBEMNNNHDM3 = childNode.Attributes["LevelMultiplier"];
 			XmlAttribute cJBEMNNNHDM4 = childNode.Attributes["Shift"];
-			pEKGEPHFCMN.LeftLimit = cJBEMNNNHDM.ParseInt(-1);
-			pEKGEPHFCMN.RightLimit = cJBEMNNNHDM2.ParseInt(-1);
+			limit.LeftLimit = leftLimitAttribute.ParseInt(-1);
+			limit.RightLimit = cJBEMNNNHDM2.ParseInt(-1);
 			if (xmlAttribute != null)
 			{
 				string text = xmlAttribute.GetStringOrDefault();
@@ -63,14 +63,14 @@ public class BarScale
 						int result;
 						if (int.TryParse(s, out result))
 						{
-							pEKGEPHFCMN.Levels.Add(result);
+							limit.Levels.Add(result);
 						}
 					}
 				}
 			}
-			pEKGEPHFCMN.LevelMultiplier = cJBEMNNNHDM3.ParseFloat(-1f);
-			pEKGEPHFCMN.Shift = cJBEMNNNHDM4.ParseInt(-1);
-			AJKECEDPPDC.Add(pEKGEPHFCMN);
+			limit.LevelMultiplier = cJBEMNNNHDM3.ParseFloat(-1f);
+			limit.Shift = cJBEMNNNHDM4.ParseInt(-1);
+			limits.Add(limit);
 		}
 	}
 }

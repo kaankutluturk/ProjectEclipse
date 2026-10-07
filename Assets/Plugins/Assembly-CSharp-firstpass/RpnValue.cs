@@ -28,10 +28,10 @@ public class RpnValue<T>
 		isConst = true;
 	}
 
-	public RpnValue(string BOADBNLBJAN, bool AEKOOFJLNFP = false)
+	public RpnValue(string formulaText, bool flag = false)
 	{
-		formula = new RpnParser.Formula(BOADBNLBJAN);
-		if (BOADBNLBJAN.Contains("?CLC_") || !BOADBNLBJAN.Contains("?"))
+		formula = new RpnParser.Formula(formulaText);
+		if (formulaText.Contains("?CLC_") || !formulaText.Contains("?"))
 		{
 			value = ConvertTo(formula.Calculate().ToString());
 			isConst = true;
@@ -40,9 +40,9 @@ public class RpnValue<T>
 	}
 
 	[SpecialName]
-	public static T op_Implicit(global::RpnValue<T> NMICDDBHMDN)
+	public static T op_Implicit(global::RpnValue<T> rpnValue)
 	{
-		return NMICDDBHMDN.GetValue();
+		return rpnValue.GetValue();
 	}
 
 	[SpecialName]
@@ -52,36 +52,36 @@ public class RpnValue<T>
 	}
 
 	[SpecialName]
-	public static global::RpnValue<T> op_Implicit(string BOADBNLBJAN)
+	public static global::RpnValue<T> op_Implicit(string formulaText)
 	{
-		return new global::RpnValue<T>(BOADBNLBJAN);
+		return new global::RpnValue<T>(formulaText);
 	}
 
-	private static T ConvertTo(string BHMCGLHBCBI)
+	private static T ConvertTo(string text)
 	{
 		Type typeFromHandle = typeof(T);
 		if (typeFromHandle == typeof(int))
 		{
-			return (T)(object)int.Parse(BHMCGLHBCBI);
+			return (T)(object)int.Parse(text);
 		}
 		if (typeFromHandle == typeof(float))
 		{
-			return (T)(object)float.Parse(BHMCGLHBCBI, CultureInfo.InvariantCulture);
+			return (T)(object)float.Parse(text, CultureInfo.InvariantCulture);
 		}
 		if (typeFromHandle == typeof(bool))
 		{
-			return (T)(object)ParseBool(BHMCGLHBCBI);
+			return (T)(object)ParseBool(text);
 		}
 		if (typeFromHandle == typeof(string))
 		{
-			return (T)(object)BHMCGLHBCBI;
+			return (T)(object)text;
 		}
 		return default(T);
 	}
 
-	private static bool ParseBool(string BHMCGLHBCBI)
+	private static bool ParseBool(string text)
 	{
-		return BHMCGLHBCBI.ToLower() == "true" || BHMCGLHBCBI == "1";
+		return text.ToLower() == "true" || text == "1";
 	}
 
 	public T GetValue()

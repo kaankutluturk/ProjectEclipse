@@ -1,3 +1,3 @@
 using System;
 
-public delegate bool OnBeforeRedirectionDelegate(HTTPRequest BPMCLBNFEDK, HTTPResponse GIHDDAKBMHE, Uri JJCEFGDNEEO);
+public delegate bool OnBeforeRedirectionDelegate(HTTPRequest request, HTTPResponse response, Uri redirectUri);

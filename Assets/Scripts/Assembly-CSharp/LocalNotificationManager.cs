@@ -84,44 +84,44 @@ public class LocalNotificationManager
 		return isForced || !SystemProperties.IsPaidApp();
 	}
 
-	public void ScheduleRetention(long IHDMLLNEGIK)
+	public void ScheduleRetention(long delay)
 	{
-		Schedule(1, GetTitle(), LocalizationManager.GetString("push_retention"), IHDMLLNEGIK);
+		Schedule(1, GetTitle(), LocalizationManager.GetString("push_retention"), delay);
 	}
 
-	public void SchedulePeriodic(long IHDMLLNEGIK)
+	public void SchedulePeriodic(long delay)
 	{
-		Schedule(2, GetTitle(), LocalizationManager.GetString("push_periodic"), IHDMLLNEGIK);
+		Schedule(2, GetTitle(), LocalizationManager.GetString("push_periodic"), delay);
 	}
 
-	public void ScheduleTest(long IHDMLLNEGIK)
+	public void ScheduleTest(long delay)
 	{
-		Schedule(7, GetTitle(), "Test1 notification, delay=" + IHDMLLNEGIK, IHDMLLNEGIK);
+		Schedule(7, GetTitle(), "Test1 notification, delay=" + delay, delay);
 	}
 
-	public void ScheduleEnergy(long IHDMLLNEGIK)
-	{
-		// Energy is disabled; never schedule refill reminders.
-	}
-
-	public void ScheduleEnergyFull(long IHDMLLNEGIK)
+	public void ScheduleEnergy(long delay)
 	{
 		// Energy is disabled; never schedule refill reminders.
 	}
 
-	public void ScheduleRecipe(string LIOGIBJBHAH, long IHDMLLNEGIK)
+	public void ScheduleEnergyFull(long delay)
+	{
+		// Energy is disabled; never schedule refill reminders.
+	}
+
+	public void ScheduleRecipe(string message, long delay)
 	{
 		if (IsSchedulingAllowed())
 		{
-			Schedule(6, GetTitle(), LIOGIBJBHAH, IHDMLLNEGIK);
+			Schedule(6, GetTitle(), message, delay);
 		}
 	}
 
-	public void ScheduleItem(string LIOGIBJBHAH, long IHDMLLNEGIK)
+	public void ScheduleItem(string message, long delay)
 	{
 		if (IsSchedulingAllowed())
 		{
-			Schedule(5, GetTitle(), LIOGIBJBHAH, IHDMLLNEGIK);
+			Schedule(5, GetTitle(), message, delay);
 		}
 	}
 
@@ -174,19 +174,19 @@ public class LocalNotificationManager
 		}
 	}
 
-	private void CancelNotification(NotificationId KEMMPFEDLAJ)
+	private void CancelNotification(NotificationId notificationId)
 	{
 		if (isEnabled)
 		{
-			AndroidLocalNotification.CancelNotification((int)KEMMPFEDLAJ);
+			AndroidLocalNotification.CancelNotification((int)notificationId);
 		}
 	}
 
-	private void Schedule(int OKNNNLIPODI, string PEMOECLNECD, string LIOGIBJBHAH, long ENDPMCNJPEA)
+	private void Schedule(int notificationId, string title, string message, long delay)
 	{
 		if (isEnabled && SystemProperties.IsAndroidPlatform())
 		{
-			AndroidLocalNotification.SendNotification(OKNNNLIPODI, PEMOECLNECD, LIOGIBJBHAH, ENDPMCNJPEA);
+			AndroidLocalNotification.SendNotification(notificationId, title, message, delay);
 		}
 	}
 

@@ -64,16 +64,16 @@ namespace Nekki.SF2.GUI.Fight
 
 		private Button _animationFinishButton;
 
-		public void Init(FightResult HEIADONEACH, VerticalLayoutGroup KPAICOOKACB, Button OBMBALDIBEB)
+		public void Init(FightResult result, VerticalLayoutGroup layout, Button finishButton)
 		{
 			if (_buttonOk != null)
 				((RectTransform)_buttonOk.transform).anchoredPosition = Vector2.zero;
-			_animationFinishButton = OBMBALDIBEB;
-			fightResult = HEIADONEACH;
+			_animationFinishButton = finishButton;
+			fightResult = result;
 			_currentLine = 0;
 			_items = fightResult.Prize.GetItems(true);
 			bool flag = _items.Count > 0;
-			parentLayout = KPAICOOKACB;
+			parentLayout = layout;
 			ownLayout = GetComponent<VerticalLayoutGroup>();
 			if (!flag)
 			{
@@ -175,10 +175,10 @@ namespace Nekki.SF2.GUI.Fight
 		{
 			if (_currentLine < lines.Count)
 			{
-				Line fCMOHBLGJFP = lines[_currentLine];
-				fCMOHBLGJFP.AddListener(OnLineFinished);
-				fCMOHBLGJFP.AddListener(fCMOHBLGJFP.StartAnimation);
-				fCMOHBLGJFP.StartAnimation();
+				Line line = lines[_currentLine];
+				line.AddListener(OnLineFinished);
+				line.AddListener(line.StartAnimation);
+				line.StartAnimation();
 				return;
 			}
 			Line fCMOHBLGJFP2 = ((lines.Count <= 0) ? null : lines[lines.Count - 1]);
@@ -214,21 +214,21 @@ namespace Nekki.SF2.GUI.Fight
 			StartNextLine();
 		}
 
-		public Line CreateLine(string HCPNFPMHFCM, long GBGNFPNCGED, long PAGGOKFIEOP = 0L, string BBLOBPOCGNM = "")
+		public Line CreateLine(string text, long money, long extraMoney = 0L, string suffix = "")
 		{
 			TextAndMoneyLine component = Object.Instantiate(_textAndMoneyLinePrefab).GetComponent<TextAndMoneyLine>();
 			component.gameObject.SetActive(true);
 			component.transform.SetParent(base.transform, false);
-			component.Init(HCPNFPMHFCM, GBGNFPNCGED, PAGGOKFIEOP, BBLOBPOCGNM);
+			component.Init(text, money, extraMoney, suffix);
 			return component;
 		}
 
-		public Line CreateLine(long exp, long GBGNFPNCGED)
+		public Line CreateLine(long exp, long money)
 		{
 			ExpAndMoneyLine component = Object.Instantiate(_expAndMoneyLinePrefab).GetComponent<ExpAndMoneyLine>();
 			component.gameObject.SetActive(true);
 			component.transform.SetParent(base.transform, false);
-			component.Init(exp, GBGNFPNCGED);
+			component.Init(exp, money);
 			return component;
 		}
 

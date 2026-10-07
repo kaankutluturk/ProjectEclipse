@@ -37,9 +37,9 @@ public class DialogsManager : global::EventDispatcher<object>
 		return _instance;
 	}
 
-	public static BaseDialog ShowDialog(DialogType FPEKKMJIKBG, object data)
+	public static BaseDialog ShowDialog(DialogType dialogType, object data)
 	{
-		currentDialogType = FPEKKMJIKBG;
+		currentDialogType = dialogType;
 		OpenDialog(data);
 		return currentDialog;
 	}
@@ -65,7 +65,7 @@ public class DialogsManager : global::EventDispatcher<object>
 		}
 	}
 
-	public void StopDialog(BaseDialog MDOHPMBJFIL)
+	public void StopDialog(BaseDialog dialog)
 	{
 		// Dialog prefabs live on a DontDestroyOnLoad canvas.  Scene changes and
 		// reconstructed quest flows can therefore leave destroyed or inactive
@@ -77,10 +77,10 @@ public class DialogsManager : global::EventDispatcher<object>
 		for (int i = openDialogs.Count - 1; i >= 0; i--)
 		{
 			BaseDialog baseDialog = openDialogs[i];
-			if (baseDialog == null || baseDialog == MDOHPMBJFIL || !baseDialog.gameObject.activeInHierarchy)
+			if (baseDialog == null || baseDialog == dialog || !baseDialog.gameObject.activeInHierarchy)
 			{
 				openDialogs.RemoveAt(i);
-				if (baseDialog != MDOHPMBJFIL)
+				if (baseDialog != dialog)
 				{
 					staleCount++;
 				}
@@ -103,10 +103,10 @@ public class DialogsManager : global::EventDispatcher<object>
 			currentDialog = null;
 			DialogCanvasController.get_Instance().UnBlockTouches();
 		}
-		if (MDOHPMBJFIL.IsPausing)
+		if (dialog.IsPausing)
 		{
 		}
-		CallEvent(0, MDOHPMBJFIL);
+		CallEvent(0, dialog);
 	}
 
 	public static void CloseNonQuestDialogs()
@@ -121,9 +121,9 @@ public class DialogsManager : global::EventDispatcher<object>
 		}
 	}
 
-	public static BaseDialog CreateDialog(DialogType IOCONKEEGKL)
+	public static BaseDialog CreateDialog(DialogType dialogType)
 	{
-		switch (IOCONKEEGKL)
+		switch (dialogType)
 		{
 		case DialogType.DialogSimple:
 			return DialogCanvasController.get_Instance().CreateDialog<SimpleDialog>();
@@ -144,7 +144,7 @@ public class DialogsManager : global::EventDispatcher<object>
 		case DialogType.DialogNews:
 			return DialogCanvasController.get_Instance().CreateDialog<NewsDialog>();
 		default:
-			GameLog.Write("ERROR: getDialog - unknown dialog type: " + IOCONKEEGKL);
+			GameLog.Write("ERROR: getDialog - unknown dialog type: " + dialogType);
 			return null;
 		}
 	}

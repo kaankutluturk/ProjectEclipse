@@ -39,37 +39,37 @@ public static class GamePad
 		Four = 4
 	}
 
-	public static bool GetButtonDown(Button KLNKEPMAGKF, Player EKFPHMLKDAP) // best guess for name
+	public static bool GetButtonDown(Button button, Player player) // best guess for name
 	{
-		return Eclipse.Input.EclipseInput.GetGamepadButton((int)KLNKEPMAGKF, (int)EKFPHMLKDAP, 1);
+		return Eclipse.Input.EclipseInput.GetGamepadButton((int)button, (int)player, 1);
 	}
 
-	public static bool GetButtonUp(Button KLNKEPMAGKF, Player EKFPHMLKDAP) // best guess for name
+	public static bool GetButtonUp(Button button, Player player) // best guess for name
 	{
-		return Eclipse.Input.EclipseInput.GetGamepadButton((int)KLNKEPMAGKF, (int)EKFPHMLKDAP, 2);
+		return Eclipse.Input.EclipseInput.GetGamepadButton((int)button, (int)player, 2);
 	}
 
-	public static bool GetButton(Button KLNKEPMAGKF, Player EKFPHMLKDAP) // best guess for name
+	public static bool GetButton(Button button, Player player) // best guess for name
 	{
-		return Eclipse.Input.EclipseInput.GetGamepadButton((int)KLNKEPMAGKF, (int)EKFPHMLKDAP);
+		return Eclipse.Input.EclipseInput.GetGamepadButton((int)button, (int)player);
 	}
 
-	public static Vector2 GetStick(Stick NMADGDHJBGB, Player EKFPHMLKDAP, bool IMFLNPNECCO = false) // best guess for name
+	public static Vector2 GetStick(Stick stick, Player player, bool raw = false) // best guess for name
 	{
-		return Eclipse.Input.EclipseInput.GetGamepadStick((int)NMADGDHJBGB, (int)EKFPHMLKDAP, IMFLNPNECCO);
+		return Eclipse.Input.EclipseInput.GetGamepadStick((int)stick, (int)player, raw);
 	}
 
-	public static float GetTrigger(Trigger CPBHKJFPFJB, Player EKFPHMLKDAP, bool IMFLNPNECCO = false) // best guess for name
+	public static float GetTrigger(Trigger trigger, Player player, bool raw = false) // best guess for name
 	{
-		return Eclipse.Input.EclipseInput.GetGamepadTrigger((int)CPBHKJFPFJB, (int)EKFPHMLKDAP, IMFLNPNECCO);
+		return Eclipse.Input.EclipseInput.GetGamepadTrigger((int)trigger, (int)player, raw);
 	}
 
-	private static KeyCode GetKeyCode(Button KLNKEPMAGKF, Player EKFPHMLKDAP)
+	private static KeyCode GetKeyCode(Button button, Player player)
 	{
-		switch (EKFPHMLKDAP)
+		switch (player)
 		{
 		case Player.One:
-			switch (KLNKEPMAGKF)
+			switch (button)
 			{
 			case Button.A:
 				return KeyCode.Joystick1Button0;
@@ -94,7 +94,7 @@ public static class GamePad
 			}
 			break;
 		case Player.Two:
-			switch (KLNKEPMAGKF)
+			switch (button)
 			{
 			case Button.A:
 				return KeyCode.Joystick2Button0;
@@ -119,7 +119,7 @@ public static class GamePad
 			}
 			break;
 		case Player.Three:
-			switch (KLNKEPMAGKF)
+			switch (button)
 			{
 			case Button.A:
 				return KeyCode.Joystick3Button0;
@@ -144,7 +144,7 @@ public static class GamePad
 			}
 			break;
 		case Player.Four:
-			switch (KLNKEPMAGKF)
+			switch (button)
 			{
 			case Button.A:
 				return KeyCode.Joystick4Button0;
@@ -169,7 +169,7 @@ public static class GamePad
 			}
 			break;
 		case Player.Any:
-			switch (KLNKEPMAGKF)
+			switch (button)
 			{
 			case Button.A:
 				return KeyCode.JoystickButton0;
@@ -197,28 +197,28 @@ public static class GamePad
 		return KeyCode.None;
 	}
 
-	public static GamepadState GetState(Player EKFPHMLKDAP, bool IMFLNPNECCO = false)
+	public static GamepadState GetState(Player player, bool raw = false)
 	{
-		GamepadState iOIGCCPIJPN = new GamepadState();
-		iOIGCCPIJPN.A = GetButton(Button.A, EKFPHMLKDAP);
-		iOIGCCPIJPN.IsButtonBPressed = GetButton(Button.B, EKFPHMLKDAP);
-		iOIGCCPIJPN.Y = GetButton(Button.Y, EKFPHMLKDAP);
-		iOIGCCPIJPN.X = GetButton(Button.X, EKFPHMLKDAP);
-		iOIGCCPIJPN.RightShoulder = GetButton(Button.RightShoulder, EKFPHMLKDAP);
-		iOIGCCPIJPN.LeftShoulder = GetButton(Button.LeftShoulder, EKFPHMLKDAP);
-		iOIGCCPIJPN.RightStick = GetButton(Button.RightStick, EKFPHMLKDAP);
-		iOIGCCPIJPN.LeftStick = GetButton(Button.LeftStick, EKFPHMLKDAP);
-		iOIGCCPIJPN.Start = GetButton(Button.Start, EKFPHMLKDAP);
-		iOIGCCPIJPN.Back = GetButton(Button.Back, EKFPHMLKDAP);
-		iOIGCCPIJPN.LeftStickAxis = GetStick(Stick.LeftStick, EKFPHMLKDAP, IMFLNPNECCO);
-		iOIGCCPIJPN.RightStickAxis = GetStick(Stick.RightStick, EKFPHMLKDAP, IMFLNPNECCO);
-		iOIGCCPIJPN.DpadAxis = GetStick(Stick.Dpad, EKFPHMLKDAP, IMFLNPNECCO);
-		iOIGCCPIJPN.Left = iOIGCCPIJPN.DpadAxis.x < 0f;
-		iOIGCCPIJPN.Right = iOIGCCPIJPN.DpadAxis.x > 0f;
-		iOIGCCPIJPN.Up = iOIGCCPIJPN.DpadAxis.y > 0f;
-		iOIGCCPIJPN.Down = iOIGCCPIJPN.DpadAxis.y < 0f;
-		iOIGCCPIJPN.LeftTrigger = GetTrigger(Trigger.LeftTrigger, EKFPHMLKDAP, IMFLNPNECCO);
-		iOIGCCPIJPN.RightTrigger = GetTrigger(Trigger.RightTrigger, EKFPHMLKDAP, IMFLNPNECCO);
-		return iOIGCCPIJPN;
+		GamepadState state = new GamepadState();
+		state.A = GetButton(Button.A, player);
+		state.IsButtonBPressed = GetButton(Button.B, player);
+		state.Y = GetButton(Button.Y, player);
+		state.X = GetButton(Button.X, player);
+		state.RightShoulder = GetButton(Button.RightShoulder, player);
+		state.LeftShoulder = GetButton(Button.LeftShoulder, player);
+		state.RightStick = GetButton(Button.RightStick, player);
+		state.LeftStick = GetButton(Button.LeftStick, player);
+		state.Start = GetButton(Button.Start, player);
+		state.Back = GetButton(Button.Back, player);
+		state.LeftStickAxis = GetStick(Stick.LeftStick, player, raw);
+		state.RightStickAxis = GetStick(Stick.RightStick, player, raw);
+		state.DpadAxis = GetStick(Stick.Dpad, player, raw);
+		state.Left = state.DpadAxis.x < 0f;
+		state.Right = state.DpadAxis.x > 0f;
+		state.Up = state.DpadAxis.y > 0f;
+		state.Down = state.DpadAxis.y < 0f;
+		state.LeftTrigger = GetTrigger(Trigger.LeftTrigger, player, raw);
+		state.RightTrigger = GetTrigger(Trigger.RightTrigger, player, raw);
+		return state;
 	}
 }

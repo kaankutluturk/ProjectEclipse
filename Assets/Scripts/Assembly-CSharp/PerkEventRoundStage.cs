@@ -22,10 +22,10 @@ public class PerkEventRoundStage : PerkEvent
 	{
 	}
 
-	public PerkEventRoundStage(PerkEventRoundStage NOLFMPDGCOC)
-		: base(NOLFMPDGCOC)
+	public PerkEventRoundStage(PerkEventRoundStage source)
+		: base(source)
 	{
-		set_RoundStage(NOLFMPDGCOC.GetRoundStageIndex());
+		set_RoundStage(source.GetRoundStageIndex());
 	}
 
 	public int GetRoundStageIndex()
@@ -44,14 +44,14 @@ public class PerkEventRoundStage : PerkEvent
 		set_RoundStage(GetRoundStage(node.Attributes["Name"].GetStringOrDefault(string.Empty)));
 	}
 
-	public override bool IsEqual(EventStruct EJMEALJNNIL)
+	public override bool IsEqual(EventStruct eventData)
 	{
-		if (!base.IsEqual(EJMEALJNNIL))
+		if (!base.IsEqual(eventData))
 		{
 			return false;
 		}
-		int jMHJDHLBHLK = EJMEALJNNIL.EventModel.RoundStage;
-		if (GetRoundStageIndex() != 0 && GetRoundStageIndex() != jMHJDHLBHLK)
+		int currentRoundStage = eventData.EventModel.RoundStage;
+		if (GetRoundStageIndex() != 0 && GetRoundStageIndex() != currentRoundStage)
 		{
 			return false;
 		}

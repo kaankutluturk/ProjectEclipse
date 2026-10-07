@@ -34,9 +34,9 @@ public static class GlobalPaths
 			}
 		}
 
-		public PathInfo(string IDGLPJGEFKB, string NEPCCFPPPIG, string bundle, string IMFLNPNECCO)
+		public PathInfo(string resourcePath, string externalPath, string bundle, string rawPath)
 		{
-			if (string.IsNullOrEmpty(IDGLPJGEFKB))
+			if (string.IsNullOrEmpty(resourcePath))
 			{
 				HasResourcePath = false;
 				ResourcePath = string.Empty;
@@ -44,9 +44,9 @@ public static class GlobalPaths
 			else
 			{
 				HasResourcePath = true;
-				ResourcePath = IDGLPJGEFKB.Trim('/').Trim('\\');
+				ResourcePath = resourcePath.Trim('/').Trim('\\');
 			}
-			if (string.IsNullOrEmpty(NEPCCFPPPIG))
+			if (string.IsNullOrEmpty(externalPath))
 			{
 				HasExternalPath = false;
 				ExternalPath = string.Empty;
@@ -54,7 +54,7 @@ public static class GlobalPaths
 			else
 			{
 				HasExternalPath = true;
-				ExternalPath = NEPCCFPPPIG.Trim('/').Trim('\\');
+				ExternalPath = externalPath.Trim('/').Trim('\\');
 			}
 			if (string.IsNullOrEmpty(bundle))
 			{
@@ -66,7 +66,7 @@ public static class GlobalPaths
 				HasBundlePath = true;
 				BundlePath = bundle.Trim('/').Trim('\\');
 			}
-			RawPath = IMFLNPNECCO.Trim('/').Trim('\\');
+			RawPath = rawPath.Trim('/').Trim('\\');
 		}
 
 		public bool GetIsEmpty()
@@ -74,27 +74,27 @@ public static class GlobalPaths
 			return !HasResourcePath && !HasExternalPath && !HasBundlePath;
 		}
 
-		public PathInfo Append(string ALHKHJOJECK)
+		public PathInfo Append(string suffix)
 		{
 			if (HasResourcePath)
 			{
-				ResourcePath = ResourcePath + "/" + ALHKHJOJECK;
+				ResourcePath = ResourcePath + "/" + suffix;
 			}
 			if (HasExternalPath)
 			{
-				ExternalPath = ExternalPath + "/" + ALHKHJOJECK;
+				ExternalPath = ExternalPath + "/" + suffix;
 			}
 			if (HasBundlePath)
 			{
-				BundlePath = BundlePath + "/" + ALHKHJOJECK;
+				BundlePath = BundlePath + "/" + suffix;
 			}
 			return this;
 		}
 
 		[SpecialName]
-		public static string op_Explicit(PathInfo PIIEECCHMAC)
+		public static string op_Explicit(PathInfo pathInfo)
 		{
-			return PIIEECCHMAC.ExternalPath;
+			return pathInfo.ExternalPath;
 		}
 	}
 
@@ -264,9 +264,9 @@ public static class GlobalPaths
 		return PathInfo.Empty;
 	}
 
-	public static PathInfo CreateExternalPathInfo(string OKJFMFILPOB)
+	public static PathInfo CreateExternalPathInfo(string path)
 	{
-		OKJFMFILPOB = "EXTERNAL_PATH/" + OKJFMFILPOB;
-		return new PathInfo(OKJFMFILPOB.Replace("EXTERNAL_PATH/", string.Empty).Replace("CURRENT_RESOLUTION/", string.Empty), OKJFMFILPOB.Replace("EXTERNAL_PATH", GetExternalResourcesPath()).Replace("CURRENT_RESOLUTION", GetCurrentResolution()), OKJFMFILPOB.Replace("EXTERNAL_PATH/", string.Empty).Replace("CURRENT_RESOLUTION/", GetCurrentResolution()), OKJFMFILPOB);
+		path = "EXTERNAL_PATH/" + path;
+		return new PathInfo(path.Replace("EXTERNAL_PATH/", string.Empty).Replace("CURRENT_RESOLUTION/", string.Empty), path.Replace("EXTERNAL_PATH", GetExternalResourcesPath()).Replace("CURRENT_RESOLUTION", GetCurrentResolution()), path.Replace("EXTERNAL_PATH/", string.Empty).Replace("CURRENT_RESOLUTION/", GetCurrentResolution()), path);
 	}
 }

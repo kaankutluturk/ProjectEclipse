@@ -5,21 +5,21 @@ public sealed class ArrayNodeDeserializer : INodeDeserializer
 {
 	private static readonly GenericStaticMethod DeserializeHelperMethod = new GenericStaticMethod(() => DeserializeHelper<object>(null, null, null));
 
-	bool INodeDeserializer.Deserialize(EventReader reader, Type MBLGNMBFHBI, Func<EventReader, Type, object> IJBAEAEDMCC, out object value)
+	bool INodeDeserializer.Deserialize(EventReader reader, Type expectedType, Func<EventReader, Type, object> nestedObjectDeserializer, out object value)
 	{
-		if (!MBLGNMBFHBI.IsArray)
+		if (!expectedType.IsArray)
 		{
 			value = false;
 			return false;
 		}
-		value = DeserializeHelperMethod.Invoke(new Type[1] { MBLGNMBFHBI.GetElementType() }, reader, MBLGNMBFHBI, IJBAEAEDMCC);
+		value = DeserializeHelperMethod.Invoke(new Type[1] { expectedType.GetElementType() }, reader, expectedType, nestedObjectDeserializer);
 		return true;
 	}
 
-	private static TItem[] DeserializeHelper<TItem>(EventReader reader, Type MBLGNMBFHBI, Func<EventReader, Type, object> IJBAEAEDMCC)
+	private static TItem[] DeserializeHelper<TItem>(EventReader reader, Type expectedType, Func<EventReader, Type, object> nestedObjectDeserializer)
 	{
 		List<TItem> list = new List<TItem>();
-		GenericCollectionNodeDeserializer.DeserializeHelper(reader, MBLGNMBFHBI, IJBAEAEDMCC, list);
+		GenericCollectionNodeDeserializer.DeserializeHelper(reader, expectedType, nestedObjectDeserializer, list);
 		return list.ToArray();
 	}
 }

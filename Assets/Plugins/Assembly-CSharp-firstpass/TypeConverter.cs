@@ -6,11 +6,11 @@ using System.Reflection;
 
 public static class TypeConverterHelper
 {
-	public delegate bool TryParseDelegate<T>(string value, out T DCJLKCFKCOM);
+	public delegate bool TryParseDelegate<T>(string value, out T result);
 
 	public static void RegisterTypeConverter<TConvertible, TConverter>() where TConverter : global::System.ComponentModel.TypeConverter
 	{
-		if (!TypeDescriptor.GetAttributes(typeof(TConvertible)).OfType<TypeConverterAttribute>().Any((TypeConverterAttribute LHBNIMGFKIB) => LHBNIMGFKIB.ConverterTypeName == typeof(TConverter).AssemblyQualifiedName))
+		if (!TypeDescriptor.GetAttributes(typeof(TConvertible)).OfType<TypeConverterAttribute>().Any((TypeConverterAttribute attribute) => attribute.ConverterTypeName == typeof(TConverter).AssemblyQualifiedName))
 		{
 			TypeDescriptor.AddAttributes(typeof(TConvertible), new TypeConverterAttribute(typeof(TConverter)));
 		}
@@ -21,53 +21,53 @@ public static class TypeConverterHelper
 		return (T)ChangeType(value, typeof(T));
 	}
 
-	public static T ChangeType<T>(object value, IFormatProvider EEGMFLOPLLH)
+	public static T ChangeType<T>(object value, IFormatProvider formatProvider)
 	{
-		return (T)ChangeType(value, typeof(T), EEGMFLOPLLH);
+		return (T)ChangeType(value, typeof(T), formatProvider);
 	}
 
-	public static T ChangeType<T>(object value, CultureInfo AGADJJPNKHG)
+	public static T ChangeType<T>(object value, CultureInfo culture)
 	{
-		return (T)ChangeType(value, typeof(T), AGADJJPNKHG);
+		return (T)ChangeType(value, typeof(T), culture);
 	}
 
-	public static object ChangeType(object value, Type ILDBENPMPNB)
+	public static object ChangeType(object value, Type targetType)
 	{
-		return ChangeType(value, ILDBENPMPNB, CultureInfo.InvariantCulture);
+		return ChangeType(value, targetType, CultureInfo.InvariantCulture);
 	}
 
-	public static object ChangeType(object value, Type ILDBENPMPNB, IFormatProvider EEGMFLOPLLH)
+	public static object ChangeType(object value, Type targetType, IFormatProvider formatProvider)
 	{
-		return ChangeType(value, ILDBENPMPNB, new CultureInfoAdapter(CultureInfo.CurrentCulture, EEGMFLOPLLH));
+		return ChangeType(value, targetType, new CultureInfoAdapter(CultureInfo.CurrentCulture, formatProvider));
 	}
 
-	public static object ChangeType(object value, Type ILDBENPMPNB, CultureInfo AGADJJPNKHG)
+	public static object ChangeType(object value, Type targetType, CultureInfo culture)
 	{
 		if (value == null || value is DBNull)
 		{
-			return (!ILDBENPMPNB.IsValueTypeCheck()) ? null : Activator.CreateInstance(ILDBENPMPNB);
+			return (!targetType.IsValueTypeCheck()) ? null : Activator.CreateInstance(targetType);
 		}
 		Type type = value.GetType();
-		if (ILDBENPMPNB.IsAssignableFrom(type))
+		if (targetType.IsAssignableFrom(type))
 		{
 			return value;
 		}
-		if (ILDBENPMPNB.IsGenericTypeCheck())
+		if (targetType.IsGenericTypeCheck())
 		{
-			Type genericTypeDefinition = ILDBENPMPNB.GetGenericTypeDefinition();
+			Type genericTypeDefinition = targetType.GetGenericTypeDefinition();
 			if (genericTypeDefinition == typeof(Nullable<>))
 			{
-				Type iLDBENPMPNB = ILDBENPMPNB.GetGenericArguments()[0];
-				object obj = ChangeType(value, iLDBENPMPNB, AGADJJPNKHG);
-				return Activator.CreateInstance(ILDBENPMPNB, obj);
+				Type underlyingType = targetType.GetGenericArguments()[0];
+				object obj = ChangeType(value, underlyingType, culture);
+				return Activator.CreateInstance(targetType, obj);
 			}
 		}
-		if (ILDBENPMPNB.IsEnumCheck())
+		if (targetType.IsEnumCheck())
 		{
 			string text = value as string;
-			return (text == null) ? value : Enum.Parse(ILDBENPMPNB, text, true);
+			return (text == null) ? value : Enum.Parse(targetType, text, true);
 		}
-		if (ILDBENPMPNB == typeof(bool))
+		if (targetType == typeof(bool))
 		{
 			if ("0".Equals(value))
 			{
@@ -79,21 +79,21 @@ public static class TypeConverterHelper
 			}
 		}
 		System.ComponentModel.TypeConverter converter = TypeDescriptor.GetConverter(value);
-		if (converter != null && converter.CanConvertTo(ILDBENPMPNB))
+		if (converter != null && converter.CanConvertTo(targetType))
 		{
-			return converter.ConvertTo(null, AGADJJPNKHG, value, ILDBENPMPNB);
+			return converter.ConvertTo(null, culture, value, targetType);
 		}
-		System.ComponentModel.TypeConverter converter2 = TypeDescriptor.GetConverter(ILDBENPMPNB);
+		System.ComponentModel.TypeConverter converter2 = TypeDescriptor.GetConverter(targetType);
 		if (converter2 != null && converter2.CanConvertFrom(type))
 		{
-			return converter2.ConvertFrom(null, AGADJJPNKHG, value);
+			return converter2.ConvertFrom(null, culture, value);
 		}
-		Type[] array = new Type[2] { type, ILDBENPMPNB };
-		foreach (Type lFLGCDNKNJI in array)
+		Type[] array = new Type[2] { type, targetType };
+		foreach (Type candidateType in array)
 		{
-			foreach (MethodInfo item in lFLGCDNKNJI.GetPublicMethods())
+			foreach (MethodInfo item in candidateType.GetPublicMethods())
 			{
-				if (!item.IsSpecialName || (!(item.Name == "op_Implicit") && !(item.Name == "op_Explicit")) || !ILDBENPMPNB.IsAssignableFrom(item.ReturnParameter.ParameterType))
+				if (!item.IsSpecialName || (!(item.Name == "op_Implicit") && !(item.Name == "op_Explicit")) || !targetType.IsAssignableFrom(item.ReturnParameter.ParameterType))
 				{
 					continue;
 				}
@@ -104,9 +104,9 @@ public static class TypeConverterHelper
 					{
 						return item.Invoke(null, new object[1] { value });
 					}
-					catch (TargetInvocationException mPFFFAOGBJE)
+					catch (TargetInvocationException invocationException)
 					{
-						throw mPFFFAOGBJE.Unwrap();
+						throw invocationException.Unwrap();
 					}
 				}
 			}
@@ -115,12 +115,12 @@ public static class TypeConverterHelper
 		{
 			try
 			{
-				MethodInfo methodInfo = ILDBENPMPNB.GetPublicStaticMethod("Parse", typeof(string), typeof(IFormatProvider));
+				MethodInfo methodInfo = targetType.GetPublicStaticMethod("Parse", typeof(string), typeof(IFormatProvider));
 				if (methodInfo != null)
 				{
-					return methodInfo.Invoke(null, new object[2] { value, AGADJJPNKHG });
+					return methodInfo.Invoke(null, new object[2] { value, culture });
 				}
-				methodInfo = ILDBENPMPNB.GetPublicStaticMethod("Parse", typeof(string));
+				methodInfo = targetType.GetPublicStaticMethod("Parse", typeof(string));
 				if (methodInfo != null)
 				{
 					return methodInfo.Invoke(null, new object[1] { value });
@@ -131,11 +131,11 @@ public static class TypeConverterHelper
 				throw mPFFFAOGBJE2.Unwrap();
 			}
 		}
-		if (ILDBENPMPNB == typeof(TimeSpan))
+		if (targetType == typeof(TimeSpan))
 		{
 			return TimeSpan.Parse((string)ChangeType(value, typeof(string), CultureInfo.InvariantCulture));
 		}
-		return Convert.ChangeType(value, ILDBENPMPNB, CultureInfo.InvariantCulture);
+		return Convert.ChangeType(value, targetType, CultureInfo.InvariantCulture);
 	}
 
 	public static T TryParse<T>(string value) where T : struct
@@ -173,9 +173,9 @@ public static class TypeConverterHelper
 		}
 	}
 
-	public static T? TryParse<T>(string value, TryParseDelegate<T> EGJGOEKBKEK) where T : struct
+	public static T? TryParse<T>(string value, TryParseDelegate<T> tryParse) where T : struct
 	{
-		T DCJLKCFKCOM;
-		return (!EGJGOEKBKEK(value, out DCJLKCFKCOM)) ? ((T?)null) : new T?(DCJLKCFKCOM);
+		T parsedValue;
+		return (!tryParse(value, out parsedValue)) ? ((T?)null) : new T?(parsedValue);
 	}
 }

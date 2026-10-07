@@ -41,49 +41,49 @@ internal class CrcCalculatorStream : Stream, IDisposable
 		}
 	}
 
-	public CrcCalculatorStream(Stream ABJIEFMMIEK)
-		: this(true, UnsetLengthLimit, ABJIEFMMIEK, null)
+	public CrcCalculatorStream(Stream stream)
+		: this(true, UnsetLengthLimit, stream, null)
 	{
 	}
 
-	public CrcCalculatorStream(Stream ABJIEFMMIEK, bool LOLBAGJKKPH)
-		: this(LOLBAGJKKPH, UnsetLengthLimit, ABJIEFMMIEK, null)
+	public CrcCalculatorStream(Stream stream, bool leaveOpen)
+		: this(leaveOpen, UnsetLengthLimit, stream, null)
 	{
 	}
 
-	public CrcCalculatorStream(Stream ABJIEFMMIEK, long BDBOAEGELMC)
-		: this(true, BDBOAEGELMC, ABJIEFMMIEK, null)
+	public CrcCalculatorStream(Stream stream, long length)
+		: this(true, length, stream, null)
 	{
-		if (BDBOAEGELMC < 0)
+		if (length < 0)
 		{
 			throw new ArgumentException("length");
 		}
 	}
 
-	public CrcCalculatorStream(Stream ABJIEFMMIEK, long BDBOAEGELMC, bool LOLBAGJKKPH)
-		: this(LOLBAGJKKPH, BDBOAEGELMC, ABJIEFMMIEK, null)
+	public CrcCalculatorStream(Stream stream, long length, bool leaveOpen)
+		: this(leaveOpen, length, stream, null)
 	{
-		if (BDBOAEGELMC < 0)
+		if (length < 0)
 		{
 			throw new ArgumentException("length");
 		}
 	}
 
-	public CrcCalculatorStream(Stream ABJIEFMMIEK, long BDBOAEGELMC, bool LOLBAGJKKPH, CRC32 CJGBICDHGGL)
-		: this(LOLBAGJKKPH, BDBOAEGELMC, ABJIEFMMIEK, CJGBICDHGGL)
+	public CrcCalculatorStream(Stream stream, long length, bool leaveOpen, CRC32 crc32)
+		: this(leaveOpen, length, stream, crc32)
 	{
-		if (BDBOAEGELMC < 0)
+		if (length < 0)
 		{
 			throw new ArgumentException("length");
 		}
 	}
 
-	private CrcCalculatorStream(bool LOLBAGJKKPH, long BDBOAEGELMC, Stream ABJIEFMMIEK, CRC32 CJGBICDHGGL)
+	private CrcCalculatorStream(bool leaveOpen, long length, Stream stream, CRC32 crc32)
 	{
-		_innerStream = ABJIEFMMIEK;
-		_crc32 = CJGBICDHGGL ?? new CRC32();
-		_lengthLimit = BDBOAEGELMC;
-		_leaveOpen = LOLBAGJKKPH;
+		_innerStream = stream;
+		_crc32 = crc32 ?? new CRC32();
+		_lengthLimit = length;
+		_leaveOpen = leaveOpen;
 	}
 
 	public long GetTotalBytesSlurped()
@@ -106,7 +106,7 @@ internal class CrcCalculatorStream : Stream, IDisposable
 		_leaveOpen = value;
 	}
 
-	public override int Read(byte[] buffer, int IPCOBJBKNAO, int count)
+	public override int Read(byte[] buffer, int offset, int count)
 	{
 		if (_lengthLimit != UnsetLengthLimit)
 		{
@@ -120,21 +120,21 @@ internal class CrcCalculatorStream : Stream, IDisposable
 				count = (int)num;
 			}
 		}
-		int num2 = _innerStream.Read(buffer, IPCOBJBKNAO, count);
+		int num2 = _innerStream.Read(buffer, offset, count);
 		if (num2 > 0)
 		{
-			_crc32.SlurpBlock(buffer, IPCOBJBKNAO, num2);
+			_crc32.SlurpBlock(buffer, offset, num2);
 		}
 		return num2;
 	}
 
-	public override void Write(byte[] buffer, int IPCOBJBKNAO, int count)
+	public override void Write(byte[] buffer, int offset, int count)
 	{
 		if (count > 0)
 		{
-			_crc32.SlurpBlock(buffer, IPCOBJBKNAO, count);
+			_crc32.SlurpBlock(buffer, offset, count);
 		}
-		_innerStream.Write(buffer, IPCOBJBKNAO, count);
+		_innerStream.Write(buffer, offset, count);
 	}
 
 	public override bool CanRead
@@ -186,7 +186,7 @@ internal class CrcCalculatorStream : Stream, IDisposable
 		}
 	}
 
-	public override long Seek(long IPCOBJBKNAO, SeekOrigin IKOOJMAOFOD)
+	public override long Seek(long offset, SeekOrigin origin)
 	{
 		throw new NotSupportedException();
 	}

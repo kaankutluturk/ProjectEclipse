@@ -5,21 +5,21 @@ public sealed class TagNodeTypeResolver : INodeTypeResolver
 {
 	private readonly IDictionary<string, Type> tagMappings;
 
-	public TagNodeTypeResolver(IDictionary<string, Type> NKEHCGOLJDA)
+	public TagNodeTypeResolver(IDictionary<string, Type> mappings)
 	{
-		if (NKEHCGOLJDA == null)
+		if (mappings == null)
 		{
 			throw new ArgumentNullException("tagMappings");
 		}
-		this.tagMappings = NKEHCGOLJDA;
+		this.tagMappings = mappings;
 	}
 
-	bool INodeTypeResolver.Resolve(NodeEvent ABOEBNGCALL, ref Type PHOBEGPKAKH)
+	bool INodeTypeResolver.Resolve(NodeEvent nodeEvent, ref Type currentType)
 	{
 		Type value;
-		if (!string.IsNullOrEmpty(ABOEBNGCALL.GetTag()) && tagMappings.TryGetValue(ABOEBNGCALL.GetTag(), out value))
+		if (!string.IsNullOrEmpty(nodeEvent.GetTag()) && tagMappings.TryGetValue(nodeEvent.GetTag(), out value))
 		{
-			PHOBEGPKAKH = value;
+			currentType = value;
 			return true;
 		}
 		return false;

@@ -12,12 +12,12 @@ public class VerificationSettings
 
 	public int Frequency;
 
-	public VerificationSettings(string KNPONKPJHFJ, int _timeout, int JAPFPFANIMO, int LIANOKFMGMB)
+	public VerificationSettings(string url, int _timeout, int maxRetry, int frequency)
 	{
-		Url = KNPONKPJHFJ;
+		Url = url;
 		Timeout = _timeout;
-		MaxRetry = JAPFPFANIMO;
-		Frequency = LIANOKFMGMB;
+		MaxRetry = maxRetry;
+		Frequency = frequency;
 	}
 
 	public VerificationSettings()

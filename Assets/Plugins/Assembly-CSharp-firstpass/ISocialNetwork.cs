@@ -8,11 +8,11 @@ public interface ISocialNetwork
 
 	SocialNetworkType NetworkType { get; }
 
-	void Init(SocialWrapper OBPHBNCBNCN);
+	void Init(SocialWrapper socialWrapper);
 
-	void GetUser(string AOKMNKOIMHI);
+	void GetUser(string userId);
 
-	void GetUsers(string[] JAIEEFOCDAA);
+	void GetUsers(string[] userIds);
 
 	void RequestFriends();
 
@@ -24,7 +24,7 @@ public interface ISocialNetwork
 
 	void CheckGroupMembership();
 
-	void PostToWall(string AOKMNKOIMHI, string LIOGIBJBHAH, string DMNBDBJNKME);
+	void PostToWall(string ownerId, string message, string attachments);
 
 	void Buy(int item);
 

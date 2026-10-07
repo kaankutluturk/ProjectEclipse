@@ -2,14 +2,14 @@ namespace Nekki.SF2.GUI
 {
 	public class ResolutionImageAvatar : ResolutionImage
 	{
-		protected new static string NormalizeSpriteName(string JGIGOMLGLPN)
+		protected new static string NormalizeSpriteName(string spriteName)
 		{
-			return JGIGOMLGLPN;
+			return spriteName;
 		}
 
-		protected new static string NormalizeAtlasName(string JLEKBBJBLOE)
+		protected new static string NormalizeAtlasName(string atlasName)
 		{
-			return JLEKBBJBLOE;
+			return atlasName;
 		}
 
 		protected override void OnNativeSizeSet()

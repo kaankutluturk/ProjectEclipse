@@ -34,49 +34,49 @@ public class StoryDialogContent
 
 	public Color FontColor = Constants.DialogTextColor;
 
-	public StoryDialogContent(string _text = "", string ADDKGJGCBMB = "", string KLIDPJCCAME = "", string MJEBMLFLLHO = "", int KMFDBBKMLOO = 0, int _id = -1, UserItem NKBIOFJMONB = null, TextTimer OIHKOMFCFME = null, ContentType _type = ContentType.CONTENT_TYPE_REGULAR, RecipeItemInfo DMDLCMBKEHA = null)
+	public StoryDialogContent(string _text = "", string buttonText = "", string itemName = "", string enchantmentName = "", int timer = 0, int _id = -1, UserItem ownedItem = null, TextTimer itemTimer = null, ContentType _type = ContentType.CONTENT_TYPE_REGULAR, RecipeItemInfo recipe = null)
 	{
 		Text = _text;
-		ButtonText = ADDKGJGCBMB;
-		ItemName = KLIDPJCCAME;
-		EnchantmentName = MJEBMLFLLHO;
+		ButtonText = buttonText;
+		ItemName = itemName;
+		EnchantmentName = enchantmentName;
 		Id = _id;
-		Timer = KMFDBBKMLOO;
-		OwnedItem = NKBIOFJMONB;
-		Recipe = DMDLCMBKEHA;
-		ItemTimer = OIHKOMFCFME;
+		Timer = timer;
+		OwnedItem = ownedItem;
+		Recipe = recipe;
+		ItemTimer = itemTimer;
 		Type = _type;
 	}
 
-	public StoryDialogContent(StoryDialogContent NOLFMPDGCOC)
+	public StoryDialogContent(StoryDialogContent source)
 	{
-		Text = NOLFMPDGCOC.Text;
-		ButtonText = NOLFMPDGCOC.ButtonText;
-		ItemName = NOLFMPDGCOC.ItemName;
-		EnchantmentName = NOLFMPDGCOC.EnchantmentName;
-		Id = NOLFMPDGCOC.Id;
-		Timer = NOLFMPDGCOC.Timer;
-		OwnedItem = NOLFMPDGCOC.OwnedItem;
-		Recipe = NOLFMPDGCOC.Recipe;
-		ItemTimer = NOLFMPDGCOC.ItemTimer;
-		Type = NOLFMPDGCOC.Type;
+		Text = source.Text;
+		ButtonText = source.ButtonText;
+		ItemName = source.ItemName;
+		EnchantmentName = source.EnchantmentName;
+		Id = source.Id;
+		Timer = source.Timer;
+		OwnedItem = source.OwnedItem;
+		Recipe = source.Recipe;
+		ItemTimer = source.ItemTimer;
+		Type = source.Type;
 	}
 
 	public bool RefreshItemTimer()
 	{
 		if (ItemName != string.Empty || EnchantmentName != string.Empty)
 		{
-			UserItem dKCHDHMLKHN = ListSF.GetUserItem(ItemName);
-			if (dKCHDHMLKHN == null)
+			UserItem userItem = ListSF.GetUserItem(ItemName);
+			if (userItem == null)
 			{
 				Timer = 0L;
 			}
 			else
 			{
-				Timer = GameUtils.GetLeftTime(dKCHDHMLKHN.GetDeliveryTimestamp());
+				Timer = GameUtils.GetLeftTime(userItem.GetDeliveryTimestamp());
 			}
 			CheckTimer = true;
-			OwnedItem = dKCHDHMLKHN;
+			OwnedItem = userItem;
 			if (Timer == 0)
 			{
 				return false;

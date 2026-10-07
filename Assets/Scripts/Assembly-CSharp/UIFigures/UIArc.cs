@@ -18,12 +18,12 @@ namespace UIFigures
 		[Range(0f, (float)Math.PI * 2f)]
 		private float _To = (float)Math.PI / 2f;
 
-		protected override void OnPopulateMesh(VertexHelper DHJBOKKAOJK)
+		protected override void OnPopulateMesh(VertexHelper vertexHelper)
 		{
-			base.OnPopulateMesh(DHJBOKKAOJK);
-			Vector2 gIAEPIIIMDH = (_LowerLeft + _UpperRight) * 0.5f;
-			Vector2 lPEMPCEJFIN = new Vector2(base.rectTransform.rect.width, base.rectTransform.rect.height) * 0.5f;
-			DrawFunctions.DrawArc(DHJBOKKAOJK, gIAEPIIIMDH, lPEMPCEJFIN, _To, _From, _Segments, color);
+			base.OnPopulateMesh(vertexHelper);
+			Vector2 center = (_LowerLeft + _UpperRight) * 0.5f;
+			Vector2 halfSize = new Vector2(base.rectTransform.rect.width, base.rectTransform.rect.height) * 0.5f;
+			DrawFunctions.DrawArc(vertexHelper, center, halfSize, _To, _From, _Segments, color);
 		}
 	}
 }

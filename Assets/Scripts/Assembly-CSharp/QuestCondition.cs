@@ -41,9 +41,9 @@ public class QuestCondition : ConditionExtension
 
 	private RosterQuest rosterQuest;
 
-	public static ComparisonType ParseComparison(string LFLGCDNKNJI)
+	public static ComparisonType ParseComparison(string comparisonText)
 	{
-		switch (LFLGCDNKNJI)
+		switch (comparisonText)
 		{
 		case "Equal":
 			return ComparisonType.QUEST_CONDITION_EQUAL;
@@ -62,9 +62,9 @@ public class QuestCondition : ConditionExtension
 		}
 	}
 
-	public static LogicalOperator ParseLogicalOperator(string FDHOMBHPNEF)
+	public static LogicalOperator ParseLogicalOperator(string operatorText)
 	{
-		switch (FDHOMBHPNEF)
+		switch (operatorText)
 		{
 		case "Or":
 			return LogicalOperator.QUEST_CONDITION_SUB_OR;
@@ -75,28 +75,28 @@ public class QuestCondition : ConditionExtension
 		}
 	}
 
-	public virtual void Parse(XmlNode BGPKIKNPIKP)
+	public virtual void Parse(XmlNode node)
 	{
-		isNot = XmlUtils.ParseBool(BGPKIKNPIKP.Attributes["Not"]);
-		_compareVersions = XmlUtils.ParseString(BGPKIKNPIKP.Attributes["CompareType"]) == "Versions";
-		comparison = ParseComparison(BGPKIKNPIKP.Name);
-		logicalOperator = ParseLogicalOperator(XmlUtils.ParseString(BGPKIKNPIKP.Attributes["Type"]));
-		value1 = ClearGaps(XmlUtils.ParseString(BGPKIKNPIKP.Attributes["Value1"]));
-		value2 = ClearGaps(XmlUtils.ParseString(BGPKIKNPIKP.Attributes["Value2"]));
+		isNot = XmlUtils.ParseBool(node.Attributes["Not"]);
+		_compareVersions = XmlUtils.ParseString(node.Attributes["CompareType"]) == "Versions";
+		comparison = ParseComparison(node.Name);
+		logicalOperator = ParseLogicalOperator(XmlUtils.ParseString(node.Attributes["Type"]));
+		value1 = ClearGaps(XmlUtils.ParseString(node.Attributes["Value1"]));
+		value2 = ClearGaps(XmlUtils.ParseString(node.Attributes["Value2"]));
 	}
 
-	public bool Compare(QuestParameters GFIHPBCEEOB, RosterQuest HFHCJABFEPE)
+	public bool Compare(QuestParameters parameters, RosterQuest quest)
 	{
-		bool dCJLKCFKCOM = false;
+		bool isMatch = false;
 		if (comparison != ComparisonType.QUEST_CONDITION_OPERATOR)
 		{
-			dCJLKCFKCOM = IsCompare(GFIHPBCEEOB, HFHCJABFEPE);
+			isMatch = IsCompare(parameters, quest);
 		}
 		else
 		{
 			foreach (QuestCondition item in conditions)
 			{
-				bool flag = item.Compare(GFIHPBCEEOB, HFHCJABFEPE);
+				bool flag = item.Compare(parameters, quest);
 				if (logicalOperator == LogicalOperator.QUEST_CONDITION_SUB_AND && !flag)
 				{
 					return IsNotCompare(false);
@@ -115,285 +115,285 @@ public class QuestCondition : ConditionExtension
 				return IsNotCompare(false);
 			}
 		}
-		return IsNotCompare(dCJLKCFKCOM);
+		return IsNotCompare(isMatch);
 	}
 
-	public void SetParameters(QuestParameters JCICKLIMBEF)
+	public void SetParameters(QuestParameters parameters)
 	{
-		questParameters = JCICKLIMBEF;
+		questParameters = parameters;
 	}
 
-	protected override void ResolveSessionVariable(string value, CompareResult BMDEBHIHIAJ)
+	protected override void ResolveSessionVariable(string value, CompareResult result)
 	{
 		if (questParameters != null)
 		{
 			switch (value)
 			{
 			case "_$Fight":
-				BMDEBHIHIAJ.resultSTR = ((questParameters.GetFightList() == null) ? string.Empty : questParameters.GetFightList().FightId.ToString());
+				result.resultSTR = ((questParameters.GetFightList() == null) ? string.Empty : questParameters.GetFightList().FightId.ToString());
 				break;
 			case "_$Raid":
-				BMDEBHIHIAJ.resultSTR = questParameters.raidId;
+				result.resultSTR = questParameters.raidId;
 				break;
 			case "_$FightResult":
-				BMDEBHIHIAJ.resultSTR = questParameters.fightResult;
+				result.resultSTR = questParameters.fightResult;
 				break;
 			case "_$RaidResult":
-				BMDEBHIHIAJ.resultSTR = questParameters.raidResult;
+				result.resultSTR = questParameters.raidResult;
 				break;
 			case "_$LevelUp":
-				BMDEBHIHIAJ.resultNumber = questParameters.levelUp;
+				result.resultNumber = questParameters.levelUp;
 				break;
 			case "_$ActionID":
-				BMDEBHIHIAJ.resultSTR = ((questParameters.actionId == null) ? string.Empty : questParameters.actionId.Value);
+				result.resultSTR = ((questParameters.actionId == null) ? string.Empty : questParameters.actionId.Value);
 				break;
 			case "_$SceneFrom":
-				BMDEBHIHIAJ.resultSTR = questParameters.sceneFrom;
+				result.resultSTR = questParameters.sceneFrom;
 				break;
 			case "_$SceneTo":
-				BMDEBHIHIAJ.resultSTR = questParameters.sceneTo;
+				result.resultSTR = questParameters.sceneTo;
 				break;
 			case "_$Purchase":
-				BMDEBHIHIAJ.resultSTR = ((questParameters.purchasedItem == null) ? string.Empty : questParameters.purchasedItem.Name);
+				result.resultSTR = ((questParameters.purchasedItem == null) ? string.Empty : questParameters.purchasedItem.Name);
 				break;
 			case "_$PurchaseUnsuccessful":
-				BMDEBHIHIAJ.resultSTR = GetPurchaseUnsuccessfulValue();
+				result.resultSTR = GetPurchaseUnsuccessfulValue();
 				break;
 			case "_$Deliver":
-				BMDEBHIHIAJ.resultSTR = ((questParameters.purchasedItem == null) ? string.Empty : questParameters.purchasedItem.Name);
+				result.resultSTR = ((questParameters.purchasedItem == null) ? string.Empty : questParameters.purchasedItem.Name);
 				break;
 			case "_$EnergyChange":
-				BMDEBHIHIAJ.resultNumber = questParameters.energyChange;
+				result.resultNumber = questParameters.energyChange;
 				break;
 			case "_$Iterator":
-				BMDEBHIHIAJ.resultSTR = questParameters.iteratorValue;
+				result.resultSTR = questParameters.iteratorValue;
 				break;
 			case "_$ChosenLocale":
-				BMDEBHIHIAJ.resultSTR = ((questParameters.chosenLanguage == null) ? string.Empty : questParameters.chosenLanguage.name);
+				result.resultSTR = ((questParameters.chosenLanguage == null) ? string.Empty : questParameters.chosenLanguage.name);
 				break;
 			case "_$ButtonType":
-				BMDEBHIHIAJ.resultSTR = questParameters.buttonType;
+				result.resultSTR = questParameters.buttonType;
 				break;
 			case "_$TabTo":
-				BMDEBHIHIAJ.resultSTR = questParameters.tabTo;
+				result.resultSTR = questParameters.tabTo;
 				break;
 			case "_$TabFrom":
-				BMDEBHIHIAJ.resultSTR = questParameters.tabFrom;
+				result.resultSTR = questParameters.tabFrom;
 				break;
 			case "_$FightAvgFPS":
-				BMDEBHIHIAJ.resultSTR = questParameters.fightAvgFps.ToString();
+				result.resultSTR = questParameters.fightAvgFps.ToString();
 				break;
 			case "_$TimerName":
-				BMDEBHIHIAJ.resultSTR = questParameters.timerName.ToString();
+				result.resultSTR = questParameters.timerName.ToString();
 				break;
 			case "_$ButtonName":
-				BMDEBHIHIAJ.resultSTR = questParameters.buttonName;
+				result.resultSTR = questParameters.buttonName;
 				break;
 			case "_$PackName":
-				BMDEBHIHIAJ.resultSTR = questParameters.packName;
+				result.resultSTR = questParameters.packName;
 				break;
 			case "_$GemsPrice":
-				BMDEBHIHIAJ.resultNumber = questParameters.gemsPrice;
+				result.resultNumber = questParameters.gemsPrice;
 				break;
 			case "_$Enchantment":
-				BMDEBHIHIAJ.resultSTR = GetEnchantmentValue();
+				result.resultSTR = GetEnchantmentValue();
 				break;
 			case "_$PerkName":
-				BMDEBHIHIAJ.resultSTR = questParameters.perkName;
+				result.resultSTR = questParameters.perkName;
 				break;
 			case "_$LotteryLastSpinNumber":
-				BMDEBHIHIAJ.resultSTR = questParameters.lotteryLastSpinNumber.ToString();
+				result.resultSTR = questParameters.lotteryLastSpinNumber.ToString();
 				break;
 			case "_$InLottery":
-				BMDEBHIHIAJ.resultSTR = questParameters.inLottery.ToString();
+				result.resultSTR = questParameters.inLottery.ToString();
 				break;
 			case "_$SetItem":
-				BMDEBHIHIAJ.resultSTR = questParameters.setItemName.ToString();
+				result.resultSTR = questParameters.setItemName.ToString();
 				break;
 			case "_$StoryTutorialStep":
-				BMDEBHIHIAJ.resultSTR = ListSF.GetRoster().GetTutorials().GetStoryStep();
+				result.resultSTR = ListSF.GetRoster().GetTutorials().GetStoryStep();
 				break;
 			default:
 			{
-				Roster nKGLHEGIKKP = ListSF.GetRoster();
-				RosterQuest.QuestVariable nOKCOAHJIPB = nKGLHEGIKKP.FindQuestVariable(value);
-				string bAINMLLIKOL = ((nOKCOAHJIPB == null) ? value : nOKCOAHJIPB.Value);
-				SetLiteralValue(bAINMLLIKOL, BMDEBHIHIAJ);
+				Roster roster = ListSF.GetRoster();
+				RosterQuest.QuestVariable questVariable = roster.FindQuestVariable(value);
+				string variableValue = ((questVariable == null) ? value : questVariable.Value);
+				SetLiteralValue(variableValue, result);
 				break;
 			}
 			}
 		}
-		if (!BMDEBHIHIAJ.resultSTR.Equals(string.Empty) && GetVariableType(BMDEBHIHIAJ.resultSTR) == QuestVariableType.QUEST_CONDITION_VARIABLE_NUMBER)
+		if (!result.resultSTR.Equals(string.Empty) && GetVariableType(result.resultSTR) == QuestVariableType.QUEST_CONDITION_VARIABLE_NUMBER)
 		{
-			string iBBAMMHHBFE = BMDEBHIHIAJ.resultSTR;
-			BMDEBHIHIAJ.resultSTR = string.Empty;
-			BMDEBHIHIAJ.resultNumber = float.Parse(iBBAMMHHBFE);
+			string numberText = result.resultSTR;
+			result.resultSTR = string.Empty;
+			result.resultNumber = float.Parse(numberText);
 		}
 	}
 
-	private bool IsCompare(QuestParameters GFIHPBCEEOB, RosterQuest HFHCJABFEPE)
+	private bool IsCompare(QuestParameters parameters, RosterQuest quest)
 	{
-		this.questParameters = GFIHPBCEEOB;
-		this.rosterQuest = HFHCJABFEPE;
-		CompareResult lNIDLHOIHIM = new CompareResult();
+		this.questParameters = parameters;
+		this.rosterQuest = quest;
+		CompareResult result = new CompareResult();
 		CompareResult lNIDLHOIHIM2 = new CompareResult();
-		SetValue(value1, lNIDLHOIHIM);
+		SetValue(value1, result);
 		SetValue(value2, lNIDLHOIHIM2);
-		return CompareResults(lNIDLHOIHIM, lNIDLHOIHIM2);
+		return CompareResults(result, lNIDLHOIHIM2);
 	}
 
-	private bool CompareResults(CompareResult HJJBNECFJGO, CompareResult KAGCCGKOPFM)
+	private bool CompareResults(CompareResult leftResult, CompareResult rightResult)
 	{
 		if (_compareVersions)
 		{
-			VersionContainer left = new VersionContainer(HJJBNECFJGO.ToString());
-			VersionContainer right = new VersionContainer(KAGCCGKOPFM.ToString());
+			VersionContainer left = new VersionContainer(leftResult.ToString());
+			VersionContainer right = new VersionContainer(rightResult.ToString());
 			int order = VersionContainer.IsEqual(left, right) ? 0 :
 				VersionContainer.IsGreater(left, right) ? 1 : -1;
 			return NumberCompare(order, 0);
 		}
-		if (!HJJBNECFJGO.IsNumber() && !KAGCCGKOPFM.IsNumber())
+		if (!leftResult.IsNumber() && !rightResult.IsNumber())
 		{
-			return StringCompare(HJJBNECFJGO.resultSTR, KAGCCGKOPFM.resultSTR);
+			return StringCompare(leftResult.resultSTR, rightResult.resultSTR);
 		}
-		if (HJJBNECFJGO.IsNumber() && KAGCCGKOPFM.IsNumber())
+		if (leftResult.IsNumber() && rightResult.IsNumber())
 		{
-			return NumberCompare((int)HJJBNECFJGO.resultNumber, (int)KAGCCGKOPFM.resultNumber);
+			return NumberCompare((int)leftResult.resultNumber, (int)rightResult.resultNumber);
 		}
-		string oFJMLPGDNKP = HJJBNECFJGO.ToString();
-		string iJHJOLLMOHA = KAGCCGKOPFM.ToString();
-		return StringCompare(oFJMLPGDNKP, iJHJOLLMOHA);
+		string leftText = leftResult.ToString();
+		string rightText = rightResult.ToString();
+		return StringCompare(leftText, rightText);
 	}
 
-	private bool StringCompare(string OFJMLPGDNKP, string IJHJOLLMOHA)
+	private bool StringCompare(string leftText, string rightText)
 	{
-		return OFJMLPGDNKP.Equals(IJHJOLLMOHA);
+		return leftText.Equals(rightText);
 	}
 
-	private bool NumberCompare(int ADADNFFCFII, int ILCHIGNGLPL)
+	private bool NumberCompare(int leftNumber, int rightNumber)
 	{
 		switch (comparison)
 		{
 		case ComparisonType.QUEST_CONDITION_EQUAL:
-			return ADADNFFCFII == ILCHIGNGLPL;
+			return leftNumber == rightNumber;
 		case ComparisonType.QUEST_CONDITION_GREATER:
-			return ADADNFFCFII > ILCHIGNGLPL;
+			return leftNumber > rightNumber;
 		case ComparisonType.QUEST_CONDITION_GREATER_EQUAL:
-			return ADADNFFCFII >= ILCHIGNGLPL;
+			return leftNumber >= rightNumber;
 		case ComparisonType.QUEST_CONDITION_LESS:
-			return ADADNFFCFII < ILCHIGNGLPL;
+			return leftNumber < rightNumber;
 		case ComparisonType.QUEST_CONDITION_LESS_EQUAL:
-			return ADADNFFCFII <= ILCHIGNGLPL;
+			return leftNumber <= rightNumber;
 		default:
 			return false;
 		}
 	}
 
-	private bool IsNotCompare(bool DCJLKCFKCOM)
+	private bool IsNotCompare(bool matches)
 	{
-		return isNot ? (!DCJLKCFKCOM) : DCJLKCFKCOM;
+		return isNot ? (!matches) : matches;
 	}
 
-	protected override void FullFunction(QuestFunctions KJFKPMCPIBH, CompareResult BMDEBHIHIAJ)
+	protected override void FullFunction(QuestFunctions function, CompareResult result)
 	{
-		BMDEBHIHIAJ.Clear();
-		switch (KJFKPMCPIBH.functionName)
+		result.Clear();
+		switch (function.functionName)
 		{
 		case "Fight":
-			EvaluateFightFunction(KJFKPMCPIBH, BMDEBHIHIAJ);
+			EvaluateFightFunction(function, result);
 			break;
 		case "Player":
-			EvaluatePlayerFunction(KJFKPMCPIBH, BMDEBHIHIAJ);
+			EvaluatePlayerFunction(function, result);
 			break;
 		case "Item":
-			EvaluateItemFunction(KJFKPMCPIBH, BMDEBHIHIAJ);
+			EvaluateItemFunction(function, result);
 			break;
 		case "PackAssert":
-			EvaluatePackAssertFunction(KJFKPMCPIBH, BMDEBHIHIAJ);
+			EvaluatePackAssertFunction(function, result);
 			break;
 		case "UniformIntRandom":
-			MathFunction(KJFKPMCPIBH, BMDEBHIHIAJ, MathFunctionType.MATH_RAND);
+			MathFunction(function, result, MathFunctionType.MATH_RAND);
 			break;
 		case "RandomAspect":
-			RandomAspect(KJFKPMCPIBH, BMDEBHIHIAJ);
+			RandomAspect(function, result);
 			break;
 		case "PerkInfo":
-			PerkInfo(KJFKPMCPIBH, BMDEBHIHIAJ);
+			PerkInfo(function, result);
 			break;
 		case "Purchase":
-			EvaluatePurchaseFunction(KJFKPMCPIBH, BMDEBHIHIAJ);
+			EvaluatePurchaseFunction(function, result);
 			break;
 		case "ItemsOfType":
-			EvaluateItemsOfTypeFunction(KJFKPMCPIBH, BMDEBHIHIAJ);
+			EvaluateItemsOfTypeFunction(function, result);
 			break;
 		case "Battle":
-			EvaluateBattleFunction(KJFKPMCPIBH, BMDEBHIHIAJ);
+			EvaluateBattleFunction(function, result);
 			break;
 		case "DataVersion":
-			EvaluateDataVersionFunction(KJFKPMCPIBH, BMDEBHIHIAJ);
+			EvaluateDataVersionFunction(function, result);
 			break;
 		case "VersionController":
-			EvaluateVersionControllerFunction(KJFKPMCPIBH, BMDEBHIHIAJ);
+			EvaluateVersionControllerFunction(function, result);
 			break;
 		case "SysInfo":
-			EvaluateSysInfoFunction(KJFKPMCPIBH, BMDEBHIHIAJ);
+			EvaluateSysInfoFunction(function, result);
 			break;
 		case "Deliver":
-			EvaluateDeliverFunction(KJFKPMCPIBH, BMDEBHIHIAJ);
+			EvaluateDeliverFunction(function, result);
 			break;
 		case "SessionSettings":
-			SessionSettings(KJFKPMCPIBH, BMDEBHIHIAJ);
+			SessionSettings(function, result);
 			break;
 		case "Sub":
-			MathFunction(KJFKPMCPIBH, BMDEBHIHIAJ, MathFunctionType.MATH_SUB);
+			MathFunction(function, result, MathFunctionType.MATH_SUB);
 			break;
 		case "Sum":
-			MathFunction(KJFKPMCPIBH, BMDEBHIHIAJ, MathFunctionType.MATH_SUM);
+			MathFunction(function, result, MathFunctionType.MATH_SUM);
 			break;
 		case "Multi":
-			MathFunction(KJFKPMCPIBH, BMDEBHIHIAJ, MathFunctionType.MATH_MULTI);
+			MathFunction(function, result, MathFunctionType.MATH_MULTI);
 			break;
 		case "Div":
-			MathFunction(KJFKPMCPIBH, BMDEBHIHIAJ, MathFunctionType.MATH_DIVISION);
+			MathFunction(function, result, MathFunctionType.MATH_DIVISION);
 			break;
 		case "NDiv":
-			MathFunction(KJFKPMCPIBH, BMDEBHIHIAJ, MathFunctionType.MATH_DIVISION_INT);
+			MathFunction(function, result, MathFunctionType.MATH_DIVISION_INT);
 			break;
 		case "Mod":
-			MathFunction(KJFKPMCPIBH, BMDEBHIHIAJ, MathFunctionType.MATH_MOD);
+			MathFunction(function, result, MathFunctionType.MATH_MOD);
 			break;
 		case "Concat":
-			StringFunction(KJFKPMCPIBH, BMDEBHIHIAJ, StringFunctionType.STRING_CONCAT);
+			StringFunction(function, result, StringFunctionType.STRING_CONCAT);
 			break;
 		case "Slice":
-			StringFunction(KJFKPMCPIBH, BMDEBHIHIAJ, StringFunctionType.STRING_SLICE);
+			StringFunction(function, result, StringFunctionType.STRING_SLICE);
 			break;
 		case "Gift":
-			EvaluateGiftFunction(KJFKPMCPIBH, BMDEBHIHIAJ);
+			EvaluateGiftFunction(function, result);
 			break;
 		case "Timer":
-			EvaluateTimerFunction(KJFKPMCPIBH, BMDEBHIHIAJ);
+			EvaluateTimerFunction(function, result);
 			break;
 		case "ABGroupExists":
-			EvaluateAbGroupExistsFunction(KJFKPMCPIBH, BMDEBHIHIAJ);
+			EvaluateAbGroupExistsFunction(function, result);
 			break;
 		case "Enchantment":
-			EvaluateEnchantmentFunction(KJFKPMCPIBH, BMDEBHIHIAJ);
+			EvaluateEnchantmentFunction(function, result);
 			break;
 		case "FightCurrencyCost":
-			EvaluateFightCurrencyCostFunction(KJFKPMCPIBH, BMDEBHIHIAJ);
+			EvaluateFightCurrencyCostFunction(function, result);
 			break;
 		case "ShopAssert":
-			EvaluateShopAssertFunction(KJFKPMCPIBH, BMDEBHIHIAJ);
+			EvaluateShopAssertFunction(function, result);
 			break;
 		case "GetSimOperator":
-			EvaluateSimOperatorFunction(KJFKPMCPIBH, BMDEBHIHIAJ);
+			EvaluateSimOperatorFunction(function, result);
 			break;
 		case "RaidInfo":
-			EvaluateRaidInfoFunction(KJFKPMCPIBH, BMDEBHIHIAJ);
+			EvaluateRaidInfoFunction(function, result);
 			break;
 		default:
-			GameLog.Error(string.Format("{0},{1}", "QuestCondition::fullFunction - unknown function: ", KJFKPMCPIBH.functionName));
+			GameLog.Error(string.Format("{0},{1}", "QuestCondition::fullFunction - unknown function: ", function.functionName));
 			break;
 		}
 	}
@@ -450,366 +450,366 @@ public class QuestCondition : ConditionExtension
 		}
 	}
 
-	private void EvaluateFightFunction(QuestFunctions KJFKPMCPIBH, CompareResult BMDEBHIHIAJ)
+	private void EvaluateFightFunction(QuestFunctions function, CompareResult result)
 	{
-		string text = KJFKPMCPIBH.GetFirstArgument();
-		FightList jDIPBIHBGPF = ListSF.GetInstance().GetFightByIdString(text);
-		if (jDIPBIHBGPF == null)
+		string text = function.GetFirstArgument();
+		FightList fight = ListSF.GetInstance().GetFightByIdString(text);
+		if (fight == null)
 		{
 			GameLog.Write(string.Format("{0},\"{1}\"", "ERROR: QuestCondition.FightFunction - cant fight fight: ", text));
 			return;
 		}
-		string hBDLDIKHFEG = KJFKPMCPIBH.property;
-		switch (hBDLDIKHFEG)
+		string propertyName = function.property;
+		switch (propertyName)
 		{
 		case "Name":
-			BMDEBHIHIAJ.resultSTR = jDIPBIHBGPF.FightId.ToString();
+			result.resultSTR = fight.FightId.ToString();
 			break;
 		case "Zone":
-			BMDEBHIHIAJ.resultSTR = jDIPBIHBGPF.FightId.GetZone();
+			result.resultSTR = fight.FightId.GetZone();
 			break;
 		case "Battle":
-			BMDEBHIHIAJ.resultSTR = jDIPBIHBGPF.FightId.GetBattle();
+			result.resultSTR = fight.FightId.GetBattle();
 			break;
 		case "Fight":
-			BMDEBHIHIAJ.resultSTR = jDIPBIHBGPF.FightId.GetFight();
+			result.resultSTR = fight.FightId.GetFight();
 			break;
 		case "Money":
-			BMDEBHIHIAJ.resultSTR = jDIPBIHBGPF.PrizeMoney.ToString();
+			result.resultSTR = fight.PrizeMoney.ToString();
 			break;
 		case "Bonus":
-			BMDEBHIHIAJ.resultSTR = jDIPBIHBGPF.PrizeBonus.ToString();
+			result.resultSTR = fight.PrizeBonus.ToString();
 			break;
 		case "Type":
-			BMDEBHIHIAJ.resultSTR = ListSF.GetInstance().GetBattleTypeName(jDIPBIHBGPF.get_Type());
+			result.resultSTR = ListSF.GetInstance().GetBattleTypeName(fight.get_Type());
 			break;
 		case "LossCount":
-			BMDEBHIHIAJ.resultNumber = ((jDIPBIHBGPF.GetRosterFight() != null) ? jDIPBIHBGPF.GetRosterFight().GetLossCount() : 0);
+			result.resultNumber = ((fight.GetRosterFight() != null) ? fight.GetRosterFight().GetLossCount() : 0);
 			break;
 		case "WinCount":
-			BMDEBHIHIAJ.resultNumber = ((jDIPBIHBGPF.GetRosterFight() != null) ? jDIPBIHBGPF.GetRosterFight().GetWinCount() : 0);
+			result.resultNumber = ((fight.GetRosterFight() != null) ? fight.GetRosterFight().GetWinCount() : 0);
 			break;
 		case "TimeLeft":
-			BMDEBHIHIAJ.resultNumber = jDIPBIHBGPF.GetTimeLeft();
+			result.resultNumber = fight.GetTimeLeft();
 			break;
 		case "Difficulty":
-			BMDEBHIHIAJ.resultNumber = GameUtils.GetFightDifficulty(jDIPBIHBGPF);
+			result.resultNumber = GameUtils.GetFightDifficulty(fight);
 			break;
 		case "Description":
-			BMDEBHIHIAJ.resultSTR = jDIPBIHBGPF.GetDescription();
+			result.resultSTR = fight.GetDescription();
 			break;
 		case "Helm":
-			BMDEBHIHIAJ.resultSTR = jDIPBIHBGPF.GetRuleItemName("Helm");
+			result.resultSTR = fight.GetRuleItemName("Helm");
 			break;
 		case "Weapon":
-			BMDEBHIHIAJ.resultSTR = jDIPBIHBGPF.GetRuleItemName("Weapon");
+			result.resultSTR = fight.GetRuleItemName("Weapon");
 			break;
 		case "Armor":
-			BMDEBHIHIAJ.resultSTR = jDIPBIHBGPF.GetRuleItemName("Armor");
+			result.resultSTR = fight.GetRuleItemName("Armor");
 			break;
 		case "Magic":
-			BMDEBHIHIAJ.resultSTR = jDIPBIHBGPF.GetRuleItemName("Magic");
+			result.resultSTR = fight.GetRuleItemName("Magic");
 			break;
 		case "RaidCharge":
-			BMDEBHIHIAJ.resultSTR = jDIPBIHBGPF.GetRuleItemName("RaidCharge");
+			result.resultSTR = fight.GetRuleItemName("RaidCharge");
 			break;
 		case "Ranged":
-			BMDEBHIHIAJ.resultSTR = jDIPBIHBGPF.GetRuleItemName("Ranged");
+			result.resultSTR = fight.GetRuleItemName("Ranged");
 			break;
 		case "HelmLevel":
-			BMDEBHIHIAJ.resultNumber = jDIPBIHBGPF.GetRuleItemLevel("Helm");
+			result.resultNumber = fight.GetRuleItemLevel("Helm");
 			break;
 		case "WeaponLevel":
-			BMDEBHIHIAJ.resultNumber = jDIPBIHBGPF.GetRuleItemLevel("Weapon");
+			result.resultNumber = fight.GetRuleItemLevel("Weapon");
 			break;
 		case "ArmorLevel":
-			BMDEBHIHIAJ.resultNumber = jDIPBIHBGPF.GetRuleItemLevel("Armor");
+			result.resultNumber = fight.GetRuleItemLevel("Armor");
 			break;
 		case "MagicLevel":
-			BMDEBHIHIAJ.resultNumber = jDIPBIHBGPF.GetRuleItemLevel("Magic");
+			result.resultNumber = fight.GetRuleItemLevel("Magic");
 			break;
 		case "RaidChargeLevel":
-			BMDEBHIHIAJ.resultNumber = jDIPBIHBGPF.GetRuleItemLevel("RaidCharge");
+			result.resultNumber = fight.GetRuleItemLevel("RaidCharge");
 			break;
 		case "RangedLevel":
-			BMDEBHIHIAJ.resultNumber = jDIPBIHBGPF.GetRuleItemLevel("Ranged");
+			result.resultNumber = fight.GetRuleItemLevel("Ranged");
 			break;
 		case "CheckCurrency":
-			BMDEBHIHIAJ.resultNumber = Convert.ToDouble(jDIPBIHBGPF.HasCurrencyCost());
+			result.resultNumber = Convert.ToDouble(fight.HasCurrencyCost());
 			break;
 		case "EnoughCurrency":
-			BMDEBHIHIAJ.resultNumber = Convert.ToDouble(GameUtils.HasEnoughCurrencyForFight(jDIPBIHBGPF));
+			result.resultNumber = Convert.ToDouble(GameUtils.HasEnoughCurrencyForFight(fight));
 			break;
 		case "Timestamp":
-			BMDEBHIHIAJ.resultNumber = ((jDIPBIHBGPF.GetRosterFight() == null) ? 0 : jDIPBIHBGPF.GetRosterFight().GetCompletionTimestamp());
+			result.resultNumber = ((fight.GetRosterFight() == null) ? 0 : fight.GetRosterFight().GetCompletionTimestamp());
 			break;
 		case "Level":
-			BMDEBHIHIAJ.resultNumber = ((jDIPBIHBGPF.GetRosterFight() != null) ? jDIPBIHBGPF.GetRosterFight().GetLevel() : 0);
+			result.resultNumber = ((fight.GetRosterFight() != null) ? fight.GetRosterFight().GetLevel() : 0);
 			break;
 		case "Power":
-			BMDEBHIHIAJ.resultNumber = jDIPBIHBGPF.GetPowerRequired();
+			result.resultNumber = fight.GetPowerRequired();
 			break;
 		default:
-			GameLog.Error(string.Format("{0},\"{1}\"", "ERROR: QuestCondition.FightFunction - unknown property: ", hBDLDIKHFEG));
+			GameLog.Error(string.Format("{0},\"{1}\"", "ERROR: QuestCondition.FightFunction - unknown property: ", propertyName));
 			break;
 		}
 	}
 
-	private void EvaluatePlayerFunction(QuestFunctions KJFKPMCPIBH, CompareResult BMDEBHIHIAJ)
+	private void EvaluatePlayerFunction(QuestFunctions function, CompareResult result)
 	{
-		Roster nKGLHEGIKKP = ListSF.GetRoster();
-		if (nKGLHEGIKKP == null)
+		Roster roster = ListSF.GetRoster();
+		if (roster == null)
 		{
 			return;
 		}
-		switch (KJFKPMCPIBH.property)
+		switch (function.property)
 		{
 		case "Skeleton":
 		{
-			ItemInfo dJKEECEOCJB6 = nKGLHEGIKKP.get_Parameters().GetItemByType("Skeleton");
+			ItemInfo dJKEECEOCJB6 = roster.get_Parameters().GetItemByType("Skeleton");
 			if (dJKEECEOCJB6 != null)
 			{
-				BMDEBHIHIAJ.resultSTR = dJKEECEOCJB6.Name;
+				result.resultSTR = dJKEECEOCJB6.Name;
 			}
 			break;
 		}
 		case "Helm":
 		{
-			ItemInfo dJKEECEOCJB2 = nKGLHEGIKKP.get_Parameters().GetItemByType("Helm");
+			ItemInfo dJKEECEOCJB2 = roster.get_Parameters().GetItemByType("Helm");
 			if (dJKEECEOCJB2 != null)
 			{
-				BMDEBHIHIAJ.resultSTR = dJKEECEOCJB2.Name;
+				result.resultSTR = dJKEECEOCJB2.Name;
 			}
 			break;
 		}
 		case "Armor":
 		{
-			ItemInfo dJKEECEOCJB4 = nKGLHEGIKKP.get_Parameters().GetItemByType("Armor");
+			ItemInfo dJKEECEOCJB4 = roster.get_Parameters().GetItemByType("Armor");
 			if (dJKEECEOCJB4 != null)
 			{
-				BMDEBHIHIAJ.resultSTR = dJKEECEOCJB4.Name;
+				result.resultSTR = dJKEECEOCJB4.Name;
 			}
 			break;
 		}
 		case "Weapon":
 		{
-			ItemInfo dJKEECEOCJB7 = nKGLHEGIKKP.get_Parameters().GetItemByType("Weapon");
+			ItemInfo dJKEECEOCJB7 = roster.get_Parameters().GetItemByType("Weapon");
 			if (dJKEECEOCJB7 != null)
 			{
-				BMDEBHIHIAJ.resultSTR = dJKEECEOCJB7.Name;
+				result.resultSTR = dJKEECEOCJB7.Name;
 			}
 			break;
 		}
 		case "Magic":
 		{
-			ItemInfo dJKEECEOCJB5 = nKGLHEGIKKP.get_Parameters().GetItemByType("Magic");
+			ItemInfo dJKEECEOCJB5 = roster.get_Parameters().GetItemByType("Magic");
 			if (dJKEECEOCJB5 != null)
 			{
-				BMDEBHIHIAJ.resultSTR = dJKEECEOCJB5.Name;
+				result.resultSTR = dJKEECEOCJB5.Name;
 			}
 			break;
 		}
 		case "RaidCharge":
 		{
-			ItemInfo dJKEECEOCJB3 = nKGLHEGIKKP.get_Parameters().GetItemByType("RaidConsumable");
+			ItemInfo dJKEECEOCJB3 = roster.get_Parameters().GetItemByType("RaidConsumable");
 			if (dJKEECEOCJB3 != null)
 			{
-				BMDEBHIHIAJ.resultSTR = dJKEECEOCJB3.Name;
+				result.resultSTR = dJKEECEOCJB3.Name;
 			}
 			break;
 		}
 		case "Ranged":
 		{
-			ItemInfo dJKEECEOCJB = nKGLHEGIKKP.get_Parameters().GetItemByType("Ranged");
-			if (dJKEECEOCJB != null)
+			ItemInfo itemInfo = roster.get_Parameters().GetItemByType("Ranged");
+			if (itemInfo != null)
 			{
-				BMDEBHIHIAJ.resultSTR = dJKEECEOCJB.Name;
+				result.resultSTR = itemInfo.Name;
 			}
 			break;
 		}
 		case "Money":
-			BMDEBHIHIAJ.resultNumber = nKGLHEGIKKP.GetMoney();
+			result.resultNumber = roster.GetMoney();
 			break;
 		case "Bonus":
-			BMDEBHIHIAJ.resultNumber = nKGLHEGIKKP.GetBonus();
+			result.resultNumber = roster.GetBonus();
 			break;
 		case "Level":
-			BMDEBHIHIAJ.resultNumber = nKGLHEGIKKP.GetLevel();
+			result.resultNumber = roster.GetLevel();
 			break;
 		case "Power":
-			BMDEBHIHIAJ.resultNumber = nKGLHEGIKKP.GetMaxPower();
+			result.resultNumber = roster.GetMaxPower();
 			break;
 		case "Language":
-			BMDEBHIHIAJ.resultSTR = nKGLHEGIKKP.GetLanguage();
+			result.resultSTR = roster.GetLanguage();
 			break;
 		case "CoinIcon":
-			BMDEBHIHIAJ.resultSTR = nKGLHEGIKKP.GetCoinIcon();
+			result.resultSTR = roster.GetCoinIcon();
 			break;
 		case "MapFocus":
 		{
 			FightIDS mOCEDDJOAEB2 = ListSF.GetRoster().GetMapFocus();
-			BMDEBHIHIAJ.resultSTR = mOCEDDJOAEB2.GetZoneBattle();
+			result.resultSTR = mOCEDDJOAEB2.GetZoneBattle();
 			break;
 		}
 		case "RaidMapFocus":
 		{
-			FightIDS mOCEDDJOAEB = ListSF.GetRoster().GetRaidMapFocus();
-			BMDEBHIHIAJ.resultSTR = mOCEDDJOAEB.GetZoneBattle();
+			FightIDS fightIds = ListSF.GetRoster().GetRaidMapFocus();
+			result.resultSTR = fightIds.GetZoneBattle();
 			break;
 		}
 		case "IsLoggedInRaids":
-			BMDEBHIHIAJ.resultNumber = Convert.ToDouble(RaidLoginState.GetInstance().GetIsLoggedIn());
+			result.resultNumber = Convert.ToDouble(RaidLoginState.GetInstance().GetIsLoggedIn());
 			break;
 		default:
-			GameLog.Error(string.Format("{0},\"{1}\"", "ERROR: QuestCondition.PlayerFunction - unknown property: ", KJFKPMCPIBH.property));
+			GameLog.Error(string.Format("{0},\"{1}\"", "ERROR: QuestCondition.PlayerFunction - unknown property: ", function.property));
 			break;
 		}
 	}
 
-	private void EvaluateItemFunction(QuestFunctions KJFKPMCPIBH, CompareResult BMDEBHIHIAJ)
+	private void EvaluateItemFunction(QuestFunctions function, CompareResult result)
 	{
-		string gOHIIMFFFJI = KJFKPMCPIBH.GetFirstArgument();
-		ItemInfo dJKEECEOCJB = ListSF.GetItems().GetItemByName(gOHIIMFFFJI);
-		if (dJKEECEOCJB == null)
+		string itemName = function.GetFirstArgument();
+		ItemInfo itemInfo = ListSF.GetItems().GetItemByName(itemName);
+		if (itemInfo == null)
 		{
 			return;
 		}
-		Roster nKGLHEGIKKP = ListSF.GetRoster();
-		switch (KJFKPMCPIBH.property)
+		Roster roster = ListSF.GetRoster();
+		switch (function.property)
 		{
 		case "Price":
-			BMDEBHIHIAJ.resultNumber = (ObscuredLong)(dJKEECEOCJB.CoinPrice);
+			result.resultNumber = (ObscuredLong)(itemInfo.CoinPrice);
 			break;
 		case "BonusPrice":
-			BMDEBHIHIAJ.resultNumber = (ObscuredLong)(dJKEECEOCJB.GemPrice);
+			result.resultNumber = (ObscuredLong)(itemInfo.GemPrice);
 			break;
 		case "BonusDeliveryPrice":
-			BMDEBHIHIAJ.resultNumber = (ObscuredLong)(dJKEECEOCJB.DeliveryGemPrice);
+			result.resultNumber = (ObscuredLong)(itemInfo.DeliveryGemPrice);
 			break;
 		case "MoneyDeliveryPrice":
-			BMDEBHIHIAJ.resultNumber = (ObscuredLong)(dJKEECEOCJB.DeliveryCoinPrice);
+			result.resultNumber = (ObscuredLong)(itemInfo.DeliveryCoinPrice);
 			break;
 		case "Level":
-			BMDEBHIHIAJ.resultNumber = dJKEECEOCJB.ItemLevel;
+			result.resultNumber = itemInfo.ItemLevel;
 			break;
 		case "Equipped":
 		{
-			UserItem dKCHDHMLKHN2 = nKGLHEGIKKP.GetInventory().FindItem(dJKEECEOCJB);
+			UserItem dKCHDHMLKHN2 = roster.GetInventory().FindItem(itemInfo);
 			if (dKCHDHMLKHN2 != null)
 			{
-				BMDEBHIHIAJ.resultNumber = Convert.ToDouble(dKCHDHMLKHN2.GetIsEquipped());
+				result.resultNumber = Convert.ToDouble(dKCHDHMLKHN2.GetIsEquipped());
 			}
 			break;
 		}
 		case "Quantity":
 		{
-			UserItem dKCHDHMLKHN = nKGLHEGIKKP.GetInventory().FindItem(dJKEECEOCJB);
-			BMDEBHIHIAJ.resultNumber = ((dKCHDHMLKHN != null) ? dKCHDHMLKHN.GetCount() : 0);
+			UserItem userItem = roster.GetInventory().FindItem(itemInfo);
+			result.resultNumber = ((userItem != null) ? userItem.GetCount() : 0);
 			break;
 		}
 		case "NextMoneyUpgradePrice":
 		{
-			ItemInfo mBIJKDIEFIF = GetNextUpgradeInfo(dJKEECEOCJB);
-			BMDEBHIHIAJ.resultNumber = GetItemPrice(mBIJKDIEFIF, true);
+			ItemInfo nextUpgradeInfo = GetNextUpgradeInfo(itemInfo);
+			result.resultNumber = GetItemPrice(nextUpgradeInfo, true);
 			break;
 		}
 		case "NextBonusUpgradePrice":
 		{
-			ItemInfo mBIJKDIEFIF2 = GetNextUpgradeInfo(dJKEECEOCJB);
-			BMDEBHIHIAJ.resultNumber = GetItemPrice(mBIJKDIEFIF2, false);
+			ItemInfo mBIJKDIEFIF2 = GetNextUpgradeInfo(itemInfo);
+			result.resultNumber = GetItemPrice(mBIJKDIEFIF2, false);
 			break;
 		}
 		case "NextUpgradeDeliveryPrice":
 		{
-			ItemInfo mBIJKDIEFIF4 = GetNextUpgradeInfo(dJKEECEOCJB);
-			BMDEBHIHIAJ.resultNumber = GetUpgradePrice(mBIJKDIEFIF4, false);
+			ItemInfo mBIJKDIEFIF4 = GetNextUpgradeInfo(itemInfo);
+			result.resultNumber = GetUpgradePrice(mBIJKDIEFIF4, false);
 			break;
 		}
 		case "NextUpgradeDeliveryTime":
 		{
-			ItemInfo mBIJKDIEFIF3 = GetNextUpgradeInfo(dJKEECEOCJB);
-			BMDEBHIHIAJ.resultNumber = GetDeliveryUpgradeTime(mBIJKDIEFIF3);
+			ItemInfo mBIJKDIEFIF3 = GetNextUpgradeInfo(itemInfo);
+			result.resultNumber = GetDeliveryUpgradeTime(mBIJKDIEFIF3);
 			break;
 		}
 		case "Type":
-			BMDEBHIHIAJ.resultSTR = dJKEECEOCJB.Type;
+			result.resultSTR = itemInfo.Type;
 			break;
 		case "SubType":
-			BMDEBHIHIAJ.resultSTR = dJKEECEOCJB.SubType;
+			result.resultSTR = itemInfo.SubType;
 			break;
 		case "Availability":
 		{
-			BMDEBHIHIAJ.resultNumber = ShopAvailabilityPolicy.IsAvailable(dJKEECEOCJB, nKGLHEGIKKP) ? 1 : 0;
+			result.resultNumber = ShopAvailabilityPolicy.IsAvailable(itemInfo, roster) ? 1 : 0;
 			break;
 		}
 		case "RealPrice":
-			BMDEBHIHIAJ.resultSTR = dJKEECEOCJB.LocalizedPriceString;
+			result.resultSTR = itemInfo.LocalizedPriceString;
 			break;
 		case "RecieveGold":
-			BMDEBHIHIAJ.resultSTR = dJKEECEOCJB.ReceiveGold.ToString();
+			result.resultSTR = itemInfo.ReceiveGold.ToString();
 			break;
 		case "RecieveBonus":
-			BMDEBHIHIAJ.resultSTR = dJKEECEOCJB.ReceiveBonus.ToString();
+			result.resultSTR = itemInfo.ReceiveBonus.ToString();
 			break;
 		case "Image":
-			BMDEBHIHIAJ.resultSTR = dJKEECEOCJB.FileName;
+			result.resultSTR = itemInfo.FileName;
 			break;
 		case "PackLabel":
-			BMDEBHIHIAJ.resultSTR = dJKEECEOCJB.GroupId;
+			result.resultSTR = itemInfo.GroupId;
 			break;
 		default:
-			GameLog.Error(string.Format("{0},\"{1}\"", "ERROR: QuestCondition.ItemFunction - unknown property: ", KJFKPMCPIBH.property));
+			GameLog.Error(string.Format("{0},\"{1}\"", "ERROR: QuestCondition.ItemFunction - unknown property: ", function.property));
 			break;
 		}
 	}
 
 	private ItemInfo GetNextUpgradeInfo(ItemInfo item)
 	{
-		ItemInfo dJKEECEOCJB = null;
-		UserItem dKCHDHMLKHN = ListSF.GetRoster().GetInventory().FindItem(item);
-		if (dKCHDHMLKHN != null && dKCHDHMLKHN.GetDeliveryTimestamp() > 0 && dKCHDHMLKHN.GetDeliveryUpgradeLevel() > 0)
+		ItemInfo upgradeInfo = null;
+		UserItem userItem = ListSF.GetRoster().GetInventory().FindItem(item);
+		if (userItem != null && userItem.GetDeliveryTimestamp() > 0 && userItem.GetDeliveryUpgradeLevel() > 0)
 		{
-			ItemInfo dJKEECEOCJB2 = dKCHDHMLKHN.GetEffectiveInfo();
-			dJKEECEOCJB = ((dJKEECEOCJB2 == null) ? null : dJKEECEOCJB2.Clone());
+			ItemInfo dJKEECEOCJB2 = userItem.GetEffectiveInfo();
+			upgradeInfo = ((dJKEECEOCJB2 == null) ? null : dJKEECEOCJB2.Clone());
 		}
-		if (dJKEECEOCJB != null)
+		if (upgradeInfo != null)
 		{
-			dJKEECEOCJB = ((dKCHDHMLKHN == null) ? item.GetUpgradeItemByIndex(0) : dKCHDHMLKHN.GetNextUpgradeItem().Clone());
+			upgradeInfo = ((userItem == null) ? item.GetUpgradeItemByIndex(0) : userItem.GetNextUpgradeItem().Clone());
 		}
-		return dJKEECEOCJB;
+		return upgradeInfo;
 	}
 
-	private long GetItemPrice(ItemInfo item, bool EDNGDDEPAPA)
+	private long GetItemPrice(ItemInfo item, bool useCoins)
 	{
 		long result = 2147483647L;
 		if (item != null)
 		{
-			if ((EDNGDDEPAPA && item.HasCoinPrice()) || (!EDNGDDEPAPA && item.HasGemPrice()))
+			if ((useCoins && item.HasCoinPrice()) || (!useCoins && item.HasGemPrice()))
 			{
-				result = (ObscuredLong)((!EDNGDDEPAPA) ? item.GemPrice : item.CoinPrice);
+				result = (ObscuredLong)((!useCoins) ? item.GemPrice : item.CoinPrice);
 			}
 			else
 			{
-				GameLog.Write(string.Format("{0},{2},{1},{3}", "QuestCondition::itemFunction ", " price - no price: ", (!EDNGDDEPAPA) ? "bonus" : "money", item.Name));
+				GameLog.Write(string.Format("{0},{2},{1},{3}", "QuestCondition::itemFunction ", " price - no price: ", (!useCoins) ? "bonus" : "money", item.Name));
 			}
 		}
 		else
 		{
-			GameLog.Write(string.Format("{0},{2},{1}", "QuestCondition::itemFunction ", " price - no next upgrade", (!EDNGDDEPAPA) ? "bonus" : "money"));
+			GameLog.Write(string.Format("{0},{2},{1}", "QuestCondition::itemFunction ", " price - no next upgrade", (!useCoins) ? "bonus" : "money"));
 		}
 		return result;
 	}
 
-	private long GetUpgradePrice(ItemInfo item, bool EDNGDDEPAPA)
+	private long GetUpgradePrice(ItemInfo item, bool useCoins)
 	{
 		long result = 2147483647L;
 		if (item != null)
 		{
-			result = (ObscuredLong)((!EDNGDDEPAPA) ? item.DeliveryGemPrice : item.DeliveryCoinPrice);
+			result = (ObscuredLong)((!useCoins) ? item.DeliveryGemPrice : item.DeliveryCoinPrice);
 		}
 		else
 		{
-			GameLog.Write(string.Format("{0},{2},{1}", "QuestCondition::itemFunction ", " price - no next upgrade", (!EDNGDDEPAPA) ? "bonus" : "money"));
+			GameLog.Write(string.Format("{0},{2},{1}", "QuestCondition::itemFunction ", " price - no next upgrade", (!useCoins) ? "bonus" : "money"));
 		}
 		return result;
 	}
@@ -828,493 +828,493 @@ public class QuestCondition : ConditionExtension
 		return result;
 	}
 
-	private void EvaluatePackAssertFunction(QuestFunctions KJFKPMCPIBH, CompareResult BMDEBHIHIAJ)
+	private void EvaluatePackAssertFunction(QuestFunctions function, CompareResult result)
 	{
-		string gOHIIMFFFJI = KJFKPMCPIBH.GetFirstArgument();
-		switch (KJFKPMCPIBH.property)
+		string packName = function.GetFirstArgument();
+		switch (function.property)
 		{
 		case "Availability":
 		{
-			bool flag = PacksController.GetInstance().IsPackByName(gOHIIMFFFJI);
-			BMDEBHIHIAJ.resultNumber = (flag ? 1 : 0);
+			bool flag = PacksController.GetInstance().IsPackByName(packName);
+			result.resultNumber = (flag ? 1 : 0);
 			break;
 		}
 		case "Existence":
 		{
-			DownloadPack jBKAOMLJCEL2 = PacksController.GetInstance().FindPack(gOHIIMFFFJI);
-			BMDEBHIHIAJ.resultNumber = ((jBKAOMLJCEL2 != null) ? 1 : 0);
+			DownloadPack jBKAOMLJCEL2 = PacksController.GetInstance().FindPack(packName);
+			result.resultNumber = ((jBKAOMLJCEL2 != null) ? 1 : 0);
 			break;
 		}
 		case "Size":
 		{
-			DownloadPack jBKAOMLJCEL = GeneralConfig.DownloadPacks.FindPack(gOHIIMFFFJI);
-			if (jBKAOMLJCEL != null)
+			DownloadPack downloadPack = GeneralConfig.DownloadPacks.FindPack(packName);
+			if (downloadPack != null)
 			{
-				BMDEBHIHIAJ.resultSTR = jBKAOMLJCEL.Size;
+				result.resultSTR = downloadPack.Size;
 			}
 			break;
 		}
 		default:
-			GameLog.Error(string.Format("{0},\"{1}\"", "ERROR: QuestCondition.PackFunction - unknown property: ", KJFKPMCPIBH.property));
+			GameLog.Error(string.Format("{0},\"{1}\"", "ERROR: QuestCondition.PackFunction - unknown property: ", function.property));
 			break;
 		}
 	}
 
-	private void EvaluatePurchaseFunction(QuestFunctions KJFKPMCPIBH, CompareResult BMDEBHIHIAJ)
+	private void EvaluatePurchaseFunction(QuestFunctions function, CompareResult result)
 	{
-		string[] array = KJFKPMCPIBH.GetFirstArgument().Split('|');
+		string[] array = function.GetFirstArgument().Split('|');
 		if (array.Length != 0)
 		{
-			string gOHIIMFFFJI = array[0];
-			string iBBAMMHHBFE = ((array.Length <= 1) ? string.Empty : array[1]);
-			UserItem dKCHDHMLKHN = ListSF.GetUserItem(gOHIIMFFFJI);
-			ItemInfo dJKEECEOCJB = ((dKCHDHMLKHN == null) ? ListSF.GetItems().GetItemByName(gOHIIMFFFJI) : dKCHDHMLKHN.GetInfo());
-			switch (KJFKPMCPIBH.property)
+			string itemName = array[0];
+			string failureText = ((array.Length <= 1) ? string.Empty : array[1]);
+			UserItem userItem = ListSF.GetUserItem(itemName);
+			ItemInfo itemInfo = ((userItem == null) ? ListSF.GetItems().GetItemByName(itemName) : userItem.GetInfo());
+			switch (function.property)
 			{
 			case "Type":
-				BMDEBHIHIAJ.resultSTR = ((dJKEECEOCJB == null) ? string.Empty : dJKEECEOCJB.Type);
+				result.resultSTR = ((itemInfo == null) ? string.Empty : itemInfo.Type);
 				break;
 			case "Name":
-				BMDEBHIHIAJ.resultSTR = ((dJKEECEOCJB == null) ? string.Empty : dJKEECEOCJB.Name);
+				result.resultSTR = ((itemInfo == null) ? string.Empty : itemInfo.Name);
 				break;
 			case "UpgradeLevel":
-				BMDEBHIHIAJ.resultNumber = ((dKCHDHMLKHN != null) ? dKCHDHMLKHN.GetUpgradeLevel() : 0);
+				result.resultNumber = ((userItem != null) ? userItem.GetUpgradeLevel() : 0);
 				break;
 			case "Timeout":
 			{
-				long num = ((dKCHDHMLKHN == null) ? 0 : dKCHDHMLKHN.GetDeliveryTimestamp());
+				long num = ((userItem == null) ? 0 : userItem.GetDeliveryTimestamp());
 				long num2 = GameUtils.GetCurrentTime();
 				long num3 = ((num <= num2) ? 0 : (num - num2));
-				BMDEBHIHIAJ.resultNumber = num3;
+				result.resultNumber = num3;
 				break;
 			}
 			case "Failure":
-				BMDEBHIHIAJ.resultSTR = iBBAMMHHBFE;
+				result.resultSTR = failureText;
 				break;
 			case "PaidItem":
-				BMDEBHIHIAJ.resultSTR = ((dJKEECEOCJB == null) ? string.Empty : dJKEECEOCJB.LegacyPaidItem);
+				result.resultSTR = ((itemInfo == null) ? string.Empty : itemInfo.LegacyPaidItem);
 				break;
 			default:
-				GameLog.Error(string.Format("{0},\"{1}\"", "ERROR: QuestCondition.PurchaseFunction - unknown property: ", KJFKPMCPIBH.property));
+				GameLog.Error(string.Format("{0},\"{1}\"", "ERROR: QuestCondition.PurchaseFunction - unknown property: ", function.property));
 				break;
 			}
 		}
 	}
 
-	private void EvaluateItemsOfTypeFunction(QuestFunctions KJFKPMCPIBH, CompareResult BMDEBHIHIAJ)
+	private void EvaluateItemsOfTypeFunction(QuestFunctions function, CompareResult result)
 	{
-		Roster nKGLHEGIKKP = ListSF.GetRoster();
-		if (nKGLHEGIKKP != null)
+		Roster roster = ListSF.GetRoster();
+		if (roster != null)
 		{
-			string lFLGCDNKNJI = KJFKPMCPIBH.GetFirstArgument();
-			List<UserItem> list = nKGLHEGIKKP.GetInventory().FindItemsByType(lFLGCDNKNJI, string.Empty);
-			if (KJFKPMCPIBH.property.Equals("Quantity"))
+			string itemType = function.GetFirstArgument();
+			List<UserItem> list = roster.GetInventory().FindItemsByType(itemType, string.Empty);
+			if (function.property.Equals("Quantity"))
 			{
-				BMDEBHIHIAJ.resultNumber = list.Count;
+				result.resultNumber = list.Count;
 			}
 		}
 	}
 
-	private void EvaluateBattleFunction(QuestFunctions KJFKPMCPIBH, CompareResult BMDEBHIHIAJ)
+	private void EvaluateBattleFunction(QuestFunctions function, CompareResult result)
 	{
-		string dIAIIPCBMFL = KJFKPMCPIBH.GetFirstArgument();
-		FightIDS mOCEDDJOAEB = new FightIDS(dIAIIPCBMFL);
-		switch (KJFKPMCPIBH.property)
+		string fightIdText = function.GetFirstArgument();
+		FightIDS fightIds = new FightIDS(fightIdText);
+		switch (function.property)
 		{
 		case "Available":
 		{
-			Battle cGJCGEBPCAF3 = ListSF.GetBattleById(mOCEDDJOAEB);
+			Battle cGJCGEBPCAF3 = ListSF.GetBattleById(fightIds);
 			if (cGJCGEBPCAF3 != null)
 			{
-				Roster nKGLHEGIKKP = ListSF.GetRoster();
-				bool flag = nKGLHEGIKKP.HasBattle(mOCEDDJOAEB);
-				BMDEBHIHIAJ.resultNumber = (flag ? 1 : 0);
+				Roster roster = ListSF.GetRoster();
+				bool flag = roster.HasBattle(fightIds);
+				result.resultNumber = (flag ? 1 : 0);
 			}
 			else
 			{
-				GameLog.Error(string.Format("{0},{1}", "Quest Error: no such battle in stages: ", mOCEDDJOAEB.ToString()));
-				BMDEBHIHIAJ.resultNumber = 0.0;
+				GameLog.Error(string.Format("{0},{1}", "Quest Error: no such battle in stages: ", fightIds.ToString()));
+				result.resultNumber = 0.0;
 			}
 			break;
 		}
 		case "Locked":
 		{
-			Battle cGJCGEBPCAF5 = ListSF.GetBattleById(mOCEDDJOAEB);
+			Battle cGJCGEBPCAF5 = ListSF.GetBattleById(fightIds);
 			bool flag2 = true;
 			if (cGJCGEBPCAF5 != null)
 			{
 				flag2 = cGJCGEBPCAF5.GetRosterBattle() == null || cGJCGEBPCAF5.GetRosterBattle().IsLocked();
 			}
-			BMDEBHIHIAJ.resultNumber = (flag2 ? 1 : 0);
+			result.resultNumber = (flag2 ? 1 : 0);
 			break;
 		}
 		case "Name":
 		{
-			Battle cGJCGEBPCAF4 = ListSF.GetBattleById(mOCEDDJOAEB);
+			Battle cGJCGEBPCAF4 = ListSF.GetBattleById(fightIds);
 			if (cGJCGEBPCAF4 != null)
 			{
-				BMDEBHIHIAJ.resultSTR = cGJCGEBPCAF4.get_Name();
+				result.resultSTR = cGJCGEBPCAF4.get_Name();
 				break;
 			}
-			GameLog.Error(string.Format("{0},{1}", "Quest Error: no such battle in stages: ", mOCEDDJOAEB.ToString()));
-			BMDEBHIHIAJ.resultSTR = string.Empty;
+			GameLog.Error(string.Format("{0},{1}", "Quest Error: no such battle in stages: ", fightIds.ToString()));
+			result.resultSTR = string.Empty;
 			break;
 		}
 		case "Type":
 		{
-			Battle cGJCGEBPCAF2 = ListSF.GetBattleById(mOCEDDJOAEB);
-			BattleType lFLGCDNKNJI = BattleType.FightDummy;
+			Battle cGJCGEBPCAF2 = ListSF.GetBattleById(fightIds);
+			BattleType battleType = BattleType.FightDummy;
 			if (cGJCGEBPCAF2 != null)
 			{
-				lFLGCDNKNJI = cGJCGEBPCAF2.get_Type();
+				battleType = cGJCGEBPCAF2.get_Type();
 			}
 			else
 			{
-				GameLog.Error(string.Format("{0},{1}", "Quest Error: no such battle in stages: ", mOCEDDJOAEB.ToString()));
+				GameLog.Error(string.Format("{0},{1}", "Quest Error: no such battle in stages: ", fightIds.ToString()));
 			}
-			BMDEBHIHIAJ.resultSTR = ListSF.GetInstance().GetBattleTypeName(lFLGCDNKNJI);
+			result.resultSTR = ListSF.GetInstance().GetBattleTypeName(battleType);
 			break;
 		}
 		case "Zone":
 		{
-			Battle cGJCGEBPCAF = ListSF.GetBattleById(mOCEDDJOAEB);
-			if (cGJCGEBPCAF != null)
+			Battle battle = ListSF.GetBattleById(fightIds);
+			if (battle != null)
 			{
-				Zone pKCPOJKLMOK = cGJCGEBPCAF.GetZone();
-				if (pKCPOJKLMOK != null)
+				Zone zone = battle.GetZone();
+				if (zone != null)
 				{
-					BMDEBHIHIAJ.resultSTR = pKCPOJKLMOK.get_Name();
+					result.resultSTR = zone.get_Name();
 				}
 				else
 				{
-					BMDEBHIHIAJ.resultSTR = string.Empty;
+					result.resultSTR = string.Empty;
 				}
 			}
 			else
 			{
-				GameLog.Error(string.Format("{0},{1}", "Quest Error: no such battle in stages: ", mOCEDDJOAEB.ToString()));
-				BMDEBHIHIAJ.resultSTR = string.Empty;
+				GameLog.Error(string.Format("{0},{1}", "Quest Error: no such battle in stages: ", fightIds.ToString()));
+				result.resultSTR = string.Empty;
 			}
 			break;
 		}
 		default:
-			GameLog.Error(string.Format("{0},\"{1}\"", "ERROR: QuestCondition.BattleFunction - unknown property: ", KJFKPMCPIBH.property));
+			GameLog.Error(string.Format("{0},\"{1}\"", "ERROR: QuestCondition.BattleFunction - unknown property: ", function.property));
 			break;
 		}
 	}
 
-	private void EvaluateDataVersionFunction(QuestFunctions KJFKPMCPIBH, CompareResult BMDEBHIHIAJ)
+	private void EvaluateDataVersionFunction(QuestFunctions function, CompareResult result)
 	{
-		VersionContainer pAMHFPMEPCH = SystemProperties.GetDataVersion();
-		switch (KJFKPMCPIBH.property)
+		VersionContainer version = SystemProperties.GetDataVersion();
+		switch (function.property)
 		{
 		case "Version":
-			BMDEBHIHIAJ.resultSTR = pAMHFPMEPCH.ToString();
+			result.resultSTR = version.ToString();
 			break;
 		case "Production":
-			BMDEBHIHIAJ.resultNumber = pAMHFPMEPCH.GetMajor();
+			result.resultNumber = version.GetMajor();
 			break;
 		case "Major":
-			BMDEBHIHIAJ.resultNumber = pAMHFPMEPCH.GetMinor();
+			result.resultNumber = version.GetMinor();
 			break;
 		case "Minor":
-			BMDEBHIHIAJ.resultNumber = pAMHFPMEPCH.GetBuild();
+			result.resultNumber = version.GetBuild();
 			break;
 		case "DataVersion":
-			BMDEBHIHIAJ.resultNumber = pAMHFPMEPCH.GetRevision();
+			result.resultNumber = version.GetRevision();
 			break;
 		default:
-			GameLog.Error(string.Format("{0},\"{1}\"", "ERROR: QuestCondition.UserVersionFunction - unknown property: ", KJFKPMCPIBH.property));
+			GameLog.Error(string.Format("{0},\"{1}\"", "ERROR: QuestCondition.UserVersionFunction - unknown property: ", function.property));
 			break;
 		}
 	}
 
-	private void EvaluateVersionControllerFunction(QuestFunctions KJFKPMCPIBH, CompareResult BMDEBHIHIAJ)
+	private void EvaluateVersionControllerFunction(QuestFunctions function, CompareResult result)
 	{
-		VersionContainer pAMHFPMEPCH = SystemProperties.GetVersion();
-		switch (KJFKPMCPIBH.property)
+		VersionContainer version = SystemProperties.GetVersion();
+		switch (function.property)
 		{
 		case "Version":
-			BMDEBHIHIAJ.resultSTR = pAMHFPMEPCH.ToString();
+			result.resultSTR = version.ToString();
 			break;
 		case "Production":
-			BMDEBHIHIAJ.resultNumber = pAMHFPMEPCH.GetMajor();
+			result.resultNumber = version.GetMajor();
 			break;
 		case "Major":
-			BMDEBHIHIAJ.resultNumber = pAMHFPMEPCH.GetMinor();
+			result.resultNumber = version.GetMinor();
 			break;
 		case "Minor":
-			BMDEBHIHIAJ.resultNumber = pAMHFPMEPCH.GetBuild();
+			result.resultNumber = version.GetBuild();
 			break;
 		case "DataVersion":
-			BMDEBHIHIAJ.resultNumber = pAMHFPMEPCH.GetRevision();
+			result.resultNumber = version.GetRevision();
 			break;
 		default:
-			GameLog.Error(string.Format("{0},\"{1}\"", "ERROR: QuestCondition.VersionControllerFunction - unknown property: ", KJFKPMCPIBH.property));
+			GameLog.Error(string.Format("{0},\"{1}\"", "ERROR: QuestCondition.VersionControllerFunction - unknown property: ", function.property));
 			break;
 		}
 	}
 
-	private void EvaluateSysInfoFunction(QuestFunctions KJFKPMCPIBH, CompareResult BMDEBHIHIAJ)
+	private void EvaluateSysInfoFunction(QuestFunctions function, CompareResult result)
 	{
-		DeviceInfo fFMKFOCMPBN = SystemProperties.GetDeviceInfo();
-		switch (KJFKPMCPIBH.property)
+		DeviceInfo deviceInfo = SystemProperties.GetDeviceInfo();
+		switch (function.property)
 		{
 		case "DeviceType":
 			if (SystemProperties.IsTabletDevice())
 			{
-				BMDEBHIHIAJ.resultSTR = "Tablet";
+				result.resultSTR = "Tablet";
 			}
 			else
 			{
-				BMDEBHIHIAJ.resultSTR = "Phone";
+				result.resultSTR = "Phone";
 			}
 			break;
 		case "ResolutionLocation":
-			BMDEBHIHIAJ.resultSTR = SystemProperties.PathTypeToString(fFMKFOCMPBN.LocationResolution);
+			result.resultSTR = SystemProperties.PathTypeToString(deviceInfo.LocationResolution);
 			break;
 		case "ResolutionGUI":
-			BMDEBHIHIAJ.resultSTR = SystemProperties.PathTypeToString(fFMKFOCMPBN.GuiResolution);
+			result.resultSTR = SystemProperties.PathTypeToString(deviceInfo.GuiResolution);
 			break;
 		case "Id":
-			BMDEBHIHIAJ.resultSTR = fFMKFOCMPBN.Id;
+			result.resultSTR = deviceInfo.Id;
 			break;
 		case "Os":
-			BMDEBHIHIAJ.resultSTR = fFMKFOCMPBN.Os;
+			result.resultSTR = deviceInfo.Os;
 			break;
 		case "OsName":
-			BMDEBHIHIAJ.resultSTR = fFMKFOCMPBN.OsName;
+			result.resultSTR = deviceInfo.OsName;
 			break;
 		case "Language":
-			BMDEBHIHIAJ.resultSTR = fFMKFOCMPBN.Locale;
+			result.resultSTR = deviceInfo.Locale;
 			break;
 		case "CpuCount":
-			BMDEBHIHIAJ.resultNumber = fFMKFOCMPBN.CpuCount;
+			result.resultNumber = deviceInfo.CpuCount;
 			break;
 		case "Ram":
-			BMDEBHIHIAJ.resultNumber = fFMKFOCMPBN.TotalRam;
+			result.resultNumber = deviceInfo.TotalRam;
 			break;
 		case "DisplayWidth":
-			BMDEBHIHIAJ.resultNumber = fFMKFOCMPBN.DisplayWidth;
+			result.resultNumber = deviceInfo.DisplayWidth;
 			break;
 		case "DisplayHeight":
-			BMDEBHIHIAJ.resultNumber = fFMKFOCMPBN.DisplayHeight;
+			result.resultNumber = deviceInfo.DisplayHeight;
 			break;
 		case "Account":
-			BMDEBHIHIAJ.resultSTR = GameCenterController.GetUserId();
+			result.resultSTR = GameCenterController.GetUserId();
 			break;
 		case "China":
-			BMDEBHIHIAJ.resultNumber = (AssemblyController.GetMarket().GetIsChinaMarket() ? 1 : 0);
+			result.resultNumber = (AssemblyController.GetMarket().GetIsChinaMarket() ? 1 : 0);
 			break;
 		case "Korea":
-			BMDEBHIHIAJ.resultNumber = (AssemblyController.GetMarket().GetIsKoreaMarket() ? 1 : 0);
+			result.resultNumber = (AssemblyController.GetMarket().GetIsKoreaMarket() ? 1 : 0);
 			break;
 		case "Amazon":
-			BMDEBHIHIAJ.resultNumber = (AssemblyController.GetMarket().GetIsAmazonMarket() ? 1 : 0);
+			result.resultNumber = (AssemblyController.GetMarket().GetIsAmazonMarket() ? 1 : 0);
 			break;
 		case "Steam":
-			BMDEBHIHIAJ.resultNumber = (AssemblyController.GetMarket().GetIsSteamMarket() ? 1 : 0);
+			result.resultNumber = (AssemblyController.GetMarket().GetIsSteamMarket() ? 1 : 0);
 			break;
 		case "Japan":
-			BMDEBHIHIAJ.resultNumber = (AssemblyController.GetMarket().GetIsJapanMarket() ? 1 : 0);
+			result.resultNumber = (AssemblyController.GetMarket().GetIsJapanMarket() ? 1 : 0);
 			break;
 		case "AmazonMobile":
-			BMDEBHIHIAJ.resultNumber = (AssemblyController.GetMarket().GetIsAmazonMobileMarket() ? 1 : 0);
+			result.resultNumber = (AssemblyController.GetMarket().GetIsAmazonMobileMarket() ? 1 : 0);
 			break;
 		case "AndroidTV":
-			BMDEBHIHIAJ.resultNumber = (AssemblyController.GetMarket().GetIsAndroidTvMarket() ? 1 : 0);
+			result.resultNumber = (AssemblyController.GetMarket().GetIsAndroidTvMarket() ? 1 : 0);
 			break;
 		case "WinStore":
-			BMDEBHIHIAJ.resultNumber = (AssemblyController.GetMarket().GetIsWinStoreMarket() ? 1 : 0);
+			result.resultNumber = (AssemblyController.GetMarket().GetIsWinStoreMarket() ? 1 : 0);
 			break;
 		case "Time":
-			BMDEBHIHIAJ.resultSTR = ListSF.GetCurrentTime().ToString();
-			BMDEBHIHIAJ.resultSTR = "0";
+			result.resultSTR = ListSF.GetCurrentTime().ToString();
+			result.resultSTR = "0";
 			break;
 		case "RatingUrl":
-			BMDEBHIHIAJ.resultSTR = InternetController.GetRateUrl();
+			result.resultSTR = InternetController.GetRateUrl();
 			break;
 		case "FacebookLiked":
-			BMDEBHIHIAJ.resultNumber = (ListSF.GetRoster().GetFacebookLiked() ? 1 : 0);
+			result.resultNumber = (ListSF.GetRoster().GetFacebookLiked() ? 1 : 0);
 			break;
 		case "FBLikeUrl":
-			BMDEBHIHIAJ.resultSTR = InternetController.GetLikeUrls().Url;
+			result.resultSTR = InternetController.GetLikeUrls().Url;
 			break;
 		case "FBLikeAltUrl":
-			BMDEBHIHIAJ.resultSTR = InternetController.GetLikeUrls().AltUrl;
+			result.resultSTR = InternetController.GetLikeUrls().AltUrl;
 			break;
 		case "UserObserved":
-			BMDEBHIHIAJ.resultNumber = (EventLog.GetInstance().GetIsLogging() ? 1 : 0);
+			result.resultNumber = (EventLog.GetInstance().GetIsLogging() ? 1 : 0);
 			break;
 		case "Connection":
-			BMDEBHIHIAJ.resultNumber = (SystemProperties.CheckConnection() ? 1 : 0);
+			result.resultNumber = (SystemProperties.CheckConnection() ? 1 : 0);
 			break;
 		case "QualityCondition":
-			BMDEBHIHIAJ.resultSTR = GraphicsController.GetEffectiveQualityCondition();
+			result.resultSTR = GraphicsController.GetEffectiveQualityCondition();
 			break;
 		case "DeviceTotalMem":
 		{
 			float num = SystemProperties.GetDeviceInfo().TotalRam / 1024;
-			BMDEBHIHIAJ.resultNumber = num;
+			result.resultNumber = num;
 			break;
 		}
 		case "LastSessionCrashed":
-			BMDEBHIHIAJ.resultNumber = (CrashBreadcrumbTracker.GetInstance().DidLastSessionCrash() ? 1 : 0);
+			result.resultNumber = (CrashBreadcrumbTracker.GetInstance().DidLastSessionCrash() ? 1 : 0);
 			break;
 		default:
 			string compatibilityString;
 			double compatibilityNumber;
 			if (Eclipse.Content.QuestCompatibility.TryGetModernSysInfo(
-				KJFKPMCPIBH.property, out compatibilityString, out compatibilityNumber))
+				function.property, out compatibilityString, out compatibilityNumber))
 			{
-				BMDEBHIHIAJ.resultSTR = compatibilityString;
-				BMDEBHIHIAJ.resultNumber = compatibilityNumber;
+				result.resultSTR = compatibilityString;
+				result.resultNumber = compatibilityNumber;
 				break;
 			}
-			GameLog.Error(string.Format("{0},\"{1}\"", "QuestCondition.SysInfoFunction - unknown property ", KJFKPMCPIBH.property));
+			GameLog.Error(string.Format("{0},\"{1}\"", "QuestCondition.SysInfoFunction - unknown property ", function.property));
 			break;
 		}
 	}
 
-	private void EvaluateGiftFunction(QuestFunctions KJFKPMCPIBH, CompareResult BMDEBHIHIAJ)
+	private void EvaluateGiftFunction(QuestFunctions function, CompareResult result)
 	{
-		switch (KJFKPMCPIBH.property)
+		switch (function.property)
 		{
 		case "Exist":
-			BMDEBHIHIAJ.resultNumber = (NetworkController.GetInstance().GiveLoginService.WasGiveApplied ? 1 : 0);
+			result.resultNumber = (NetworkController.GetInstance().GiveLoginService.WasGiveApplied ? 1 : 0);
 			break;
 		case "Money":
-			BMDEBHIHIAJ.resultNumber = NetworkController.GetInstance().GiveLoginService.MoneyAmount;
+			result.resultNumber = NetworkController.GetInstance().GiveLoginService.MoneyAmount;
 			break;
 		case "Bonus":
-			BMDEBHIHIAJ.resultNumber = NetworkController.GetInstance().GiveLoginService.BonusAmount;
+			result.resultNumber = NetworkController.GetInstance().GiveLoginService.BonusAmount;
 			break;
 		case "Items":
-			BMDEBHIHIAJ.resultNumber = NetworkController.GetInstance().GiveLoginService.Items.Count;
+			result.resultNumber = NetworkController.GetInstance().GiveLoginService.Items.Count;
 			break;
 		default:
-			GameLog.Error(string.Format("{0},\"{1}\"", "QuestCondition.GiftFunction - unknown property ", KJFKPMCPIBH.property));
+			GameLog.Error(string.Format("{0},\"{1}\"", "QuestCondition.GiftFunction - unknown property ", function.property));
 			break;
 		}
 	}
 
-	private void EvaluateDeliverFunction(QuestFunctions KJFKPMCPIBH, CompareResult BMDEBHIHIAJ)
+	private void EvaluateDeliverFunction(QuestFunctions function, CompareResult result)
 	{
-		EvaluatePurchaseFunction(KJFKPMCPIBH, BMDEBHIHIAJ);
+		EvaluatePurchaseFunction(function, result);
 	}
 
-	private void SessionSettings(QuestFunctions KJFKPMCPIBH, CompareResult BMDEBHIHIAJ)
+	private void SessionSettings(QuestFunctions function, CompareResult result)
 	{
-		Roster nKGLHEGIKKP = ListSF.GetRoster();
-		if (nKGLHEGIKKP.HasSessionSetting(KJFKPMCPIBH.property))
+		Roster roster = ListSF.GetRoster();
+		if (roster.HasSessionSetting(function.property))
 		{
-			string text = nKGLHEGIKKP.GetSettingsXML(KJFKPMCPIBH.property);
-			BMDEBHIHIAJ.resultNumber = (text.Equals(string.Empty) ? 0.0 : double.Parse(text));
+			string text = roster.GetSettingsXML(function.property);
+			result.resultNumber = (text.Equals(string.Empty) ? 0.0 : double.Parse(text));
 		}
 	}
 
-	private void EvaluateTimerFunction(QuestFunctions KJFKPMCPIBH, CompareResult BMDEBHIHIAJ)
+	private void EvaluateTimerFunction(QuestFunctions function, CompareResult result)
 	{
-		string text = KJFKPMCPIBH.GetFirstArgument();
-		ListSF oPLPFMFAGMN = ListSF.GetInstance();
-		Roster nKGLHEGIKKP = ListSF.GetRoster();
-		if (!KJFKPMCPIBH.property.Equals("Value"))
+		string text = function.GetFirstArgument();
+		ListSF listInstance = ListSF.GetInstance();
+		Roster roster = ListSF.GetRoster();
+		if (!function.property.Equals("Value"))
 		{
 			return;
 		}
 		if (text.Equals("EnergyRefillTimer"))
 		{
-			BMDEBHIHIAJ.resultNumber = nKGLHEGIKKP.GetEnergyRefillTimer();
+			result.resultNumber = roster.GetEnergyRefillTimer();
 			return;
 		}
 		if (text.Equals("DuelAccessibilityTimer"))
 		{
 			if (BattlePeriodic.GetTime() > 0)
 			{
-				BMDEBHIHIAJ.resultNumber = BattlePeriodic.GetRepeatTime() - BattlePeriodic.GetTime();
+				result.resultNumber = BattlePeriodic.GetRepeatTime() - BattlePeriodic.GetTime();
 			}
 			return;
 		}
 		if (text.Equals("StarterPackTimer"))
 		{
-			BMDEBHIHIAJ.resultNumber = GameUtils.GetLeftTime(nKGLHEGIKKP.GetStarterPackTimerEndTime());
+			result.resultNumber = GameUtils.GetLeftTime(roster.GetStarterPackTimerEndTime());
 			return;
 		}
-		RosterTimerContainer kCMICMHCEBB = nKGLHEGIKKP.GetTimerContainer();
-		RosterTimer fPNMILOHPMB = kCMICMHCEBB.FindTimer(text);
-		if (fPNMILOHPMB != null)
+		RosterTimerContainer timerContainer = roster.GetTimerContainer();
+		RosterTimer timer = timerContainer.FindTimer(text);
+		if (timer != null)
 		{
-			BMDEBHIHIAJ.resultNumber = GameUtils.GetLeftTime(fPNMILOHPMB.GetEndTimeSeconds());
+			result.resultNumber = GameUtils.GetLeftTime(timer.GetEndTimeSeconds());
 		}
 	}
 
-	private void EvaluateAbGroupExistsFunction(QuestFunctions KJFKPMCPIBH, CompareResult BMDEBHIHIAJ)
+	private void EvaluateAbGroupExistsFunction(QuestFunctions function, CompareResult result)
 	{
-		Roster nKGLHEGIKKP = ListSF.GetRoster();
-		string gOHIIMFFFJI = KJFKPMCPIBH.GetFirstArgument();
-		BMDEBHIHIAJ.resultNumber = (nKGLHEGIKKP.DoesAbGroupExist(gOHIIMFFFJI) ? 1 : 0);
+		Roster roster = ListSF.GetRoster();
+		string groupName = function.GetFirstArgument();
+		result.resultNumber = (roster.DoesAbGroupExist(groupName) ? 1 : 0);
 	}
 
-	private void EvaluateEnchantmentFunction(QuestFunctions KJFKPMCPIBH, CompareResult BMDEBHIHIAJ)
+	private void EvaluateEnchantmentFunction(QuestFunctions function, CompareResult result)
 	{
-		string[] array = KJFKPMCPIBH.GetFirstArgument().Split('|');
+		string[] array = function.GetFirstArgument().Split('|');
 		if (array.Length < 2)
 		{
 			return;
 		}
-		string bAINMLLIKOL = array[0];
-		CompareResult lNIDLHOIHIM = new CompareResult();
-		QuestCondition kKDGLNECFHA = new QuestCondition();
-		kKDGLNECFHA.SetParameters(questParameters);
-		kKDGLNECFHA.SetValue(bAINMLLIKOL, lNIDLHOIHIM);
-		bAINMLLIKOL = lNIDLHOIHIM.resultSTR;
+		string expression = array[0];
+		CompareResult valueResult = new CompareResult();
+		QuestCondition condition = new QuestCondition();
+		condition.SetParameters(questParameters);
+		condition.SetValue(expression, valueResult);
+		expression = valueResult.resultSTR;
 		string bAINMLLIKOL2 = array[1];
-		kKDGLNECFHA.SetValue(bAINMLLIKOL2, lNIDLHOIHIM);
-		bAINMLLIKOL2 = lNIDLHOIHIM.resultSTR;
+		condition.SetValue(bAINMLLIKOL2, valueResult);
+		bAINMLLIKOL2 = valueResult.resultSTR;
 		long num = 0L;
 		if (array.Length == 3)
 		{
 			string bAINMLLIKOL3 = array[2];
-			kKDGLNECFHA.SetValue(bAINMLLIKOL3, lNIDLHOIHIM);
-			num = (long)lNIDLHOIHIM.resultNumber;
+			condition.SetValue(bAINMLLIKOL3, valueResult);
+			num = (long)valueResult.resultNumber;
 		}
-		switch (KJFKPMCPIBH.property)
+		switch (function.property)
 		{
 		case "Item":
-			BMDEBHIHIAJ.resultSTR = bAINMLLIKOL;
+			result.resultSTR = expression;
 			break;
 		case "Recipe":
-			BMDEBHIHIAJ.resultSTR = bAINMLLIKOL2;
+			result.resultSTR = bAINMLLIKOL2;
 			break;
 		case "Timeout":
 		{
-			RecipePrice pANAKJICBKI2 = ForgeManager.GetInstance().GetPriceByItemName(bAINMLLIKOL, bAINMLLIKOL2);
-			BMDEBHIHIAJ.resultNumber = ((pANAKJICBKI2 != null) ? pANAKJICBKI2.DeliveryTimeSeconds : 0);
+			RecipePrice pANAKJICBKI2 = ForgeManager.GetInstance().GetPriceByItemName(expression, bAINMLLIKOL2);
+			result.resultNumber = ((pANAKJICBKI2 != null) ? pANAKJICBKI2.DeliveryTimeSeconds : 0);
 			break;
 		}
 		case "DeliveryTime":
-			BMDEBHIHIAJ.resultNumber = num;
+			result.resultNumber = num;
 			break;
 		case "BonusDeliveryPrice":
 		{
-			RecipePrice pANAKJICBKI = ForgeManager.GetInstance().GetPriceByItemName(bAINMLLIKOL, bAINMLLIKOL2);
-			BMDEBHIHIAJ.resultNumber = (int)((pANAKJICBKI != null) ? (ObscuredLong)(pANAKJICBKI.BonusDeliveryPriceValue) : 0);
+			RecipePrice recipePrice = ForgeManager.GetInstance().GetPriceByItemName(expression, bAINMLLIKOL2);
+			result.resultNumber = (int)((recipePrice != null) ? (ObscuredLong)(recipePrice.BonusDeliveryPriceValue) : 0);
 			break;
 		}
 		case "Available":
 		{
-			Recipe iNODIOJPNJH = ForgeManager.GetInstance().GetRecipeByName(bAINMLLIKOL2);
-			UserItem dKCHDHMLKHN = ListSF.GetUserItem(bAINMLLIKOL);
+			Recipe recipe = ForgeManager.GetInstance().GetRecipeByName(bAINMLLIKOL2);
+			UserItem userItem = ListSF.GetUserItem(expression);
 			bool flag = false;
-			if (iNODIOJPNJH != null && dKCHDHMLKHN != null)
+			if (recipe != null && userItem != null)
 			{
-				flag = iNODIOJPNJH.IsAvailableWithMaterials(dKCHDHMLKHN);
+				flag = recipe.IsAvailableWithMaterials(userItem);
 			}
-			BMDEBHIHIAJ.resultNumber = (flag ? 1 : 0);
+			result.resultNumber = (flag ? 1 : 0);
 			break;
 		}
 		default:
-			GameLog.Error(string.Format("{0},\"{1}\"", "QuestCondition.EnchantmentFunction - unknown property ", KJFKPMCPIBH.property));
+			GameLog.Error(string.Format("{0},\"{1}\"", "QuestCondition.EnchantmentFunction - unknown property ", function.property));
 			break;
 		}
 	}
@@ -1322,10 +1322,10 @@ public class QuestCondition : ConditionExtension
 	private string GetPurchaseUnsuccessfulValue()
 	{
 		StringBuilder stringBuilder = new StringBuilder();
-		ItemInfo dLKPBAJDHBO = questParameters.purchasedItem;
-		if (dLKPBAJDHBO != null)
+		ItemInfo itemInfo = questParameters.purchasedItem;
+		if (itemInfo != null)
 		{
-			stringBuilder.Append(dLKPBAJDHBO.Name);
+			stringBuilder.Append(itemInfo.Name);
 			if (!questParameters.purchaseFailureReason.Equals(string.Empty))
 			{
 				stringBuilder.Append("|");
@@ -1362,12 +1362,12 @@ public class QuestCondition : ConditionExtension
 		return stringBuilder.ToString();
 	}
 
-	private void EvaluateFightCurrencyCostFunction(QuestFunctions KJFKPMCPIBH, CompareResult BMDEBHIHIAJ)
+	private void EvaluateFightCurrencyCostFunction(QuestFunctions function, CompareResult result)
 	{
-		string text = ((KJFKPMCPIBH.arguments.Count <= 0) ? string.Empty : KJFKPMCPIBH.arguments[0].result);
-		string text2 = ((KJFKPMCPIBH.arguments.Count <= 1) ? string.Empty : KJFKPMCPIBH.arguments[1].result);
-		FightList jDIPBIHBGPF = ListSF.GetInstance().GetFightByIdString(text);
-		if (jDIPBIHBGPF == null)
+		string text = ((function.arguments.Count <= 0) ? string.Empty : function.arguments[0].result);
+		string text2 = ((function.arguments.Count <= 1) ? string.Empty : function.arguments[1].result);
+		FightList fight = ListSF.GetInstance().GetFightByIdString(text);
+		if (fight == null)
 		{
 			GameLog.Error(string.Format("{0},\"{1}\"", "ERROR: QuestCondition::fightCurrencyCostFunction - cant fight fight: ", text));
 		}
@@ -1377,51 +1377,51 @@ public class QuestCondition : ConditionExtension
 		}
 		else
 		{
-			BMDEBHIHIAJ.resultNumber = jDIPBIHBGPF.GetCurrencyCost(text2);
+			result.resultNumber = fight.GetCurrencyCost(text2);
 		}
 	}
 
-	private void EvaluateShopAssertFunction(QuestFunctions KJFKPMCPIBH, CompareResult BMDEBHIHIAJ)
+	private void EvaluateShopAssertFunction(QuestFunctions function, CompareResult result)
 	{
-		string gOHIIMFFFJI = KJFKPMCPIBH.GetFirstArgument();
-		string hBDLDIKHFEG = KJFKPMCPIBH.property;
-		if (hBDLDIKHFEG.Equals("IsOpen"))
+		string lockName = function.GetFirstArgument();
+		string propertyName = function.property;
+		if (propertyName.Equals("IsOpen"))
 		{
-			Roster nKGLHEGIKKP = ListSF.GetRoster();
-			bool flag = nKGLHEGIKKP.HasShopLock(gOHIIMFFFJI);
-			BMDEBHIHIAJ.resultNumber = (flag ? 1 : 0);
+			Roster roster = ListSF.GetRoster();
+			bool flag = roster.HasShopLock(lockName);
+			result.resultNumber = (flag ? 1 : 0);
 		}
 		else
 		{
-			GameLog.Error(string.Format("{0},\"{1}\"", "ERROR: QuestCondition::shopAssertFunction - unknown property: ", hBDLDIKHFEG));
+			GameLog.Error(string.Format("{0},\"{1}\"", "ERROR: QuestCondition::shopAssertFunction - unknown property: ", propertyName));
 		}
 	}
 
-	private void EvaluateSimOperatorFunction(QuestFunctions KJFKPMCPIBH, CompareResult BMDEBHIHIAJ)
+	private void EvaluateSimOperatorFunction(QuestFunctions function, CompareResult result)
 	{
-		string text = KJFKPMCPIBH.GetFirstArgument();
-		string hBDLDIKHFEG = KJFKPMCPIBH.property;
-		if (hBDLDIKHFEG != null && hBDLDIKHFEG == "Code")
+		string text = function.GetFirstArgument();
+		string propertyName = function.property;
+		if (propertyName != null && propertyName == "Code")
 		{
-			BMDEBHIHIAJ.resultSTR = string.Empty;
+			result.resultSTR = string.Empty;
 		}
 		else
 		{
-			GameLog.Error(string.Format("{0},\"{1}\"", "ERROR: QuestCondition::getSimOperator - unknown property: ", KJFKPMCPIBH.property));
+			GameLog.Error(string.Format("{0},\"{1}\"", "ERROR: QuestCondition::getSimOperator - unknown property: ", function.property));
 		}
 	}
 
-	private void EvaluateRaidInfoFunction(QuestFunctions KJFKPMCPIBH, CompareResult BMDEBHIHIAJ)
+	private void EvaluateRaidInfoFunction(QuestFunctions function, CompareResult result)
 	{
-		switch (KJFKPMCPIBH.property)
+		switch (function.property)
 		{
 		case "TutorialStep":
-			BMDEBHIHIAJ.resultSTR = GameUtils.RaidTutorialStepNames[ListSF.GetRoster().GetTutorials().GetRaidStep()];
+			result.resultSTR = GameUtils.RaidTutorialStepNames[ListSF.GetRoster().GetTutorials().GetRaidStep()];
 			break;
 		case "RestoreCurrencyValue":
 			break;
 		default:
-			GameLog.Error(string.Format("{0},\"{1}\"", "ERROR: QuestCondition::getSimOperator - unknown property: ", KJFKPMCPIBH.property));
+			GameLog.Error(string.Format("{0},\"{1}\"", "ERROR: QuestCondition::getSimOperator - unknown property: ", function.property));
 			break;
 		}
 	}

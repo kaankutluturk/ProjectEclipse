@@ -10,14 +10,14 @@ public class ConditionOfCompletionBattle : ConditionOfCompletion
 		_name = node.Attributes["Name"].GetStringOrDefault();
 	}
 
-	public ConditionOfCompletionBattle(string name, int OGOLNFLBLBD)
+	public ConditionOfCompletionBattle(string name, int count)
 	{
 		_name = name;
 	}
 
-	bool ConditionOfCompletion.IsComplete(FightIDS DIAIIPCBMFL)
+	bool ConditionOfCompletion.IsComplete(FightIDS fightId)
 	{
-		if (IsFightInRoster() || DIAIIPCBMFL.Equals(_name))
+		if (IsFightInRoster() || fightId.Equals(_name))
 		{
 			return true;
 		}
@@ -28,12 +28,12 @@ public class ConditionOfCompletionBattle : ConditionOfCompletion
 	{
 		List<RosterFight> list = ListSF.GetRoster().GetSavedFights();
 		bool result = false;
-		FightIDS mOCEDDJOAEB = new FightIDS();
-		mOCEDDJOAEB.SetFightIDSByString(_name);
+		FightIDS targetFightId = new FightIDS();
+		targetFightId.SetFightIDSByString(_name);
 		for (int i = 0; i < list.Count; i++)
 		{
-			RosterFight pIGKOIFBOME = list[i];
-			if (mOCEDDJOAEB.Equals(pIGKOIFBOME.GetFightIdString()))
+			RosterFight rosterFight = list[i];
+			if (targetFightId.Equals(rosterFight.GetFightIdString()))
 			{
 				result = true;
 			}

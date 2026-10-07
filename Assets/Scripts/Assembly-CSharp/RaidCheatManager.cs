@@ -68,21 +68,21 @@ public static class RaidCheatManager
 		}
 	}
 
-	public static void OnConsoleActiveChanged(bool OEKIAFFOPJJ)
+	public static void OnConsoleActiveChanged(bool isActive)
 	{
 		if (GameController.get_Current() != null)
 		{
-			GameController.get_Current().enabled = !OEKIAFFOPJJ;
+			GameController.get_Current().enabled = !isActive;
 		}
 	}
 
-	public static void Log(string BFFNFGKHBJA)
+	public static void Log(string message)
 	{
-		ConsoleUI.Log(BFFNFGKHBJA);
-		Debug.Log(BFFNFGKHBJA);
+		ConsoleUI.Log(message);
+		Debug.Log(message);
 	}
 
-	private static string HelpCommand(params string[] PCJAKPJMKGN)
+	private static string HelpCommand(params string[] args)
 	{
 		StringBuilder stringBuilder = new StringBuilder();
 		stringBuilder.Append("All commands:\n");
@@ -102,25 +102,25 @@ public static class RaidCheatManager
 		return stringBuilder.ToString().TrimEnd('\r', '\n');
 	}
 
-	public static string Clear(params string[] PCJAKPJMKGN)
+	public static string Clear(params string[] args)
 	{
 		ConsoleUI.Clear();
 		return "Ok";
 	}
 
-	private static int ParseAmountArg(params string[] LKIOKGCNKHE)
+	private static int ParseAmountArg(params string[] args)
 	{
 		int result;
-		if (LKIOKGCNKHE.Length > 0 && int.TryParse(LKIOKGCNKHE[0], out result))
+		if (args.Length > 0 && int.TryParse(args[0], out result))
 		{
 			return result;
 		}
 		return 1000000;
 	}
 
-	public static string AddMoneyCommand(params string[] LKIOKGCNKHE)
+	public static string AddMoneyCommand(params string[] args)
 	{
-		ListSF.AddCoins(ParseAmountArg(LKIOKGCNKHE));
+		ListSF.AddCoins(ParseAmountArg(args));
 		if (MainMenu.get_Instance() != null)
 		{
 			MainMenu.get_Instance().UpdateMoney();
@@ -128,9 +128,9 @@ public static class RaidCheatManager
 		return string.Format("Ok. Money={0}", ListSF.GetRoster().GetMoney());
 	}
 
-	public static string AddGemsCommand(params string[] LKIOKGCNKHE)
+	public static string AddGemsCommand(params string[] args)
 	{
-		ListSF.AddGems(ParseAmountArg(LKIOKGCNKHE), Roster.BalanceChangeType.CHANGE_CHEAT);
+		ListSF.AddGems(ParseAmountArg(args), Roster.BalanceChangeType.CHANGE_CHEAT);
 		if (MainMenu.get_Instance() != null)
 		{
 			MainMenu.get_Instance().UpdateMoney();
@@ -138,9 +138,9 @@ public static class RaidCheatManager
 		return string.Format("Ok. Gems={0}", ListSF.GetRoster().GetBonus());
 	}
 
-	public static string SetMoneyCommand(params string[] LKIOKGCNKHE)
+	public static string SetMoneyCommand(params string[] args)
 	{
-		int num = ParseAmountArg(LKIOKGCNKHE);
+		int num = ParseAmountArg(args);
 		if (num < 0)
 		{
 			return "Must be >= 0";
@@ -153,9 +153,9 @@ public static class RaidCheatManager
 		return string.Format("Ok. Money={0}", ListSF.GetRoster().GetMoney());
 	}
 
-	public static string SetGemsCommand(params string[] LKIOKGCNKHE)
+	public static string SetGemsCommand(params string[] args)
 	{
-		int num = ParseAmountArg(LKIOKGCNKHE);
+		int num = ParseAmountArg(args);
 		if (num < 0)
 		{
 			return "Must be >= 0";
@@ -168,12 +168,12 @@ public static class RaidCheatManager
 		return string.Format("Ok. Gems={0}", ListSF.GetRoster().GetBonus());
 	}
 
-	public static string AddLevelsCommand(params string[] PCJAKPJMKGN)
+	public static string AddLevelsCommand(params string[] args)
 	{
 		int result = 1;
-		if (PCJAKPJMKGN.Length > 0)
+		if (args.Length > 0)
 		{
-			int.TryParse(PCJAKPJMKGN[0], out result);
+			int.TryParse(args[0], out result);
 		}
 		while (result > 0)
 		{
@@ -191,13 +191,13 @@ public static class RaidCheatManager
 		return string.Format("Ok. Level={0}", ListSF.GetRoster().GetLevel());
 	}
 
-	public static string UserCommand(params string[] PCJAKPJMKGN)
+	public static string UserCommand(params string[] args)
 	{
-		if (PCJAKPJMKGN.Length == 0)
+		if (args.Length == 0)
 		{
 			return "No Arguments! Try: user unlock/reset/print";
 		}
-		switch (PCJAKPJMKGN[0])
+		switch (args[0])
 		{
 		case "unlock":
 			ListSF.GetRoster().AddShopLock("ZONE_2", true);
@@ -217,11 +217,11 @@ public static class RaidCheatManager
 		case "print":
 			return ListSF.ReadUsersFile();
 		default:
-			return string.Format("unknown argument {0}", PCJAKPJMKGN[0]);
+			return string.Format("unknown argument {0}", args[0]);
 		}
 	}
 
-	public static string SkipTutorialCommand(params string[] PCJAKPJMKGN)
+	public static string SkipTutorialCommand(params string[] args)
 	{
 		if (MainMenu.get_Instance() != null && Module.GetInstance() != null && Module.GetInstance().IsUserTutorialComplete())
 		{
@@ -230,13 +230,13 @@ public static class RaidCheatManager
 		return "Ok";
 	}
 
-	public static string PaymentCommand(params string[] PCJAKPJMKGN)
+	public static string PaymentCommand(params string[] args)
 	{
-		if (PCJAKPJMKGN.Length == 0)
+		if (args.Length == 0)
 		{
 			return "No Arguments! Try: payment [unlock/restore/products/receipt/satb/verify/log/logu/purchase]";
 		}
-		switch (PCJAKPJMKGN[0])
+		switch (args[0])
 		{
 		case "unlock":
 			ListSF.GetRoster().AddShopLock("ZONE_1_DONATE", true);
@@ -265,9 +265,9 @@ public static class RaidCheatManager
 			if (SystemProperties.IsIosPlatform())
 			{
 				bool flag = false;
-				if (PCJAKPJMKGN.Length > 1)
+				if (args.Length > 1)
 				{
-					flag = PCJAKPJMKGN[1] == "on" || PCJAKPJMKGN[1] == "1";
+					flag = args[1] == "on" || args[1] == "1";
 				}
 				var appleExtSim = PaymentManager.GetStore().GetExtension<AppleStoreExtensions>();
 				if (appleExtSim != null)
@@ -283,9 +283,9 @@ public static class RaidCheatManager
 		case "verify":
 		{
 			bool flag2 = false;
-			if (PCJAKPJMKGN.Length > 1)
+			if (args.Length > 1)
 			{
-				flag2 = PCJAKPJMKGN[1] == "on" || PCJAKPJMKGN[1] == "1";
+				flag2 = args[1] == "on" || args[1] == "1";
 			}
 			PaymentVerifier.SetVerificationEnabled(flag2);
 			if (flag2)
@@ -331,12 +331,12 @@ public static class RaidCheatManager
 		}
 		case "purchase":
 		{
-			if (PCJAKPJMKGN.Length < 2)
+			if (args.Length < 2)
 			{
 				return "No Arguments! Try: payment [purchase] [int]";
 			}
 			int result = 0;
-			int.TryParse(PCJAKPJMKGN[1], out result);
+			int.TryParse(args[1], out result);
 			Product[] array = PaymentManager.GetStore().GetProducts();
 			if (result < 0 || result >= array.Length)
 			{
@@ -350,13 +350,13 @@ public static class RaidCheatManager
 		}
 	}
 
-	public static string ObfuscatorCommand(params string[] PCJAKPJMKGN)
+	public static string ObfuscatorCommand(params string[] args)
 	{
-		if (PCJAKPJMKGN.Length == 0)
+		if (args.Length == 0)
 		{
 			return "No Arguments! Try: obfuscator/of [logi/logw/loge/logexp]";
 		}
-		switch (PCJAKPJMKGN[0])
+		switch (args[0])
 		{
 		case "logi":
 			Debug.Log("Info");
@@ -382,13 +382,13 @@ public static class RaidCheatManager
 		}
 	}
 
-	public static string BundlesCommand(params string[] PCJAKPJMKGN)
+	public static string BundlesCommand(params string[] args)
 	{
-		if (PCJAKPJMKGN.Length == 0)
+		if (args.Length == 0)
 		{
 			return "No Arguments! Try: bundles [reset]";
 		}
-		string text = PCJAKPJMKGN[0];
+		string text = args[0];
 		if (text != null && text == "reset")
 		{
 			PacksController.GetInstance().DeletePacksFile();
@@ -398,45 +398,45 @@ public static class RaidCheatManager
 		return "Unknown bundles action!";
 	}
 
-	public static string CheatCommand(params string[] LKIOKGCNKHE)
+	public static string CheatCommand(params string[] args)
 	{
-		Fight gDBOMJODDEA = Fight.GetCurrentFight();
-		if (gDBOMJODDEA == null)
+		Fight fight = Fight.GetCurrentFight();
+		if (fight == null)
 		{
 			return "NOT IN FIGHT";
 		}
-		string text = string.Join(string.Empty, LKIOKGCNKHE).ToLower();
+		string text = string.Join(string.Empty, args).ToLower();
 		text = text.Replace("magic", "rechargemagic").Replace("lose", "loss").Replace("godmode", "immortality");
 		string[] names = Enum.GetNames(typeof(FightCID));
 		foreach (string text2 in names)
 		{
 			if (text2.ToLower().Contains(text))
 			{
-				FightCID eCHINOPKGGI = (FightCID)Enum.Parse(typeof(FightCID), text2);
-				gDBOMJODDEA.ReleaseAnyKey(eCHINOPKGGI);
-				return "OK - " + eCHINOPKGGI;
+				FightCID controlId = (FightCID)Enum.Parse(typeof(FightCID), text2);
+				fight.ReleaseAnyKey(controlId);
+				return "OK - " + controlId;
 			}
 		}
 		return "NOT RECOGNIZED\nUSAGE:\ncheat [win round|win fight|lose round|lose fight|reset round|reset fight]\ncheat [pause|next|min scale|magic|combo|style|crit]\ncheat [player godmode|bot godmode|debug|perks|slow]\ncheat (you can pass any kind of ControlQuadrant enum)";
 	}
 
-	private static long ParseDelayArg(params string[] LKIOKGCNKHE)
+	private static long ParseDelayArg(params string[] args)
 	{
 		int result = 3;
-		if (LKIOKGCNKHE.Length >= 2)
+		if (args.Length >= 2)
 		{
-			int.TryParse(LKIOKGCNKHE[1], out result);
+			int.TryParse(args[1], out result);
 		}
 		return result;
 	}
 
-	private static bool? ParseBoolArg(int index, params string[] LKIOKGCNKHE)
+	private static bool? ParseBoolArg(int index, params string[] args)
 	{
-		if (LKIOKGCNKHE.Length <= index)
+		if (args.Length <= index)
 		{
 			return null;
 		}
-		string text = LKIOKGCNKHE[index].ToLower();
+		string text = args[index].ToLower();
 		if (text.Equals("t") || text.Equals("1"))
 		{
 			return true;
@@ -448,13 +448,13 @@ public static class RaidCheatManager
 		return null;
 	}
 
-	public static string NotifCommand(params string[] LKIOKGCNKHE)
+	public static string NotifCommand(params string[] args)
 	{
-		if (LKIOKGCNKHE.Length == 0)
+		if (args.Length == 0)
 		{
 			return "No Arguments! Try:\nnotif t1 (int) - run simple Test-notification-1\nnotif [Fa0|Faf | Fa1|Fat] - force show all notifications (Paid/non-Paid SF2) off/on\nnotif ra (int) - run all notifs\nnotif info - print to console notif. infos\nnotif kill - cancel all notifications\nnotif en (t|1 | f|0) - enable or disable all notifications\nlook SFIIU-48 or Wiki for details";
 		}
-		switch (LKIOKGCNKHE[0].ToLower())
+		switch (args[0].ToLower())
 		{
 		case "kill":
 			LocalNotificationManager.GetInstance().CancelAll();
@@ -463,7 +463,7 @@ public static class RaidCheatManager
 			return LocalNotificationManager.GetInstance().GetUnsupportedPlatformMessage();
 		case "t1":
 		{
-			long num = ParseDelayArg(LKIOKGCNKHE);
+			long num = ParseDelayArg(args);
 			LocalNotificationManager.GetInstance().CancelTest();
 			LocalNotificationManager.GetInstance().ScheduleTest(num);
 			return "Test-notification-1 launched, delay=" + num;
@@ -479,7 +479,7 @@ public static class RaidCheatManager
 		case "ra":
 		{
 			LocalNotificationManager.GetInstance().CancelAll();
-			long num = ParseDelayArg(LKIOKGCNKHE);
+			long num = ParseDelayArg(args);
 			LocalNotificationManager.GetInstance().ScheduleEnergy(num);
 			LocalNotificationManager.GetInstance().ScheduleEnergyFull(num + 2);
 			LocalNotificationManager.GetInstance().ScheduleItem("Test item", num + 4);
@@ -492,7 +492,7 @@ public static class RaidCheatManager
 		}
 		case "en":
 		{
-			bool? flag = ParseBoolArg(1, LKIOKGCNKHE);
+			bool? flag = ParseBoolArg(1, args);
 			if (!flag.HasValue)
 			{
 				break;

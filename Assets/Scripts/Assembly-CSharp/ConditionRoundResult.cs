@@ -62,13 +62,13 @@ public class ConditionRoundResult : ConditionAnimation
 		return (!IsNot) ? flag : (!flag);
 	}
 
-	private bool IsWinner(bool PKHDLOGJKAD)
+	private bool IsWinner(bool isPlayer)
 	{
-		return (PKHDLOGJKAD && _resultType == RoundResultType.RESULT_TYPE_VICTORY) || (!PKHDLOGJKAD && _resultType == RoundResultType.RESULT_TYPE_DEFEAT);
+		return (isPlayer && _resultType == RoundResultType.RESULT_TYPE_VICTORY) || (!isPlayer && _resultType == RoundResultType.RESULT_TYPE_DEFEAT);
 	}
 
-	private bool MatchesEndRoundType(EndRoundType LFLGCDNKNJI)
+	private bool MatchesEndRoundType(EndRoundType endRoundType)
 	{
-		return (LFLGCDNKNJI == EndRoundType.EndRoundTypeTimeOut && _resultSubType == RoundResultSubType.RESULT_SUBTYPE_TIMEOUT) || (LFLGCDNKNJI == EndRoundType.EndRoundTypeRingOut && _resultSubType == RoundResultSubType.RESULT_SUBTYPE_TIMEOUT) || (LFLGCDNKNJI == EndRoundType.EndRoundTypeLose && _resultSubType == RoundResultSubType.RESULT_SUBTYPE_TIMEOUT) || (LFLGCDNKNJI == EndRoundType.EndRoundTypeZeroHealth && _resultSubType == RoundResultSubType.RESULT_SUBTYPE_TIMEOUT);
+		return (endRoundType == EndRoundType.EndRoundTypeTimeOut && _resultSubType == RoundResultSubType.RESULT_SUBTYPE_TIMEOUT) || (endRoundType == EndRoundType.EndRoundTypeRingOut && _resultSubType == RoundResultSubType.RESULT_SUBTYPE_TIMEOUT) || (endRoundType == EndRoundType.EndRoundTypeLose && _resultSubType == RoundResultSubType.RESULT_SUBTYPE_TIMEOUT) || (endRoundType == EndRoundType.EndRoundTypeZeroHealth && _resultSubType == RoundResultSubType.RESULT_SUBTYPE_TIMEOUT);
 	}
 }

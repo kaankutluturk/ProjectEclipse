@@ -6,8 +6,8 @@ public partial class PerkActionFlag : PerkActionModificator
 	{
 	}
 
-	public PerkActionFlag(PerkActionFlag NOLFMPDGCOC)
-		: base(NOLFMPDGCOC)
+	public PerkActionFlag(PerkActionFlag source)
+		: base(source)
 	{
 	}
 

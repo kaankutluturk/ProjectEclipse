@@ -68,7 +68,7 @@ namespace Nekki.SF2.GUI.Map
 			base.gameObject.SetActive(get_Battle().IsMapVisible && !isHidden);
 		}
 
-		public void Init(string LPCAHLHLBJE, string KEIJPCJFLEO, string HHBECAKNFHD, string NGHGFJCOMIP, bool NIBIMBDBPMI, string iconAtlas = "")
+		public void Init(string baseSprite, string activeSprite, string lockedSprite, string lockedActiveSprite, bool locked, string iconAtlas = "")
 		{
 			// Zones 1-6 still tag their original Tournament/Lynx map entries with
 			// the legacy BattleBtnStart atlas. The modern bundle no longer ships that
@@ -91,31 +91,31 @@ namespace Nekki.SF2.GUI.Map
 				(raidDefault ? "BattleBtnLockActive_raid" : iconAtlas + "LockActive");
 			// Some raid pages intentionally reuse classic icons. Prefer the raid or
 			// event atlas, but gracefully retain those classic entries.
-			if (ResolutionImage.GetSprite("UI/Atlases/", baseAtlas + "." + LPCAHLHLBJE) == null)
+			if (ResolutionImage.GetSprite("UI/Atlases/", baseAtlas + "." + baseSprite) == null)
 			{
 				baseAtlas = "BattleBtnBase";
 			}
-			if (ResolutionImage.GetSprite("UI/Atlases/", activeAtlas + "." + KEIJPCJFLEO) == null)
+			if (ResolutionImage.GetSprite("UI/Atlases/", activeAtlas + "." + activeSprite) == null)
 			{
 				activeAtlas = "BattleBtnActive";
 			}
-			if (ResolutionImage.GetSprite("UI/Atlases/", lockAtlas + "." + HHBECAKNFHD) == null)
+			if (ResolutionImage.GetSprite("UI/Atlases/", lockAtlas + "." + lockedSprite) == null)
 			{
 				lockAtlas = "BattleBtnLock";
 			}
-			if (ResolutionImage.GetSprite("UI/Atlases/", lockActiveAtlas + "." + NGHGFJCOMIP) == null)
+			if (ResolutionImage.GetSprite("UI/Atlases/", lockActiveAtlas + "." + lockedActiveSprite) == null)
 			{
 				lockActiveAtlas = "BattleBtnLockActive";
 			}
-			if (!NIBIMBDBPMI)
+			if (!locked)
 			{
-				SetNormalSprite("UI/Atlases/", baseAtlas + "." + LPCAHLHLBJE);
-				SetDisabledSprite("UI/Atlases/", activeAtlas + "." + KEIJPCJFLEO);
+				SetNormalSprite("UI/Atlases/", baseAtlas + "." + baseSprite);
+				SetDisabledSprite("UI/Atlases/", activeAtlas + "." + activeSprite);
 			}
 			else
 			{
-				SetNormalSprite("UI/Atlases/", lockAtlas + "." + HHBECAKNFHD);
-				SetDisabledSprite("UI/Atlases/", lockActiveAtlas + "." + NGHGFJCOMIP);
+				SetNormalSprite("UI/Atlases/", lockAtlas + "." + lockedSprite);
+				SetDisabledSprite("UI/Atlases/", lockActiveAtlas + "." + lockedActiveSprite);
 			}
 		}
 
@@ -140,14 +140,14 @@ namespace Nekki.SF2.GUI.Map
 		{
 		}
 
-		public void SetText(string JMLFOFKBGPE)
+		public void SetText(string text)
 		{
-			_lblName.set_text(JMLFOFKBGPE);
+			_lblName.set_text(text);
 		}
 
-		public void SetAlias(string HCCJDBGBCNC)
+		public void SetAlias(string alias)
 		{
-			_lblName.SetAlias(HCCJDBGBCNC);
+			_lblName.SetAlias(alias);
 		}
 
 		public void SetActiveBattle(bool isActive)
@@ -156,25 +156,25 @@ namespace Nekki.SF2.GUI.Map
 			base.transition = (base.interactable ? Transition.ColorTint : Transition.SpriteSwap);
 		}
 
-		public void SetAlpha(float PGFIPOJBNFC, float time = 0f)
+		public void SetAlpha(float alpha, float time = 0f)
 		{
 			KillTween();
 			if (!base.gameObject.activeSelf || time <= 0f)
 			{
-				ApplyAlpha(PGFIPOJBNFC);
+				ApplyAlpha(alpha);
 				return;
 			}
-			_tween = DOTween.To(() => _CurrentAlpha, (float DHDMNHCIPEH) =>
+			_tween = DOTween.To(() => _CurrentAlpha, (float alpha) =>
 			{
-				ApplyAlpha(DHDMNHCIPEH);
-			}, PGFIPOJBNFC, time);
+				ApplyAlpha(alpha);
+			}, alpha, time);
 		}
 
-		private void ApplyAlpha(float PGFIPOJBNFC)
+		private void ApplyAlpha(float alpha)
 		{
-			if (_CurrentAlpha != PGFIPOJBNFC)
+			if (_CurrentAlpha != alpha)
 			{
-				_CurrentAlpha = Mathf.Clamp(PGFIPOJBNFC, 0f, 1f);
+				_CurrentAlpha = Mathf.Clamp(alpha, 0f, 1f);
 				GetComponent<CanvasGroup>().alpha = _CurrentAlpha;
 			}
 		}

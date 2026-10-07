@@ -2,13 +2,13 @@ using YamlDotNet.RepresentationModel;
 
 public interface IYamlVisitor
 {
-	void Visit(YamlStream ABJIEFMMIEK);
+	void Visit(YamlStream yamlStream);
 
-	void Visit(YamlDocument DPMKHPJABAF);
+	void Visit(YamlDocument yamlDocument);
 
-	void Visit(YamlScalarNode ADDIBOMFCNH);
+	void Visit(YamlScalarNode scalarNode);
 
 	void Visit(YamlSequenceNode sequence);
 
-	void Visit(YamlMappingNode JPEFEBICPFI);
+	void Visit(YamlMappingNode mappingNode);
 }

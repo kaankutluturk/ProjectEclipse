@@ -10,15 +10,15 @@ public class SysDlg : MonoBehaviour
 
 	private static Texture2D _t;
 
-	public static void Show(string LIOGIBJBHAH, bool ONBPFALHBAN)
+	public static void Show(string message, bool shouldExit)
 	{
 		if (!_t)
 		{
 			_t = new Texture2D(1, 1);
 			_t.SetPixel(0, 0, new Color(0f, 0f, 0f, 0.8f));
 		}
-		_message = LIOGIBJBHAH;
-		_exit = ONBPFALHBAN;
+		_message = message;
+		_exit = shouldExit;
 		if (!instance)
 		{
 			instance = new GameObject("_message").AddComponent<SysDlg>();

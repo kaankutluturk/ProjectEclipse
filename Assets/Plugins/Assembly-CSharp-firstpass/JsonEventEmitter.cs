@@ -3,25 +3,25 @@ using System.Globalization;
 
 public sealed class JsonEventEmitter : ChainedEventEmitter
 {
-	public JsonEventEmitter(IEventEmitter JDJEJDIJLLE)
-		: base(JDJEJDIJLLE)
+	public JsonEventEmitter(IEventEmitter nextEmitter)
+		: base(nextEmitter)
 	{
 	}
 
-	public override void Emit(AliasEventInfo FNHCFCAALAE)
+	public override void Emit(AliasEventInfo aliasInfo)
 	{
 		throw new NotSupportedException("Aliases are not supported in JSON");
 	}
 
-	public override void Emit(ScalarEventInfo FNHCFCAALAE)
+	public override void Emit(ScalarEventInfo scalarInfo)
 	{
-		FNHCFCAALAE.SetIsPlainImplicit(true);
-		FNHCFCAALAE.SetStyle(ScalarStyle.Plain);
-		TypeCode typeCode = ((FNHCFCAALAE.GetSource().GetValue() != null) ? FNHCFCAALAE.GetSource().get_Type().GetTypeCode() : TypeCode.Empty);
+		scalarInfo.SetIsPlainImplicit(true);
+		scalarInfo.SetStyle(ScalarStyle.Plain);
+		TypeCode typeCode = ((scalarInfo.GetSource().GetValue() != null) ? scalarInfo.GetSource().get_Type().GetTypeCode() : TypeCode.Empty);
 		switch (typeCode)
 		{
 		case TypeCode.Boolean:
-			FNHCFCAALAE.set_RenderedValue(YamlFormatter.FormatBool(FNHCFCAALAE.GetSource().GetValue()));
+			scalarInfo.set_RenderedValue(YamlFormatter.FormatBool(scalarInfo.GetSource().GetValue()));
 			break;
 		case TypeCode.SByte:
 		case TypeCode.Byte:
@@ -34,39 +34,39 @@ public sealed class JsonEventEmitter : ChainedEventEmitter
 		case TypeCode.Single:
 		case TypeCode.Double:
 		case TypeCode.Decimal:
-			FNHCFCAALAE.set_RenderedValue(YamlFormatter.FormatNumber(FNHCFCAALAE.GetSource().GetValue()));
+			scalarInfo.set_RenderedValue(YamlFormatter.FormatNumber(scalarInfo.GetSource().GetValue()));
 			break;
 		case TypeCode.Char:
 		case TypeCode.String:
-			FNHCFCAALAE.set_RenderedValue(FNHCFCAALAE.GetSource().GetValue().ToString());
-			FNHCFCAALAE.SetStyle(ScalarStyle.DoubleQuoted);
+			scalarInfo.set_RenderedValue(scalarInfo.GetSource().GetValue().ToString());
+			scalarInfo.SetStyle(ScalarStyle.DoubleQuoted);
 			break;
 		case TypeCode.DateTime:
-			FNHCFCAALAE.set_RenderedValue(YamlFormatter.FormatDateTime(FNHCFCAALAE.GetSource().GetValue()));
+			scalarInfo.set_RenderedValue(YamlFormatter.FormatDateTime(scalarInfo.GetSource().GetValue()));
 			break;
 		case TypeCode.Empty:
-			FNHCFCAALAE.set_RenderedValue("null");
+			scalarInfo.set_RenderedValue("null");
 			break;
 		default:
-			if (FNHCFCAALAE.GetSource().get_Type() == typeof(TimeSpan))
+			if (scalarInfo.GetSource().get_Type() == typeof(TimeSpan))
 			{
-				FNHCFCAALAE.set_RenderedValue(YamlFormatter.FormatTimeSpan(FNHCFCAALAE.GetSource().GetValue()));
+				scalarInfo.set_RenderedValue(YamlFormatter.FormatTimeSpan(scalarInfo.GetSource().GetValue()));
 				break;
 			}
 			throw new NotSupportedException(string.Format(CultureInfo.InvariantCulture, "TypeCode.{0} is not supported.", typeCode));
 		}
-		base.Emit(FNHCFCAALAE);
+		base.Emit(scalarInfo);
 	}
 
-	public override void Emit(MappingStartEventInfo FNHCFCAALAE)
+	public override void Emit(MappingStartEventInfo mappingStartInfo)
 	{
-		FNHCFCAALAE.SetStyle(MappingStyle.Flow);
-		base.Emit(FNHCFCAALAE);
+		mappingStartInfo.SetStyle(MappingStyle.Flow);
+		base.Emit(mappingStartInfo);
 	}
 
-	public override void Emit(SequenceStartEventInfo FNHCFCAALAE)
+	public override void Emit(SequenceStartEventInfo sequenceStartInfo)
 	{
-		FNHCFCAALAE.SetStyle(SequenceStyle.Flow);
-		base.Emit(FNHCFCAALAE);
+		sequenceStartInfo.SetStyle(SequenceStyle.Flow);
+		base.Emit(sequenceStartInfo);
 	}
 }

@@ -10,8 +10,8 @@ public class SequenceEnd : ParsingEvent
 		}
 	}
 
-	public SequenceEnd(Mark ILENLCMAMBH, Mark PCLFFOBJJFO)
-		: base(ILENLCMAMBH, PCLFFOBJJFO)
+	public SequenceEnd(Mark start, Mark end)
+		: base(start, end)
 	{
 	}
 
@@ -35,8 +35,8 @@ public class SequenceEnd : ParsingEvent
 		return "Sequence end";
 	}
 
-	public override void Accept(IParsingEventVisitor NKECMANOOEM)
+	public override void Accept(IParsingEventVisitor visitor)
 	{
-		NKECMANOOEM.Visit(this);
+		visitor.Visit(this);
 	}
 }

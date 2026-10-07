@@ -39,15 +39,15 @@ public class SequenceStart : NodeEvent
 		}
 	}
 
-	public SequenceStart(string KOLNNNLOCFE, string EDLADAAKMDF, bool isImplicit, SequenceStyle KIGNIBIMLKK, Mark ILENLCMAMBH, Mark PCLFFOBJJFO)
-		: base(KOLNNNLOCFE, EDLADAAKMDF, ILENLCMAMBH, PCLFFOBJJFO)
+	public SequenceStart(string anchor, string tag, bool isImplicit, SequenceStyle style, Mark start, Mark end)
+		: base(anchor, tag, start, end)
 	{
 		this.isImplicit = isImplicit;
-		this.style = KIGNIBIMLKK;
+		this.style = style;
 	}
 
-	public SequenceStart(string KOLNNNLOCFE, string EDLADAAKMDF, bool isImplicit, SequenceStyle KIGNIBIMLKK)
-		: this(KOLNNNLOCFE, EDLADAAKMDF, isImplicit, KIGNIBIMLKK, Mark.Empty, Mark.Empty)
+	public SequenceStart(string anchor, string tag, bool isImplicit, SequenceStyle style)
+		: this(anchor, tag, isImplicit, style, Mark.Empty, Mark.Empty)
 	{
 	}
 
@@ -81,8 +81,8 @@ public class SequenceStart : NodeEvent
 		return string.Format(CultureInfo.InvariantCulture, "Sequence start [anchor = {0}, tag = {1}, isImplicit = {2}, style = {3}]", GetAnchor(), GetTag(), isImplicit, style);
 	}
 
-	public override void Accept(IParsingEventVisitor NKECMANOOEM)
+	public override void Accept(IParsingEventVisitor visitor)
 	{
-		NKECMANOOEM.Visit(this);
+		visitor.Visit(this);
 	}
 }

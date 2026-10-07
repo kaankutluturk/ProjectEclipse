@@ -439,41 +439,41 @@ public static class HTTPManager
 		CookieJar.SetupFolder();
 	}
 
-	public static HTTPRequest SendRequest(string BEPKJNKCKPH, OnRequestFinishedDelegate callback)
+	public static HTTPRequest SendRequest(string url, OnRequestFinishedDelegate callback)
 	{
-		return SendRequest(new HTTPRequest(new Uri(BEPKJNKCKPH), HTTPMethods.Get, callback));
+		return SendRequest(new HTTPRequest(new Uri(url), HTTPMethods.Get, callback));
 	}
 
-	public static HTTPRequest SendRequest(string BEPKJNKCKPH, HTTPMethods AMFJIGAEHLD, OnRequestFinishedDelegate callback)
+	public static HTTPRequest SendRequest(string url, HTTPMethods methodType, OnRequestFinishedDelegate callback)
 	{
-		return SendRequest(new HTTPRequest(new Uri(BEPKJNKCKPH), AMFJIGAEHLD, callback));
+		return SendRequest(new HTTPRequest(new Uri(url), methodType, callback));
 	}
 
-	public static HTTPRequest SendRequest(string BEPKJNKCKPH, HTTPMethods AMFJIGAEHLD, bool LLLAPINJJIJ, OnRequestFinishedDelegate callback)
+	public static HTTPRequest SendRequest(string url, HTTPMethods methodType, bool isKeepAlive, OnRequestFinishedDelegate callback)
 	{
-		return SendRequest(new HTTPRequest(new Uri(BEPKJNKCKPH), AMFJIGAEHLD, LLLAPINJJIJ, callback));
+		return SendRequest(new HTTPRequest(new Uri(url), methodType, isKeepAlive, callback));
 	}
 
-	public static HTTPRequest SendRequest(string BEPKJNKCKPH, HTTPMethods AMFJIGAEHLD, bool LLLAPINJJIJ, bool JNCJAGIBJFL, OnRequestFinishedDelegate callback)
+	public static HTTPRequest SendRequest(string url, HTTPMethods methodType, bool isKeepAlive, bool disableCache, OnRequestFinishedDelegate callback)
 	{
-		return SendRequest(new HTTPRequest(new Uri(BEPKJNKCKPH), AMFJIGAEHLD, LLLAPINJJIJ, JNCJAGIBJFL, callback));
+		return SendRequest(new HTTPRequest(new Uri(url), methodType, isKeepAlive, disableCache, callback));
 	}
 
-	public static HTTPRequest SendRequest(HTTPRequest ONOCIELLAPL)
+	public static HTTPRequest SendRequest(HTTPRequest request)
 	{
-		ONOCIELLAPL.set_Exception(new NotSupportedException("Network services are disabled in the offline build."));
-		ONOCIELLAPL.set_State(HTTPRequestStates.Error);
-		ONOCIELLAPL.GetCallback()?.Invoke(ONOCIELLAPL, null);
-		return ONOCIELLAPL;
+		request.set_Exception(new NotSupportedException("Network services are disabled in the offline build."));
+		request.set_State(HTTPRequestStates.Error);
+		request.GetCallback()?.Invoke(request, null);
+		return request;
 	}
 
-	public static GeneralStatistics GetGeneralStatistics(StatisticsQueryFlags AGADCPIIGLC)
+	public static GeneralStatistics GetGeneralStatistics(StatisticsQueryFlags queryFlags)
 	{
 		GeneralStatistics result = new GeneralStatistics
 		{
-			QueryFlags = AGADCPIIGLC
+			QueryFlags = queryFlags
 		};
-		if ((AGADCPIIGLC & StatisticsQueryFlags.Connections) != 0)
+		if ((queryFlags & StatisticsQueryFlags.Connections) != 0)
 		{
 			int num = 0;
 			foreach (KeyValuePair<string, List<HTTPConnection>> item in connections)
@@ -489,12 +489,12 @@ public static class HTTPManager
 			result.RecycledConnections = recycledConnections.Count;
 			result.RequestsInQueue = requestQueue.Count;
 		}
-		if ((AGADCPIIGLC & StatisticsQueryFlags.Cache) != 0)
+		if ((queryFlags & StatisticsQueryFlags.Cache) != 0)
 		{
 			result.CacheEntityCount = HTTPCacheService.GetCacheEntityCount();
 			result.CacheSize = HTTPCacheService.GetCacheSize();
 		}
-		if ((AGADCPIIGLC & StatisticsQueryFlags.Cookies) != 0)
+		if ((queryFlags & StatisticsQueryFlags.Cookies) != 0)
 		{
 			List<Cookie> list = CookieJar.GetAll();
 			result.CookieCount = list.Count;
@@ -508,36 +508,36 @@ public static class HTTPManager
 		return result;
 	}
 
-	private static void SendRequestImpl(HTTPRequest ONOCIELLAPL)
+	private static void SendRequestImpl(HTTPRequest request)
 	{
-		HTTPConnection NNLEEIONBEP = FindOrCreateFreeConnection(ONOCIELLAPL);
-		if (NNLEEIONBEP != null)
+		HTTPConnection connection = FindOrCreateFreeConnection(request);
+		if (connection != null)
 		{
-			if (activeConnections.Find((HTTPConnection ILHDJDNPFKH) => ILHDJDNPFKH == NNLEEIONBEP) == null)
+			if (activeConnections.Find((HTTPConnection ILHDJDNPFKH) => ILHDJDNPFKH == connection) == null)
 			{
-				activeConnections.Add(NNLEEIONBEP);
+				activeConnections.Add(connection);
 			}
-			freeConnections.Remove(NNLEEIONBEP);
-			ONOCIELLAPL.set_State(HTTPRequestStates.Processing);
-			ONOCIELLAPL.Prepare();
-			NNLEEIONBEP.Process(ONOCIELLAPL);
+			freeConnections.Remove(connection);
+			request.set_State(HTTPRequestStates.Processing);
+			request.Prepare();
+			connection.Process(request);
 		}
 		else
 		{
-			ONOCIELLAPL.set_State(HTTPRequestStates.Queued);
-			requestQueue.Add(ONOCIELLAPL);
+			request.set_State(HTTPRequestStates.Queued);
+			requestQueue.Add(request);
 		}
 	}
 
-	private static string GetKeyForRequest(HTTPRequest ONOCIELLAPL)
+	private static string GetKeyForRequest(HTTPRequest request)
 	{
-		return ((ONOCIELLAPL.GetProxy() == null) ? string.Empty : new UriBuilder(ONOCIELLAPL.GetProxy().GetAddress().Scheme, ONOCIELLAPL.GetProxy().GetAddress().Host, ONOCIELLAPL.GetProxy().GetAddress().Port).Uri.ToString()) + new UriBuilder(ONOCIELLAPL.GetCurrentUri().Scheme, ONOCIELLAPL.GetCurrentUri().Host, ONOCIELLAPL.GetCurrentUri().Port).Uri.ToString();
+		return ((request.GetProxy() == null) ? string.Empty : new UriBuilder(request.GetProxy().GetAddress().Scheme, request.GetProxy().GetAddress().Host, request.GetProxy().GetAddress().Port).Uri.ToString()) + new UriBuilder(request.GetCurrentUri().Scheme, request.GetCurrentUri().Host, request.GetCurrentUri().Port).Uri.ToString();
 	}
 
-	private static HTTPConnection FindOrCreateFreeConnection(HTTPRequest ONOCIELLAPL)
+	private static HTTPConnection FindOrCreateFreeConnection(HTTPRequest request)
 	{
-		HTTPConnection hPNEPPBEKGG = null;
-		string text = GetKeyForRequest(ONOCIELLAPL);
+		HTTPConnection connection = null;
+		string text = GetKeyForRequest(request);
 		List<HTTPConnection> value;
 		if (connections.TryGetValue(text, out value))
 		{
@@ -553,14 +553,14 @@ public static class HTTPManager
 			{
 				for (int j = 0; j < value.Count; j++)
 				{
-					if (hPNEPPBEKGG != null)
+					if (connection != null)
 					{
 						break;
 					}
 					HTTPConnection hPNEPPBEKGG2 = value[j];
-					if (hPNEPPBEKGG2 != null && hPNEPPBEKGG2.GetIsFree() && (!hPNEPPBEKGG2.GetHasProxy() || hPNEPPBEKGG2.GetLastProcessedUri() == null || hPNEPPBEKGG2.GetLastProcessedUri().Host.Equals(ONOCIELLAPL.GetCurrentUri().Host, StringComparison.OrdinalIgnoreCase)))
+					if (hPNEPPBEKGG2 != null && hPNEPPBEKGG2.GetIsFree() && (!hPNEPPBEKGG2.GetHasProxy() || hPNEPPBEKGG2.GetLastProcessedUri() == null || hPNEPPBEKGG2.GetLastProcessedUri().Host.Equals(request.GetCurrentUri().Host, StringComparison.OrdinalIgnoreCase)))
 					{
-						hPNEPPBEKGG = hPNEPPBEKGG2;
+						connection = hPNEPPBEKGG2;
 					}
 				}
 			}
@@ -569,15 +569,15 @@ public static class HTTPManager
 		{
 			connections.Add(text, value = new List<HTTPConnection>(GetMaxConnectionPerServer()));
 		}
-		if (hPNEPPBEKGG == null)
+		if (connection == null)
 		{
 			if (value.Count >= GetMaxConnectionPerServer())
 			{
 				return null;
 			}
-			value.Add(hPNEPPBEKGG = new HTTPConnection(text));
+			value.Add(connection = new HTTPConnection(text));
 		}
-		return hPNEPPBEKGG;
+		return connection;
 	}
 
 	private static bool CanProcessFromQueue()
@@ -592,31 +592,31 @@ public static class HTTPManager
 		return false;
 	}
 
-	private static void RecycleConnection(HTTPConnection NNLEEIONBEP)
+	private static void RecycleConnection(HTTPConnection connection)
 	{
-		NNLEEIONBEP.Recycle();
-		recycledConnections.Add(NNLEEIONBEP);
+		connection.Recycle();
+		recycledConnections.Add(connection);
 	}
 
-	internal static HTTPConnection GetConnectionWith(HTTPRequest ONOCIELLAPL)
+	internal static HTTPConnection GetConnectionWith(HTTPRequest request)
 	{
 		lock (Locker)
 		{
 			for (int i = 0; i < activeConnections.Count; i++)
 			{
-				HTTPConnection hPNEPPBEKGG = activeConnections[i];
-				if (hPNEPPBEKGG.GetCurrentRequest() == ONOCIELLAPL)
+				HTTPConnection connection = activeConnections[i];
+				if (connection.GetCurrentRequest() == request)
 				{
-					return hPNEPPBEKGG;
+					return connection;
 				}
 			}
 			return null;
 		}
 	}
 
-	internal static bool RemoveFromQueue(HTTPRequest ONOCIELLAPL)
+	internal static bool RemoveFromQueue(HTTPRequest request)
 	{
-		return requestQueue.Remove(ONOCIELLAPL);
+		return requestQueue.Remove(request);
 	}
 
 	internal static string GetRootCacheFolder()
@@ -628,9 +628,9 @@ public static class HTTPManager
 				return GetRootCacheFolderProvider()();
 			}
 		}
-		catch (Exception mPFFFAOGBJE)
+		catch (Exception ex)
 		{
-			GetLogger().Exception("HTTPManager", "GetRootCacheFolder", mPFFFAOGBJE);
+			GetLogger().Exception("HTTPManager", "GetRootCacheFolder", ex);
 		}
 		return Application.persistentDataPath;
 	}
@@ -644,76 +644,76 @@ public static class HTTPManager
 			{
 				for (int i = 0; i < activeConnections.Count; i++)
 				{
-					HTTPConnection hPNEPPBEKGG = activeConnections[i];
-					switch (hPNEPPBEKGG.GetState())
+					HTTPConnection connection = activeConnections[i];
+					switch (connection.GetState())
 					{
 					case HTTPConnectionStates.Processing:
-						hPNEPPBEKGG.HandleProgressCallback();
-						if (hPNEPPBEKGG.GetCurrentRequest().GetUseStreaming() && hPNEPPBEKGG.GetCurrentRequest().GetResponse() != null && hPNEPPBEKGG.GetCurrentRequest().GetResponse().HasStreamedFragments())
+						connection.HandleProgressCallback();
+						if (connection.GetCurrentRequest().GetUseStreaming() && connection.GetCurrentRequest().GetResponse() != null && connection.GetCurrentRequest().GetResponse().HasStreamedFragments())
 						{
-							hPNEPPBEKGG.HandleCallback();
+							connection.HandleCallback();
 						}
-						if (((!hPNEPPBEKGG.GetCurrentRequest().GetUseStreaming() && hPNEPPBEKGG.GetCurrentRequest().GetUploadStream() == null) || hPNEPPBEKGG.GetCurrentRequest().GetEnableTimeoutForStreaming()) && DateTime.UtcNow - hPNEPPBEKGG.GetStartTime() > hPNEPPBEKGG.GetCurrentRequest().GetTimeout())
+						if (((!connection.GetCurrentRequest().GetUseStreaming() && connection.GetCurrentRequest().GetUploadStream() == null) || connection.GetCurrentRequest().GetEnableTimeoutForStreaming()) && DateTime.UtcNow - connection.GetStartTime() > connection.GetCurrentRequest().GetTimeout())
 						{
-							hPNEPPBEKGG.Abort(HTTPConnectionStates.TimedOut);
+							connection.Abort(HTTPConnectionStates.TimedOut);
 						}
 						break;
 					case HTTPConnectionStates.TimedOut:
-						if (DateTime.UtcNow - hPNEPPBEKGG.GetTimedOutStart() > TimeSpan.FromMilliseconds(500.0))
+						if (DateTime.UtcNow - connection.GetTimedOutStart() > TimeSpan.FromMilliseconds(500.0))
 						{
 							GetLogger().Information("HTTPManager", "Hard aborting connection becouse of a long waiting TimedOut state");
-							hPNEPPBEKGG.GetCurrentRequest().SetResponse(null);
-							hPNEPPBEKGG.GetCurrentRequest().set_State(HTTPRequestStates.TimedOut);
-							hPNEPPBEKGG.HandleCallback();
-							RecycleConnection(hPNEPPBEKGG);
+							connection.GetCurrentRequest().SetResponse(null);
+							connection.GetCurrentRequest().set_State(HTTPRequestStates.TimedOut);
+							connection.HandleCallback();
+							RecycleConnection(connection);
 						}
 						break;
 					case HTTPConnectionStates.Redirected:
-						SendRequest(hPNEPPBEKGG.GetCurrentRequest());
-						RecycleConnection(hPNEPPBEKGG);
+						SendRequest(connection.GetCurrentRequest());
+						RecycleConnection(connection);
 						break;
 					case HTTPConnectionStates.WaitForRecycle:
-						hPNEPPBEKGG.GetCurrentRequest().FinishStreaming();
-						hPNEPPBEKGG.HandleCallback();
-						RecycleConnection(hPNEPPBEKGG);
+						connection.GetCurrentRequest().FinishStreaming();
+						connection.HandleCallback();
+						RecycleConnection(connection);
 						break;
 					case HTTPConnectionStates.Upgraded:
-						hPNEPPBEKGG.HandleCallback();
+						connection.HandleCallback();
 						break;
 					case HTTPConnectionStates.WaitForProtocolShutdown:
 					{
-						IProtocol gFACLEJNACD = hPNEPPBEKGG.GetCurrentRequest().GetResponse() as IProtocol;
-						if (gFACLEJNACD != null)
+						IProtocol protocol = connection.GetCurrentRequest().GetResponse() as IProtocol;
+						if (protocol != null)
 						{
-							gFACLEJNACD.HandleEvents();
+							protocol.HandleEvents();
 						}
-						if (gFACLEJNACD == null || gFACLEJNACD.GetIsClosed())
+						if (protocol == null || protocol.GetIsClosed())
 						{
-							hPNEPPBEKGG.HandleCallback();
-							hPNEPPBEKGG.Dispose();
-							RecycleConnection(hPNEPPBEKGG);
+							connection.HandleCallback();
+							connection.Dispose();
+							RecycleConnection(connection);
 						}
 						break;
 					}
 					case HTTPConnectionStates.AbortRequested:
 					{
-						IProtocol gFACLEJNACD = hPNEPPBEKGG.GetCurrentRequest().GetResponse() as IProtocol;
-						if (gFACLEJNACD != null)
+						IProtocol protocol = connection.GetCurrentRequest().GetResponse() as IProtocol;
+						if (protocol != null)
 						{
-							gFACLEJNACD.HandleEvents();
-							if (gFACLEJNACD.GetIsClosed())
+							protocol.HandleEvents();
+							if (protocol.GetIsClosed())
 							{
-								hPNEPPBEKGG.HandleCallback();
-								hPNEPPBEKGG.Dispose();
-								RecycleConnection(hPNEPPBEKGG);
+								connection.HandleCallback();
+								connection.Dispose();
+								RecycleConnection(connection);
 							}
 						}
 						break;
 					}
 					case HTTPConnectionStates.Closed:
-						hPNEPPBEKGG.GetCurrentRequest().FinishStreaming();
-						hPNEPPBEKGG.HandleCallback();
-						RecycleConnection(hPNEPPBEKGG);
+						connection.GetCurrentRequest().FinishStreaming();
+						connection.HandleCallback();
+						RecycleConnection(connection);
 						break;
 					}
 				}
@@ -755,9 +755,9 @@ public static class HTTPManager
 			}
 			if (CanProcessFromQueue())
 			{
-				if (requestQueue.Find((HTTPRequest CGOIOKHEGOE) => CGOIOKHEGOE.GetPriority() != 0) != null)
+				if (requestQueue.Find((HTTPRequest request) => request.GetPriority() != 0) != null)
 				{
-					requestQueue.Sort((HTTPRequest OGGFKJBFCLP, HTTPRequest GEODKIAICBK) => OGGFKJBFCLP.GetPriority() - GEODKIAICBK.GetPriority());
+					requestQueue.Sort((HTTPRequest first, HTTPRequest second) => first.GetPriority() - second.GetPriority());
 				}
 				HTTPRequest[] array = requestQueue.ToArray();
 				requestQueue.Clear();

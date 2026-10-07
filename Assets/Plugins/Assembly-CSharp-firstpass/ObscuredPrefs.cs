@@ -170,438 +170,438 @@ public static class ObscuredPrefs
 	}
 
 	[Obsolete("This method is obsolete, use property CryptoKey instead")]
-	public static void SetNewCryptoKey(string CNOFJICCAHK)
+	public static void SetNewCryptoKey(string newCryptoKey)
 	{
-		SetCryptoKey(CNOFJICCAHK);
+		SetCryptoKey(newCryptoKey);
 	}
 
-	public static void SetInt(string KGBGENDIMBC, int value)
+	public static void SetInt(string key, int value)
 	{
-		PlayerPrefs.SetString(EncryptKey(KGBGENDIMBC), EncryptIntValue(KGBGENDIMBC, value));
+		PlayerPrefs.SetString(EncryptKey(key), EncryptIntValue(key, value));
 	}
 
-	public static int GetInt(string KGBGENDIMBC)
+	public static int GetInt(string key)
 	{
-		return GetInt(KGBGENDIMBC, 0);
+		return GetInt(key, 0);
 	}
 
-	public static int GetInt(string KGBGENDIMBC, int OBPKDHBJKJL)
+	public static int GetInt(string key, int defaultValue)
 	{
-		string text = EncryptKey(KGBGENDIMBC);
-		if (!PlayerPrefs.HasKey(text) && PlayerPrefs.HasKey(KGBGENDIMBC))
+		string text = EncryptKey(key);
+		if (!PlayerPrefs.HasKey(text) && PlayerPrefs.HasKey(key))
 		{
-			int num = PlayerPrefs.GetInt(KGBGENDIMBC, OBPKDHBJKJL);
+			int num = PlayerPrefs.GetInt(key, defaultValue);
 			if (!PreservePlayerPrefs)
 			{
-				SetInt(KGBGENDIMBC, num);
-				PlayerPrefs.DeleteKey(KGBGENDIMBC);
+				SetInt(key, num);
+				PlayerPrefs.DeleteKey(key);
 			}
 			return num;
 		}
-		string text2 = GetEncryptedPrefsString(KGBGENDIMBC, text);
-		return (!(text2 == "{not_found}")) ? DecryptIntValue(KGBGENDIMBC, text2, OBPKDHBJKJL) : OBPKDHBJKJL;
+		string text2 = GetEncryptedPrefsString(key, text);
+		return (!(text2 == "{not_found}")) ? DecryptIntValue(key, text2, defaultValue) : defaultValue;
 	}
 
-	public static string EncryptIntValue(string KGBGENDIMBC, int value)
+	public static string EncryptIntValue(string key, int value)
 	{
 		byte[] bytes = BitConverter.GetBytes(value);
-		return EncryptData(KGBGENDIMBC, bytes, DataType.Int);
+		return EncryptData(key, bytes, DataType.Int);
 	}
 
-	public static int DecryptIntValue(string KGBGENDIMBC, string JKPOIFLKGEN, int OBPKDHBJKJL)
+	public static int DecryptIntValue(string key, string encryptedValue, int defaultValue)
 	{
-		if (JKPOIFLKGEN.IndexOf(':') > -1)
+		if (encryptedValue.IndexOf(':') > -1)
 		{
-			string text = DeprecatedDecrypt(JKPOIFLKGEN);
+			string text = DeprecatedDecrypt(encryptedValue);
 			if (text == string.Empty)
 			{
-				return OBPKDHBJKJL;
+				return defaultValue;
 			}
 			int result;
 			int.TryParse(text, out result);
-			SetInt(KGBGENDIMBC, result);
+			SetInt(key, result);
 			return result;
 		}
-		byte[] array = DecryptData(KGBGENDIMBC, JKPOIFLKGEN);
+		byte[] array = DecryptData(key, encryptedValue);
 		if (array == null)
 		{
-			return OBPKDHBJKJL;
+			return defaultValue;
 		}
 		return BitConverter.ToInt32(array, 0);
 	}
 
-	public static void SetUInt(string KGBGENDIMBC, uint value)
+	public static void SetUInt(string key, uint value)
 	{
-		PlayerPrefs.SetString(EncryptKey(KGBGENDIMBC), EncryptUIntValue(KGBGENDIMBC, value));
+		PlayerPrefs.SetString(EncryptKey(key), EncryptUIntValue(key, value));
 	}
 
-	public static uint GetUInt(string KGBGENDIMBC)
+	public static uint GetUInt(string key)
 	{
-		return GetUInt(KGBGENDIMBC, 0u);
+		return GetUInt(key, 0u);
 	}
 
-	public static uint GetUInt(string KGBGENDIMBC, uint OBPKDHBJKJL)
+	public static uint GetUInt(string key, uint defaultValue)
 	{
-		string text = GetEncryptedPrefsString(KGBGENDIMBC, EncryptKey(KGBGENDIMBC));
-		return (!(text == "{not_found}")) ? DecryptUIntValue(KGBGENDIMBC, text, OBPKDHBJKJL) : OBPKDHBJKJL;
+		string text = GetEncryptedPrefsString(key, EncryptKey(key));
+		return (!(text == "{not_found}")) ? DecryptUIntValue(key, text, defaultValue) : defaultValue;
 	}
 
-	private static string EncryptUIntValue(string KGBGENDIMBC, uint value)
+	private static string EncryptUIntValue(string key, uint value)
 	{
 		byte[] bytes = BitConverter.GetBytes(value);
-		return EncryptData(KGBGENDIMBC, bytes, DataType.UInt);
+		return EncryptData(key, bytes, DataType.UInt);
 	}
 
-	private static uint DecryptUIntValue(string KGBGENDIMBC, string JKPOIFLKGEN, uint OBPKDHBJKJL)
+	private static uint DecryptUIntValue(string key, string encryptedValue, uint defaultValue)
 	{
-		if (JKPOIFLKGEN.IndexOf(':') > -1)
+		if (encryptedValue.IndexOf(':') > -1)
 		{
-			string text = DeprecatedDecrypt(JKPOIFLKGEN);
+			string text = DeprecatedDecrypt(encryptedValue);
 			if (text == string.Empty)
 			{
-				return OBPKDHBJKJL;
+				return defaultValue;
 			}
 			uint result;
 			uint.TryParse(text, out result);
-			SetUInt(KGBGENDIMBC, result);
+			SetUInt(key, result);
 			return result;
 		}
-		byte[] array = DecryptData(KGBGENDIMBC, JKPOIFLKGEN);
+		byte[] array = DecryptData(key, encryptedValue);
 		if (array == null)
 		{
-			return OBPKDHBJKJL;
+			return defaultValue;
 		}
 		return BitConverter.ToUInt32(array, 0);
 	}
 
-	public static void SetString(string KGBGENDIMBC, string value)
+	public static void SetString(string key, string value)
 	{
-		PlayerPrefs.SetString(EncryptKey(KGBGENDIMBC), EncryptStringValue(KGBGENDIMBC, value));
+		PlayerPrefs.SetString(EncryptKey(key), EncryptStringValue(key, value));
 	}
 
-	public static string GetString(string KGBGENDIMBC)
+	public static string GetString(string key)
 	{
-		return GetString(KGBGENDIMBC, string.Empty);
+		return GetString(key, string.Empty);
 	}
 
-	public static string GetString(string KGBGENDIMBC, string OBPKDHBJKJL)
+	public static string GetString(string key, string defaultValue)
 	{
-		string text = EncryptKey(KGBGENDIMBC);
-		if (!PlayerPrefs.HasKey(text) && PlayerPrefs.HasKey(KGBGENDIMBC))
+		string text = EncryptKey(key);
+		if (!PlayerPrefs.HasKey(text) && PlayerPrefs.HasKey(key))
 		{
-			string text2 = PlayerPrefs.GetString(KGBGENDIMBC, OBPKDHBJKJL);
+			string text2 = PlayerPrefs.GetString(key, defaultValue);
 			if (!PreservePlayerPrefs)
 			{
-				SetString(KGBGENDIMBC, text2);
-				PlayerPrefs.DeleteKey(KGBGENDIMBC);
+				SetString(key, text2);
+				PlayerPrefs.DeleteKey(key);
 			}
 			return text2;
 		}
-		string text3 = GetEncryptedPrefsString(KGBGENDIMBC, text);
-		return (!(text3 == "{not_found}")) ? DecryptStringValue(KGBGENDIMBC, text3, OBPKDHBJKJL) : OBPKDHBJKJL;
+		string text3 = GetEncryptedPrefsString(key, text);
+		return (!(text3 == "{not_found}")) ? DecryptStringValue(key, text3, defaultValue) : defaultValue;
 	}
 
-	public static string EncryptStringValue(string KGBGENDIMBC, string value)
+	public static string EncryptStringValue(string key, string value)
 	{
 		byte[] bytes = Encoding.UTF8.GetBytes(value);
-		return EncryptData(KGBGENDIMBC, bytes, DataType.String);
+		return EncryptData(key, bytes, DataType.String);
 	}
 
-	public static string DecryptStringValue(string KGBGENDIMBC, string JKPOIFLKGEN, string OBPKDHBJKJL)
+	public static string DecryptStringValue(string key, string encryptedValue, string defaultValue)
 	{
-		if (JKPOIFLKGEN.IndexOf(':') > -1)
+		if (encryptedValue.IndexOf(':') > -1)
 		{
-			string text = DeprecatedDecrypt(JKPOIFLKGEN);
+			string text = DeprecatedDecrypt(encryptedValue);
 			if (text == string.Empty)
 			{
-				return OBPKDHBJKJL;
+				return defaultValue;
 			}
-			SetString(KGBGENDIMBC, text);
+			SetString(key, text);
 			return text;
 		}
-		byte[] array = DecryptData(KGBGENDIMBC, JKPOIFLKGEN);
+		byte[] array = DecryptData(key, encryptedValue);
 		if (array == null)
 		{
-			return OBPKDHBJKJL;
+			return defaultValue;
 		}
 		return Encoding.UTF8.GetString(array, 0, array.Length);
 	}
 
-	public static void SetFloat(string KGBGENDIMBC, float value)
+	public static void SetFloat(string key, float value)
 	{
-		PlayerPrefs.SetString(EncryptKey(KGBGENDIMBC), EncryptFloatValue(KGBGENDIMBC, value));
+		PlayerPrefs.SetString(EncryptKey(key), EncryptFloatValue(key, value));
 	}
 
-	public static float GetFloat(string KGBGENDIMBC)
+	public static float GetFloat(string key)
 	{
-		return GetFloat(KGBGENDIMBC, 0f);
+		return GetFloat(key, 0f);
 	}
 
-	public static float GetFloat(string KGBGENDIMBC, float OBPKDHBJKJL)
+	public static float GetFloat(string key, float defaultValue)
 	{
-		string text = EncryptKey(KGBGENDIMBC);
-		if (!PlayerPrefs.HasKey(text) && PlayerPrefs.HasKey(KGBGENDIMBC))
+		string text = EncryptKey(key);
+		if (!PlayerPrefs.HasKey(text) && PlayerPrefs.HasKey(key))
 		{
-			float num = PlayerPrefs.GetFloat(KGBGENDIMBC, OBPKDHBJKJL);
+			float num = PlayerPrefs.GetFloat(key, defaultValue);
 			if (!PreservePlayerPrefs)
 			{
-				SetFloat(KGBGENDIMBC, num);
-				PlayerPrefs.DeleteKey(KGBGENDIMBC);
+				SetFloat(key, num);
+				PlayerPrefs.DeleteKey(key);
 			}
 			return num;
 		}
-		string text2 = GetEncryptedPrefsString(KGBGENDIMBC, text);
-		return (!(text2 == "{not_found}")) ? DecryptFloatValue(KGBGENDIMBC, text2, OBPKDHBJKJL) : OBPKDHBJKJL;
+		string text2 = GetEncryptedPrefsString(key, text);
+		return (!(text2 == "{not_found}")) ? DecryptFloatValue(key, text2, defaultValue) : defaultValue;
 	}
 
-	public static string EncryptFloatValue(string KGBGENDIMBC, float value)
+	public static string EncryptFloatValue(string key, float value)
 	{
 		byte[] bytes = BitConverter.GetBytes(value);
-		return EncryptData(KGBGENDIMBC, bytes, DataType.Float);
+		return EncryptData(key, bytes, DataType.Float);
 	}
 
-	public static float DecryptFloatValue(string KGBGENDIMBC, string JKPOIFLKGEN, float OBPKDHBJKJL)
+	public static float DecryptFloatValue(string key, string encryptedValue, float defaultValue)
 	{
-		if (JKPOIFLKGEN.IndexOf(':') > -1)
+		if (encryptedValue.IndexOf(':') > -1)
 		{
-			string text = DeprecatedDecrypt(JKPOIFLKGEN);
+			string text = DeprecatedDecrypt(encryptedValue);
 			if (text == string.Empty)
 			{
-				return OBPKDHBJKJL;
+				return defaultValue;
 			}
 			float result;
 			float.TryParse(text, out result);
-			SetFloat(KGBGENDIMBC, result);
+			SetFloat(key, result);
 			return result;
 		}
-		byte[] array = DecryptData(KGBGENDIMBC, JKPOIFLKGEN);
+		byte[] array = DecryptData(key, encryptedValue);
 		if (array == null)
 		{
-			return OBPKDHBJKJL;
+			return defaultValue;
 		}
 		return BitConverter.ToSingle(array, 0);
 	}
 
-	public static void SetDouble(string KGBGENDIMBC, double value)
+	public static void SetDouble(string key, double value)
 	{
-		PlayerPrefs.SetString(EncryptKey(KGBGENDIMBC), EncryptDoubleValue(KGBGENDIMBC, value));
+		PlayerPrefs.SetString(EncryptKey(key), EncryptDoubleValue(key, value));
 	}
 
-	public static double GetDouble(string KGBGENDIMBC)
+	public static double GetDouble(string key)
 	{
-		return GetDouble(KGBGENDIMBC, 0.0);
+		return GetDouble(key, 0.0);
 	}
 
-	public static double GetDouble(string KGBGENDIMBC, double OBPKDHBJKJL)
+	public static double GetDouble(string key, double defaultValue)
 	{
-		string text = GetEncryptedPrefsString(KGBGENDIMBC, EncryptKey(KGBGENDIMBC));
-		return (!(text == "{not_found}")) ? DecryptDoubleValue(KGBGENDIMBC, text, OBPKDHBJKJL) : OBPKDHBJKJL;
+		string text = GetEncryptedPrefsString(key, EncryptKey(key));
+		return (!(text == "{not_found}")) ? DecryptDoubleValue(key, text, defaultValue) : defaultValue;
 	}
 
-	private static string EncryptDoubleValue(string KGBGENDIMBC, double value)
+	private static string EncryptDoubleValue(string key, double value)
 	{
 		byte[] bytes = BitConverter.GetBytes(value);
-		return EncryptData(KGBGENDIMBC, bytes, DataType.Double);
+		return EncryptData(key, bytes, DataType.Double);
 	}
 
-	private static double DecryptDoubleValue(string KGBGENDIMBC, string JKPOIFLKGEN, double OBPKDHBJKJL)
+	private static double DecryptDoubleValue(string key, string encryptedValue, double defaultValue)
 	{
-		if (JKPOIFLKGEN.IndexOf(':') > -1)
+		if (encryptedValue.IndexOf(':') > -1)
 		{
-			string text = DeprecatedDecrypt(JKPOIFLKGEN);
+			string text = DeprecatedDecrypt(encryptedValue);
 			if (text == string.Empty)
 			{
-				return OBPKDHBJKJL;
+				return defaultValue;
 			}
 			double result;
 			double.TryParse(text, out result);
-			SetDouble(KGBGENDIMBC, result);
+			SetDouble(key, result);
 			return result;
 		}
-		byte[] array = DecryptData(KGBGENDIMBC, JKPOIFLKGEN);
+		byte[] array = DecryptData(key, encryptedValue);
 		if (array == null)
 		{
-			return OBPKDHBJKJL;
+			return defaultValue;
 		}
 		return BitConverter.ToDouble(array, 0);
 	}
 
-	public static void SetLong(string KGBGENDIMBC, long value)
+	public static void SetLong(string key, long value)
 	{
-		PlayerPrefs.SetString(EncryptKey(KGBGENDIMBC), EncryptLongValue(KGBGENDIMBC, value));
+		PlayerPrefs.SetString(EncryptKey(key), EncryptLongValue(key, value));
 	}
 
-	public static long GetLong(string KGBGENDIMBC)
+	public static long GetLong(string key)
 	{
-		return GetLong(KGBGENDIMBC, 0L);
+		return GetLong(key, 0L);
 	}
 
-	public static long GetLong(string KGBGENDIMBC, long OBPKDHBJKJL)
+	public static long GetLong(string key, long defaultValue)
 	{
-		string text = GetEncryptedPrefsString(KGBGENDIMBC, EncryptKey(KGBGENDIMBC));
-		return (!(text == "{not_found}")) ? DecryptLongValue(KGBGENDIMBC, text, OBPKDHBJKJL) : OBPKDHBJKJL;
+		string text = GetEncryptedPrefsString(key, EncryptKey(key));
+		return (!(text == "{not_found}")) ? DecryptLongValue(key, text, defaultValue) : defaultValue;
 	}
 
-	private static string EncryptLongValue(string KGBGENDIMBC, long value)
+	private static string EncryptLongValue(string key, long value)
 	{
 		byte[] bytes = BitConverter.GetBytes(value);
-		return EncryptData(KGBGENDIMBC, bytes, DataType.Long);
+		return EncryptData(key, bytes, DataType.Long);
 	}
 
-	private static long DecryptLongValue(string KGBGENDIMBC, string JKPOIFLKGEN, long OBPKDHBJKJL)
+	private static long DecryptLongValue(string key, string encryptedValue, long defaultValue)
 	{
-		if (JKPOIFLKGEN.IndexOf(':') > -1)
+		if (encryptedValue.IndexOf(':') > -1)
 		{
-			string text = DeprecatedDecrypt(JKPOIFLKGEN);
+			string text = DeprecatedDecrypt(encryptedValue);
 			if (text == string.Empty)
 			{
-				return OBPKDHBJKJL;
+				return defaultValue;
 			}
 			long result;
 			long.TryParse(text, out result);
-			SetLong(KGBGENDIMBC, result);
+			SetLong(key, result);
 			return result;
 		}
-		byte[] array = DecryptData(KGBGENDIMBC, JKPOIFLKGEN);
+		byte[] array = DecryptData(key, encryptedValue);
 		if (array == null)
 		{
-			return OBPKDHBJKJL;
+			return defaultValue;
 		}
 		return BitConverter.ToInt64(array, 0);
 	}
 
-	public static void SetBool(string KGBGENDIMBC, bool value)
+	public static void SetBool(string key, bool value)
 	{
-		PlayerPrefs.SetString(EncryptKey(KGBGENDIMBC), EncryptBoolValue(KGBGENDIMBC, value));
+		PlayerPrefs.SetString(EncryptKey(key), EncryptBoolValue(key, value));
 	}
 
-	public static bool GetBool(string KGBGENDIMBC)
+	public static bool GetBool(string key)
 	{
-		return GetBool(KGBGENDIMBC, false);
+		return GetBool(key, false);
 	}
 
-	public static bool GetBool(string KGBGENDIMBC, bool OBPKDHBJKJL)
+	public static bool GetBool(string key, bool defaultValue)
 	{
-		string text = GetEncryptedPrefsString(KGBGENDIMBC, EncryptKey(KGBGENDIMBC));
-		return (!(text == "{not_found}")) ? DecryptBoolValue(KGBGENDIMBC, text, OBPKDHBJKJL) : OBPKDHBJKJL;
+		string text = GetEncryptedPrefsString(key, EncryptKey(key));
+		return (!(text == "{not_found}")) ? DecryptBoolValue(key, text, defaultValue) : defaultValue;
 	}
 
-	private static string EncryptBoolValue(string KGBGENDIMBC, bool value)
+	private static string EncryptBoolValue(string key, bool value)
 	{
 		byte[] bytes = BitConverter.GetBytes(value);
-		return EncryptData(KGBGENDIMBC, bytes, DataType.Bool);
+		return EncryptData(key, bytes, DataType.Bool);
 	}
 
-	private static bool DecryptBoolValue(string KGBGENDIMBC, string JKPOIFLKGEN, bool OBPKDHBJKJL)
+	private static bool DecryptBoolValue(string key, string encryptedValue, bool defaultValue)
 	{
-		if (JKPOIFLKGEN.IndexOf(':') > -1)
+		if (encryptedValue.IndexOf(':') > -1)
 		{
-			string text = DeprecatedDecrypt(JKPOIFLKGEN);
+			string text = DeprecatedDecrypt(encryptedValue);
 			if (text == string.Empty)
 			{
-				return OBPKDHBJKJL;
+				return defaultValue;
 			}
 			int result;
 			int.TryParse(text, out result);
-			SetBool(KGBGENDIMBC, result == 1);
+			SetBool(key, result == 1);
 			return result == 1;
 		}
-		byte[] array = DecryptData(KGBGENDIMBC, JKPOIFLKGEN);
+		byte[] array = DecryptData(key, encryptedValue);
 		if (array == null)
 		{
-			return OBPKDHBJKJL;
+			return defaultValue;
 		}
 		return BitConverter.ToBoolean(array, 0);
 	}
 
-	public static void SetByteArray(string KGBGENDIMBC, byte[] value)
+	public static void SetByteArray(string key, byte[] value)
 	{
-		PlayerPrefs.SetString(EncryptKey(KGBGENDIMBC), EncryptByteArrayValue(KGBGENDIMBC, value));
+		PlayerPrefs.SetString(EncryptKey(key), EncryptByteArrayValue(key, value));
 	}
 
-	public static byte[] GetByteArray(string KGBGENDIMBC)
+	public static byte[] GetByteArray(string key)
 	{
-		return GetByteArray(KGBGENDIMBC, 0, 0);
+		return GetByteArray(key, 0, 0);
 	}
 
-	public static byte[] GetByteArray(string KGBGENDIMBC, byte OBPKDHBJKJL, int HLNIEGFECPK)
+	public static byte[] GetByteArray(string key, byte defaultValue, int defaultLength)
 	{
-		string text = GetEncryptedPrefsString(KGBGENDIMBC, EncryptKey(KGBGENDIMBC));
+		string text = GetEncryptedPrefsString(key, EncryptKey(key));
 		if (text == "{not_found}")
 		{
-			return ConstructByteArray(OBPKDHBJKJL, HLNIEGFECPK);
+			return ConstructByteArray(defaultValue, defaultLength);
 		}
-		return DecryptByteArrayValue(KGBGENDIMBC, text, OBPKDHBJKJL, HLNIEGFECPK);
+		return DecryptByteArrayValue(key, text, defaultValue, defaultLength);
 	}
 
-	private static string EncryptByteArrayValue(string KGBGENDIMBC, byte[] value)
+	private static string EncryptByteArrayValue(string key, byte[] value)
 	{
-		return EncryptData(KGBGENDIMBC, value, DataType.ByteArray);
+		return EncryptData(key, value, DataType.ByteArray);
 	}
 
-	private static byte[] DecryptByteArrayValue(string KGBGENDIMBC, string JKPOIFLKGEN, byte OBPKDHBJKJL, int HLNIEGFECPK)
+	private static byte[] DecryptByteArrayValue(string key, string encryptedValue, byte defaultValue, int defaultLength)
 	{
-		if (JKPOIFLKGEN.IndexOf(':') > -1)
+		if (encryptedValue.IndexOf(':') > -1)
 		{
-			string text = DeprecatedDecrypt(JKPOIFLKGEN);
+			string text = DeprecatedDecrypt(encryptedValue);
 			if (text == string.Empty)
 			{
-				return ConstructByteArray(OBPKDHBJKJL, HLNIEGFECPK);
+				return ConstructByteArray(defaultValue, defaultLength);
 			}
 			byte[] bytes = Encoding.UTF8.GetBytes(text);
-			SetByteArray(KGBGENDIMBC, bytes);
+			SetByteArray(key, bytes);
 			return bytes;
 		}
-		byte[] array = DecryptData(KGBGENDIMBC, JKPOIFLKGEN);
+		byte[] array = DecryptData(key, encryptedValue);
 		if (array == null)
 		{
-			return ConstructByteArray(OBPKDHBJKJL, HLNIEGFECPK);
+			return ConstructByteArray(defaultValue, defaultLength);
 		}
 		return array;
 	}
 
-	private static byte[] ConstructByteArray(byte value, int BDBOAEGELMC)
+	private static byte[] ConstructByteArray(byte value, int arrayLength)
 	{
-		byte[] array = new byte[BDBOAEGELMC];
-		for (int i = 0; i < BDBOAEGELMC; i++)
+		byte[] array = new byte[arrayLength];
+		for (int i = 0; i < arrayLength; i++)
 		{
 			array[i] = value;
 		}
 		return array;
 	}
 
-	public static void SetVector2(string KGBGENDIMBC, Vector2 value)
+	public static void SetVector2(string key, Vector2 value)
 	{
-		PlayerPrefs.SetString(EncryptKey(KGBGENDIMBC), EncryptVector2Value(KGBGENDIMBC, value));
+		PlayerPrefs.SetString(EncryptKey(key), EncryptVector2Value(key, value));
 	}
 
-	public static Vector2 GetVector2(string KGBGENDIMBC)
+	public static Vector2 GetVector2(string key)
 	{
-		return GetVector2(KGBGENDIMBC, Vector2.zero);
+		return GetVector2(key, Vector2.zero);
 	}
 
-	public static Vector2 GetVector2(string KGBGENDIMBC, Vector2 OBPKDHBJKJL)
+	public static Vector2 GetVector2(string key, Vector2 defaultValue)
 	{
-		string text = GetEncryptedPrefsString(KGBGENDIMBC, EncryptKey(KGBGENDIMBC));
-		return (!(text == "{not_found}")) ? DecryptVector2Value(KGBGENDIMBC, text, OBPKDHBJKJL) : OBPKDHBJKJL;
+		string text = GetEncryptedPrefsString(key, EncryptKey(key));
+		return (!(text == "{not_found}")) ? DecryptVector2Value(key, text, defaultValue) : defaultValue;
 	}
 
-	private static string EncryptVector2Value(string KGBGENDIMBC, Vector2 value)
+	private static string EncryptVector2Value(string key, Vector2 value)
 	{
 		byte[] array = new byte[8];
 		Buffer.BlockCopy(BitConverter.GetBytes(value.x), 0, array, 0, 4);
 		Buffer.BlockCopy(BitConverter.GetBytes(value.y), 0, array, 4, 4);
-		return EncryptData(KGBGENDIMBC, array, DataType.Vector2);
+		return EncryptData(key, array, DataType.Vector2);
 	}
 
-	private static Vector2 DecryptVector2Value(string KGBGENDIMBC, string JKPOIFLKGEN, Vector2 OBPKDHBJKJL)
+	private static Vector2 DecryptVector2Value(string key, string encryptedValue, Vector2 defaultValue)
 	{
-		if (JKPOIFLKGEN.IndexOf(':') > -1)
+		if (encryptedValue.IndexOf(':') > -1)
 		{
-			string text = DeprecatedDecrypt(JKPOIFLKGEN);
+			string text = DeprecatedDecrypt(encryptedValue);
 			if (text == string.Empty)
 			{
-				return OBPKDHBJKJL;
+				return defaultValue;
 			}
 			string[] array = text.Split("|"[0]);
 			float result;
@@ -609,13 +609,13 @@ public static class ObscuredPrefs
 			float result2;
 			float.TryParse(array[1], out result2);
 			Vector2 vector = new Vector2(result, result2);
-			SetVector2(KGBGENDIMBC, vector);
+			SetVector2(key, vector);
 			return vector;
 		}
-		byte[] array2 = DecryptData(KGBGENDIMBC, JKPOIFLKGEN);
+		byte[] array2 = DecryptData(key, encryptedValue);
 		if (array2 == null)
 		{
-			return OBPKDHBJKJL;
+			return defaultValue;
 		}
 		Vector2 result3 = default(Vector2);
 		result3.x = BitConverter.ToSingle(array2, 0);
@@ -623,39 +623,39 @@ public static class ObscuredPrefs
 		return result3;
 	}
 
-	public static void SetVector3(string KGBGENDIMBC, Vector3 value)
+	public static void SetVector3(string key, Vector3 value)
 	{
-		PlayerPrefs.SetString(EncryptKey(KGBGENDIMBC), EncryptVector3Value(KGBGENDIMBC, value));
+		PlayerPrefs.SetString(EncryptKey(key), EncryptVector3Value(key, value));
 	}
 
-	public static Vector3 GetVector3(string KGBGENDIMBC)
+	public static Vector3 GetVector3(string key)
 	{
-		return GetVector3(KGBGENDIMBC, Vector3.zero);
+		return GetVector3(key, Vector3.zero);
 	}
 
-	public static Vector3 GetVector3(string KGBGENDIMBC, Vector3 OBPKDHBJKJL)
+	public static Vector3 GetVector3(string key, Vector3 defaultValue)
 	{
-		string text = GetEncryptedPrefsString(KGBGENDIMBC, EncryptKey(KGBGENDIMBC));
-		return (!(text == "{not_found}")) ? DecryptVector3Value(KGBGENDIMBC, text, OBPKDHBJKJL) : OBPKDHBJKJL;
+		string text = GetEncryptedPrefsString(key, EncryptKey(key));
+		return (!(text == "{not_found}")) ? DecryptVector3Value(key, text, defaultValue) : defaultValue;
 	}
 
-	private static string EncryptVector3Value(string KGBGENDIMBC, Vector3 value)
+	private static string EncryptVector3Value(string key, Vector3 value)
 	{
 		byte[] array = new byte[12];
 		Buffer.BlockCopy(BitConverter.GetBytes(value.x), 0, array, 0, 4);
 		Buffer.BlockCopy(BitConverter.GetBytes(value.y), 0, array, 4, 4);
 		Buffer.BlockCopy(BitConverter.GetBytes(value.z), 0, array, 8, 4);
-		return EncryptData(KGBGENDIMBC, array, DataType.Vector3);
+		return EncryptData(key, array, DataType.Vector3);
 	}
 
-	private static Vector3 DecryptVector3Value(string KGBGENDIMBC, string JKPOIFLKGEN, Vector3 OBPKDHBJKJL)
+	private static Vector3 DecryptVector3Value(string key, string encryptedValue, Vector3 defaultValue)
 	{
-		if (JKPOIFLKGEN.IndexOf(':') > -1)
+		if (encryptedValue.IndexOf(':') > -1)
 		{
-			string text = DeprecatedDecrypt(JKPOIFLKGEN);
+			string text = DeprecatedDecrypt(encryptedValue);
 			if (text == string.Empty)
 			{
-				return OBPKDHBJKJL;
+				return defaultValue;
 			}
 			string[] array = text.Split("|"[0]);
 			float result;
@@ -665,13 +665,13 @@ public static class ObscuredPrefs
 			float result3;
 			float.TryParse(array[2], out result3);
 			Vector3 vector = new Vector3(result, result2, result3);
-			SetVector3(KGBGENDIMBC, vector);
+			SetVector3(key, vector);
 			return vector;
 		}
-		byte[] array2 = DecryptData(KGBGENDIMBC, JKPOIFLKGEN);
+		byte[] array2 = DecryptData(key, encryptedValue);
 		if (array2 == null)
 		{
-			return OBPKDHBJKJL;
+			return defaultValue;
 		}
 		Vector3 result4 = default(Vector3);
 		result4.x = BitConverter.ToSingle(array2, 0);
@@ -680,40 +680,40 @@ public static class ObscuredPrefs
 		return result4;
 	}
 
-	public static void SetQuaternion(string KGBGENDIMBC, Quaternion value)
+	public static void SetQuaternion(string key, Quaternion value)
 	{
-		PlayerPrefs.SetString(EncryptKey(KGBGENDIMBC), EncryptQuaternionValue(KGBGENDIMBC, value));
+		PlayerPrefs.SetString(EncryptKey(key), EncryptQuaternionValue(key, value));
 	}
 
-	public static Quaternion GetQuaternion(string KGBGENDIMBC)
+	public static Quaternion GetQuaternion(string key)
 	{
-		return GetQuaternion(KGBGENDIMBC, Quaternion.identity);
+		return GetQuaternion(key, Quaternion.identity);
 	}
 
-	public static Quaternion GetQuaternion(string KGBGENDIMBC, Quaternion OBPKDHBJKJL)
+	public static Quaternion GetQuaternion(string key, Quaternion defaultValue)
 	{
-		string text = GetEncryptedPrefsString(KGBGENDIMBC, EncryptKey(KGBGENDIMBC));
-		return (!(text == "{not_found}")) ? DecryptQuaternionValue(KGBGENDIMBC, text, OBPKDHBJKJL) : OBPKDHBJKJL;
+		string text = GetEncryptedPrefsString(key, EncryptKey(key));
+		return (!(text == "{not_found}")) ? DecryptQuaternionValue(key, text, defaultValue) : defaultValue;
 	}
 
-	private static string EncryptQuaternionValue(string KGBGENDIMBC, Quaternion value)
+	private static string EncryptQuaternionValue(string key, Quaternion value)
 	{
 		byte[] array = new byte[16];
 		Buffer.BlockCopy(BitConverter.GetBytes(value.x), 0, array, 0, 4);
 		Buffer.BlockCopy(BitConverter.GetBytes(value.y), 0, array, 4, 4);
 		Buffer.BlockCopy(BitConverter.GetBytes(value.z), 0, array, 8, 4);
 		Buffer.BlockCopy(BitConverter.GetBytes(value.w), 0, array, 12, 4);
-		return EncryptData(KGBGENDIMBC, array, DataType.Quaternion);
+		return EncryptData(key, array, DataType.Quaternion);
 	}
 
-	private static Quaternion DecryptQuaternionValue(string KGBGENDIMBC, string JKPOIFLKGEN, Quaternion OBPKDHBJKJL)
+	private static Quaternion DecryptQuaternionValue(string key, string encryptedValue, Quaternion defaultValue)
 	{
-		if (JKPOIFLKGEN.IndexOf(':') > -1)
+		if (encryptedValue.IndexOf(':') > -1)
 		{
-			string text = DeprecatedDecrypt(JKPOIFLKGEN);
+			string text = DeprecatedDecrypt(encryptedValue);
 			if (text == string.Empty)
 			{
-				return OBPKDHBJKJL;
+				return defaultValue;
 			}
 			string[] array = text.Split("|"[0]);
 			float result;
@@ -725,13 +725,13 @@ public static class ObscuredPrefs
 			float result4;
 			float.TryParse(array[3], out result4);
 			Quaternion quaternion = new Quaternion(result, result2, result3, result4);
-			SetQuaternion(KGBGENDIMBC, quaternion);
+			SetQuaternion(key, quaternion);
 			return quaternion;
 		}
-		byte[] array2 = DecryptData(KGBGENDIMBC, JKPOIFLKGEN);
+		byte[] array2 = DecryptData(key, encryptedValue);
 		if (array2 == null)
 		{
-			return OBPKDHBJKJL;
+			return defaultValue;
 		}
 		Quaternion result5 = default(Quaternion);
 		result5.x = BitConverter.ToSingle(array2, 0);
@@ -741,25 +741,25 @@ public static class ObscuredPrefs
 		return result5;
 	}
 
-	public static void SetColor(string KGBGENDIMBC, Color32 value)
+	public static void SetColor(string key, Color32 value)
 	{
-		uint bAINMLLIKOL = (uint)((value.a << 24) | (value.r << 16) | (value.g << 8) | value.b);
-		PlayerPrefs.SetString(EncryptKey(KGBGENDIMBC), EncryptColorValue(KGBGENDIMBC, bAINMLLIKOL));
+		uint encodedColor = (uint)((value.a << 24) | (value.r << 16) | (value.g << 8) | value.b);
+		PlayerPrefs.SetString(EncryptKey(key), EncryptColorValue(key, encodedColor));
 	}
 
-	public static Color32 GetColor(string KGBGENDIMBC)
+	public static Color32 GetColor(string key)
 	{
-		return GetColor(KGBGENDIMBC, new Color32(0, 0, 0, 1));
+		return GetColor(key, new Color32(0, 0, 0, 1));
 	}
 
-	public static Color32 GetColor(string KGBGENDIMBC, Color32 OBPKDHBJKJL)
+	public static Color32 GetColor(string key, Color32 defaultValue)
 	{
-		string text = GetEncryptedPrefsString(KGBGENDIMBC, EncryptKey(KGBGENDIMBC));
+		string text = GetEncryptedPrefsString(key, EncryptKey(key));
 		if (text == "{not_found}")
 		{
-			return OBPKDHBJKJL;
+			return defaultValue;
 		}
-		uint num = DecryptUIntValue(KGBGENDIMBC, text, 16777216u);
+		uint num = DecryptUIntValue(key, text, 16777216u);
 		byte a = (byte)(num >> 24);
 		byte r = (byte)(num >> 16);
 		byte g = (byte)(num >> 8);
@@ -767,46 +767,46 @@ public static class ObscuredPrefs
 		return new Color32(r, g, b, a);
 	}
 
-	private static string EncryptColorValue(string KGBGENDIMBC, uint value)
+	private static string EncryptColorValue(string key, uint value)
 	{
 		byte[] bytes = BitConverter.GetBytes(value);
-		return EncryptData(KGBGENDIMBC, bytes, DataType.Color);
+		return EncryptData(key, bytes, DataType.Color);
 	}
 
-	public static void SetRect(string KGBGENDIMBC, Rect value)
+	public static void SetRect(string key, Rect value)
 	{
-		PlayerPrefs.SetString(EncryptKey(KGBGENDIMBC), EncryptRectValue(KGBGENDIMBC, value));
+		PlayerPrefs.SetString(EncryptKey(key), EncryptRectValue(key, value));
 	}
 
-	public static Rect GetRect(string KGBGENDIMBC)
+	public static Rect GetRect(string key)
 	{
-		return GetRect(KGBGENDIMBC, new Rect(0f, 0f, 0f, 0f));
+		return GetRect(key, new Rect(0f, 0f, 0f, 0f));
 	}
 
-	public static Rect GetRect(string KGBGENDIMBC, Rect OBPKDHBJKJL)
+	public static Rect GetRect(string key, Rect defaultValue)
 	{
-		string text = GetEncryptedPrefsString(KGBGENDIMBC, EncryptKey(KGBGENDIMBC));
-		return (!(text == "{not_found}")) ? DecryptRectValue(KGBGENDIMBC, text, OBPKDHBJKJL) : OBPKDHBJKJL;
+		string text = GetEncryptedPrefsString(key, EncryptKey(key));
+		return (!(text == "{not_found}")) ? DecryptRectValue(key, text, defaultValue) : defaultValue;
 	}
 
-	private static string EncryptRectValue(string KGBGENDIMBC, Rect value)
+	private static string EncryptRectValue(string key, Rect value)
 	{
 		byte[] array = new byte[16];
 		Buffer.BlockCopy(BitConverter.GetBytes(value.x), 0, array, 0, 4);
 		Buffer.BlockCopy(BitConverter.GetBytes(value.y), 0, array, 4, 4);
 		Buffer.BlockCopy(BitConverter.GetBytes(value.width), 0, array, 8, 4);
 		Buffer.BlockCopy(BitConverter.GetBytes(value.height), 0, array, 12, 4);
-		return EncryptData(KGBGENDIMBC, array, DataType.Rect);
+		return EncryptData(key, array, DataType.Rect);
 	}
 
-	private static Rect DecryptRectValue(string KGBGENDIMBC, string JKPOIFLKGEN, Rect OBPKDHBJKJL)
+	private static Rect DecryptRectValue(string key, string encryptedValue, Rect defaultValue)
 	{
-		if (JKPOIFLKGEN.IndexOf(':') > -1)
+		if (encryptedValue.IndexOf(':') > -1)
 		{
-			string text = DeprecatedDecrypt(JKPOIFLKGEN);
+			string text = DeprecatedDecrypt(encryptedValue);
 			if (text == string.Empty)
 			{
-				return OBPKDHBJKJL;
+				return defaultValue;
 			}
 			string[] array = text.Split("|"[0]);
 			float result;
@@ -818,13 +818,13 @@ public static class ObscuredPrefs
 			float result4;
 			float.TryParse(array[3], out result4);
 			Rect rect = new Rect(result, result2, result3, result4);
-			SetRect(KGBGENDIMBC, rect);
+			SetRect(key, rect);
 			return rect;
 		}
-		byte[] array2 = DecryptData(KGBGENDIMBC, JKPOIFLKGEN);
+		byte[] array2 = DecryptData(key, encryptedValue);
 		if (array2 == null)
 		{
-			return OBPKDHBJKJL;
+			return defaultValue;
 		}
 		return new Rect
 		{
@@ -835,14 +835,14 @@ public static class ObscuredPrefs
 		};
 	}
 
-	public static void SetRawValue(string KGBGENDIMBC, string LJACLKKLMPA)
+	public static void SetRawValue(string key, string rawValue)
 	{
-		PlayerPrefs.SetString(EncryptKey(KGBGENDIMBC), LJACLKKLMPA);
+		PlayerPrefs.SetString(EncryptKey(key), rawValue);
 	}
 
-	public static string GetRawValue(string KGBGENDIMBC)
+	public static string GetRawValue(string prefKey)
 	{
-		string key = EncryptKey(KGBGENDIMBC);
+		string key = EncryptKey(prefKey);
 		return PlayerPrefs.GetString(key);
 	}
 
@@ -866,24 +866,24 @@ public static class ObscuredPrefs
 		return (DataType)array[num - 7];
 	}
 
-	public static string EncryptKey(string KGBGENDIMBC)
+	public static string EncryptKey(string key)
 	{
-		KGBGENDIMBC = ObscuredString.EncryptDecrypt(KGBGENDIMBC, cryptoKey);
-		KGBGENDIMBC = Convert.ToBase64String(Encoding.UTF8.GetBytes(KGBGENDIMBC));
-		return KGBGENDIMBC;
+		key = ObscuredString.EncryptDecrypt(key, cryptoKey);
+		key = Convert.ToBase64String(Encoding.UTF8.GetBytes(key));
+		return key;
 	}
 
-	public static bool HasKey(string KGBGENDIMBC)
+	public static bool HasKey(string key)
 	{
-		return PlayerPrefs.HasKey(KGBGENDIMBC) || PlayerPrefs.HasKey(EncryptKey(KGBGENDIMBC));
+		return PlayerPrefs.HasKey(key) || PlayerPrefs.HasKey(EncryptKey(key));
 	}
 
-	public static void DeleteKey(string KGBGENDIMBC)
+	public static void DeleteKey(string key)
 	{
-		PlayerPrefs.DeleteKey(EncryptKey(KGBGENDIMBC));
+		PlayerPrefs.DeleteKey(EncryptKey(key));
 		if (!PreservePlayerPrefs)
 		{
-			PlayerPrefs.DeleteKey(KGBGENDIMBC);
+			PlayerPrefs.DeleteKey(key);
 		}
 	}
 
@@ -897,21 +897,21 @@ public static class ObscuredPrefs
 		PlayerPrefs.Save();
 	}
 
-	private static string GetEncryptedPrefsString(string KGBGENDIMBC, string ILBAAOLECKP)
+	private static string GetEncryptedPrefsString(string key, string encryptedKey)
 	{
-		string text = PlayerPrefs.GetString(ILBAAOLECKP, "{not_found}");
-		if (text == "{not_found}" && PlayerPrefs.HasKey(KGBGENDIMBC))
+		string text = PlayerPrefs.GetString(encryptedKey, "{not_found}");
+		if (text == "{not_found}" && PlayerPrefs.HasKey(key))
 		{
-			Debug.LogWarning("[ACTk] Are you trying to read regular PlayerPrefs data using ObscuredPrefs (key = " + KGBGENDIMBC + ")?");
+			Debug.LogWarning("[ACTk] Are you trying to read regular PlayerPrefs data using ObscuredPrefs (key = " + key + ")?");
 		}
 		return text;
 	}
 
-	private static string EncryptData(string KGBGENDIMBC, byte[] LLIKENLOBPI, DataType LFLGCDNKNJI)
+	private static string EncryptData(string key, byte[] data, DataType dataType)
 	{
-		int num = LLIKENLOBPI.Length;
-		byte[] src = EncryptDecryptBytes(LLIKENLOBPI, num, KGBGENDIMBC + cryptoKey);
-		uint num2 = xxHash.CalculateHash(LLIKENLOBPI, num, 0u);
+		int num = data.Length;
+		byte[] src = EncryptDecryptBytes(data, num, key + cryptoKey);
+		uint num2 = xxHash.CalculateHash(data, num, 0u);
 		byte[] src2 = new byte[4]
 		{
 			(byte)(num2 & 0xFF),
@@ -943,19 +943,19 @@ public static class ObscuredPrefs
 		{
 			Buffer.BlockCopy(array, 0, array2, num, 4);
 		}
-		array2[num3 - 7] = (byte)LFLGCDNKNJI;
+		array2[num3 - 7] = (byte)dataType;
 		array2[num3 - 6] = 2;
 		array2[num3 - 5] = (byte)LockToDevice;
 		Buffer.BlockCopy(src2, 0, array2, num3 - 4, 4);
 		return Convert.ToBase64String(array2);
 	}
 
-	public static byte[] DecryptData(string KGBGENDIMBC, string JKPOIFLKGEN)
+	public static byte[] DecryptData(string key, string encryptedValue)
 	{
 		byte[] array;
 		try
 		{
-			array = Convert.FromBase64String(JKPOIFLKGEN);
+			array = Convert.FromBase64String(encryptedValue);
 		}
 		catch (Exception)
 		{
@@ -974,13 +974,13 @@ public static class ObscuredPrefs
 			SavesTampered();
 			return null;
 		}
-		DeviceLockLevel eAONKJOAGJI = (DeviceLockLevel)array[num - 5];
+		DeviceLockLevel lockLevel = (DeviceLockLevel)array[num - 5];
 		byte[] array2 = new byte[4];
 		Buffer.BlockCopy(array, num - 4, array2, 0, 4);
 		uint num2 = (uint)(array2[0] | (array2[1] << 8) | (array2[2] << 16) | (array2[3] << 24));
 		uint num3 = 0u;
 		int num4;
-		if (eAONKJOAGJI != DeviceLockLevel.None)
+		if (lockLevel != DeviceLockLevel.None)
 		{
 			num4 = num - 11;
 			if (LockToDevice != DeviceLockLevel.None)
@@ -996,7 +996,7 @@ public static class ObscuredPrefs
 		}
 		byte[] array4 = new byte[num4];
 		Buffer.BlockCopy(array, 0, array4, 0, num4);
-		byte[] array5 = EncryptDecryptBytes(array4, num4, KGBGENDIMBC + cryptoKey);
+		byte[] array5 = EncryptDecryptBytes(array4, num4, key + cryptoKey);
 		uint num5 = xxHash.CalculateHash(array5, num4, 0u);
 		if (num5 != num2)
 		{
@@ -1022,9 +1022,9 @@ public static class ObscuredPrefs
 		return array5;
 	}
 
-	private static uint CalculateChecksum(string NILNDHEKNLJ)
+	private static uint CalculateChecksum(string input)
 	{
-		byte[] bytes = Encoding.UTF8.GetBytes(NILNDHEKNLJ + cryptoKey);
+		byte[] bytes = Encoding.UTF8.GetBytes(input + cryptoKey);
 		return xxHash.CalculateHash(bytes, bytes.Length, 0u);
 	}
 
@@ -1056,13 +1056,13 @@ public static class ObscuredPrefs
 		return text;
 	}
 
-	private static byte[] EncryptDecryptBytes(byte[] KPAMPCLHCEN, int HIGBAHGOFIJ, string KGBGENDIMBC)
+	private static byte[] EncryptDecryptBytes(byte[] data, int dataLength, string key)
 	{
-		int length = KGBGENDIMBC.Length;
-		byte[] array = new byte[HIGBAHGOFIJ];
-		for (int i = 0; i < HIGBAHGOFIJ; i++)
+		int length = key.Length;
+		byte[] array = new byte[dataLength];
+		for (int i = 0; i < dataLength; i++)
 		{
-			array[i] = (byte)(KPAMPCLHCEN[i] ^ KGBGENDIMBC[i % length]);
+			array[i] = (byte)(data[i] ^ key[i % length]);
 		}
 		return array;
 	}
@@ -1087,8 +1087,8 @@ public static class ObscuredPrefs
 			SavesTampered();
 			return string.Empty;
 		}
-		string bAINMLLIKOL = Encoding.UTF8.GetString(array2, 0, array2.Length);
-		string result = ObscuredString.EncryptDecrypt(bAINMLLIKOL, cryptoKey);
+		string decodedValue = Encoding.UTF8.GetString(array2, 0, array2.Length);
+		string result = ObscuredString.EncryptDecrypt(decodedValue, cryptoKey);
 		if (array.Length == 3)
 		{
 			if (text2 != DeprecatedCalculateChecksum(text + GetDeprecatedDeviceId()))
@@ -1141,10 +1141,10 @@ public static class ObscuredPrefs
 		return result;
 	}
 
-	private static string DeprecatedCalculateChecksum(string NILNDHEKNLJ)
+	private static string DeprecatedCalculateChecksum(string input)
 	{
 		int num = 0;
-		byte[] bytes = Encoding.UTF8.GetBytes(NILNDHEKNLJ + cryptoKey);
+		byte[] bytes = Encoding.UTF8.GetBytes(input + cryptoKey);
 		int num2 = bytes.Length;
 		int num3 = cryptoKey.Length ^ 0x40;
 		for (int i = 0; i < num2; i++)

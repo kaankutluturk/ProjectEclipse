@@ -56,10 +56,10 @@ namespace Nekki.SF2.Core.Tutorials
 			}
 		}
 
-		private void AddAction(TutorialAction IBODMPMJELJ)
+		private void AddAction(TutorialAction action)
 		{
-			IBODMPMJELJ.AddEventListener(0, OnActionComplete);
-			actions.Add(IBODMPMJELJ);
+			action.AddEventListener(0, OnActionComplete);
+			actions.Add(action);
 		}
 
 		private void OnActionComplete(object data)

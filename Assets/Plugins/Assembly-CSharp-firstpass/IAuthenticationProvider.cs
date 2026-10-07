@@ -18,5 +18,5 @@ public interface IAuthenticationProvider
 
 	void StartAuthentication();
 
-	void PrepareRequest(HTTPRequest ONOCIELLAPL, SignalRRequestType LFLGCDNKNJI);
+	void PrepareRequest(HTTPRequest request, SignalRRequestType requestType);
 }

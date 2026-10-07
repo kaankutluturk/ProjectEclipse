@@ -6,61 +6,61 @@ using System.Text;
 
 public static class Extensions
 {
-	public static string AsciiToString(this byte[] KPAMPCLHCEN)
+	public static string AsciiToString(this byte[] bytes)
 	{
-		StringBuilder stringBuilder = new StringBuilder(KPAMPCLHCEN.Length);
-		foreach (byte b in KPAMPCLHCEN)
+		StringBuilder stringBuilder = new StringBuilder(bytes.Length);
+		foreach (byte b in bytes)
 		{
 			stringBuilder.Append((char)((b > 127) ? 63 : b));
 		}
 		return stringBuilder.ToString();
 	}
 
-	public static byte[] GetASCIIBytes(this string IGGFGLLIGCG)
+	public static byte[] GetASCIIBytes(this string text)
 	{
-		byte[] array = new byte[IGGFGLLIGCG.Length];
-		for (int i = 0; i < IGGFGLLIGCG.Length; i++)
+		byte[] array = new byte[text.Length];
+		for (int i = 0; i < text.Length; i++)
 		{
-			char c = IGGFGLLIGCG[i];
+			char c = text[i];
 			array[i] = (byte)((c >= '\u0080') ? '?' : c);
 		}
 		return array;
 	}
 
-	public static void SendAsASCII(this BinaryWriter ABJIEFMMIEK, string IGGFGLLIGCG)
+	public static void SendAsASCII(this BinaryWriter writer, string text)
 	{
-		foreach (char c in IGGFGLLIGCG)
+		foreach (char c in text)
 		{
-			ABJIEFMMIEK.Write((byte)((c >= '\u0080') ? '?' : c));
+			writer.Write((byte)((c >= '\u0080') ? '?' : c));
 		}
 	}
 
-	public static void WriteLine(this FileStream MEHMICNAPMK)
+	public static void WriteLine(this FileStream stream)
 	{
-		MEHMICNAPMK.Write(HTTPRequest.EOL, 0, 2);
+		stream.Write(HTTPRequest.EOL, 0, 2);
 	}
 
-	public static void WriteLine(this FileStream MEHMICNAPMK, string MGPBPJOHMLH)
+	public static void WriteLine(this FileStream stream, string text)
 	{
-		byte[] array = MGPBPJOHMLH.GetASCIIBytes();
-		MEHMICNAPMK.Write(array, 0, array.Length);
-		MEHMICNAPMK.WriteLine();
+		byte[] array = text.GetASCIIBytes();
+		stream.Write(array, 0, array.Length);
+		stream.WriteLine();
 	}
 
-	public static void WriteLine(this FileStream MEHMICNAPMK, string LBOHOKIBHOH, params object[] AMMFNLMJJFM)
+	public static void WriteLine(this FileStream stream, string format, params object[] args)
 	{
-		byte[] array = string.Format(LBOHOKIBHOH, AMMFNLMJJFM).GetASCIIBytes();
-		MEHMICNAPMK.Write(array, 0, array.Length);
-		MEHMICNAPMK.WriteLine();
+		byte[] array = string.Format(format, args).GetASCIIBytes();
+		stream.Write(array, 0, array.Length);
+		stream.WriteLine();
 	}
 
-	public static string[] FindOption(this string IGGFGLLIGCG, string LFJBBPIDBCL)
+	public static string[] FindOption(this string text, string option)
 	{
-		string[] array = IGGFGLLIGCG.ToLower().Split(new char[1] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-		LFJBBPIDBCL = LFJBBPIDBCL.ToLower();
+		string[] array = text.ToLower().Split(new char[1] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+		option = option.ToLower();
 		for (int i = 0; i < array.Length; i++)
 		{
-			if (array[i].Contains(LFJBBPIDBCL))
+			if (array[i].Contains(option))
 			{
 				return array[i].Split(new char[1] { '=' }, StringSplitOptions.RemoveEmptyEntries);
 			}
@@ -68,72 +68,72 @@ public static class Extensions
 		return null;
 	}
 
-	public static int ToInt32(this string IGGFGLLIGCG, int OBPKDHBJKJL = 0)
+	public static int ToInt32(this string text, int defaultValue = 0)
 	{
-		if (IGGFGLLIGCG == null)
+		if (text == null)
 		{
-			return OBPKDHBJKJL;
+			return defaultValue;
 		}
 		try
 		{
-			return int.Parse(IGGFGLLIGCG);
+			return int.Parse(text);
 		}
 		catch
 		{
-			return OBPKDHBJKJL;
+			return defaultValue;
 		}
 	}
 
-	public static long ToInt64(this string IGGFGLLIGCG, long OBPKDHBJKJL = 0L)
+	public static long ToInt64(this string text, long defaultValue = 0L)
 	{
-		if (IGGFGLLIGCG == null)
+		if (text == null)
 		{
-			return OBPKDHBJKJL;
+			return defaultValue;
 		}
 		try
 		{
-			return long.Parse(IGGFGLLIGCG);
+			return long.Parse(text);
 		}
 		catch
 		{
-			return OBPKDHBJKJL;
+			return defaultValue;
 		}
 	}
 
-	public static DateTime ToDateTime(this string IGGFGLLIGCG, DateTime OBPKDHBJKJL = default(DateTime))
+	public static DateTime ToDateTime(this string text, DateTime defaultValue = default(DateTime))
 	{
-		if (IGGFGLLIGCG == null)
+		if (text == null)
 		{
-			return OBPKDHBJKJL;
+			return defaultValue;
 		}
 		try
 		{
-			DateTime.TryParse(IGGFGLLIGCG, out OBPKDHBJKJL);
-			return OBPKDHBJKJL.ToUniversalTime();
+			DateTime.TryParse(text, out defaultValue);
+			return defaultValue.ToUniversalTime();
 		}
 		catch
 		{
-			return OBPKDHBJKJL;
+			return defaultValue;
 		}
 	}
 
-	public static string ToStrOrEmpty(this string IGGFGLLIGCG)
+	public static string ToStrOrEmpty(this string text)
 	{
-		if (IGGFGLLIGCG == null)
+		if (text == null)
 		{
 			return string.Empty;
 		}
-		return IGGFGLLIGCG;
+		return text;
 	}
 
-	public static string CalculateMD5Hash(this string NILNDHEKNLJ)
+	public static string CalculateMD5Hash(this string text)
 	{
-		return NILNDHEKNLJ.GetASCIIBytes().CalculateMD5Hash();
+		return text.GetASCIIBytes().CalculateMD5Hash();
 	}
 
-	public static string CalculateMD5Hash(this byte[] NILNDHEKNLJ)
+	public static string CalculateMD5Hash(this byte[] data)
 	{
-		byte[] array = MD5.Create().ComputeHash(NILNDHEKNLJ);
+		byte[] array = MD5.Create().ComputeHash(data);
 		StringBuilder stringBuilder = new StringBuilder();
 		byte[] array2 = array;
 		foreach (byte b in array2)
@@ -143,68 +143,68 @@ public static class Extensions
 		return stringBuilder.ToString();
 	}
 
-	internal static string Read(this string IGGFGLLIGCG, ref int LCCLEFMKLPB, char JILGHDDEMPE, bool EEIONCIPIIE = true)
+	internal static string Read(this string text, ref int LCCLEFMKLPB, char delimiter, bool returnText = true)
 	{
-		return IGGFGLLIGCG.Read(ref LCCLEFMKLPB, (char KDFCGMMKAME) => KDFCGMMKAME != JILGHDDEMPE, EEIONCIPIIE);
+		return text.Read(ref LCCLEFMKLPB, (char KDFCGMMKAME) => KDFCGMMKAME != delimiter, returnText);
 	}
 
-	internal static string Read(this string IGGFGLLIGCG, ref int LCCLEFMKLPB, Func<char, bool> JILGHDDEMPE, bool EEIONCIPIIE = true)
+	internal static string Read(this string text, ref int LCCLEFMKLPB, Func<char, bool> predicate, bool returnText = true)
 	{
-		if (LCCLEFMKLPB >= IGGFGLLIGCG.Length)
+		if (LCCLEFMKLPB >= text.Length)
 		{
 			return string.Empty;
 		}
-		IGGFGLLIGCG.SkipWhiteSpace(ref LCCLEFMKLPB);
+		text.SkipWhiteSpace(ref LCCLEFMKLPB);
 		int num = LCCLEFMKLPB;
-		while (LCCLEFMKLPB < IGGFGLLIGCG.Length && JILGHDDEMPE(IGGFGLLIGCG[LCCLEFMKLPB]))
+		while (LCCLEFMKLPB < text.Length && predicate(text[LCCLEFMKLPB]))
 		{
 			LCCLEFMKLPB++;
 		}
-		string result = ((!EEIONCIPIIE) ? null : IGGFGLLIGCG.Substring(num, LCCLEFMKLPB - num));
+		string result = ((!returnText) ? null : text.Substring(num, LCCLEFMKLPB - num));
 		LCCLEFMKLPB++;
 		return result;
 	}
 
-	internal static string ReadQuotedText(this string IGGFGLLIGCG, ref int LCCLEFMKLPB)
+	internal static string ReadQuotedText(this string text, ref int LCCLEFMKLPB)
 	{
 		string empty = string.Empty;
-		if (IGGFGLLIGCG == null)
+		if (text == null)
 		{
 			return empty;
 		}
-		if (IGGFGLLIGCG[LCCLEFMKLPB] == '"')
+		if (text[LCCLEFMKLPB] == '"')
 		{
-			IGGFGLLIGCG.Read(ref LCCLEFMKLPB, '"', false);
-			empty = IGGFGLLIGCG.Read(ref LCCLEFMKLPB, '"');
-			IGGFGLLIGCG.Read(ref LCCLEFMKLPB, ',', false);
+			text.Read(ref LCCLEFMKLPB, '"', false);
+			empty = text.Read(ref LCCLEFMKLPB, '"');
+			text.Read(ref LCCLEFMKLPB, ',', false);
 		}
 		else
 		{
-			empty = IGGFGLLIGCG.Read(ref LCCLEFMKLPB, ',');
+			empty = text.Read(ref LCCLEFMKLPB, ',');
 		}
 		return empty;
 	}
 
-	internal static void SkipWhiteSpace(this string IGGFGLLIGCG, ref int LCCLEFMKLPB)
+	internal static void SkipWhiteSpace(this string text, ref int LCCLEFMKLPB)
 	{
-		if (LCCLEFMKLPB < IGGFGLLIGCG.Length)
+		if (LCCLEFMKLPB < text.Length)
 		{
-			while (LCCLEFMKLPB < IGGFGLLIGCG.Length && char.IsWhiteSpace(IGGFGLLIGCG[LCCLEFMKLPB]))
+			while (LCCLEFMKLPB < text.Length && char.IsWhiteSpace(text[LCCLEFMKLPB]))
 			{
 				LCCLEFMKLPB++;
 			}
 		}
 	}
 
-	internal static string TrimAndLower(this string IGGFGLLIGCG)
+	internal static string TrimAndLower(this string text)
 	{
-		if (IGGFGLLIGCG == null)
+		if (text == null)
 		{
 			return null;
 		}
-		char[] array = new char[IGGFGLLIGCG.Length];
+		char[] array = new char[text.Length];
 		int length = 0;
-		foreach (char c in IGGFGLLIGCG)
+		foreach (char c in text)
 		{
 			if (!char.IsWhiteSpace(c) && !char.IsControl(c))
 			{
@@ -214,78 +214,78 @@ public static class Extensions
 		return new string(array, 0, length);
 	}
 
-	internal static List<KeyValuePair> ParseOptionalHeader(this string IGGFGLLIGCG)
+	internal static List<KeyValuePair> ParseOptionalHeader(this string text)
 	{
 		List<KeyValuePair> list = new List<KeyValuePair>();
-		if (IGGFGLLIGCG == null)
+		if (text == null)
 		{
 			return list;
 		}
 		int LCCLEFMKLPB = 0;
-		while (LCCLEFMKLPB < IGGFGLLIGCG.Length)
+		while (LCCLEFMKLPB < text.Length)
 		{
-			string kGBGENDIMBC = IGGFGLLIGCG.Read(ref LCCLEFMKLPB, (char KDFCGMMKAME) => KDFCGMMKAME != '=' && KDFCGMMKAME != ',').TrimAndLower();
-			KeyValuePair gGCJLGPPHKP = new KeyValuePair(kGBGENDIMBC);
-			if (IGGFGLLIGCG[LCCLEFMKLPB - 1] == '=')
+			string key = text.Read(ref LCCLEFMKLPB, (char KDFCGMMKAME) => KDFCGMMKAME != '=' && KDFCGMMKAME != ',').TrimAndLower();
+			KeyValuePair pair = new KeyValuePair(key);
+			if (text[LCCLEFMKLPB - 1] == '=')
 			{
-				gGCJLGPPHKP.set_Value(IGGFGLLIGCG.ReadQuotedText(ref LCCLEFMKLPB));
+				pair.set_Value(text.ReadQuotedText(ref LCCLEFMKLPB));
 			}
-			list.Add(gGCJLGPPHKP);
+			list.Add(pair);
 		}
 		return list;
 	}
 
-	internal static List<KeyValuePair> ParseQualityParams(this string IGGFGLLIGCG)
+	internal static List<KeyValuePair> ParseQualityParams(this string text)
 	{
 		List<KeyValuePair> list = new List<KeyValuePair>();
-		if (IGGFGLLIGCG == null)
+		if (text == null)
 		{
 			return list;
 		}
 		int LCCLEFMKLPB = 0;
-		while (LCCLEFMKLPB < IGGFGLLIGCG.Length)
+		while (LCCLEFMKLPB < text.Length)
 		{
-			string kGBGENDIMBC = IGGFGLLIGCG.Read(ref LCCLEFMKLPB, (char KDFCGMMKAME) => KDFCGMMKAME != ',' && KDFCGMMKAME != ';').TrimAndLower();
-			KeyValuePair gGCJLGPPHKP = new KeyValuePair(kGBGENDIMBC);
-			if (IGGFGLLIGCG[LCCLEFMKLPB - 1] == ';')
+			string key = text.Read(ref LCCLEFMKLPB, (char KDFCGMMKAME) => KDFCGMMKAME != ',' && KDFCGMMKAME != ';').TrimAndLower();
+			KeyValuePair pair = new KeyValuePair(key);
+			if (text[LCCLEFMKLPB - 1] == ';')
 			{
-				IGGFGLLIGCG.Read(ref LCCLEFMKLPB, '=', false);
-				gGCJLGPPHKP.set_Value(IGGFGLLIGCG.Read(ref LCCLEFMKLPB, ','));
+				text.Read(ref LCCLEFMKLPB, '=', false);
+				pair.set_Value(text.Read(ref LCCLEFMKLPB, ','));
 			}
-			list.Add(gGCJLGPPHKP);
+			list.Add(pair);
 		}
 		return list;
 	}
 
-	public static void ReadBuffer(this Stream ABJIEFMMIEK, byte[] buffer)
+	public static void ReadBuffer(this Stream stream, byte[] buffer)
 	{
 		int num = 0;
 		do
 		{
-			num += ABJIEFMMIEK.Read(buffer, num, buffer.Length - num);
+			num += stream.Read(buffer, num, buffer.Length - num);
 		}
 		while (num < buffer.Length);
 	}
 
-	public static void WriteAll(this MemoryStream PKGAJCFLOLA, byte[] buffer)
+	public static void WriteAll(this MemoryStream stream, byte[] buffer)
 	{
-		PKGAJCFLOLA.Write(buffer, 0, buffer.Length);
+		stream.Write(buffer, 0, buffer.Length);
 	}
 
-	public static void WriteString(this MemoryStream PKGAJCFLOLA, string IGGFGLLIGCG)
+	public static void WriteString(this MemoryStream stream, string text)
 	{
-		byte[] bytes = Encoding.UTF8.GetBytes(IGGFGLLIGCG);
-		PKGAJCFLOLA.WriteAll(bytes);
+		byte[] bytes = Encoding.UTF8.GetBytes(text);
+		stream.WriteAll(bytes);
 	}
 
-	public static void WriteLine(this MemoryStream PKGAJCFLOLA)
+	public static void WriteLine(this MemoryStream stream)
 	{
-		PKGAJCFLOLA.WriteAll(HTTPRequest.EOL);
+		stream.WriteAll(HTTPRequest.EOL);
 	}
 
-	public static void WriteLine(this MemoryStream PKGAJCFLOLA, string IGGFGLLIGCG)
+	public static void WriteLine(this MemoryStream stream, string text)
 	{
-		PKGAJCFLOLA.WriteString(IGGFGLLIGCG);
-		PKGAJCFLOLA.WriteLine();
+		stream.WriteString(text);
+		stream.WriteLine();
 	}
 }

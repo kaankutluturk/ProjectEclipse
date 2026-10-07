@@ -24,16 +24,16 @@ public class UIPoligon : UIFigure
 		return _Points;
 	}
 
-	protected override void OnPopulateMesh(VertexHelper DHJBOKKAOJK)
+	protected override void OnPopulateMesh(VertexHelper vertexHelper)
 	{
-		base.OnPopulateMesh(DHJBOKKAOJK);
+		base.OnPopulateMesh(vertexHelper);
 		List<UIVertex> list = new List<UIVertex>(_Points.Count);
 		for (int i = 0; i < _Points.Count; i++)
 		{
 			list.Add(AddVertex(_Points[i]));
 		}
-		DHJBOKKAOJK.Clear();
-		DHJBOKKAOJK.AddUIVertexStream(list, (!_UseTriangleFan) ? FigureTopology.CreateStripIndices(list.Count - 2) : FigureTopology.CreateFanIndices(list.Count - 2));
+		vertexHelper.Clear();
+		vertexHelper.AddUIVertexStream(list, (!_UseTriangleFan) ? FigureTopology.CreateStripIndices(list.Count - 2) : FigureTopology.CreateFanIndices(list.Count - 2));
 	}
 
 	private UIVertex AddVertex(Vector3 GIAEPIIIMDH)

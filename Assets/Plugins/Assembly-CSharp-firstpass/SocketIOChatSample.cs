@@ -33,18 +33,18 @@ public sealed class SocketIOChatSample : MonoBehaviour
 	private void Start()
 	{
 		state = ChatState.Login;
-		SocketOptions pGHMKLAAHKP = new SocketOptions();
-		pGHMKLAAHKP.SetAutoConnect(false);
-		manager = new SocketManager(new Uri("http://chat.socket.io/socket.io/"), pGHMKLAAHKP);
+		SocketOptions options = new SocketOptions();
+		options.SetAutoConnect(false);
+		manager = new SocketManager(new Uri("http://chat.socket.io/socket.io/"), options);
 		manager.GetRootSocket().On("login", OnLogin);
 		manager.GetRootSocket().On("new message", OnNewMessage);
 		manager.GetRootSocket().On("user joined", OnUserJoined);
 		manager.GetRootSocket().On("user left", OnUserLeft);
 		manager.GetRootSocket().On("typing", OnTyping);
 		manager.GetRootSocket().On("stop typing", OnStopTyping);
-		manager.GetRootSocket().On(SocketIOEventType.Error, (Socket JLEACANCMJF, Packet NPKADBPBKIG, object[] LKIOKGCNKHE) =>
+		manager.GetRootSocket().On(SocketIOEventType.Error, (Socket socket, Packet packet, object[] args) =>
 		{
-			AdvLog.LogError(string.Format("Error: {0}", LKIOKGCNKHE[0].ToString()));
+			AdvLog.LogError(string.Format("Error: {0}", args[0].ToString()));
 		});
 		manager.Open();
 	}
@@ -174,8 +174,8 @@ public sealed class SocketIOChatSample : MonoBehaviour
 			chatLog += "there's 1 participant\n";
 			return;
 		}
-		string hJIGDBEJLGJ = chatLog;
-		chatLog = hJIGDBEJLGJ + "there are " + num + " participants\n";
+		string previousChatLog = chatLog;
+		chatLog = previousChatLog + "there are " + num + " participants\n";
 	}
 
 	private void AddChatMessage(Dictionary<string, object> data)
@@ -193,48 +193,48 @@ public sealed class SocketIOChatSample : MonoBehaviour
 
 	private void RemoveChatTyping(Dictionary<string, object> data)
 	{
-		string HPCGFILEHPH = data["username"] as string;
-		int num = typingUsers.FindIndex((string name) => name.Equals(HPCGFILEHPH));
+		string username = data["username"] as string;
+		int num = typingUsers.FindIndex((string name) => name.Equals(username));
 		if (num != -1)
 		{
 			typingUsers.RemoveAt(num);
 		}
 	}
 
-	private void OnLogin(Socket JLEACANCMJF, Packet NPKADBPBKIG, params object[] LKIOKGCNKHE)
+	private void OnLogin(Socket socket, Packet packet, params object[] args)
 	{
 		chatLog = "Welcome to Socket.IO Chat — \n";
-		AddParticipantsMessage(LKIOKGCNKHE[0] as Dictionary<string, object>);
+		AddParticipantsMessage(args[0] as Dictionary<string, object>);
 	}
 
-	private void OnNewMessage(Socket JLEACANCMJF, Packet NPKADBPBKIG, params object[] LKIOKGCNKHE)
+	private void OnNewMessage(Socket socket, Packet packet, params object[] args)
 	{
-		AddChatMessage(LKIOKGCNKHE[0] as Dictionary<string, object>);
+		AddChatMessage(args[0] as Dictionary<string, object>);
 	}
 
-	private void OnUserJoined(Socket JLEACANCMJF, Packet NPKADBPBKIG, params object[] LKIOKGCNKHE)
+	private void OnUserJoined(Socket socket, Packet packet, params object[] args)
 	{
-		Dictionary<string, object> dictionary = LKIOKGCNKHE[0] as Dictionary<string, object>;
+		Dictionary<string, object> dictionary = args[0] as Dictionary<string, object>;
 		string arg = dictionary["username"] as string;
 		chatLog += string.Format("{0} joined\n", arg);
 		AddParticipantsMessage(dictionary);
 	}
 
-	private void OnUserLeft(Socket JLEACANCMJF, Packet NPKADBPBKIG, params object[] LKIOKGCNKHE)
+	private void OnUserLeft(Socket socket, Packet packet, params object[] args)
 	{
-		Dictionary<string, object> dictionary = LKIOKGCNKHE[0] as Dictionary<string, object>;
+		Dictionary<string, object> dictionary = args[0] as Dictionary<string, object>;
 		string arg = dictionary["username"] as string;
 		chatLog += string.Format("{0} left\n", arg);
 		AddParticipantsMessage(dictionary);
 	}
 
-	private void OnTyping(Socket JLEACANCMJF, Packet NPKADBPBKIG, params object[] LKIOKGCNKHE)
+	private void OnTyping(Socket socket, Packet packet, params object[] args)
 	{
-		AddChatTyping(LKIOKGCNKHE[0] as Dictionary<string, object>);
+		AddChatTyping(args[0] as Dictionary<string, object>);
 	}
 
-	private void OnStopTyping(Socket JLEACANCMJF, Packet NPKADBPBKIG, params object[] LKIOKGCNKHE)
+	private void OnStopTyping(Socket socket, Packet packet, params object[] args)
 	{
-		RemoveChatTyping(LKIOKGCNKHE[0] as Dictionary<string, object>);
+		RemoveChatTyping(args[0] as Dictionary<string, object>);
 	}
 }

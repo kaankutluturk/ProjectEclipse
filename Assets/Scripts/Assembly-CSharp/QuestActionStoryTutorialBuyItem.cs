@@ -6,17 +6,17 @@ using UnityEngine.UI;
 
 public class QuestActionStoryTutorialBuyItem : QuestAction
 {
-	public override void Execute(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters parameters)
 	{
-		string cDNCPBKAHKJ = GameUtils.TutorialSettings.TutorialWeapon;
-		UserItem dKCHDHMLKHN = ListSF.GetRoster().GetInventory().FindItem(cDNCPBKAHKJ);
-		if (dKCHDHMLKHN != null)
+		string itemName = GameUtils.TutorialSettings.TutorialWeapon;
+		UserItem userItem = ListSF.GetRoster().GetInventory().FindItem(itemName);
+		if (userItem != null)
 		{
 			FinishAction();
 		}
 		TutorialCanvas.get_Instance().set_BlockOn(true);
 		ShopScene current = Scene<ShopScene>.get_Current();
-		current.ScrollToItemByName(ShopSection.Weapon, cDNCPBKAHKJ);
+		current.ScrollToItemByName(ShopSection.Weapon, itemName);
 		IconLabelButton goldButton = current.GetInfoPanel().GetGoldButton();
 		goldButton.set_IsFlashing(true);
 		goldButton.RemoveAllEventListener();
@@ -49,13 +49,13 @@ public class QuestActionStoryTutorialBuyItem : QuestAction
 		goldButton.onClick.RemoveListener(OnButtonClick);
 		TutorialComponent component = goldButton.gameObject.GetComponent<TutorialComponent>();
 		component.IsActive = false;
-		string cDNCPBKAHKJ = GameUtils.TutorialSettings.TutorialWeapon;
-		ItemInfo dJKEECEOCJB = ListSF.GetItems().GetItemByName(cDNCPBKAHKJ);
-		if (dJKEECEOCJB != null)
+		string itemName = GameUtils.TutorialSettings.TutorialWeapon;
+		ItemInfo itemInfo = ListSF.GetItems().GetItemByName(itemName);
+		if (itemInfo != null)
 		{
-			if (ItemBuyHelper.BuyItemWithCoins(dJKEECEOCJB))
+			if (ItemBuyHelper.BuyItemWithCoins(itemInfo))
 			{
-				ListSF.GetRoster().GetInventory().EquipItem(dJKEECEOCJB, true);
+				ListSF.GetRoster().GetInventory().EquipItem(itemInfo, true);
 			}
 			instance.GetInfoPanel().UpdateContent();
 		}

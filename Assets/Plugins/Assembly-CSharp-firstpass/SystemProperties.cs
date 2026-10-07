@@ -340,13 +340,13 @@ public class SystemProperties
 		return "-UP";
 	}
 
-	public static string MakeIdentifier(string OONGHHGHHFG)
+	public static string MakeIdentifier(string name)
 	{
-		if (!string.IsNullOrEmpty(OONGHHGHHFG))
+		if (!string.IsNullOrEmpty(name))
 		{
-			return OONGHHGHHFG + GetIdentifierSuffix();
+			return name + GetIdentifierSuffix();
 		}
-		return OONGHHGHHFG;
+		return name;
 	}
 
 	public static bool IsDebug()
@@ -374,10 +374,10 @@ public class SystemProperties
 		return _numOfDisplayModes;
 	}
 
-	public static void ApplyResolution(int NMMPBADCFHK)
+	public static void ApplyResolution(int resolution)
 	{
-		Vector2 eMGIKFNGDMA = smallResolution;
-		ScaleX = (float)deviceInfo.DisplayWidth / eMGIKFNGDMA.x;
+		Vector2 baseResolution = smallResolution;
+		ScaleX = (float)deviceInfo.DisplayWidth / baseResolution.x;
 		ScaleY = (float)deviceInfo.DisplayHeight / wideResolution.y;
 		VirtualWidth = (float)deviceInfo.DisplayWidth / ScaleY;
 		VirtualHeight = (float)deviceInfo.DisplayHeight / ScaleY;
@@ -429,23 +429,23 @@ public class SystemProperties
 		return SystemInfo.operatingSystem;
 	}
 
-	public static void LoadDevicesConfig(XmlDocument JFJPKEONJIJ)
+	public static void LoadDevicesConfig(XmlDocument document)
 	{
-		ParseDevicesXml(JFJPKEONJIJ);
-		PathType lOHALAKNGFB = GetResolutionPathType();
-		if (lOHALAKNGFB == PathType.PATH_DEFAULT)
+		ParseDevicesXml(document);
+		PathType guiPathType = GetResolutionPathType();
+		if (guiPathType == PathType.PATH_DEFAULT)
 		{
-			lOHALAKNGFB = (IsHighResolution() ? PathType.PATH_BIG : PathType.PATH_SMALL);
+			guiPathType = (IsHighResolution() ? PathType.PATH_BIG : PathType.PATH_SMALL);
 		}
-		SetPicturePaths(lOHALAKNGFB);
+		SetPicturePaths(guiPathType);
 		PathType lOHALAKNGFB2 = GetLocationPathType();
 		if (lOHALAKNGFB2 == PathType.PATH_DEFAULT)
 		{
 			lOHALAKNGFB2 = (IsHighResolution() ? PathType.PATH_BIG : PathType.PATH_SMALL);
 		}
 		SetInverseLocationScale((lOHALAKNGFB2 != PathType.PATH_SMALL) ? 1 : 2);
-		Vector2 eMGIKFNGDMA = smallResolution;
-		ScaleX = (float)GetScreenWidth() / eMGIKFNGDMA.x;
+		Vector2 baseResolution = smallResolution;
+		ScaleX = (float)GetScreenWidth() / baseResolution.x;
 		ScaleY = (float)GetScreenHeight() / wideResolution.y;
 		VirtualWidth = (float)GetScreenWidth() / ScaleY;
 		VirtualHeight = (float)GetScreenHeight() / ScaleY;
@@ -599,9 +599,9 @@ public class SystemProperties
 		return deviceInfo;
 	}
 
-	public static string PathTypeToString(PathType EBIGIKHLFNL)
+	public static string PathTypeToString(PathType pathType)
 	{
-		switch (EBIGIKHLFNL)
+		switch (pathType)
 		{
 		case PathType.PATH_DEFAULT:
 			return (!IsHighResolution()) ? "LOW" : "HIGH";
@@ -645,10 +645,10 @@ public class SystemProperties
 		deviceInfo.CustomUniqueId = value;
 	}
 
-	public static void SetVersions(VersionContainer version, VersionContainer JJCDPPFGPDO)
+	public static void SetVersions(VersionContainer version, VersionContainer dataVersion)
 	{
 		deviceInfo.Version = version;
-		deviceInfo.DataVersion = JJCDPPFGPDO;
+		deviceInfo.DataVersion = dataVersion;
 	}
 
 	public static string RefreshSocialUserId()
@@ -702,14 +702,14 @@ public class SystemProperties
 		deviceInfo.InverseLocationScale = value;
 	}
 
-	private static void ParseDevicesXml(XmlDocument EELFNMOHGJL)
+	private static void ParseDevicesXml(XmlDocument document)
 	{
 		Clear();
 		DetectScreenResolution();
 		deviceInfo.IsTablet = IsHighResolution();
 		deviceInfo.GuiResolution = ParsePathType("DEFAULT");
 		deviceInfo.LocationResolution = ParsePathType("DEFAULT");
-		XmlElement xmlElement = EELFNMOHGJL["Root"];
+		XmlElement xmlElement = document["Root"];
 		if (xmlElement == null)
 		{
 			return;
@@ -726,7 +726,7 @@ public class SystemProperties
 		XmlElement xmlElement2 = xmlElement["Devices"];
 		if (xmlElement2 != null)
 		{
-			DeviceInfoForcibly kGDCPJPEKKE = new DeviceInfoForcibly();
+			DeviceInfoForcibly forcedDevice = new DeviceInfoForcibly();
 			for (int i = 0; i < xmlElement2.ChildNodes.Count; i++)
 			{
 				if (xmlElement2.ChildNodes[i].Attributes == null)
@@ -737,57 +737,57 @@ public class SystemProperties
 				{
 					if (xmlElement2.ChildNodes[i].Attributes["Tablet"] != null)
 					{
-						kGDCPJPEKKE.Tablet = xmlElement2.ChildNodes[i].Attributes["Tablet"].Value;
+						forcedDevice.Tablet = xmlElement2.ChildNodes[i].Attributes["Tablet"].Value;
 					}
 					if (xmlElement2.ChildNodes[i].Attributes["Resolution"] != null)
 					{
-						kGDCPJPEKKE.Resolution = xmlElement2.ChildNodes[i].Attributes["Resolution"].Value;
+						forcedDevice.Resolution = xmlElement2.ChildNodes[i].Attributes["Resolution"].Value;
 					}
 					if (xmlElement2.ChildNodes[i].Attributes["LocationResolution"] != null)
 					{
-						kGDCPJPEKKE.LocationResolution = xmlElement2.ChildNodes[i].Attributes["LocationResolution"].Value;
+						forcedDevice.LocationResolution = xmlElement2.ChildNodes[i].Attributes["LocationResolution"].Value;
 					}
 					if (xmlElement2.ChildNodes[i].Attributes["QualityCondition"] != null)
 					{
-						kGDCPJPEKKE.QualityCondition = xmlElement2.ChildNodes[i].Attributes["QualityCondition"].Value;
+						forcedDevice.QualityCondition = xmlElement2.ChildNodes[i].Attributes["QualityCondition"].Value;
 					}
 				}
 				if (deviceInfo.Id == xmlElement2.ChildNodes[i].Attributes["Name"].Value)
 				{
 					deviceInfo.IsTablet = xmlElement2.ChildNodes[i].Attributes["Tablet"] != null && int.Parse(xmlElement2.ChildNodes[i].Attributes["Tablet"].Value) > 0;
-					string gOHIIMFFFJI = ((xmlElement2.Attributes["Resolution"] == null) ? "DEFAULT" : xmlNode.Attributes["Resolution"].Value);
-					deviceInfo.GuiResolution = ParsePathType(gOHIIMFFFJI);
+					string guiResolutionName = ((xmlElement2.Attributes["Resolution"] == null) ? "DEFAULT" : xmlNode.Attributes["Resolution"].Value);
+					deviceInfo.GuiResolution = ParsePathType(guiResolutionName);
 					string gOHIIMFFFJI2 = ((xmlElement2.Attributes["LocationResolution"] == null) ? "DEFAULT" : xmlNode.Attributes["LocationResolution"].Value);
 					deviceInfo.LocationResolution = ParsePathType(gOHIIMFFFJI2);
 					deviceInfo.QualityCondition = ((xmlElement2.Attributes["QualityCondition"] == null) ? string.Empty : xmlNode.Attributes["QualityCondition"].Value);
 				}
 			}
-			if (!kGDCPJPEKKE.IsEmpty())
+			if (!forcedDevice.IsEmpty())
 			{
-				if (!string.IsNullOrEmpty(kGDCPJPEKKE.Tablet))
+				if (!string.IsNullOrEmpty(forcedDevice.Tablet))
 				{
-					deviceInfo.IsTablet = int.Parse(kGDCPJPEKKE.Tablet) > 0;
+					deviceInfo.IsTablet = int.Parse(forcedDevice.Tablet) > 0;
 				}
-				if (kGDCPJPEKKE.Resolution != string.Empty)
+				if (forcedDevice.Resolution != string.Empty)
 				{
-					deviceInfo.GuiResolution = ParsePathType(kGDCPJPEKKE.Resolution);
+					deviceInfo.GuiResolution = ParsePathType(forcedDevice.Resolution);
 				}
-				if (kGDCPJPEKKE.LocationResolution != string.Empty)
+				if (forcedDevice.LocationResolution != string.Empty)
 				{
-					deviceInfo.LocationResolution = ParsePathType(kGDCPJPEKKE.LocationResolution);
+					deviceInfo.LocationResolution = ParsePathType(forcedDevice.LocationResolution);
 				}
-				if (kGDCPJPEKKE.QualityCondition != string.Empty)
+				if (forcedDevice.QualityCondition != string.Empty)
 				{
-					deviceInfo.QualityCondition = kGDCPJPEKKE.QualityCondition;
+					deviceInfo.QualityCondition = forcedDevice.QualityCondition;
 				}
 			}
 		}
 		ParseQualityConditions(xmlElement["QualityConditions"]);
 	}
 
-	private static void SetPicturePaths(PathType LFLGCDNKNJI)
+	private static void SetPicturePaths(PathType pathType)
 	{
-		switch (LFLGCDNKNJI)
+		switch (pathType)
 		{
 		case PathType.PATH_SMALL:
 			PictureResolution = smallResolution;
@@ -796,7 +796,7 @@ public class SystemProperties
 			PictureResolution = bigResolution;
 			return;
 		}
-		GameLog.Error("ERROR: SystemProperties::setPicturePaths - %i", LFLGCDNKNJI);
+		GameLog.Error("ERROR: SystemProperties::setPicturePaths - %i", pathType);
 		PictureResolution = smallResolution;
 	}
 
@@ -880,7 +880,7 @@ public class SystemProperties
 
 	public static void set_UnconfirmedLedgerIDs(int[] value)
 	{
-		PlayerPrefs.SetString("UnconfirmedLedgerIDs", string.Join(",", value.Select((int OKNNNLIPODI) => OKNNNLIPODI.ToString()).ToArray()));
+		PlayerPrefs.SetString("UnconfirmedLedgerIDs", string.Join(",", value.Select((int ledgerId) => ledgerId.ToString()).ToArray()));
 	}
 
 	public static string GetDeviceModel()

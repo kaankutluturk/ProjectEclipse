@@ -4,7 +4,7 @@ using Nekki.SF2.GUI.Map;
 
 public class QuestActionStoryTutorialClickFight : QuestAction
 {
-	public override void Execute(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters parameters)
 	{
 		TutorialCanvas.get_Instance().set_BlockOn(true);
 		MapScene current = Scene<MapScene>.get_Current();

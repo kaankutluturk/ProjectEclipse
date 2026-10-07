@@ -20,15 +20,15 @@ namespace YamlDotNet.Core.Tokens
 		{
 		}
 
-		public VersionDirective(Version version, Mark ILENLCMAMBH, Mark PCLFFOBJJFO)
-			: base(ILENLCMAMBH, PCLFFOBJJFO)
+		public VersionDirective(Version version, Mark startMark, Mark endMark)
+			: base(startMark, endMark)
 		{
 			version = version;
 		}
 
-		public override bool Equals(object AOMLCBHAJJH)
+		public override bool Equals(object obj)
 		{
-			VersionDirective versionDirective = AOMLCBHAJJH as VersionDirective;
+			VersionDirective versionDirective = obj as VersionDirective;
 			return versionDirective != null && version.Equals(versionDirective.version);
 		}
 

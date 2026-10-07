@@ -74,15 +74,15 @@ public class InternalSettings
 		return null;
 	}
 
-	private void ResolveExternalPaths(string OGGDCFJAIMH)
+	private void ResolveExternalPaths(string path)
 	{
 		Dictionary<string, string> dictionary = new Dictionary<string, string>();
 		foreach (KeyValuePair<string, string> externalPath in ExternalPaths)
 		{
-			dictionary.Add(externalPath.Key, externalPath.Value.Replace("EXTERNAL_PATH", OGGDCFJAIMH));
+			dictionary.Add(externalPath.Key, externalPath.Value.Replace("EXTERNAL_PATH", path));
 		}
 		ExternalPaths = dictionary;
-		string noImageTexture = LocalSettings.NoImageTexture.Replace("EXTERNAL_PATH", OGGDCFJAIMH);
+		string noImageTexture = LocalSettings.NoImageTexture.Replace("EXTERNAL_PATH", path);
 		LocalSettings.NoImageTexture = noImageTexture;
 	}
 

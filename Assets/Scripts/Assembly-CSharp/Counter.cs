@@ -118,9 +118,9 @@ public class Counter
 		return Conditions.IsEqual(conditions);
 	}
 
-	public bool IsFightComplete(FightIDS DIAIIPCBMFL)
+	public bool IsFightComplete(FightIDS fightId)
 	{
-		return CompletionInspector.AreAllComplete(DIAIIPCBMFL);
+		return CompletionInspector.AreAllComplete(fightId);
 	}
 
 	public void Initialize()

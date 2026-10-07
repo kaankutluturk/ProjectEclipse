@@ -22,10 +22,10 @@ public partial class ModelMacroNode : ModelNode
 		SetType(NodeType.MacroNode);
 	}
 
-	public ModelMacroNode(ModelMacroNode AHJOLBKABMC)
-		: base(AHJOLBKABMC)
+	public ModelMacroNode(ModelMacroNode source)
+		: base(source)
 	{
-		_nodeWeights = new List<global::Pair<ModelNode, float>>(AHJOLBKABMC._nodeWeights);
+		_nodeWeights = new List<global::Pair<ModelNode, float>>(source._nodeWeights);
 		SetType(NodeType.MacroNode);
 	}
 
@@ -34,9 +34,9 @@ public partial class ModelMacroNode : ModelNode
 		return _nodeWeights;
 	}
 
-	public void AddNodeWeight(ModelNode BFEBLBKODLK, float EBIFKGEMHLK)
+	public void AddNodeWeight(ModelNode node, float weight)
 	{
-		_nodeWeights.Add(new global::Pair<ModelNode, float>(BFEBLBKODLK, EBIFKGEMHLK));
+		_nodeWeights.Add(new global::Pair<ModelNode, float>(node, weight));
 	}
 
 	public void UpdateFromWeights()
@@ -49,12 +49,12 @@ public partial class ModelMacroNode : ModelNode
 		_End.Set(_Start);
 		_Start.Reset();
 		if (UpdateSkinBindings()) return;
-		global::Pair<ModelNode, float> cCKLNOPEKHO = null;
+		global::Pair<ModelNode, float> nodeWeight = null;
 		int count = _nodeWeights.Count;
 		for (int i = 0; i < count; i++)
 		{
-			cCKLNOPEKHO = _nodeWeights[i];
-			_Start.AddScaledXY(cCKLNOPEKHO.First.GetStart(), cCKLNOPEKHO.Second);
+			nodeWeight = _nodeWeights[i];
+			_Start.AddScaledXY(nodeWeight.First.GetStart(), nodeWeight.Second);
 		}
 	}
 }

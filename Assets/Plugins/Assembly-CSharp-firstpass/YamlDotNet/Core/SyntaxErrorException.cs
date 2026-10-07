@@ -10,23 +10,23 @@ namespace YamlDotNet.Core
 		{
 		}
 
-		public SyntaxErrorException(string LIOGIBJBHAH)
-			: base(LIOGIBJBHAH)
+		public SyntaxErrorException(string message)
+			: base(message)
 		{
 		}
 
-		public SyntaxErrorException(Mark ILENLCMAMBH, Mark PCLFFOBJJFO, string LIOGIBJBHAH)
-			: base(ILENLCMAMBH, PCLFFOBJJFO, LIOGIBJBHAH)
+		public SyntaxErrorException(Mark startMark, Mark endMark, string message)
+			: base(startMark, endMark, message)
 		{
 		}
 
-		public SyntaxErrorException(string LIOGIBJBHAH, Exception LEPEAKBGHLB)
-			: base(LIOGIBJBHAH, LEPEAKBGHLB)
+		public SyntaxErrorException(string message, Exception innerException)
+			: base(message, innerException)
 		{
 		}
 
-		protected SyntaxErrorException(SerializationInfo EMBBNNBFODN, StreamingContext PDCAHMPCPOC)
-			: base(EMBBNNBFODN, PDCAHMPCPOC)
+		protected SyntaxErrorException(SerializationInfo info, StreamingContext context)
+			: base(info, context)
 		{
 		}
 	}

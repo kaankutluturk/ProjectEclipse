@@ -16,11 +16,11 @@ namespace YamlDotNet.Core
 			Line = 1;
 		}
 
-		public Cursor(Cursor LIMLDKKPJIA)
+		public Cursor(Cursor cursor)
 		{
-			Index = LIMLDKKPJIA.Index;
-			Line = LIMLDKKPJIA.Line;
-			LineOffset = LIMLDKKPJIA.LineOffset;
+			Index = cursor.Index;
+			Line = cursor.Line;
+			LineOffset = cursor.LineOffset;
 		}
 
 		public Mark Mark()
@@ -34,9 +34,9 @@ namespace YamlDotNet.Core
 			LineOffset++;
 		}
 
-		public void SkipLineByOffset(int IPCOBJBKNAO)
+		public void SkipLineByOffset(int offset)
 		{
-			Index += IPCOBJBKNAO;
+			Index += offset;
 			Line++;
 			LineOffset = 0;
 		}

@@ -4,14 +4,14 @@ public class PerkEventAreaEnter : PerkEvent
 	{
 	}
 
-	public PerkEventAreaEnter(PerkEventAreaEnter NOLFMPDGCOC)
-		: base(NOLFMPDGCOC)
+	public PerkEventAreaEnter(PerkEventAreaEnter source)
+		: base(source)
 	{
 	}
 
-	public override bool IsEqual(EventStruct EJMEALJNNIL)
+	public override bool IsEqual(EventStruct eventData)
 	{
-		if (!base.IsEqual(EJMEALJNNIL) || EJMEALJNNIL == null)
+		if (!base.IsEqual(eventData) || eventData == null)
 		{
 			return false;
 		}

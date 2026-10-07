@@ -22,8 +22,8 @@ public class StyleLevels
 
 	public float GetStyleMultiplier(int index)
 	{
-		Style mHOJFHKHIIL = GetStyle(index);
-		return (mHOJFHKHIIL == null) ? 0f : mHOJFHKHIIL.StyleMultiplier;
+		Style style = GetStyle(index);
+		return (style == null) ? 0f : style.StyleMultiplier;
 	}
 
 	public void Parse(XmlNode node)
@@ -58,12 +58,12 @@ public class StyleLevels
 		}
 		foreach (XmlNode childNode in node.ChildNodes)
 		{
-			Style mHOJFHKHIIL = new Style();
-			mHOJFHKHIIL.Name = childNode.Attributes["Name"].GetStringOrDefault(string.Empty);
-			mHOJFHKHIIL.StyleMultiplier = childNode.Attributes["StyleMultiplier"].ParseFloat();
-			mHOJFHKHIIL.TextImage = childNode.Attributes["TextImage"].GetStringOrDefault(string.Empty);
-			mHOJFHKHIIL.BarImage = childNode.Attributes["BarImage"].GetStringOrDefault(string.Empty);
-			Styles.Add(mHOJFHKHIIL);
+			Style style = new Style();
+			style.Name = childNode.Attributes["Name"].GetStringOrDefault(string.Empty);
+			style.StyleMultiplier = childNode.Attributes["StyleMultiplier"].ParseFloat();
+			style.TextImage = childNode.Attributes["TextImage"].GetStringOrDefault(string.Empty);
+			style.BarImage = childNode.Attributes["BarImage"].GetStringOrDefault(string.Empty);
+			Styles.Add(style);
 		}
 		if (Styles.Count == 0)
 		{

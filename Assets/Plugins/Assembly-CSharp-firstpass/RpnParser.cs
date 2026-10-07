@@ -22,7 +22,7 @@ public class RpnParser
 
 	public delegate object VariableDelegate();
 
-	public delegate object ParameterDelegate(List<object> BPLIHEIIBFP);
+	public delegate object ParameterDelegate(List<object> arguments);
 
 	public enum OperatorArgCount
 	{
@@ -112,12 +112,12 @@ public class RpnParser
 
 		public OperatorDirection Direction;
 
-		public OperatorInfo(OperatorPriority DBNEBOIBILM, OperatorDelegate NGOJAJIKFBA, OperatorArgCount MPOEHCOADGE, OperatorDirection PCBCFHJBODO)
+		public OperatorInfo(OperatorPriority priority, OperatorDelegate operation, OperatorArgCount argCount, OperatorDirection direction)
 		{
-			Priority = DBNEBOIBILM;
-			Function = NGOJAJIKFBA;
-			ArgCount = MPOEHCOADGE;
-			Direction = PCBCFHJBODO;
+			Priority = priority;
+			Function = operation;
+			ArgCount = argCount;
+			Direction = direction;
 		}
 
 		public static double Add(List<double> arguments)
@@ -378,9 +378,9 @@ public class RpnParser
 	{
 		private VariableDelegate getter;
 
-		public VariableOperand(VariableDelegate NFDJONMIEFL)
+		public VariableOperand(VariableDelegate variableGetter)
 		{
-			getter = NFDJONMIEFL;
+			getter = variableGetter;
 			set_Type(OperandType.Variable);
 		}
 
@@ -396,10 +396,10 @@ public class RpnParser
 
 		private List<Operand> argumentList;
 
-		public FunctionOperand(List<Operand> arguments, ParameterDelegate JKAELOIBLFJ)
+		public FunctionOperand(List<Operand> arguments, ParameterDelegate functionDelegate)
 		{
 			argumentList = arguments;
-			function = JKAELOIBLFJ;
+			function = functionDelegate;
 		}
 
 		public override object GetValue()
@@ -434,18 +434,18 @@ public class RpnParser
 			}
 		}
 
-		public Formula(string HBICLHKEIEI)
+		public Formula(string formulaText)
 		{
 			if (!_isInited)
 			{
 				throw new Exception("RpnParser is not inited!");
 			}
-			_items = ParseFormula(HBICLHKEIEI);
+			_items = ParseFormula(formulaText);
 		}
 
 		public int GetVariableCount()
 		{
-			return _items.FindAll((FormulaItem DHDMNHCIPEH) => DHDMNHCIPEH.Operand != null && DHDMNHCIPEH.Operand.get_Type() == OperandType.Variable).Count;
+			return _items.FindAll((FormulaItem item) => item.Operand != null && item.Operand.get_Type() == OperandType.Variable).Count;
 		}
 
 		public object Calculate()
@@ -472,13 +472,13 @@ public class RpnParser
 
 	public const char ArgumentSeparator = ',';
 
-	public static void init(Dictionary<string, VariableDelegate> PPEABEJMCPI, Dictionary<string, ParameterDelegate> GIOGAJGIGMO)
+	public static void init(Dictionary<string, VariableDelegate> variables, Dictionary<string, ParameterDelegate> functions)
 	{
 		if (!_isInited)
 		{
 			InitOperators();
-			_variables = PPEABEJMCPI;
-			_functions = GIOGAJGIGMO;
+			_variables = variables;
+			_functions = functions;
 			_isInited = true;
 		}
 	}
@@ -517,16 +517,16 @@ public class RpnParser
 		}
 	}
 
-	private static List<FormulaItem> ParseFormula(string DPABILBDPFF)
+	private static List<FormulaItem> ParseFormula(string formulaText)
 	{
 		List<FormulaItem> list = new List<FormulaItem>();
-		if (DPABILBDPFF == string.Empty)
+		if (formulaText == string.Empty)
 		{
 			throw new Exception("Formula can not be empty");
 		}
-		DPABILBDPFF = RemoveSpaces(DPABILBDPFF);
-		DPABILBDPFF = InsertUnaryZeros(DPABILBDPFF);
-		List<FormulaItem> list2 = Tokenize(DPABILBDPFF);
+		formulaText = RemoveSpaces(formulaText);
+		formulaText = InsertUnaryZeros(formulaText);
+		List<FormulaItem> list2 = Tokenize(formulaText);
 		if (!AreBracketsBalanced(list2))
 		{
 			throw new Exception("Formula can not be empty");
@@ -539,33 +539,33 @@ public class RpnParser
 		return list;
 	}
 
-	private static object Calculate(List<FormulaItem> HELFDCAIJNE)
+	private static object Calculate(List<FormulaItem> items)
 	{
-		if (HELFDCAIJNE == null || HELFDCAIJNE.Count == 0)
+		if (items == null || items.Count == 0)
 		{
 			// A newer perk can resolve entirely to unsupported runtime parameters.
 			// Treat that expression as zero instead of breaking combat every hit.
 			return 0.0;
 		}
-		if (HELFDCAIJNE.Count == 1 && HELFDCAIJNE[0].Kind == ItemKind.Operand)
+		if (items.Count == 1 && items[0].Kind == ItemKind.Operand)
 		{
-			return HELFDCAIJNE[0].Operand.GetValue();
+			return items[0].Operand.GetValue();
 		}
 		List<object> list = new List<object>(2);
-		for (int i = 0; i != HELFDCAIJNE.Count; i++)
+		for (int i = 0; i != items.Count; i++)
 		{
-			if (HELFDCAIJNE[i].Kind == ItemKind.Operand)
+			if (items[i].Kind == ItemKind.Operand)
 			{
-				list.Add(HELFDCAIJNE[i].Operand.GetValue());
+				list.Add(items[i].Operand.GetValue());
 			}
 			else
 			{
-				if (HELFDCAIJNE[i].Kind != ItemKind.Operator)
+				if (items[i].Kind != ItemKind.Operator)
 				{
 					continue;
 				}
 				List<double> list2 = new List<double>();
-				int num = (int)(list.Count - HELFDCAIJNE[i].Operator.ArgCount);
+				int num = (int)(list.Count - items[i].Operator.ArgCount);
 				if (num < 0)
 				{
 					return 0.0;
@@ -579,29 +579,29 @@ public class RpnParser
 					}
 					list2.Add(result);
 				}
-				double num2 = HELFDCAIJNE[i].Operator.Function(list2);
-				list.RemoveRange(num, (int)HELFDCAIJNE[i].Operator.ArgCount);
+				double num2 = items[i].Operator.Function(list2);
+				list.RemoveRange(num, (int)items[i].Operator.ArgCount);
 				list.Add(num2);
 			}
 		}
 		return ((list.Count == 0) ? 0.0 : list[0]);
 	}
 
-	private static string InsertUnaryZeros(string DPABILBDPFF)
+	private static string InsertUnaryZeros(string formulaText)
 	{
-		for (int i = 0; i < DPABILBDPFF.Length; i++)
+		for (int i = 0; i < formulaText.Length; i++)
 		{
-			if ((DPABILBDPFF[i] == '-' || DPABILBDPFF[i] == '+') && (i == 0 || DPABILBDPFF[i - 1] == '('))
+			if ((formulaText[i] == '-' || formulaText[i] == '+') && (i == 0 || formulaText[i - 1] == '('))
 			{
-				DPABILBDPFF = DPABILBDPFF.Insert(i, "0");
+				formulaText = formulaText.Insert(i, "0");
 			}
 		}
-		return DPABILBDPFF;
+		return formulaText;
 	}
 
-	private static string RemoveSpaces(string DPABILBDPFF)
+	private static string RemoveSpaces(string formulaText)
 	{
-		return DPABILBDPFF.Replace(" ", string.Empty);
+		return formulaText.Replace(" ", string.Empty);
 	}
 
 	public static bool IsOperatorSymbol(string symbol)
@@ -618,19 +618,19 @@ public class RpnParser
 		return "+-*^()|/&#".IndexOf(symbol) != -1;
 	}
 
-	private static bool IsOperator(string IGGFGLLIGCG)
+	private static bool IsOperator(string token)
 	{
-		string key = IGGFGLLIGCG.ToLower();
+		string key = token.ToLower();
 		return _operators.ContainsKey(key);
 	}
 
-	private static bool IsFunction(string IGGFGLLIGCG)
+	private static bool IsFunction(string token)
 	{
-		if (IGGFGLLIGCG[0] == '?')
+		if (token[0] == '?')
 		{
 			return true;
 		}
-		foreach (char c in IGGFGLLIGCG)
+		foreach (char c in token)
 		{
 			if (c == '.' || c == '[' || c == ']')
 			{
@@ -640,30 +640,30 @@ public class RpnParser
 		return false;
 	}
 
-	private static bool IsVariable(string IGGFGLLIGCG)
+	private static bool IsVariable(string token)
 	{
-		if (IGGFGLLIGCG[0] == '$')
+		if (token[0] == '$')
 		{
 			return true;
 		}
 		return false;
 	}
 
-	private static List<FormulaItem> Tokenize(string DPABILBDPFF)
+	private static List<FormulaItem> Tokenize(string formulaText)
 	{
 		List<FormulaItem> list = new List<FormulaItem>();
 		int i = 0;
-		int length = DPABILBDPFF.Length;
+		int length = formulaText.Length;
 		while (i < length)
 		{
-			FormulaItem bAELOMEILMK = new FormulaItem();
-			if (char.IsDigit(DPABILBDPFF[i]))
+			FormulaItem item = new FormulaItem();
+			if (char.IsDigit(formulaText[i]))
 			{
 				string text = string.Empty;
 				char? c = null;
 				for (; i < length; i++)
 				{
-					char c2 = DPABILBDPFF[i];
+					char c2 = formulaText[i];
 					if (!char.IsDigit(c2))
 					{
 						bool flag = c2 != '.';
@@ -678,20 +678,20 @@ public class RpnParser
 					text += c2;
 				}
 				double num = Convert.ToDouble(text, CultureInfo.InvariantCulture);
-				bAELOMEILMK.Kind = ItemKind.Operand;
-				bAELOMEILMK.Operand = new ConstantOperand(num);
+				item.Kind = ItemKind.Operand;
+				item.Operand = new ConstantOperand(num);
 			}
-			else if (!char.IsDigit(DPABILBDPFF[i]))
+			else if (!char.IsDigit(formulaText[i]))
 			{
-				if (DPABILBDPFF[i] == ',')
+				if (formulaText[i] == ',')
 				{
 					i++;
 					continue;
 				}
 				string text2 = string.Empty;
-				while (i < length && (!IsOperatorSymbol(DPABILBDPFF[i].ToString()) || !AreSquareBracketsBalanced(text2) || text2.Length == 0))
+				while (i < length && (!IsOperatorSymbol(formulaText[i].ToString()) || !AreSquareBracketsBalanced(text2) || text2.Length == 0))
 				{
-					text2 += DPABILBDPFF[i];
+					text2 += formulaText[i];
 					i++;
 					if (IsOperator(text2))
 					{
@@ -700,28 +700,28 @@ public class RpnParser
 				}
 				if (IsOperator(text2))
 				{
-					bAELOMEILMK.Kind = ItemKind.Operator;
+					item.Kind = ItemKind.Operator;
 					string key = text2.ToLower();
-					bAELOMEILMK.Operator = _operators[key];
+					item.Operator = _operators[key];
 				}
 				else
 				{
-					bAELOMEILMK.Kind = ItemKind.Operand;
-					bAELOMEILMK.Operand = ParseOperand(text2);
+					item.Kind = ItemKind.Operand;
+					item.Operand = ParseOperand(text2);
 				}
 			}
-			list.Add(bAELOMEILMK);
+			list.Add(item);
 		}
 		return list;
 	}
 
-	private static bool AreSquareBracketsBalanced(string IGGFGLLIGCG)
+	private static bool AreSquareBracketsBalanced(string text)
 	{
 		int num = 0;
 		int num2 = 0;
-		for (int i = 0; i < IGGFGLLIGCG.Length; i++)
+		for (int i = 0; i < text.Length; i++)
 		{
-			switch (IGGFGLLIGCG[i])
+			switch (text[i])
 			{
 			case '[':
 				num++;
@@ -734,117 +734,117 @@ public class RpnParser
 		return num == num2;
 	}
 
-	private static FunctionOperand ParseFunction(string IGGFGLLIGCG)
+	private static FunctionOperand ParseFunction(string functionCall)
 	{
-		int num = IGGFGLLIGCG.IndexOf("[");
-		string text = IGGFGLLIGCG.Substring(0, num);
-		string dJIONFCICFC = IGGFGLLIGCG.Substring(num + 1, IGGFGLLIGCG.Length - num - 2);
+		int num = functionCall.IndexOf("[");
+		string text = functionCall.Substring(0, num);
+		string argumentsText = functionCall.Substring(num + 1, functionCall.Length - num - 2);
 		string text2 = text.Substring(1, text.Length - 1);
 		if (!_functions.ContainsKey(text2))
 		{
 			throw new Exception("Unknown function name " + text2);
 		}
-		List<Operand> mAABDFKMACJ = ParseArguments(dJIONFCICFC);
-		return new FunctionOperand(mAABDFKMACJ, _functions[text2]);
+		List<Operand> arguments = ParseArguments(argumentsText);
+		return new FunctionOperand(arguments, _functions[text2]);
 	}
 
-	private static Operand ParseOperand(string EBDLDPIBIEO)
+	private static Operand ParseOperand(string operandText)
 	{
-		Operand fAOBBBMHEBL = null;
-		if (IsFunction(EBDLDPIBIEO))
+		Operand operand = null;
+		if (IsFunction(operandText))
 		{
-			EBDLDPIBIEO = ExpandMemberAccess(EBDLDPIBIEO);
-			fAOBBBMHEBL = ParseFunction(EBDLDPIBIEO);
+			operandText = ExpandMemberAccess(operandText);
+			operand = ParseFunction(operandText);
 		}
-		else if (char.IsDigit(EBDLDPIBIEO[0]))
+		else if (char.IsDigit(operandText[0]))
 		{
-			double num = Convert.ToDouble(EBDLDPIBIEO);
-			fAOBBBMHEBL = new ConstantOperand(num);
+			double num = Convert.ToDouble(operandText);
+			operand = new ConstantOperand(num);
 		}
-		else if (IsVariable(EBDLDPIBIEO))
+		else if (IsVariable(operandText))
 		{
-			string text = EBDLDPIBIEO.Substring(1, EBDLDPIBIEO.Length - 1);
+			string text = operandText.Substring(1, operandText.Length - 1);
 			if (!_variables.ContainsKey(text))
 			{
 				throw new Exception("Unknown variable " + text);
 			}
-			fAOBBBMHEBL = new VariableOperand(_variables[text]);
+			operand = new VariableOperand(_variables[text]);
 		}
 		else
 		{
-			fAOBBBMHEBL = new ConstantOperand(EBDLDPIBIEO);
-			fAOBBBMHEBL.set_Type(OperandType.Variable);
+			operand = new ConstantOperand(operandText);
+			operand.set_Type(OperandType.Variable);
 		}
-		return fAOBBBMHEBL;
+		return operand;
 	}
 
-	private static List<Operand> ParseArguments(string DJIONFCICFC)
+	private static List<Operand> ParseArguments(string argumentsText)
 	{
-		if (DJIONFCICFC.Length == 0)
+		if (argumentsText.Length == 0)
 		{
 			List<Operand> list = new List<Operand>();
 			list.Add(new Operand());
 			return list;
 		}
 		List<Operand> list2 = new List<Operand>();
-		DJIONFCICFC = DJIONFCICFC.Trim();
-		string[] array = SplitArguments(DJIONFCICFC, ',');
+		argumentsText = argumentsText.Trim();
+		string[] array = SplitArguments(argumentsText, ',');
 		string[] array2 = array;
-		foreach (string eBDLDPIBIEO in array2)
+		foreach (string argumentText in array2)
 		{
-			Operand item = ParseOperand(eBDLDPIBIEO);
+			Operand item = ParseOperand(argumentText);
 			list2.Add(item);
 		}
 		return list2;
 	}
 
-	private static string[] SplitArguments(string CGJGACJABDF, char EPJDMLMAOII)
+	private static string[] SplitArguments(string text, char separator)
 	{
 		List<string> list = new List<string>();
 		int num = 0;
 		do
 		{
 			int num2;
-			if (CGJGACJABDF[num] == '?')
+			if (text[num] == '?')
 			{
-				num2 = GetEndOfFunc(CGJGACJABDF, num) + 1;
+				num2 = GetEndOfFunc(text, num) + 1;
 			}
 			else
 			{
-				num2 = CGJGACJABDF.IndexOf(',', num);
+				num2 = text.IndexOf(',', num);
 				if (num2 == -1)
 				{
-					list.Add(CGJGACJABDF.Substring(num));
+					list.Add(text.Substring(num));
 					break;
 				}
 			}
-			list.Add(CGJGACJABDF.Substring(num, num2 - num));
+			list.Add(text.Substring(num, num2 - num));
 			num = num2 + 1;
 		}
-		while (num < CGJGACJABDF.Length);
+		while (num < text.Length);
 		return list.ToArray();
 	}
 
-	private static int GetEndOfFunc(string CGJGACJABDF, int CAILGDNIKJD)
+	private static int GetEndOfFunc(string text, int startIndex)
 	{
-		int num = CGJGACJABDF.IndexOf('[', CAILGDNIKJD);
+		int num = text.IndexOf('[', startIndex);
 		if (num < 0)
 		{
 			return -1;
 		}
 		num++;
 		int num2 = 1;
-		for (; num < CGJGACJABDF.Length; num++)
+		for (; num < text.Length; num++)
 		{
 			if (num2 == 0)
 			{
 				break;
 			}
-			if (CGJGACJABDF[num] == '[')
+			if (text[num] == '[')
 			{
 				num2++;
 			}
-			else if (CGJGACJABDF[num] == ']')
+			else if (text[num] == ']')
 			{
 				num2--;
 			}
@@ -852,37 +852,37 @@ public class RpnParser
 		return num - 1;
 	}
 
-	private static string ExpandMemberAccess(string IGGFGLLIGCG)
+	private static string ExpandMemberAccess(string expression)
 	{
-		while (IGGFGLLIGCG.Contains("."))
+		while (expression.Contains("."))
 		{
-			IGGFGLLIGCG = ConvertMemberAccess(IGGFGLLIGCG);
+			expression = ConvertMemberAccess(expression);
 		}
-		return IGGFGLLIGCG;
+		return expression;
 	}
 
-	private static string ConvertMemberAccess(string IGGFGLLIGCG)
+	private static string ConvertMemberAccess(string expression)
 	{
-		int num = IGGFGLLIGCG.IndexOf('.');
-		string text = IGGFGLLIGCG.Substring(0, num);
-		string text2 = "?" + IGGFGLLIGCG.Substring(num + 1, IGGFGLLIGCG.Length - num - 1);
-		IGGFGLLIGCG = text2 + "[" + text + "]";
-		return IGGFGLLIGCG;
+		int num = expression.IndexOf('.');
+		string text = expression.Substring(0, num);
+		string text2 = "?" + expression.Substring(num + 1, expression.Length - num - 1);
+		expression = text2 + "[" + text + "]";
+		return expression;
 	}
 
-	private static bool AreBracketsBalanced(List<FormulaItem> HELFDCAIJNE)
+	private static bool AreBracketsBalanced(List<FormulaItem> items)
 	{
 		int num = 0;
 		int num2 = 0;
-		for (int i = 0; i != HELFDCAIJNE.Count; i++)
+		for (int i = 0; i != items.Count; i++)
 		{
-			if (HELFDCAIJNE[i].Kind == ItemKind.Operator)
+			if (items[i].Kind == ItemKind.Operator)
 			{
-				if (HELFDCAIJNE[i].Operator == _operators["("])
+				if (items[i].Operator == _operators["("])
 				{
 					num++;
 				}
-				else if (HELFDCAIJNE[i].Operator == _operators[")"])
+				else if (items[i].Operator == _operators[")"])
 				{
 					num2++;
 				}
@@ -891,24 +891,24 @@ public class RpnParser
 		return num == num2;
 	}
 
-	private static List<FormulaItem> ToPostfix(List<FormulaItem> JEFEGDICJJC)
+	private static List<FormulaItem> ToPostfix(List<FormulaItem> infixItems)
 	{
 		List<FormulaItem> list = new List<FormulaItem>();
 		List<FormulaItem> list2 = new List<FormulaItem>();
 		int num = 0;
-		while (num != JEFEGDICJJC.Count)
+		while (num != infixItems.Count)
 		{
-			if (JEFEGDICJJC[num].Kind == ItemKind.Operand)
+			if (infixItems[num].Kind == ItemKind.Operand)
 			{
-				list.Add(JEFEGDICJJC[num]);
+				list.Add(infixItems[num]);
 				num++;
 			}
-			else if (JEFEGDICJJC[num].Operator == _operators["("])
+			else if (infixItems[num].Operator == _operators["("])
 			{
-				list2.Add(JEFEGDICJJC[num]);
+				list2.Add(infixItems[num]);
 				num++;
 			}
-			else if (JEFEGDICJJC[num].Operator == _operators[")"])
+			else if (infixItems[num].Operator == _operators[")"])
 			{
 				while (list2.Count != 0 && list2[list2.Count - 1].Operator != _operators["("])
 				{
@@ -928,15 +928,15 @@ public class RpnParser
 			}
 			else if (list2.Count == 0)
 			{
-				list2.Add(JEFEGDICJJC[num]);
+				list2.Add(infixItems[num]);
 				num++;
 			}
-			else if ((JEFEGDICJJC[num].Operator.Direction == OperatorDirection.OperatorAddDirect && list2[list2.Count - 1].Operator.Priority < JEFEGDICJJC[num].Operator.Priority) || (JEFEGDICJJC[num].Operator.Direction == OperatorDirection.OperatorPowDirect && list2[list2.Count - 1].Operator.Priority <= JEFEGDICJJC[num].Operator.Priority))
+			else if ((infixItems[num].Operator.Direction == OperatorDirection.OperatorAddDirect && list2[list2.Count - 1].Operator.Priority < infixItems[num].Operator.Priority) || (infixItems[num].Operator.Direction == OperatorDirection.OperatorPowDirect && list2[list2.Count - 1].Operator.Priority <= infixItems[num].Operator.Priority))
 			{
-				list2.Add(JEFEGDICJJC[num]);
+				list2.Add(infixItems[num]);
 				num++;
 			}
-			else if ((JEFEGDICJJC[num].Operator.Direction == OperatorDirection.OperatorAddDirect && list2[list2.Count - 1].Operator.Priority >= JEFEGDICJJC[num].Operator.Priority) || (JEFEGDICJJC[num].Operator.Direction == OperatorDirection.OperatorPowDirect && list2[list2.Count - 1].Operator.Priority > JEFEGDICJJC[num].Operator.Priority))
+			else if ((infixItems[num].Operator.Direction == OperatorDirection.OperatorAddDirect && list2[list2.Count - 1].Operator.Priority >= infixItems[num].Operator.Priority) || (infixItems[num].Operator.Direction == OperatorDirection.OperatorPowDirect && list2[list2.Count - 1].Operator.Priority > infixItems[num].Operator.Priority))
 			{
 				list.Add(list2[list2.Count - 1]);
 				list2.RemoveAt(list2.Count - 1);

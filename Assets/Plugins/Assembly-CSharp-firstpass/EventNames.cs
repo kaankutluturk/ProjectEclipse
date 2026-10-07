@@ -22,21 +22,21 @@ public static class EventNames
 
 	private static string[] BlacklistedEvents = new string[10] { "connect", "connect_error", "connect_timeout", "disconnect", "error", "reconnect", "reconnect_attempt", "reconnect_failed", "reconnect_error", "reconnecting" };
 
-	public static string GetNameFor(SocketIOEventType LFLGCDNKNJI)
+	public static string GetNameFor(SocketIOEventType eventType)
 	{
-		return SocketIONames[(int)(LFLGCDNKNJI + 1)];
+		return SocketIONames[(int)(eventType + 1)];
 	}
 
-	public static string GetNameFor(TransportEventTypes AJONKGOAHJH)
+	public static string GetNameFor(TransportEventTypes eventType)
 	{
-		return TransportNames[(int)(AJONKGOAHJH + 1)];
+		return TransportNames[(int)(eventType + 1)];
 	}
 
-	public static bool IsBlacklisted(string DOPHKKGNAEF)
+	public static bool IsBlacklisted(string eventName)
 	{
 		for (int i = 0; i < BlacklistedEvents.Length; i++)
 		{
-			if (string.Compare(BlacklistedEvents[i], DOPHKKGNAEF, StringComparison.OrdinalIgnoreCase) == 0)
+			if (string.Compare(BlacklistedEvents[i], eventName, StringComparison.OrdinalIgnoreCase) == 0)
 			{
 				return true;
 			}

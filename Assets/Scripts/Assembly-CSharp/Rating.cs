@@ -22,26 +22,26 @@ public class Rating
 		enemyAttribute = string.Empty;
 	}
 
-	public Rating(Rating NOLFMPDGCOC)
+	public Rating(Rating source)
 	{
-		player = NOLFMPDGCOC.player;
-		damageType = NOLFMPDGCOC.damageType;
-		defenseType = NOLFMPDGCOC.defenseType;
-		Multiplier = NOLFMPDGCOC.Multiplier;
-		enemyAttribute = NOLFMPDGCOC.enemyAttribute;
+		player = source.player;
+		damageType = source.damageType;
+		defenseType = source.defenseType;
+		Multiplier = source.Multiplier;
+		enemyAttribute = source.enemyAttribute;
 	}
 
-	public void Parse(XmlNode node, PerkSetAttributes CJILONFAJIK = null)
+	public void Parse(XmlNode node, PerkSetAttributes setAttributes = null)
 	{
-		if (CJILONFAJIK != null)
+		if (setAttributes != null)
 		{
 			foreach (XmlAttribute attribute in node.Attributes)
 			{
 				string text = XmlUtils.ParseString(attribute, string.Empty);
 				if (text[0] == '_')
 				{
-					string gOHIIMFFFJI = text.Substring(1, text.Length - 1);
-					string value = CJILONFAJIK.GetValue(gOHIIMFFFJI);
+					string attributeName = text.Substring(1, text.Length - 1);
+					string value = setAttributes.GetValue(attributeName);
 					attribute.Value = value;
 				}
 			}

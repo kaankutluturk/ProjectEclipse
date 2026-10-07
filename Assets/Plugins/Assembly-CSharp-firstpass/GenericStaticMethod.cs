@@ -6,21 +6,21 @@ public sealed class GenericStaticMethod
 {
 	private readonly MethodInfo methodToCall;
 
-	public GenericStaticMethod(Expression<Action> BOPGDKGIGHM)
+	public GenericStaticMethod(Expression<Action> expression)
 	{
-		MethodCallExpression methodCallExpression = (MethodCallExpression)BOPGDKGIGHM.Body;
+		MethodCallExpression methodCallExpression = (MethodCallExpression)expression.Body;
 		methodToCall = methodCallExpression.Method.GetGenericMethodDefinition();
 	}
 
-	public object Invoke(Type[] GIAFINCFDLC, params object[] arguments)
+	public object Invoke(Type[] genericArguments, params object[] arguments)
 	{
 		try
 		{
-			return methodToCall.MakeGenericMethod(GIAFINCFDLC).Invoke(null, arguments);
+			return methodToCall.MakeGenericMethod(genericArguments).Invoke(null, arguments);
 		}
-		catch (TargetInvocationException mPFFFAOGBJE)
+		catch (TargetInvocationException ex)
 		{
-			throw mPFFFAOGBJE.Unwrap();
+			throw ex.Unwrap();
 		}
 	}
 }

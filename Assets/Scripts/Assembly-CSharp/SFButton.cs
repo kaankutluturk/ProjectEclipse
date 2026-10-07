@@ -80,14 +80,14 @@ public class SFButton : Button, global::IEventDispatcher<object>
 		}
 	}
 
-	public int AddEventListener(int name, Action<object> ODDEOFKLIAG)
+	public int AddEventListener(int name, Action<object> callback)
 	{
-		return eventDispatcher.AddEventListener(name, ODDEOFKLIAG);
+		return eventDispatcher.AddEventListener(name, callback);
 	}
 
-	public int CallEvent(int name, object EHCLMBADLKH)
+	public int CallEvent(int name, object data)
 	{
-		return (!base.interactable) ? 1 : eventDispatcher.CallEvent(name, EHCLMBADLKH);
+		return (!base.interactable) ? 1 : eventDispatcher.CallEvent(name, data);
 	}
 
 	public int RemoveAllEventListener()
@@ -100,9 +100,9 @@ public class SFButton : Button, global::IEventDispatcher<object>
 		return eventDispatcher.RemoveEvent(name);
 	}
 
-	public int RemoveEventListener(int name, Action<object> ODDEOFKLIAG)
+	public int RemoveEventListener(int name, Action<object> callback)
 	{
-		return eventDispatcher.RemoveEventListener(name, ODDEOFKLIAG);
+		return eventDispatcher.RemoveEventListener(name, callback);
 	}
 
     private SelectionState _inputVisualState;
@@ -126,21 +126,21 @@ public class SFButton : Button, global::IEventDispatcher<object>
         if (!_hasInputVisualState || state != _inputVisualState) DoStateTransition(state, true);
     }
 
-    public override void OnPointerDown(PointerEventData BHOLFGOGPCP)
+    public override void OnPointerDown(PointerEventData eventData)
 	{
-		base.OnPointerDown(BHOLFGOGPCP);
+		base.OnPointerDown(eventData);
 		CallEvent(0, ButtonId);
 	}
 
-	public override void OnPointerUp(PointerEventData BHOLFGOGPCP)
+	public override void OnPointerUp(PointerEventData eventData)
 	{
-		base.OnPointerUp(BHOLFGOGPCP);
+		base.OnPointerUp(eventData);
 		CallEvent(1, ButtonId);
 	}
 
-	public override void OnPointerClick(PointerEventData BHOLFGOGPCP)
+	public override void OnPointerClick(PointerEventData eventData)
 	{
-		base.OnPointerClick(BHOLFGOGPCP);
+		base.OnPointerClick(eventData);
 		CallEvent(2, ButtonId);
 	}
 
@@ -178,13 +178,13 @@ public class SFButton : Button, global::IEventDispatcher<object>
 		}
 	}
 
-	public void AddFlashImage(string JGIGOMLGLPN)
+	public void AddFlashImage(string spriteName)
 	{
 		GameObject gameObject = new GameObject();
 		gameObject.name = "FlashingImage";
 		gameObject.transform.SetParent(base.transform, false);
 		FlashingImage = gameObject.AddComponent<ResolutionImage>();
-		FlashingImage.set_SpriteName(JGIGOMLGLPN);
+		FlashingImage.set_SpriteName(spriteName);
 		FlashingImage.SetNativeSize();
 	}
 }

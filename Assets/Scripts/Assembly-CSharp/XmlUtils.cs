@@ -17,217 +17,217 @@ public static class XmlUtils
 
 	public const string CommentNodeName = "#comment";
 
-	public static bool IsCommentNode(XmlNode MEEAKLDGLDF)
+	public static bool IsCommentNode(XmlNode node)
 	{
-		return MEEAKLDGLDF.NodeType == XmlNodeType.Comment;
+		return node.NodeType == XmlNodeType.Comment;
 	}
 
-	public static int ParseInt(this XmlAttribute CJBEMNNNHDM, int KDLNPAGLMHF = 0)
+	public static int ParseInt(this XmlAttribute attribute, int defaultValue = 0)
 	{
-		if (CJBEMNNNHDM == null)
+		if (attribute == null)
 		{
-			return KDLNPAGLMHF;
+			return defaultValue;
 		}
 		int result;
-		return (!int.TryParse(CJBEMNNNHDM.Value, out result)) ? KDLNPAGLMHF : result;
+		return (!int.TryParse(attribute.Value, out result)) ? defaultValue : result;
 	}
 
-	public static long ParseLong(this XmlAttribute CJBEMNNNHDM, long KDLNPAGLMHF = 0L)
+	public static long ParseLong(this XmlAttribute attribute, long defaultValue = 0L)
 	{
-		if (CJBEMNNNHDM == null)
+		if (attribute == null)
 		{
-			return KDLNPAGLMHF;
+			return defaultValue;
 		}
 		long result;
-		return (!long.TryParse(CJBEMNNNHDM.Value, out result)) ? KDLNPAGLMHF : result;
+		return (!long.TryParse(attribute.Value, out result)) ? defaultValue : result;
 	}
 
-	public static uint ParseUint(this XmlAttribute CJBEMNNNHDM, uint KDLNPAGLMHF = 0u)
+	public static uint ParseUint(this XmlAttribute attribute, uint defaultValue = 0u)
 	{
-		if (CJBEMNNNHDM == null)
+		if (attribute == null)
 		{
-			return KDLNPAGLMHF;
+			return defaultValue;
 		}
 		uint result;
-		return (!uint.TryParse(CJBEMNNNHDM.Value, out result)) ? KDLNPAGLMHF : result;
+		return (!uint.TryParse(attribute.Value, out result)) ? defaultValue : result;
 	}
 
-	public static float ParseFloat(this XmlAttribute CJBEMNNNHDM, float KDLNPAGLMHF = 0f)
+	public static float ParseFloat(this XmlAttribute attribute, float defaultValue = 0f)
 	{
-		if (CJBEMNNNHDM == null)
+		if (attribute == null)
 		{
-			return KDLNPAGLMHF;
+			return defaultValue;
 		}
 		float result;
 		// Game XML always uses decimal points. The player's locale may treat a
 		// point as a thousands separator, corrupting rig coordinates and weights.
-		return (!float.TryParse(CJBEMNNNHDM.Value, NumberStyles.Float, CultureInfo.InvariantCulture, out result)) ? KDLNPAGLMHF : result;
+		return (!float.TryParse(attribute.Value, NumberStyles.Float, CultureInfo.InvariantCulture, out result)) ? defaultValue : result;
 	}
 
-	public static bool ParseBool(this XmlAttribute CJBEMNNNHDM, bool KDLNPAGLMHF = false)
+	public static bool ParseBool(this XmlAttribute attribute, bool defaultValue = false)
 	{
-		if (CJBEMNNNHDM == null)
+		if (attribute == null)
 		{
-			return KDLNPAGLMHF;
+			return defaultValue;
 		}
 		int result;
-		return (!int.TryParse(CJBEMNNNHDM.Value, out result)) ? KDLNPAGLMHF : (result > 0);
+		return (!int.TryParse(attribute.Value, out result)) ? defaultValue : (result > 0);
 	}
 
-	public static string ParseString(XmlAttribute CJBEMNNNHDM, string KDLNPAGLMHF = null)
+	public static string ParseString(XmlAttribute attribute, string defaultValue = null)
 	{
-		if (CJBEMNNNHDM == null)
+		if (attribute == null)
 		{
-			return KDLNPAGLMHF;
+			return defaultValue;
 		}
-		return CJBEMNNNHDM.Value;
+		return attribute.Value;
 	}
 
-	public static string GetStringOrDefault(this XmlAttribute CJBEMNNNHDM, string KDLNPAGLMHF = null)
+	public static string GetStringOrDefault(this XmlAttribute attribute, string defaultValue = null)
 	{
-		if (CJBEMNNNHDM == null)
+		if (attribute == null)
 		{
-			return KDLNPAGLMHF;
+			return defaultValue;
 		}
-		return CJBEMNNNHDM.Value;
+		return attribute.Value;
 	}
 
-	public static KeyValuePair<int, int> ParseMinMax(this XmlNode MEEAKLDGLDF, int JLJBICAKJJH = 0, int PPHPIDGJOCJ = 0)
+	public static KeyValuePair<int, int> ParseMinMax(this XmlNode node, int defaultMin = 0, int defaultMax = 0)
 	{
-		if (MEEAKLDGLDF == null)
+		if (node == null)
 		{
-			return new KeyValuePair<int, int>(JLJBICAKJJH, PPHPIDGJOCJ);
+			return new KeyValuePair<int, int>(defaultMin, defaultMax);
 		}
-		int key = MEEAKLDGLDF.Attributes["Min"].ParseInt(JLJBICAKJJH);
-		int value = MEEAKLDGLDF.Attributes["Max"].ParseInt(PPHPIDGJOCJ);
+		int key = node.Attributes["Min"].ParseInt(defaultMin);
+		int value = node.Attributes["Max"].ParseInt(defaultMax);
 		return new KeyValuePair<int, int>(key, value);
 	}
 
-	public static Vector2 ParseInOut(this XmlNode MEEAKLDGLDF, float COPBJEEJIBB = 0f, float FLOKDJLEJCK = 0f)
+	public static Vector2 ParseInOut(this XmlNode node, float defaultIn = 0f, float defaultOut = 0f)
 	{
-		Vector2 result = new Vector2(COPBJEEJIBB, FLOKDJLEJCK);
-		if (MEEAKLDGLDF != null)
+		Vector2 result = new Vector2(defaultIn, defaultOut);
+		if (node != null)
 		{
-			result.x = MEEAKLDGLDF.Attributes["In"].ParseFloat(COPBJEEJIBB);
-			result.y = MEEAKLDGLDF.Attributes["Out"].ParseFloat(FLOKDJLEJCK);
+			result.x = node.Attributes["In"].ParseFloat(defaultIn);
+			result.y = node.Attributes["Out"].ParseFloat(defaultOut);
 		}
 		return result;
 	}
 
-	public static XmlAttribute FirstAttribute(this XmlNode MEEAKLDGLDF)
+	public static XmlAttribute FirstAttribute(this XmlNode node)
 	{
-		if (MEEAKLDGLDF != null && MEEAKLDGLDF.Attributes.Count > 0)
+		if (node != null && node.Attributes.Count > 0)
 		{
-			return MEEAKLDGLDF.Attributes[0];
+			return node.Attributes[0];
 		}
 		return null;
 	}
 
-	public static XmlAttribute LastAttribute(this XmlNode MEEAKLDGLDF)
+	public static XmlAttribute LastAttribute(this XmlNode node)
 	{
-		if (MEEAKLDGLDF != null && MEEAKLDGLDF.Attributes.Count > 0)
+		if (node != null && node.Attributes.Count > 0)
 		{
-			return MEEAKLDGLDF.Attributes[MEEAKLDGLDF.Attributes.Count - 1];
+			return node.Attributes[node.Attributes.Count - 1];
 		}
 		return null;
 	}
 
-	public static XmlAttribute Attribute(this XmlNode MEEAKLDGLDF, string PNPLADGGOJN)
+	public static XmlAttribute Attribute(this XmlNode node, string attributeName)
 	{
-		if (MEEAKLDGLDF != null)
+		if (node != null)
 		{
-			return MEEAKLDGLDF.Attributes[PNPLADGGOJN];
+			return node.Attributes[attributeName];
 		}
 		return null;
 	}
 
-	public static T ParseEnum<T>(XmlAttribute CJBEMNNNHDM, T JEALBOJLKFM)
+	public static T ParseEnum<T>(XmlAttribute attribute, T defaultValue)
 	{
-		if (CJBEMNNNHDM == null)
+		if (attribute == null)
 		{
-			return JEALBOJLKFM;
+			return defaultValue;
 		}
 		try
 		{
-			return (T)Enum.Parse(typeof(T), CJBEMNNNHDM.Value, true);
+			return (T)Enum.Parse(typeof(T), attribute.Value, true);
 		}
 		catch
 		{
-			return JEALBOJLKFM;
+			return defaultValue;
 		}
 	}
 
-	public static bool Empty(this XmlAttribute CJBEMNNNHDM)
+	public static bool Empty(this XmlAttribute attribute)
 	{
-		if (CJBEMNNNHDM == null)
+		if (attribute == null)
 		{
 			return true;
 		}
-		return CJBEMNNNHDM.Value.Equals(string.Empty);
+		return attribute.Value.Equals(string.Empty);
 	}
 
-	public static XmlElement AppendElement(this XmlNode MEEAKLDGLDF, string JLEKBBJBLOE)
+	public static XmlElement AppendElement(this XmlNode node, string elementName)
 	{
-		XmlDocument xmlDocument = ((!(MEEAKLDGLDF is XmlDocument)) ? MEEAKLDGLDF.OwnerDocument : ((XmlDocument)MEEAKLDGLDF));
-		XmlElement xmlElement = xmlDocument.CreateElement(JLEKBBJBLOE);
-		MEEAKLDGLDF.AppendChild(xmlElement);
+		XmlDocument xmlDocument = ((!(node is XmlDocument)) ? node.OwnerDocument : ((XmlDocument)node));
+		XmlElement xmlElement = xmlDocument.CreateElement(elementName);
+		node.AppendChild(xmlElement);
 		return xmlElement;
 	}
 
-	public static XmlNode AppendImportedClone(this XmlNode MEEAKLDGLDF, XmlNode NBMGOEMJJAF)
+	public static XmlNode AppendImportedClone(this XmlNode node, XmlNode sourceNode)
 	{
-		XmlDocument xmlDocument = MEEAKLDGLDF.OwnerDocument;
+		XmlDocument xmlDocument = node.OwnerDocument;
 		if (xmlDocument == null)
 		{
-			xmlDocument = MEEAKLDGLDF as XmlDocument;
+			xmlDocument = node as XmlDocument;
 		}
-		XmlNode xmlNode = xmlDocument.ImportNode(NBMGOEMJJAF.Clone(), true);
-		MEEAKLDGLDF.AppendChild(xmlNode);
+		XmlNode xmlNode = xmlDocument.ImportNode(sourceNode.Clone(), true);
+		node.AppendChild(xmlNode);
 		return xmlNode;
 	}
 
-	public static void CopyAttribute(this XmlNode MEEAKLDGLDF, XmlAttribute NBMGOEMJJAF)
+	public static void CopyAttribute(this XmlNode node, XmlAttribute sourceAttribute)
 	{
-		((XmlElement)MEEAKLDGLDF).SetAttribute(NBMGOEMJJAF.Name, NBMGOEMJJAF.Value);
+		((XmlElement)node).SetAttribute(sourceAttribute.Name, sourceAttribute.Value);
 	}
 
-	public static XmlAttribute AppendAttribute(this XmlNode MEEAKLDGLDF, string MJMEBBCLHII)
+	public static XmlAttribute AppendAttribute(this XmlNode node, string attributeName)
 	{
-		XmlAttribute xmlAttribute = MEEAKLDGLDF.OwnerDocument.CreateAttribute(MJMEBBCLHII);
-		MEEAKLDGLDF.Attributes.Append(xmlAttribute);
+		XmlAttribute xmlAttribute = node.OwnerDocument.CreateAttribute(attributeName);
+		node.Attributes.Append(xmlAttribute);
 		return xmlAttribute;
 	}
 
-	public static XmlAttribute PrependAttribute(this XmlNode MEEAKLDGLDF, string MJMEBBCLHII)
+	public static XmlAttribute PrependAttribute(this XmlNode node, string attributeName)
 	{
-		XmlAttribute xmlAttribute = MEEAKLDGLDF.OwnerDocument.CreateAttribute(MJMEBBCLHII);
-		MEEAKLDGLDF.Attributes.Prepend(xmlAttribute);
+		XmlAttribute xmlAttribute = node.OwnerDocument.CreateAttribute(attributeName);
+		node.Attributes.Prepend(xmlAttribute);
 		return xmlAttribute;
 	}
 
-	public static XmlNode AppendNewNode(this XmlDocument JMCOLDENNDH, string IMGCANJHPND)
+	public static XmlNode AppendNewNode(this XmlDocument document, string nodeName)
 	{
-		XmlNode xmlNode = JMCOLDENNDH.CreateNode(XmlNodeType.Element, IMGCANJHPND, null);
-		JMCOLDENNDH.AppendChild(xmlNode);
+		XmlNode xmlNode = document.CreateNode(XmlNodeType.Element, nodeName, null);
+		document.AppendChild(xmlNode);
 		return xmlNode;
 	}
 
-	public static XmlNode AppendNewNode(this XmlNode MEEAKLDGLDF, string IMGCANJHPND)
+	public static XmlNode AppendNewNode(this XmlNode node, string nodeName)
 	{
-		XmlNode xmlNode = MEEAKLDGLDF.OwnerDocument.CreateNode(XmlNodeType.Element, IMGCANJHPND, null);
-		MEEAKLDGLDF.AppendChild(xmlNode);
+		XmlNode xmlNode = node.OwnerDocument.CreateNode(XmlNodeType.Element, nodeName, null);
+		node.AppendChild(xmlNode);
 		return xmlNode;
 	}
 
-	public static XmlNode FindChildWithAttribute(this XmlNode MEEAKLDGLDF, string name, string MJMEBBCLHII)
+	public static XmlNode FindChildWithAttribute(this XmlNode node, string name, string attributeName)
 	{
-		if (MEEAKLDGLDF != null)
+		if (node != null)
 		{
-			foreach (XmlNode childNode in MEEAKLDGLDF.ChildNodes)
+			foreach (XmlNode childNode in node.ChildNodes)
 			{
 				if (childNode.Name.Equals(name))
 				{
-					XmlAttribute xmlAttribute = childNode.Attributes[MJMEBBCLHII];
+					XmlAttribute xmlAttribute = childNode.Attributes[attributeName];
 					if (xmlAttribute != null)
 					{
 						return childNode;
@@ -238,15 +238,15 @@ public static class XmlUtils
 		return null;
 	}
 
-	public static XmlNode FindChildWithAttribute(this XmlNode MEEAKLDGLDF, string name, string MJMEBBCLHII, string FOOKNBHPOOA)
+	public static XmlNode FindChildWithAttribute(this XmlNode node, string name, string attributeName, string attributeValue)
 	{
-		if (MEEAKLDGLDF != null)
+		if (node != null)
 		{
-			foreach (XmlNode childNode in MEEAKLDGLDF.ChildNodes)
+			foreach (XmlNode childNode in node.ChildNodes)
 			{
 				if (childNode.Name.Equals(name))
 				{
-					XmlAttribute xmlAttribute = childNode.FindAttributeWithValue(MJMEBBCLHII, FOOKNBHPOOA);
+					XmlAttribute xmlAttribute = childNode.FindAttributeWithValue(attributeName, attributeValue);
 					if (xmlAttribute != null)
 					{
 						return childNode;
@@ -257,13 +257,13 @@ public static class XmlUtils
 		return null;
 	}
 
-	public static XmlAttribute FindAttributeWithValue(this XmlNode MEEAKLDGLDF, string MJMEBBCLHII, string FOOKNBHPOOA)
+	public static XmlAttribute FindAttributeWithValue(this XmlNode node, string attributeName, string attributeValue)
 	{
-		if (MEEAKLDGLDF != null)
+		if (node != null)
 		{
-			foreach (XmlAttribute attribute in MEEAKLDGLDF.Attributes)
+			foreach (XmlAttribute attribute in node.Attributes)
 			{
-				if (attribute.Name.Equals(MJMEBBCLHII) && attribute.Value.Equals(FOOKNBHPOOA))
+				if (attribute.Name.Equals(attributeName) && attribute.Value.Equals(attributeValue))
 				{
 					return attribute;
 				}
@@ -272,16 +272,16 @@ public static class XmlUtils
 		return null;
 	}
 
-	public static XmlDocument LoadFromBytes(byte[] OIOHECBCFJA, bool LELJDDBPCNL = true)
+	public static XmlDocument LoadFromBytes(byte[] bytes, bool ignoreComments = true)
 	{
 		XmlReaderSettings xmlReaderSettings = new XmlReaderSettings();
-		xmlReaderSettings.IgnoreComments = LELJDDBPCNL;
+		xmlReaderSettings.IgnoreComments = ignoreComments;
 		try
 		{
-			MemoryStream stream = new MemoryStream(OIOHECBCFJA);
-			using (XmlReader aEHOOKGCGLO = XmlReader.Create(stream, xmlReaderSettings))
+			MemoryStream stream = new MemoryStream(bytes);
+			using (XmlReader reader = XmlReader.Create(stream, xmlReaderSettings))
 			{
-				return OpenXMLDocument(aEHOOKGCGLO);
+				return OpenXMLDocument(reader);
 			}
 		}
 		catch
@@ -290,16 +290,16 @@ public static class XmlUtils
 		}
 	}
 
-	public static XmlDocument LoadFromString(string NGEPNAJJHCD, bool LELJDDBPCNL = true, bool PGKCOJBBOOH = false)
+	public static XmlDocument LoadFromString(string xml, bool ignoreComments = true, bool decryptIfNeeded = false)
 	{
 		XmlReaderSettings xmlReaderSettings = new XmlReaderSettings();
-		xmlReaderSettings.IgnoreComments = LELJDDBPCNL;
+		xmlReaderSettings.IgnoreComments = ignoreComments;
 		try
 		{
-			XmlDocument xmlDocument = ParseXmlText(NGEPNAJJHCD, xmlReaderSettings, PGKCOJBBOOH);
+			XmlDocument xmlDocument = ParseXmlText(xml, xmlReaderSettings, decryptIfNeeded);
 			if (xmlDocument == null)
 			{
-				Debug.LogError("Error open xml from string: " + NGEPNAJJHCD);
+				Debug.LogError("Error open xml from string: " + xml);
 			}
 			return xmlDocument;
 		}
@@ -309,29 +309,29 @@ public static class XmlUtils
 		}
 	}
 
-	public static XmlDocument OpenXMLDocument(string ONEIGMLOGDC, string LOBFDOKFJIP = "", XmlSourceMode HDCCAKLHKBD = XmlSourceMode.Normal, bool LELJDDBPCNL = true, bool PGKCOJBBOOH = false)
+	public static XmlDocument OpenXMLDocument(string basePath, string fileName = "", XmlSourceMode sourceMode = XmlSourceMode.Normal, bool ignoreComments = true, bool decryptIfNeeded = false)
 	{
 		try
 		{
-			string text = ONEIGMLOGDC + ((!(LOBFDOKFJIP != string.Empty)) ? string.Empty : ("/" + LOBFDOKFJIP));
+			string text = basePath + ((!(fileName != string.Empty)) ? string.Empty : ("/" + fileName));
 			XmlReaderSettings xmlReaderSettings = new XmlReaderSettings();
-			xmlReaderSettings.IgnoreComments = LELJDDBPCNL;
+			xmlReaderSettings.IgnoreComments = ignoreComments;
 			// TexturePacker emits Apple plist files with a DOCTYPE declaration.
 			// These files never need external entity resolution, but rejecting the
 			// declaration makes every recovered location atlas look empty.
 			xmlReaderSettings.DtdProcessing = DtdProcessing.Ignore;
 			xmlReaderSettings.XmlResolver = null;
 			XmlDocument xmlDocument = null;
-			switch (HDCCAKLHKBD)
+			switch (sourceMode)
 			{
 			case XmlSourceMode.Normal:
-				xmlDocument = ((!ONEIGMLOGDC.StartsWith(SF2Paths.UserDataRoot)) ? ParseXmlText(ResourceManager.GetText(text), xmlReaderSettings, PGKCOJBBOOH) : ParseXmlText(ResourceManager.GetFileOrDevText(text), xmlReaderSettings, PGKCOJBBOOH));
+				xmlDocument = ((!basePath.StartsWith(SF2Paths.UserDataRoot)) ? ParseXmlText(ResourceManager.GetText(text), xmlReaderSettings, decryptIfNeeded) : ParseXmlText(ResourceManager.GetFileOrDevText(text), xmlReaderSettings, decryptIfNeeded));
 				break;
 			case XmlSourceMode.ForcedExternal:
-				xmlDocument = ParseXmlText(ResourceManager.GetFileOrDevText(text), xmlReaderSettings, PGKCOJBBOOH);
+				xmlDocument = ParseXmlText(ResourceManager.GetFileOrDevText(text), xmlReaderSettings, decryptIfNeeded);
 				break;
 			case XmlSourceMode.ForcedResourced:
-				xmlDocument = ParseXmlText(ResourceManager.GetBundledOrModText(text), xmlReaderSettings, PGKCOJBBOOH);
+				xmlDocument = ParseXmlText(ResourceManager.GetBundledOrModText(text), xmlReaderSettings, decryptIfNeeded);
 				break;
 			}
 			if (xmlDocument == null)
@@ -346,28 +346,28 @@ public static class XmlUtils
 		}
 	}
 
-	private static XmlDocument ParseXmlText(string GHDPPHAAPCA, XmlReaderSettings ENBBEFMEILD, bool PGKCOJBBOOH)
+	private static XmlDocument ParseXmlText(string xmlText, XmlReaderSettings readerSettings, bool decryptIfNeeded)
 	{
-		if (PGKCOJBBOOH && (string.IsNullOrEmpty(GHDPPHAAPCA) || !GHDPPHAAPCA.TrimStart().StartsWith("<")))
+		if (decryptIfNeeded && (string.IsNullOrEmpty(xmlText) || !xmlText.TrimStart().StartsWith("<")))
 		{
-			string text = XmlCryptoUtils.DecryptStringOrPassThrough(GHDPPHAAPCA);
+			string text = XmlCryptoUtils.DecryptStringOrPassThrough(xmlText);
 			if (!string.IsNullOrEmpty(text))
 			{
-				GHDPPHAAPCA = text;
+				xmlText = text;
 			}
 		}
-		using (XmlReader aEHOOKGCGLO = XmlReader.Create(new StringReader(GHDPPHAAPCA), ENBBEFMEILD))
+		using (XmlReader reader = XmlReader.Create(new StringReader(xmlText), readerSettings))
 		{
-			return OpenXMLDocument(aEHOOKGCGLO);
+			return OpenXMLDocument(reader);
 		}
 	}
 
-	private static XmlDocument OpenXMLDocument(XmlReader AEHOOKGCGLO)
+	private static XmlDocument OpenXMLDocument(XmlReader reader)
 	{
 		try
 		{
 			XmlDocument xmlDocument = new XmlDocument();
-			xmlDocument.Load(AEHOOKGCGLO);
+			xmlDocument.Load(reader);
 			return xmlDocument;
 		}
 		catch (Exception ex)
@@ -377,12 +377,12 @@ public static class XmlUtils
 		}
 	}
 
-	public static void TrimWhitespaceToFile(string AMNCLCPADOO, string IFIOLDFCLIE)
+	public static void TrimWhitespaceToFile(string sourcePath, string destinationPath)
 	{
-		XmlDocument xmlDocument = OpenXMLDocument(AMNCLCPADOO, string.Empty, XmlSourceMode.ForcedExternal);
+		XmlDocument xmlDocument = OpenXMLDocument(sourcePath, string.Empty, XmlSourceMode.ForcedExternal);
 		if (xmlDocument == null)
 		{
-			Debug.LogError("[XmlUtils]: try to trim spaces from incorrect xml - " + AMNCLCPADOO);
+			Debug.LogError("[XmlUtils]: try to trim spaces from incorrect xml - " + sourcePath);
 			return;
 		}
 		try
@@ -390,7 +390,7 @@ public static class XmlUtils
 			XmlWriterSettings xmlWriterSettings = new XmlWriterSettings();
 			xmlWriterSettings.Indent = false;
 			xmlWriterSettings.NewLineChars = string.Empty;
-			using (XmlWriter xmlWriter = XmlWriter.Create(IFIOLDFCLIE, xmlWriterSettings))
+			using (XmlWriter xmlWriter = XmlWriter.Create(destinationPath, xmlWriterSettings))
 			{
 				xmlDocument.Save(xmlWriter);
 			}
@@ -401,12 +401,12 @@ public static class XmlUtils
 		}
 	}
 
-	public static void TrimWhitespaceInPlace(string ONEIGMLOGDC)
+	public static void TrimWhitespaceInPlace(string filePath)
 	{
-		TrimWhitespaceToFile(ONEIGMLOGDC, ONEIGMLOGDC);
+		TrimWhitespaceToFile(filePath, filePath);
 	}
 
-	public static string ToIndentedString(this XmlDocument GPIBAMAMGKD)
+	public static string ToIndentedString(this XmlDocument document)
 	{
 		StringBuilder stringBuilder = new StringBuilder();
 		XmlWriterSettings xmlWriterSettings = new XmlWriterSettings();
@@ -414,50 +414,50 @@ public static class XmlUtils
 		xmlWriterSettings.Indent = true;
 		using (XmlWriter xmlWriter = XmlWriter.Create(stringBuilder, xmlWriterSettings))
 		{
-			GPIBAMAMGKD.Save(xmlWriter);
+			document.Save(xmlWriter);
 		}
 		return stringBuilder.ToString();
 	}
 
-	public static XmlDocument LoadDocumentWithHashCheck(string ONEIGMLOGDC, string LOBFDOKFJIP = "", XmlSourceMode HDCCAKLHKBD = XmlSourceMode.Normal, bool LELJDDBPCNL = true)
+	public static XmlDocument LoadDocumentWithHashCheck(string basePath, string fileName = "", XmlSourceMode sourceMode = XmlSourceMode.Normal, bool ignoreComments = true)
 	{
-		if (HDCCAKLHKBD == XmlSourceMode.Normal || HDCCAKLHKBD == XmlSourceMode.ForcedExternal)
-			Eclipse.Modding.ModRuntime.RecoverProfileSnapshot(string.IsNullOrEmpty(LOBFDOKFJIP) ? ONEIGMLOGDC : Path.Combine(ONEIGMLOGDC, LOBFDOKFJIP));
-		XmlDocument xmlDocument = OpenXMLDocument(ONEIGMLOGDC, LOBFDOKFJIP, HDCCAKLHKBD, LELJDDBPCNL);
-		if (xmlDocument != null && (HDCCAKLHKBD == XmlSourceMode.Normal || HDCCAKLHKBD == XmlSourceMode.ForcedExternal))
+		if (sourceMode == XmlSourceMode.Normal || sourceMode == XmlSourceMode.ForcedExternal)
+			Eclipse.Modding.ModRuntime.RecoverProfileSnapshot(string.IsNullOrEmpty(fileName) ? basePath : Path.Combine(basePath, fileName));
+		XmlDocument xmlDocument = OpenXMLDocument(basePath, fileName, sourceMode, ignoreComments);
+		if (xmlDocument != null && (sourceMode == XmlSourceMode.Normal || sourceMode == XmlSourceMode.ForcedExternal))
 		{
-			string oNEIGMLOGDC = ONEIGMLOGDC + ((!(LOBFDOKFJIP != string.Empty)) ? string.Empty : ("/" + LOBFDOKFJIP));
-			UserDataValidator.CheckFileHash(xmlDocument, oNEIGMLOGDC);
+			string fullPath = basePath + ((!(fileName != string.Empty)) ? string.Empty : ("/" + fileName));
+			UserDataValidator.CheckFileHash(xmlDocument, fullPath);
 		}
 		return xmlDocument;
 	}
 
-	public static void SaveDocumentWithHash(XmlDocument JMCOLDENNDH, string KPFELJFPGHJ)
+	public static void SaveDocumentWithHash(XmlDocument document, string filePath)
 	{
-		if (Eclipse.Modding.ModRuntime.TryWriteProfileSnapshot(JMCOLDENNDH, KPFELJFPGHJ)) return;
-		JMCOLDENNDH.Save(KPFELJFPGHJ);
-		UserDataValidator.UpdateFileHash(JMCOLDENNDH, KPFELJFPGHJ);
+		if (Eclipse.Modding.ModRuntime.TryWriteProfileSnapshot(document, filePath)) return;
+		document.Save(filePath);
+		UserDataValidator.UpdateFileHash(document, filePath);
 	}
 
-	public static void CopyDocumentWithHash(string AMNCLCPADOO, string IFIOLDFCLIE)
+	public static void CopyDocumentWithHash(string sourcePath, string destinationPath)
 	{
-		XmlDocument xmlDocument = OpenXMLDocument(AMNCLCPADOO, string.Empty);
-		xmlDocument.Save(IFIOLDFCLIE);
-		UserDataValidator.UpdateFileHash(xmlDocument, IFIOLDFCLIE);
+		XmlDocument xmlDocument = OpenXMLDocument(sourcePath, string.Empty);
+		xmlDocument.Save(destinationPath);
+		UserDataValidator.UpdateFileHash(xmlDocument, destinationPath);
 	}
 
-	public static void UpdateHashForFile(string EFGLOMANJHN)
+	public static void UpdateHashForFile(string filePath)
 	{
 		try
 		{
-			if (Path.GetExtension(EFGLOMANJHN).ToLower().Equals(".xml"))
+			if (Path.GetExtension(filePath).ToLower().Equals(".xml"))
 			{
-				XmlDocument lOBFDOKFJIP = OpenXMLDocument(EFGLOMANJHN, string.Empty);
-				UserDataValidator.UpdateFileHash(lOBFDOKFJIP, EFGLOMANJHN);
+				XmlDocument document = OpenXMLDocument(filePath, string.Empty);
+				UserDataValidator.UpdateFileHash(document, filePath);
 			}
 			else
 			{
-				UserDataValidator.UpdateFileHash(EFGLOMANJHN);
+				UserDataValidator.UpdateFileHash(filePath);
 			}
 		}
 		catch (Exception ex)

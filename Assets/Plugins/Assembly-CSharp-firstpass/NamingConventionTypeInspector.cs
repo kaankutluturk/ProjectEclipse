@@ -8,27 +8,27 @@ public sealed class NamingConventionTypeInspector : TypeInspectorSkeleton
 
 	private readonly INamingConvention namingConvention;
 
-	public NamingConventionTypeInspector(ITypeInspector CECGLIIIJJH, INamingConvention LELOAKPLJEH)
+	public NamingConventionTypeInspector(ITypeInspector innerTypeDescriptor, INamingConvention namingConvention)
 	{
-		if (CECGLIIIJJH == null)
+		if (innerTypeDescriptor == null)
 		{
 			throw new ArgumentNullException("innerTypeDescriptor");
 		}
-		this.innerTypeDescriptor = CECGLIIIJJH;
-		if (LELOAKPLJEH == null)
+		this.innerTypeDescriptor = innerTypeDescriptor;
+		if (namingConvention == null)
 		{
 			throw new ArgumentNullException("namingConvention");
 		}
-		this.namingConvention = LELOAKPLJEH;
+		this.namingConvention = namingConvention;
 	}
 
-	public override IEnumerable<IPropertyDescriptor> GetProperties(Type LFLGCDNKNJI, object EGJHGBCEPHO)
+	public override IEnumerable<IPropertyDescriptor> GetProperties(Type type, object container)
 	{
-		return innerTypeDescriptor.GetProperties(LFLGCDNKNJI, EGJHGBCEPHO).Select((Func<IPropertyDescriptor, IPropertyDescriptor>)((IPropertyDescriptor PIIEECCHMAC) =>
+		return innerTypeDescriptor.GetProperties(type, container).Select((Func<IPropertyDescriptor, IPropertyDescriptor>)((IPropertyDescriptor innerDescriptor) =>
 		{
-			PropertyDescriptor fLAHDIEMBAL = new PropertyDescriptor(PIIEECCHMAC);
-			fLAHDIEMBAL.set_Name(namingConvention.Apply(PIIEECCHMAC.get_Name()));
-			return fLAHDIEMBAL;
+			PropertyDescriptor descriptor = new PropertyDescriptor(innerDescriptor);
+			descriptor.set_Name(namingConvention.Apply(innerDescriptor.get_Name()));
+			return descriptor;
 		}));
 	}
 }

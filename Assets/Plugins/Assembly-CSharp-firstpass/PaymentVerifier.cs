@@ -39,164 +39,164 @@ public class PaymentVerifier
 		verificationEnabled = value;
 	}
 
-	public static void Init(IPurchaseVerifier IHLKACMLEGK)
+	public static void Init(IPurchaseVerifier purchaseVerifier)
 	{
-		verifier = IHLKACMLEGK;
+		verifier = purchaseVerifier;
 	}
 
-	public static void VerifyPurchase(PurchaseReceipt HIKIPCMNPDK)
+	public static void VerifyPurchase(PurchaseReceipt purchaseReceipt)
 	{
-		VerifyPurchase(HIKIPCMNPDK.GetProductId(), HIKIPCMNPDK.GetTransactionId(), HIKIPCMNPDK.GetJson(), HIKIPCMNPDK.GetSignature());
+		VerifyPurchase(purchaseReceipt.GetProductId(), purchaseReceipt.GetTransactionId(), purchaseReceipt.GetJson(), purchaseReceipt.GetSignature());
 	}
 
-	public static void VerifyPurchase(string FDKNIPNGFNF, string BGMLFNGKDHI, string DNHKNDPBGNM, string BGLGHEMMANM)
+	public static void VerifyPurchase(string productId, string paymentId, string receipt, string signature)
 	{
-		Debug.LogFormat("Verify: productId={0}, paymentId={1}, receipt={2}, signature={3}", FDKNIPNGFNF, BGMLFNGKDHI, DNHKNDPBGNM, (BGLGHEMMANM == null) ? "null" : BGLGHEMMANM);
-		PaymentInfo jLDHCFFAIPK = null;
-		if (!verificationEnabled || BGMLFNGKDHI == null || PaymentManager.GetIsEmulator())
+		Debug.LogFormat("Verify: productId={0}, paymentId={1}, receipt={2}, signature={3}", productId, paymentId, receipt, (signature == null) ? "null" : signature);
+		PaymentInfo paymentInfo = null;
+		if (!verificationEnabled || paymentId == null || PaymentManager.GetIsEmulator())
 		{
-			jLDHCFFAIPK = PaymentManager.AddUnverifiedCompletedPayment(FDKNIPNGFNF, BGMLFNGKDHI, DNHKNDPBGNM, BGLGHEMMANM);
+			paymentInfo = PaymentManager.AddUnverifiedCompletedPayment(productId, paymentId, receipt, signature);
 			if (!PaymentManager.GetIsEmulator())
 			{
-				PaymentManager.GetStore().ConfirmPendingPurchase(FDKNIPNGFNF);
+				PaymentManager.GetStore().ConfirmPendingPurchase(productId);
 			}
-			PaymentManager.GetStore().FinishTransaction(jLDHCFFAIPK);
+			PaymentManager.GetStore().FinishTransaction(paymentInfo);
 		}
 		else
 		{
-			jLDHCFFAIPK = PaymentManager.AddInProgressPayment(FDKNIPNGFNF, BGMLFNGKDHI, DNHKNDPBGNM, BGLGHEMMANM);
-			SendVerifyRequest(jLDHCFFAIPK);
+			paymentInfo = PaymentManager.AddInProgressPayment(productId, paymentId, receipt, signature);
+			SendVerifyRequest(paymentInfo);
 		}
 	}
 
-	public static void VerifyPayment(PaymentInfo PAENLDALDGB)
+	public static void VerifyPayment(PaymentInfo payment)
 	{
 		if (!verificationEnabled)
 		{
-			PaymentManager.GetStore().ConfirmPendingPurchase(PAENLDALDGB.GetProductId());
-			PaymentManager.GetStore().FinishTransaction(PAENLDALDGB);
-			PaymentManager.CompletePayment(PAENLDALDGB);
+			PaymentManager.GetStore().ConfirmPendingPurchase(payment.GetProductId());
+			PaymentManager.GetStore().FinishTransaction(payment);
+			PaymentManager.CompletePayment(payment);
 		}
-		SendVerifyRequest(PAENLDALDGB);
+		SendVerifyRequest(payment);
 	}
 
-	public static void ConfirmPayment(PaymentInfo PAENLDALDGB)
+	public static void ConfirmPayment(PaymentInfo payment)
 	{
-		SendConfirmRequest(PAENLDALDGB);
+		SendConfirmRequest(payment);
 	}
 
-	private static void SendVerifyRequest(PaymentInfo PAENLDALDGB)
+	private static void SendVerifyRequest(PaymentInfo payment)
 	{
 		if (SystemProperties.IsIosPlatform())
 		{
-			verifier.VerifyPurchaseAction(PAENLDALDGB, "iOS", OnVerifyResponse);
+			verifier.VerifyPurchaseAction(payment, "iOS", OnVerifyResponse);
 		}
 		else if (SystemProperties.IsAndroidPlatform())
 		{
-			verifier.VerifyPurchaseAction(PAENLDALDGB, "Android", OnVerifyResponse);
+			verifier.VerifyPurchaseAction(payment, "Android", OnVerifyResponse);
 		}
-		if (PAENLDALDGB != null)
+		if (payment != null)
 		{
-			PaymentManager.GetStore().NotifyVerificationStarted(PAENLDALDGB.GetProductId(), PAENLDALDGB.GetReceipt());
+			PaymentManager.GetStore().NotifyVerificationStarted(payment.GetProductId(), payment.GetReceipt());
 		}
 	}
 
-	private static void OnVerifyResponse(bool AMKKLMOONEP, string GHDPPHAAPCA, object JHJDJOFPHPH)
+	private static void OnVerifyResponse(bool isSuccess, string response, object paymentInfoObject)
 	{
 		Debug.Log("VerifyRequest_Response");
-		Debug.Log((!AMKKLMOONEP) ? "Result fail" : "Result ok!");
-		Debug.Log(GHDPPHAAPCA);
-		PaymentInfo jLDHCFFAIPK = (PaymentInfo)JHJDJOFPHPH;
-		if (!AMKKLMOONEP)
+		Debug.Log((!isSuccess) ? "Result fail" : "Result ok!");
+		Debug.Log(response);
+		PaymentInfo paymentInfo = (PaymentInfo)paymentInfoObject;
+		if (!isSuccess)
 		{
-			if (jLDHCFFAIPK.VerificationAttempts <= 2)
+			if (paymentInfo.VerificationAttempts <= 2)
 			{
-				jLDHCFFAIPK.VerificationAttempts++;
-				SendVerifyRequest(jLDHCFFAIPK);
+				paymentInfo.VerificationAttempts++;
+				SendVerifyRequest(paymentInfo);
 			}
 			else
 			{
-				jLDHCFFAIPK.VerificationAttempts = 0;
-				PaymentManager.GetStore().NotifyVerificationFailed(jLDHCFFAIPK.GetProductId());
-				PaymentManager.GetStore().NotifyVerificationFinished(jLDHCFFAIPK.GetProductId(), jLDHCFFAIPK.GetReceipt());
+				paymentInfo.VerificationAttempts = 0;
+				PaymentManager.GetStore().NotifyVerificationFailed(paymentInfo.GetProductId());
+				PaymentManager.GetStore().NotifyVerificationFinished(paymentInfo.GetProductId(), paymentInfo.GetReceipt());
 			}
 			return;
 		}
-		JSONNode jSONNode = JSONNode.Parse(GHDPPHAAPCA);
+		JSONNode jSONNode = JSONNode.Parse(response);
 		switch (jSONNode["status"].AsInt)
 		{
 		case 0:
-			if (PaymentManager.IsUnknownPayment(jLDHCFFAIPK))
+			if (PaymentManager.IsUnknownPayment(paymentInfo))
 			{
-				jLDHCFFAIPK.VerificationAttempts = 0;
-				jLDHCFFAIPK.SetIsCheating(true);
-				PaymentManager.GetStore().NotifyPurchaseRejected(jLDHCFFAIPK.GetProductId());
+				paymentInfo.VerificationAttempts = 0;
+				paymentInfo.SetIsCheating(true);
+				PaymentManager.GetStore().NotifyPurchaseRejected(paymentInfo.GetProductId());
 				break;
 			}
-			jLDHCFFAIPK.SetPurchaseDate(jSONNode["data"]["receiptPurchaseDate"].Value);
-			PaymentManager.GetStore().ConfirmPendingPurchase(jLDHCFFAIPK.GetProductId());
-			PaymentManager.GetStore().FinishTransaction(jLDHCFFAIPK);
-			PaymentManager.MarkPaymentVerified(jLDHCFFAIPK);
+			paymentInfo.SetPurchaseDate(jSONNode["data"]["receiptPurchaseDate"].Value);
+			PaymentManager.GetStore().ConfirmPendingPurchase(paymentInfo.GetProductId());
+			PaymentManager.GetStore().FinishTransaction(paymentInfo);
+			PaymentManager.MarkPaymentVerified(paymentInfo);
 			if (!jSONNode["data"]["confirmed"].AsBool)
 			{
-				jLDHCFFAIPK.VerificationAttempts = 0;
-				SendConfirmRequest(jLDHCFFAIPK);
+				paymentInfo.VerificationAttempts = 0;
+				SendConfirmRequest(paymentInfo);
 			}
 			else
 			{
-				PaymentManager.ConfirmPayment(jLDHCFFAIPK);
-				Debug.Log("Payment doesn't need to be confirm! " + jLDHCFFAIPK.ToString());
+				PaymentManager.ConfirmPayment(paymentInfo);
+				Debug.Log("Payment doesn't need to be confirm! " + paymentInfo.ToString());
 			}
 			break;
 		case 1:
-			jLDHCFFAIPK.SetIsCheating(true);
-			PaymentManager.MarkPaymentFailed(jLDHCFFAIPK);
-			PaymentManager.GetStore().ConfirmPendingPurchase(jLDHCFFAIPK.GetProductId());
-			PaymentManager.GetStore().NotifyPurchaseRejected(jLDHCFFAIPK.GetProductId());
+			paymentInfo.SetIsCheating(true);
+			PaymentManager.MarkPaymentFailed(paymentInfo);
+			PaymentManager.GetStore().ConfirmPendingPurchase(paymentInfo.GetProductId());
+			PaymentManager.GetStore().NotifyPurchaseRejected(paymentInfo.GetProductId());
 			break;
 		}
-		PaymentManager.GetStore().NotifyVerificationFinished(jLDHCFFAIPK.GetProductId(), jLDHCFFAIPK.GetReceipt());
+		PaymentManager.GetStore().NotifyVerificationFinished(paymentInfo.GetProductId(), paymentInfo.GetReceipt());
 	}
 
-	private static void SendConfirmRequest(PaymentInfo PAENLDALDGB)
+	private static void SendConfirmRequest(PaymentInfo payment)
 	{
 		if (SystemProperties.IsIosPlatform())
 		{
-			verifier.ConfirmVerificationAction(PAENLDALDGB, "iOS", OnConfirmResponse);
+			verifier.ConfirmVerificationAction(payment, "iOS", OnConfirmResponse);
 		}
 		else if (SystemProperties.IsAndroidPlatform())
 		{
-			verifier.ConfirmVerificationAction(PAENLDALDGB, "Android", OnConfirmResponse);
+			verifier.ConfirmVerificationAction(payment, "Android", OnConfirmResponse);
 		}
-		if (PAENLDALDGB != null)
+		if (payment != null)
 		{
-			PaymentManager.GetStore().NotifyConfirmationStarted(PAENLDALDGB.GetProductId(), PAENLDALDGB.GetReceipt());
+			PaymentManager.GetStore().NotifyConfirmationStarted(payment.GetProductId(), payment.GetReceipt());
 		}
 	}
 
-	private static void OnConfirmResponse(bool AMKKLMOONEP, string GHDPPHAAPCA, object JHJDJOFPHPH)
+	private static void OnConfirmResponse(bool isSuccess, string response, object paymentInfoObject)
 	{
 		Debug.Log("CompletedRequest_Response");
-		Debug.Log((!AMKKLMOONEP) ? "Result fail" : "Result ok!");
-		Debug.Log(GHDPPHAAPCA);
-		PaymentInfo jLDHCFFAIPK = (PaymentInfo)JHJDJOFPHPH;
-		if (!AMKKLMOONEP)
+		Debug.Log((!isSuccess) ? "Result fail" : "Result ok!");
+		Debug.Log(response);
+		PaymentInfo paymentInfo = (PaymentInfo)paymentInfoObject;
+		if (!isSuccess)
 		{
-			if (jLDHCFFAIPK.VerificationAttempts <= 2)
+			if (paymentInfo.VerificationAttempts <= 2)
 			{
-				jLDHCFFAIPK.VerificationAttempts++;
-				SendConfirmRequest(jLDHCFFAIPK);
+				paymentInfo.VerificationAttempts++;
+				SendConfirmRequest(paymentInfo);
 			}
 			else
 			{
-				jLDHCFFAIPK.VerificationAttempts = 0;
-				PaymentManager.GetStore().NotifyConfirmationFinished(jLDHCFFAIPK.GetProductId(), jLDHCFFAIPK.GetReceipt());
+				paymentInfo.VerificationAttempts = 0;
+				PaymentManager.GetStore().NotifyConfirmationFinished(paymentInfo.GetProductId(), paymentInfo.GetReceipt());
 			}
 		}
 		else
 		{
-			PaymentManager.ConfirmPayment(jLDHCFFAIPK);
-			PaymentManager.GetStore().NotifyConfirmationFinished(jLDHCFFAIPK.GetProductId(), jLDHCFFAIPK.GetReceipt());
+			PaymentManager.ConfirmPayment(paymentInfo);
+			PaymentManager.GetStore().NotifyConfirmationFinished(paymentInfo.GetProductId(), paymentInfo.GetReceipt());
 		}
 	}
 }

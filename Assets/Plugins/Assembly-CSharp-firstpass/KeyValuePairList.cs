@@ -28,25 +28,25 @@ public class KeyValuePairList
 		values = value;
 	}
 
-	public bool TryGet(string value, out KeyValuePair KKNOCIPBIIK)
+	public bool TryGet(string value, out KeyValuePair pair)
 	{
-		KKNOCIPBIIK = null;
+		pair = null;
 		for (int i = 0; i < GetValues().Count; i++)
 		{
 			if (string.CompareOrdinal(GetValues()[i].GetKey(), value) == 0)
 			{
-				KKNOCIPBIIK = GetValues()[i];
+				pair = GetValues()[i];
 				return true;
 			}
 		}
 		return false;
 	}
 
-	public bool HasAny(string OIPHDFDAOFN, string DBALKBDCIKJ = "")
+	public bool HasAny(string key, string alternateKey = "")
 	{
 		for (int i = 0; i < GetValues().Count; i++)
 		{
-			if (string.CompareOrdinal(GetValues()[i].GetKey(), OIPHDFDAOFN) == 0 || string.CompareOrdinal(GetValues()[i].GetKey(), DBALKBDCIKJ) == 0)
+			if (string.CompareOrdinal(GetValues()[i].GetKey(), key) == 0 || string.CompareOrdinal(GetValues()[i].GetKey(), alternateKey) == 0)
 			{
 				return true;
 			}

@@ -11,10 +11,10 @@ public class RaidCurrencyCostRule : CurrencyCostRule
 		Parse(node);
 	}
 
-	public RaidCurrencyCostRule(RaidCurrencyCostRule HNBFMAKFJAM)
-		: base(HNBFMAKFJAM)
+	public RaidCurrencyCostRule(RaidCurrencyCostRule source)
+		: base(source)
 	{
-		packName = HNBFMAKFJAM.GetPackName();
+		packName = source.GetPackName();
 	}
 
 	public string GetPackName()

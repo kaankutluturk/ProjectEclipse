@@ -28,7 +28,7 @@ public class TacticalTableHolder
 
 	private string _weaponName;
 
-	public void Load(byte[] buffer, int KOHGHADGPCE, string NBJPDCDOOKH)
+	public void Load(byte[] buffer, int tableIndex, string weaponName)
 	{
 		int num = buffer.Length;
 		if (0 >= num)
@@ -43,7 +43,7 @@ public class TacticalTableHolder
 			{
 				ReadAnimationList(binaryReader, list);
 				ReadWeaponTypeList(binaryReader, list2);
-				ReadTables(binaryReader, list, list2, KOHGHADGPCE, NBJPDCDOOKH);
+				ReadTables(binaryReader, list, list2, tableIndex, weaponName);
 				if (binaryReader.BaseStream.Length != binaryReader.BaseStream.Position)
 				{
 					GameLog.Error("pointer != buffer.end()");
@@ -80,91 +80,91 @@ public class TacticalTableHolder
 		return false;
 	}
 
-	private static void ReadAnimationList(BinaryReader NNGPBPLGEOK, List<InfoAnimation> MAHEJFLCCHP)
+	private static void ReadAnimationList(BinaryReader reader, List<InfoAnimation> animations)
 	{
-		int num = (MAHEJFLCCHP.Capacity = NNGPBPLGEOK.ReadUInt16());
-		byte[] array = NNGPBPLGEOK.ReadBytes(num);
+		int num = (animations.Capacity = reader.ReadUInt16());
+		byte[] array = reader.ReadBytes(num);
 		for (int i = 0; i < num; i++)
 		{
 			byte count = array[i];
-			string gOHIIMFFFJI = new string(NNGPBPLGEOK.ReadChars(count));
-			MAHEJFLCCHP.Add(AnimationData.GetAnimationByName(gOHIIMFFFJI, AiData.get_IsShowErrorIfAnimationNotFound()));
+			string animationName = new string(reader.ReadChars(count));
+			animations.Add(AnimationData.GetAnimationByName(animationName, AiData.get_IsShowErrorIfAnimationNotFound()));
 		}
 	}
 
-	private static void ReadWeaponTypeList(BinaryReader NNGPBPLGEOK, List<string> NFMICLFEKJD)
+	private static void ReadWeaponTypeList(BinaryReader reader, List<string> weaponTypes)
 	{
-		short num = NNGPBPLGEOK.ReadInt16();
-		byte[] array = NNGPBPLGEOK.ReadBytes(num);
+		short num = reader.ReadInt16();
+		byte[] array = reader.ReadBytes(num);
 		for (int i = 0; i < num; i++)
 		{
 			byte count = array[i];
-			NFMICLFEKJD.Add(new string(NNGPBPLGEOK.ReadChars(count)));
+			weaponTypes.Add(new string(reader.ReadChars(count)));
 		}
 	}
 
-	private void ReadTables(BinaryReader LEOMHBCGLKI, List<InfoAnimation> CHNJHIPHIHA, List<string> IMOCIDBCFBA, int GAMDIAAJJMC, string EILBAKBJCIJ)
+	private void ReadTables(BinaryReader reader, List<InfoAnimation> animations, List<string> weaponTypes, int tableIndex, string weaponName)
 	{
-		_tableIndex = GAMDIAAJJMC;
-		_weaponName = EILBAKBJCIJ;
-		int num = (int)LEOMHBCGLKI.ReadUInt32();
-		int num2 = (int)LEOMHBCGLKI.ReadUInt32();
+		_tableIndex = tableIndex;
+		_weaponName = weaponName;
+		int num = (int)reader.ReadUInt32();
+		int num2 = (int)reader.ReadUInt32();
 		_groups = new List<GroupTables>(num2);
 		for (int i = 0; i < num2; i++)
 		{
 			_groups.Add(new GroupTables());
 		}
-		int num3 = (int)LEOMHBCGLKI.ReadUInt32();
+		int num3 = (int)reader.ReadUInt32();
 		_tables = new List<TacticalTable>(num3);
 		for (int j = 0; j < num3; j++)
 		{
 			_tables.Add(new TacticalTable());
 		}
-		int num4 = (int)LEOMHBCGLKI.ReadUInt32();
+		int num4 = (int)reader.ReadUInt32();
 		_intervals = new List<Intervals>(num4);
 		for (int k = 0; k < num4; k++)
 		{
 			_intervals.Add(new Intervals());
 		}
-		int num5 = (int)LEOMHBCGLKI.ReadUInt32();
+		int num5 = (int)reader.ReadUInt32();
 		_animationsWithIntervals = new List<IntervalNew>(num5);
 		for (int l = 0; l < num5; l++)
 		{
 			_animationsWithIntervals.Add(new IntervalNew());
 		}
-		int num6 = (int)LEOMHBCGLKI.ReadUInt32();
-		int num7 = (int)LEOMHBCGLKI.ReadUInt32();
+		int num6 = (int)reader.ReadUInt32();
+		int num7 = (int)reader.ReadUInt32();
 		_animationTables = new List<AnimationTablesForAnimation>(num);
 		for (int m = 0; m < num; m++)
 		{
-			ushort num8 = LEOMHBCGLKI.ReadUInt16();
+			ushort num8 = reader.ReadUInt16();
 			_animationTables.Add(new AnimationTablesForAnimation());
-			if (num8 < CHNJHIPHIHA.Count)
+			if (num8 < animations.Count)
 			{
-				_animationTables[m].Animation = CHNJHIPHIHA[num8];
+				_animationTables[m].Animation = animations[num8];
 			}
 			else
 			{
 				_animationTables[m].Animation = null;
 			}
 		}
-		short num9 = LEOMHBCGLKI.ReadInt16();
+		short num9 = reader.ReadInt16();
 		_distances = new List<float>(num6);
 		for (int n = 0; n < num6; n++)
 		{
-			_distances.Add((num9 == 0) ? LEOMHBCGLKI.ReadInt16() : (num9 * LEOMHBCGLKI.ReadInt16()));
+			_distances.Add((num9 == 0) ? reader.ReadInt16() : (num9 * reader.ReadInt16()));
 		}
 		_interframes = new List<int>(num7);
 		for (int num10 = 0; num10 < num7; num10++)
 		{
-			_interframes.Add(LEOMHBCGLKI.ReadInt32());
+			_interframes.Add(reader.ReadInt32());
 		}
 		List<InfoAnimation> list = new List<InfoAnimation>(num5);
 		int num11 = 0;
 		int num12 = 0;
 		for (int num13 = num5; num12 < num13; num12++)
 		{
-			list.Add(CHNJHIPHIHA[LEOMHBCGLKI.ReadUInt16()]);
+			list.Add(animations[reader.ReadUInt16()]);
 			if (list[num12] == null)
 			{
 				num11++;
@@ -184,7 +184,7 @@ public class TacticalTableHolder
 		int num21 = 0;
 		foreach (AnimationTablesForAnimation item in _animationTables)
 		{
-			ushort num22 = LEOMHBCGLKI.ReadUInt16();
+			ushort num22 = reader.ReadUInt16();
 			if (item.Animation == null)
 			{
 				item.Animation = new InfoAnimation();
@@ -194,23 +194,23 @@ public class TacticalTableHolder
 			num15 += num22;
 			foreach (GroupTables item2 in item.Container)
 			{
-				ushort index = LEOMHBCGLKI.ReadUInt16();
-				item2.GroupLabel = IMOCIDBCFBA[index];
-				num22 = LEOMHBCGLKI.ReadUInt16();
+				ushort index = reader.ReadUInt16();
+				item2.GroupLabel = weaponTypes[index];
+				num22 = reader.ReadUInt16();
 				item2.Tables = _tables.GetRange(num16, num22);
 				num16 += num22;
 				foreach (TacticalTable item3 in item2.Tables)
 				{
-					item3.Label = ReadNullTerminatedString(LEOMHBCGLKI);
-					num22 = LEOMHBCGLKI.ReadUInt16();
+					item3.Label = ReadNullTerminatedString(reader);
+					num22 = reader.ReadUInt16();
 					if (0 < num22)
 					{
 						item3.IntervalList = _intervals.GetRange(num17, num22);
 						num17 += num22;
-						item3.FirstFrameIndex = LEOMHBCGLKI.ReadInt16();
+						item3.FirstFrameIndex = reader.ReadInt16();
 						foreach (Intervals item4 in item3.IntervalList)
 						{
-							ushort num23 = LEOMHBCGLKI.ReadUInt16();
+							ushort num23 = reader.ReadUInt16();
 							item4.Items = _animationsWithIntervals.GetRange(num21, num23);
 							num21 += num23;
 							if (0 >= num23)
@@ -224,13 +224,13 @@ public class TacticalTableHolder
 							}
 							foreach (IntervalNew item6 in item4.Items)
 							{
-								ushort num24 = LEOMHBCGLKI.ReadUInt16();
+								ushort num24 = reader.ReadUInt16();
 								item6.Distances = _distances.GetRange(num18, num24);
 								num18 += num24;
 							}
 							foreach (IntervalNew item7 in item4.Items)
 							{
-								ushort num25 = LEOMHBCGLKI.ReadUInt16();
+								ushort num25 = reader.ReadUInt16();
 								item7.Interframes = _interframes.GetRange(num20, num25);
 								num20 += num25;
 							}
@@ -286,10 +286,10 @@ public class TacticalTableHolder
 		}
 	}
 
-	public static string ReadNullTerminatedString(BinaryReader NNGPBPLGEOK)
+	public static string ReadNullTerminatedString(BinaryReader reader)
 	{
 		string text = string.Empty;
-		for (char c = NNGPBPLGEOK.ReadChar(); c != 0; c = NNGPBPLGEOK.ReadChar())
+		for (char c = reader.ReadChar(); c != 0; c = reader.ReadChar())
 		{
 			text += c;
 		}

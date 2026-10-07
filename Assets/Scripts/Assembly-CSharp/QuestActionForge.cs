@@ -1,8 +1,8 @@
 public class QuestActionForge : QuestAction
 {
-	public override void Execute(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters parameters)
 	{
-		base.Execute(GFIHPBCEEOB);
+		base.Execute(parameters);
 		Roster roster = ListSF.GetRoster();
 		if (roster != null)
 		{

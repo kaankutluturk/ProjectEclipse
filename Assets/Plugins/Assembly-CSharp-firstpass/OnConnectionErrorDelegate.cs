@@ -1,1 +1,1 @@
-public delegate void OnConnectionErrorDelegate(Connection MDGFGCDPGFI, string JDONBAPIJCG);
+public delegate void OnConnectionErrorDelegate(Connection connection, string error);

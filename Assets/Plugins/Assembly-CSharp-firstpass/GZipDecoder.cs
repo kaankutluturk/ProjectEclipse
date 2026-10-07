@@ -64,13 +64,13 @@ internal class GZipDecoder : IFileFormatReader
 		expectedOutputStreamSizeModulo = 0u;
 	}
 
-	public bool ReadHeader(InputBuffer NILNDHEKNLJ)
+	public bool ReadHeader(InputBuffer input)
 	{
 		switch (gzipHeaderSubstate)
 		{
 		case GzipHeaderState.ReadingID1:
 		{
-			int num = NILNDHEKNLJ.GetBits(8);
+			int num = input.GetBits(8);
 			if (num < 0)
 			{
 				return false;
@@ -84,7 +84,7 @@ internal class GZipDecoder : IFileFormatReader
 		}
 		case GzipHeaderState.ReadingID2:
 		{
-			int num = NILNDHEKNLJ.GetBits(8);
+			int num = input.GetBits(8);
 			if (num < 0)
 			{
 				return false;
@@ -98,7 +98,7 @@ internal class GZipDecoder : IFileFormatReader
 		}
 		case GzipHeaderState.ReadingCM:
 		{
-			int num = NILNDHEKNLJ.GetBits(8);
+			int num = input.GetBits(8);
 			if (num < 0)
 			{
 				return false;
@@ -112,7 +112,7 @@ internal class GZipDecoder : IFileFormatReader
 		}
 		case GzipHeaderState.ReadingFLG:
 		{
-			int num = NILNDHEKNLJ.GetBits(8);
+			int num = input.GetBits(8);
 			if (num < 0)
 			{
 				return false;
@@ -127,7 +127,7 @@ internal class GZipDecoder : IFileFormatReader
 			int num = 0;
 			while (loopCounter < 4)
 			{
-				num = NILNDHEKNLJ.GetBits(8);
+				num = input.GetBits(8);
 				if (num < 0)
 				{
 					return false;
@@ -140,7 +140,7 @@ internal class GZipDecoder : IFileFormatReader
 		}
 		case GzipHeaderState.ReadingXFL:
 		{
-			int num = NILNDHEKNLJ.GetBits(8);
+			int num = input.GetBits(8);
 			if (num < 0)
 			{
 				return false;
@@ -150,7 +150,7 @@ internal class GZipDecoder : IFileFormatReader
 		}
 		case GzipHeaderState.ReadingOS:
 		{
-			int num = NILNDHEKNLJ.GetBits(8);
+			int num = input.GetBits(8);
 			if (num < 0)
 			{
 				return false;
@@ -164,7 +164,7 @@ internal class GZipDecoder : IFileFormatReader
 			{
 				goto case GzipHeaderState.ReadingFileName;
 			}
-			int num = NILNDHEKNLJ.GetBits(8);
+			int num = input.GetBits(8);
 			if (num < 0)
 			{
 				return false;
@@ -175,7 +175,7 @@ internal class GZipDecoder : IFileFormatReader
 		}
 		case GzipHeaderState.ReadingXLen2:
 		{
-			int num = NILNDHEKNLJ.GetBits(8);
+			int num = input.GetBits(8);
 			if (num < 0)
 			{
 				return false;
@@ -190,7 +190,7 @@ internal class GZipDecoder : IFileFormatReader
 			int num = 0;
 			while (loopCounter < gzip_header_xlen)
 			{
-				num = NILNDHEKNLJ.GetBits(8);
+				num = input.GetBits(8);
 				if (num < 0)
 				{
 					return false;
@@ -211,7 +211,7 @@ internal class GZipDecoder : IFileFormatReader
 				int num;
 				do
 				{
-					num = NILNDHEKNLJ.GetBits(8);
+					num = input.GetBits(8);
 					if (num < 0)
 					{
 						return false;
@@ -231,7 +231,7 @@ internal class GZipDecoder : IFileFormatReader
 				int num;
 				do
 				{
-					num = NILNDHEKNLJ.GetBits(8);
+					num = input.GetBits(8);
 					if (num < 0)
 					{
 						return false;
@@ -248,7 +248,7 @@ internal class GZipDecoder : IFileFormatReader
 				gzipHeaderSubstate = GzipHeaderState.Done;
 				goto case GzipHeaderState.Done;
 			}
-			int num = NILNDHEKNLJ.GetBits(8);
+			int num = input.GetBits(8);
 			if (num < 0)
 			{
 				return false;
@@ -258,7 +258,7 @@ internal class GZipDecoder : IFileFormatReader
 		}
 		case GzipHeaderState.ReadingCRC16Part2:
 		{
-			int num = NILNDHEKNLJ.GetBits(8);
+			int num = input.GetBits(8);
 			if (num < 0)
 			{
 				return false;
@@ -273,14 +273,14 @@ internal class GZipDecoder : IFileFormatReader
 		}
 	}
 
-	public bool ReadFooter(InputBuffer NILNDHEKNLJ)
+	public bool ReadFooter(InputBuffer input)
 	{
-		NILNDHEKNLJ.SkipToByteBoundary();
+		input.SkipToByteBoundary();
 		if (gzipFooterSubstate == GzipHeaderState.ReadingCRC)
 		{
 			while (loopCounter < 4)
 			{
-				int num = NILNDHEKNLJ.GetBits(8);
+				int num = input.GetBits(8);
 				if (num < 0)
 				{
 					return false;
@@ -299,7 +299,7 @@ internal class GZipDecoder : IFileFormatReader
 			}
 			while (loopCounter < 4)
 			{
-				int num2 = NILNDHEKNLJ.GetBits(8);
+				int num2 = input.GetBits(8);
 				if (num2 < 0)
 				{
 					return false;
@@ -311,10 +311,10 @@ internal class GZipDecoder : IFileFormatReader
 		return true;
 	}
 
-	public void UpdateWithBytesRead(byte[] buffer, int IPCOBJBKNAO, int KKBGGFLOLMB)
+	public void UpdateWithBytesRead(byte[] buffer, int offset, int count)
 	{
-		actualCrc32 = Crc32Helper.UpdateCrc32(actualCrc32, buffer, IPCOBJBKNAO, KKBGGFLOLMB);
-		long num = actualStreamSizeModulo + (uint)KKBGGFLOLMB;
+		actualCrc32 = Crc32Helper.UpdateCrc32(actualCrc32, buffer, offset, count);
+		long num = actualStreamSizeModulo + (uint)count;
 		if (num >= 4294967296L)
 		{
 			num %= 4294967296L;

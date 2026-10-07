@@ -28,8 +28,8 @@ namespace Nekki.SF2.GUI.Dialogs
 
 		public override void Init(object data)
 		{
-			TradeDialogInfo fOIIPALJAMM = (TradeDialogInfo)data;
-			if (fOIIPALJAMM == null)
+			TradeDialogInfo info = (TradeDialogInfo)data;
+			if (info == null)
 			{
 				_value = GameValueType.Gold;
 				price = 0L;
@@ -38,10 +38,10 @@ namespace Nekki.SF2.GUI.Dialogs
 			}
 			else
 			{
-				_value = fOIIPALJAMM.Value;
-				price = fOIIPALJAMM.Price;
-				action = fOIIPALJAMM.TradeType;
-				waitTimeSeconds = fOIIPALJAMM.DeliverySeconds;
+				_value = info.Value;
+				price = info.Price;
+				action = info.TradeType;
+				waitTimeSeconds = info.DeliverySeconds;
 			}
 			string text;
 			switch (action)
@@ -76,9 +76,9 @@ namespace Nekki.SF2.GUI.Dialogs
 				}
 			}
 			defaultOkButtonAlias = text;
-			if (fOIIPALJAMM != null && fOIIPALJAMM.Dlg != null)
+			if (info != null && info.Dlg != null)
 			{
-				AddEventListener(0, fOIIPALJAMM.Dlg);
+				AddEventListener(0, info.Dlg);
 			}
 			base.Init(_titleString, text, "CANCEL", FooterType.FOOTER_BOTH);
 		}
@@ -95,8 +95,8 @@ namespace Nekki.SF2.GUI.Dialogs
 				text += "MiscSprites.ruby";
 				break;
 			}
-			string pEMOECLNECD = "dlgCurrencyQuestion{" + text + "}{" + price + "}";
-			string text2 = LocalizationManager.GetString(messageKey) + "\n" + LocalizationManager.GetString(pEMOECLNECD);
+			string questionKey = "dlgCurrencyQuestion{" + text + "}{" + price + "}";
+			string text2 = LocalizationManager.GetString(messageKey) + "\n" + LocalizationManager.GetString(questionKey);
 			_text.set_text(text2);
 			if (waitTimeSeconds > 0)
 			{

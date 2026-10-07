@@ -24,19 +24,19 @@ namespace Nekki.SF2.GUI.Fight
 			}
 		}
 
-		public void AddStrip(string KHPKDMGDMAB, string path = "", float LOGBIEIPCMB = 0f, string KFGFMPJMOAP = "")
+		public void AddStrip(string spriteName, string path = "", float skewAngle = 0f, string stripName = "")
 		{
-			if (KHPKDMGDMAB != null)
+			if (spriteName != null)
 			{
 				GameObject gameObject = new GameObject();
-				if (!KFGFMPJMOAP.Equals(string.Empty))
+				if (!stripName.Equals(string.Empty))
 				{
-					gameObject.name = KFGFMPJMOAP;
+					gameObject.name = stripName;
 				}
 				StyleBarStrip styleBarStrip = gameObject.AddComponent<StyleBarStrip>();
 				styleBarStrip.set_TexturePath(path);
-				styleBarStrip.set_SpriteName(KHPKDMGDMAB);
-				styleBarStrip.set_SkewAngle(LOGBIEIPCMB);
+				styleBarStrip.set_SpriteName(spriteName);
+				styleBarStrip.set_SkewAngle(skewAngle);
 				styleBarStrip.SetNativeSize();
 				AddStrip(styleBarStrip);
 			}
@@ -54,64 +54,64 @@ namespace Nekki.SF2.GUI.Fight
 			}
 		}
 
-		public void AddStrip(StyleBarStrip AFAJEAMJFJH)
+		public void AddStrip(StyleBarStrip strip)
 		{
-			if (!(AFAJEAMJFJH == null))
+			if (!(strip == null))
 			{
-				AFAJEAMJFJH.transform.SetParent(base.transform, false);
-				AFAJEAMJFJH.rectTransform.anchorMin = new Vector2(0f, 0.5f);
-				AFAJEAMJFJH.rectTransform.anchorMax = new Vector2(1f, 0.5f);
-				AFAJEAMJFJH.Init(1f);
-				styleBarStrips.Add(AFAJEAMJFJH);
+				strip.transform.SetParent(base.transform, false);
+				strip.rectTransform.anchorMin = new Vector2(0f, 0.5f);
+				strip.rectTransform.anchorMax = new Vector2(1f, 0.5f);
+				strip.Init(1f);
+				styleBarStrips.Add(strip);
 			}
 		}
 
-		public void SetSkewAngle(float LOGBIEIPCMB)
+		public void SetSkewAngle(float skewAngle)
 		{
-			SetSkewBackground(LOGBIEIPCMB);
-			styleBarStrips.ForEach((StyleBarStrip DHDMNHCIPEH) =>
+			SetSkewBackground(skewAngle);
+			styleBarStrips.ForEach((StyleBarStrip strip) =>
 			{
-				DHDMNHCIPEH.set_SkewAngle(LOGBIEIPCMB);
+				strip.set_SkewAngle(skewAngle);
 			});
 		}
 
-		public void SetSkewAngle(float LOGBIEIPCMB, int BKCCOEBNFAA)
+		public void SetSkewAngle(float skewAngle, int index)
 		{
-			if (styleBarStrips.Count > BKCCOEBNFAA)
+			if (styleBarStrips.Count > index)
 			{
-				styleBarStrips[BKCCOEBNFAA].set_SkewAngle(LOGBIEIPCMB);
+				styleBarStrips[index].set_SkewAngle(skewAngle);
 			}
 		}
 
-		public void SetSkewBackground(float LOGBIEIPCMB)
+		public void SetSkewBackground(float skewAngle)
 		{
 			if (background != null)
 			{
-				background.set_SkewAngle(LOGBIEIPCMB);
+				background.set_SkewAngle(skewAngle);
 			}
 		}
 
 		public void SetValue(float value, int frames)
 		{
-			styleBarStrips.ForEach((StyleBarStrip DHDMNHCIPEH) =>
+			styleBarStrips.ForEach((StyleBarStrip strip) =>
 			{
-				DHDMNHCIPEH.SetValue(value, frames);
+				strip.SetValue(value, frames);
 			});
 		}
 
-		public void SetValue(float value, int frames, int BKCCOEBNFAA)
+		public void SetValue(float value, int frames, int index)
 		{
-			if (styleBarStrips.Count > BKCCOEBNFAA)
+			if (styleBarStrips.Count > index)
 			{
-				styleBarStrips[BKCCOEBNFAA].SetValue(value, frames);
+				styleBarStrips[index].SetValue(value, frames);
 			}
 		}
 
-		public float GetValue(int BKCCOEBNFAA)
+		public float GetValue(int index)
 		{
-			if (styleBarStrips.Count > BKCCOEBNFAA)
+			if (styleBarStrips.Count > index)
 			{
-				return styleBarStrips[BKCCOEBNFAA].fillAmount;
+				return styleBarStrips[index].fillAmount;
 			}
 			return 0f;
 		}

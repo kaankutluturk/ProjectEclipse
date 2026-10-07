@@ -33,14 +33,14 @@ public static class GameTimeUtils
 		return (long)(DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalMilliseconds;
 	}
 
-	public static int ToGameSeconds(long AIJGNBNAGGJ)
+	public static int ToGameSeconds(long unixMs)
 	{
-		return (int)((double)(AIJGNBNAGGJ - gameEpochMs) * 0.001);
+		return (int)((double)(unixMs - gameEpochMs) * 0.001);
 	}
 
-	public static long FromGameSeconds(int AIJGNBNAGGJ)
+	public static long FromGameSeconds(int gameSeconds)
 	{
-		return (long)AIJGNBNAGGJ * 1000L + gameEpochMs;
+		return (long)gameSeconds * 1000L + gameEpochMs;
 	}
 
 	public static TimeZone GetLocalTimeZone()

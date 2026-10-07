@@ -59,15 +59,15 @@ namespace Nekki.SF2.GUI.Menu
 			}
 			for (int i = 0; i < list.Count; i++)
 			{
-				GameCurrency cJJOFMHLFFM = list[i];
-				if (cJJOFMHLFFM.Group == GameCurrency.CurrencyGroup.CURRENCY_GROUP_FORGE)
+				GameCurrency currency = list[i];
+				if (currency.Group == GameCurrency.CurrencyGroup.CURRENCY_GROUP_FORGE)
 				{
 					GameObject gameObject = Object.Instantiate(MaterialPrefab);
 					MenuMaterSprite component = gameObject.GetComponent<MenuMaterSprite>();
 					// RectTransform.parent preserves world-space scale and position, which
 					// makes these UI entries oversized or offset under a scaled Canvas.
 					component.transform.SetParent(base.transform, false);
-					component.Init(cJJOFMHLFFM);
+					component.Init(currency);
 					materialSprites.Add(component);
 				}
 			}

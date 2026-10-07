@@ -4,8 +4,8 @@ public class ComboRule : DamageRule
 {
 	private int _comboLevel;
 
-	public ComboRule(XmlNode node, RuleAppliance EJPOJJKKICO)
-		: base(node, EJPOJJKKICO, RuleType.RuleCombo)
+	public ComboRule(XmlNode node, RuleAppliance ruleAppliance)
+		: base(node, ruleAppliance, RuleType.RuleCombo)
 	{
 		_comboLevel = 0;
 		applianceLosesOnTrigger = false;
@@ -15,12 +15,12 @@ public class ComboRule : DamageRule
 
 	protected override bool CompareSingle(object data)
 	{
-		FightData hCPJJKMNMCE = (FightData)data;
-		if (hCPJJKMNMCE.FightEventType == FightEvent.DamageCheckEvent)
+		FightData fightData = (FightData)data;
+		if (fightData.FightEventType == FightEvent.DamageCheckEvent)
 		{
 			return false;
 		}
-		return CheckIsNoDamageChange(hCPJJKMNMCE.currentComboLevel < _comboLevel);
+		return CheckIsNoDamageChange(fightData.currentComboLevel < _comboLevel);
 	}
 
 	protected override void Parse(XmlNode node)

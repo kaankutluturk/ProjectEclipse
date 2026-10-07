@@ -7,24 +7,24 @@ public class QuestActionOpenUrl : QuestAction
 
 	private string altUrlExpression = string.Empty;
 
-	public override void Parse(XmlNode EPKLCPOEELO)
+	public override void Parse(XmlNode node)
 	{
-		base.Parse(EPKLCPOEELO);
-		urlExpression = EPKLCPOEELO.Attributes["URL"].GetStringOrDefault(string.Empty);
-		altUrlExpression = EPKLCPOEELO.Attributes["ALT_URL"].GetStringOrDefault(string.Empty);
+		base.Parse(node);
+		urlExpression = node.Attributes["URL"].GetStringOrDefault(string.Empty);
+		altUrlExpression = node.Attributes["ALT_URL"].GetStringOrDefault(string.Empty);
 	}
 
-	public override void Execute(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters parameters)
 	{
-		base.Execute(GFIHPBCEEOB);
+		base.Execute(parameters);
 		bool flag = false;
 		if (urlExpression != string.Empty)
 		{
-			ConditionExtension.CompareResult lNIDLHOIHIM = new ConditionExtension.CompareResult();
-			QuestCondition kKDGLNECFHA = new QuestCondition();
-			kKDGLNECFHA.SetParameters(GFIHPBCEEOB);
-			kKDGLNECFHA.SetValue(urlExpression, lNIDLHOIHIM);
-			string text = lNIDLHOIHIM.ToString();
+			ConditionExtension.CompareResult result = new ConditionExtension.CompareResult();
+			QuestCondition condition = new QuestCondition();
+			condition.SetParameters(parameters);
+			condition.SetValue(urlExpression, result);
+			string text = result.ToString();
 			if (text != string.Empty)
 			{
 				OfflineServices.OpenExternalUrl(text);
@@ -34,7 +34,7 @@ public class QuestActionOpenUrl : QuestAction
 		{
 			ConditionExtension.CompareResult lNIDLHOIHIM2 = new ConditionExtension.CompareResult();
 			QuestCondition kKDGLNECFHA2 = new QuestCondition();
-			kKDGLNECFHA2.SetParameters(GFIHPBCEEOB);
+			kKDGLNECFHA2.SetParameters(parameters);
 			kKDGLNECFHA2.SetValue(altUrlExpression, lNIDLHOIHIM2);
 			string text2 = lNIDLHOIHIM2.ToString();
 			if (text2 != string.Empty)

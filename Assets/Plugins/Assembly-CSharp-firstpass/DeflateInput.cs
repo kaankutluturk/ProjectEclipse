@@ -67,10 +67,10 @@ internal class DeflateInput
 		startIndex = value;
 	}
 
-	internal void ConsumeBytes(int HDKKKCDKFEE)
+	internal void ConsumeBytes(int consumed)
 	{
-		startIndex += HDKKKCDKFEE;
-		count -= HDKKKCDKFEE;
+		startIndex += consumed;
+		count -= consumed;
 	}
 
 	internal InputState DumpState()

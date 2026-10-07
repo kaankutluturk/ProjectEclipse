@@ -53,9 +53,9 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 			inited = true;
 		}
 
-		public static void SetNewCryptoKey(int CNOFJICCAHK)
+		public static void SetNewCryptoKey(int newKey)
 		{
-			cryptoKey = CNOFJICCAHK;
+			cryptoKey = newKey;
 		}
 
 		public static int Encrypt(float value)
@@ -63,14 +63,14 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 			return Encrypt(value, cryptoKey);
 		}
 
-		public static int Encrypt(float value, int KGBGENDIMBC)
+		public static int Encrypt(float value, int key)
 		{
-			FloatIntBytesUnion eHLBLJICLKD = new FloatIntBytesUnion
+			FloatIntBytesUnion union = new FloatIntBytesUnion
 			{
 				f = value
 			};
-			eHLBLJICLKD.i ^= KGBGENDIMBC;
-			return eHLBLJICLKD.i;
+			union.i ^= key;
+			return union.i;
 		}
 
 		private static byte[] InternalEncrypt(float value)
@@ -78,19 +78,19 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 			return InternalEncrypt(value, 0);
 		}
 
-		private static byte[] InternalEncrypt(float value, int KGBGENDIMBC)
+		private static byte[] InternalEncrypt(float value, int key)
 		{
-			int num = KGBGENDIMBC;
+			int num = key;
 			if (num == 0)
 			{
 				num = cryptoKey;
 			}
-			FloatIntBytesUnion eHLBLJICLKD = new FloatIntBytesUnion
+			FloatIntBytesUnion union = new FloatIntBytesUnion
 			{
 				f = value
 			};
-			eHLBLJICLKD.i ^= num;
-			return new byte[4] { eHLBLJICLKD.b1, eHLBLJICLKD.b2, eHLBLJICLKD.b3, eHLBLJICLKD.b4 };
+			union.i ^= num;
+			return new byte[4] { union.b1, union.b2, union.b3, union.b4 };
 		}
 
 		public static float Decrypt(int value)
@@ -98,13 +98,13 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 			return Decrypt(value, cryptoKey);
 		}
 
-		public static float Decrypt(int value, int KGBGENDIMBC)
+		public static float Decrypt(int value, int key)
 		{
-			FloatIntBytesUnion eHLBLJICLKD = new FloatIntBytesUnion
+			FloatIntBytesUnion union = new FloatIntBytesUnion
 			{
-				i = (value ^ KGBGENDIMBC)
+				i = (value ^ key)
 			};
-			return eHLBLJICLKD.f;
+			return union.f;
 		}
 
 		public void ApplyNewCryptoKey()
@@ -118,32 +118,32 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 
 		public void RandomizeCryptoKey()
 		{
-			float bAINMLLIKOL = InternalDecrypt();
+			float decrypted = InternalDecrypt();
 			currentCryptoKey = UnityEngine.Random.Range(int.MinValue, int.MaxValue);
-			hiddenValue = InternalEncrypt(bAINMLLIKOL, currentCryptoKey);
+			hiddenValue = InternalEncrypt(decrypted, currentCryptoKey);
 		}
 
 		public int GetEncrypted()
 		{
 			ApplyNewCryptoKey();
-			FloatIntBytesUnion eHLBLJICLKD = new FloatIntBytesUnion
+			FloatIntBytesUnion union = new FloatIntBytesUnion
 			{
 				b1 = hiddenValue[0],
 				b2 = hiddenValue[1],
 				b3 = hiddenValue[2],
 				b4 = hiddenValue[3]
 			};
-			return eHLBLJICLKD.i;
+			return union.i;
 		}
 
-		public void SetEncrypted(int ANGFOBEKKKD)
+		public void SetEncrypted(int encrypted)
 		{
 			inited = true;
-			FloatIntBytesUnion eHLBLJICLKD = new FloatIntBytesUnion
+			FloatIntBytesUnion union = new FloatIntBytesUnion
 			{
-				i = ANGFOBEKKKD
+				i = encrypted
 			};
-			hiddenValue = new byte[4] { eHLBLJICLKD.b1, eHLBLJICLKD.b2, eHLBLJICLKD.b3, eHLBLJICLKD.b4 };
+			hiddenValue = new byte[4] { union.b1, union.b2, union.b3, union.b4 };
 			if (ObscuredCheatingDetector.GetIsRunning())
 			{
 				fakeValue = InternalDecrypt();
@@ -159,20 +159,20 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 				fakeValue = 0f;
 				inited = true;
 			}
-			FloatIntBytesUnion eHLBLJICLKD = new FloatIntBytesUnion
+			FloatIntBytesUnion union = new FloatIntBytesUnion
 			{
 				b1 = hiddenValue[0],
 				b2 = hiddenValue[1],
 				b3 = hiddenValue[2],
 				b4 = hiddenValue[3]
 			};
-			eHLBLJICLKD.i ^= currentCryptoKey;
-			float jKBEIEPBHOD = eHLBLJICLKD.f;
-			if (ObscuredCheatingDetector.GetIsRunning() && fakeValue != 0f && Math.Abs(jKBEIEPBHOD - fakeValue) > ObscuredCheatingDetector.get_Instance().floatEpsilon)
+			union.i ^= currentCryptoKey;
+			float decrypted = union.f;
+			if (ObscuredCheatingDetector.GetIsRunning() && fakeValue != 0f && Math.Abs(decrypted - fakeValue) > ObscuredCheatingDetector.get_Instance().floatEpsilon)
 			{
 				ObscuredCheatingDetector.get_Instance().OnCheatingDetected();
 			}
-			return jKBEIEPBHOD;
+			return decrypted;
 		}
 
 		public static implicit operator ObscuredFloat(float value)
@@ -191,41 +191,41 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 		}
 
 		[SpecialName]
-		public static ObscuredFloat op_Increment(ObscuredFloat NILNDHEKNLJ)
+		public static ObscuredFloat op_Increment(ObscuredFloat input)
 		{
-			float bAINMLLIKOL = NILNDHEKNLJ.InternalDecrypt() + 1f;
-			NILNDHEKNLJ.hiddenValue = InternalEncrypt(bAINMLLIKOL, NILNDHEKNLJ.currentCryptoKey);
+			float newValue = input.InternalDecrypt() + 1f;
+			input.hiddenValue = InternalEncrypt(newValue, input.currentCryptoKey);
 			if (ObscuredCheatingDetector.GetIsRunning())
 			{
-				NILNDHEKNLJ.fakeValue = bAINMLLIKOL;
+				input.fakeValue = newValue;
 			}
-			return NILNDHEKNLJ;
+			return input;
 		}
 
 		[SpecialName]
-		public static ObscuredFloat op_Decrement(ObscuredFloat NILNDHEKNLJ)
+		public static ObscuredFloat op_Decrement(ObscuredFloat input)
 		{
-			float bAINMLLIKOL = NILNDHEKNLJ.InternalDecrypt() - 1f;
-			NILNDHEKNLJ.hiddenValue = InternalEncrypt(bAINMLLIKOL, NILNDHEKNLJ.currentCryptoKey);
+			float newValue = input.InternalDecrypt() - 1f;
+			input.hiddenValue = InternalEncrypt(newValue, input.currentCryptoKey);
 			if (ObscuredCheatingDetector.GetIsRunning())
 			{
-				NILNDHEKNLJ.fakeValue = bAINMLLIKOL;
+				input.fakeValue = newValue;
 			}
-			return NILNDHEKNLJ;
+			return input;
 		}
 
-		public override bool Equals(object AOMLCBHAJJH)
+		public override bool Equals(object obj)
 		{
-			if (!(AOMLCBHAJJH is ObscuredFloat))
+			if (!(obj is ObscuredFloat))
 			{
 				return false;
 			}
-			return Equals((ObscuredFloat)AOMLCBHAJJH);
+			return Equals((ObscuredFloat)obj);
 		}
 
-		public bool Equals(ObscuredFloat AOMLCBHAJJH)
+		public bool Equals(ObscuredFloat other)
 		{
-			double num = AOMLCBHAJJH.InternalDecrypt();
+			double num = other.InternalDecrypt();
 			double obj = InternalDecrypt();
 			return num.Equals(obj);
 		}
@@ -240,19 +240,19 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 			return InternalDecrypt().ToString();
 		}
 
-		public string ToString(string LBOHOKIBHOH)
+		public string ToString(string format)
 		{
-			return InternalDecrypt().ToString(LBOHOKIBHOH);
+			return InternalDecrypt().ToString(format);
 		}
 
-		public string ToString(IFormatProvider EEGMFLOPLLH)
+		public string ToString(IFormatProvider provider)
 		{
-			return InternalDecrypt().ToString(EEGMFLOPLLH);
+			return InternalDecrypt().ToString(provider);
 		}
 
-		public string ToString(string LBOHOKIBHOH, IFormatProvider EEGMFLOPLLH)
+		public string ToString(string format, IFormatProvider provider)
 		{
-			return InternalDecrypt().ToString(LBOHOKIBHOH, EEGMFLOPLLH);
+			return InternalDecrypt().ToString(format, provider);
 		}
 	}
 }

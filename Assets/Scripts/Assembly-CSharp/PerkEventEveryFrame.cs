@@ -24,10 +24,10 @@ public class PerkEventEveryFrame : PerkEvent
 	{
 	}
 
-	public PerkEventEveryFrame(PerkEventEveryFrame NOLFMPDGCOC)
-		: base(NOLFMPDGCOC)
+	public PerkEventEveryFrame(PerkEventEveryFrame source)
+		: base(source)
 	{
-		set_Step(NOLFMPDGCOC.GetStep());
+		set_Step(source.GetStep());
 	}
 
 	public int GetStep()
@@ -46,15 +46,15 @@ public class PerkEventEveryFrame : PerkEvent
 		set_Step(node.Attributes["Step"].ParseInt());
 	}
 
-	public override bool IsEqual(EventStruct EJMEALJNNIL)
+	public override bool IsEqual(EventStruct eventData)
 	{
-		if (!base.IsEqual(EJMEALJNNIL) || EJMEALJNNIL == null || EJMEALJNNIL.Info == null)
+		if (!base.IsEqual(eventData) || eventData == null || eventData.Info == null)
 		{
 			return false;
 		}
 		if (GetStep() != 0)
 		{
-			Dictionary<string, object> dictionary = (Dictionary<string, object>)EJMEALJNNIL.Info;
+			Dictionary<string, object> dictionary = (Dictionary<string, object>)eventData.Info;
 			if (dictionary != null)
 			{
 				long num = 0L;

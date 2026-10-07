@@ -6,21 +6,21 @@ public class QuestActionDeliver : QuestAction
 
 	private string enchantmentExpression;
 
-	public override void Parse(XmlNode EPKLCPOEELO)
+	public override void Parse(XmlNode node)
 	{
-		base.Parse(EPKLCPOEELO);
-		itemExpression = EPKLCPOEELO.Attributes["Item"].GetStringOrDefault(string.Empty);
-		enchantmentExpression = EPKLCPOEELO.Attributes["Enchantment"].GetStringOrDefault(string.Empty);
+		base.Parse(node);
+		itemExpression = node.Attributes["Item"].GetStringOrDefault(string.Empty);
+		enchantmentExpression = node.Attributes["Enchantment"].GetStringOrDefault(string.Empty);
 	}
 
-	public override void Execute(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters parameters)
 	{
-		base.Execute(GFIHPBCEEOB);
-		ConditionExtension.CompareResult lNIDLHOIHIM = new ConditionExtension.CompareResult();
-		QuestCondition kKDGLNECFHA = new QuestCondition();
-		kKDGLNECFHA.SetParameters(GFIHPBCEEOB);
-		kKDGLNECFHA.SetValue(itemExpression, lNIDLHOIHIM);
-		string text = lNIDLHOIHIM.ToString();
+		base.Execute(parameters);
+		ConditionExtension.CompareResult result = new ConditionExtension.CompareResult();
+		QuestCondition condition = new QuestCondition();
+		condition.SetParameters(parameters);
+		condition.SetValue(itemExpression, result);
+		string text = result.ToString();
 		if (!text.Equals("0"))
 		{
 			ItemBuyHelper.BuyImmediatelyDelivery(text);
@@ -28,8 +28,8 @@ public class QuestActionDeliver : QuestAction
 		else
 		{
 			string empty = string.Empty;
-			kKDGLNECFHA.SetValue(enchantmentExpression, lNIDLHOIHIM);
-			empty = lNIDLHOIHIM.ToString();
+			condition.SetValue(enchantmentExpression, result);
+			empty = result.ToString();
 			GameUtils.TrackDelivery(empty);
 		}
 		FinishAction();

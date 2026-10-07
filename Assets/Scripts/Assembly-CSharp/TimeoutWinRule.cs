@@ -2,8 +2,8 @@ using System.Xml;
 
 public class TimeoutWinRule : InFightRule
 {
-	public TimeoutWinRule(XmlNode node, RuleAppliance EJPOJJKKICO)
-		: base(RuleType.RuleTimeoutWin, EJPOJJKKICO, node)
+	public TimeoutWinRule(XmlNode node, RuleAppliance ruleAppliance)
+		: base(RuleType.RuleTimeoutWin, ruleAppliance, node)
 	{
 		applianceLosesOnTrigger = false;
 		SubscribeEvent(FightEvent.TimeoutEvent);
@@ -18,11 +18,11 @@ public class TimeoutWinRule : InFightRule
 
 	public override InFightRule Copy()
 	{
-		InFightRule aAJIFBJLJOA = null;
-		RuleAppliance eJPOJJKKICO = GetAppliance();
-		XmlNode hKPPBKPJOEO = GetXmlSource().GetNode();
-		aAJIFBJLJOA = new TimeoutWinRule(hKPPBKPJOEO, eJPOJJKKICO);
-		aAJIFBJLJOA.IsRandom = IsRandom;
-		return aAJIFBJLJOA;
+		InFightRule copiedRule = null;
+		RuleAppliance ruleAppliance = GetAppliance();
+		XmlNode ruleNode = GetXmlSource().GetNode();
+		copiedRule = new TimeoutWinRule(ruleNode, ruleAppliance);
+		copiedRule.IsRandom = IsRandom;
+		return copiedRule;
 	}
 }

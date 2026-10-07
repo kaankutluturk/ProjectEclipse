@@ -33,10 +33,10 @@ namespace Nekki.SF2.GUI.Menu
 
 		private int hintFrameDelay;
 
-		public void ShowHint(string HCPNFPMHFCM)
+		public void ShowHint(string hintText)
 		{
 			_hintRootGO.SetActive(true);
-			_hintText.text = HCPNFPMHFCM;
+			_hintText.text = hintText;
 			hintFrameDelay = 1;
 		}
 
@@ -90,21 +90,21 @@ namespace Nekki.SF2.GUI.Menu
 			_labelLevel.text = text;
 		}
 
-		public void UpdateBarExp(float OBLEMIHLFII, float KAEPJHHLLPK)
+		public void UpdateBarExp(float experience, float experienceToNextLevel)
 		{
-			if (OBLEMIHLFII != 0f && _barExp.GetValue() == OBLEMIHLFII)
+			if (experience != 0f && _barExp.GetValue() == experience)
 			{
 				return;
 			}
-			_barExp.SetValueBorders(0f, KAEPJHHLLPK);
-			_barExp.SetValue(OBLEMIHLFII);
+			_barExp.SetValueBorders(0f, experienceToNextLevel);
+			_barExp.SetValue(experience);
 			int num = ListSF.GetRoster().GetLevel();
 			int count = GameUtils.LevelThresholdTable.Thresholds.Count;
 			if (count != 0)
 			{
-				global::Pair<int, uint> cCKLNOPEKHO = GameUtils.LevelThresholdTable.Thresholds[count - 1];
-				int lLHEDBIEHAA = cCKLNOPEKHO.First;
-				if (num >= lLHEDBIEHAA)
+				global::Pair<int, uint> maxLevelEntry = GameUtils.LevelThresholdTable.Thresholds[count - 1];
+				int maxLevel = maxLevelEntry.First;
+				if (num >= maxLevel)
 				{
 					_iconMaxLevel.gameObject.SetActive(true);
 					_barExp.gameObject.SetActive(false);
@@ -124,7 +124,7 @@ namespace Nekki.SF2.GUI.Menu
 			CallEvent(0, 0);
 		}
 
-		public void SetHintBtnPressType(ButtonStateExtensions.ButtonPressType LFLGCDNKNJI, bool GHJGPAEDIHG)
+		public void SetHintBtnPressType(ButtonStateExtensions.ButtonPressType pressType, bool isInteractable)
 		{
 			if (_iconMaxLevel.gameObject.activeSelf)
 			{
@@ -132,7 +132,7 @@ namespace Nekki.SF2.GUI.Menu
 			}
 			else
 			{
-				_levelHintButton.SetPressType(LFLGCDNKNJI, GHJGPAEDIHG);
+				_levelHintButton.SetPressType(pressType, isInteractable);
 			}
 		}
 

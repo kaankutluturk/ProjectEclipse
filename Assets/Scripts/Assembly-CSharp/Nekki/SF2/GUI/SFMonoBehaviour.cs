@@ -7,14 +7,14 @@ namespace Nekki.SF2.GUI
 	{
 		private global::EventDispatcher<T> eventDispatcher = new global::EventDispatcher<T>();
 
-		public int AddEventListener(int name, Action<T> ODDEOFKLIAG)
+		public int AddEventListener(int name, Action<T> callback)
 		{
-			return eventDispatcher.AddEventListener(name, ODDEOFKLIAG);
+			return eventDispatcher.AddEventListener(name, callback);
 		}
 
-		public int CallEvent(int name, T EHCLMBADLKH)
+		public int CallEvent(int name, T data)
 		{
-			return eventDispatcher.CallEvent(name, EHCLMBADLKH);
+			return eventDispatcher.CallEvent(name, data);
 		}
 
 		public int RemoveAllEventListener()
@@ -27,9 +27,9 @@ namespace Nekki.SF2.GUI
 			return eventDispatcher.RemoveEvent(name);
 		}
 
-		public int RemoveEventListener(int name, Action<T> ODDEOFKLIAG)
+		public int RemoveEventListener(int name, Action<T> callback)
 		{
-			return eventDispatcher.RemoveEventListener(name, ODDEOFKLIAG);
+			return eventDispatcher.RemoveEventListener(name, callback);
 		}
 	}
 }

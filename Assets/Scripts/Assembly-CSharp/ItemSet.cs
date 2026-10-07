@@ -31,11 +31,11 @@ public class ItemSet
 		}
 	}
 
-	public ItemSetItem GetItemByName(string OHCGEEEKEJH)
+	public ItemSetItem GetItemByName(string itemName)
 	{
 		foreach (ItemSetItem item in Items)
 		{
-			if (item.Name.Equals(OHCGEEEKEJH))
+			if (item.Name.Equals(itemName))
 			{
 				return item;
 			}
@@ -47,13 +47,13 @@ public class ItemSet
 	{
 		foreach (ItemSetItem item in Items)
 		{
-			ItemInfo oFMCNLBFIDF = item.Item;
-			if (oFMCNLBFIDF == null)
+			ItemInfo itemInfo = item.Item;
+			if (itemInfo == null)
 			{
 				return false;
 			}
-			UserItem dKCHDHMLKHN = ListSF.GetRoster().GetInventory().FindItem(oFMCNLBFIDF);
-			if (dKCHDHMLKHN == null)
+			UserItem userItem = ListSF.GetRoster().GetInventory().FindItem(itemInfo);
+			if (userItem == null)
 			{
 				return false;
 			}

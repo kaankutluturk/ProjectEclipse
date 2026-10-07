@@ -2,7 +2,7 @@ using Nekki.SF2.GUI;
 
 public interface ITableViewDelegate
 {
-	void TableViewDidHighlightCellForRow(TableView OIDFBEAABBA, int IBAKGENOEPH);
+	void TableViewDidHighlightCellForRow(TableView tableView, int row);
 
-	void TableViewDidSelectCellForRow(TableView OIDFBEAABBA, int IBAKGENOEPH);
+	void TableViewDidSelectCellForRow(TableView tableView, int row);
 }

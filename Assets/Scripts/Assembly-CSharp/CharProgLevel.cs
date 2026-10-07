@@ -8,10 +8,10 @@ public struct CharProgLevel
 
 	public long value;
 
-	public CharProgLevel(XmlNode OPGGCJGNIPB)
+	public CharProgLevel(XmlNode node)
 	{
-		Min = OPGGCJGNIPB.Attributes["Min"].ParseUint();
-		Max = OPGGCJGNIPB.Attributes["Max"].ParseUint(uint.MaxValue);
-		value = OPGGCJGNIPB.Attributes["Value"].ParseLong(0L);
+		Min = node.Attributes["Min"].ParseUint();
+		Max = node.Attributes["Max"].ParseUint(uint.MaxValue);
+		value = node.Attributes["Value"].ParseLong(0L);
 	}
 }

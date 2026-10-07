@@ -31,7 +31,7 @@ public class CommandLineReader
 		string empty = string.Empty;
 		try
 		{
-			empty = array.Where((string IBAKGENOEPH) => IBAKGENOEPH.Contains("-CustomArgs:")).Single();
+			empty = array.Where((string argument) => argument.Contains("-CustomArgs:")).Single();
 		}
 		catch (Exception ex)
 		{
@@ -56,14 +56,14 @@ public class CommandLineReader
 		return dictionary;
 	}
 
-	public static string GetCustomArgument(string CDCEKJEPOAK)
+	public static string GetCustomArgument(string name)
 	{
 		Dictionary<string, string> dictionary = GetCustomArguments();
-		if (dictionary.ContainsKey(CDCEKJEPOAK))
+		if (dictionary.ContainsKey(name))
 		{
-			return dictionary[CDCEKJEPOAK];
+			return dictionary[name];
 		}
-		AdvLog.LogError("CommandLineReader.cs - GetCustomArgument() - Can't retrieve any custom argument named [" + CDCEKJEPOAK + "] in the command line [" + GetCommandLine() + "].");
+		AdvLog.LogError("CommandLineReader.cs - GetCustomArgument() - Can't retrieve any custom argument named [" + name + "] in the command line [" + GetCommandLine() + "].");
 		return string.Empty;
 	}
 }

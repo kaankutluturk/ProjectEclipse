@@ -1,1 +1,1 @@
-public delegate void OnStateChangedDelegate(EventSource GLFHBCIPCBD, EventSourceState JOBAGBFMMFP, EventSourceState MPJEMGJIBBD);
+public delegate void OnStateChangedDelegate(EventSource eventSource, EventSourceState oldState, EventSourceState newState);

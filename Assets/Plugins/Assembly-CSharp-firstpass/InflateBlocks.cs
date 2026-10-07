@@ -64,12 +64,12 @@ internal sealed class InflateBlocks
 
 	internal InfTree inftree = new InfTree();
 
-	internal InflateBlocks(ZlibCodec HNJFOALABOA, object checkfn, int OKPHBCHECPI)
+	internal InflateBlocks(ZlibCodec codec, object checkfn, int windowSize)
 	{
-		_codec = HNJFOALABOA;
+		_codec = codec;
 		hufts = new int[4320];
-		window = new byte[OKPHBCHECPI];
-		end = OKPHBCHECPI;
+		window = new byte[windowSize];
+		end = windowSize;
 		this.checkfn = checkfn;
 		mode = InflateBlockMode.TYPE;
 		Reset();
@@ -77,7 +77,7 @@ internal sealed class InflateBlocks
 
 	internal uint Reset()
 	{
-		uint iADLPBPGLKO = check;
+		uint previousCheck = check;
 		mode = InflateBlockMode.TYPE;
 		bitk = 0;
 		bitb = 0;
@@ -86,10 +86,10 @@ internal sealed class InflateBlocks
 		{
 			_codec._Adler32 = (check = Adler.Adler32(0u, null, 0, 0));
 		}
-		return iADLPBPGLKO;
+		return previousCheck;
 	}
 
-	internal int Process(int BOPODEAIEBJ)
+	internal int Process(int result)
 	{
 		int num = _codec.NextIn;
 		int num2 = _codec.AvailableBytesIn;
@@ -107,7 +107,7 @@ internal sealed class InflateBlocks
 				{
 					if (num2 != 0)
 					{
-						BOPODEAIEBJ = 0;
+						result = 0;
 						num2--;
 						num3 |= (_codec.InputBuffer[num++] & 0xFF) << i;
 						continue;
@@ -118,7 +118,7 @@ internal sealed class InflateBlocks
 					_codec.TotalBytesIn += num - _codec.NextIn;
 					_codec.NextIn = num;
 					writeAt = num4;
-					return Flush(BOPODEAIEBJ);
+					return Flush(result);
 				}
 				int num6 = num3 & 7;
 				last = num6 & 1;
@@ -155,14 +155,14 @@ internal sealed class InflateBlocks
 					i -= 3;
 					mode = InflateBlockMode.BAD;
 					_codec.Message = "invalid block type";
-					BOPODEAIEBJ = -3;
+					result = -3;
 					bitb = num3;
 					bitk = i;
 					_codec.AvailableBytesIn = num2;
 					_codec.TotalBytesIn += num - _codec.NextIn;
 					_codec.NextIn = num;
 					writeAt = num4;
-					return Flush(BOPODEAIEBJ);
+					return Flush(result);
 				}
 				break;
 			}
@@ -171,7 +171,7 @@ internal sealed class InflateBlocks
 				{
 					if (num2 != 0)
 					{
-						BOPODEAIEBJ = 0;
+						result = 0;
 						num2--;
 						num3 |= (_codec.InputBuffer[num++] & 0xFF) << i;
 						continue;
@@ -182,20 +182,20 @@ internal sealed class InflateBlocks
 					_codec.TotalBytesIn += num - _codec.NextIn;
 					_codec.NextIn = num;
 					writeAt = num4;
-					return Flush(BOPODEAIEBJ);
+					return Flush(result);
 				}
 				if (((~num3 >> 16) & 0xFFFF) != (num3 & 0xFFFF))
 				{
 					mode = InflateBlockMode.BAD;
 					_codec.Message = "invalid stored block lengths";
-					BOPODEAIEBJ = -3;
+					result = -3;
 					bitb = num3;
 					bitk = i;
 					_codec.AvailableBytesIn = num2;
 					_codec.TotalBytesIn += num - _codec.NextIn;
 					_codec.NextIn = num;
 					writeAt = num4;
-					return Flush(BOPODEAIEBJ);
+					return Flush(result);
 				}
 				left = num3 & 0xFFFF;
 				num3 = (i = 0);
@@ -211,7 +211,7 @@ internal sealed class InflateBlocks
 					_codec.TotalBytesIn += num - _codec.NextIn;
 					_codec.NextIn = num;
 					writeAt = num4;
-					return Flush(BOPODEAIEBJ);
+					return Flush(result);
 				}
 				if (num5 == 0)
 				{
@@ -223,7 +223,7 @@ internal sealed class InflateBlocks
 					if (num5 == 0)
 					{
 						writeAt = num4;
-						BOPODEAIEBJ = Flush(BOPODEAIEBJ);
+						result = Flush(result);
 						num4 = writeAt;
 						num5 = ((num4 >= readAt) ? (end - num4) : (readAt - num4 - 1));
 						if (num4 == end && readAt != 0)
@@ -239,11 +239,11 @@ internal sealed class InflateBlocks
 							_codec.TotalBytesIn += num - _codec.NextIn;
 							_codec.NextIn = num;
 							writeAt = num4;
-							return Flush(BOPODEAIEBJ);
+							return Flush(result);
 						}
 					}
 				}
-				BOPODEAIEBJ = 0;
+				result = 0;
 				int num6 = left;
 				if (num6 > num2)
 				{
@@ -270,7 +270,7 @@ internal sealed class InflateBlocks
 				{
 					if (num2 != 0)
 					{
-						BOPODEAIEBJ = 0;
+						result = 0;
 						num2--;
 						num3 |= (_codec.InputBuffer[num++] & 0xFF) << i;
 						continue;
@@ -281,21 +281,21 @@ internal sealed class InflateBlocks
 					_codec.TotalBytesIn += num - _codec.NextIn;
 					_codec.NextIn = num;
 					writeAt = num4;
-					return Flush(BOPODEAIEBJ);
+					return Flush(result);
 				}
 				int num6 = (table = num3 & 0x3FFF);
 				if ((num6 & 0x1F) > 29 || ((num6 >> 5) & 0x1F) > 29)
 				{
 					mode = InflateBlockMode.BAD;
 					_codec.Message = "too many length or distance symbols";
-					BOPODEAIEBJ = -3;
+					result = -3;
 					bitb = num3;
 					bitk = i;
 					_codec.AvailableBytesIn = num2;
 					_codec.TotalBytesIn += num - _codec.NextIn;
 					_codec.NextIn = num;
 					writeAt = num4;
-					return Flush(BOPODEAIEBJ);
+					return Flush(result);
 				}
 				num6 = 258 + (num6 & 0x1F) + ((num6 >> 5) & 0x1F);
 				if (blens == null || blens.Length < num6)
@@ -320,7 +320,7 @@ internal sealed class InflateBlocks
 					{
 						if (num2 != 0)
 						{
-							BOPODEAIEBJ = 0;
+							result = 0;
 							num2--;
 							num3 |= (_codec.InputBuffer[num++] & 0xFF) << i;
 							continue;
@@ -331,7 +331,7 @@ internal sealed class InflateBlocks
 						_codec.TotalBytesIn += num - _codec.NextIn;
 						_codec.NextIn = num;
 						writeAt = num4;
-						return Flush(BOPODEAIEBJ);
+						return Flush(result);
 					}
 					blens[border[index++]] = num3 & 7;
 					num3 >>= 3;
@@ -345,8 +345,8 @@ internal sealed class InflateBlocks
 				int num6 = inftree.inflate_trees_bits(blens, bb, tb, hufts, _codec);
 				if (num6 != 0)
 				{
-					BOPODEAIEBJ = num6;
-					if (BOPODEAIEBJ == -3)
+					result = num6;
+					if (result == -3)
 					{
 						blens = null;
 						mode = InflateBlockMode.BAD;
@@ -357,7 +357,7 @@ internal sealed class InflateBlocks
 					_codec.TotalBytesIn += num - _codec.NextIn;
 					_codec.NextIn = num;
 					writeAt = num4;
-					return Flush(BOPODEAIEBJ);
+					return Flush(result);
 				}
 				index = 0;
 				mode = InflateBlockMode.DTREE;
@@ -377,7 +377,7 @@ internal sealed class InflateBlocks
 					{
 						if (num2 != 0)
 						{
-							BOPODEAIEBJ = 0;
+							result = 0;
 							num2--;
 							num3 |= (_codec.InputBuffer[num++] & 0xFF) << i;
 							continue;
@@ -388,7 +388,7 @@ internal sealed class InflateBlocks
 						_codec.TotalBytesIn += num - _codec.NextIn;
 						_codec.NextIn = num;
 						writeAt = num4;
-						return Flush(BOPODEAIEBJ);
+						return Flush(result);
 					}
 					num6 = hufts[(tb[0] + (num3 & InternalInflateConstants.InflateMask[num6])) * 3 + 1];
 					int num7 = hufts[(tb[0] + (num3 & InternalInflateConstants.InflateMask[num6])) * 3 + 2];
@@ -405,7 +405,7 @@ internal sealed class InflateBlocks
 					{
 						if (num2 != 0)
 						{
-							BOPODEAIEBJ = 0;
+							result = 0;
 							num2--;
 							num3 |= (_codec.InputBuffer[num++] & 0xFF) << i;
 							continue;
@@ -416,7 +416,7 @@ internal sealed class InflateBlocks
 						_codec.TotalBytesIn += num - _codec.NextIn;
 						_codec.NextIn = num;
 						writeAt = num4;
-						return Flush(BOPODEAIEBJ);
+						return Flush(result);
 					}
 					num3 >>= num6;
 					i -= num6;
@@ -430,14 +430,14 @@ internal sealed class InflateBlocks
 						blens = null;
 						mode = InflateBlockMode.BAD;
 						_codec.Message = "invalid bit length repeat";
-						BOPODEAIEBJ = -3;
+						result = -3;
 						bitb = num3;
 						bitk = i;
 						_codec.AvailableBytesIn = num2;
 						_codec.TotalBytesIn += num - _codec.NextIn;
 						_codec.NextIn = num;
 						writeAt = num4;
-						return Flush(BOPODEAIEBJ);
+						return Flush(result);
 					}
 					num7 = ((num7 == 16) ? blens[num8 - 1] : 0);
 					do
@@ -461,14 +461,14 @@ internal sealed class InflateBlocks
 						blens = null;
 						mode = InflateBlockMode.BAD;
 					}
-					BOPODEAIEBJ = num6;
+					result = num6;
 					bitb = num3;
 					bitk = i;
 					_codec.AvailableBytesIn = num2;
 					_codec.TotalBytesIn += num - _codec.NextIn;
 					_codec.NextIn = num;
 					writeAt = num4;
-					return Flush(BOPODEAIEBJ);
+					return Flush(result);
 				}
 				codes.Init(array5[0], array6[0], hufts, array7[0], hufts, array8[0]);
 				mode = InflateBlockMode.CODES;
@@ -481,12 +481,12 @@ internal sealed class InflateBlocks
 				_codec.TotalBytesIn += num - _codec.NextIn;
 				_codec.NextIn = num;
 				writeAt = num4;
-				BOPODEAIEBJ = codes.Process(this, BOPODEAIEBJ);
-				if (BOPODEAIEBJ != 1)
+				result = codes.Process(this, result);
+				if (result != 1)
 				{
-					return Flush(BOPODEAIEBJ);
+					return Flush(result);
 				}
-				BOPODEAIEBJ = 0;
+				result = 0;
 				num = _codec.NextIn;
 				num2 = _codec.AvailableBytesIn;
 				num3 = bitb;
@@ -502,7 +502,7 @@ internal sealed class InflateBlocks
 				goto case InflateBlockMode.DRY;
 			case InflateBlockMode.DRY:
 				writeAt = num4;
-				BOPODEAIEBJ = Flush(BOPODEAIEBJ);
+				result = Flush(result);
 				num4 = writeAt;
 				num5 = ((num4 >= readAt) ? (end - num4) : (readAt - num4 - 1));
 				if (readAt != writeAt)
@@ -513,37 +513,37 @@ internal sealed class InflateBlocks
 					_codec.TotalBytesIn += num - _codec.NextIn;
 					_codec.NextIn = num;
 					writeAt = num4;
-					return Flush(BOPODEAIEBJ);
+					return Flush(result);
 				}
 				mode = InflateBlockMode.DONE;
 				goto case InflateBlockMode.DONE;
 			case InflateBlockMode.DONE:
-				BOPODEAIEBJ = 1;
+				result = 1;
 				bitb = num3;
 				bitk = i;
 				_codec.AvailableBytesIn = num2;
 				_codec.TotalBytesIn += num - _codec.NextIn;
 				_codec.NextIn = num;
 				writeAt = num4;
-				return Flush(BOPODEAIEBJ);
+				return Flush(result);
 			case InflateBlockMode.BAD:
-				BOPODEAIEBJ = -3;
+				result = -3;
 				bitb = num3;
 				bitk = i;
 				_codec.AvailableBytesIn = num2;
 				_codec.TotalBytesIn += num - _codec.NextIn;
 				_codec.NextIn = num;
 				writeAt = num4;
-				return Flush(BOPODEAIEBJ);
+				return Flush(result);
 			default:
-				BOPODEAIEBJ = -2;
+				result = -2;
 				bitb = num3;
 				bitk = i;
 				_codec.AvailableBytesIn = num2;
 				_codec.TotalBytesIn += num - _codec.NextIn;
 				_codec.NextIn = num;
 				writeAt = num4;
-				return Flush(BOPODEAIEBJ);
+				return Flush(result);
 			}
 		}
 	}
@@ -555,10 +555,10 @@ internal sealed class InflateBlocks
 		hufts = null;
 	}
 
-	internal void SetDictionary(byte[] d, int ILENLCMAMBH, int HDKKKCDKFEE)
+	internal void SetDictionary(byte[] d, int offset, int length)
 	{
-		Array.Copy(d, ILENLCMAMBH, window, 0, HDKKKCDKFEE);
-		readAt = (writeAt = HDKKKCDKFEE);
+		Array.Copy(d, offset, window, 0, length);
+		readAt = (writeAt = length);
 	}
 
 	internal int SyncPoint()
@@ -566,26 +566,26 @@ internal sealed class InflateBlocks
 		return (mode == InflateBlockMode.LENS) ? 1 : 0;
 	}
 
-	internal int Flush(int BOPODEAIEBJ)
+	internal int Flush(int result)
 	{
 		for (int i = 0; i < 2; i++)
 		{
 			int num = ((i != 0) ? (writeAt - readAt) : (((readAt > writeAt) ? end : writeAt) - readAt));
 			if (num == 0)
 			{
-				if (BOPODEAIEBJ == -5)
+				if (result == -5)
 				{
-					BOPODEAIEBJ = 0;
+					result = 0;
 				}
-				return BOPODEAIEBJ;
+				return result;
 			}
 			if (num > _codec.AvailableBytesOut)
 			{
 				num = _codec.AvailableBytesOut;
 			}
-			if (num != 0 && BOPODEAIEBJ == -5)
+			if (num != 0 && result == -5)
 			{
-				BOPODEAIEBJ = 0;
+				result = 0;
 			}
 			_codec.AvailableBytesOut -= num;
 			_codec.TotalBytesOut += num;
@@ -609,6 +609,6 @@ internal sealed class InflateBlocks
 				i++;
 			}
 		}
-		return BOPODEAIEBJ;
+		return result;
 	}
 }

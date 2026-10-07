@@ -12,19 +12,19 @@ public class GUIMessageList
 		Draw(Screen.width, 0f);
 	}
 
-	public void Draw(float IIMDMHKPJJN, float JKKFHOLODHB)
+	public void Draw(float width, float minHeight)
 	{
-		scrollPos = GUILayout.BeginScrollView(scrollPos, false, false, GUILayout.MinHeight(JKKFHOLODHB));
+		scrollPos = GUILayout.BeginScrollView(scrollPos, false, false, GUILayout.MinHeight(minHeight));
 		for (int i = 0; i < messages.Count; i++)
 		{
-			GUILayout.Label(messages[i], GUILayout.MinWidth(IIMDMHKPJJN));
+			GUILayout.Label(messages[i], GUILayout.MinWidth(width));
 		}
 		GUILayout.EndScrollView();
 	}
 
-	public void Add(string CKEHOEGLMBM)
+	public void Add(string message)
 	{
-		messages.Add(CKEHOEGLMBM);
+		messages.Add(message);
 		scrollPos = new Vector2(scrollPos.x, float.MaxValue);
 	}
 

@@ -12,23 +12,23 @@ public class SwitchForm
 
 	public string PostCharSet;
 
-	public SwitchForm(string FBEJCDFPDLD, SwitchType LFLGCDNKNJI, bool IJMDFIKBJAG, int GNKCLPKOEBL, int FJLKBBJCLHD, string PHBJBABMEPL)
+	public SwitchForm(string idString, SwitchType switchType, bool multi, int minLen, int maxLen, string postCharSet)
 	{
-		IDString = FBEJCDFPDLD;
-		Type = LFLGCDNKNJI;
-		Multi = IJMDFIKBJAG;
-		MinLen = GNKCLPKOEBL;
-		MaxLen = FJLKBBJCLHD;
-		PostCharSet = PHBJBABMEPL;
+		IDString = idString;
+		Type = switchType;
+		Multi = multi;
+		MinLen = minLen;
+		MaxLen = maxLen;
+		PostCharSet = postCharSet;
 	}
 
-	public SwitchForm(string FBEJCDFPDLD, SwitchType LFLGCDNKNJI, bool IJMDFIKBJAG, int GNKCLPKOEBL)
-		: this(FBEJCDFPDLD, LFLGCDNKNJI, IJMDFIKBJAG, GNKCLPKOEBL, 0, string.Empty)
+	public SwitchForm(string idString, SwitchType switchType, bool multi, int minLen)
+		: this(idString, switchType, multi, minLen, 0, string.Empty)
 	{
 	}
 
-	public SwitchForm(string FBEJCDFPDLD, SwitchType LFLGCDNKNJI, bool IJMDFIKBJAG)
-		: this(FBEJCDFPDLD, LFLGCDNKNJI, IJMDFIKBJAG, 0)
+	public SwitchForm(string idString, SwitchType switchType, bool multi)
+		: this(idString, switchType, multi, 0)
 	{
 	}
 }

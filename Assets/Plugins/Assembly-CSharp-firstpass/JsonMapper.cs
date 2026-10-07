@@ -61,29 +61,29 @@ public class JsonMapper
 		RegisterBaseImporters();
 	}
 
-	private static bool HasInterface(Type LFLGCDNKNJI, string name)
+	private static bool HasInterface(Type type, string name)
 	{
-		return LFLGCDNKNJI.GetInterface(name, true) != null;
+		return type.GetInterface(name, true) != null;
 	}
 
-	public static PropertyInfo[] GetPublicInstanceProperties(Type LFLGCDNKNJI)
+	public static PropertyInfo[] GetPublicInstanceProperties(Type type)
 	{
-		return LFLGCDNKNJI.GetProperties();
+		return type.GetProperties();
 	}
 
-	private static void AddArrayMetadata(Type LFLGCDNKNJI)
+	private static void AddArrayMetadata(Type type)
 	{
-		if (array_metadata.ContainsKey(LFLGCDNKNJI))
+		if (array_metadata.ContainsKey(type))
 		{
 			return;
 		}
 		ArrayMetadata value = default(ArrayMetadata);
-		value.SetIsArray(LFLGCDNKNJI.IsArray);
-		if (HasInterface(LFLGCDNKNJI, "System.Collections.IList"))
+		value.SetIsArray(type.IsArray);
+		if (HasInterface(type, "System.Collections.IList"))
 		{
 			value.SetIsList(true);
 		}
-		PropertyInfo[] array = GetPublicInstanceProperties(LFLGCDNKNJI);
+		PropertyInfo[] array = GetPublicInstanceProperties(type);
 		foreach (PropertyInfo propertyInfo in array)
 		{
 			if (!(propertyInfo.Name != "Item"))
@@ -99,7 +99,7 @@ public class JsonMapper
 		{
 			try
 			{
-				array_metadata.Add(LFLGCDNKNJI, value);
+				array_metadata.Add(type, value);
 			}
 			catch (ArgumentException)
 			{
@@ -107,19 +107,19 @@ public class JsonMapper
 		}
 	}
 
-	private static void AddObjectMetadata(Type LFLGCDNKNJI)
+	private static void AddObjectMetadata(Type type)
 	{
-		if (object_metadata.ContainsKey(LFLGCDNKNJI))
+		if (object_metadata.ContainsKey(type))
 		{
 			return;
 		}
 		ObjectMetadata value = default(ObjectMetadata);
-		if (HasInterface(LFLGCDNKNJI, "System.Collections.IDictionary"))
+		if (HasInterface(type, "System.Collections.IDictionary"))
 		{
 			value.set_IsDictionary(true);
 		}
 		value.SetProperties(new Dictionary<string, PropertyMetadata>());
-		PropertyInfo[] array = GetPublicInstanceProperties(LFLGCDNKNJI);
+		PropertyInfo[] array = GetPublicInstanceProperties(type);
 		foreach (PropertyInfo propertyInfo in array)
 		{
 			if (propertyInfo.Name == "Item")
@@ -140,7 +140,7 @@ public class JsonMapper
 				value.GetProperties().Add(propertyInfo.Name, value2);
 			}
 		}
-		FieldInfo[] fields = LFLGCDNKNJI.GetFields();
+		FieldInfo[] fields = type.GetFields();
 		foreach (FieldInfo fieldInfo in fields)
 		{
 			PropertyMetadata value3 = new PropertyMetadata
@@ -155,7 +155,7 @@ public class JsonMapper
 		{
 			try
 			{
-				object_metadata.Add(LFLGCDNKNJI, value);
+				object_metadata.Add(type, value);
 			}
 			catch (ArgumentException)
 			{
@@ -163,14 +163,14 @@ public class JsonMapper
 		}
 	}
 
-	private static void AddTypeProperties(Type LFLGCDNKNJI)
+	private static void AddTypeProperties(Type type)
 	{
-		if (type_properties.ContainsKey(LFLGCDNKNJI))
+		if (type_properties.ContainsKey(type))
 		{
 			return;
 		}
 		IList<PropertyMetadata> list = new List<PropertyMetadata>();
-		PropertyInfo[] array = GetPublicInstanceProperties(LFLGCDNKNJI);
+		PropertyInfo[] array = GetPublicInstanceProperties(type);
 		foreach (PropertyInfo propertyInfo in array)
 		{
 			if (!(propertyInfo.Name == "Item"))
@@ -182,12 +182,12 @@ public class JsonMapper
 				});
 			}
 		}
-		FieldInfo[] fields = LFLGCDNKNJI.GetFields();
-		foreach (FieldInfo cGJLHJGIGHD in fields)
+		FieldInfo[] fields = type.GetFields();
+		foreach (FieldInfo fieldInfo in fields)
 		{
 			list.Add(new PropertyMetadata
 			{
-				Info = cGJLHJGIGHD,
+				Info = fieldInfo,
 				IsField = true
 			});
 		}
@@ -195,7 +195,7 @@ public class JsonMapper
 		{
 			try
 			{
-				type_properties.Add(LFLGCDNKNJI, list);
+				type_properties.Add(type, list);
 			}
 			catch (ArgumentException)
 			{
@@ -203,35 +203,35 @@ public class JsonMapper
 		}
 	}
 
-	private static MethodInfo GetConvOp(Type GKLIKMLCGFB, Type KGONIIAMHAP)
+	private static MethodInfo GetConvOp(Type targetType, Type sourceType)
 	{
 		lock (conv_ops_lock)
 		{
-			if (!conv_ops.ContainsKey(GKLIKMLCGFB))
+			if (!conv_ops.ContainsKey(targetType))
 			{
-				conv_ops.Add(GKLIKMLCGFB, new Dictionary<Type, MethodInfo>());
+				conv_ops.Add(targetType, new Dictionary<Type, MethodInfo>());
 			}
 		}
-		if (conv_ops[GKLIKMLCGFB].ContainsKey(KGONIIAMHAP))
+		if (conv_ops[targetType].ContainsKey(sourceType))
 		{
-			return conv_ops[GKLIKMLCGFB][KGONIIAMHAP];
+			return conv_ops[targetType][sourceType];
 		}
-		MethodInfo method = GKLIKMLCGFB.GetMethod("op_Implicit", new Type[1] { KGONIIAMHAP });
+		MethodInfo method = targetType.GetMethod("op_Implicit", new Type[1] { sourceType });
 		lock (conv_ops_lock)
 		{
 			try
 			{
-				conv_ops[GKLIKMLCGFB].Add(KGONIIAMHAP, method);
+				conv_ops[targetType].Add(sourceType, method);
 				return method;
 			}
 			catch (ArgumentException)
 			{
-				return conv_ops[GKLIKMLCGFB][KGONIIAMHAP];
+				return conv_ops[targetType][sourceType];
 			}
 		}
 	}
 
-	private static object ReadValue(Type DHLFLIEGLOK, JsonReader reader)
+	private static object ReadValue(Type valueType, JsonReader reader)
 	{
 		reader.Read();
 		if (reader.GetToken() == JsonToken.ArrayEnd)
@@ -240,64 +240,64 @@ public class JsonMapper
 		}
 		if (reader.GetToken() == JsonToken.Null)
 		{
-			if (!DHLFLIEGLOK.IsClass)
+			if (!valueType.IsClass)
 			{
-				throw new JsonException(string.Format("Can't assign null to an instance of type {0}", DHLFLIEGLOK));
+				throw new JsonException(string.Format("Can't assign null to an instance of type {0}", valueType));
 			}
 			return null;
 		}
 		if (reader.GetToken() == JsonToken.Double || reader.GetToken() == JsonToken.Int || reader.GetToken() == JsonToken.Long || reader.GetToken() == JsonToken.String || reader.GetToken() == JsonToken.Boolean)
 		{
 			Type type = reader.GetValue().GetType();
-			if (DHLFLIEGLOK.IsAssignableFrom(type))
+			if (valueType.IsAssignableFrom(type))
 			{
 				return reader.GetValue();
 			}
-			if (custom_importers_table.ContainsKey(type) && custom_importers_table[type].ContainsKey(DHLFLIEGLOK))
+			if (custom_importers_table.ContainsKey(type) && custom_importers_table[type].ContainsKey(valueType))
 			{
-				ImporterFunc iPPLMFLBMNF = custom_importers_table[type][DHLFLIEGLOK];
-				return iPPLMFLBMNF(reader.GetValue());
+				ImporterFunc importer = custom_importers_table[type][valueType];
+				return importer(reader.GetValue());
 			}
-			if (base_importers_table.ContainsKey(type) && base_importers_table[type].ContainsKey(DHLFLIEGLOK))
+			if (base_importers_table.ContainsKey(type) && base_importers_table[type].ContainsKey(valueType))
 			{
-				ImporterFunc iPPLMFLBMNF2 = base_importers_table[type][DHLFLIEGLOK];
+				ImporterFunc iPPLMFLBMNF2 = base_importers_table[type][valueType];
 				return iPPLMFLBMNF2(reader.GetValue());
 			}
-			if (DHLFLIEGLOK.IsEnum)
+			if (valueType.IsEnum)
 			{
-				return Enum.ToObject(DHLFLIEGLOK, reader.GetValue());
+				return Enum.ToObject(valueType, reader.GetValue());
 			}
-			MethodInfo methodInfo = GetConvOp(DHLFLIEGLOK, type);
+			MethodInfo methodInfo = GetConvOp(valueType, type);
 			if (methodInfo != null)
 			{
 				return methodInfo.Invoke(null, new object[1] { reader.GetValue() });
 			}
-			throw new JsonException(string.Format("Can't assign value '{0}' (type {1}) to type {2}", reader.GetValue(), type, DHLFLIEGLOK));
+			throw new JsonException(string.Format("Can't assign value '{0}' (type {1}) to type {2}", reader.GetValue(), type, valueType));
 		}
 		object obj = null;
 		if (reader.GetToken() == JsonToken.ArrayStart)
 		{
-			if (DHLFLIEGLOK.FullName == "System.Object")
+			if (valueType.FullName == "System.Object")
 			{
-				DHLFLIEGLOK = typeof(object[]);
+				valueType = typeof(object[]);
 			}
-			AddArrayMetadata(DHLFLIEGLOK);
-			ArrayMetadata gKAHCDHJLBP = array_metadata[DHLFLIEGLOK];
-			if (!gKAHCDHJLBP.GetIsArray() && !gKAHCDHJLBP.GetIsList())
+			AddArrayMetadata(valueType);
+			ArrayMetadata arrayMetadata = array_metadata[valueType];
+			if (!arrayMetadata.GetIsArray() && !arrayMetadata.GetIsList())
 			{
-				throw new JsonException(string.Format("Type {0} can't act as an array", DHLFLIEGLOK));
+				throw new JsonException(string.Format("Type {0} can't act as an array", valueType));
 			}
 			IList list;
 			Type type2;
-			if (!gKAHCDHJLBP.GetIsArray())
+			if (!arrayMetadata.GetIsArray())
 			{
-				list = (IList)Activator.CreateInstance(DHLFLIEGLOK);
-				type2 = gKAHCDHJLBP.GetElementType();
+				list = (IList)Activator.CreateInstance(valueType);
+				type2 = arrayMetadata.GetElementType();
 			}
 			else
 			{
 				list = new ArrayList();
-				type2 = DHLFLIEGLOK.GetElementType();
+				type2 = valueType.GetElementType();
 			}
 			while (true)
 			{
@@ -308,7 +308,7 @@ public class JsonMapper
 				}
 				list.Add(obj2);
 			}
-			if (gKAHCDHJLBP.GetIsArray())
+			if (arrayMetadata.GetIsArray())
 			{
 				int count = list.Count;
 				obj = Array.CreateInstance(type2, count);
@@ -324,13 +324,13 @@ public class JsonMapper
 		}
 		else if (reader.GetToken() == JsonToken.ObjectStart)
 		{
-			if (DHLFLIEGLOK == typeof(object))
+			if (valueType == typeof(object))
 			{
-				DHLFLIEGLOK = typeof(Dictionary<string, object>);
+				valueType = typeof(Dictionary<string, object>);
 			}
-			AddObjectMetadata(DHLFLIEGLOK);
-			ObjectMetadata iNPMDAGENOB = object_metadata[DHLFLIEGLOK];
-			obj = Activator.CreateInstance(DHLFLIEGLOK);
+			AddObjectMetadata(valueType);
+			ObjectMetadata objectMetadata = object_metadata[valueType];
+			obj = Activator.CreateInstance(valueType);
 			while (true)
 			{
 				reader.Read();
@@ -339,90 +339,90 @@ public class JsonMapper
 					break;
 				}
 				string text = (string)reader.GetValue();
-				if (iNPMDAGENOB.GetProperties().ContainsKey(text))
+				if (objectMetadata.GetProperties().ContainsKey(text))
 				{
-					PropertyMetadata nOCGBHBELKO = iNPMDAGENOB.GetProperties()[text];
-					if (nOCGBHBELKO.IsField)
+					PropertyMetadata propertyMetadata = objectMetadata.GetProperties()[text];
+					if (propertyMetadata.IsField)
 					{
-						((FieldInfo)nOCGBHBELKO.Info).SetValue(obj, ReadValue(nOCGBHBELKO.Type, reader));
+						((FieldInfo)propertyMetadata.Info).SetValue(obj, ReadValue(propertyMetadata.Type, reader));
 						continue;
 					}
-					PropertyInfo propertyInfo = (PropertyInfo)nOCGBHBELKO.Info;
+					PropertyInfo propertyInfo = (PropertyInfo)propertyMetadata.Info;
 					if (propertyInfo.CanWrite)
 					{
-						propertyInfo.SetValue(obj, ReadValue(nOCGBHBELKO.Type, reader), null);
+						propertyInfo.SetValue(obj, ReadValue(propertyMetadata.Type, reader), null);
 					}
 					else
 					{
-						ReadValue(nOCGBHBELKO.Type, reader);
+						ReadValue(propertyMetadata.Type, reader);
 					}
 				}
-				else if (!iNPMDAGENOB.GetIsDictionary())
+				else if (!objectMetadata.GetIsDictionary())
 				{
 					if (!reader.GetSkipNonMembers())
 					{
-						throw new JsonException(string.Format("The type {0} doesn't have the property '{1}'", DHLFLIEGLOK, text));
+						throw new JsonException(string.Format("The type {0} doesn't have the property '{1}'", valueType, text));
 					}
 					ReadSkip(reader);
 				}
 				else
 				{
-					((IDictionary)obj).Add(text, ReadValue(iNPMDAGENOB.GetElementType(), reader));
+					((IDictionary)obj).Add(text, ReadValue(objectMetadata.GetElementType(), reader));
 				}
 			}
 		}
 		return obj;
 	}
 
-	private static IJsonWrapper ReadValue(WrapperFactory DJFCIPIMOBC, JsonReader reader)
+	private static IJsonWrapper ReadValue(WrapperFactory factory, JsonReader reader)
 	{
 		reader.Read();
 		if (reader.GetToken() == JsonToken.ArrayEnd || reader.GetToken() == JsonToken.Null)
 		{
 			return null;
 		}
-		IJsonWrapper pIIMPPKAOCI = DJFCIPIMOBC();
+		IJsonWrapper wrapper = factory();
 		if (reader.GetToken() == JsonToken.String)
 		{
-			pIIMPPKAOCI.SetString((string)reader.GetValue());
-			return pIIMPPKAOCI;
+			wrapper.SetString((string)reader.GetValue());
+			return wrapper;
 		}
 		if (reader.GetToken() == JsonToken.Double)
 		{
-			pIIMPPKAOCI.SetDouble((double)reader.GetValue());
-			return pIIMPPKAOCI;
+			wrapper.SetDouble((double)reader.GetValue());
+			return wrapper;
 		}
 		if (reader.GetToken() == JsonToken.Int)
 		{
-			pIIMPPKAOCI.SetInt((int)reader.GetValue());
-			return pIIMPPKAOCI;
+			wrapper.SetInt((int)reader.GetValue());
+			return wrapper;
 		}
 		if (reader.GetToken() == JsonToken.Long)
 		{
-			pIIMPPKAOCI.SetLong((long)reader.GetValue());
-			return pIIMPPKAOCI;
+			wrapper.SetLong((long)reader.GetValue());
+			return wrapper;
 		}
 		if (reader.GetToken() == JsonToken.Boolean)
 		{
-			pIIMPPKAOCI.SetBoolean((bool)reader.GetValue());
-			return pIIMPPKAOCI;
+			wrapper.SetBoolean((bool)reader.GetValue());
+			return wrapper;
 		}
 		if (reader.GetToken() == JsonToken.ArrayStart)
 		{
-			pIIMPPKAOCI.SetJsonType(JsonType.Array);
+			wrapper.SetJsonType(JsonType.Array);
 			while (true)
 			{
-				IJsonWrapper pIIMPPKAOCI2 = ReadValue(DJFCIPIMOBC, reader);
+				IJsonWrapper pIIMPPKAOCI2 = ReadValue(factory, reader);
 				if (pIIMPPKAOCI2 == null && reader.GetToken() == JsonToken.ArrayEnd)
 				{
 					break;
 				}
-				pIIMPPKAOCI.Add(pIIMPPKAOCI2);
+				wrapper.Add(pIIMPPKAOCI2);
 			}
 		}
 		else if (reader.GetToken() == JsonToken.ObjectStart)
 		{
-			pIIMPPKAOCI.SetJsonType(JsonType.Object);
+			wrapper.SetJsonType(JsonType.Object);
 			while (true)
 			{
 				reader.Read();
@@ -431,10 +431,10 @@ public class JsonMapper
 					break;
 				}
 				string key = (string)reader.GetValue();
-				pIIMPPKAOCI[key] = ReadValue(DJFCIPIMOBC, reader);
+				wrapper[key] = ReadValue(factory, reader);
 			}
 		}
-		return pIIMPPKAOCI;
+		return wrapper;
 	}
 
 	private static void ReadSkip(JsonReader reader)
@@ -444,183 +444,183 @@ public class JsonMapper
 
 	private static void RegisterBaseExporters()
 	{
-		base_exporters_table[typeof(byte)] = (object AOMLCBHAJJH, JsonWriter writer) =>
+		base_exporters_table[typeof(byte)] = (object obj, JsonWriter writer) =>
 		{
-			writer.Write(Convert.ToInt32((byte)AOMLCBHAJJH));
+			writer.Write(Convert.ToInt32((byte)obj));
 		};
-		base_exporters_table[typeof(char)] = (object AOMLCBHAJJH, JsonWriter writer) =>
+		base_exporters_table[typeof(char)] = (object obj, JsonWriter writer) =>
 		{
-			writer.Write(Convert.ToString((char)AOMLCBHAJJH));
+			writer.Write(Convert.ToString((char)obj));
 		};
-		base_exporters_table[typeof(DateTime)] = (object AOMLCBHAJJH, JsonWriter writer) =>
+		base_exporters_table[typeof(DateTime)] = (object obj, JsonWriter writer) =>
 		{
-			writer.Write(Convert.ToString((DateTime)AOMLCBHAJJH, datetime_format));
+			writer.Write(Convert.ToString((DateTime)obj, datetime_format));
 		};
-		base_exporters_table[typeof(decimal)] = (object AOMLCBHAJJH, JsonWriter writer) =>
+		base_exporters_table[typeof(decimal)] = (object obj, JsonWriter writer) =>
 		{
-			writer.Write((decimal)AOMLCBHAJJH);
+			writer.Write((decimal)obj);
 		};
-		base_exporters_table[typeof(sbyte)] = (object AOMLCBHAJJH, JsonWriter writer) =>
+		base_exporters_table[typeof(sbyte)] = (object obj, JsonWriter writer) =>
 		{
-			writer.Write(Convert.ToInt32((sbyte)AOMLCBHAJJH));
+			writer.Write(Convert.ToInt32((sbyte)obj));
 		};
-		base_exporters_table[typeof(short)] = (object AOMLCBHAJJH, JsonWriter writer) =>
+		base_exporters_table[typeof(short)] = (object obj, JsonWriter writer) =>
 		{
-			writer.Write(Convert.ToInt32((short)AOMLCBHAJJH));
+			writer.Write(Convert.ToInt32((short)obj));
 		};
-		base_exporters_table[typeof(ushort)] = (object AOMLCBHAJJH, JsonWriter writer) =>
+		base_exporters_table[typeof(ushort)] = (object obj, JsonWriter writer) =>
 		{
-			writer.Write(Convert.ToInt32((ushort)AOMLCBHAJJH));
+			writer.Write(Convert.ToInt32((ushort)obj));
 		};
-		base_exporters_table[typeof(uint)] = (object AOMLCBHAJJH, JsonWriter writer) =>
+		base_exporters_table[typeof(uint)] = (object obj, JsonWriter writer) =>
 		{
-			writer.Write(Convert.ToUInt64((uint)AOMLCBHAJJH));
+			writer.Write(Convert.ToUInt64((uint)obj));
 		};
-		base_exporters_table[typeof(ulong)] = (object AOMLCBHAJJH, JsonWriter writer) =>
+		base_exporters_table[typeof(ulong)] = (object obj, JsonWriter writer) =>
 		{
-			writer.Write((ulong)AOMLCBHAJJH);
+			writer.Write((ulong)obj);
 		};
 	}
 
 	private static void RegisterBaseImporters()
 	{
-		ImporterFunc pAOKGMMLPNC = (object NILNDHEKNLJ) => Convert.ToByte((int)NILNDHEKNLJ);
-		RegisterImporter(base_importers_table, typeof(int), typeof(byte), pAOKGMMLPNC);
-		pAOKGMMLPNC = (object NILNDHEKNLJ) => Convert.ToUInt64((int)NILNDHEKNLJ);
-		RegisterImporter(base_importers_table, typeof(int), typeof(ulong), pAOKGMMLPNC);
-		pAOKGMMLPNC = (object NILNDHEKNLJ) => Convert.ToSByte((int)NILNDHEKNLJ);
-		RegisterImporter(base_importers_table, typeof(int), typeof(sbyte), pAOKGMMLPNC);
-		pAOKGMMLPNC = (object NILNDHEKNLJ) => Convert.ToInt16((int)NILNDHEKNLJ);
-		RegisterImporter(base_importers_table, typeof(int), typeof(short), pAOKGMMLPNC);
-		pAOKGMMLPNC = (object NILNDHEKNLJ) => Convert.ToUInt16((int)NILNDHEKNLJ);
-		RegisterImporter(base_importers_table, typeof(int), typeof(ushort), pAOKGMMLPNC);
-		pAOKGMMLPNC = (object NILNDHEKNLJ) => Convert.ToUInt32((int)NILNDHEKNLJ);
-		RegisterImporter(base_importers_table, typeof(int), typeof(uint), pAOKGMMLPNC);
-		pAOKGMMLPNC = (object NILNDHEKNLJ) => Convert.ToSingle((int)NILNDHEKNLJ);
-		RegisterImporter(base_importers_table, typeof(int), typeof(float), pAOKGMMLPNC);
-		pAOKGMMLPNC = (object NILNDHEKNLJ) => Convert.ToDouble((int)NILNDHEKNLJ);
-		RegisterImporter(base_importers_table, typeof(int), typeof(double), pAOKGMMLPNC);
-		pAOKGMMLPNC = (object NILNDHEKNLJ) => Convert.ToDecimal((double)NILNDHEKNLJ);
-		RegisterImporter(base_importers_table, typeof(double), typeof(decimal), pAOKGMMLPNC);
-		pAOKGMMLPNC = (object NILNDHEKNLJ) => Convert.ToUInt32((long)NILNDHEKNLJ);
-		RegisterImporter(base_importers_table, typeof(long), typeof(uint), pAOKGMMLPNC);
-		pAOKGMMLPNC = (object NILNDHEKNLJ) => Convert.ToChar((string)NILNDHEKNLJ);
-		RegisterImporter(base_importers_table, typeof(string), typeof(char), pAOKGMMLPNC);
-		pAOKGMMLPNC = (object NILNDHEKNLJ) => Convert.ToDateTime((string)NILNDHEKNLJ, datetime_format);
-		RegisterImporter(base_importers_table, typeof(string), typeof(DateTime), pAOKGMMLPNC);
+		ImporterFunc importer = (object input) => Convert.ToByte((int)input);
+		RegisterImporter(base_importers_table, typeof(int), typeof(byte), importer);
+		importer = (object input) => Convert.ToUInt64((int)input);
+		RegisterImporter(base_importers_table, typeof(int), typeof(ulong), importer);
+		importer = (object input) => Convert.ToSByte((int)input);
+		RegisterImporter(base_importers_table, typeof(int), typeof(sbyte), importer);
+		importer = (object input) => Convert.ToInt16((int)input);
+		RegisterImporter(base_importers_table, typeof(int), typeof(short), importer);
+		importer = (object input) => Convert.ToUInt16((int)input);
+		RegisterImporter(base_importers_table, typeof(int), typeof(ushort), importer);
+		importer = (object input) => Convert.ToUInt32((int)input);
+		RegisterImporter(base_importers_table, typeof(int), typeof(uint), importer);
+		importer = (object input) => Convert.ToSingle((int)input);
+		RegisterImporter(base_importers_table, typeof(int), typeof(float), importer);
+		importer = (object input) => Convert.ToDouble((int)input);
+		RegisterImporter(base_importers_table, typeof(int), typeof(double), importer);
+		importer = (object input) => Convert.ToDecimal((double)input);
+		RegisterImporter(base_importers_table, typeof(double), typeof(decimal), importer);
+		importer = (object input) => Convert.ToUInt32((long)input);
+		RegisterImporter(base_importers_table, typeof(long), typeof(uint), importer);
+		importer = (object input) => Convert.ToChar((string)input);
+		RegisterImporter(base_importers_table, typeof(string), typeof(char), importer);
+		importer = (object input) => Convert.ToDateTime((string)input, datetime_format);
+		RegisterImporter(base_importers_table, typeof(string), typeof(DateTime), importer);
 	}
 
-	private static void RegisterImporter(IDictionary<Type, IDictionary<Type, ImporterFunc>> BFGHBIMJHAK, Type FMOEMAEOMCK, Type MFCKGHCBHGC, ImporterFunc PAOKGMMLPNC)
+	private static void RegisterImporter(IDictionary<Type, IDictionary<Type, ImporterFunc>> importersTable, Type jsonType, Type valueType, ImporterFunc importer)
 	{
-		if (!BFGHBIMJHAK.ContainsKey(FMOEMAEOMCK))
+		if (!importersTable.ContainsKey(jsonType))
 		{
-			BFGHBIMJHAK.Add(FMOEMAEOMCK, new Dictionary<Type, ImporterFunc>());
+			importersTable.Add(jsonType, new Dictionary<Type, ImporterFunc>());
 		}
-		BFGHBIMJHAK[FMOEMAEOMCK][MFCKGHCBHGC] = PAOKGMMLPNC;
+		importersTable[jsonType][valueType] = importer;
 	}
 
-	private static void WriteValue(object AOMLCBHAJJH, JsonWriter writer, bool PHKCIGJLGDM, int depth)
+	private static void WriteValue(object obj, JsonWriter writer, bool isTopLevel, int depth)
 	{
 		if (depth > max_nesting_depth)
 		{
-			throw new JsonException(string.Format("Max allowed object depth reached while trying to export from type {0}", AOMLCBHAJJH.GetType()));
+			throw new JsonException(string.Format("Max allowed object depth reached while trying to export from type {0}", obj.GetType()));
 		}
-		if (AOMLCBHAJJH == null)
+		if (obj == null)
 		{
 			writer.Write(null);
 			return;
 		}
-		if (AOMLCBHAJJH is IJsonWrapper)
+		if (obj is IJsonWrapper)
 		{
-			if (PHKCIGJLGDM)
+			if (isTopLevel)
 			{
-				writer.GetTextWriter().Write(((IJsonWrapper)AOMLCBHAJJH).ToJson());
+				writer.GetTextWriter().Write(((IJsonWrapper)obj).ToJson());
 			}
 			else
 			{
-				((IJsonWrapper)AOMLCBHAJJH).ToJson(writer);
+				((IJsonWrapper)obj).ToJson(writer);
 			}
 			return;
 		}
-		if (AOMLCBHAJJH is string)
+		if (obj is string)
 		{
-			writer.Write((string)AOMLCBHAJJH);
+			writer.Write((string)obj);
 			return;
 		}
-		if (AOMLCBHAJJH is double)
+		if (obj is double)
 		{
-			writer.Write((double)AOMLCBHAJJH);
+			writer.Write((double)obj);
 			return;
 		}
-		if (AOMLCBHAJJH is int)
+		if (obj is int)
 		{
-			writer.Write((int)AOMLCBHAJJH);
+			writer.Write((int)obj);
 			return;
 		}
-		if (AOMLCBHAJJH is bool)
+		if (obj is bool)
 		{
-			writer.Write((bool)AOMLCBHAJJH);
+			writer.Write((bool)obj);
 			return;
 		}
-		if (AOMLCBHAJJH is long)
+		if (obj is long)
 		{
-			writer.Write((long)AOMLCBHAJJH);
+			writer.Write((long)obj);
 			return;
 		}
-		if (AOMLCBHAJJH is Array)
+		if (obj is Array)
 		{
 			writer.WriteArrayStart();
-			foreach (object item in (Array)AOMLCBHAJJH)
+			foreach (object item in (Array)obj)
 			{
-				WriteValue(item, writer, PHKCIGJLGDM, depth + 1);
+				WriteValue(item, writer, isTopLevel, depth + 1);
 			}
 			writer.WriteArrayEnd();
 			return;
 		}
-		if (AOMLCBHAJJH is IList)
+		if (obj is IList)
 		{
 			writer.WriteArrayStart();
-			foreach (object item2 in (IList)AOMLCBHAJJH)
+			foreach (object item2 in (IList)obj)
 			{
-				WriteValue(item2, writer, PHKCIGJLGDM, depth + 1);
+				WriteValue(item2, writer, isTopLevel, depth + 1);
 			}
 			writer.WriteArrayEnd();
 			return;
 		}
-		if (AOMLCBHAJJH is IDictionary)
+		if (obj is IDictionary)
 		{
 			writer.WriteObjectStart();
-			foreach (DictionaryEntry item3 in (IDictionary)AOMLCBHAJJH)
+			foreach (DictionaryEntry item3 in (IDictionary)obj)
 			{
 				writer.WritePropertyName((string)item3.Key);
-				WriteValue(item3.Value, writer, PHKCIGJLGDM, depth + 1);
+				WriteValue(item3.Value, writer, isTopLevel, depth + 1);
 			}
 			writer.WriteObjectEnd();
 			return;
 		}
-		Type type = AOMLCBHAJJH.GetType();
+		Type type = obj.GetType();
 		if (custom_exporters_table.ContainsKey(type))
 		{
-			ExporterFunc nHMEKPMHION = custom_exporters_table[type];
-			nHMEKPMHION(AOMLCBHAJJH, writer);
+			ExporterFunc exporter = custom_exporters_table[type];
+			exporter(obj, writer);
 			return;
 		}
 		if (base_exporters_table.ContainsKey(type))
 		{
 			ExporterFunc nHMEKPMHION2 = base_exporters_table[type];
-			nHMEKPMHION2(AOMLCBHAJJH, writer);
+			nHMEKPMHION2(obj, writer);
 			return;
 		}
-		if (AOMLCBHAJJH is Enum)
+		if (obj is Enum)
 		{
 			Type underlyingType = Enum.GetUnderlyingType(type);
 			if (underlyingType == typeof(long) || underlyingType == typeof(uint) || underlyingType == typeof(ulong))
 			{
-				writer.Write((ulong)AOMLCBHAJJH);
+				writer.Write((ulong)obj);
 			}
 			else
 			{
-				writer.Write((int)AOMLCBHAJJH);
+				writer.Write((int)obj);
 			}
 			return;
 		}
@@ -632,32 +632,32 @@ public class JsonMapper
 			if (item4.IsField)
 			{
 				writer.WritePropertyName(item4.Info.Name);
-				WriteValue(((FieldInfo)item4.Info).GetValue(AOMLCBHAJJH), writer, PHKCIGJLGDM, depth + 1);
+				WriteValue(((FieldInfo)item4.Info).GetValue(obj), writer, isTopLevel, depth + 1);
 				continue;
 			}
 			PropertyInfo propertyInfo = (PropertyInfo)item4.Info;
 			if (propertyInfo.CanRead)
 			{
 				writer.WritePropertyName(item4.Info.Name);
-				WriteValue(propertyInfo.GetValue(AOMLCBHAJJH, null), writer, PHKCIGJLGDM, depth + 1);
+				WriteValue(propertyInfo.GetValue(obj, null), writer, isTopLevel, depth + 1);
 			}
 		}
 		writer.WriteObjectEnd();
 	}
 
-	public static string ToJson(object AOMLCBHAJJH)
+	public static string ToJson(object obj)
 	{
 		lock (static_writer_lock)
 		{
 			static_writer.Reset();
-			WriteValue(AOMLCBHAJJH, static_writer, true, 0);
+			WriteValue(obj, static_writer, true, 0);
 			return static_writer.ToString();
 		}
 	}
 
-	public static void ToJson(object AOMLCBHAJJH, JsonWriter writer)
+	public static void ToJson(object obj, JsonWriter writer)
 	{
-		WriteValue(AOMLCBHAJJH, writer, false, 0);
+		WriteValue(obj, writer, false, 0);
 	}
 
 	public static JsonData ToObject(JsonReader reader)
@@ -667,13 +667,13 @@ public class JsonMapper
 
 	public static JsonData ToObject(TextReader reader)
 	{
-		JsonReader iJIMLLIHKGN = new JsonReader(reader);
-		return (JsonData)ToWrapper(() => new JsonData(), iJIMLLIHKGN);
+		JsonReader jsonReader = new JsonReader(reader);
+		return (JsonData)ToWrapper(() => new JsonData(), jsonReader);
 	}
 
-	public static JsonData ToObject(string EMDHMHOKGFP)
+	public static JsonData ToObject(string json)
 	{
-		return (JsonData)ToWrapper(() => new JsonData(), EMDHMHOKGFP);
+		return (JsonData)ToWrapper(() => new JsonData(), json);
 	}
 
 	public static T ToObject<T>(JsonReader reader)
@@ -683,40 +683,40 @@ public class JsonMapper
 
 	public static T ToObject<T>(TextReader reader)
 	{
-		JsonReader iJIMLLIHKGN = new JsonReader(reader);
-		return (T)ReadValue(typeof(T), iJIMLLIHKGN);
+		JsonReader jsonReader = new JsonReader(reader);
+		return (T)ReadValue(typeof(T), jsonReader);
 	}
 
-	public static T ToObject<T>(string EMDHMHOKGFP)
+	public static T ToObject<T>(string json)
 	{
-		JsonReader iJIMLLIHKGN = new JsonReader(EMDHMHOKGFP);
-		return (T)ReadValue(typeof(T), iJIMLLIHKGN);
+		JsonReader jsonReader = new JsonReader(json);
+		return (T)ReadValue(typeof(T), jsonReader);
 	}
 
-	public static IJsonWrapper ToWrapper(WrapperFactory DJFCIPIMOBC, JsonReader reader)
+	public static IJsonWrapper ToWrapper(WrapperFactory factory, JsonReader reader)
 	{
-		return ReadValue(DJFCIPIMOBC, reader);
+		return ReadValue(factory, reader);
 	}
 
-	public static IJsonWrapper ToWrapper(WrapperFactory DJFCIPIMOBC, string EMDHMHOKGFP)
+	public static IJsonWrapper ToWrapper(WrapperFactory factory, string json)
 	{
-		JsonReader iJIMLLIHKGN = new JsonReader(EMDHMHOKGFP);
-		return ReadValue(DJFCIPIMOBC, iJIMLLIHKGN);
+		JsonReader jsonReader = new JsonReader(json);
+		return ReadValue(factory, jsonReader);
 	}
 
-	public static void RegisterExporter<T>(global::TypedExporterFunc<T> ACIKPHKFNMH)
+	public static void RegisterExporter<T>(global::TypedExporterFunc<T> typedExporter)
 	{
-		ExporterFunc value = (object AOMLCBHAJJH, JsonWriter writer) =>
+		ExporterFunc value = (object obj, JsonWriter writer) =>
 		{
-			ACIKPHKFNMH((T)AOMLCBHAJJH, writer);
+			typedExporter((T)obj, writer);
 		};
 		custom_exporters_table[typeof(T)] = value;
 	}
 
-	public static void RegisterImporter<TJson, TValue>(global::TypedImporterFunc<TJson, TValue> PAOKGMMLPNC)
+	public static void RegisterImporter<TJson, TValue>(global::TypedImporterFunc<TJson, TValue> typedImporter)
 	{
-		ImporterFunc pAOKGMMLPNC = (object NILNDHEKNLJ) => PAOKGMMLPNC((TJson)NILNDHEKNLJ);
-		RegisterImporter(custom_importers_table, typeof(TJson), typeof(TValue), pAOKGMMLPNC);
+		ImporterFunc importer = (object input) => typedImporter((TJson)input);
+		RegisterImporter(custom_importers_table, typeof(TJson), typeof(TValue), importer);
 	}
 
 	public static void UnregisterExporters()

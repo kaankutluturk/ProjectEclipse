@@ -22,29 +22,29 @@ namespace Nekki.Yaml
 			_yamlStream = new YamlStream();
 		}
 
-		public static YamlDocumentNekki LoadFromFile(string PMFEIPCHENB)
+		public static YamlDocumentNekki LoadFromFile(string path)
 		{
-			if (!File.Exists(PMFEIPCHENB))
+			if (!File.Exists(path))
 			{
 				AdvLog.LogError("YAML file is not exists!!!");
 				return null;
 			}
-			using (TextReader textReader = new StreamReader(PMFEIPCHENB))
+			using (TextReader textReader = new StreamReader(path))
 			{
 				return LoadFromString(textReader.ReadToEnd());
 			}
 		}
 
-		public static YamlDocumentNekki LoadFromString(string DNHDOEEDDBD)
+		public static YamlDocumentNekki LoadFromString(string yamlText)
 		{
 			YamlDocumentNekki yamlDocumentNekki = new YamlDocumentNekki();
-			yamlDocumentNekki._yamlStream.Load(new StringReader(DNHDOEEDDBD));
+			yamlDocumentNekki._yamlStream.Load(new StringReader(yamlText));
 			yamlDocumentNekki._yamlDocument = yamlDocumentNekki._yamlStream.Documents[0];
 			if (yamlDocumentNekki._yamlDocument.RootNode is YamlMappingNode)
 			{
 				yamlDocumentNekki._rootMapping = new Mapping("Root", (YamlMappingNode)yamlDocumentNekki._yamlDocument.RootNode);
 			}
-			yamlDocumentNekki._content = DNHDOEEDDBD;
+			yamlDocumentNekki._content = yamlText;
 			return yamlDocumentNekki;
 		}
 
@@ -53,11 +53,11 @@ namespace Nekki.Yaml
 			return _yamlDocument.ToString();
 		}
 
-		public void SaveToFile(string PMFEIPCHENB, bool EENMGCCBIHF = true)
+		public void SaveToFile(string path, bool assignAnchors = true)
 		{
-			using (TextWriter jGEEEDKMKKH = new StreamWriter(PMFEIPCHENB, false, Encoding.UTF8))
+			using (TextWriter textWriter = new StreamWriter(path, false, Encoding.UTF8))
 			{
-				_yamlStream.Save(jGEEEDKMKKH, EENMGCCBIHF);
+				_yamlStream.Save(textWriter, assignAnchors);
 			}
 		}
 
@@ -78,17 +78,17 @@ namespace Nekki.Yaml
 			return _rootMapping;
 		}
 
-		public void Serialize(string PMFEIPCHENB)
+		public void Serialize(string path)
 		{
-			TextReader nILNDHEKNLJ = new StringReader(_content);
-			Deserializer iLDIAJJOJJD = new Deserializer();
-			object obj = iLDIAJJOJJD.Deserialize(nILNDHEKNLJ);
+			TextReader textReader = new StringReader(_content);
+			Deserializer deserializer = new Deserializer();
+			object obj = deserializer.Deserialize(textReader);
 			if (obj == null)
 			{
 				return;
 			}
 			BinaryFormatter binaryFormatter = new BinaryFormatter();
-			using (FileStream serializationStream = File.OpenWrite(PMFEIPCHENB))
+			using (FileStream serializationStream = File.OpenWrite(path))
 			{
 				binaryFormatter.Serialize(serializationStream, obj);
 			}

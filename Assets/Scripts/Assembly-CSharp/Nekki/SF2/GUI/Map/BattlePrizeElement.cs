@@ -14,19 +14,19 @@ namespace Nekki.SF2.GUI.Map
 		[SerializeField]
 		private Text _value;
 
-		public void Init(string ADONPNOBBDE, long value, int CFMPJLLNCFF, float JPDGMJHNKPK = 1f)
+		public void Init(string iconName, long value, int fontSize, float scale = 1f)
 		{
 			_icon.set_TexturePath("MiscSprites");
-			_icon.set_SpriteName(ADONPNOBBDE);
+			_icon.set_SpriteName(iconName);
 			_icon.SetNativeSize();
 			float nativeWidth = _icon.rectTransform.rect.width;
 			float nativeHeight = _icon.rectTransform.rect.height;
 			float nativeMax = Mathf.Max(nativeWidth, nativeHeight);
-			float iconScale = (nativeMax > CFMPJLLNCFF) ? (float)CFMPJLLNCFF / nativeMax : 1f;
-			iconScale *= JPDGMJHNKPK;
+			float iconScale = (nativeMax > fontSize) ? (float)fontSize / nativeMax : 1f;
+			iconScale *= scale;
 			_icon.rectTransform.localScale = new Vector3(iconScale, iconScale);
 			_value.font = LocalizationManager.GetContentFont();
-			_value.fontSize = CFMPJLLNCFF;
+			_value.fontSize = fontSize;
 			_value.color = Constants.DialogTextColor;
 			_value.text = value.ToString();
 			UpdateLayout();

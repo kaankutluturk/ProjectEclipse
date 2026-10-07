@@ -9,7 +9,7 @@ public class VideoClickHandler : MonoBehaviour, IPointerClickHandler, IEventSyst
 
 	public UnityEvent onClickVideo;
 
-	public void OnPointerClick(PointerEventData BHOLFGOGPCP)
+	public void OnPointerClick(PointerEventData eventData)
 	{
 		onClickVideo.Invoke();
 	}

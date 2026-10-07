@@ -4,8 +4,8 @@ public class NewsDialogInfo
 {
 	public List<NewsItem> Items = new List<NewsItem>();
 
-	public NewsDialogInfo(List<NewsItem> FDAFJMFLKEP)
+	public NewsDialogInfo(List<NewsItem> items)
 	{
-		Items = FDAFJMFLKEP;
+		Items = items;
 	}
 }

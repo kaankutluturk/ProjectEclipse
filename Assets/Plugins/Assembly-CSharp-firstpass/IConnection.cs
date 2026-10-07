@@ -12,7 +12,7 @@ public interface IConnection
 
 	void SetJsonEncoder(IJsonEncoder value);
 
-	void OnMessage(IServerMessage CKEHOEGLMBM);
+	void OnMessage(IServerMessage message);
 
 	void TransportStarted();
 
@@ -20,13 +20,13 @@ public interface IConnection
 
 	void TransportAborted();
 
-	void Error(string NEPOLDCKNJL);
+	void Error(string error);
 
-	Uri BuildUri(SignalRRequestType LFLGCDNKNJI);
+	Uri BuildUri(SignalRRequestType requestType);
 
-	Uri BuildUri(SignalRRequestType LFLGCDNKNJI, TransportBase CHMELBKHOPP);
+	Uri BuildUri(SignalRRequestType requestType, TransportBase transport);
 
-	HTTPRequest PrepareRequest(HTTPRequest CGOIOKHEGOE, SignalRRequestType LFLGCDNKNJI);
+	HTTPRequest PrepareRequest(HTTPRequest request, SignalRRequestType requestType);
 
-	string ParseResponse(string GHCCHADLAEK);
+	string ParseResponse(string response);
 }

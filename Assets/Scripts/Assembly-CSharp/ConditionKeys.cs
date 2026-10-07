@@ -12,8 +12,8 @@ public class ConditionKeys : ConditionAnimation
 	{
 		foreach (XmlNode childNode in node.ChildNodes)
 		{
-			string bAINMLLIKOL = childNode.Attributes["Type"].GetStringOrDefault(string.Empty);
-			FightCID item = (FightCID)MovesMaps.GetMappedIndex(MovesMaps.MapType.KEY_TYPE, bAINMLLIKOL);
+			string keyTypeName = childNode.Attributes["Type"].GetStringOrDefault(string.Empty);
+			FightCID item = (FightCID)MovesMaps.GetMappedIndex(MovesMaps.MapType.KEY_TYPE, keyTypeName);
 			switch (childNode.Attributes["PressType"].GetStringOrDefault(string.Empty))
 			{
 			case "Hold":
@@ -34,14 +34,14 @@ public class ConditionKeys : ConditionAnimation
 
 	public override bool IsEqual(ModelConditions conditions)
 	{
-		KeyData oHGJEGDLEJK = ((!conditions.PressedKeys.IsInverted && conditions.AnimationSign <= 0) ? ReversedKeys : RequiredKeys);
-		bool flag = !conditions.IsKeyCheckEnabled || oHGJEGDLEJK.IsVariable(conditions.PressedKeys);
+		KeyData keys = ((!conditions.PressedKeys.IsInverted && conditions.AnimationSign <= 0) ? ReversedKeys : RequiredKeys);
+		bool flag = !conditions.IsKeyCheckEnabled || keys.IsVariable(conditions.PressedKeys);
 		return (!IsNot) ? flag : (!flag);
 	}
 
-	public bool IsEqual(KeyData KDKEJHHKCDB, bool ANCFHGGJOJB)
+	public bool IsEqual(KeyData pressedKeys, bool isKeyCheckEnabled)
 	{
-		bool flag = !ANCFHGGJOJB || RequiredKeys.IsVariable(KDKEJHHKCDB);
+		bool flag = !isKeyCheckEnabled || RequiredKeys.IsVariable(pressedKeys);
 		return (!IsNot) ? flag : (!flag);
 	}
 

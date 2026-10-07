@@ -61,43 +61,43 @@ public class Compressor
 		algorithm = value;
 	}
 
-	public static void CompressFile(string OBAMLJHHPPE, string POBFCEMGIGO, CompressionAlgorithm ABKOBELCOIK = CompressionAlgorithm.LZMA)
+	public static void CompressFile(string destinationPath, string sourcePath, CompressionAlgorithm algorithm = CompressionAlgorithm.LZMA)
 	{
-		File.WriteAllBytes(OBAMLJHHPPE, Compress(File.ReadAllBytes(POBFCEMGIGO), ABKOBELCOIK));
+		File.WriteAllBytes(destinationPath, Compress(File.ReadAllBytes(sourcePath), algorithm));
 	}
 
-	public static void DecompressFile(string OBAMLJHHPPE, string OOPMIPCMFPC, CompressionAlgorithm ABKOBELCOIK = CompressionAlgorithm.LZMA)
+	public static void DecompressFile(string sourcePath, string destinationPath, CompressionAlgorithm algorithm = CompressionAlgorithm.LZMA)
 	{
-		File.WriteAllBytes(OOPMIPCMFPC, Decompress(File.ReadAllBytes(OBAMLJHHPPE), ABKOBELCOIK));
+		File.WriteAllBytes(destinationPath, Decompress(File.ReadAllBytes(sourcePath), algorithm));
 	}
 
-	public static byte[] Compress(byte[] APACFLKJCKF, CompressionAlgorithm ABKOBELCOIK = CompressionAlgorithm.LZMA)
+	public static byte[] Compress(byte[] data, CompressionAlgorithm algorithm = CompressionAlgorithm.LZMA)
 	{
-		if (ABKOBELCOIK == CompressionAlgorithm.LZMA)
+		if (algorithm == CompressionAlgorithm.LZMA)
 		{
-			MemoryStream memoryStream = new MemoryStream(APACFLKJCKF);
+			MemoryStream memoryStream = new MemoryStream(data);
 			MemoryStream memoryStream2 = new MemoryStream();
-			LzmaEncoder mNPBDHNFEBB = new LzmaEncoder();
-			mNPBDHNFEBB.SetCoderProperties(propIDs, properties);
-			mNPBDHNFEBB.WriteCoderProperties(memoryStream2);
+			LzmaEncoder encoder = new LzmaEncoder();
+			encoder.SetCoderProperties(propIDs, properties);
+			encoder.WriteCoderProperties(memoryStream2);
 			long length = memoryStream.Length;
 			for (int i = 0; i < 8; i++)
 			{
 				memoryStream2.WriteByte((byte)(length >> 8 * i));
 			}
-			mNPBDHNFEBB.Code(memoryStream, memoryStream2, -1L, -1L, null);
+			encoder.Code(memoryStream, memoryStream2, -1L, -1L, null);
 			return memoryStream2.ToArray();
 		}
 		return new byte[0];
 	}
 
-	public static byte[] Decompress(byte[] APACFLKJCKF, CompressionAlgorithm ABKOBELCOIK = CompressionAlgorithm.LZMA)
+	public static byte[] Decompress(byte[] data, CompressionAlgorithm algorithm = CompressionAlgorithm.LZMA)
 	{
-		if (ABKOBELCOIK == CompressionAlgorithm.LZMA)
+		if (algorithm == CompressionAlgorithm.LZMA)
 		{
-			using (MemoryStream memoryStream = new MemoryStream(APACFLKJCKF))
+			using (MemoryStream memoryStream = new MemoryStream(data))
 			{
-				LzmaDecoder gDEMLIAGBCB = new LzmaDecoder();
+				LzmaDecoder decoder = new LzmaDecoder();
 				memoryStream.Seek(0L, SeekOrigin.Begin);
 				using (MemoryStream memoryStream2 = new MemoryStream())
 				{
@@ -116,9 +116,9 @@ public class Compressor
 						}
 						num |= (long)(int)(byte)num2 << 8 * i;
 					}
-					gDEMLIAGBCB.SetDecoderProperties(array);
-					long nCKELGLBGJN = memoryStream.Length - memoryStream.Position;
-					gDEMLIAGBCB.Code(memoryStream, memoryStream2, nCKELGLBGJN, num, null);
+					decoder.SetDecoderProperties(array);
+					long outSize = memoryStream.Length - memoryStream.Position;
+					decoder.Code(memoryStream, memoryStream2, outSize, num, null);
 					return memoryStream2.ToArray();
 				}
 			}
@@ -126,27 +126,27 @@ public class Compressor
 		return new byte[0];
 	}
 
-	public static void DecodeStream(FileStream FBGBPGIDKHM, MemoryStream BBBGGJLOCPB)
+	public static void DecodeStream(FileStream input, MemoryStream output)
 	{
-		LzmaDecoder gDEMLIAGBCB = new LzmaDecoder();
-		FBGBPGIDKHM.Seek(0L, SeekOrigin.Begin);
+		LzmaDecoder decoder = new LzmaDecoder();
+		input.Seek(0L, SeekOrigin.Begin);
 		byte[] array = new byte[5];
-		if (FBGBPGIDKHM.Read(array, 0, 5) != 5)
+		if (input.Read(array, 0, 5) != 5)
 		{
 			throw new Exception("input .lzma is too short");
 		}
 		long num = 0L;
 		for (int i = 0; i < 8; i++)
 		{
-			int num2 = FBGBPGIDKHM.ReadByte();
+			int num2 = input.ReadByte();
 			if (num2 < 0)
 			{
 				throw new Exception("Can't Read 1");
 			}
 			num |= (long)(int)(byte)num2 << 8 * i;
 		}
-		gDEMLIAGBCB.SetDecoderProperties(array);
-		long nCKELGLBGJN = FBGBPGIDKHM.Length - FBGBPGIDKHM.Position;
-		gDEMLIAGBCB.Code(FBGBPGIDKHM, BBBGGJLOCPB, nCKELGLBGJN, num, null);
+		decoder.SetDecoderProperties(array);
+		long outSize = input.Length - input.Position;
+		decoder.Code(input, output, outSize, num, null);
 	}
 }

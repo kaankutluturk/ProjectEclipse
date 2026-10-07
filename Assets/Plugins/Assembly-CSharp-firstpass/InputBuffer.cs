@@ -101,29 +101,29 @@ internal class InputBuffer
 		return result;
 	}
 
-	public int CopyTo(byte[] output, int IPCOBJBKNAO, int BDBOAEGELMC)
+	public int CopyTo(byte[] output, int offset, int length)
 	{
 		int num = 0;
-		while (bitsInBuffer > 0 && BDBOAEGELMC > 0)
+		while (bitsInBuffer > 0 && length > 0)
 		{
-			output[IPCOBJBKNAO++] = (byte)bitBuffer;
+			output[offset++] = (byte)bitBuffer;
 			bitBuffer >>= 8;
 			bitsInBuffer -= 8;
-			BDBOAEGELMC--;
+			length--;
 			num++;
 		}
-		if (BDBOAEGELMC == 0)
+		if (length == 0)
 		{
 			return num;
 		}
 		int num2 = end - start;
-		if (BDBOAEGELMC > num2)
+		if (length > num2)
 		{
-			BDBOAEGELMC = num2;
+			length = num2;
 		}
-		Array.Copy(buffer, start, output, IPCOBJBKNAO, BDBOAEGELMC);
-		start += BDBOAEGELMC;
-		return num + BDBOAEGELMC;
+		Array.Copy(buffer, start, output, offset, length);
+		start += length;
+		return num + length;
 	}
 
 	public bool NeedsInput()
@@ -131,17 +131,17 @@ internal class InputBuffer
 		return start == end;
 	}
 
-	public void SetInput(byte[] buffer, int IPCOBJBKNAO, int BDBOAEGELMC)
+	public void SetInput(byte[] buffer, int offset, int length)
 	{
 		this.buffer = buffer;
-		start = IPCOBJBKNAO;
-		end = IPCOBJBKNAO + BDBOAEGELMC;
+		start = offset;
+		end = offset + length;
 	}
 
-	public void SkipBits(int HDKKKCDKFEE)
+	public void SkipBits(int count)
 	{
-		bitBuffer >>= HDKKKCDKFEE;
-		bitsInBuffer -= HDKKKCDKFEE;
+		bitBuffer >>= count;
+		bitsInBuffer -= count;
 	}
 
 	public void SkipToByteBoundary()

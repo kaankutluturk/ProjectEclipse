@@ -3,22 +3,22 @@ using System.IO;
 
 internal static class HTTPProtocolFactory
 {
-	public static HTTPResponse Get(SupportedProtocols ENLHAIGCCBO, HTTPRequest ONOCIELLAPL, Stream ABJIEFMMIEK, bool IBIIADCLKCH, bool PEAJIKCANHP)
+	public static HTTPResponse Get(SupportedProtocols protocol, HTTPRequest request, Stream stream, bool isStreamed, bool isFromCache)
 	{
-		switch (ENLHAIGCCBO)
+		switch (protocol)
 		{
 		case SupportedProtocols.WebSocket:
-			return new WebSocketResponse(ONOCIELLAPL, ABJIEFMMIEK, IBIIADCLKCH, PEAJIKCANHP);
+			return new WebSocketResponse(request, stream, isStreamed, isFromCache);
 		case SupportedProtocols.ServerSentEvents:
-			return new EventSourceResponse(ONOCIELLAPL, ABJIEFMMIEK, IBIIADCLKCH, PEAJIKCANHP);
+			return new EventSourceResponse(request, stream, isStreamed, isFromCache);
 		default:
-			return new HTTPResponse(ONOCIELLAPL, ABJIEFMMIEK, IBIIADCLKCH, PEAJIKCANHP);
+			return new HTTPResponse(request, stream, isStreamed, isFromCache);
 		}
 	}
 
-	public static SupportedProtocols GetProtocolFromUri(Uri KJHNCLAJMLO)
+	public static SupportedProtocols GetProtocolFromUri(Uri uri)
 	{
-		switch (KJHNCLAJMLO.Scheme.ToLowerInvariant())
+		switch (uri.Scheme.ToLowerInvariant())
 		{
 		case "ws":
 		case "wss":
@@ -28,9 +28,9 @@ internal static class HTTPProtocolFactory
 		}
 	}
 
-	public static bool IsSecureProtocol(Uri KJHNCLAJMLO)
+	public static bool IsSecureProtocol(Uri uri)
 	{
-		switch (KJHNCLAJMLO.Scheme.ToLowerInvariant())
+		switch (uri.Scheme.ToLowerInvariant())
 		{
 		case "https":
 		case "wss":

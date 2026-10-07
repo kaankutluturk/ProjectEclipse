@@ -72,9 +72,9 @@ public class VersionContainer
 		SetVersion(version);
 	}
 
-	public VersionContainer(int IGIOOCIDFIN, int IBGMIGIFNJM, int LDKAECLLDNG, int JJCDPPFGPDO = -1)
+	public VersionContainer(int major, int minor, int build, int revision = -1)
 	{
-		SetVersion(IGIOOCIDFIN, IBGMIGIFNJM, LDKAECLLDNG, JJCDPPFGPDO);
+		SetVersion(major, minor, build, revision);
 	}
 
 	public int GetMajor()
@@ -145,12 +145,12 @@ public class VersionContainer
 		SetVersion(version.GetMajor(), version.GetMinor(), version.GetBuild(), version.GetRevision());
 	}
 
-	public void SetVersion(int IGIOOCIDFIN, int IBGMIGIFNJM = -1, int LDKAECLLDNG = -1, int JJCDPPFGPDO = -1)
+	public void SetVersion(int major, int minor = -1, int build = -1, int revision = -1)
 	{
-		SetMajor(IGIOOCIDFIN);
-		SetMinor(IBGMIGIFNJM);
-		SetBuild(LDKAECLLDNG);
-		SetRevision(JJCDPPFGPDO);
+		SetMajor(major);
+		SetMinor(minor);
+		SetBuild(build);
+		SetRevision(revision);
 	}
 
 	public static VersionContainer CreateVersion(string version)
@@ -163,100 +163,100 @@ public class VersionContainer
 		return new VersionContainer(version.GetMajor(), version.GetMinor(), version.GetBuild(), version.GetRevision());
 	}
 
-	public static VersionContainer CreateVersion(int IGIOOCIDFIN, int IBGMIGIFNJM = -1, int LDKAECLLDNG = -1, int JJCDPPFGPDO = -1)
+	public static VersionContainer CreateVersion(int major, int minor = -1, int build = -1, int revision = -1)
 	{
-		return new VersionContainer(IGIOOCIDFIN, IBGMIGIFNJM, LDKAECLLDNG, JJCDPPFGPDO);
+		return new VersionContainer(major, minor, build, revision);
 	}
 
 	[SpecialName]
-	public static bool IsEqual(VersionContainer LHBNIMGFKIB, VersionContainer AAOIAEJJINO)
+	public static bool IsEqual(VersionContainer leftVersion, VersionContainer rightVersion)
 	{
-		CompareResult lOICEAFFHDO = Compare(LHBNIMGFKIB, AAOIAEJJINO);
-		return lOICEAFFHDO == CompareResult.Equally;
+		CompareResult comparison = Compare(leftVersion, rightVersion);
+		return comparison == CompareResult.Equally;
 	}
 
 	[SpecialName]
-	public static bool IsEqual(VersionContainer LHBNIMGFKIB, string AAOIAEJJINO)
+	public static bool IsEqual(VersionContainer leftVersion, string rightVersion)
 	{
-		return IsEqual(LHBNIMGFKIB, CreateVersion(AAOIAEJJINO));
+		return IsEqual(leftVersion, CreateVersion(rightVersion));
 	}
 
 	[SpecialName]
-	public static bool IsNotEqual(VersionContainer LHBNIMGFKIB, VersionContainer AAOIAEJJINO)
+	public static bool IsNotEqual(VersionContainer leftVersion, VersionContainer rightVersion)
 	{
-		return !IsEqual(LHBNIMGFKIB, AAOIAEJJINO);
+		return !IsEqual(leftVersion, rightVersion);
 	}
 
 	[SpecialName]
-	public static bool IsNotEqual(VersionContainer LHBNIMGFKIB, string AAOIAEJJINO)
+	public static bool IsNotEqual(VersionContainer leftVersion, string rightVersion)
 	{
-		return IsNotEqual(LHBNIMGFKIB, CreateVersion(AAOIAEJJINO));
+		return IsNotEqual(leftVersion, CreateVersion(rightVersion));
 	}
 
 	[SpecialName]
-	public static bool IsGreater(VersionContainer LHBNIMGFKIB, VersionContainer AAOIAEJJINO)
+	public static bool IsGreater(VersionContainer leftVersion, VersionContainer rightVersion)
 	{
-		CompareResult lOICEAFFHDO = Compare(LHBNIMGFKIB, AAOIAEJJINO);
-		return lOICEAFFHDO == CompareResult.More && lOICEAFFHDO != CompareResult.Equally;
+		CompareResult comparison = Compare(leftVersion, rightVersion);
+		return comparison == CompareResult.More && comparison != CompareResult.Equally;
 	}
 
 	[SpecialName]
-	public static bool IsGreater(VersionContainer LHBNIMGFKIB, string AAOIAEJJINO)
+	public static bool IsGreater(VersionContainer leftVersion, string rightVersion)
 	{
-		return IsGreater(LHBNIMGFKIB, CreateVersion(AAOIAEJJINO));
+		return IsGreater(leftVersion, CreateVersion(rightVersion));
 	}
 
 	[SpecialName]
-	public static bool IsLess(VersionContainer LHBNIMGFKIB, VersionContainer AAOIAEJJINO)
+	public static bool IsLess(VersionContainer leftVersion, VersionContainer rightVersion)
 	{
-		CompareResult lOICEAFFHDO = Compare(LHBNIMGFKIB, AAOIAEJJINO);
-		return lOICEAFFHDO == CompareResult.Less && lOICEAFFHDO != CompareResult.Equally;
+		CompareResult comparison = Compare(leftVersion, rightVersion);
+		return comparison == CompareResult.Less && comparison != CompareResult.Equally;
 	}
 
 	[SpecialName]
-	public static bool IsLess(VersionContainer LHBNIMGFKIB, string AAOIAEJJINO)
+	public static bool IsLess(VersionContainer leftVersion, string rightVersion)
 	{
-		return IsLess(LHBNIMGFKIB, CreateVersion(AAOIAEJJINO));
+		return IsLess(leftVersion, CreateVersion(rightVersion));
 	}
 
 	[SpecialName]
-	public static bool IsGreaterOrEqual(VersionContainer LHBNIMGFKIB, VersionContainer AAOIAEJJINO)
+	public static bool IsGreaterOrEqual(VersionContainer leftVersion, VersionContainer rightVersion)
 	{
-		CompareResult lOICEAFFHDO = Compare(LHBNIMGFKIB, AAOIAEJJINO);
-		return lOICEAFFHDO == CompareResult.More || lOICEAFFHDO == CompareResult.Equally;
+		CompareResult comparison = Compare(leftVersion, rightVersion);
+		return comparison == CompareResult.More || comparison == CompareResult.Equally;
 	}
 
 	[SpecialName]
-	public static bool IsGreaterOrEqual(VersionContainer LHBNIMGFKIB, string AAOIAEJJINO)
+	public static bool IsGreaterOrEqual(VersionContainer leftVersion, string rightVersion)
 	{
-		return IsGreaterOrEqual(LHBNIMGFKIB, CreateVersion(AAOIAEJJINO));
+		return IsGreaterOrEqual(leftVersion, CreateVersion(rightVersion));
 	}
 
 	[SpecialName]
-	public static bool IsLessOrEqual(VersionContainer LHBNIMGFKIB, VersionContainer AAOIAEJJINO)
+	public static bool IsLessOrEqual(VersionContainer leftVersion, VersionContainer rightVersion)
 	{
-		CompareResult lOICEAFFHDO = Compare(LHBNIMGFKIB, AAOIAEJJINO);
-		return lOICEAFFHDO == CompareResult.Less || lOICEAFFHDO == CompareResult.Equally;
+		CompareResult comparison = Compare(leftVersion, rightVersion);
+		return comparison == CompareResult.Less || comparison == CompareResult.Equally;
 	}
 
 	[SpecialName]
-	public static bool IsLessOrEqual(VersionContainer LHBNIMGFKIB, string AAOIAEJJINO)
+	public static bool IsLessOrEqual(VersionContainer leftVersion, string rightVersion)
 	{
-		return IsLessOrEqual(LHBNIMGFKIB, CreateVersion(AAOIAEJJINO));
+		return IsLessOrEqual(leftVersion, CreateVersion(rightVersion));
 	}
 
-	public string ToString(bool MJHLPGDFEHA)
+	public string ToString(bool includeRevision)
 	{
-		if (MJHLPGDFEHA)
+		if (includeRevision)
 		{
 			return string.Format("{0}.{1}.{2}.{3}", GetMajor(), GetMinor(), GetBuild(), GetRevision());
 		}
 		return string.Format("{0}.{1}.{2}", GetMajor(), GetMinor(), GetBuild());
 	}
 
-	public override bool Equals(object AOMLCBHAJJH)
+	public override bool Equals(object obj)
 	{
-		return AOMLCBHAJJH is VersionContainer && IsEqual((VersionContainer)AOMLCBHAJJH, this);
+		return obj is VersionContainer && IsEqual((VersionContainer)obj, this);
 	}
 
 	public override int GetHashCode()
@@ -270,46 +270,46 @@ public class VersionContainer
 	}
 
 	[SpecialName]
-	public static string op_Implicit(VersionContainer AFIEJABPAKA)
+	public static string op_Implicit(VersionContainer version)
 	{
-		return AFIEJABPAKA.ToString(true);
+		return version.ToString(true);
 	}
 
-	public bool Empty(bool MJHLPGDFEHA = false)
+	public bool Empty(bool includeRevision = false)
 	{
-		if (GetMajor() == 0 && GetMinor() == 0 && GetBuild() == 0 && (!MJHLPGDFEHA || GetRevision() == 0))
+		if (GetMajor() == 0 && GetMinor() == 0 && GetBuild() == 0 && (!includeRevision || GetRevision() == 0))
 		{
 			return true;
 		}
 		return false;
 	}
 
-	private static CompareResult Compare(VersionContainer LHBNIMGFKIB, VersionContainer AAOIAEJJINO, int IGIEDFIPIAN = 4)
+	private static CompareResult Compare(VersionContainer leftVersion, VersionContainer rightVersion, int componentCount = 4)
 	{
-		int[] mOCMENBOJJF = LHBNIMGFKIB._versionSource;
-		int[] mOCMENBOJJF2 = AAOIAEJJINO._versionSource;
-		for (int i = 0; i < IGIEDFIPIAN; i++)
+		int[] leftParts = leftVersion._versionSource;
+		int[] mOCMENBOJJF2 = rightVersion._versionSource;
+		for (int i = 0; i < componentCount; i++)
 		{
-			if (mOCMENBOJJF[i] != mOCMENBOJJF2[i])
+			if (leftParts[i] != mOCMENBOJJF2[i])
 			{
-				return (mOCMENBOJJF[i] > mOCMENBOJJF2[i]) ? CompareResult.More : CompareResult.Less;
+				return (leftParts[i] > mOCMENBOJJF2[i]) ? CompareResult.More : CompareResult.Less;
 			}
 		}
 		return CompareResult.Equally;
 	}
 
-	public bool ForCurrentVersion(string JJCDPPFGPDO)
+	public bool ForCurrentVersion(string version)
 	{
-		return ForCurrentVersion(new VersionContainer(JJCDPPFGPDO));
+		return ForCurrentVersion(new VersionContainer(version));
 	}
 
-	public bool ForCurrentVersion(VersionContainer JJCDPPFGPDO)
+	public bool ForCurrentVersion(VersionContainer version)
 	{
-		return Compare(this, JJCDPPFGPDO, 3) == CompareResult.Equally;
+		return Compare(this, version, 3) == CompareResult.Equally;
 	}
 
-	public bool IsOlderThan(VersionContainer JJCDPPFGPDO)
+	public bool IsOlderThan(VersionContainer version)
 	{
-		return Compare(this, JJCDPPFGPDO, 3) == CompareResult.Less;
+		return Compare(this, version, 3) == CompareResult.Less;
 	}
 }

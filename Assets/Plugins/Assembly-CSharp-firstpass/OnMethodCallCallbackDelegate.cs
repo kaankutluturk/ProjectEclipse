@@ -1,1 +1,1 @@
-public delegate void OnMethodCallCallbackDelegate(Hub CGFIJCNNCKP, MethodCallMessage BOPGDKGIGHM);
+public delegate void OnMethodCallCallbackDelegate(Hub hub, MethodCallMessage methodCall);

@@ -3,14 +3,14 @@ using UnityEngine;
 
 internal class VerticalLayout : IDisposable
 {
-	public VerticalLayout(params GUILayoutOption[] LHONCAIFCAF)
+	public VerticalLayout(params GUILayoutOption[] options)
 	{
-		GUILayout.BeginVertical(LHONCAIFCAF);
+		GUILayout.BeginVertical(options);
 	}
 
-	public VerticalLayout(GUIStyle KIGNIBIMLKK)
+	public VerticalLayout(GUIStyle style)
 	{
-		GUILayout.BeginVertical(KIGNIBIMLKK);
+		GUILayout.BeginVertical(style);
 	}
 
 	public void Dispose()

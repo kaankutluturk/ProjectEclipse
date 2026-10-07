@@ -35,11 +35,11 @@ public class LedgerSettings
 		}
 	}
 
-	public LedgerSettings(string BEPKJNKCKPH, int DGDKHFPEHOG, int BDNJNFPONEF)
+	public LedgerSettings(string ledgerUrl, int timeoutValue, int maxRetryCount)
 	{
-		set_Url(BEPKJNKCKPH);
-		SetTimeout(DGDKHFPEHOG);
-		SetMaxRetry(BDNJNFPONEF);
+		set_Url(ledgerUrl);
+		SetTimeout(timeoutValue);
+		SetMaxRetry(maxRetryCount);
 		if (!GetUrl().EndsWith("/"))
 		{
 			set_Url(GetUrl() + "/");

@@ -1,1 +1,1 @@
-public delegate void OnMethodFailedDelegate(Hub CGFIJCNNCKP, ClientMessage BKNEELNMDHH, FailureMessage JDONBAPIJCG);
+public delegate void OnMethodFailedDelegate(Hub hub, ClientMessage originalMessage, FailureMessage failure);

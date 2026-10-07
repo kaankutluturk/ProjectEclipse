@@ -88,9 +88,9 @@ namespace Nekki.SF2.GUI.Menu
 			}
 		}
 
-		public void SetDialogBtnPressType(ButtonStateExtensions.ButtonPressType LFLGCDNKNJI, bool GHJGPAEDIHG)
+		public void SetDialogBtnPressType(ButtonStateExtensions.ButtonPressType pressType, bool isInteractable)
 		{
-			_dialogButton.SetPressType(LFLGCDNKNJI, GHJGPAEDIHG);
+			_dialogButton.SetPressType(pressType, isInteractable);
 		}
 
 		public virtual void SetTouchEnabled(bool value)

@@ -51,10 +51,10 @@ internal sealed class EventDescriptor
 		}
 	}
 
-	public EventDescriptor(bool ONOLLCMDGBO, bool EJDLINOJJIF, SocketIOCallback callback)
+	public EventDescriptor(bool onlyOnce, bool autoDecodePayload, SocketIOCallback callback)
 	{
-		SetOnlyOnce(ONOLLCMDGBO);
-		SetAutoDecodePayload(EJDLINOJJIF);
+		SetOnlyOnce(onlyOnce);
+		SetAutoDecodePayload(autoDecodePayload);
 		SetCallbacks(new List<SocketIOCallback>(1));
 		if (callback != null)
 		{
@@ -92,7 +92,7 @@ internal sealed class EventDescriptor
 		autoDecodePayload = value;
 	}
 
-	public void Call(Socket JLEACANCMJF, Packet NPKADBPBKIG, params object[] LKIOKGCNKHE)
+	public void Call(Socket socket, Packet packet, params object[] args)
 	{
 		if (callbackArray == null || callbackArray.Length < GetCallbacks().Count)
 		{
@@ -103,11 +103,11 @@ internal sealed class EventDescriptor
 		{
 			try
 			{
-				callbackArray[i](JLEACANCMJF, NPKADBPBKIG, LKIOKGCNKHE);
+				callbackArray[i](socket, packet, args);
 			}
 			catch (Exception ex)
 			{
-				((ISocket)JLEACANCMJF).EmitError(SocketIOErrors.User, ex.Message + " " + ex.StackTrace);
+				((ISocket)socket).EmitError(SocketIOErrors.User, ex.Message + " " + ex.StackTrace);
 				HTTPManager.GetLogger().Exception("EventDescriptor", "Call", ex);
 			}
 			if (GetOnlyOnce())

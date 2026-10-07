@@ -12,10 +12,10 @@ public class IntroModule : LoadingModule
 
 	private GameObject _logo;
 
-	public IntroModule(GameLoaderScene FCDFLMFEJGI)
+	public IntroModule(GameLoaderScene loaderScene)
 	{
-		introClip = FCDFLMFEJGI.get_IntroClip();
-		_logo = FCDFLMFEJGI.get_Logo();
+		introClip = loaderScene.get_IntroClip();
+		_logo = loaderScene.get_Logo();
 	}
 
 	// Eclipse: the intro plays on entering a save only when enabled under Options > Audio.

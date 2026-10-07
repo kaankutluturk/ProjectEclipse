@@ -35,10 +35,10 @@ public class XmlCryptoUtils
 		return SystemProperties.IsAndroidPlatform() || SystemProperties.IsIosPlatform();
 	}
 
-	public static string LoadAndEncryptResource(string ONEIGMLOGDC)
+	public static string LoadAndEncryptResource(string resourcePath)
 	{
-		ONEIGMLOGDC = StripExtension(ONEIGMLOGDC);
-		TextAsset textAsset = ResourcesAndBundles.Load<TextAsset>(ONEIGMLOGDC);
+		resourcePath = StripExtension(resourcePath);
+		TextAsset textAsset = ResourcesAndBundles.Load<TextAsset>(resourcePath);
 		string result = null;
 		try
 		{
@@ -54,10 +54,10 @@ public class XmlCryptoUtils
 		return result;
 	}
 
-	public static string LoadAndDecryptResource(string ONEIGMLOGDC)
+	public static string LoadAndDecryptResource(string resourcePath)
 	{
-		ONEIGMLOGDC = StripExtension(ONEIGMLOGDC);
-		TextAsset textAsset = ResourcesAndBundles.Load<TextAsset>(ONEIGMLOGDC);
+		resourcePath = StripExtension(resourcePath);
+		TextAsset textAsset = ResourcesAndBundles.Load<TextAsset>(resourcePath);
 		string result = null;
 		try
 		{
@@ -73,12 +73,12 @@ public class XmlCryptoUtils
 		return result;
 	}
 
-	public static string EncryptString(string HCPNFPMHFCM)
+	public static string EncryptString(string plainText)
 	{
 		string result = null;
 		try
 		{
-			result = AESUtils.EncryptStringToBase64(HCPNFPMHFCM, aesKey, aesIv);
+			result = AESUtils.EncryptStringToBase64(plainText, aesKey, aesIv);
 		}
 		catch (Exception ex)
 		{
@@ -87,12 +87,12 @@ public class XmlCryptoUtils
 		return result;
 	}
 
-	public static string DecryptStringOrPassThrough(string HCPNFPMHFCM)
+	public static string DecryptStringOrPassThrough(string encryptedText)
 	{
 		string result = null;
 		try
 		{
-			result = AESUtils.DecryptBase64ToString(HCPNFPMHFCM, aesKey, aesIv);
+			result = AESUtils.DecryptBase64ToString(encryptedText, aesKey, aesIv);
 		}
 		catch (Exception ex)
 		{
@@ -100,17 +100,17 @@ public class XmlCryptoUtils
 		}
 		if (string.IsNullOrEmpty(result))
 		{
-			result = HCPNFPMHFCM;
+			result = encryptedText;
 		}
 		return result;
 	}
 
-	private static string StripExtension(string ONEIGMLOGDC)
+	private static string StripExtension(string path)
 	{
-		if (Path.HasExtension(ONEIGMLOGDC))
+		if (Path.HasExtension(path))
 		{
-			return Path.ChangeExtension(ONEIGMLOGDC, null);
+			return Path.ChangeExtension(path, null);
 		}
-		return ONEIGMLOGDC;
+		return path;
 	}
 }

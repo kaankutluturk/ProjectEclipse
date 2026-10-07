@@ -27,11 +27,11 @@ namespace Nekki.SF2.GUI.Shop
 			}
 		}
 
-		public void OnClick(ShopSection KGDHCBNKLMF)
+		public void OnClick(ShopSection section)
 		{
 			if (_shopScene != null)
 			{
-				_shopScene.SetShopSection(KGDHCBNKLMF);
+				_shopScene.SetShopSection(section);
 			}
 		}
 
@@ -88,16 +88,16 @@ namespace Nekki.SF2.GUI.Shop
 			{
 				if (!(button == null))
 				{
-					int kGDHCBNKLMF = _buttons.IndexOf(button);
-					string lFLGCDNKNJI = GetItemTypeBySection((ShopSection)kGDHCBNKLMF);
-					button.set_NewItemsCount(ListSF.GetItems().GetCountNewItemsByType(lFLGCDNKNJI));
+					int sectionIndex = _buttons.IndexOf(button);
+					string itemType = GetItemTypeBySection((ShopSection)sectionIndex);
+					button.set_NewItemsCount(ListSF.GetItems().GetCountNewItemsByType(itemType));
 				}
 			}
 		}
 
-		private string GetItemTypeBySection(ShopSection KGDHCBNKLMF)
+		private string GetItemTypeBySection(ShopSection section)
 		{
-			switch (KGDHCBNKLMF)
+			switch (section)
 			{
 			case ShopSection.Weapon:
 				return "Weapon";

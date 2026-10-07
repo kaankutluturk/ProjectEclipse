@@ -23,10 +23,10 @@ public class PerkActionChangeHitEffectScale : PerkAction
 		set_HitEffectScale(1f);
 	}
 
-	public PerkActionChangeHitEffectScale(PerkActionChangeHitEffectScale NOLFMPDGCOC)
-		: base(NOLFMPDGCOC)
+	public PerkActionChangeHitEffectScale(PerkActionChangeHitEffectScale source)
+		: base(source)
 	{
-		set_HitEffectScale(NOLFMPDGCOC.GetHitEffectScale());
+		set_HitEffectScale(source.GetHitEffectScale());
 	}
 
 	public float GetHitEffectScale()

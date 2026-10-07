@@ -189,15 +189,15 @@ namespace Nekki.SF2.GUI
 			_Items.Clear();
 		}
 
-		public void SetItems(List<BaseScrollItem> HELFDCAIJNE)
+		public void SetItems(List<BaseScrollItem> items)
 		{
-			if (HELFDCAIJNE == null)
+			if (items == null)
 			{
 				GameLog.Error("BaseScrollContent.SetItems items is null");
 				return;
 			}
 			Clear();
-			foreach (BaseScrollItem item in HELFDCAIJNE)
+			foreach (BaseScrollItem item in items)
 			{
 				AddItem(item);
 			}
@@ -226,9 +226,9 @@ namespace Nekki.SF2.GUI
 				item.gameObject.SetActive(false);
 				list.Add(item.gameObject);
 			}
-			list.ForEach((GameObject BFEBLBKODLK) =>
+			list.ForEach((GameObject itemObject) =>
 			{
-				UnityEngine.Object.Destroy(BFEBLBKODLK);
+				UnityEngine.Object.Destroy(itemObject);
 			});
 			ClearItems();
 			VerticalLayoutGroup verticalLayoutGroup = _layout as VerticalLayoutGroup;
@@ -270,18 +270,18 @@ namespace Nekki.SF2.GUI
 			}
 		}
 
-		public BaseScrollItem GetNearestItem(float GHGLPGGMDNP = 0f)
+		public BaseScrollItem GetNearestItem(float offset = 0f)
 		{
 			VerticalLayoutGroup verticalLayoutGroup = _layout as VerticalLayoutGroup;
 			float num = Center.position.x;
 			float num2 = Center.position.y;
 			if (verticalLayoutGroup != null)
 			{
-				num2 += GHGLPGGMDNP;
+				num2 += offset;
 			}
 			else
 			{
-				num += GHGLPGGMDNP;
+				num += offset;
 			}
 			Vector2 a = new Vector2(num, num2);
 			BaseScrollItem result = null;

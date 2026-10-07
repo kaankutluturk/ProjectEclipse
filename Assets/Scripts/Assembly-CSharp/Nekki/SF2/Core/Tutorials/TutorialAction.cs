@@ -31,14 +31,14 @@ namespace Nekki.SF2.Core.Tutorials
 			return true;
 		}
 
-		protected void CompleteAction(int BNPIIOAIBGN = 0)
+		protected void CompleteAction(int resultCode = 0)
 		{
-			CallEvent(0, BNPIIOAIBGN);
+			CallEvent(0, resultCode);
 		}
 
-		protected void SetButtonHighlight(Button KLNKEPMAGKF, bool KOHDJNFJLGH)
+		protected void SetButtonHighlight(Button button, bool highlight)
 		{
-			if (!KOHDJNFJLGH)
+			if (!highlight)
 			{
 			}
 		}
@@ -48,7 +48,7 @@ namespace Nekki.SF2.Core.Tutorials
 			Object.Destroy(highlightObject);
 		}
 
-		protected void HighlightTarget(GameObject target, float KDGOIIIHPCL, float AMKFJMOMNNB, float DOBNKCHMKGE = 0f)
+		protected void HighlightTarget(GameObject target, float offsetX, float offsetY, float offsetZ = 0f)
 		{
 		}
 
@@ -61,9 +61,9 @@ namespace Nekki.SF2.Core.Tutorials
 			spawnedObjects.Clear();
 		}
 
-		protected void TrackObject(GameObject GBIOHMNNEJI)
+		protected void TrackObject(GameObject trackedObject)
 		{
-			global::Pair<GameObject, int> item = new global::Pair<GameObject, int>(GBIOHMNNEJI, 0);
+			global::Pair<GameObject, int> item = new global::Pair<GameObject, int>(trackedObject, 0);
 			trackedObjects.Add(item);
 		}
 	}

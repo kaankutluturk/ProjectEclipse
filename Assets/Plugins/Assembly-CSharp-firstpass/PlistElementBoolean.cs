@@ -2,8 +2,8 @@ public class PlistElementBoolean : PlistElement
 {
 	public bool value;
 
-	public PlistElementBoolean(bool AFIEJABPAKA)
+	public PlistElementBoolean(bool newValue)
 	{
-		value = AFIEJABPAKA;
+		value = newValue;
 	}
 }

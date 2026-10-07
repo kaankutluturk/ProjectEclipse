@@ -18,11 +18,11 @@ public class MoneyBaseValues
 		}
 	}
 
-	public long GetBaseValue(int OMHDLKNHNMJ)
+	public long GetBaseValue(int level)
 	{
 		foreach (CharProgLevel item in levels)
 		{
-			if (OMHDLKNHNMJ >= item.Min && OMHDLKNHNMJ <= item.Max)
+			if (level >= item.Min && level <= item.Max)
 			{
 				return item.value;
 			}

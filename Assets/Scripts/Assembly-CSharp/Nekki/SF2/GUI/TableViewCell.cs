@@ -45,7 +45,7 @@ namespace Nekki.SF2.GUI
 
 		public abstract void Display();
 
-		public void OnSelect(BaseEventData BHOLFGOGPCP)
+		public void OnSelect(BaseEventData eventData)
 		{
 			SetHighlighted();
 			if (DidHighlightEvent != null)
@@ -54,7 +54,7 @@ namespace Nekki.SF2.GUI
 			}
 		}
 
-		public void OnSubmit(BaseEventData BHOLFGOGPCP)
+		public void OnSubmit(BaseEventData eventData)
 		{
 			SetSelected();
 			if (DidSelectEvent != null)
@@ -63,7 +63,7 @@ namespace Nekki.SF2.GUI
 			}
 		}
 
-		public void OnPointerClick(PointerEventData BHOLFGOGPCP)
+		public void OnPointerClick(PointerEventData eventData)
 		{
 			SetSelected();
 			if (DidSelectEvent != null)

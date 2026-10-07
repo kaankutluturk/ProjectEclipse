@@ -22,10 +22,10 @@ public class ModHealthChange : PerkActionModificator
 	{
 	}
 
-	public ModHealthChange(ModHealthChange NOLFMPDGCOC)
-		: base(NOLFMPDGCOC)
+	public ModHealthChange(ModHealthChange other)
+		: base(other)
 	{
-		set_PerFrameValue(NOLFMPDGCOC.GetPerFrameValue());
+		set_PerFrameValue(other.GetPerFrameValue());
 	}
 
 	public float GetPerFrameValue()

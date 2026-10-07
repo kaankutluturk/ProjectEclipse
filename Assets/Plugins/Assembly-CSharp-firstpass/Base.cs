@@ -100,12 +100,12 @@ internal abstract class Base
 
 	public const uint kMatchMaxLen = 273u;
 
-	public static uint GetLenToPosState(uint JCAJDBOMGOM)
+	public static uint GetLenToPosState(uint length)
 	{
-		JCAJDBOMGOM -= 2;
-		if (JCAJDBOMGOM < 4)
+		length -= 2;
+		if (length < 4)
 		{
-			return JCAJDBOMGOM;
+			return length;
 		}
 		return 3u;
 	}

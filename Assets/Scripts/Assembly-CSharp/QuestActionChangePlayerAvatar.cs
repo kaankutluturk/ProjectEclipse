@@ -4,30 +4,30 @@ public class QuestActionChangePlayerAvatar : QuestAction
 {
 	private string avatarExpression;
 
-	public override void Parse(XmlNode EPKLCPOEELO)
+	public override void Parse(XmlNode node)
 	{
-		base.Parse(EPKLCPOEELO);
-		avatarExpression = EPKLCPOEELO.Attributes["Avatar"].GetStringOrDefault(string.Empty);
+		base.Parse(node);
+		avatarExpression = node.Attributes["Avatar"].GetStringOrDefault(string.Empty);
 	}
 
-	public override void Execute(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters parameters)
 	{
-		base.Execute(GFIHPBCEEOB);
-		string FHLFEBDNIFF = string.Empty;
-		GetValues(ref FHLFEBDNIFF);
-		if (GameUtils.AvatarExists(FHLFEBDNIFF))
+		base.Execute(parameters);
+		string avatarName = string.Empty;
+		GetValues(ref avatarName);
+		if (GameUtils.AvatarExists(avatarName))
 		{
-			ListSF.GetRoster().SetAvatar(FHLFEBDNIFF);
+			ListSF.GetRoster().SetAvatar(avatarName);
 		}
 		FinishAction();
 	}
 
-	private void GetValues(ref string FHLFEBDNIFF)
+	private void GetValues(ref string avatarName)
 	{
-		ConditionExtension.CompareResult lNIDLHOIHIM = new ConditionExtension.CompareResult();
-		QuestCondition kKDGLNECFHA = new QuestCondition();
-		kKDGLNECFHA.SetParameters(Parameters);
-		kKDGLNECFHA.SetValue(avatarExpression, lNIDLHOIHIM);
-		FHLFEBDNIFF = lNIDLHOIHIM.ToString();
+		ConditionExtension.CompareResult result = new ConditionExtension.CompareResult();
+		QuestCondition condition = new QuestCondition();
+		condition.SetParameters(Parameters);
+		condition.SetValue(avatarExpression, result);
+		avatarName = result.ToString();
 	}
 }

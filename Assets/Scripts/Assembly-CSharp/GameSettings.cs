@@ -77,131 +77,131 @@ public static class GameSettings
 		}
 	}
 
-	private static void ParseInternalSettings(XmlNode BAMDEPGMGEN)
+	private static void ParseInternalSettings(XmlNode settingsNode)
 	{
-		XmlNode xmlNode = BAMDEPGMGEN["Attributes"];
+		XmlNode xmlNode = settingsNode["Attributes"];
 		if (xmlNode != null)
 		{
 			GameUtils.WarriorAttributeList.Parse(xmlNode);
 		}
-		XmlNode xmlNode2 = BAMDEPGMGEN["RatingEvaluation"];
+		XmlNode xmlNode2 = settingsNode["RatingEvaluation"];
 		if (xmlNode2 != null)
 		{
 			ModelParameters.ParseRatingConfig(xmlNode2);
 		}
-		XmlNode xmlNode3 = BAMDEPGMGEN["DifficultyEvaluation"];
+		XmlNode xmlNode3 = settingsNode["DifficultyEvaluation"];
 		if (xmlNode3 != null)
 		{
 			DifficultyPanel.DifficultyEvaluationParse(xmlNode3);
 		}
-		GameUtils.SlowModeSpeed = BAMDEPGMGEN["SlowMode"].Attributes["Value"].ParseInt(10);
-		GameUtils.SetSlowMotionDefense(BAMDEPGMGEN["SlowMotion"].Attributes["Defense"].GetStringOrDefault(string.Empty));
-		GameUtils.SetDefaultAvatar(BAMDEPGMGEN["Avatar"].Attributes["Name"].GetStringOrDefault("avatar_hero"));
-		GameUtils.SetDefaultSkeleton(BAMDEPGMGEN["Skeleton"].Attributes["Player"].GetStringOrDefault("Skeleton"));
-		XmlNode xmlNode4 = BAMDEPGMGEN["DefaultItems"];
+		GameUtils.SlowModeSpeed = settingsNode["SlowMode"].Attributes["Value"].ParseInt(10);
+		GameUtils.SetSlowMotionDefense(settingsNode["SlowMotion"].Attributes["Defense"].GetStringOrDefault(string.Empty));
+		GameUtils.SetDefaultAvatar(settingsNode["Avatar"].Attributes["Name"].GetStringOrDefault("avatar_hero"));
+		GameUtils.SetDefaultSkeleton(settingsNode["Skeleton"].Attributes["Player"].GetStringOrDefault("Skeleton"));
+		XmlNode xmlNode4 = settingsNode["DefaultItems"];
 		if (xmlNode4 != null)
 		{
 			GameUtils.ParseDefaultItems(xmlNode4);
 		}
-		GameUtils.DefaultLocation = BAMDEPGMGEN["Location"].Attributes["Name"].GetStringOrDefault("dojo");
-		GameUtils.TutorialSettings.Parse(BAMDEPGMGEN["Tutorial"]);
-		GameUtils.PivotNodeName = BAMDEPGMGEN["PivotNode"].Attributes["Name"].GetStringOrDefault("NPivot");
-		GameUtils.SellPriceFactor = BAMDEPGMGEN["SellItems"].Attributes["Value"].ParseFloat(0.5f);
-		GameUtils.SetComboMinHits(BAMDEPGMGEN["Combo"].Attributes["MinHits"].ParseInt(3));
-		GameUtils.SetComboTime(BAMDEPGMGEN["Combo"].Attributes["Time"].ParseInt(90));
-		GameUtils.SetAnnouncementTime(BAMDEPGMGEN["Announcements"].Attributes["Time"].ParseInt(60));
-		GameUtils.SetHotGroundTime(BAMDEPGMGEN["HotGroundTimer"].Attributes["Time"].ParseInt(90));
-		PhysicsController.Parse(BAMDEPGMGEN["Physics"]);
-		GameUtils.SetGreatMaxHealth(BAMDEPGMGEN["Great"].Attributes["MaxHealth"].ParseFloat(0.3f));
-		GameUtils.SetDamageFactorBase(BAMDEPGMGEN["DamageFactor"].Attributes["Base"].ParseFloat());
-		GameUtils.SetDamageFactorMaxValue(BAMDEPGMGEN["DamageFactor"].Attributes["MaxValue"].ParseInt(20000));
-		GameUtils.SetDamageFactorAttribute(BAMDEPGMGEN["DamageFactor"].Attributes["Attribute"].GetStringOrDefault(string.Empty));
-		XmlNode hKPPBKPJOEO = BAMDEPGMGEN["BlockDamageFactor"];
-		GameUtils.GetBlockDamageFactor().Parse(hKPPBKPJOEO);
-		XmlNode hKPPBKPJOEO2 = BAMDEPGMGEN["CriticalHit"]["Damage"];
+		GameUtils.DefaultLocation = settingsNode["Location"].Attributes["Name"].GetStringOrDefault("dojo");
+		GameUtils.TutorialSettings.Parse(settingsNode["Tutorial"]);
+		GameUtils.PivotNodeName = settingsNode["PivotNode"].Attributes["Name"].GetStringOrDefault("NPivot");
+		GameUtils.SellPriceFactor = settingsNode["SellItems"].Attributes["Value"].ParseFloat(0.5f);
+		GameUtils.SetComboMinHits(settingsNode["Combo"].Attributes["MinHits"].ParseInt(3));
+		GameUtils.SetComboTime(settingsNode["Combo"].Attributes["Time"].ParseInt(90));
+		GameUtils.SetAnnouncementTime(settingsNode["Announcements"].Attributes["Time"].ParseInt(60));
+		GameUtils.SetHotGroundTime(settingsNode["HotGroundTimer"].Attributes["Time"].ParseInt(90));
+		PhysicsController.Parse(settingsNode["Physics"]);
+		GameUtils.SetGreatMaxHealth(settingsNode["Great"].Attributes["MaxHealth"].ParseFloat(0.3f));
+		GameUtils.SetDamageFactorBase(settingsNode["DamageFactor"].Attributes["Base"].ParseFloat());
+		GameUtils.SetDamageFactorMaxValue(settingsNode["DamageFactor"].Attributes["MaxValue"].ParseInt(20000));
+		GameUtils.SetDamageFactorAttribute(settingsNode["DamageFactor"].Attributes["Attribute"].GetStringOrDefault(string.Empty));
+		XmlNode blockDamageFactorNode = settingsNode["BlockDamageFactor"];
+		GameUtils.GetBlockDamageFactor().Parse(blockDamageFactorNode);
+		XmlNode hKPPBKPJOEO2 = settingsNode["CriticalHit"]["Damage"];
 		GameUtils.GetCriticalHitDamage().Parse(hKPPBKPJOEO2);
-		GameUtils.SetBlockDefenseAttribute(BAMDEPGMGEN["BlockDefense"].Attributes["Attribute"].GetStringOrDefault(string.Empty));
-		GameUtils.DamageDoublingRange = BAMDEPGMGEN["DamageDoublingRange"].Attributes["Value"].ParseFloat();
-		GameUtils.SetResistanceDoublingRange(BAMDEPGMGEN["ResistanceDoublingRange"].Attributes["Value"].ParseFloat());
-		GameUtils.SetStartingMagicAttribute((BAMDEPGMGEN["StartingMagic"] == null) ? null : BAMDEPGMGEN["StartingMagic"].Attributes["Attribute"].GetStringOrDefault(string.Empty));
-		GameUtils.SetMaxPower((BAMDEPGMGEN["Power"] == null) ? 10 : BAMDEPGMGEN["Power"].Attributes["Max"].ParseInt(10));
-		GameUtils.PowerMaxTime = ((BAMDEPGMGEN["Power"] == null) ? 600 : BAMDEPGMGEN["Power"].Attributes["TimeMax"].ParseInt(600));
-		GameUtils.SetLifeBarValue((BAMDEPGMGEN["LifeBar"] == null) ? 0f : BAMDEPGMGEN["LifeBar"].Attributes["Value"].ParseFloat());
-		GameUtils.PushRetentionTime = ((BAMDEPGMGEN["PushRetantionTime"] == null) ? 172800 : BAMDEPGMGEN["PushRetantionTime"].Attributes["Value"].ParseInt(172800));
-		XmlNode xmlNode5 = BAMDEPGMGEN["OutdateLevels"];
+		GameUtils.SetBlockDefenseAttribute(settingsNode["BlockDefense"].Attributes["Attribute"].GetStringOrDefault(string.Empty));
+		GameUtils.DamageDoublingRange = settingsNode["DamageDoublingRange"].Attributes["Value"].ParseFloat();
+		GameUtils.SetResistanceDoublingRange(settingsNode["ResistanceDoublingRange"].Attributes["Value"].ParseFloat());
+		GameUtils.SetStartingMagicAttribute((settingsNode["StartingMagic"] == null) ? null : settingsNode["StartingMagic"].Attributes["Attribute"].GetStringOrDefault(string.Empty));
+		GameUtils.SetMaxPower((settingsNode["Power"] == null) ? 10 : settingsNode["Power"].Attributes["Max"].ParseInt(10));
+		GameUtils.PowerMaxTime = ((settingsNode["Power"] == null) ? 600 : settingsNode["Power"].Attributes["TimeMax"].ParseInt(600));
+		GameUtils.SetLifeBarValue((settingsNode["LifeBar"] == null) ? 0f : settingsNode["LifeBar"].Attributes["Value"].ParseFloat());
+		GameUtils.PushRetentionTime = ((settingsNode["PushRetantionTime"] == null) ? 172800 : settingsNode["PushRetantionTime"].Attributes["Value"].ParseInt(172800));
+		XmlNode xmlNode5 = settingsNode["OutdateLevels"];
 		if (xmlNode5 != null)
 		{
 			GameUtils.OutdateLevelTable.Parse(xmlNode5);
 		}
-		XmlNode xmlNode6 = BAMDEPGMGEN["AlignTargetAttributes"];
+		XmlNode xmlNode6 = settingsNode["AlignTargetAttributes"];
 		if (xmlNode6 != null)
 		{
 			GameUtils.AlignTargetAttributes.Clear();
 			GameUtils.AlignTargetAttribute.Parse(xmlNode6, GameUtils.AlignTargetAttributes);
 		}
-		GameUtils.CounterPunches = BAMDEPGMGEN["CounterPunches"].Attributes["Value"].ParseInt(2);
-		XmlNode hKPPBKPJOEO3 = BAMDEPGMGEN["RewardsPrize"];
+		GameUtils.CounterPunches = settingsNode["CounterPunches"].Attributes["Value"].ParseInt(2);
+		XmlNode hKPPBKPJOEO3 = settingsNode["RewardsPrize"];
 		GameUtils.RewardsPrizeSettings.Parse(hKPPBKPJOEO3);
-		XmlNode hKPPBKPJOEO4 = BAMDEPGMGEN["CriticalHit"];
+		XmlNode hKPPBKPJOEO4 = settingsNode["CriticalHit"];
 		GameUtils.CriticalHitDefaults.Parse(hKPPBKPJOEO4);
-		XmlNode hKPPBKPJOEO5 = BAMDEPGMGEN["HitEffects"];
+		XmlNode hKPPBKPJOEO5 = settingsNode["HitEffects"];
 		GameUtils.GetHitEffects().Parse(hKPPBKPJOEO5);
-		XmlNode hKPPBKPJOEO6 = BAMDEPGMGEN["Shock"];
+		XmlNode hKPPBKPJOEO6 = settingsNode["Shock"];
 		GameUtils.ShockSettings.Parse(hKPPBKPJOEO6);
-		XmlNode hKPPBKPJOEO7 = BAMDEPGMGEN["Camera"];
+		XmlNode hKPPBKPJOEO7 = settingsNode["Camera"];
 		GameUtils.GetCameraSettings().Parse(hKPPBKPJOEO7);
-		GameUtils.SupportChoices.Parse(BAMDEPGMGEN["Supports"]);
-		XmlNode hKPPBKPJOEO8 = BAMDEPGMGEN["Shop"];
+		GameUtils.SupportChoices.Parse(settingsNode["Supports"]);
+		XmlNode hKPPBKPJOEO8 = settingsNode["Shop"];
 		GameUtils.ShopOverrides.Parse(hKPPBKPJOEO8);
-		XmlNode hKPPBKPJOEO9 = BAMDEPGMGEN["Currencies"];
+		XmlNode hKPPBKPJOEO9 = settingsNode["Currencies"];
 		GameUtils.GameCurrencies.Parse(hKPPBKPJOEO9);
-		XmlNode eBLIGDMALEA = BAMDEPGMGEN["Resistances"];
-		GameUtils.GameResistances.Parse(eBLIGDMALEA);
-		XmlNode hKPPBKPJOEO10 = BAMDEPGMGEN["BarScales"];
+		XmlNode resistancesNode = settingsNode["Resistances"];
+		GameUtils.GameResistances.Parse(resistancesNode);
+		XmlNode hKPPBKPJOEO10 = settingsNode["BarScales"];
 		GameUtils.BarScaleTable.Parse(hKPPBKPJOEO10);
-		XmlNode hKPPBKPJOEO11 = BAMDEPGMGEN["Magic"];
+		XmlNode hKPPBKPJOEO11 = settingsNode["Magic"];
 		GameUtils.MagicConfig.Parse(hKPPBKPJOEO11);
-		XmlNode eBLIGDMALEA2 = BAMDEPGMGEN["AchievementCounter"];
+		XmlNode eBLIGDMALEA2 = settingsNode["AchievementCounter"];
 		GameUtils.ModeCounters.Parse(eBLIGDMALEA2);
-		XmlNode hKPPBKPJOEO12 = BAMDEPGMGEN["Regeneration"];
+		XmlNode hKPPBKPJOEO12 = settingsNode["Regeneration"];
 		GameUtils.GetRegeneration().Parse(hKPPBKPJOEO12);
-		XmlNode hKPPBKPJOEO13 = BAMDEPGMGEN["Lifesteal"];
+		XmlNode hKPPBKPJOEO13 = settingsNode["Lifesteal"];
 		GameUtils.GetLifesteal().Parse(hKPPBKPJOEO13);
-		GameUtils.FrameRate = BAMDEPGMGEN["FrameRate"].Attributes["Value"].ParseInt(60);
-		BasicGUI.Parse(BAMDEPGMGEN["GUI"]["Basic"]);
-		MapGUI.Parse(BAMDEPGMGEN["GUI"]["Map"]);
-		FightGUI.Parse(BAMDEPGMGEN["GUI"]["Fight"]);
-		ProfileGUI.Parse(BAMDEPGMGEN["GUI"]["Profile"]);
-		InternetController.Parse(BAMDEPGMGEN["Internet"]);
+		GameUtils.FrameRate = settingsNode["FrameRate"].Attributes["Value"].ParseInt(60);
+		BasicGUI.Parse(settingsNode["GUI"]["Basic"]);
+		MapGUI.Parse(settingsNode["GUI"]["Map"]);
+		FightGUI.Parse(settingsNode["GUI"]["Fight"]);
+		ProfileGUI.Parse(settingsNode["GUI"]["Profile"]);
+		InternetController.Parse(settingsNode["Internet"]);
 		if (!Debug.isDebugBuild)
 		{
 			GameUtils.AlwaysMagicMode = false;
 		}
 		else
 		{
-			GameUtils.AlwaysMagicMode = BAMDEPGMGEN["AlwaysMagicMode"].Attributes["Value"].ParseBool();
+			GameUtils.AlwaysMagicMode = settingsNode["AlwaysMagicMode"].Attributes["Value"].ParseBool();
 		}
-		GameUtils.DailyDebugMode = BAMDEPGMGEN["DailyDebugMode"].Attributes["Value"].ParseBool();
-		GameUtils.DailyDebugTime = BAMDEPGMGEN["DailyDebugTime"].Attributes["Value"].ParseInt();
+		GameUtils.DailyDebugMode = settingsNode["DailyDebugMode"].Attributes["Value"].ParseBool();
+		GameUtils.DailyDebugTime = settingsNode["DailyDebugTime"].Attributes["Value"].ParseInt();
 		SystemProperties.SetTargetFrameRate(GameUtils.FrameRate);
-		ParseQualityOptions(BAMDEPGMGEN["QualityOptions"]);
-		XmlNode xmlNode7 = BAMDEPGMGEN["Aspects"];
+		ParseQualityOptions(settingsNode["QualityOptions"]);
+		XmlNode xmlNode7 = settingsNode["Aspects"];
 		if (xmlNode7 != null)
 		{
 			GameUtils.ParseAspects(xmlNode7);
 		}
-		XmlNode xmlNode8 = BAMDEPGMGEN["Aspect"];
+		XmlNode xmlNode8 = settingsNode["Aspect"];
 		if (xmlNode8 != null)
 		{
 			GameUtils.ParseAspectConstants(xmlNode8);
 		}
 		GameUtils.RegisterAspectAttributes();
-		XmlNode xmlNode9 = BAMDEPGMGEN["StyleLevels"];
+		XmlNode xmlNode9 = settingsNode["StyleLevels"];
 		if (xmlNode9 != null)
 		{
 			GameUtils.StyleLevelTable.Parse(xmlNode9);
 		}
-		GameUtils.MaximumExperience = BAMDEPGMGEN["MaximumExperience"].Attributes["Value"].ParseUint(30000000u);
+		GameUtils.MaximumExperience = settingsNode["MaximumExperience"].Attributes["Value"].ParseUint(30000000u);
 	}
 
 	public static void CheckVersions()
@@ -209,15 +209,15 @@ public static class GameSettings
 		bool flag = false;
 		versionSettings.IsFirstLaunch = false;
 		versionSettings.HasVersionData = false;
-		VersionContainer pAMHFPMEPCH = new VersionContainer();
+		VersionContainer bundledVersion = new VersionContainer();
 		VersionContainer pAMHFPMEPCH2 = new VersionContainer();
 		VersionContainer pAMHFPMEPCH3 = new VersionContainer();
 		XmlDocument xmlDocument = XmlUtils.OpenXMLDocument(SF2Paths.GetGameDataPath(), "versionController.xml");
 		XmlNode xmlNode = ((xmlDocument == null) ? null : xmlDocument["Versions"]["Version"]);
 		if (xmlNode != null)
 		{
-			pAMHFPMEPCH.SetVersion(xmlNode.Attributes["Value"].GetStringOrDefault(string.Empty));
-			pAMHFPMEPCH.SetRevision(0);
+			bundledVersion.SetVersion(xmlNode.Attributes["Value"].GetStringOrDefault(string.Empty));
+			bundledVersion.SetRevision(0);
 		}
 		XmlDocument xmlDocument2 = XmlUtils.LoadDocumentWithHashCheck(SF2Paths.GetUserDataDirectory(), Constants.UsersFileName);
 		if (xmlDocument2 == null)
@@ -225,8 +225,8 @@ public static class GameSettings
 			xmlDocument2 = XmlUtils.LoadDocumentWithHashCheck(SF2Paths.GetUserDataDirectory(), Constants.UsersBackupFileName);
 			if (xmlDocument2 != null)
 			{
-				string kPFELJFPGHJ = string.Format("{0}/{1}", SF2Paths.GetUserDataDirectory(), Constants.UsersFileName);
-				XmlUtils.SaveDocumentWithHash(xmlDocument2, kPFELJFPGHJ);
+				string userDataPath = string.Format("{0}/{1}", SF2Paths.GetUserDataDirectory(), Constants.UsersFileName);
+				XmlUtils.SaveDocumentWithHash(xmlDocument2, userDataPath);
 			}
 		}
 		if (xmlDocument2 == null)
@@ -240,11 +240,11 @@ public static class GameSettings
 		}
 		if (versionSettings.HasVersionData)
 		{
-			string aHLPODLKBEP = xmlDocument2["Root"]["Versions"]["Version"].Attributes["Value"].GetStringOrDefault(string.Empty);
+			string savedVersionText = xmlDocument2["Root"]["Versions"]["Version"].Attributes["Value"].GetStringOrDefault(string.Empty);
 			string aHLPODLKBEP2 = xmlDocument2["Root"]["Versions"]["DataVersion"].Attributes["Value"].GetStringOrDefault(string.Empty);
-			pAMHFPMEPCH2.SetVersion(aHLPODLKBEP);
+			pAMHFPMEPCH2.SetVersion(savedVersionText);
 			pAMHFPMEPCH3.SetVersion(aHLPODLKBEP2);
-			if (VersionContainer.IsGreater(pAMHFPMEPCH, pAMHFPMEPCH2))
+			if (VersionContainer.IsGreater(bundledVersion, pAMHFPMEPCH2))
 			{
 				flag = true;
 			}
@@ -253,31 +253,31 @@ public static class GameSettings
 		{
 			versionUpdatePending = true;
 		}
-		SystemProperties.SetVersions(pAMHFPMEPCH, pAMHFPMEPCH3);
+		SystemProperties.SetVersions(bundledVersion, pAMHFPMEPCH3);
 	}
 
 	public static void InitVersion()
 	{
 		if (versionUpdatePending)
 		{
-			VersionContainer pAMHFPMEPCH = SystemProperties.GetVersion();
+			VersionContainer currentVersion = SystemProperties.GetVersion();
 			VersionContainer pAMHFPMEPCH2 = new VersionContainer();
-			string oNEIGMLOGDC = ((!versionSettings.IsFirstLaunch) ? SF2Paths.GetUserDataDirectory() : SF2Paths.GetGameDataPath());
+			string dataDirectory = ((!versionSettings.IsFirstLaunch) ? SF2Paths.GetUserDataDirectory() : SF2Paths.GetGameDataPath());
 			XmlDocument xmlDocument = null;
-			xmlDocument = ((!versionSettings.IsFirstLaunch) ? XmlUtils.OpenXMLDocument(oNEIGMLOGDC, Constants.UsersFileName) : XmlUtils.OpenXMLDocument(oNEIGMLOGDC, "usersDefault.xml", XmlUtils.XmlSourceMode.Normal, true, XmlCryptoUtils.GetIsEncryptionEnabled()));
+			xmlDocument = ((!versionSettings.IsFirstLaunch) ? XmlUtils.OpenXMLDocument(dataDirectory, Constants.UsersFileName) : XmlUtils.OpenXMLDocument(dataDirectory, "usersDefault.xml", XmlUtils.XmlSourceMode.Normal, true, XmlCryptoUtils.GetIsEncryptionEnabled()));
 			if (xmlDocument != null)
 			{
 				XmlNode xmlNode = xmlDocument["Root"]["Versions"];
 				if (xmlNode != null)
 				{
-					string value = pAMHFPMEPCH.ToString();
+					string value = currentVersion.ToString();
 					xmlNode["Version"].Attributes["Value"].Value = value;
-					string aHLPODLKBEP = xmlNode["DataVersion"].Attributes["Value"].GetStringOrDefault(string.Empty);
-					pAMHFPMEPCH2.SetVersion(aHLPODLKBEP);
+					string dataVersionText = xmlNode["DataVersion"].Attributes["Value"].GetStringOrDefault(string.Empty);
+					pAMHFPMEPCH2.SetVersion(dataVersionText);
 				}
-				SystemProperties.SetVersions(pAMHFPMEPCH, pAMHFPMEPCH2);
-				string kPFELJFPGHJ = string.Format("{0}/{1}", SF2Paths.GetUserDataDirectory(), Constants.UsersFileName);
-				XmlUtils.SaveDocumentWithHash(xmlDocument, kPFELJFPGHJ);
+				SystemProperties.SetVersions(currentVersion, pAMHFPMEPCH2);
+				string userDataPath = string.Format("{0}/{1}", SF2Paths.GetUserDataDirectory(), Constants.UsersFileName);
+				XmlUtils.SaveDocumentWithHash(xmlDocument, userDataPath);
 			}
 			else
 			{
@@ -400,11 +400,11 @@ public static class GameSettings
 
 	private static void LoadPerks()
 	{
-		XmlDocument EELFNMOHGJL = null;
-		PerksCompiler.CompilePerks(ref EELFNMOHGJL, string.Format("{0}/{1}", SF2Paths.GetGameDataPath(), "perks.xml"));
-		if (EELFNMOHGJL != null)
+		XmlDocument perksDocument = null;
+		PerksCompiler.CompilePerks(ref perksDocument, string.Format("{0}/{1}", SF2Paths.GetGameDataPath(), "perks.xml"));
+		if (perksDocument != null)
 		{
-			XmlNode xmlNode = EELFNMOHGJL["Perks"];
+			XmlNode xmlNode = perksDocument["Perks"];
 			if (xmlNode != null)
 			{
 				GameUtils.PerkItemList.Parse(xmlNode);
@@ -425,18 +425,18 @@ public static class GameSettings
 		GameUtils.AchievementDefinitions.Parse(node);
 	}
 
-	private static void ParseCharacterProgress(XmlNode BAMDEPGMGEN)
+	private static void ParseCharacterProgress(XmlNode progressNode)
 	{
-		XmlNode eBLIGDMALEA = BAMDEPGMGEN["Thresholds"];
-		XmlNode xmlNode = BAMDEPGMGEN["LotteryThresholds"];
-		XmlNode hKPPBKPJOEO = BAMDEPGMGEN["Perks"];
-		XmlNode hKPPBKPJOEO2 = BAMDEPGMGEN["LevelAttributeGain"];
-		XmlNode hKPPBKPJOEO3 = BAMDEPGMGEN["StartingAttributes"];
-		XmlNode hKPPBKPJOEO4 = BAMDEPGMGEN["PerkTree"];
-		XmlNode hKPPBKPJOEO5 = BAMDEPGMGEN["CurrencyBaseValues"];
-		XmlNode hKPPBKPJOEO6 = BAMDEPGMGEN["MoneyBaseValues"];
-		GameUtils.LevelThresholdTable.Parse(eBLIGDMALEA);
-		GameUtils.PerkItemList.ParseProgression(hKPPBKPJOEO);
+		XmlNode thresholdsNode = progressNode["Thresholds"];
+		XmlNode xmlNode = progressNode["LotteryThresholds"];
+		XmlNode perksNode = progressNode["Perks"];
+		XmlNode hKPPBKPJOEO2 = progressNode["LevelAttributeGain"];
+		XmlNode hKPPBKPJOEO3 = progressNode["StartingAttributes"];
+		XmlNode hKPPBKPJOEO4 = progressNode["PerkTree"];
+		XmlNode hKPPBKPJOEO5 = progressNode["CurrencyBaseValues"];
+		XmlNode hKPPBKPJOEO6 = progressNode["MoneyBaseValues"];
+		GameUtils.LevelThresholdTable.Parse(thresholdsNode);
+		GameUtils.PerkItemList.ParseProgression(perksNode);
 		GameUtils.LevelAttributeGains.Parse(hKPPBKPJOEO2);
 		GameUtils.StartingAttributes.Parse(hKPPBKPJOEO3);
 		GameUtils.CurrencyBaseValueTable.Parse(hKPPBKPJOEO5);

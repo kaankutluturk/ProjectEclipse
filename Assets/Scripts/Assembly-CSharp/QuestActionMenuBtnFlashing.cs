@@ -15,19 +15,19 @@ public class QuestActionMenuBtnFlashing : QuestAction
 
 	private SectionButton targetButton;
 
-	public override void Parse(XmlNode EPKLCPOEELO)
+	public override void Parse(XmlNode node)
 	{
-		base.Parse(EPKLCPOEELO);
-		_btnName = EPKLCPOEELO.Attributes["BtnName"].GetStringOrDefault(string.Empty);
+		base.Parse(node);
+		_btnName = node.Attributes["BtnName"].GetStringOrDefault(string.Empty);
 	}
 
-	public override void Execute(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters parameters)
 	{
 		// Keep the quest parameters alive until the scroll finishes opening.  The
 		// destination is usually a roster variable (for example _NextScene), and
 		// resolving it later without base initialization turns it into numeric 0.
-		base.Execute(GFIHPBCEEOB);
-		resolvedScreenName = ResolveScreenName(GFIHPBCEEOB);
+		base.Execute(parameters);
+		resolvedScreenName = ResolveScreenName(parameters);
 		MainMenu.get_Instance().CloseMenu();
 		TutorialCanvas.get_Instance().set_BlockOn(true);
 		Button scrollBtn = MainMenu.get_Instance().GetScrollBtn();
@@ -68,21 +68,21 @@ public class QuestActionMenuBtnFlashing : QuestAction
 		TutorialComponent component = scrollBtn.gameObject.GetComponent<TutorialComponent>();
 		component.IsActive = false;
 		string screenName = resolvedScreenName;
-		ScreenType cCGJDFLIKFN;
+		ScreenType screenType;
 		switch (screenName)
 		{
 		case "Dojo":
 		case "Map":
 		case "Shop":
 		case "Profile":
-			cCGJDFLIKFN = Module.ParseScreenType(screenName);
+			screenType = Module.ParseScreenType(screenName);
 			break;
 		default:
 			Debug.LogWarning("[Tutorial] MenuBtnFlashing could not resolve target '" + _btnName + "' (value '" + screenName + "'); releasing tutorial lock.");
 			ReleaseTutorialLock();
 			return;
 		}
-		targetButton = MainMenu.get_Instance().GetButtonFromScreen(cCGJDFLIKFN);
+		targetButton = MainMenu.get_Instance().GetButtonFromScreen(screenType);
 		if (targetButton == null)
 		{
 			Debug.LogWarning("[Tutorial] Menu button is unavailable for " + screenName + "; releasing tutorial lock.");

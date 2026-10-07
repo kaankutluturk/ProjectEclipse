@@ -12,21 +12,21 @@ public class QuestActionStoryTutorialPunchbag : QuestAction
 
 	private bool _LastAnimationIsKick;
 
-	public override void Execute(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters parameters)
 	{
-		base.Execute(GFIHPBCEEOB);
+		base.Execute(parameters);
 		MainMenu.get_Instance().SetEnabled(false);
-		Fight gDBOMJODDEA = Fight.GetCurrentFight();
-		SFButton buttonPunch = gDBOMJODDEA.Controller.GetButtonPunch();
+		Fight fight = Fight.GetCurrentFight();
+		SFButton buttonPunch = fight.Controller.GetButtonPunch();
 		buttonPunch.AddFlashImage("FightButtons.Kick_Highlight");
 		buttonPunch.FlashingImage.rectTransform.localScale = new Vector3(1.33f, 1.33f);
 		buttonPunch.set_IsFlashing(true);
-		SFButton buttonKick = gDBOMJODDEA.Controller.GetButtonKick();
+		SFButton buttonKick = fight.Controller.GetButtonKick();
 		buttonKick.AddFlashImage("FightButtons.Kick_Highlight");
 		buttonKick.FlashingImage.rectTransform.localScale = new Vector3(1.33f, 1.33f);
 		buttonKick.set_IsFlashing(true);
-		Model fGCODGKLHED = gDBOMJODDEA.ActiveModels[0];
-		fGCODGKLHED.AddEventListener(2, OnAnimationStart);
+		Model playerModel = fight.ActiveModels[0];
+		playerModel.AddEventListener(2, OnAnimationStart);
 		_WaitTimeCoroutine = WaitForTimeout();
 		CoroutineManager.get_Current().StartRoutine(_WaitTimeCoroutine);
 	}
@@ -42,10 +42,10 @@ public class QuestActionStoryTutorialPunchbag : QuestAction
 				CompleteStep();
 			}
 		}
-		Fight gDBOMJODDEA = Fight.GetCurrentFight();
-		Model fGCODGKLHED = gDBOMJODDEA.ActiveModels[0];
-		InfoAnimation.AnimationKind dFLPNNBIFFN = fGCODGKLHED.LastAnimationType;
-		if (dFLPNNBIFFN == InfoAnimation.AnimationKind.AnimationAttack)
+		Fight fight = Fight.GetCurrentFight();
+		Model playerModel = fight.ActiveModels[0];
+		InfoAnimation.AnimationKind animationKind = playerModel.LastAnimationType;
+		if (animationKind == InfoAnimation.AnimationKind.AnimationAttack)
 		{
 			_LastAnimationIsKick = true;
 		}
@@ -64,13 +64,13 @@ public class QuestActionStoryTutorialPunchbag : QuestAction
 			CoroutineManager.get_Current().StopRoutine(_WaitTimeCoroutine);
 		}
 		MainMenu.get_Instance().SetEnabled(true);
-		Fight gDBOMJODDEA = Fight.GetCurrentFight();
-		SFButton buttonPunch = gDBOMJODDEA.Controller.GetButtonPunch();
+		Fight fight = Fight.GetCurrentFight();
+		SFButton buttonPunch = fight.Controller.GetButtonPunch();
 		buttonPunch.set_IsFlashing(false);
-		SFButton buttonKick = gDBOMJODDEA.Controller.GetButtonKick();
+		SFButton buttonKick = fight.Controller.GetButtonKick();
 		buttonKick.set_IsFlashing(false);
-		Model fGCODGKLHED = gDBOMJODDEA.ActiveModels[0];
-		fGCODGKLHED.RemoveEventListener(2, OnAnimationStart);
+		Model playerModel = fight.ActiveModels[0];
+		playerModel.RemoveEventListener(2, OnAnimationStart);
 		FinishAction();
 	}
 }

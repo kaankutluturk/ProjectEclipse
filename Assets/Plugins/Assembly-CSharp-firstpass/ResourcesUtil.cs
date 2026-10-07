@@ -15,11 +15,11 @@ public class ResourcesUtil
 		return Resources.Load<T>(path);
 	}
 
-	public static void UnloadAsset(UnityEngine.Object value, bool OJCKACIMFEJ = true)
+	public static void UnloadAsset(UnityEngine.Object value, bool immediate = true)
 	{
 		if (value is GameObject)
 		{
-			GlobalLoad.DestroyObject(value, OJCKACIMFEJ);
+			GlobalLoad.DestroyObject(value, immediate);
 		}
 		else
 		{

@@ -89,24 +89,24 @@ namespace Nekki.SF2.GUI.Fight
 			needsDelete = value;
 		}
 
-		public void Init(float HLBMDDOPKKL = 0f, float ELAKEOGEDPN = 0f)
+		public void Init(float offsetX = 0f, float offsetY = 0f)
 		{
-			spawnOffsetX = HLBMDDOPKKL;
-			spawnOffsetY = ELAKEOGEDPN;
+			spawnOffsetX = offsetX;
+			spawnOffsetY = offsetY;
 			set_FinishPosX(0f);
 			set_NeedDelete(false);
 		}
 
-		public void AddActivePerk(ActivePerkItem AEFFHJGMNFI)
+		public void AddActivePerk(ActivePerkItem activePerk)
 		{
-			AEFFHJGMNFI.transform.SetParent(base.transform, false);
-			AEFFHJGMNFI.set_PulseCount(0);
-			_activePerks.Add(AEFFHJGMNFI);
+			activePerk.transform.SetParent(base.transform, false);
+			activePerk.set_PulseCount(0);
+			_activePerks.Add(activePerk);
 			_activePerks.Sort();
 			ActivePerkItem activePerkItem = _activePerks[_activePerks.Count - 1];
 			activePerkItem.set_PulseCount(activePerkItem.get_PulseCount() + 1);
 			RectTransform rectTransform = base.transform as RectTransform;
-			RectTransform rectTransform2 = AEFFHJGMNFI.transform as RectTransform;
+			RectTransform rectTransform2 = activePerk.transform as RectTransform;
 			if (rectTransform != null && rectTransform2 != null)
 			{
 				rectTransform.sizeDelta = rectTransform2.sizeDelta;
@@ -147,9 +147,9 @@ namespace Nekki.SF2.GUI.Fight
 					list.Add(item);
 				}
 			}
-			list.ForEach((ActivePerkItem DHDMNHCIPEH) =>
+			list.ForEach((ActivePerkItem perkItem) =>
 			{
-				_activePerks.Remove(DHDMNHCIPEH);
+				_activePerks.Remove(perkItem);
 			});
 			if (_activePerks.Count == 0)
 			{

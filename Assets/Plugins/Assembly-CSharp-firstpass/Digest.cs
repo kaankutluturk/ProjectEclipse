@@ -158,9 +158,9 @@ internal sealed class Digest
 		}
 	}
 
-	internal Digest(Uri KJHNCLAJMLO)
+	internal Digest(Uri digestUri)
 	{
-		set_Uri(KJHNCLAJMLO);
+		set_Uri(digestUri);
 		SetAlgorithm("md5");
 	}
 
@@ -274,7 +274,7 @@ internal sealed class Digest
 		ha1Sess = value;
 	}
 
-	public void ParseChallange(string HHAAFADDOJB)
+	public void ParseChallange(string challenge)
 	{
 		set_Type(AuthenticationTypes.Unknown);
 		set_Stale(false);
@@ -286,8 +286,8 @@ internal sealed class Digest
 		{
 			GetProtectedUris().Clear();
 		}
-		WWWAuthenticateHeaderParser iIGMPGDLCCK = new WWWAuthenticateHeaderParser(HHAAFADDOJB);
-		foreach (KeyValuePair item2 in iIGMPGDLCCK.GetValues())
+		WWWAuthenticateHeaderParser parser = new WWWAuthenticateHeaderParser(challenge);
+		foreach (KeyValuePair item2 in parser.GetValues())
 		{
 			switch (item2.GetKey())
 			{
@@ -336,29 +336,29 @@ internal sealed class Digest
 		}
 	}
 
-	public string GenerateResponseHeader(HTTPRequest ONOCIELLAPL, Credentials JKBAHGNLECO)
+	public string GenerateResponseHeader(HTTPRequest request, Credentials credentials)
 	{
 		try
 		{
 			switch (get_Type())
 			{
 			case AuthenticationTypes.Basic:
-				return "Basic " + Convert.ToBase64String(Encoding.UTF8.GetBytes(string.Format("{0}:{1}", JKBAHGNLECO.GetUserName(), JKBAHGNLECO.GetPassword())));
+				return "Basic " + Convert.ToBase64String(Encoding.UTF8.GetBytes(string.Format("{0}:{1}", credentials.GetUserName(), credentials.GetPassword())));
 			case AuthenticationTypes.Digest:
 			{
 				set_NonceCount(GetNonceCount() + 1);
 				string empty = string.Empty;
-				string text = new Random(ONOCIELLAPL.GetHashCode()).Next(int.MinValue, int.MaxValue).ToString("X8");
+				string text = new Random(request.GetHashCode()).Next(int.MinValue, int.MaxValue).ToString("X8");
 				string text2 = GetNonceCount().ToString("X8");
 				switch (GetAlgorithm().TrimAndLower())
 				{
 				case "md5":
-					empty = string.Format("{0}:{1}:{2}", JKBAHGNLECO.GetUserName(), GetRealm(), JKBAHGNLECO.GetPassword()).CalculateMD5Hash();
+					empty = string.Format("{0}:{1}:{2}", credentials.GetUserName(), GetRealm(), credentials.GetPassword()).CalculateMD5Hash();
 					break;
 				case "md5-sess":
 					if (string.IsNullOrEmpty(GetHA1Sess()))
 					{
-						SetHA1Sess(string.Format("{0}:{1}:{2}:{3}:{4}", JKBAHGNLECO.GetUserName(), GetRealm(), JKBAHGNLECO.GetPassword(), GetNonce(), text2).CalculateMD5Hash());
+						SetHA1Sess(string.Format("{0}:{1}:{2}:{3}:{4}", credentials.GetUserName(), GetRealm(), credentials.GetPassword(), GetNonce(), text2).CalculateMD5Hash());
 					}
 					empty = GetHA1Sess();
 					break;
@@ -369,18 +369,18 @@ internal sealed class Digest
 				string text3 = ((GetQualityOfProtections() == null) ? null : GetQualityOfProtections().TrimAndLower());
 				if (text3 == null)
 				{
-					string arg = (ONOCIELLAPL.GetMethodType().ToString().ToUpper() + ":" + ONOCIELLAPL.GetCurrentUri().PathAndQuery).CalculateMD5Hash();
+					string arg = (request.GetMethodType().ToString().ToUpper() + ":" + request.GetCurrentUri().PathAndQuery).CalculateMD5Hash();
 					empty2 = string.Format("{0}:{1}:{2}", empty, GetNonce(), arg).CalculateMD5Hash();
 				}
 				else if (text3.Contains("auth-int"))
 				{
 					text3 = "auth-int";
-					byte[] array = ONOCIELLAPL.GetEntityBody();
+					byte[] array = request.GetEntityBody();
 					if (array == null)
 					{
 						array = string.Empty.GetASCIIBytes();
 					}
-					string text4 = string.Format("{0}:{1}:{2}", ONOCIELLAPL.GetMethodType().ToString().ToUpper(), ONOCIELLAPL.GetCurrentUri().PathAndQuery, array.CalculateMD5Hash()).CalculateMD5Hash();
+					string text4 = string.Format("{0}:{1}:{2}", request.GetMethodType().ToString().ToUpper(), request.GetCurrentUri().PathAndQuery, array.CalculateMD5Hash()).CalculateMD5Hash();
 					empty2 = string.Format("{0}:{1}:{2}:{3}:{4}:{5}", empty, GetNonce(), text2, text, text3, text4).CalculateMD5Hash();
 				}
 				else
@@ -390,10 +390,10 @@ internal sealed class Digest
 						return string.Empty;
 					}
 					text3 = "auth";
-					string text5 = (ONOCIELLAPL.GetMethodType().ToString().ToUpper() + ":" + ONOCIELLAPL.GetCurrentUri().PathAndQuery).CalculateMD5Hash();
+					string text5 = (request.GetMethodType().ToString().ToUpper() + ":" + request.GetCurrentUri().PathAndQuery).CalculateMD5Hash();
 					empty2 = string.Format("{0}:{1}:{2}:{3}:{4}:{5}", empty, GetNonce(), text2, text, text3, text5).CalculateMD5Hash();
 				}
-				string text6 = string.Format("Digest username=\"{0}\", realm=\"{1}\", nonce=\"{2}\", uri=\"{3}\", cnonce=\"{4}\", response=\"{5}\"", JKBAHGNLECO.GetUserName(), GetRealm(), GetNonce(), ONOCIELLAPL.GetUri().PathAndQuery, text, empty2);
+				string text6 = string.Format("Digest username=\"{0}\", realm=\"{1}\", nonce=\"{2}\", uri=\"{3}\", cnonce=\"{4}\", response=\"{5}\"", credentials.GetUserName(), GetRealm(), GetNonce(), request.GetUri().PathAndQuery, text, empty2);
 				if (text3 != null)
 				{
 					text6 = string.Concat(text6, ", qop=\"" + text3 + "\", nc=" + text2);
@@ -412,13 +412,13 @@ internal sealed class Digest
 		return string.Empty;
 	}
 
-	public bool IsUriProtected(Uri KJHNCLAJMLO)
+	public bool IsUriProtected(Uri requestUri)
 	{
-		if (string.CompareOrdinal(KJHNCLAJMLO.Host, GetUri().Host) != 0)
+		if (string.CompareOrdinal(requestUri.Host, GetUri().Host) != 0)
 		{
 			return false;
 		}
-		string text = KJHNCLAJMLO.ToString();
+		string text = requestUri.ToString();
 		if (GetProtectedUris() != null && GetProtectedUris().Count > 0)
 		{
 			for (int i = 0; i < GetProtectedUris().Count; i++)

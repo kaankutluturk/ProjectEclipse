@@ -48,9 +48,9 @@ internal class HuffmanTree
 		staticDistanceTree = new HuffmanTree(GetStaticDistanceTreeLength());
 	}
 
-	public HuffmanTree(byte[] BOKCDKCDIOA)
+	public HuffmanTree(byte[] codeLengths)
 	{
-		codeLengthArray = BOKCDKCDIOA;
+		codeLengthArray = codeLengths;
 		if (codeLengthArray.Length == 288)
 		{
 			tableBits = 9;
@@ -108,8 +108,8 @@ internal class HuffmanTree
 	private uint[] CalculateHuffmanCode()
 	{
 		uint[] array = new uint[17];
-		byte[] bIODNNBNOFC = codeLengthArray;
-		foreach (int num in bIODNNBNOFC)
+		byte[] lengths = codeLengthArray;
+		foreach (int num in lengths)
 		{
 			array[num]++;
 		}
@@ -190,10 +190,10 @@ internal class HuffmanTree
 		}
 	}
 
-	public int GetNextSymbol(InputBuffer NILNDHEKNLJ)
+	public int GetNextSymbol(InputBuffer input)
 	{
-		uint num = NILNDHEKNLJ.TryLoad16Bits();
-		if (NILNDHEKNLJ.GetAvailableBits() == 0)
+		uint num = input.TryLoad16Bits();
+		if (input.GetAvailableBits() == 0)
 		{
 			return -1;
 		}
@@ -214,11 +214,11 @@ internal class HuffmanTree
 		{
 			throw new InvalidDataException(SR.GetString("Invalid Huffman data"));
 		}
-		if (num4 > NILNDHEKNLJ.GetAvailableBits())
+		if (num4 > input.GetAvailableBits())
 		{
 			return -1;
 		}
-		NILNDHEKNLJ.SkipBits(num4);
+		input.SkipBits(num4);
 		return num2;
 	}
 }

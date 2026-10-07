@@ -19,26 +19,26 @@ public class PerkConditionModExists : PerkCondition
 		Namespace = node.Attributes["Namespace"].GetStringOrDefault(string.Empty);
 	}
 
-	public override bool IsEqual(Model ACENLMONNPA, List<string> NIKHAICFGNM)
+	public override bool IsEqual(Model model, List<string> modNames)
 	{
 		if (Namespace != string.Empty && PerksStage.CheckModNameInNamespace(Name, Namespace))
 		{
 			return true;
 		}
-		Model fGCODGKLHED = ResolveTargetModel(ACENLMONNPA);
-		if (fGCODGKLHED == null)
+		Model targetModel = ResolveTargetModel(model);
+		if (targetModel == null)
 		{
 			return false;
 		}
-		if (fGCODGKLHED.HasTransientPerkFlag(Name))
+		if (targetModel.HasTransientPerkFlag(Name))
 		{
 			return true;
 		}
-		if (NIKHAICFGNM == null)
+		if (modNames == null)
 		{
 			return false;
 		}
-		foreach (string item in NIKHAICFGNM)
+		foreach (string item in modNames)
 		{
 			string value = item;
 			if (Name.Equals(value))

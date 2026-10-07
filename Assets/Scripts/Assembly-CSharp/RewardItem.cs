@@ -132,33 +132,33 @@ public class RewardItem : Rewardable
 
 	private string EvaluateLevelExpression(string expression)
 	{
-		FunctionExtension oPIFBDJNMKD = new FunctionExtension();
-		oPIFBDJNMKD.Parse(expression);
-		oPIFBDJNMKD.SetFunctionCallback(OnFunctionCalled);
-		oPIFBDJNMKD.SetVariableCallback(OnFunctionCompleted);
-		FunctionResult dEIHAOLOPLC = oPIFBDJNMKD.Calculate();
-		return dEIHAOLOPLC.Value;
+		FunctionExtension functionExtension = new FunctionExtension();
+		functionExtension.Parse(expression);
+		functionExtension.SetFunctionCallback(OnFunctionCalled);
+		functionExtension.SetVariableCallback(OnFunctionCompleted);
+		FunctionResult functionResult = functionExtension.Calculate();
+		return functionResult.Value;
 	}
 
-	public void OnFunctionCompleted(FunctionExtension.CallbackResult DCJLKCFKCOM)
+	public void OnFunctionCompleted(FunctionExtension.CallbackResult callbackResult)
 	{
 	}
 
-	public void OnFunctionCalled(FunctionExtension.CallbackResult DCJLKCFKCOM)
+	public void OnFunctionCalled(FunctionExtension.CallbackResult callbackResult)
 	{
-		FunctionExtension.FunctionCall gLBAFLLMOOH = DCJLKCFKCOM.data as FunctionExtension.FunctionCall;
-		FunctionResult nAGGNMIFFGK = DCJLKCFKCOM.result;
-		if (gLBAFLLMOOH.functionName.Equals("Player"))
+		FunctionExtension.FunctionCall functionCall = callbackResult.data as FunctionExtension.FunctionCall;
+		FunctionResult functionResult = callbackResult.result;
+		if (functionCall.functionName.Equals("Player"))
 		{
-			ResolvePlayerFunction(gLBAFLLMOOH, nAGGNMIFFGK);
+			ResolvePlayerFunction(functionCall, functionResult);
 		}
 	}
 
-	private void ResolvePlayerFunction(FunctionExtension.FunctionCall KJFKPMCPIBH, FunctionResult DCJLKCFKCOM)
+	private void ResolvePlayerFunction(FunctionExtension.FunctionCall functionCall, FunctionResult functionResult)
 	{
-		if (KJFKPMCPIBH.propertyName.Equals("Level"))
+		if (functionCall.propertyName.Equals("Level"))
 		{
-			DCJLKCFKCOM.Value = ListSF.GetRoster().GetLevel().ToString();
+			functionResult.Value = ListSF.GetRoster().GetLevel().ToString();
 		}
 	}
 }

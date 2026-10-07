@@ -14,12 +14,12 @@ public class Thread
 		}
 	}
 
-	public Thread(ThreadStartDelegate ILENLCMAMBH)
+	public Thread(ThreadStartDelegate start)
 	{
 		throw new NotSupportedException();
 	}
 
-	public Thread(ParameterizedThreadStart ILENLCMAMBH)
+	public Thread(ParameterizedThreadStart start)
 	{
 		throw new NotSupportedException();
 	}
@@ -39,7 +39,7 @@ public class Thread
 		throw new NotSupportedException();
 	}
 
-	public bool Join(int PKGAJCFLOLA)
+	public bool Join(int milliseconds)
 	{
 		throw new NotSupportedException();
 	}
@@ -49,12 +49,12 @@ public class Thread
 		throw new NotSupportedException();
 	}
 
-	public void Start(object KKNOCIPBIIK)
+	public void Start(object parameter)
 	{
 		throw new NotSupportedException();
 	}
 
-	public static void Sleep(int PKGAJCFLOLA)
+	public static void Sleep(int milliseconds)
 	{
 		throw new NotSupportedException();
 	}

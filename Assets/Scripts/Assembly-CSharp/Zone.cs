@@ -58,15 +58,15 @@ public class Zone
 		}
 	}
 
-	public Zone(string name, string PMFEIPCHENB, bool PENNHKHFEOM = false, ConditionStatus status = ConditionStatus.StatusOpen, int index = 0, uint CDCJKJNGPOE = 0u, uint MCDAHGPLLDO = 0u)
+	public Zone(string name, string fileName, bool isStartZone = false, ConditionStatus status = ConditionStatus.StatusOpen, int index = 0, uint initialRewardDigits = 0u, uint initialPrizeBaseDigits = 0u)
 	{
 		_name = name;
-		_fileName = PMFEIPCHENB;
-		_isStart = PENNHKHFEOM;
+		_fileName = fileName;
+		_isStart = isStartZone;
 		Status = status;
 		_index = index;
-		rewardDigits = CDCJKJNGPOE;
-		prizeBaseDigits = MCDAHGPLLDO;
+		rewardDigits = initialRewardDigits;
+		prizeBaseDigits = initialPrizeBaseDigits;
 	}
 
 	public bool GetIsStart()
@@ -112,19 +112,19 @@ public class Zone
 		return null;
 	}
 
-	public List<Battle> FindBattlesByType(BattleType LFLGCDNKNJI)
+	public List<Battle> FindBattlesByType(BattleType battleType)
 	{
 		List<Battle> list = new List<Battle>();
 		foreach (Battle lGIIBNJFADum in Battles)
 		{
-			if (lGIIBNJFADum.get_Type() == LFLGCDNKNJI)
+			if (lGIIBNJFADum.get_Type() == battleType)
 			{
 				list.Add(lGIIBNJFADum);
 			}
 		}
 		if (list.Count == 0)
 		{
-			GameLog.Write("Error: _battles with type={0} not found", LFLGCDNKNJI);
+			GameLog.Write("Error: _battles with type={0} not found", battleType);
 		}
 		return list;
 	}
@@ -136,14 +136,14 @@ public class Zone
 		int i = 0;
 		for (int count = Battles.Count; i < count; i++)
 		{
-			Battle cGJCGEBPCAF = Battles[i];
-			List<FightList> list = cGJCGEBPCAF.GetLoadedFights();
+			Battle battle = Battles[i];
+			List<FightList> list = battle.GetLoadedFights();
 			int j = 0;
 			for (int count2 = list.Count; j < count2; j++)
 			{
 				num++;
-				ConditionStatus pGBKNLAEANJ = list[j].Status;
-				if (pGBKNLAEANJ == ConditionStatus.StatusOpen || pGBKNLAEANJ == ConditionStatus.StatusComplete)
+				ConditionStatus fightStatus = list[j].Status;
+				if (fightStatus == ConditionStatus.StatusOpen || fightStatus == ConditionStatus.StatusComplete)
 				{
 					Status = ConditionStatus.StatusOpen;
 					flag = true;

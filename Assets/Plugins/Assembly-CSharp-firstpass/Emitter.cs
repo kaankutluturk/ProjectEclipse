@@ -97,42 +97,42 @@ public class Emitter : IEmitter
 	{
 	}
 
-	public Emitter(TextWriter output, int EMOCJNOCJKM)
-		: this(output, EMOCJNOCJKM, int.MaxValue)
+	public Emitter(TextWriter output, int bestIndent)
+		: this(output, bestIndent, int.MaxValue)
 	{
 	}
 
-	public Emitter(TextWriter output, int EMOCJNOCJKM, int CEIKEMJHLKL)
-		: this(output, EMOCJNOCJKM, CEIKEMJHLKL, false)
+	public Emitter(TextWriter output, int bestIndent, int bestWidth)
+		: this(output, bestIndent, bestWidth, false)
 	{
 	}
 
-	public Emitter(TextWriter output, int EMOCJNOCJKM, int CEIKEMJHLKL, bool LGDHGOGFFCJ)
+	public Emitter(TextWriter output, int bestIndent, int bestWidth, bool isCanonical)
 	{
-		if (EMOCJNOCJKM < 4 || EMOCJNOCJKM > 9)
+		if (bestIndent < 4 || bestIndent > 9)
 		{
 			throw new ArgumentOutOfRangeException("bestIndent", string.Format(CultureInfo.InvariantCulture, "The bestIndent parameter must be between {0} and {1}.", 4, 9));
 		}
-		this.bestIndent = EMOCJNOCJKM;
-		if (CEIKEMJHLKL <= EMOCJNOCJKM * 2)
+		this.bestIndent = bestIndent;
+		if (bestWidth <= bestIndent * 2)
 		{
 			throw new ArgumentOutOfRangeException("bestWidth", "The bestWidth parameter must be greater than bestIndent * 2.");
 		}
-		this.bestWidth = CEIKEMJHLKL;
-		this.isCanonical = LGDHGOGFFCJ;
+		this.bestWidth = bestWidth;
+		this.isCanonical = isCanonical;
 		this.output = output;
 	}
 
-	public void Emit(ParsingEvent KEAJCHAAIEP)
+	public void Emit(ParsingEvent evt)
 	{
-		events.Enqueue(KEAJCHAAIEP);
+		events.Enqueue(evt);
 		while (!NeedMoreEvents())
 		{
-			ParsingEvent iILOLJJLLGH = events.Peek();
+			ParsingEvent nextEvent = events.Peek();
 			try
 			{
-				AnalyzeEvent(iILOLJJLLGH);
-				StateMachine(iILOLJJLLGH);
+				AnalyzeEvent(nextEvent);
+				StateMachine(nextEvent);
 			}
 			finally
 			{
@@ -190,37 +190,37 @@ public class Emitter : IEmitter
 		return true;
 	}
 
-	private void AnalyzeEvent(ParsingEvent IILOLJJLLGH)
+	private void AnalyzeEvent(ParsingEvent evt)
 	{
 		anchorData.anchor = null;
 		tagData.handle = null;
 		tagData.suffix = null;
-		AnchorAlias mBEGNNDMDKH = IILOLJJLLGH as AnchorAlias;
-		if (mBEGNNDMDKH != null)
+		AnchorAlias alias = evt as AnchorAlias;
+		if (alias != null)
 		{
-			AnalyzeAnchor(mBEGNNDMDKH.GetValue(), true);
+			AnalyzeAnchor(alias.GetValue(), true);
 			return;
 		}
-		NodeEvent dGMPGIHHKCN = IILOLJJLLGH as NodeEvent;
-		if (dGMPGIHHKCN != null)
+		NodeEvent nodeEvent = evt as NodeEvent;
+		if (nodeEvent != null)
 		{
-			Scalar lEACOCDHICF = IILOLJJLLGH as Scalar;
-			if (lEACOCDHICF != null)
+			Scalar scalar = evt as Scalar;
+			if (scalar != null)
 			{
-				AnalyzeScalar(lEACOCDHICF.GetValue());
+				AnalyzeScalar(scalar.GetValue());
 			}
-			AnalyzeAnchor(dGMPGIHHKCN.GetAnchor(), false);
-			if (!string.IsNullOrEmpty(dGMPGIHHKCN.GetTag()) && (isCanonical || dGMPGIHHKCN.GetIsCanonical()))
+			AnalyzeAnchor(nodeEvent.GetAnchor(), false);
+			if (!string.IsNullOrEmpty(nodeEvent.GetTag()) && (isCanonical || nodeEvent.GetIsCanonical()))
 			{
-				AnalyzeTag(dGMPGIHHKCN.GetTag());
+				AnalyzeTag(nodeEvent.GetTag());
 			}
 		}
 	}
 
-	private void AnalyzeAnchor(string KOLNNNLOCFE, bool LCPNKFDMFIA)
+	private void AnalyzeAnchor(string anchor, bool isAlias)
 	{
-		anchorData.anchor = KOLNNNLOCFE;
-		anchorData.isAlias = LCPNKFDMFIA;
+		anchorData.anchor = anchor;
+		anchorData.isAlias = isAlias;
 	}
 
 	private void AnalyzeScalar(string value)
@@ -396,85 +396,85 @@ public class Emitter : IEmitter
 		}
 	}
 
-	private bool IsUnicode(Encoding JIBCJOMMFCO)
+	private bool IsUnicode(Encoding encoding)
 	{
-		return JIBCJOMMFCO.Equals(Encoding.UTF8) || JIBCJOMMFCO.Equals(Encoding.Unicode) || JIBCJOMMFCO.Equals(Encoding.BigEndianUnicode) || JIBCJOMMFCO.Equals(Encoding.UTF7) || JIBCJOMMFCO.Equals(Encoding.UTF32);
+		return encoding.Equals(Encoding.UTF8) || encoding.Equals(Encoding.Unicode) || encoding.Equals(Encoding.BigEndianUnicode) || encoding.Equals(Encoding.UTF7) || encoding.Equals(Encoding.UTF32);
 	}
 
-	private void AnalyzeTag(string EDLADAAKMDF)
+	private void AnalyzeTag(string tag)
 	{
-		tagData.handle = EDLADAAKMDF;
+		tagData.handle = tag;
 		foreach (TagDirective item in tagDirectives)
 		{
-			if (EDLADAAKMDF.StartsWith(item.Prefix, StringComparison.Ordinal))
+			if (tag.StartsWith(item.Prefix, StringComparison.Ordinal))
 			{
 				tagData.handle = item.Handle;
-				tagData.suffix = EDLADAAKMDF.Substring(item.Prefix.Length);
+				tagData.suffix = tag.Substring(item.Prefix.Length);
 				break;
 			}
 		}
 	}
 
-	private void StateMachine(ParsingEvent IILOLJJLLGH)
+	private void StateMachine(ParsingEvent evt)
 	{
-		Comment mGMGDDOIHAJ = IILOLJJLLGH as Comment;
-		if (mGMGDDOIHAJ != null)
+		Comment comment = evt as Comment;
+		if (comment != null)
 		{
-			EmitComment(mGMGDDOIHAJ);
+			EmitComment(comment);
 			return;
 		}
 		switch (state)
 		{
 		case EmitterStateKind.StreamStart:
-			EmitStreamStart(IILOLJJLLGH);
+			EmitStreamStart(evt);
 			break;
 		case EmitterStateKind.FirstDocumentStart:
-			EmitDocumentStart(IILOLJJLLGH, true);
+			EmitDocumentStart(evt, true);
 			break;
 		case EmitterStateKind.DocumentStart:
-			EmitDocumentStart(IILOLJJLLGH, false);
+			EmitDocumentStart(evt, false);
 			break;
 		case EmitterStateKind.DocumentContent:
-			EmitDocumentContent(IILOLJJLLGH);
+			EmitDocumentContent(evt);
 			break;
 		case EmitterStateKind.DocumentEnd:
-			EmitDocumentEnd(IILOLJJLLGH);
+			EmitDocumentEnd(evt);
 			break;
 		case EmitterStateKind.FlowSequenceFirstItem:
-			EmitFlowSequenceItem(IILOLJJLLGH, true);
+			EmitFlowSequenceItem(evt, true);
 			break;
 		case EmitterStateKind.FlowSequenceItem:
-			EmitFlowSequenceItem(IILOLJJLLGH, false);
+			EmitFlowSequenceItem(evt, false);
 			break;
 		case EmitterStateKind.FlowMappingFirstKey:
-			EmitFlowMappingKey(IILOLJJLLGH, true);
+			EmitFlowMappingKey(evt, true);
 			break;
 		case EmitterStateKind.FlowMappingKey:
-			EmitFlowMappingKey(IILOLJJLLGH, false);
+			EmitFlowMappingKey(evt, false);
 			break;
 		case EmitterStateKind.FlowMappingSimpleValue:
-			EmitFlowMappingValue(IILOLJJLLGH, true);
+			EmitFlowMappingValue(evt, true);
 			break;
 		case EmitterStateKind.FlowMappingValue:
-			EmitFlowMappingValue(IILOLJJLLGH, false);
+			EmitFlowMappingValue(evt, false);
 			break;
 		case EmitterStateKind.BlockSequenceFirstItem:
-			EmitBlockSequenceItem(IILOLJJLLGH, true);
+			EmitBlockSequenceItem(evt, true);
 			break;
 		case EmitterStateKind.BlockSequenceItem:
-			EmitBlockSequenceItem(IILOLJJLLGH, false);
+			EmitBlockSequenceItem(evt, false);
 			break;
 		case EmitterStateKind.BlockMappingFirstKey:
-			EmitBlockMappingKey(IILOLJJLLGH, true);
+			EmitBlockMappingKey(evt, true);
 			break;
 		case EmitterStateKind.BlockMappingKey:
-			EmitBlockMappingKey(IILOLJJLLGH, false);
+			EmitBlockMappingKey(evt, false);
 			break;
 		case EmitterStateKind.BlockMappingSimpleValue:
-			EmitBlockMappingValue(IILOLJJLLGH, true);
+			EmitBlockMappingValue(evt, true);
 			break;
 		case EmitterStateKind.BlockMappingValue:
-			EmitBlockMappingValue(IILOLJJLLGH, false);
+			EmitBlockMappingValue(evt, false);
 			break;
 		case EmitterStateKind.StreamEnd:
 			throw new YamlException("Expected nothing after STREAM-END");
@@ -483,9 +483,9 @@ public class Emitter : IEmitter
 		}
 	}
 
-	private void EmitComment(Comment MPMFGPGDGDN)
+	private void EmitComment(Comment comment)
 	{
-		if (MPMFGPGDGDN.GetIsInline())
+		if (comment.GetIsInline())
 		{
 			Write(' ');
 		}
@@ -494,13 +494,13 @@ public class Emitter : IEmitter
 			WriteBreak();
 		}
 		Write("# ");
-		Write(MPMFGPGDGDN.GetValue());
+		Write(comment.GetValue());
 		isIndentation = true;
 	}
 
-	private void EmitStreamStart(ParsingEvent IILOLJJLLGH)
+	private void EmitStreamStart(ParsingEvent evt)
 	{
-		if (!(IILOLJJLLGH is StreamStart))
+		if (!(evt is StreamStart))
 		{
 			throw new ArgumentException("Expected STREAM-START.", "evt");
 		}
@@ -511,45 +511,45 @@ public class Emitter : IEmitter
 		state = EmitterStateKind.FirstDocumentStart;
 	}
 
-	private void EmitDocumentStart(ParsingEvent IILOLJJLLGH, bool IKNHLPGLLKB)
+	private void EmitDocumentStart(ParsingEvent evt, bool isFirst)
 	{
-		DocumentStart aOGNBDOIKPE = IILOLJJLLGH as DocumentStart;
-		if (aOGNBDOIKPE != null)
+		DocumentStart documentStart = evt as DocumentStart;
+		if (documentStart != null)
 		{
-			bool flag = aOGNBDOIKPE.GetIsImplicit() && IKNHLPGLLKB && !isCanonical;
-			TagDirectiveCollection iDHIKALFADG = NonDefaultTagsAmong(aOGNBDOIKPE.GetTags());
-			if (!IKNHLPGLLKB && !isDocumentEndWritten && (aOGNBDOIKPE.GetVersion() != null || iDHIKALFADG.Count > 0))
+			bool flag = documentStart.GetIsImplicit() && isFirst && !isCanonical;
+			TagDirectiveCollection nonDefaultTags = NonDefaultTagsAmong(documentStart.GetTags());
+			if (!isFirst && !isDocumentEndWritten && (documentStart.GetVersion() != null || nonDefaultTags.Count > 0))
 			{
 				isDocumentEndWritten = false;
 				WriteIndicator("...", true, false, false);
 				WriteIndent();
 			}
-			if (aOGNBDOIKPE.GetVersion() != null)
+			if (documentStart.GetVersion() != null)
 			{
-				AnalyzeVersionDirective(aOGNBDOIKPE.GetVersion());
+				AnalyzeVersionDirective(documentStart.GetVersion());
 				flag = false;
 				WriteIndicator("%YAML", true, false, false);
 				WriteIndicator(string.Format(CultureInfo.InvariantCulture, "{0}.{1}", 1, 1), true, false, false);
 				WriteIndent();
 			}
-			foreach (TagDirective item in iDHIKALFADG)
+			foreach (TagDirective item in nonDefaultTags)
 			{
 				AppendTagDirectiveTo(item, false, tagDirectives);
 			}
-			TagDirective[] gNPKLFKPLCM = YamlConstants.DefaultTagDirectives;
-			foreach (TagDirective bAINMLLIKOL in gNPKLFKPLCM)
+			TagDirective[] defaultDirectives = YamlConstants.DefaultTagDirectives;
+			foreach (TagDirective defaultDirective in defaultDirectives)
 			{
-				AppendTagDirectiveTo(bAINMLLIKOL, true, tagDirectives);
+				AppendTagDirectiveTo(defaultDirective, true, tagDirectives);
 			}
-			if (iDHIKALFADG.Count > 0)
+			if (nonDefaultTags.Count > 0)
 			{
 				flag = false;
 				TagDirective[] gNPKLFKPLCM2 = YamlConstants.DefaultTagDirectives;
 				foreach (TagDirective bAINMLLIKOL2 in gNPKLFKPLCM2)
 				{
-					AppendTagDirectiveTo(bAINMLLIKOL2, true, iDHIKALFADG);
+					AppendTagDirectiveTo(bAINMLLIKOL2, true, nonDefaultTags);
 				}
-				foreach (TagDirective item2 in iDHIKALFADG)
+				foreach (TagDirective item2 in nonDefaultTags)
 				{
 					WriteIndicator("%TAG", true, false, false);
 					WriteTagHandle(item2.Handle);
@@ -574,7 +574,7 @@ public class Emitter : IEmitter
 		}
 		else
 		{
-			if (!(IILOLJJLLGH is StreamEndEvent))
+			if (!(evt is StreamEndEvent))
 			{
 				throw new YamlException("Expected DOCUMENT-START or STREAM-END");
 			}
@@ -587,75 +587,75 @@ public class Emitter : IEmitter
 		}
 	}
 
-	private TagDirectiveCollection NonDefaultTagsAmong(IEnumerable<TagDirective> FIMJCFLNJIK)
+	private TagDirectiveCollection NonDefaultTagsAmong(IEnumerable<TagDirective> directives)
 	{
-		TagDirectiveCollection iDHIKALFADG = new TagDirectiveCollection();
-		if (FIMJCFLNJIK == null)
+		TagDirectiveCollection result = new TagDirectiveCollection();
+		if (directives == null)
 		{
-			return iDHIKALFADG;
+			return result;
 		}
-		foreach (TagDirective item2 in FIMJCFLNJIK)
+		foreach (TagDirective item2 in directives)
 		{
-			AppendTagDirectiveTo(item2, false, iDHIKALFADG);
+			AppendTagDirectiveTo(item2, false, result);
 		}
-		TagDirective[] gNPKLFKPLCM = YamlConstants.DefaultTagDirectives;
-		foreach (TagDirective item in gNPKLFKPLCM)
+		TagDirective[] defaultDirectives = YamlConstants.DefaultTagDirectives;
+		foreach (TagDirective item in defaultDirectives)
 		{
-			iDHIKALFADG.Remove(item);
+			result.Remove(item);
 		}
-		return iDHIKALFADG;
+		return result;
 	}
 
-	private void AnalyzeVersionDirective(VersionDirective JMCEGKIENKI)
+	private void AnalyzeVersionDirective(VersionDirective versionDirective)
 	{
-		if (JMCEGKIENKI.Version.Major != 1 || JMCEGKIENKI.Version.Minor != 1)
+		if (versionDirective.Version.Major != 1 || versionDirective.Version.Minor != 1)
 		{
 			throw new YamlException("Incompatible %YAML directive");
 		}
 	}
 
-	private void AppendTagDirectiveTo(TagDirective value, bool KBLBEMDBNGB, TagDirectiveCollection FMCEHNBELJF)
+	private void AppendTagDirectiveTo(TagDirective value, bool allowDuplicates, TagDirectiveCollection target)
 	{
-		if (FMCEHNBELJF.Contains(value))
+		if (target.Contains(value))
 		{
-			if (!KBLBEMDBNGB)
+			if (!allowDuplicates)
 			{
 				throw new YamlException("Duplicate %TAG directive.");
 			}
 		}
 		else
 		{
-			FMCEHNBELJF.Add(value);
+			target.Add(value);
 		}
 	}
 
-	private void EmitDocumentContent(ParsingEvent IILOLJJLLGH)
+	private void EmitDocumentContent(ParsingEvent evt)
 	{
 		states.Push(EmitterStateKind.DocumentEnd);
-		EmitNode(IILOLJJLLGH, true, false, false);
+		EmitNode(evt, true, false, false);
 	}
 
-	private void EmitNode(ParsingEvent IILOLJJLLGH, bool OHJNFDICPDH, bool CLHNCJFJJKN, bool MJHMCMNBBAA)
+	private void EmitNode(ParsingEvent evt, bool isRoot, bool isMapping, bool isSimpleKey)
 	{
-		isRootContext = OHJNFDICPDH;
-		isMappingContext = CLHNCJFJJKN;
-		isSimpleKeyContext = MJHMCMNBBAA;
-		switch (IILOLJJLLGH.get_Type())
+		isRootContext = isRoot;
+		isMappingContext = isMapping;
+		isSimpleKeyContext = isSimpleKey;
+		switch (evt.get_Type())
 		{
 		case ParsingEventType.Alias:
 			EmitAlias();
 			break;
 		case ParsingEventType.Scalar:
-			EmitScalar(IILOLJJLLGH);
+			EmitScalar(evt);
 			break;
 		case ParsingEventType.SequenceStart:
-			EmitSequenceStart(IILOLJJLLGH);
+			EmitSequenceStart(evt);
 			break;
 		case ParsingEventType.MappingStart:
-			EmitMappingStart(IILOLJJLLGH);
+			EmitMappingStart(evt);
 			break;
 		default:
-			throw new YamlException(string.Format("Expected SCALAR, SEQUENCE-START, MAPPING-START, or ALIAS, got {0}", IILOLJJLLGH.get_Type()));
+			throw new YamlException(string.Format("Expected SCALAR, SEQUENCE-START, MAPPING-START, or ALIAS, got {0}", evt.get_Type()));
 		}
 	}
 
@@ -665,9 +665,9 @@ public class Emitter : IEmitter
 		state = states.Pop();
 	}
 
-	private void EmitScalar(ParsingEvent IILOLJJLLGH)
+	private void EmitScalar(ParsingEvent evt)
 	{
-		SelectScalarStyle(IILOLJJLLGH);
+		SelectScalarStyle(evt);
 		ProcessAnchor();
 		ProcessTag();
 		IncreaseIndent(true, false);
@@ -676,51 +676,51 @@ public class Emitter : IEmitter
 		state = states.Pop();
 	}
 
-	private void SelectScalarStyle(ParsingEvent IILOLJJLLGH)
+	private void SelectScalarStyle(ParsingEvent evt)
 	{
-		Scalar lEACOCDHICF = (Scalar)IILOLJJLLGH;
-		ScalarStyle iBEOFCPMMJJ = lEACOCDHICF.GetStyle();
+		Scalar scalar = (Scalar)evt;
+		ScalarStyle style = scalar.GetStyle();
 		bool flag = tagData.handle == null && tagData.suffix == null;
-		if (flag && !lEACOCDHICF.GetIsPlainImplicit() && !lEACOCDHICF.GetIsQuotedImplicit())
+		if (flag && !scalar.GetIsPlainImplicit() && !scalar.GetIsQuotedImplicit())
 		{
 			throw new YamlException("Neither tag nor isImplicit flags are specified.");
 		}
-		if (iBEOFCPMMJJ == ScalarStyle.Any)
+		if (style == ScalarStyle.Any)
 		{
-			iBEOFCPMMJJ = ((!scalarData.isMultiline) ? ScalarStyle.Plain : ScalarStyle.Folded);
+			style = ((!scalarData.isMultiline) ? ScalarStyle.Plain : ScalarStyle.Folded);
 		}
 		if (isCanonical)
 		{
-			iBEOFCPMMJJ = ScalarStyle.DoubleQuoted;
+			style = ScalarStyle.DoubleQuoted;
 		}
 		if (isSimpleKeyContext && scalarData.isMultiline)
 		{
-			iBEOFCPMMJJ = ScalarStyle.DoubleQuoted;
+			style = ScalarStyle.DoubleQuoted;
 		}
-		if (iBEOFCPMMJJ == ScalarStyle.Plain)
+		if (style == ScalarStyle.Plain)
 		{
 			if ((flowLevel != 0 && !scalarData.isFlowPlainAllowed) || (flowLevel == 0 && !scalarData.isBlockPlainAllowed))
 			{
-				iBEOFCPMMJJ = ScalarStyle.SingleQuoted;
+				style = ScalarStyle.SingleQuoted;
 			}
 			if (string.IsNullOrEmpty(scalarData.value) && (flowLevel != 0 || isSimpleKeyContext))
 			{
-				iBEOFCPMMJJ = ScalarStyle.SingleQuoted;
+				style = ScalarStyle.SingleQuoted;
 			}
-			if (flag && !lEACOCDHICF.GetIsPlainImplicit())
+			if (flag && !scalar.GetIsPlainImplicit())
 			{
-				iBEOFCPMMJJ = ScalarStyle.SingleQuoted;
+				style = ScalarStyle.SingleQuoted;
 			}
 		}
-		if (iBEOFCPMMJJ == ScalarStyle.SingleQuoted && !scalarData.isSingleQuotedAllowed)
+		if (style == ScalarStyle.SingleQuoted && !scalarData.isSingleQuotedAllowed)
 		{
-			iBEOFCPMMJJ = ScalarStyle.DoubleQuoted;
+			style = ScalarStyle.DoubleQuoted;
 		}
-		if ((iBEOFCPMMJJ == ScalarStyle.Literal || iBEOFCPMMJJ == ScalarStyle.Folded) && (!scalarData.isBlockAllowed || flowLevel != 0 || isSimpleKeyContext))
+		if ((style == ScalarStyle.Literal || style == ScalarStyle.Folded) && (!scalarData.isBlockAllowed || flowLevel != 0 || isSimpleKeyContext))
 		{
-			iBEOFCPMMJJ = ScalarStyle.DoubleQuoted;
+			style = ScalarStyle.DoubleQuoted;
 		}
-		scalarData.style = iBEOFCPMMJJ;
+		scalarData.style = style;
 	}
 
 	private void ProcessScalar()
@@ -747,7 +747,7 @@ public class Emitter : IEmitter
 		}
 	}
 
-	private void WritePlainScalar(string value, bool AEMLFBEACGF)
+	private void WritePlainScalar(string value, bool allowBreaks)
 	{
 		if (!isWhitespace)
 		{
@@ -760,7 +760,7 @@ public class Emitter : IEmitter
 			char c = value[i];
 			if (IsSpace(c))
 			{
-				if (AEMLFBEACGF && !flag && column > bestWidth && i + 1 < value.Length && value[i + 1] != ' ')
+				if (allowBreaks && !flag && column > bestWidth && i + 1 < value.Length && value[i + 1] != ' ')
 				{
 					WriteIndent();
 				}
@@ -799,7 +799,7 @@ public class Emitter : IEmitter
 		}
 	}
 
-	private void WriteSingleQuotedScalar(string value, bool AEMLFBEACGF)
+	private void WriteSingleQuotedScalar(string value, bool allowBreaks)
 	{
 		WriteIndicator("'", true, false, false);
 		bool flag = false;
@@ -809,7 +809,7 @@ public class Emitter : IEmitter
 			char c = value[i];
 			if (c == ' ')
 			{
-				if (AEMLFBEACGF && !flag && column > bestWidth && i != 0 && i + 1 < value.Length && value[i + 1] != ' ')
+				if (allowBreaks && !flag && column > bestWidth && i != 0 && i + 1 < value.Length && value[i + 1] != ' ')
 				{
 					WriteIndent();
 				}
@@ -849,7 +849,7 @@ public class Emitter : IEmitter
 		isIndentation = false;
 	}
 
-	private void WriteDoubleQuotedScalar(string value, bool AEMLFBEACGF)
+	private void WriteDoubleQuotedScalar(string value, bool allowBreaks)
 	{
 		WriteIndicator("\"", true, false, false);
 		bool flag = false;
@@ -864,7 +864,7 @@ public class Emitter : IEmitter
 				case '\\':
 					break;
 				case ' ':
-					if (AEMLFBEACGF && !flag && column > bestWidth && i > 0 && i + 1 < value.Length)
+					if (allowBreaks && !flag && column > bestWidth && i > 0 && i + 1 < value.Length)
 					{
 						WriteIndent();
 						if (value[i + 1] == ' ')
@@ -1052,12 +1052,12 @@ public class Emitter : IEmitter
 		return KGDPNIINCJH == '\t' || KGDPNIINCJH == '\n' || KGDPNIINCJH == '\r' || (KGDPNIINCJH >= ' ' && KGDPNIINCJH <= '~') || KGDPNIINCJH == '\u0085' || (KGDPNIINCJH >= '\u00a0' && KGDPNIINCJH <= '\ud7ff') || (KGDPNIINCJH >= '\ue000' && KGDPNIINCJH <= '\ufffd');
 	}
 
-	private void EmitSequenceStart(ParsingEvent IILOLJJLLGH)
+	private void EmitSequenceStart(ParsingEvent evt)
 	{
 		ProcessAnchor();
 		ProcessTag();
-		SequenceStart jODGINIKFJF = (SequenceStart)IILOLJJLLGH;
-		if (flowLevel != 0 || isCanonical || jODGINIKFJF.GetStyle() == SequenceStyle.Flow || CheckEmptySequence())
+		SequenceStart sequenceStart = (SequenceStart)evt;
+		if (flowLevel != 0 || isCanonical || sequenceStart.GetStyle() == SequenceStyle.Flow || CheckEmptySequence())
 		{
 			state = EmitterStateKind.FlowSequenceFirstItem;
 		}
@@ -1067,12 +1067,12 @@ public class Emitter : IEmitter
 		}
 	}
 
-	private void EmitMappingStart(ParsingEvent IILOLJJLLGH)
+	private void EmitMappingStart(ParsingEvent evt)
 	{
 		ProcessAnchor();
 		ProcessTag();
-		MappingStart oGMPNFCPPDH = (MappingStart)IILOLJJLLGH;
-		if (flowLevel != 0 || isCanonical || oGMPNFCPPDH.GetStyle() == MappingStyle.Flow || CheckEmptyMapping())
+		MappingStart mappingStart = (MappingStart)evt;
+		if (flowLevel != 0 || isCanonical || mappingStart.GetStyle() == MappingStyle.Flow || CheckEmptyMapping())
 		{
 			state = EmitterStateKind.FlowMappingFirstKey;
 		}
@@ -1113,13 +1113,13 @@ public class Emitter : IEmitter
 		}
 	}
 
-	private void EmitDocumentEnd(ParsingEvent IILOLJJLLGH)
+	private void EmitDocumentEnd(ParsingEvent evt)
 	{
-		DocumentEnd nKCBFAMCLMO = IILOLJJLLGH as DocumentEnd;
-		if (nKCBFAMCLMO != null)
+		DocumentEnd documentEnd = evt as DocumentEnd;
+		if (documentEnd != null)
 		{
 			WriteIndent();
-			if (!nKCBFAMCLMO.GetIsImplicit())
+			if (!documentEnd.GetIsImplicit())
 			{
 				WriteIndicator("...", true, false, false);
 				WriteIndent();
@@ -1132,19 +1132,19 @@ public class Emitter : IEmitter
 		throw new YamlException("Expected DOCUMENT-END.");
 	}
 
-	private void EmitFlowSequenceItem(ParsingEvent IILOLJJLLGH, bool IKNHLPGLLKB)
+	private void EmitFlowSequenceItem(ParsingEvent evt, bool isFirst)
 	{
-		if (IKNHLPGLLKB)
+		if (isFirst)
 		{
 			WriteIndicator("[", true, true, false);
 			IncreaseIndent(true, false);
 			flowLevel++;
 		}
-		if (IILOLJJLLGH is SequenceEnd)
+		if (evt is SequenceEnd)
 		{
 			flowLevel--;
 			indent = indents.Pop();
-			if (isCanonical && !IKNHLPGLLKB)
+			if (isCanonical && !isFirst)
 			{
 				WriteIndicator(",", false, false, false);
 				WriteIndent();
@@ -1154,7 +1154,7 @@ public class Emitter : IEmitter
 		}
 		else
 		{
-			if (!IKNHLPGLLKB)
+			if (!isFirst)
 			{
 				WriteIndicator(",", false, false, false);
 			}
@@ -1163,23 +1163,23 @@ public class Emitter : IEmitter
 				WriteIndent();
 			}
 			states.Push(EmitterStateKind.FlowSequenceItem);
-			EmitNode(IILOLJJLLGH, false, false, false);
+			EmitNode(evt, false, false, false);
 		}
 	}
 
-	private void EmitFlowMappingKey(ParsingEvent IILOLJJLLGH, bool IKNHLPGLLKB)
+	private void EmitFlowMappingKey(ParsingEvent evt, bool isFirst)
 	{
-		if (IKNHLPGLLKB)
+		if (isFirst)
 		{
 			WriteIndicator("{", true, true, false);
 			IncreaseIndent(true, false);
 			flowLevel++;
 		}
-		if (IILOLJJLLGH is MappingEnd)
+		if (evt is MappingEnd)
 		{
 			flowLevel--;
 			indent = indents.Pop();
-			if (isCanonical && !IKNHLPGLLKB)
+			if (isCanonical && !isFirst)
 			{
 				WriteIndicator(",", false, false, false);
 				WriteIndent();
@@ -1188,7 +1188,7 @@ public class Emitter : IEmitter
 			state = states.Pop();
 			return;
 		}
-		if (!IKNHLPGLLKB)
+		if (!isFirst)
 		{
 			WriteIndicator(",", false, false, false);
 		}
@@ -1199,19 +1199,19 @@ public class Emitter : IEmitter
 		if (!isCanonical && CheckSimpleKey())
 		{
 			states.Push(EmitterStateKind.FlowMappingSimpleValue);
-			EmitNode(IILOLJJLLGH, false, true, true);
+			EmitNode(evt, false, true, true);
 		}
 		else
 		{
 			WriteIndicator("?", true, false, false);
 			states.Push(EmitterStateKind.FlowMappingValue);
-			EmitNode(IILOLJJLLGH, false, true, false);
+			EmitNode(evt, false, true, false);
 		}
 	}
 
-	private void EmitFlowMappingValue(ParsingEvent IILOLJJLLGH, bool FBFEFFJCLBE)
+	private void EmitFlowMappingValue(ParsingEvent evt, bool isSimple)
 	{
-		if (FBFEFFJCLBE)
+		if (isSimple)
 		{
 			WriteIndicator(":", false, false, false);
 		}
@@ -1224,16 +1224,16 @@ public class Emitter : IEmitter
 			WriteIndicator(":", true, false, false);
 		}
 		states.Push(EmitterStateKind.FlowMappingKey);
-		EmitNode(IILOLJJLLGH, false, true, false);
+		EmitNode(evt, false, true, false);
 	}
 
-	private void EmitBlockSequenceItem(ParsingEvent IILOLJJLLGH, bool IKNHLPGLLKB)
+	private void EmitBlockSequenceItem(ParsingEvent evt, bool isFirst)
 	{
-		if (IKNHLPGLLKB)
+		if (isFirst)
 		{
 			IncreaseIndent(false, isMappingContext && !isIndentation);
 		}
-		if (IILOLJJLLGH is SequenceEnd)
+		if (evt is SequenceEnd)
 		{
 			indent = indents.Pop();
 			state = states.Pop();
@@ -1242,16 +1242,16 @@ public class Emitter : IEmitter
 		WriteIndent();
 		WriteIndicator("  -", true, false, true);
 		states.Push(EmitterStateKind.BlockSequenceItem);
-		EmitNode(IILOLJJLLGH, false, false, false);
+		EmitNode(evt, false, false, false);
 	}
 
-	private void EmitBlockMappingKey(ParsingEvent IILOLJJLLGH, bool IKNHLPGLLKB)
+	private void EmitBlockMappingKey(ParsingEvent evt, bool isFirst)
 	{
-		if (IKNHLPGLLKB)
+		if (isFirst)
 		{
 			IncreaseIndent(false, false);
 		}
-		if (IILOLJJLLGH is MappingEnd)
+		if (evt is MappingEnd)
 		{
 			indent = indents.Pop();
 			state = states.Pop();
@@ -1261,19 +1261,19 @@ public class Emitter : IEmitter
 		if (CheckSimpleKey())
 		{
 			states.Push(EmitterStateKind.BlockMappingSimpleValue);
-			EmitNode(IILOLJJLLGH, false, true, true);
+			EmitNode(evt, false, true, true);
 		}
 		else
 		{
 			WriteIndicator("?", true, false, true);
 			states.Push(EmitterStateKind.BlockMappingValue);
-			EmitNode(IILOLJJLLGH, false, true, false);
+			EmitNode(evt, false, true, false);
 		}
 	}
 
-	private void EmitBlockMappingValue(ParsingEvent IILOLJJLLGH, bool FBFEFFJCLBE)
+	private void EmitBlockMappingValue(ParsingEvent evt, bool isSimple)
 	{
-		if (FBFEFFJCLBE)
+		if (isSimple)
 		{
 			WriteIndicator(":", false, false, false);
 		}
@@ -1283,17 +1283,17 @@ public class Emitter : IEmitter
 			WriteIndicator(":", true, false, true);
 		}
 		states.Push(EmitterStateKind.BlockMappingKey);
-		EmitNode(IILOLJJLLGH, false, true, false);
+		EmitNode(evt, false, true, false);
 	}
 
-	private void IncreaseIndent(bool LMEEIAPIDIJ, bool BHHEHBPGKIO)
+	private void IncreaseIndent(bool flow, bool indentless)
 	{
 		indents.Push(indent);
 		if (indent < 0)
 		{
-			indent = (LMEEIAPIDIJ ? bestIndent : 0);
+			indent = (flow ? bestIndent : 0);
 		}
-		else if (!BHHEHBPGKIO)
+		else if (!indentless)
 		{
 			indent += bestIndent;
 		}
@@ -1307,10 +1307,10 @@ public class Emitter : IEmitter
 			num++;
 			if (num == 2)
 			{
-				Scalar lEACOCDHICF = item as Scalar;
-				if (lEACOCDHICF != null)
+				Scalar scalar = item as Scalar;
+				if (scalar != null)
 				{
-					return string.IsNullOrEmpty(lEACOCDHICF.GetValue());
+					return string.IsNullOrEmpty(scalar.GetValue());
 				}
 				break;
 			}
@@ -1368,8 +1368,8 @@ public class Emitter : IEmitter
 		{
 			return false;
 		}
-		global::FakeList<ParsingEvent> aGIJCJFMLNN = new global::FakeList<ParsingEvent>(events);
-		return aGIJCJFMLNN.get_Item(0) is SequenceStart && aGIJCJFMLNN.get_Item(1) is SequenceEnd;
+		global::FakeList<ParsingEvent> eventList = new global::FakeList<ParsingEvent>(events);
+		return eventList.get_Item(0) is SequenceStart && eventList.get_Item(1) is SequenceEnd;
 	}
 
 	private bool CheckEmptyMapping()
@@ -1378,8 +1378,8 @@ public class Emitter : IEmitter
 		{
 			return false;
 		}
-		global::FakeList<ParsingEvent> aGIJCJFMLNN = new global::FakeList<ParsingEvent>(events);
-		return aGIJCJFMLNN.get_Item(0) is MappingStart && aGIJCJFMLNN.get_Item(1) is MappingEnd;
+		global::FakeList<ParsingEvent> eventList = new global::FakeList<ParsingEvent>(events);
+		return eventList.get_Item(0) is MappingStart && eventList.get_Item(1) is MappingEnd;
 	}
 
 	private void WriteBlockScalarHints(string value)
@@ -1387,8 +1387,8 @@ public class Emitter : IEmitter
 		CharacterAnalyzer<StringLookAheadBuffer> characterAnalyzer = new CharacterAnalyzer<StringLookAheadBuffer>(new StringLookAheadBuffer(value));
 		if (characterAnalyzer.IsSpace() || characterAnalyzer.IsBreak())
 		{
-			string gPKBINAOGDC = string.Format(CultureInfo.InvariantCulture, "{0}\0", bestIndent);
-			WriteIndicator(gPKBINAOGDC, false, false, false);
+			string indentHint = string.Format(CultureInfo.InvariantCulture, "{0}\0", bestIndent);
+			WriteIndicator(indentHint, false, false, false);
 		}
 		isOpenEnded = false;
 		string text = null;
@@ -1407,15 +1407,15 @@ public class Emitter : IEmitter
 		}
 	}
 
-	private void WriteIndicator(string GPKBINAOGDC, bool EMBMHCGJHDL, bool KCCMOOJPCBM, bool FCOACAMEHOE)
+	private void WriteIndicator(string indicator, bool needsWhitespace, bool whitespace, bool indentation)
 	{
-		if (EMBMHCGJHDL && !isWhitespace)
+		if (needsWhitespace && !isWhitespace)
 		{
 			Write(' ');
 		}
-		Write(GPKBINAOGDC);
-		isWhitespace = KCCMOOJPCBM;
-		isIndentation &= FCOACAMEHOE;
+		Write(indicator);
+		isWhitespace = whitespace;
+		isIndentation &= indentation;
 		isOpenEnded = false;
 	}
 
@@ -1452,9 +1452,9 @@ public class Emitter : IEmitter
 		isIndentation = false;
 	}
 
-	private void WriteTagContent(string value, bool BFPMMILLOHL)
+	private void WriteTagContent(string value, bool needsWhitespace)
 	{
-		if (BFPMMILLOHL && !isWhitespace)
+		if (needsWhitespace && !isWhitespace)
 		{
 			Write(' ');
 		}
@@ -1463,12 +1463,12 @@ public class Emitter : IEmitter
 		isIndentation = false;
 	}
 
-	private string UrlEncode(string HCPNFPMHFCM)
+	private string UrlEncode(string text)
 	{
-		return uriReplacer.Replace(HCPNFPMHFCM, (System.Text.RegularExpressions.Match MLPEJKLNAKF) =>
+		return uriReplacer.Replace(text, (System.Text.RegularExpressions.Match match) =>
 		{
 			StringBuilder stringBuilder = new StringBuilder();
-			byte[] bytes = Encoding.UTF8.GetBytes(MLPEJKLNAKF.Value);
+			byte[] bytes = Encoding.UTF8.GetBytes(match.Value);
 			foreach (byte b in bytes)
 			{
 				stringBuilder.AppendFormat("%{0:X02}", b);

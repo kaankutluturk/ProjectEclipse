@@ -24,8 +24,8 @@ public class DarknessRule : InFightRule
 
 	protected DarknessStage stage;
 
-	public DarknessRule(XmlNode node, RuleAppliance EJPOJJKKICO)
-		: base(RuleType.RuleDarkness, EJPOJJKKICO, node)
+	public DarknessRule(XmlNode node, RuleAppliance ruleAppliance)
+		: base(RuleType.RuleDarkness, ruleAppliance, node)
 	{
 		darknessData = new LocationSelectorDarknessData();
 		stage = DarknessStage.STAGE_PAUSE;
@@ -112,11 +112,11 @@ public class DarknessRule : InFightRule
 
 	public override InFightRule Copy()
 	{
-		InFightRule aAJIFBJLJOA = null;
-		RuleAppliance eJPOJJKKICO = GetAppliance();
-		XmlNode hKPPBKPJOEO = GetXmlSource().GetNode();
-		aAJIFBJLJOA = new DarknessRule(hKPPBKPJOEO, eJPOJJKKICO);
-		aAJIFBJLJOA.IsRandom = IsRandom;
-		return aAJIFBJLJOA;
+		InFightRule copy = null;
+		RuleAppliance ruleAppliance = GetAppliance();
+		XmlNode sourceNode = GetXmlSource().GetNode();
+		copy = new DarknessRule(sourceNode, ruleAppliance);
+		copy.IsRandom = IsRandom;
+		return copy;
 	}
 }

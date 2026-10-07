@@ -4,14 +4,14 @@ using System.Reflection;
 public class PlistElement
 {
 	// C# has no syntax for parameterized property 'DLKPBAJDHBO'.
-	public PlistElement get_DLKPBAJDHBO(string KGBGENDIMBC)
+	public PlistElement get_DLKPBAJDHBO(string key)
 	{
-		return get_Item(KGBGENDIMBC);
+		return get_Item(key);
 	}
 
-	public void set_DLKPBAJDHBO(string KGBGENDIMBC, PlistElement value)
+	public void set_DLKPBAJDHBO(string key, PlistElement value)
 	{
-		SetItem(KGBGENDIMBC, value);
+		SetItem(key, value);
 	}
 
 	protected PlistElement()
@@ -43,13 +43,13 @@ public class PlistElement
 		return (PlistElementDict)this;
 	}
 
-	public PlistElement get_Item(string KGBGENDIMBC)
+	public PlistElement get_Item(string key)
 	{
-		return AsDict().get_Item(KGBGENDIMBC);
+		return AsDict().get_Item(key);
 	}
 
-	public void SetItem(string KGBGENDIMBC, PlistElement value)
+	public void SetItem(string key, PlistElement value)
 	{
-		AsDict().SetItem(KGBGENDIMBC, value);
+		AsDict().SetItem(key, value);
 	}
 }

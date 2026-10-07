@@ -35,16 +35,16 @@ public class PerkConditionOperator : PerkCondition
 		_conditions = PerkCondition.Create(node, GetPerk());
 	}
 
-	public override bool IsEqual(Model ACENLMONNPA, List<string> NIKHAICFGNM)
+	public override bool IsEqual(Model model, List<string> args)
 	{
-		Model fGCODGKLHED = ResolveTargetModel(ACENLMONNPA);
-		if (ACENLMONNPA == null)
+		Model targetModel = ResolveTargetModel(model);
+		if (model == null)
 		{
 			return false;
 		}
 		foreach (PerkCondition item in _conditions)
 		{
-			bool flag = item.IsEqual(ACENLMONNPA, NIKHAICFGNM);
+			bool flag = item.IsEqual(model, args);
 			bool flag2 = ((!item.IsNot) ? flag : (!flag));
 			if (_operator == PerkConditionOperatorType.OPERATOR_AND && !flag2)
 			{

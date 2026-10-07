@@ -4,11 +4,11 @@ public class ConditionOfCompletionInspector
 {
 	private List<ConditionOfCompletion> _conditions = new List<ConditionOfCompletion>();
 
-	public bool AreAllComplete(FightIDS DIAIIPCBMFL)
+	public bool AreAllComplete(FightIDS fightId)
 	{
 		for (int i = 0; i < _conditions.Count; i++)
 		{
-			if (!_conditions[i].IsComplete(DIAIIPCBMFL))
+			if (!_conditions[i].IsComplete(fightId))
 			{
 				return false;
 			}
@@ -16,9 +16,9 @@ public class ConditionOfCompletionInspector
 		return true;
 	}
 
-	public void AddCondition(ConditionOfCompletion IOFGGOCEIAM)
+	public void AddCondition(ConditionOfCompletion condition)
 	{
-		_conditions.Add(IOFGGOCEIAM);
+		_conditions.Add(condition);
 	}
 
 	public void AddConditions(List<ConditionOfCompletion> conditions)

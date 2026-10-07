@@ -81,7 +81,7 @@ namespace CodeStage.AntiCheat.Detectors
 			}
 		}
 
-		protected virtual bool Init(ActDetectorBase instance, string JKIBCHLBCBC)
+		protected virtual bool Init(ActDetectorBase instance, string detectorKey)
 		{
 			if (instance != null && instance != this && instance.keepAlive)
 			{

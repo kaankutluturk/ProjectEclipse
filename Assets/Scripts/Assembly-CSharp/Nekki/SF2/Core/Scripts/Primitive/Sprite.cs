@@ -90,19 +90,19 @@ namespace Nekki.SF2.Core.Scripts.Primitive
 			}
 		}
 
-		private static Material GetMaterialForTexture(bool IPEKLPADIMF, Texture AOHHPLGIPDA)
+		private static Material GetMaterialForTexture(bool useMultiply, Texture texture)
 		{
-			Dictionary<Texture, Material> dictionary = ((!IPEKLPADIMF) ? materialsByTexture : multiplyMaterialsByTexture);
+			Dictionary<Texture, Material> dictionary = ((!useMultiply) ? materialsByTexture : multiplyMaterialsByTexture);
 			Material material = null;
-			if (dictionary.ContainsKey(AOHHPLGIPDA))
+			if (dictionary.ContainsKey(texture))
 			{
-				material = dictionary[AOHHPLGIPDA];
+				material = dictionary[texture];
 			}
 			else
 			{
-				material = new Material((!IPEKLPADIMF) ? _Shader : multiplyShader);
-				material.mainTexture = AOHHPLGIPDA;
-				dictionary.Add(AOHHPLGIPDA, material);
+				material = new Material((!useMultiply) ? _Shader : multiplyShader);
+				material.mainTexture = texture;
+				dictionary.Add(texture, material);
 			}
 			return material;
 		}
@@ -113,10 +113,10 @@ namespace Nekki.SF2.Core.Scripts.Primitive
 			UpdateUvs();
 		}
 
-		public void SetWidthHeight(float JGAPNGHPJGJ, float ANEFPJNALLK)
+		public void SetWidthHeight(float newWidth, float newHeight)
 		{
-			width = JGAPNGHPJGJ;
-			height = ANEFPJNALLK;
+			width = newWidth;
+			height = newHeight;
 			UpdateVertices();
 		}
 

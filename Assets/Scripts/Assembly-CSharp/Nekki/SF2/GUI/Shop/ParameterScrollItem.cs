@@ -204,31 +204,31 @@ namespace Nekki.SF2.GUI.Shop
 			return (float)ListSF.GetRoster().GetLevel() * levelMultiplier + (float)levelShift;
 		}
 
-		public void Init(string name, string ADONPNOBBDE, int value, int OKEFHDDPMEC, bool EIAKNKDEEKA, string MMOBJGKHPNA = null)
+		public void Init(string name, string iconName, int value, int upgradedValue, bool isItemLimit, string barScale = null)
 		{
-			InitVariables(name, EIAKNKDEEKA, MMOBJGKHPNA);
+			InitVariables(name, isItemLimit, barScale);
 			if (_progressBar != null)
 			{
 				_progressBar.Init();
 			}
 			if (_icon != null)
 			{
-				_icon.set_SpriteName(atlasName + ADONPNOBBDE);
+				_icon.set_SpriteName(atlasName + iconName);
 			}
-			SetValue(value, OKEFHDDPMEC);
+			SetValue(value, upgradedValue);
 		}
 
-		public void SetValue(int value, int OKEFHDDPMEC, float _Duration = 0f)
+		public void SetValue(int value, int upgradedValue, float _Duration = 0f)
 		{
-			SetTextValue(value, OKEFHDDPMEC, _Duration);
-			SetProgressBarValue(value, OKEFHDDPMEC, _Duration);
+			SetTextValue(value, upgradedValue, _Duration);
+			SetProgressBarValue(value, upgradedValue, _Duration);
 		}
 
-		public void SetTextValue(int value, int OKEFHDDPMEC, float _Duration = 0f)
+		public void SetTextValue(int value, int upgradedValue, float _Duration = 0f)
 		{
 			TweenValueText(value, _Duration);
-			int bAINMLLIKOL = OKEFHDDPMEC - value;
-			TweenAdditionalValue(bAINMLLIKOL, _Duration);
+			int additionalValue = upgradedValue - value;
+			TweenAdditionalValue(additionalValue, _Duration);
 		}
 
 		protected void TweenValueText(int value, float _Duration)
@@ -236,9 +236,9 @@ namespace Nekki.SF2.GUI.Shop
 			if (!(_value == null))
 			{
 				KillTween(ref valueTween);
-				valueTween = DOTween.To(() => displayedValue, (int DHDMNHCIPEH) =>
+				valueTween = DOTween.To(() => displayedValue, (int tweenedValue) =>
 				{
-					displayedValue = DHDMNHCIPEH;
+					displayedValue = tweenedValue;
 					_value.set_text(displayedValue.ToString());
 				}, value, _Duration);
 			}
@@ -277,19 +277,19 @@ namespace Nekki.SF2.GUI.Shop
 			}
 		}
 
-		public void SetProgressBarValue(int MCOIPKLENOC, int OKEFHDDPMEC, float _Duration = 0f)
+		public void SetProgressBarValue(int baseValue, int upgradedValue, float _Duration = 0f)
 		{
-			if (OKEFHDDPMEC < MCOIPKLENOC)
+			if (upgradedValue < baseValue)
 			{
-				SetBarSegment(OKEFHDDPMEC, BarColor.ORANGE, _Duration);
-				SetBarSegment(MCOIPKLENOC, BarColor.RED, _Duration);
-				SetBarSegment(OKEFHDDPMEC, BarColor.GREEN, _Duration);
+				SetBarSegment(upgradedValue, BarColor.ORANGE, _Duration);
+				SetBarSegment(baseValue, BarColor.RED, _Duration);
+				SetBarSegment(upgradedValue, BarColor.GREEN, _Duration);
 			}
 			else
 			{
-				SetBarSegment(MCOIPKLENOC, BarColor.ORANGE, _Duration);
-				SetBarSegment(OKEFHDDPMEC, BarColor.GREEN, _Duration);
-				SetBarSegment(MCOIPKLENOC, BarColor.RED, _Duration);
+				SetBarSegment(baseValue, BarColor.ORANGE, _Duration);
+				SetBarSegment(upgradedValue, BarColor.GREEN, _Duration);
+				SetBarSegment(baseValue, BarColor.RED, _Duration);
 			}
 		}
 
@@ -310,14 +310,14 @@ namespace Nekki.SF2.GUI.Shop
 			}
 		}
 
-		private void InitVariables(string CEELFMIPAII, bool EIAKNKDEEKA, string MMOBJGKHPNA = null)
+		private void InitVariables(string newAttributeName, bool isItemLimit, string newBarScaleName = null)
 		{
-			attributeName = CEELFMIPAII;
-			barScaleName = MMOBJGKHPNA;
+			attributeName = newAttributeName;
+			barScaleName = newBarScaleName;
 			if (string.IsNullOrEmpty(barScaleName))
 			{
-				WarriorAttribute bCNOAOPGAEI = GameUtils.WarriorAttributeList.GetAttribute(attributeName);
-				barScaleName = ((bCNOAOPGAEI == null) ? attributeName : bCNOAOPGAEI.BarScale);
+				WarriorAttribute warriorAttribute = GameUtils.WarriorAttributeList.GetAttribute(attributeName);
+				barScaleName = ((warriorAttribute == null) ? attributeName : warriorAttribute.BarScale);
 			}
 			if (string.IsNullOrEmpty(barScaleName))
 			{
@@ -327,37 +327,37 @@ namespace Nekki.SF2.GUI.Shop
 				levelShift = 0;
 				return;
 			}
-			BarScale bABKPEHINKF = GameUtils.BarScaleTable.GetScaleByName(barScaleName);
-			if (bABKPEHINKF == null)
+			BarScale barScale = GameUtils.BarScaleTable.GetScaleByName(barScaleName);
+			if (barScale == null)
 			{
 				GameLog.Error("Needed barScale not exist.");
 				return;
 			}
-			Limit pEKGEPHFCMN = ((!EIAKNKDEEKA) ? bABKPEHINKF.GetAttributeLimitForLevel(ListSF.GetRoster().GetLevel()) : bABKPEHINKF.GetItemLimitForLevel(ListSF.GetRoster().GetLevel()));
-			if (pEKGEPHFCMN == null)
+			Limit limit = ((!isItemLimit) ? barScale.GetAttributeLimitForLevel(ListSF.GetRoster().GetLevel()) : barScale.GetItemLimitForLevel(ListSF.GetRoster().GetLevel()));
+			if (limit == null)
 			{
-				pEKGEPHFCMN = ((!EIAKNKDEEKA) ? bABKPEHINKF.GetDefaultAttributeLimit() : bABKPEHINKF.GetDefaultItemLimit());
+				limit = ((!isItemLimit) ? barScale.GetDefaultAttributeLimit() : barScale.GetDefaultItemLimit());
 			}
 			lowerLimit = 0f;
 			upperLimit = 0f;
-			if (pEKGEPHFCMN != null)
+			if (limit != null)
 			{
-				lowerLimit = pEKGEPHFCMN.LeftLimit;
-				upperLimit = pEKGEPHFCMN.RightLimit;
-				levelMultiplier = pEKGEPHFCMN.LevelMultiplier;
-				levelShift = pEKGEPHFCMN.Shift;
+				lowerLimit = limit.LeftLimit;
+				upperLimit = limit.RightLimit;
+				levelMultiplier = limit.LevelMultiplier;
+				levelShift = limit.Shift;
 			}
-			_power = ((!(bABKPEHINKF.Power < 0f)) ? bABKPEHINKF.Power : defaultPower);
-			minPercent = ((!(bABKPEHINKF.MinPower < 0f)) ? bABKPEHINKF.MinPower : defaultMinPercent);
-			_type = ((!string.IsNullOrEmpty(bABKPEHINKF.Type)) ? bABKPEHINKF.Type : linearTypeName);
+			_power = ((!(barScale.Power < 0f)) ? barScale.Power : defaultPower);
+			minPercent = ((!(barScale.MinPower < 0f)) ? barScale.MinPower : defaultMinPercent);
+			_type = ((!string.IsNullOrEmpty(barScale.Type)) ? barScale.Type : linearTypeName);
 		}
 
 		protected virtual void SetBarSegment(int value, BarColor index = BarColor.ORANGE, float _Duration = 0f)
 		{
-			float oKEFHDDPMEC = GetPercentFromValue(value);
+			float percent = GetPercentFromValue(value);
 			if (_progressBar != null)
 			{
-				_progressBar.SetValue(oKEFHDDPMEC, (int)index, _Duration);
+				_progressBar.SetValue(percent, (int)index, _Duration);
 			}
 		}
 
@@ -371,8 +371,8 @@ namespace Nekki.SF2.GUI.Shop
 			}
 			else
 			{
-				float bGJPLNFFEOB = GameUtils.DamageDoublingRange;
-				num = Mathf.Pow(2f, (value - rightLimit) * _power / bGJPLNFFEOB);
+				float damageDoublingRange = GameUtils.DamageDoublingRange;
+				num = Mathf.Pow(2f, (value - rightLimit) * _power / damageDoublingRange);
 			}
 			if (num < 0f)
 			{

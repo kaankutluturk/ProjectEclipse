@@ -9,11 +9,11 @@ public sealed class AnchorAssigningObjectGraphVisitor : ChainedObjectGraphVisito
 
 	private readonly HashSet<string> emittedAliases = new HashSet<string>();
 
-	public AnchorAssigningObjectGraphVisitor(IObjectGraphVisitor GDMFLLGPLNO, IEventEmitter OPIGMJHGIDL, IAliasProvider JNNJMIPHLBI)
-		: base(GDMFLLGPLNO)
+	public AnchorAssigningObjectGraphVisitor(IObjectGraphVisitor visitor, IEventEmitter emitter, IAliasProvider aliasSource)
+		: base(visitor)
 	{
-		this.eventEmitter = OPIGMJHGIDL;
-		this.aliasProvider = JNNJMIPHLBI;
+		this.eventEmitter = emitter;
+		this.aliasProvider = aliasSource;
 	}
 
 	public override bool Enter(IObjectDescriptor value)
@@ -21,36 +21,36 @@ public sealed class AnchorAssigningObjectGraphVisitor : ChainedObjectGraphVisito
 		string text = aliasProvider.GetAlias(value.GetValue());
 		if (text != null && !emittedAliases.Add(text))
 		{
-			IEventEmitter oPIGMJHGIDL = eventEmitter;
-			AliasEventInfo nDOLNPCPJCJ = new AliasEventInfo(value);
-			nDOLNPCPJCJ.set_Alias(text);
-			oPIGMJHGIDL.Emit(nDOLNPCPJCJ);
+			IEventEmitter emitter = eventEmitter;
+			AliasEventInfo aliasEvent = new AliasEventInfo(value);
+			aliasEvent.set_Alias(text);
+			emitter.Emit(aliasEvent);
 			return false;
 		}
 		return base.Enter(value);
 	}
 
-	public override void VisitMappingStart(IObjectDescriptor JPEFEBICPFI, Type FHNELPLPIPI, Type EJGJHBGMCDM)
+	public override void VisitMappingStart(IObjectDescriptor mapping, Type keyType, Type valueType)
 	{
-		IEventEmitter oPIGMJHGIDL = eventEmitter;
-		MappingStartEventInfo lPADMPIAIPF = new MappingStartEventInfo(JPEFEBICPFI);
-		lPADMPIAIPF.SetAnchor(aliasProvider.GetAlias(JPEFEBICPFI.GetValue()));
-		oPIGMJHGIDL.Emit(lPADMPIAIPF);
+		IEventEmitter emitter = eventEmitter;
+		MappingStartEventInfo mappingStart = new MappingStartEventInfo(mapping);
+		mappingStart.SetAnchor(aliasProvider.GetAlias(mapping.GetValue()));
+		emitter.Emit(mappingStart);
 	}
 
-	public override void VisitSequenceStart(IObjectDescriptor sequence, Type LKAAAFHOAGD)
+	public override void VisitSequenceStart(IObjectDescriptor sequence, Type elementType)
 	{
-		IEventEmitter oPIGMJHGIDL = eventEmitter;
-		SequenceStartEventInfo pBGMOJFHMGI = new SequenceStartEventInfo(sequence);
-		pBGMOJFHMGI.SetAnchor(aliasProvider.GetAlias(sequence.GetValue()));
-		oPIGMJHGIDL.Emit(pBGMOJFHMGI);
+		IEventEmitter emitter = eventEmitter;
+		SequenceStartEventInfo sequenceStart = new SequenceStartEventInfo(sequence);
+		sequenceStart.SetAnchor(aliasProvider.GetAlias(sequence.GetValue()));
+		emitter.Emit(sequenceStart);
 	}
 
-	public override void VisitScalar(IObjectDescriptor ADDIBOMFCNH)
+	public override void VisitScalar(IObjectDescriptor scalar)
 	{
-		IEventEmitter oPIGMJHGIDL = eventEmitter;
-		ScalarEventInfo gEPIKBBFJED = new ScalarEventInfo(ADDIBOMFCNH);
-		gEPIKBBFJED.SetAnchor(aliasProvider.GetAlias(ADDIBOMFCNH.GetValue()));
-		oPIGMJHGIDL.Emit(gEPIKBBFJED);
+		IEventEmitter emitter = eventEmitter;
+		ScalarEventInfo scalarEvent = new ScalarEventInfo(scalar);
+		scalarEvent.SetAnchor(aliasProvider.GetAlias(scalar.GetValue()));
+		emitter.Emit(scalarEvent);
 	}
 }

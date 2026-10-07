@@ -12,14 +12,14 @@ namespace YamlDotNet.RepresentationModel
 		[Serializable]
 		public class BoxEqVolume : EqualityComparer<YamlNode>
 		{
-			public override int GetHashCode(YamlNode FLFFACBBLNM)
+			public override int GetHashCode(YamlNode obj)
 			{
-				return FLFFACBBLNM.GetHashCode();
+				return obj.GetHashCode();
 			}
 
-			public override bool Equals(YamlNode NMAJNHKJJEM, YamlNode ONNJMGGPHEL)
+			public override bool Equals(YamlNode y, YamlNode x)
 			{
-				return NMAJNHKJJEM.Equals(ONNJMGGPHEL);
+				return y.Equals(x);
 			}
 		}
 
@@ -54,22 +54,22 @@ namespace YamlDotNet.RepresentationModel
 			}
 		}
 
-		internal YamlMappingNode(EventReader DNBFFLFBDOB, DocumentLoadingState state)
+		internal YamlMappingNode(EventReader reader, DocumentLoadingState state)
 		{
-			MappingStart cAJDINOLOJH = DNBFFLFBDOB.Expect<MappingStart>();
-			Load(cAJDINOLOJH, state);
+			MappingStart mappingStart = reader.Expect<MappingStart>();
+			Load(mappingStart, state);
 			bool flag = false;
-			while (!DNBFFLFBDOB.Accept<MappingEnd>())
+			while (!reader.Accept<MappingEnd>())
 			{
-				YamlNode yamlNode = YamlNode.ParseNode(DNBFFLFBDOB, state);
-				YamlNode yamlNode2 = YamlNode.ParseNode(DNBFFLFBDOB, state);
+				YamlNode yamlNode = YamlNode.ParseNode(reader, state);
+				YamlNode yamlNode2 = YamlNode.ParseNode(reader, state);
 				try
 				{
 					children.Add(yamlNode, yamlNode2);
 				}
-				catch (ArgumentException oLABPFGLNFC)
+				catch (ArgumentException duplicateKeyException)
 				{
-					throw new YamlException(yamlNode.Start, yamlNode.End, "Duplicate key", oLABPFGLNFC);
+					throw new YamlException(yamlNode.Start, yamlNode.End, "Duplicate key", duplicateKeyException);
 				}
 				flag |= yamlNode is YamlAliasNode || yamlNode2 is YamlAliasNode;
 			}
@@ -77,34 +77,34 @@ namespace YamlDotNet.RepresentationModel
 			{
 				state.AddNodeWithUnresolvedAliases(this);
 			}
-			DNBFFLFBDOB.Expect<MappingEnd>();
+			reader.Expect<MappingEnd>();
 		}
 
 		public YamlMappingNode()
 		{
 		}
 
-		public YamlMappingNode(params KeyValuePair<YamlNode, YamlNode>[] IPCFHFNBMIC)
-			: this((IEnumerable<KeyValuePair<YamlNode, YamlNode>>)IPCFHFNBMIC)
+		public YamlMappingNode(params KeyValuePair<YamlNode, YamlNode>[] keyValuePairs)
+			: this((IEnumerable<KeyValuePair<YamlNode, YamlNode>>)keyValuePairs)
 		{
 		}
 
-		public YamlMappingNode(IEnumerable<KeyValuePair<YamlNode, YamlNode>> IPCFHFNBMIC)
+		public YamlMappingNode(IEnumerable<KeyValuePair<YamlNode, YamlNode>> keyValuePairs)
 		{
-			foreach (KeyValuePair<YamlNode, YamlNode> item in IPCFHFNBMIC)
+			foreach (KeyValuePair<YamlNode, YamlNode> item in keyValuePairs)
 			{
 				children.Add(item);
 			}
 		}
 
-		public YamlMappingNode(params YamlNode[] IPCFHFNBMIC)
-			: this((IEnumerable<YamlNode>)IPCFHFNBMIC)
+		public YamlMappingNode(params YamlNode[] nodes)
+			: this((IEnumerable<YamlNode>)nodes)
 		{
 		}
 
-		public YamlMappingNode(IEnumerable<YamlNode> IPCFHFNBMIC)
+		public YamlMappingNode(IEnumerable<YamlNode> nodes)
 		{
-			using (IEnumerator<YamlNode> enumerator = IPCFHFNBMIC.GetEnumerator())
+			using (IEnumerator<YamlNode> enumerator = nodes.GetEnumerator())
 			{
 				while (enumerator.MoveNext())
 				{
@@ -118,11 +118,11 @@ namespace YamlDotNet.RepresentationModel
 			}
 		}
 
-		public void Remove(string KGBGENDIMBC, YamlNode value)
+		public void Remove(string key, YamlNode value)
 		{
 			foreach (KeyValuePair<YamlNode, YamlNode> child in children)
 			{
-				if (child.Key.ToString() == KGBGENDIMBC && child.Value == value)
+				if (child.Key.ToString() == key && child.Value == value)
 				{
 					children.Remove(child.Key);
 					break;
@@ -130,31 +130,31 @@ namespace YamlDotNet.RepresentationModel
 			}
 		}
 
-		public void Add(YamlNode KGBGENDIMBC, YamlNode value)
+		public void Add(YamlNode key, YamlNode value)
 		{
-			children.Add(KGBGENDIMBC, value);
+			children.Add(key, value);
 		}
 
-		public void Add(string KGBGENDIMBC, YamlNode value)
+		public void Add(string key, YamlNode value)
 		{
-			children.Add(new YamlScalarNode(KGBGENDIMBC), value);
+			children.Add(new YamlScalarNode(key), value);
 		}
 
-		public void Add(YamlNode KGBGENDIMBC, string value)
+		public void Add(YamlNode key, string value)
 		{
-			children.Add(KGBGENDIMBC, new YamlScalarNode(value));
+			children.Add(key, new YamlScalarNode(value));
 		}
 
-		public void Add(string KGBGENDIMBC, string value)
+		public void Add(string key, string value)
 		{
-			children.Add(new YamlScalarNode(KGBGENDIMBC), new YamlScalarNode(value));
+			children.Add(new YamlScalarNode(key), new YamlScalarNode(value));
 		}
 
-		public bool HasKey(string KGBGENDIMBC)
+		public bool HasKey(string key)
 		{
 			foreach (KeyValuePair<YamlNode, YamlNode> child in children)
 			{
-				if (((YamlScalarNode)child.Key).Value == KGBGENDIMBC)
+				if (((YamlScalarNode)child.Key).Value == key)
 				{
 					return true;
 				}
@@ -162,11 +162,11 @@ namespace YamlDotNet.RepresentationModel
 			return false;
 		}
 
-		public YamlNode GetNode(string LLCIAOMCJBG)
+		public YamlNode GetNode(string key)
 		{
 			foreach (KeyValuePair<YamlNode, YamlNode> child in children)
 			{
-				if (((YamlScalarNode)child.Key).Value == LLCIAOMCJBG)
+				if (((YamlScalarNode)child.Key).Value == key)
 				{
 					return child.Value;
 				}
@@ -216,25 +216,25 @@ namespace YamlDotNet.RepresentationModel
 			}
 		}
 
-		internal override void Emit(IEmitter NPIDIMCLNEM, EmitterState state)
+		internal override void Emit(IEmitter emitter, EmitterState state)
 		{
-			NPIDIMCLNEM.Emit(new MappingStart(base.Anchor, base.Tag, true, Style));
+			emitter.Emit(new MappingStart(base.Anchor, base.Tag, true, Style));
 			foreach (KeyValuePair<YamlNode, YamlNode> child in children)
 			{
-				child.Key.Save(NPIDIMCLNEM, state);
-				child.Value.Save(NPIDIMCLNEM, state);
+				child.Key.Save(emitter, state);
+				child.Value.Save(emitter, state);
 			}
-			NPIDIMCLNEM.Emit(new MappingEnd());
+			emitter.Emit(new MappingEnd());
 		}
 
-		public override void Accept(IYamlVisitor NKECMANOOEM)
+		public override void Accept(IYamlVisitor visitor)
 		{
-			NKECMANOOEM.Visit(this);
+			visitor.Visit(this);
 		}
 
-		public override bool Equals(object NOLFMPDGCOC)
+		public override bool Equals(object obj)
 		{
-			YamlMappingNode yamlMappingNode = NOLFMPDGCOC as YamlMappingNode;
+			YamlMappingNode yamlMappingNode = obj as YamlMappingNode;
 			if (yamlMappingNode == null || !Equals(yamlMappingNode) || children.Count != yamlMappingNode.children.Count)
 			{
 				return false;

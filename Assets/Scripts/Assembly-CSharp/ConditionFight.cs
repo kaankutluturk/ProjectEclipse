@@ -23,8 +23,8 @@ public class ConditionFight
 		return _fightIDS;
 	}
 
-	public void SetFightIds(string DIAIIPCBMFL)
+	public void SetFightIds(string fightIds)
 	{
-		_fightIDS.SetFightIDSByString(DIAIIPCBMFL);
+		_fightIDS.SetFightIDSByString(fightIds);
 	}
 }

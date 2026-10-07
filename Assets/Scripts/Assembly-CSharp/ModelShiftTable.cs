@@ -43,12 +43,12 @@ public class ModelShiftTable : List<List<float>>
 		return _Animation;
 	}
 
-	public int GetNodeId(string IMGCANJHPND)
+	public int GetNodeId(string nodeName)
 	{
 		int num = 0;
 		for (int i = 0; i < _NodeNames.Count; i++)
 		{
-			if (IMGCANJHPND == _NodeNames[i])
+			if (nodeName == _NodeNames[i])
 			{
 				return num;
 			}
@@ -56,25 +56,25 @@ public class ModelShiftTable : List<List<float>>
 		}
 		if (_Animation != null)
 		{
-			GameLog.Error("heel {0} not found in shift table for {1}", IMGCANJHPND, _Animation.Name);
+			GameLog.Error("heel {0} not found in shift table for {1}", nodeName, _Animation.Name);
 		}
 		return -1;
 	}
 
-	public void LoadFromFile(InfoAnimation DBOLBEOCEME, BinaryReader buffer)
+	public void LoadFromFile(InfoAnimation animation, BinaryReader buffer)
 	{
-		_Animation = DBOLBEOCEME;
-		uint pEEOEOMEBFG = buffer.ReadUInt32();
-		LoadFromFile(buffer, (int)pEEOEOMEBFG);
+		_Animation = animation;
+		uint dataSize = buffer.ReadUInt32();
+		LoadFromFile(buffer, (int)dataSize);
 	}
 
-	private void LoadFromFile(BinaryReader buffer, int PEEOEOMEBFG)
+	private void LoadFromFile(BinaryReader buffer, int dataSize)
 	{
-		if (0 < PEEOEOMEBFG)
+		if (0 < dataSize)
 		{
 			int num = ParseTableHeader(buffer);
 			int count = _NodeNames.Count;
-			int num2 = PEEOEOMEBFG - num;
+			int num2 = dataSize - num;
 			if (num2 % 4 != 0)
 			{
 				GameLog.Error("count % 4 != 0");
@@ -115,16 +115,16 @@ public class ModelShiftTable : List<List<float>>
 		return num;
 	}
 
-	public float GetDistance(int JAPBDIJOKDJ, string IMGCANJHPND)
+	public float GetDistance(int rowIndex, string nodeName)
 	{
-		if (JAPBDIJOKDJ < base.Count)
+		if (rowIndex < base.Count)
 		{
-			int num = GetNodeId(IMGCANJHPND);
+			int num = GetNodeId(nodeName);
 			if (-1 < num)
 			{
-				return this.ElementAt(JAPBDIJOKDJ)[num];
+				return this.ElementAt(rowIndex)[num];
 			}
-			GameLog.Error("node {1} not found", IMGCANJHPND);
+			GameLog.Error("node {1} not found", nodeName);
 		}
 		return 0f;
 	}

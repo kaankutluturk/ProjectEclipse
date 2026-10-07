@@ -10,8 +10,8 @@ public class RegenerationRule : InFightRule
 
 	private bool _isWeaponStrike;
 
-	public RegenerationRule(XmlNode node, RuleAppliance EJPOJJKKICO)
-		: base(RuleType.RuleRegeneration, EJPOJJKKICO, node)
+	public RegenerationRule(XmlNode node, RuleAppliance appliance)
+		: base(RuleType.RuleRegeneration, appliance, node)
 	{
 		_frames = 0f;
 		framesAfterHit = 0f;
@@ -35,12 +35,12 @@ public class RegenerationRule : InFightRule
 
 	protected override bool CompareSingle(object data)
 	{
-		FightData hCPJJKMNMCE = (FightData)data;
-		switch (hCPJJKMNMCE.FightEventType)
+		FightData fightData = (FightData)data;
+		switch (fightData.FightEventType)
 		{
 		case FightEvent.RenderEvent:
 			_frames++;
-			if (_isWeaponStrike && hCPJJKMNMCE.IsUsingItem)
+			if (_isWeaponStrike && fightData.IsUsingItem)
 			{
 				return false;
 			}
@@ -66,11 +66,11 @@ public class RegenerationRule : InFightRule
 
 	public override InFightRule Copy()
 	{
-		InFightRule aAJIFBJLJOA = null;
-		RuleAppliance eJPOJJKKICO = GetAppliance();
-		XmlNode hKPPBKPJOEO = GetXmlSource().GetNode();
-		aAJIFBJLJOA = new RegenerationRule(hKPPBKPJOEO, eJPOJJKKICO);
-		aAJIFBJLJOA.IsRandom = IsRandom;
-		return aAJIFBJLJOA;
+		InFightRule copy = null;
+		RuleAppliance appliance = GetAppliance();
+		XmlNode node = GetXmlSource().GetNode();
+		copy = new RegenerationRule(node, appliance);
+		copy.IsRandom = IsRandom;
+		return copy;
 	}
 }

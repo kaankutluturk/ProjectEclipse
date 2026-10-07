@@ -6,20 +6,20 @@ public class QuestActionSessionSettings : QuestAction
 
 	private string settingValue = string.Empty;
 
-	public override void Parse(XmlNode EPKLCPOEELO)
+	public override void Parse(XmlNode node)
 	{
-		base.Parse(EPKLCPOEELO);
-		settingName = EPKLCPOEELO.Attributes["Name"].GetStringOrDefault(string.Empty);
-		settingValue = EPKLCPOEELO.Attributes["Value"].GetStringOrDefault(string.Empty);
+		base.Parse(node);
+		settingName = node.Attributes["Name"].GetStringOrDefault(string.Empty);
+		settingValue = node.Attributes["Value"].GetStringOrDefault(string.Empty);
 	}
 
-	public override void Execute(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters parameters)
 	{
-		base.Execute(GFIHPBCEEOB);
-		Roster nKGLHEGIKKP = ListSF.GetRoster();
-		if (nKGLHEGIKKP != null)
+		base.Execute(parameters);
+		Roster roster = ListSF.GetRoster();
+		if (roster != null)
 		{
-			nKGLHEGIKKP.SessionSettings(settingName, settingValue);
+			roster.SessionSettings(settingName, settingValue);
 		}
 		ListSF.GetInstance().RequestSave();
 		FinishAction();

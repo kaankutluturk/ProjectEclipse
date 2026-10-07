@@ -35,18 +35,18 @@ internal sealed class SimpleStreamingSample : MonoBehaviour
 		});
 	}
 
-	private void OnNonHubMessage(Connection MDGFGCDPGFI, object data)
+	private void OnNonHubMessage(Connection connection, object data)
 	{
 		messages.Add("[Server Message] " + data.ToString());
 	}
 
-	private void OnStateChanged(Connection MDGFGCDPGFI, ConnectionStates JOBAGBFMMFP, ConnectionStates MPJEMGJIBBD)
+	private void OnStateChanged(Connection connection, ConnectionStates oldState, ConnectionStates newState)
 	{
-		messages.Add(string.Format("[State Change] {0} => {1}", JOBAGBFMMFP, MPJEMGJIBBD));
+		messages.Add(string.Format("[State Change] {0} => {1}", oldState, newState));
 	}
 
-	private void OnError(Connection MDGFGCDPGFI, string JDONBAPIJCG)
+	private void OnError(Connection connection, string error)
 	{
-		messages.Add("[Error] " + JDONBAPIJCG);
+		messages.Add("[Error] " + error);
 	}
 }

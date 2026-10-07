@@ -356,9 +356,9 @@ public class ModelObject
 		return additionalData.PairNodeIds;
 	}
 
-	public static Vector3f GetNodesMidpoint(ModelNode LHBNIMGFKIB, ModelNode AAOIAEJJINO)
+	public static Vector3f GetNodesMidpoint(ModelNode firstNode, ModelNode secondNode)
 	{
-		return Vector3f.Middle(LHBNIMGFKIB.GetStart(), AAOIAEJJINO.GetStart());
+		return Vector3f.Middle(firstNode.GetStart(), secondNode.GetStart());
 	}
 
 	public int GetNodeIDByPairName(int index)
@@ -378,15 +378,15 @@ public class ModelObject
 		return -1;
 	}
 
-	public ModelNode FindNodeAtPoint(Vector2f MGMMDGFPBLP, float PKFOEAEPOAF)
+	public ModelNode FindNodeAtPoint(Vector2f point, float radius)
 	{
 		ModelNode result = null;
-		PKFOEAEPOAF *= PKFOEAEPOAF;
+		radius *= radius;
 		List<ModelNode> list = GetAllNodes();
 		foreach (ModelNode item in list)
 		{
-			Vector3f lHBNIMGFKIB = item.GetStart();
-			if (Vector2f.DistanceSquared2D(lHBNIMGFKIB, MGMMDGFPBLP) < PKFOEAEPOAF)
+			Vector3f nodeStart = item.GetStart();
+			if (Vector2f.DistanceSquared2D(nodeStart, point) < radius)
 			{
 				result = item;
 				break;
@@ -415,16 +415,16 @@ public class ModelObject
 		{
 			return nodeData.Pivot;
 		}
-		ModelNode lCDGOCIAIDK = GetNodeByName(name);
-		if (lCDGOCIAIDK != null)
+		ModelNode node = GetNodeByName(name);
+		if (node != null)
 		{
-			return lCDGOCIAIDK;
+			return node;
 		}
 		if (GetModel() != null && GetModel().GetParentModel() != null)
 		{
-			lCDGOCIAIDK = GetModel().GetParentModel().GetBodyObject().GetNodeByName(name);
+			node = GetModel().GetParentModel().GetBodyObject().GetNodeByName(name);
 		}
-		return lCDGOCIAIDK;
+		return node;
 	}
 
 	// best guess for name
@@ -469,20 +469,20 @@ public class ModelObject
 
 	public void UpdateCenterOfMass()
 	{
-		Vector3f eMAFACPEPDK = new Vector3f();
+		Vector3f centerStart = new Vector3f();
 		Vector3f eMAFACPEPDK2 = new Vector3f();
-		Vector3f bAINMLLIKOL = new Vector3f(centerOfMassNode.GetStart());
+		Vector3f centerEnd = new Vector3f(centerOfMassNode.GetStart());
 		List<ModelNode> list = GetMassNodes();
 		centerOfMassNode.GetStart().Reset();
 		foreach (ModelNode item in list)
 		{
 			eMAFACPEPDK2.Set(item.GetStart());
 			eMAFACPEPDK2.Multiply(item.GetWeight());
-			eMAFACPEPDK.Add(eMAFACPEPDK2);
+			centerStart.Add(eMAFACPEPDK2);
 		}
-		eMAFACPEPDK.Multiply(1f / _ModelWeight);
-		centerOfMassNode.SetStart(eMAFACPEPDK);
-		centerOfMassNode.SetEnd(bAINMLLIKOL);
+		centerStart.Multiply(1f / _ModelWeight);
+		centerOfMassNode.SetStart(centerStart);
+		centerOfMassNode.SetEnd(centerEnd);
 	}
 
 	public Vector3f GetPreviousCenterOfMass()
@@ -490,75 +490,75 @@ public class ModelObject
 		return centerOfMassNode.GetEnd();
 	}
 
-	public void SetModelPosition(Vector3f MGMMDGFPBLP, ModelNode NFADOLIKJEA = null)
+	public void SetModelPosition(Vector3f targetPosition, ModelNode pivotNode = null)
 	{
-		if (NFADOLIKJEA == null)
+		if (pivotNode == null)
 		{
-			NFADOLIKJEA = GetNodeByName(_PivotName);
+			pivotNode = GetNodeByName(_PivotName);
 		}
-		if (NFADOLIKJEA == null || 0 >= nodeData.AllNodes.Count)
+		if (pivotNode == null || 0 >= nodeData.AllNodes.Count)
 		{
 			return;
 		}
-		Vector3f bEHOPOPCJGB = new Vector3f(Vector3f.op_Subtraction(MGMMDGFPBLP, NFADOLIKJEA.GetStart()));
-		Vector3f bEHOPOPCJGB2 = new Vector3f(Vector3f.op_Subtraction(MGMMDGFPBLP, NFADOLIKJEA.GetEnd()));
+		Vector3f offset = new Vector3f(Vector3f.op_Subtraction(targetPosition, pivotNode.GetStart()));
+		Vector3f bEHOPOPCJGB2 = new Vector3f(Vector3f.op_Subtraction(targetPosition, pivotNode.GetEnd()));
 		foreach (ModelNode item in nodeData.AllNodes)
 		{
-			item.GetStart().Add(bEHOPOPCJGB);
+			item.GetStart().Add(offset);
 			item.GetEnd().Add(bEHOPOPCJGB2);
 		}
 	}
 
-	public void AlignToFrame(List<Vector3f> KPLANIHPMED)
+	public void AlignToFrame(List<Vector3f> framePositions)
 	{
 		int index = GetNodeIDByName(_PivotName);
-		Vector3f nBMEGFBPGFE = GetPivotNode().GetStart();
-		Vector3f eMAFACPEPDK = Vector3f.op_Subtraction(nBMEGFBPGFE, KPLANIHPMED[index]);
-		eMAFACPEPDK.SetY(0f);
+		Vector3f pivotStart = GetPivotNode().GetStart();
+		Vector3f offset = Vector3f.op_Subtraction(pivotStart, framePositions[index]);
+		offset.SetY(0f);
 		int i = 0;
-		for (int count = KPLANIHPMED.Count; i < count; i++)
+		for (int count = framePositions.Count; i < count; i++)
 		{
-			nodeData.AllNodes[i].SetStart(Vector3f.op_Addition(KPLANIHPMED[i], eMAFACPEPDK));
-			nodeData.AllNodes[i].SetEnd(Vector3f.op_Addition(KPLANIHPMED[i], eMAFACPEPDK));
+			nodeData.AllNodes[i].SetStart(Vector3f.op_Addition(framePositions[i], offset));
+			nodeData.AllNodes[i].SetEnd(Vector3f.op_Addition(framePositions[i], offset));
 		}
 	}
 
-	public void AlignToFrame(List<Vector3f> KPLANIHPMED, ModelNode AECCPADGGPG)
+	public void AlignToFrame(List<Vector3f> framePositions, ModelNode pivotNode)
 	{
-		int index = AECCPADGGPG.GetID();
-		Vector3f nBMEGFBPGFE = AECCPADGGPG.GetStart();
-		Vector3f eMAFACPEPDK = Vector3f.op_Subtraction(nBMEGFBPGFE, KPLANIHPMED[index]);
-		eMAFACPEPDK.SetY(0f);
+		int index = pivotNode.GetID();
+		Vector3f pivotStart = pivotNode.GetStart();
+		Vector3f offset = Vector3f.op_Subtraction(pivotStart, framePositions[index]);
+		offset.SetY(0f);
 		int i = 0;
-		for (int count = KPLANIHPMED.Count; i < count; i++)
+		for (int count = framePositions.Count; i < count; i++)
 		{
-			nodeData.AllNodes[i].SetStart(Vector3f.op_Addition(KPLANIHPMED[i], eMAFACPEPDK));
-			nodeData.AllNodes[i].SetEnd(Vector3f.op_Addition(KPLANIHPMED[i], eMAFACPEPDK));
+			nodeData.AllNodes[i].SetStart(Vector3f.op_Addition(framePositions[i], offset));
+			nodeData.AllNodes[i].SetEnd(Vector3f.op_Addition(framePositions[i], offset));
 		}
 	}
 
-	public void TranslateAllNodes(Vector3f OPNPKNEOALJ)
+	public void TranslateAllNodes(Vector3f translation)
 	{
 		foreach (ModelNode item in nodeData.AllNodes)
 		{
-			item.GetStart().Add(OPNPKNEOALJ);
-			item.GetEnd().Add(OPNPKNEOALJ);
+			item.GetStart().Add(translation);
+			item.GetEnd().Add(translation);
 		}
 		UpdateCenterOfMass();
 	}
 
 	public void FindPivotNode()
 	{
-		ModelNode lCDGOCIAIDK = GetNodeByName(_PivotName);
-		if (lCDGOCIAIDK != null)
+		ModelNode pivotNode = GetNodeByName(_PivotName);
+		if (pivotNode != null)
 		{
-			nodeData.Pivot = lCDGOCIAIDK;
+			nodeData.Pivot = pivotNode;
 		}
 	}
 
-	public void SetFileNames(List<string> CBHAEPCLDFG)
+	public void SetFileNames(List<string> fileNames)
 	{
-		additionalData.FileNames.AddRange(CBHAEPCLDFG);
+		additionalData.FileNames.AddRange(fileNames);
 	}
 
 	public void ResolveMacroNodeWeights()
@@ -566,23 +566,23 @@ public class ModelObject
 		int count = nodeData.MacroNodes.Count;
 		for (int i = 0; i < count; i++)
 		{
-			ModelMacroNode gDNAJOODAGP = nodeData.MacroNodes[i];
-			List<global::Pair<string, float>> lMPPCKACMNB = gDNAJOODAGP.NamedWeights;
-			if (lMPPCKACMNB == null)
+			ModelMacroNode macroNode = nodeData.MacroNodes[i];
+			List<global::Pair<string, float>> namedWeights = macroNode.NamedWeights;
+			if (namedWeights == null)
 			{
 				continue;
 			}
-			foreach (global::Pair<string, float> item in lMPPCKACMNB)
+			foreach (global::Pair<string, float> item in namedWeights)
 			{
-				ModelNode lCDGOCIAIDK = GetNodeByName(item.First);
-				if (lCDGOCIAIDK != null)
+				ModelNode node = GetNodeByName(item.First);
+				if (node != null)
 				{
-					gDNAJOODAGP.AddNodeWeight(lCDGOCIAIDK, item.Second);
+					macroNode.AddNodeWeight(node, item.Second);
 					continue;
 				}
-				GameLog.Error("Nodes '{0}' for macronode '{1}' was not found", item.First, gDNAJOODAGP.GetName());
+				GameLog.Error("Nodes '{0}' for macronode '{1}' was not found", item.First, macroNode.GetName());
 			}
-			gDNAJOODAGP.NamedWeights = null;
+			macroNode.NamedWeights = null;
 		}
 	}
 
@@ -641,22 +641,22 @@ public class ModelObject
 		}
 	}
 
-	public void AddCenterOfMassNodes(List<global::Pair<string, float>> MFIEGKAMKNJ)
+	public void AddCenterOfMassNodes(List<global::Pair<string, float>> centerOfMassWeights)
 	{
-		foreach (global::Pair<string, float> item in MFIEGKAMKNJ)
+		foreach (global::Pair<string, float> item in centerOfMassWeights)
 		{
-			ModelNode lCDGOCIAIDK = GetNodeByName(item.First);
-			if (lCDGOCIAIDK == null)
+			ModelNode node = GetNodeByName(item.First);
+			if (node == null)
 			{
 				GameLog.Error("ModelObject::addComNodes - no node with name: {0}", item.First);
 			}
-			nodeData.CenterOfMassNodes.Add(lCDGOCIAIDK);
+			nodeData.CenterOfMassNodes.Add(node);
 		}
 	}
 
-	private void LinkPairNodes(List<ModelNode> nodes, List<global::Pair<int, int>> OEMALIFPGPO)
+	private void LinkPairNodes(List<ModelNode> nodes, List<global::Pair<int, int>> pairNodeIds)
 	{
-		OEMALIFPGPO.Clear();
+		pairNodeIds.Clear();
 		foreach (ModelNode item in nodes)
 		{
 			string text = item.GetName();
@@ -672,9 +672,9 @@ public class ModelObject
 				string text5 = item2.GetName();
 				if (text5 == text4)
 				{
-					int gBCLEDJAOBM = item.GetID();
-					int pOFHDGJAFMP = item2.GetID();
-					OEMALIFPGPO.Add(new global::Pair<int, int>(gBCLEDJAOBM, pOFHDGJAFMP));
+					int firstId = item.GetID();
+					int secondId = item2.GetID();
+					pairNodeIds.Add(new global::Pair<int, int>(firstId, secondId));
 					item.SetPairNode(item2);
 					item2.SetPairNode(item);
 					break;

@@ -16,9 +16,9 @@ public static class GameLoader
 		Sound.PlaySound("snd_armor", 0f);
 	}
 
-	public static void SetSound(uint BELCFJOLEMF)
+	public static void SetSound(uint maxPlayableSounds)
 	{
-		Sound.MaxPlayableSounds = BELCFJOLEMF;
+		Sound.MaxPlayableSounds = maxPlayableSounds;
 	}
 
 	public static void SetSound()
@@ -38,15 +38,15 @@ public static class GameLoader
 		AiData.Load();
 	}
 
-	public static void SetVersion(string APFECPFKMMH)
+	public static void SetVersion(string version)
 	{
 		XmlDocument xmlDocument = XmlUtils.LoadDocumentWithHashCheck(SF2Paths.GetUserDataDirectory(), Constants.UsersFileName);
 		if (xmlDocument != null)
 		{
-			xmlDocument["Root"]["Versions"]["Version"].SetAttribute("Value", APFECPFKMMH);
-			string kPFELJFPGHJ = string.Format("{0}/{1}", SF2Paths.GetUserDataDirectory(), Constants.UsersFileName);
+			xmlDocument["Root"]["Versions"]["Version"].SetAttribute("Value", version);
+			string savePath = string.Format("{0}/{1}", SF2Paths.GetUserDataDirectory(), Constants.UsersFileName);
 			string kPFELJFPGHJ2 = string.Format("{0}/{1}", SF2Paths.GetUserDataDirectory(), Constants.UsersBackupFileName);
-			XmlUtils.SaveDocumentWithHash(xmlDocument, kPFELJFPGHJ);
+			XmlUtils.SaveDocumentWithHash(xmlDocument, savePath);
 			XmlUtils.SaveDocumentWithHash(xmlDocument, kPFELJFPGHJ2);
 		}
 	}

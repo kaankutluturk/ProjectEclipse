@@ -2,5 +2,5 @@ using System;
 
 public interface IObjectFactory
 {
-	object Create(Type LFLGCDNKNJI);
+	object Create(Type type);
 }

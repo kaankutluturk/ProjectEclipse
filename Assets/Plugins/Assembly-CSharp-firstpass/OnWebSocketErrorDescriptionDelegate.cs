@@ -1,1 +1,1 @@
-public delegate void OnWebSocketErrorDescriptionDelegate(WebSocket ILNFPNFEOCL, string NEPOLDCKNJL);
+public delegate void OnWebSocketErrorDescriptionDelegate(WebSocket webSocket, string description);

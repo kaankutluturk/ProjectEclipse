@@ -26,9 +26,9 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 			inited = true;
 		}
 
-		public static void SetNewCryptoKey(char CNOFJICCAHK)
+		public static void SetNewCryptoKey(char newKey)
 		{
-			cryptoKey = CNOFJICCAHK;
+			cryptoKey = newKey;
 		}
 
 		public static char EncryptDecrypt(char value)
@@ -36,13 +36,13 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 			return EncryptDecrypt(value, '\0');
 		}
 
-		public static char EncryptDecrypt(char value, char KGBGENDIMBC)
+		public static char EncryptDecrypt(char value, char key)
 		{
-			if (KGBGENDIMBC == '\0')
+			if (key == '\0')
 			{
 				return (char)(value ^ cryptoKey);
 			}
-			return (char)(value ^ KGBGENDIMBC);
+			return (char)(value ^ key);
 		}
 
 		public void ApplyNewCryptoKey()
@@ -56,9 +56,9 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 
 		public void RandomizeCryptoKey()
 		{
-			char bAINMLLIKOL = InternalDecrypt();
+			char decrypted = InternalDecrypt();
 			currentCryptoKey = (char)UnityEngine.Random.Range(0, 65535);
-			hiddenValue = EncryptDecrypt(bAINMLLIKOL, currentCryptoKey);
+			hiddenValue = EncryptDecrypt(decrypted, currentCryptoKey);
 		}
 
 		public char GetEncrypted()
@@ -67,10 +67,10 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 			return hiddenValue;
 		}
 
-		public void SetEncrypted(char ANGFOBEKKKD)
+		public void SetEncrypted(char encrypted)
 		{
 			inited = true;
-			hiddenValue = ANGFOBEKKKD;
+			hiddenValue = encrypted;
 			if (ObscuredCheatingDetector.GetIsRunning())
 			{
 				fakeValue = InternalDecrypt();
@@ -110,45 +110,45 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 		}
 
 		[SpecialName]
-		public static ObscuredChar op_Increment(ObscuredChar NILNDHEKNLJ)
+		public static ObscuredChar op_Increment(ObscuredChar input)
 		{
-			char bAINMLLIKOL = (char)(NILNDHEKNLJ.InternalDecrypt() + 1);
-			NILNDHEKNLJ.hiddenValue = EncryptDecrypt(bAINMLLIKOL, NILNDHEKNLJ.currentCryptoKey);
+			char newValue = (char)(input.InternalDecrypt() + 1);
+			input.hiddenValue = EncryptDecrypt(newValue, input.currentCryptoKey);
 			if (ObscuredCheatingDetector.GetIsRunning())
 			{
-				NILNDHEKNLJ.fakeValue = bAINMLLIKOL;
+				input.fakeValue = newValue;
 			}
-			return NILNDHEKNLJ;
+			return input;
 		}
 
 		[SpecialName]
-		public static ObscuredChar op_Decrement(ObscuredChar NILNDHEKNLJ)
+		public static ObscuredChar op_Decrement(ObscuredChar input)
 		{
-			char bAINMLLIKOL = (char)(NILNDHEKNLJ.InternalDecrypt() - 1);
-			NILNDHEKNLJ.hiddenValue = EncryptDecrypt(bAINMLLIKOL, NILNDHEKNLJ.currentCryptoKey);
+			char newValue = (char)(input.InternalDecrypt() - 1);
+			input.hiddenValue = EncryptDecrypt(newValue, input.currentCryptoKey);
 			if (ObscuredCheatingDetector.GetIsRunning())
 			{
-				NILNDHEKNLJ.fakeValue = bAINMLLIKOL;
+				input.fakeValue = newValue;
 			}
-			return NILNDHEKNLJ;
+			return input;
 		}
 
-		public override bool Equals(object AOMLCBHAJJH)
+		public override bool Equals(object obj)
 		{
-			if (!(AOMLCBHAJJH is ObscuredChar))
+			if (!(obj is ObscuredChar))
 			{
 				return false;
 			}
-			return Equals((ObscuredChar)AOMLCBHAJJH);
+			return Equals((ObscuredChar)obj);
 		}
 
-		public bool Equals(ObscuredChar AOMLCBHAJJH)
+		public bool Equals(ObscuredChar other)
 		{
-			if (currentCryptoKey == AOMLCBHAJJH.currentCryptoKey)
+			if (currentCryptoKey == other.currentCryptoKey)
 			{
-				return hiddenValue == AOMLCBHAJJH.hiddenValue;
+				return hiddenValue == other.hiddenValue;
 			}
-			return EncryptDecrypt(hiddenValue, currentCryptoKey) == EncryptDecrypt(AOMLCBHAJJH.hiddenValue, AOMLCBHAJJH.currentCryptoKey);
+			return EncryptDecrypt(hiddenValue, currentCryptoKey) == EncryptDecrypt(other.hiddenValue, other.currentCryptoKey);
 		}
 
 		public override string ToString()
@@ -156,9 +156,9 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 			return InternalDecrypt().ToString();
 		}
 
-		public string ToString(IFormatProvider EEGMFLOPLLH)
+		public string ToString(IFormatProvider provider)
 		{
-			return InternalDecrypt().ToString(EEGMFLOPLLH);
+			return InternalDecrypt().ToString(provider);
 		}
 
 		public override int GetHashCode()

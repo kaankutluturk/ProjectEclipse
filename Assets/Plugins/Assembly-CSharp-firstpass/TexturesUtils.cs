@@ -119,29 +119,29 @@ public class TexturesUtils
 		texturesToDestroy.Remove(texture);
 	}
 
-	public static Sprite GetSpriteFromAtlas(string NJKCBALJDMM, string KIKMPCLOBCK, string JGIGOMLGLPN)
+	public static Sprite GetSpriteFromAtlas(string atlasPath, string atlasName, string spriteName)
 	{
-		return GetSpriteFromAtlas(LoadAtlas(NJKCBALJDMM, KIKMPCLOBCK), JGIGOMLGLPN);
+		return GetSpriteFromAtlas(LoadAtlas(atlasPath, atlasName), spriteName);
 	}
 
-	public static Sprite GetSpriteFromAtlas(string KIKMPCLOBCK, string JGIGOMLGLPN)
+	public static Sprite GetSpriteFromAtlas(string atlasPath, string spriteName)
 	{
-		return GetSpriteFromAtlas(LoadAtlas(KIKMPCLOBCK, string.Empty), JGIGOMLGLPN);
+		return GetSpriteFromAtlas(LoadAtlas(atlasPath, string.Empty), spriteName);
 	}
 
-	private static Sprite GetSpriteFromAtlas(Sprite[] KIPBMMFEBEE, string JGIGOMLGLPN)
+	private static Sprite GetSpriteFromAtlas(Sprite[] sprites, string spriteName)
 	{
-		if (KIPBMMFEBEE != null && KIPBMMFEBEE.Length > 0)
+		if (sprites != null && sprites.Length > 0)
 		{
-			foreach (Sprite sprite in KIPBMMFEBEE)
+			foreach (Sprite sprite in sprites)
 			{
-				if (sprite.name.Equals(JGIGOMLGLPN))
+				if (sprite.name.Equals(spriteName))
 				{
 					return sprite;
 				}
 			}
 		}
-		Log("Sprite From Atlas Not Found  - " + JGIGOMLGLPN);
+		Log("Sprite From Atlas Not Found  - " + spriteName);
 		return GlobalLoad.GetNoImageSprite();
 	}
 
@@ -161,7 +161,7 @@ public class TexturesUtils
 		return AtlasesCache[path];
 	}
 
-	private static void Log(string LIOGIBJBHAH)
+	private static void Log(string message)
 	{
 	}
 }

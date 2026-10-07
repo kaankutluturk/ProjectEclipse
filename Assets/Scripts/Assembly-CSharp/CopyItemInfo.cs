@@ -6,10 +6,10 @@ public class CopyItemInfo : ItemInfo
 
 	public string CopyParentSubtype;
 
-	public CopyItemInfo(XmlNode node, string FFBGOLDLBHD = "", string IGOAPEILEFP = "")
+	public CopyItemInfo(XmlNode node, string parentType = "", string parentSubtype = "")
 		: base(node)
 	{
-		CopyParentType = FFBGOLDLBHD;
-		CopyParentSubtype = IGOAPEILEFP;
+		CopyParentType = parentType;
+		CopyParentSubtype = parentSubtype;
 	}
 }

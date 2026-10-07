@@ -2,5 +2,5 @@ using System;
 
 public interface INodeTypeResolver
 {
-	bool Resolve(NodeEvent ABOEBNGCALL, ref Type PHOBEGPKAKH);
+	bool Resolve(NodeEvent nodeEvent, ref Type currentType);
 }

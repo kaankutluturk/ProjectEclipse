@@ -84,9 +84,9 @@ public class ActionAnimation
 		}
 	}
 
-	public ActionAnimation(ActionType LFLGCDNKNJI)
+	public ActionAnimation(ActionType actionType)
 	{
-		_actionType = LFLGCDNKNJI;
+		_actionType = actionType;
 		_Model = null;
 	}
 
@@ -115,9 +115,9 @@ public class ActionAnimation
 		return _startParameters.Trigger == StartTrigger.START_FRAME && _startParameters.Frame == frame;
 	}
 
-	public bool NeedStart(EventAnimation.EventAnimationType LFLGCDNKNJI)
+	public bool NeedStart(EventAnimation.EventAnimationType eventType)
 	{
-		return _startParameters.Trigger == StartTrigger.START_EVENT && _startParameters.TriggerEvent == LFLGCDNKNJI;
+		return _startParameters.Trigger == StartTrigger.START_EVENT && _startParameters.TriggerEvent == eventType;
 	}
 
 	public bool CanVisit(Model model)
@@ -152,9 +152,9 @@ public class ActionAnimation
 		return _Conditions.Count;
 	}
 
-	public virtual void Visit(Model ACENLMONNPA)
+	public virtual void Visit(Model model)
 	{
-		ACENLMONNPA.StartAction(this);
+		model.StartAction(this);
 	}
 
 	protected virtual void Parse(XmlNode node)
@@ -168,8 +168,8 @@ public class ActionAnimation
 		else
 		{
 			_startParameters.Trigger = StartTrigger.START_EVENT;
-			string gOHIIMFFFJI = node.Attributes["Event"].GetStringOrDefault(string.Empty);
-			_startParameters.TriggerEvent = EventAnimation.GetTypeByName(gOHIIMFFFJI);
+			string eventName = node.Attributes["Event"].GetStringOrDefault(string.Empty);
+			_startParameters.TriggerEvent = EventAnimation.GetTypeByName(eventName);
 		}
 		_targetPlayer = ModelType.ParseTargetType(node.Attributes["Player"].GetStringOrDefault("Me"));
 		XmlNode conditions = node["Conditions"];

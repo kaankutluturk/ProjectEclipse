@@ -50,7 +50,7 @@ namespace Nekki.Social
 			_currentUser = value;
 		}
 
-		internal static SocialWrapper Init(Callbacks EODBKOHACMO, Action<SocialNetworkType> GOLAPDHMKGC)
+		internal static SocialWrapper Init(Callbacks callbacks, Action<SocialNetworkType> onNetworkDetected)
 		{
 			GameObject gameObject = GameObject.Find("_social");
 			if (!gameObject)
@@ -64,8 +64,8 @@ namespace Nekki.Social
 				UnityEngine.Object.Destroy(component);
 			}
 			_instance = gameObject.AddComponent<SocialWrapper>();
-			_instance._callbacks = EODBKOHACMO;
-			_onNetworkDetected = GOLAPDHMKGC;
+			_instance._callbacks = callbacks;
+			_onNetworkDetected = onNetworkDetected;
 			return _instance;
 		}
 
@@ -85,38 +85,38 @@ namespace Nekki.Social
 			Application.ExternalCall("RequestSocialNetworkInfo");
 		}
 
-		internal void OnSocialNetworkInfo(string EMBBNNBFODN)
+		internal void OnSocialNetworkInfo(string networkInfo)
 		{
-			if (!_initDone && EMBBNNBFODN.Contains("|"))
+			if (!_initDone && networkInfo.Contains("|"))
 			{
 				_initDone = true;
-				string[] array = EMBBNNBFODN.Split('|');
+				string[] array = networkInfo.Split('|');
 				OnNetworkInitialized(array[0], array[1]);
 			}
 		}
 
-		protected virtual void OnNetworkInitialized(string IDMBNOHJOAH, string AOKMNKOIMHI)
+		protected virtual void OnNetworkInitialized(string networkName, string userId)
 		{
-			_currentUserID = AOKMNKOIMHI;
-			if (IDMBNOHJOAH != null && IDMBNOHJOAH == "VK")
+			_currentUserID = userId;
+			if (networkName != null && networkName == "VK")
 			{
-				_callbacks.OnInitialized(SocialNetworkType.VKontakte, AOKMNKOIMHI);
+				_callbacks.OnInitialized(SocialNetworkType.VKontakte, userId);
 				_onNetworkDetected(SocialNetworkType.VKontakte);
 			}
 			else
 			{
-				_callbacks.OnInitialized(SocialNetworkType.None, AOKMNKOIMHI);
+				_callbacks.OnInitialized(SocialNetworkType.None, userId);
 				_onNetworkDetected(SocialNetworkType.None);
 			}
 		}
 
-		internal void RequestUsersInfo(string[] JAIEEFOCDAA)
+		internal void RequestUsersInfo(string[] userIds)
 		{
 			StringBuilder stringBuilder = new StringBuilder();
-			for (int i = 0; i < JAIEEFOCDAA.Length; i++)
+			for (int i = 0; i < userIds.Length; i++)
 			{
-				stringBuilder.Append(JAIEEFOCDAA[i]);
-				if (i < JAIEEFOCDAA.Length - 1)
+				stringBuilder.Append(userIds[i]);
+				if (i < userIds.Length - 1)
 				{
 					stringBuilder.Append(",");
 				}
@@ -124,14 +124,14 @@ namespace Nekki.Social
 			Application.ExternalCall("RequestUsersInfo", stringBuilder.ToString());
 		}
 
-		internal void OnUserInfo(string BBNKIBKPBLO)
+		internal void OnUserInfo(string userJson)
 		{
-			UserInfo jPKEEFNNAAP = new UserInfo(BBNKIBKPBLO);
-			if (jPKEEFNNAAP.GetUserId() == _currentUserID)
+			UserInfo userInfo = new UserInfo(userJson);
+			if (userInfo.GetUserId() == _currentUserID)
 			{
-				SetCurrentUser(jPKEEFNNAAP);
+				SetCurrentUser(userInfo);
 			}
-			_callbacks.OnUserInfo(jPKEEFNNAAP);
+			_callbacks.OnUserInfo(userInfo);
 		}
 
 		internal void RequestFriends()
@@ -139,14 +139,14 @@ namespace Nekki.Social
 			Application.ExternalCall("RequestFriends");
 		}
 
-		internal void OnFriends(string BBNKIBKPBLO)
+		internal void OnFriends(string usersJson)
 		{
-			_callbacks.OnFriendsInfo(UserInfo.GetInfos(BBNKIBKPBLO));
+			_callbacks.OnFriendsInfo(UserInfo.GetInfos(usersJson));
 		}
 
-		internal void OnAppFriends(string BBNKIBKPBLO)
+		internal void OnAppFriends(string usersJson)
 		{
-			_callbacks.OnAppFriendsInfo(UserInfo.GetInfos(BBNKIBKPBLO));
+			_callbacks.OnAppFriendsInfo(UserInfo.GetInfos(usersJson));
 		}
 
 		internal void Invite()
@@ -154,9 +154,9 @@ namespace Nekki.Social
 			Application.ExternalCall("Invite");
 		}
 
-		internal void RequestBookmark(bool DPJFKNNHONA)
+		internal void RequestBookmark(bool bookmark)
 		{
-			Application.ExternalCall("RequestBookmark", (!DPJFKNNHONA) ? "false" : "true");
+			Application.ExternalCall("RequestBookmark", (!bookmark) ? "false" : "true");
 		}
 
 		internal void OnBookmarkState(string state)
@@ -174,24 +174,24 @@ namespace Nekki.Social
 			_callbacks.OnGroupMembership(state.Equals("true"));
 		}
 
-		internal void RequestWallPost(string FFHABDMFMMC, string LIOGIBJBHAH, string DMNBDBJNKME)
+		internal void RequestWallPost(string ownerId, string message, string attachments)
 		{
-			Application.ExternalCall("RequestWallPost", FFHABDMFMMC, LIOGIBJBHAH, DMNBDBJNKME);
+			Application.ExternalCall("RequestWallPost", ownerId, message, attachments);
 		}
 
-		internal void OnWallPost(string ADFFKCBJDMP)
+		internal void OnWallPost(string result)
 		{
-			_callbacks.OnWallPostResult(ADFFKCBJDMP);
+			_callbacks.OnWallPostResult(result);
 		}
 
-		internal void Buy(string BGFOJFBFJIA)
+		internal void Buy(string itemId)
 		{
-			Application.ExternalCall("Buy", BGFOJFBFJIA);
+			Application.ExternalCall("Buy", itemId);
 		}
 
-		internal void OnBuy(string DACBPIHLFFD)
+		internal void OnBuy(string result)
 		{
-			_callbacks.OnBuyResult(DACBPIHLFFD);
+			_callbacks.OnBuyResult(result);
 		}
 
 		internal void OnExternalFocusGained()
@@ -204,9 +204,9 @@ namespace Nekki.Social
 			_callbacks.OnOrderCompleted(false);
 		}
 
-		internal void OnResolutionChanged(string BDKHPMOHIMN)
+		internal void OnResolutionChanged(string resolution)
 		{
-			string[] array = BDKHPMOHIMN.Split('|');
+			string[] array = resolution.Split('|');
 			int num = int.Parse(array[0]);
 			int num2 = int.Parse(array[1]);
 			Screen.SetResolution(num, num2, false);

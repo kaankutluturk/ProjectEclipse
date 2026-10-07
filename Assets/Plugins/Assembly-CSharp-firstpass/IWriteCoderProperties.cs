@@ -2,5 +2,5 @@ using System.IO;
 
 public interface IWriteCoderProperties
 {
-	void WriteCoderProperties(Stream BBBGGJLOCPB);
+	void WriteCoderProperties(Stream stream);
 }

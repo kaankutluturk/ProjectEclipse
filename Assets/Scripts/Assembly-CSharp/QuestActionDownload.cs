@@ -18,16 +18,16 @@ public class QuestActionDownload : QuestAction
 
 	private DownloadingScreen downloadingScreen;
 
-	public override void Parse(XmlNode EPKLCPOEELO)
+	public override void Parse(XmlNode node)
 	{
-		base.Parse(EPKLCPOEELO);
-		name = EPKLCPOEELO.Attributes["Pack"].GetStringOrDefault();
-		progressBarTitle = EPKLCPOEELO.Attributes["ProgressBarTitle"].GetStringOrDefault();
+		base.Parse(node);
+		name = node.Attributes["Pack"].GetStringOrDefault();
+		progressBarTitle = node.Attributes["ProgressBarTitle"].GetStringOrDefault();
 		packInfo = null;
-		isRewriteHashes = EPKLCPOEELO.Attributes["RewriteHashes"].ParseInt() > 0;
-		XmlNode ePKLCPOEELO = EPKLCPOEELO["Success"];
-		XmlNode ePKLCPOEELO2 = EPKLCPOEELO["Error"];
-		ParseSequenceWithUnlock(ePKLCPOEELO, successSequence, OnActionComplete);
+		isRewriteHashes = node.Attributes["RewriteHashes"].ParseInt() > 0;
+		XmlNode successNode = node["Success"];
+		XmlNode ePKLCPOEELO2 = node["Error"];
+		ParseSequenceWithUnlock(successNode, successSequence, OnActionComplete);
 		ParseSequenceWithUnlock(ePKLCPOEELO2, errorSequence, OnActionComplete);
 	}
 
@@ -48,19 +48,19 @@ public class QuestActionDownload : QuestAction
 		errorSequence.Reset();
 	}
 
-	public override void Execute(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters parameters)
 	{
 		ResetSequences();
-		base.Execute(GFIHPBCEEOB);
-		ConditionExtension.CompareResult lNIDLHOIHIM = new ConditionExtension.CompareResult();
-		QuestCondition kKDGLNECFHA = new QuestCondition();
-		kKDGLNECFHA.SetParameters(GFIHPBCEEOB);
-		kKDGLNECFHA.SetValue(name, lNIDLHOIHIM);
-		packInfo = GeneralConfig.DownloadPacks.FindPack(lNIDLHOIHIM.resultSTR);
+		base.Execute(parameters);
+		ConditionExtension.CompareResult result = new ConditionExtension.CompareResult();
+		QuestCondition condition = new QuestCondition();
+		condition.SetParameters(parameters);
+		condition.SetValue(name, result);
+		packInfo = GeneralConfig.DownloadPacks.FindPack(result.resultSTR);
 		if (packInfo == null)
 		{
-			GameLog.Error("QuestActionDownload noName: {0}", lNIDLHOIHIM.resultSTR);
-			errorSequence.Run(GFIHPBCEEOB);
+			GameLog.Error("QuestActionDownload noName: {0}", result.resultSTR);
+			errorSequence.Run(parameters);
 			return;
 		}
 		string text = NekkiMath.randomInt(1000000).ToString();
@@ -86,11 +86,11 @@ public class QuestActionDownload : QuestAction
 		}
 	}
 
-	private void OnLoadContent(bool DCJLKCFKCOM)
+	private void OnLoadContent(bool isSuccess)
 	{
 		bool flag = false;
 		string text = string.Format("{0}/{1}", SF2Paths.GetBundlesPath(), packInfo.Name);
-		if (DCJLKCFKCOM && File.Exists(text))
+		if (isSuccess && File.Exists(text))
 		{
 			string text2 = MD5Utils.MD5HashFile(text);
 			flag = text2.Equals(packInfo.Checksum.ToUpper());
@@ -112,8 +112,8 @@ public class QuestActionDownload : QuestAction
 
 	private void Complete()
 	{
-		string aHLPODLKBEP = SystemProperties.GetVersion().ToString();
-		PacksController.GetInstance().AddPack(packInfo.Name, packInfo.Url, aHLPODLKBEP, -1L, packInfo.Attach);
+		string version = SystemProperties.GetVersion().ToString();
+		PacksController.GetInstance().AddPack(packInfo.Name, packInfo.Url, version, -1L, packInfo.Attach);
 		if (isRewriteHashes)
 		{
 			ListSF.GetInstance().OnPacksChanged();

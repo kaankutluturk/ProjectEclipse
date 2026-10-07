@@ -2,8 +2,8 @@ using System;
 
 public sealed class DynamicTypeResolver : ITypeResolver
 {
-	public Type Resolve(Type FGDJAEMHFKC, object LNDKPCCDCOB)
+	public Type Resolve(Type staticType, object actualValue)
 	{
-		return (LNDKPCCDCOB == null) ? FGDJAEMHFKC : LNDKPCCDCOB.GetType();
+		return (actualValue == null) ? staticType : actualValue.GetType();
 	}
 }

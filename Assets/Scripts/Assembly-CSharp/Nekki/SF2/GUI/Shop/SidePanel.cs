@@ -94,15 +94,15 @@ namespace Nekki.SF2.GUI.Shop
 			UpdateMoveButton();
 		}
 
-		public void Init(SidePanelContent DMNBDBJNKME, bool JOJGKNGGAHB, float MDPGKEDBHNO = 0f, bool NKGDKKNNJOF = true, string NEFNMHJLBPC = null, string AENEHAMGPBC = null)
+		public void Init(SidePanelContent content, bool isMovable, float buttonOffsetY = 0f, bool isOpen = true, string openImage = null, string closeImage = null)
 		{
-			_isMovable = JOJGKNGGAHB;
-			_closeButtonOffset.y = MDPGKEDBHNO;
-			_openButtonOffset.y = MDPGKEDBHNO;
-			_isOpen = NKGDKKNNJOF;
-			_openImage = NEFNMHJLBPC;
-			_closeImage = AENEHAMGPBC;
-			_content = DMNBDBJNKME;
+			_isMovable = isMovable;
+			_closeButtonOffset.y = buttonOffsetY;
+			_openButtonOffset.y = buttonOffsetY;
+			_isOpen = isOpen;
+			_openImage = openImage;
+			_closeImage = closeImage;
+			_content = content;
 			if (_scrollRect != null)
 			{
 				_normalizedPosition = _scrollRect.normalizedPosition;
@@ -128,18 +128,18 @@ namespace Nekki.SF2.GUI.Shop
 			SetOpen(!_isOpen);
 		}
 
-		public void OnValueChanged(Vector2 LCCLEFMKLPB)
+		public void OnValueChanged(Vector2 normalizedPosition)
 		{
 			if (!_isMovable) return;
-			if (_normalizedPosition.x > LCCLEFMKLPB.x || LCCLEFMKLPB.x == 0f)
+			if (_normalizedPosition.x > normalizedPosition.x || normalizedPosition.x == 0f)
 			{
 				_shouldOpenOnRelease = true;
 			}
-			if (_normalizedPosition.x < LCCLEFMKLPB.x || LCCLEFMKLPB.x == 1f)
+			if (_normalizedPosition.x < normalizedPosition.x || normalizedPosition.x == 1f)
 			{
 				_shouldOpenOnRelease = false;
 			}
-			_normalizedPosition = LCCLEFMKLPB;
+			_normalizedPosition = normalizedPosition;
 		}
 
 		public void OnScrollDragBegin(PointerEventData data)
@@ -173,13 +173,13 @@ namespace Nekki.SF2.GUI.Shop
 			}
 		}
 
-		private void TweenPosition(Vector2 LCCLEFMKLPB, float _Duration)
+		private void TweenPosition(Vector2 targetPosition, float _Duration)
 		{
 			KillTween();
 			_tween = DOTween.To(() => _normalizedPosition, (Vector2Wrapper HBLGAEMOHAL) =>
 			{
 				SetPosition(HBLGAEMOHAL);
-			}, LCCLEFMKLPB, _Duration);
+			}, targetPosition, _Duration);
 			_tween.OnComplete(OnTweenComplete);
 		}
 
@@ -199,12 +199,12 @@ namespace Nekki.SF2.GUI.Shop
 			}
 		}
 
-		private void SetButtonSprite(string KHPKDMGDMAB)
+		private void SetButtonSprite(string spriteName)
 		{
 			ResolutionImage resolutionImage = _moveButton.image as ResolutionImage;
 			if (resolutionImage != null)
 			{
-				resolutionImage.set_SpriteName(KHPKDMGDMAB);
+				resolutionImage.set_SpriteName(spriteName);
 			}
 		}
 
@@ -227,16 +227,16 @@ namespace Nekki.SF2.GUI.Shop
 			}
 		}
 
-		public void SetOpen(bool FPCBALMEPEN, float _Duration = 1f)
+		public void SetOpen(bool isOpen, float _Duration = 1f)
 		{
-			_isOpen = FPCBALMEPEN;
-			if (FPCBALMEPEN)
+			_isOpen = isOpen;
+			if (isOpen)
 			{
 				TweenPosition(new Vector2(0f, 0f), _Duration);
 				base.gameObject.transform.SetSiblingIndex(1);
 				UpdateMoveButton();
 			}
-			else if (!FPCBALMEPEN)
+			else if (!isOpen)
 			{
 				TweenPosition(new Vector2(1f, 0f), _Duration);
 				UpdateMoveButton();

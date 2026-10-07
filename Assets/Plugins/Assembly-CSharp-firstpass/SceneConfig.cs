@@ -274,11 +274,11 @@ public class SceneConfig : MonoBehaviour
 		}
 	}
 
-	public int GetInt(string JLCGLCLEGBD)
+	public int GetInt(string propertyName)
 	{
 		for (int i = 0; i < IntProperties.Count; i++)
 		{
-			if (IntProperties[i].Name.Equals(JLCGLCLEGBD))
+			if (IntProperties[i].Name.Equals(propertyName))
 			{
 				return IntProperties[i].Value;
 			}
@@ -286,11 +286,11 @@ public class SceneConfig : MonoBehaviour
 		return 0;
 	}
 
-	public float GetFloat(string JLCGLCLEGBD)
+	public float GetFloat(string propertyName)
 	{
 		for (int i = 0; i < FloatProperties.Count; i++)
 		{
-			if (FloatProperties[i].Name.Equals(JLCGLCLEGBD))
+			if (FloatProperties[i].Name.Equals(propertyName))
 			{
 				return FloatProperties[i].Value;
 			}
@@ -298,11 +298,11 @@ public class SceneConfig : MonoBehaviour
 		return 0f;
 	}
 
-	public string GetString(string JLCGLCLEGBD)
+	public string GetString(string propertyName)
 	{
 		for (int i = 0; i < StringProperties.Count; i++)
 		{
-			if (StringProperties[i].Name.Equals(JLCGLCLEGBD))
+			if (StringProperties[i].Name.Equals(propertyName))
 			{
 				return StringProperties[i].Value;
 			}
@@ -310,11 +310,11 @@ public class SceneConfig : MonoBehaviour
 		return string.Empty;
 	}
 
-	public bool GetBool(string JLCGLCLEGBD)
+	public bool GetBool(string propertyName)
 	{
 		for (int i = 0; i < BoolProperties.Count; i++)
 		{
-			if (BoolProperties[i].Name.Equals(JLCGLCLEGBD))
+			if (BoolProperties[i].Name.Equals(propertyName))
 			{
 				return BoolProperties[i].Value;
 			}
@@ -322,11 +322,11 @@ public class SceneConfig : MonoBehaviour
 		return false;
 	}
 
-	public List<int> GetIntArray(string JLCGLCLEGBD)
+	public List<int> GetIntArray(string propertyName)
 	{
 		for (int i = 0; i < IntArrayProperties.Count; i++)
 		{
-			if (IntArrayProperties[i].Name.Equals(JLCGLCLEGBD))
+			if (IntArrayProperties[i].Name.Equals(propertyName))
 			{
 				return IntArrayProperties[i].Value;
 			}
@@ -334,11 +334,11 @@ public class SceneConfig : MonoBehaviour
 		return new List<int>();
 	}
 
-	public List<float> GetFloatArray(string JLCGLCLEGBD)
+	public List<float> GetFloatArray(string propertyName)
 	{
 		for (int i = 0; i < FloatArrayProperties.Count; i++)
 		{
-			if (FloatArrayProperties[i].Name.Equals(JLCGLCLEGBD))
+			if (FloatArrayProperties[i].Name.Equals(propertyName))
 			{
 				return FloatArrayProperties[i].Value;
 			}
@@ -346,11 +346,11 @@ public class SceneConfig : MonoBehaviour
 		return new List<float>();
 	}
 
-	public List<string> GetStringArray(string JLCGLCLEGBD)
+	public List<string> GetStringArray(string propertyName)
 	{
 		for (int i = 0; i < StringArrayProperties.Count; i++)
 		{
-			if (StringArrayProperties[i].Name.Equals(JLCGLCLEGBD))
+			if (StringArrayProperties[i].Name.Equals(propertyName))
 			{
 				return StringArrayProperties[i].Value;
 			}
@@ -358,11 +358,11 @@ public class SceneConfig : MonoBehaviour
 		return new List<string>();
 	}
 
-	public List<bool> GetBoolArray(string JLCGLCLEGBD)
+	public List<bool> GetBoolArray(string propertyName)
 	{
 		for (int i = 0; i < BoolArrayProperties.Count; i++)
 		{
-			if (BoolArrayProperties[i].Name.Equals(JLCGLCLEGBD))
+			if (BoolArrayProperties[i].Name.Equals(propertyName))
 			{
 				return BoolArrayProperties[i].Value;
 			}

@@ -226,23 +226,23 @@ public static class PreciseLocale
 		}
 	}
 
-	public static string ToLanguageCode(this SystemLanguage HBGOBBALPBP)
+	public static string ToLanguageCode(this SystemLanguage language)
 	{
-		if (HBGOBBALPBP == SystemLanguage.ChineseSimplified || HBGOBBALPBP == SystemLanguage.ChineseTraditional) return "zh";
+		if (language == SystemLanguage.ChineseSimplified || language == SystemLanguage.ChineseTraditional) return "zh";
 		string value;
-		if (languageCodes.TryGetValue(HBGOBBALPBP, out value))
+		if (languageCodes.TryGetValue(language, out value))
 		{
 			return value;
 		}
 		return languageCodes[SystemLanguage.Unknown];
 	}
 
-	public static SystemLanguage FromLanguageCode(this string HBGOBBALPBP)
+	public static SystemLanguage FromLanguageCode(this string languageCode)
 	{
 		SystemLanguage result = SystemLanguage.Unknown;
 		foreach (KeyValuePair<SystemLanguage, string> item in languageCodes)
 		{
-			if (HBGOBBALPBP == item.Value)
+			if (languageCode == item.Value)
 			{
 				return item.Key;
 			}

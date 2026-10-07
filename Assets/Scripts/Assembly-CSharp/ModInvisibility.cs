@@ -6,8 +6,8 @@ public class ModInvisibility : PerkActionModificator
 	{
 	}
 
-	public ModInvisibility(ModInvisibility NOLFMPDGCOC)
-		: base(NOLFMPDGCOC)
+	public ModInvisibility(ModInvisibility other)
+		: base(other)
 	{
 	}
 

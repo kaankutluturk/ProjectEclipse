@@ -327,19 +327,19 @@ public class AiData
 		RefreshParameters();
 	}
 
-	public static void Load(List<string> ODODFFKBOEG, List<string> DKDIKAHDOBF)
+	public static void Load(List<string> weaponSubtypes, List<string> singleFighterSubtypes)
 	{
 		if (!TacticsEnabled)
 		{
 			return;
 		}
-		RemoveDuplicateSubtypes(ODODFFKBOEG);
-		string jIIFFJAJNNN = GameUtils.ShockSettings.WeaponName;
-		ODODFFKBOEG.AddIfNotExist(jIIFFJAJNNN);
-		ODODFFKBOEG.AddIfNotExist(string.Empty);
-		if (DKDIKAHDOBF.Contains(jIIFFJAJNNN))
+		RemoveDuplicateSubtypes(weaponSubtypes);
+		string shockWeaponName = GameUtils.ShockSettings.WeaponName;
+		weaponSubtypes.AddIfNotExist(shockWeaponName);
+		weaponSubtypes.AddIfNotExist(string.Empty);
+		if (singleFighterSubtypes.Contains(shockWeaponName))
 		{
-			DKDIKAHDOBF.Remove(jIIFFJAJNNN);
+			singleFighterSubtypes.Remove(shockWeaponName);
 		}
 		List<string> list = new List<string>();
 		list.Add(string.Empty);
@@ -347,20 +347,20 @@ public class AiData
 		RemoveExept(list);
 		loadedSubtypes.Clear();
 		GameLog.Write("weaponsSubtypes");
-		foreach (string item in ODODFFKBOEG)
+		foreach (string item in weaponSubtypes)
 		{
 			GameLog.Write(item);
 		}
-		foreach (string item2 in ODODFFKBOEG)
+		foreach (string item2 in weaponSubtypes)
 		{
 			if (loadedSubtypes.Contains(item2))
 			{
 				continue;
 			}
-			Loadfor(item2, ODODFFKBOEG);
-			foreach (string item3 in ODODFFKBOEG)
+			Loadfor(item2, weaponSubtypes);
+			foreach (string item3 in weaponSubtypes)
 			{
-				if (item2 == item3 && DKDIKAHDOBF.Contains(item2))
+				if (item2 == item3 && singleFighterSubtypes.Contains(item2))
 				{
 					GameLog.Write("Skipped load tactics: {0} - {1}", item2, item3);
 				}
@@ -376,12 +376,12 @@ public class AiData
 			GameLog.Write("  - {0}", item4);
 		}
 		GameLog.Write("New tactic:");
-		foreach (string item5 in ODODFFKBOEG)
+		foreach (string item5 in weaponSubtypes)
 		{
 			GameLog.Write("  - {0}", item5);
 		}
 		loadedSubtypes.Clear();
-		loadedSubtypes.AddIfNotExist(ODODFFKBOEG);
+		loadedSubtypes.AddIfNotExist(weaponSubtypes);
 		GameLog.Write("Available tables:");
 		GameLog.Write("  outcometablesforattack:");
 		List<global::Pair<TacticalTableHolder, global::Pair<string, string>>> list2 = get_TablesHoldersNew()[0];
@@ -462,14 +462,14 @@ public class AiData
 
 	public static void ClearTables()
 	{
-		List<string> lCIGOHHEDGK = new List<string>();
-		RemoveExept(lCIGOHHEDGK);
+		List<string> exceptionWeapons = new List<string>();
+		RemoveExept(exceptionWeapons);
 		loadedSubtypes.Clear();
 	}
 
-	public static string GetTacticsTableName(TableType LFLGCDNKNJI)
+	public static string GetTacticsTableName(TableType tableType)
 	{
-		switch (LFLGCDNKNJI)
+		switch (tableType)
 		{
 		case TableType.randomAnimation:
 			return "RandomAnimation";
@@ -507,47 +507,47 @@ public class AiData
 		return bothBotEnabled;
 	}
 
-	public static void ParseAnimationList(XmlNode ABPANOKOIEF, List<TemplateAnimation> BMMCGJDICOJ)
+	public static void ParseAnimationList(XmlNode node, List<TemplateAnimation> animations)
 	{
-		if (ABPANOKOIEF == null)
+		if (node == null)
 		{
 			return;
 		}
-		foreach (XmlNode childNode in ABPANOKOIEF.ChildNodes)
+		foreach (XmlNode childNode in node.ChildNodes)
 		{
 			if (childNode.Name == "Animation")
 			{
-				string gOHIIMFFFJI = childNode.Attributes["Name"].GetStringOrDefault();
-				TemplateAnimation bHIDAHDCPHM = AnimationData.GetTemplateByName(gOHIIMFFFJI);
-				if (bHIDAHDCPHM != null)
+				string animationName = childNode.Attributes["Name"].GetStringOrDefault();
+				TemplateAnimation templateAnimation = AnimationData.GetTemplateByName(animationName);
+				if (templateAnimation != null)
 				{
-					BMMCGJDICOJ.Add(bHIDAHDCPHM);
+					animations.Add(templateAnimation);
 				}
 			}
 		}
 	}
 
-	public static void ParseStringList(XmlNode ABPANOKOIEF, List<string> CHLCLGKFLPP, string CEELFMIPAII = "Animation")
+	public static void ParseStringList(XmlNode node, List<string> names, string elementName = "Animation")
 	{
-		if (ABPANOKOIEF == null)
+		if (node == null)
 		{
 			return;
 		}
-		foreach (XmlNode childNode in ABPANOKOIEF.ChildNodes)
+		foreach (XmlNode childNode in node.ChildNodes)
 		{
-			if (childNode.Name == CEELFMIPAII)
+			if (childNode.Name == elementName)
 			{
 				string item = childNode.Attributes["Name"].GetStringOrDefault();
-				CHLCLGKFLPP.Add(item);
+				names.Add(item);
 			}
 		}
 	}
 
 	private static void RefreshParameters()
 	{
-		string lOBFDOKFJIP = DirectoryController.ResolvePath("tacticSettings.xml");
+		string tacticSettingsPath = DirectoryController.ResolvePath("tacticSettings.xml");
 		string lOBFDOKFJIP2 = DirectoryController.ResolvePath("ComputerSettings.xml");
-		XmlDocument xmlDocument = XmlUtils.OpenXMLDocument(SF2Paths.GetGameDataPath(), lOBFDOKFJIP);
+		XmlDocument xmlDocument = XmlUtils.OpenXMLDocument(SF2Paths.GetGameDataPath(), tacticSettingsPath);
 		if (xmlDocument != null)
 		{
 			TacticsCompiler.CompileTacticsSettings(xmlDocument);
@@ -570,9 +570,9 @@ public class AiData
 		if (0 < num)
 		{
 			string[] array2 = array;
-			foreach (string iGGFGLLIGCG in array2)
+			foreach (string frameText in array2)
 			{
-				AttackTablesFrames.Add(iGGFGLLIGCG.ToInt());
+				AttackTablesFrames.Add(frameText.ToInt());
 			}
 		}
 		xmlNode = xmlDocument["Settings"]["MovementsTables"]["MovementsMainIterations"];
@@ -649,16 +649,16 @@ public class AiData
 		}
 	}
 
-	public static void RefreshTacticSetParameters(XmlNode EELFNMOHGJL)
+	public static void RefreshTacticSetParameters(XmlNode root)
 	{
-		bothBotEnabled = EELFNMOHGJL["TacticsSettings"]["BothBot"].Attributes["Enabled"].ParseBool();
-		XmlNode xmlNode = EELFNMOHGJL["TacticsSettings"]["Tactics"];
+		bothBotEnabled = root["TacticsSettings"]["BothBot"].Attributes["Enabled"].ParseBool();
+		XmlNode xmlNode = root["TacticsSettings"]["Tactics"];
 		if (xmlNode != null)
 		{
 			ParseTactics(xmlNode);
 		}
 		List<string> list = new List<string>();
-		XmlNode xmlNode2 = EELFNMOHGJL["TacticsSettings"]["ItemEquivalents"];
+		XmlNode xmlNode2 = root["TacticsSettings"]["ItemEquivalents"];
 		foreach (XmlNode childNode in xmlNode2.ChildNodes)
 		{
 			if (childNode.Name == "Item")
@@ -668,7 +668,7 @@ public class AiData
 				{
 					GameLog.Error("strange item type '{0}'", text);
 				}
-				string gBCLEDJAOBM = childNode.Attributes["SubType"].GetStringOrDefault();
+				string subType = childNode.Attributes["SubType"].GetStringOrDefault();
 				list.Clear();
 				foreach (XmlNode childNode2 in childNode.ChildNodes)
 				{
@@ -687,60 +687,60 @@ public class AiData
 						GameLog.Error("strange xml node '%s'", childNode2.Name);
 					}
 				}
-				itemEquivalents.Add(new global::Pair<string, List<string>>(gBCLEDJAOBM, list));
+				itemEquivalents.Add(new global::Pair<string, List<string>>(subType, list));
 			}
 			else
 			{
 				GameLog.Error("strange xml node '%s'", childNode.Name);
 			}
 		}
-		xmlNode2 = EELFNMOHGJL["TacticsSettings"]["NoDecision"]["Intervals"];
+		xmlNode2 = root["TacticsSettings"]["NoDecision"]["Intervals"];
 		ParseStringList(xmlNode2, noDecisionIntervals, "Interval");
-		xmlNode2 = EELFNMOHGJL["TacticsSettings"]["NoDecision"]["Moves"];
+		xmlNode2 = root["TacticsSettings"]["NoDecision"]["Moves"];
 		ParseStringList(xmlNode2, noDecisionMoves, "Move");
-		xmlNode2 = EELFNMOHGJL["TacticsSettings"]["UnexpectedMoves"];
+		xmlNode2 = root["TacticsSettings"]["UnexpectedMoves"];
 		ParseStringList(xmlNode2, unexpectedMoves, "Move");
-		xmlNode2 = EELFNMOHGJL["TacticsSettings"]["IgnoredEnemyAnimations"];
+		xmlNode2 = root["TacticsSettings"]["IgnoredEnemyAnimations"];
 		ParseStringList(xmlNode2, ignoredEnemyAnimations);
-		xmlNode2 = EELFNMOHGJL["TacticsSettings"]["SafeDodges"];
+		xmlNode2 = root["TacticsSettings"]["SafeDodges"];
 		ParseStringList(xmlNode2, safeDodgesAnimations);
-		xmlNode2 = EELFNMOHGJL["TacticsSettings"]["EmergencyDodges"];
+		xmlNode2 = root["TacticsSettings"]["EmergencyDodges"];
 		ParseAnimationList(xmlNode2, emergencyDodgesAnimations);
-		xmlNode2 = EELFNMOHGJL["TacticsSettings"]["CautiousMovements"];
+		xmlNode2 = root["TacticsSettings"]["CautiousMovements"];
 		ParseAnimationList(xmlNode2, cautiousMovements);
-		xmlNode2 = EELFNMOHGJL["TacticsSettings"]["EvadeThrowDodges"];
+		xmlNode2 = root["TacticsSettings"]["EvadeThrowDodges"];
 		ParseAnimationList(xmlNode2, evadeThrowDodges);
-		xmlNode2 = EELFNMOHGJL["TacticsSettings"]["RandomizingEnemyAnimation"];
+		xmlNode2 = root["TacticsSettings"]["RandomizingEnemyAnimation"];
 		ParseAnimationList(xmlNode2, randomizingEnemyAnimation);
-		xmlNode2 = EELFNMOHGJL["TacticsSettings"]["MissileAnimations"];
+		xmlNode2 = root["TacticsSettings"]["MissileAnimations"];
 		ParseAnimationList(xmlNode2, missileAnimations);
-		xmlNode2 = EELFNMOHGJL["TacticsSettings"]["MagicAnimations"];
+		xmlNode2 = root["TacticsSettings"]["MagicAnimations"];
 		ParseAnimationList(xmlNode2, magicAnimations);
-		xmlNode2 = EELFNMOHGJL["TacticsSettings"]["EvadeUnsafeDodges"];
+		xmlNode2 = root["TacticsSettings"]["EvadeUnsafeDodges"];
 		ParseStringList(xmlNode2, evadeUnsafeDodgesAnimations);
-		xmlNode2 = EELFNMOHGJL["TacticsSettings"]["AttackMoves"];
+		xmlNode2 = root["TacticsSettings"]["AttackMoves"];
 		ParseStringList(xmlNode2, attackMoves);
-		xmlNode2 = EELFNMOHGJL["TacticsSettings"]["DistanceNode"];
+		xmlNode2 = root["TacticsSettings"]["DistanceNode"];
 		if (xmlNode2 != null)
 		{
 			_DistanceNode = xmlNode2.Attributes["Name"].GetStringOrDefault();
 		}
-		xmlNode2 = EELFNMOHGJL["TacticsSettings"]["Debug"]["ShowErrorIfAnimationNotFound"];
+		xmlNode2 = root["TacticsSettings"]["Debug"]["ShowErrorIfAnimationNotFound"];
 		if (xmlNode2 != null)
 		{
 			showErrorIfAnimationNotFound = xmlNode2.Attributes["Value"].ParseBool();
 		}
 	}
 
-	public static void RefreshTacticParamWithRaidData(XmlDocument FJCFBLBNDNG)
+	public static void RefreshTacticParamWithRaidData(XmlDocument document)
 	{
-		TacticsCompiler.CompileTacticsSettings(FJCFBLBNDNG);
-		RefreshTacticSetParameters(FJCFBLBNDNG);
+		TacticsCompiler.CompileTacticsSettings(document);
+		RefreshTacticSetParameters(document);
 	}
 
-	public static void ParseTactics(XmlNode AFHNINCKJEE)
+	public static void ParseTactics(XmlNode tacticsNode)
 	{
-		foreach (XmlNode childNode in AFHNINCKJEE.ChildNodes)
+		foreach (XmlNode childNode in tacticsNode.ChildNodes)
 		{
 			if (childNode.Name == "Tactic")
 			{
@@ -776,30 +776,30 @@ public class AiData
 		return false;
 	}
 
-	public static string GetItemEquivalent(string LKBJNLBIDGP)
+	public static string GetItemEquivalent(string itemName)
 	{
 		foreach (global::Pair<string, List<string>> item in itemEquivalents)
 		{
-			if (item.First == LKBJNLBIDGP)
+			if (item.First == itemName)
 			{
-				return LKBJNLBIDGP;
+				return itemName;
 			}
 			foreach (string item2 in item.Second)
 			{
-				if (item2 == LKBJNLBIDGP)
+				if (item2 == itemName)
 				{
 					return item.First;
 				}
 			}
 		}
-		return LKBJNLBIDGP;
+		return itemName;
 	}
 
-	public static Tactic GetTacticByName(string BHNDJOGLEOI)
+	public static Tactic GetTacticByName(string tacticName)
 	{
 		foreach (Tactic item in tactics)
 		{
-			if (item.get_Name() == BHNDJOGLEOI)
+			if (item.get_Name() == tacticName)
 			{
 				return item;
 			}
@@ -807,18 +807,18 @@ public class AiData
 		return defaultTactic;
 	}
 
-	public static void AddTableHolder(TacticalTableHolder IOAAHOMGEPI, string KEEMLGNLKPF, string ANCBHPMAAFI, TableType GLBPKPEIOKE)
+	public static void AddTableHolder(TacticalTableHolder tableHolder, string firstSubtype, string secondSubtype, TableType tableType)
 	{
-		List<global::Pair<TacticalTableHolder, global::Pair<string, string>>> list = tableHolders[(int)GLBPKPEIOKE];
-		list.Add(new global::Pair<TacticalTableHolder, global::Pair<string, string>>(IOAAHOMGEPI, new global::Pair<string, string>(KEEMLGNLKPF, ANCBHPMAAFI)));
+		List<global::Pair<TacticalTableHolder, global::Pair<string, string>>> list = tableHolders[(int)tableType];
+		list.Add(new global::Pair<TacticalTableHolder, global::Pair<string, string>>(tableHolder, new global::Pair<string, string>(firstSubtype, secondSubtype)));
 	}
 
-	public static bool CheckIfTableExists(string LGCMGHAFEDD, TableType GLBPKPEIOKE)
+	public static bool CheckIfTableExists(string subtype, TableType tableType)
 	{
-		List<global::Pair<TacticalTableHolder, global::Pair<string, string>>> list = tableHolders[(int)GLBPKPEIOKE];
+		List<global::Pair<TacticalTableHolder, global::Pair<string, string>>> list = tableHolders[(int)tableType];
 		foreach (global::Pair<TacticalTableHolder, global::Pair<string, string>> item in list)
 		{
-			if (item.Second.First == LGCMGHAFEDD && item.Second.Second == LGCMGHAFEDD)
+			if (item.Second.First == subtype && item.Second.Second == subtype)
 			{
 				return true;
 			}
@@ -826,12 +826,12 @@ public class AiData
 		return false;
 	}
 
-	public static bool CheckIfTableExists(string NDAJLDOMNLK, string AFKFIEAMFKG, TableType GLBPKPEIOKE)
+	public static bool CheckIfTableExists(string firstSubtype, string secondSubtype, TableType tableType)
 	{
-		List<global::Pair<TacticalTableHolder, global::Pair<string, string>>> list = tableHolders[(int)GLBPKPEIOKE];
+		List<global::Pair<TacticalTableHolder, global::Pair<string, string>>> list = tableHolders[(int)tableType];
 		foreach (global::Pair<TacticalTableHolder, global::Pair<string, string>> item in list)
 		{
-			if (item.Second.First == NDAJLDOMNLK && item.Second.Second == AFKFIEAMFKG)
+			if (item.Second.First == firstSubtype && item.Second.Second == secondSubtype)
 			{
 				return true;
 			}
@@ -839,13 +839,13 @@ public class AiData
 		return false;
 	}
 
-	public static bool CheckIfTableExists(List<string> PGHJNFEGLJE, TableType GLBPKPEIOKE)
+	public static bool CheckIfTableExists(List<string> subtypes, TableType tableType)
 	{
-		List<global::Pair<TacticalTableHolder, global::Pair<string, string>>> list = tableHolders[(int)GLBPKPEIOKE];
+		List<global::Pair<TacticalTableHolder, global::Pair<string, string>>> list = tableHolders[(int)tableType];
 		foreach (global::Pair<TacticalTableHolder, global::Pair<string, string>> item in list)
 		{
 			bool flag = false;
-			foreach (string item2 in PGHJNFEGLJE)
+			foreach (string item2 in subtypes)
 			{
 				if (item2 == item.Second.First)
 				{
@@ -854,7 +854,7 @@ public class AiData
 				}
 			}
 			bool flag2 = false;
-			foreach (string item3 in PGHJNFEGLJE)
+			foreach (string item3 in subtypes)
 			{
 				if (item3 == item.Second.Second)
 				{
@@ -985,30 +985,30 @@ public class AiData
 		return showErrorIfAnimationNotFound;
 	}
 
-	private static void Loadfor(string LEPELMEGAOE, List<string> LDNMLKGMABH)
+	private static void Loadfor(string subtype, List<string> subtypes)
 	{
-		LoadShiftTablesfor(LEPELMEGAOE);
+		LoadShiftTablesfor(subtype);
 	}
 
-	private static void LoadShiftTablesfor(string LEBFGLIGPOK)
+	private static void LoadShiftTablesfor(string subtype)
 	{
-		TacticsArchiver.LoadArchive(LEBFGLIGPOK);
+		TacticsArchiver.LoadArchive(subtype);
 	}
 
-	private static void LoadMovementsTablefor(string KEEMLGNLKPF, List<string> LDNMLKGMABH)
+	private static void LoadMovementsTablefor(string firstSubtype, List<string> subtypes)
 	{
-		foreach (string item in LDNMLKGMABH)
+		foreach (string item in subtypes)
 		{
-			LoadMovementsTablefor(KEEMLGNLKPF, item);
+			LoadMovementsTablefor(firstSubtype, item);
 		}
 	}
 
-	private static void LoadMovementsTablefor(string KEEMLGNLKPF, string ANCBHPMAAFI)
+	private static void LoadMovementsTablefor(string firstSubtype, string secondSubtype)
 	{
-		TacticsArchiver.LoadArchive(KEEMLGNLKPF, ANCBHPMAAFI);
+		TacticsArchiver.LoadArchive(firstSubtype, secondSubtype);
 	}
 
-	private static void RemoveExept(List<string> LCIGOHHEDGK)
+	private static void RemoveExept(List<string> exceptionWeapons)
 	{
 		TableType[] array = new TableType[3]
 		{
@@ -1040,12 +1040,12 @@ public class AiData
 			List<global::Pair<TacticalTableHolder, global::Pair<string, string>>> list3 = get_TablesHoldersNew()[j];
 			for (int k = 0; k < list3.Count; k++)
 			{
-				global::Pair<TacticalTableHolder, global::Pair<string, string>> cCKLNOPEKHO = list3[k];
-				if (!cCKLNOPEKHO.First.Empty())
+				global::Pair<TacticalTableHolder, global::Pair<string, string>> tableEntry = list3[k];
+				if (!tableEntry.First.Empty())
 				{
-					if (CheckExceptionWeapons(cCKLNOPEKHO.Second.First, cCKLNOPEKHO.Second.Second, LCIGOHHEDGK))
+					if (CheckExceptionWeapons(tableEntry.Second.First, tableEntry.Second.Second, exceptionWeapons))
 					{
-						GameLog.Write("Skipping exeptional weapons (%s/%s) on tactic table clear", cCKLNOPEKHO.Second.First, cCKLNOPEKHO.Second.Second);
+						GameLog.Write("Skipping exeptional weapons (%s/%s) on tactic table clear", tableEntry.Second.First, tableEntry.Second.Second);
 					}
 					else
 					{
@@ -1057,12 +1057,12 @@ public class AiData
 		}
 	}
 
-	private static bool CheckExceptionWeapons(string NDAJLDOMNLK, string AFKFIEAMFKG, List<string> LCIGOHHEDGK)
+	private static bool CheckExceptionWeapons(string weaponA, string weaponB, List<string> exceptionWeapons)
 	{
 		bool flag = false;
 		bool flag2 = false;
-		string text = NDAJLDOMNLK;
-		foreach (string item in LCIGOHHEDGK)
+		string text = weaponA;
+		foreach (string item in exceptionWeapons)
 		{
 			if (text == item)
 			{
@@ -1070,8 +1070,8 @@ public class AiData
 				break;
 			}
 		}
-		text = AFKFIEAMFKG;
-		foreach (string item2 in LCIGOHHEDGK)
+		text = weaponB;
+		foreach (string item2 in exceptionWeapons)
 		{
 			if (text == item2)
 			{
@@ -1082,15 +1082,15 @@ public class AiData
 		return flag && flag2;
 	}
 
-	private static void RemoveDuplicateSubtypes(List<string> JIGEFEPNCIN)
+	private static void RemoveDuplicateSubtypes(List<string> subtypes)
 	{
-		for (int i = 0; i < JIGEFEPNCIN.Count; i++)
+		for (int i = 0; i < subtypes.Count; i++)
 		{
-			for (int j = i + 1; j < JIGEFEPNCIN.Count; j++)
+			for (int j = i + 1; j < subtypes.Count; j++)
 			{
-				if (JIGEFEPNCIN[i] == JIGEFEPNCIN[j])
+				if (subtypes[i] == subtypes[j])
 				{
-					JIGEFEPNCIN.RemoveAt(j);
+					subtypes.RemoveAt(j);
 					j--;
 				}
 			}

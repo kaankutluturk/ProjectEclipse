@@ -36,32 +36,32 @@ public class GlobalLoad : GlobalPath
 		return GetNoImageSprite().texture;
 	}
 
-	public static GameObject GetLoadGameObjectInstanceInternal(string CKANLCOICIL, string CBKHNNNCPLO = "")
+	public static GameObject GetLoadGameObjectInstanceInternal(string key, string name = "")
 	{
-		GameObject dONFADGOEDE = GetLoadGameObjectInternal(CKANLCOICIL, CBKHNNNCPLO);
-		return GetGameObjectInstance(dONFADGOEDE);
+		GameObject prefab = GetLoadGameObjectInternal(key, name);
+		return GetGameObjectInstance(prefab);
 	}
 
 	public static GameObject GetLoadGameObjectInstance(string path)
 	{
-		GameObject dONFADGOEDE = GetLoadGameObject(path);
-		return GetGameObjectInstance(dONFADGOEDE);
+		GameObject prefab = GetLoadGameObject(path);
+		return GetGameObjectInstance(prefab);
 	}
 
-	private static GameObject GetGameObjectInstance(GameObject DONFADGOEDE)
+	private static GameObject GetGameObjectInstance(GameObject prefab)
 	{
-		if (DONFADGOEDE != null)
+		if (prefab != null)
 		{
-			GameObject gameObject = UnityEngine.Object.Instantiate(DONFADGOEDE);
+			GameObject gameObject = UnityEngine.Object.Instantiate(prefab);
 			gameObject.name = gameObject.name.Replace("(Clone)", string.Empty);
 			return gameObject;
 		}
 		return null;
 	}
 
-	public static GameObject GetLoadGameObjectInternal(string CKANLCOICIL, string CBKHNNNCPLO = "")
+	public static GameObject GetLoadGameObjectInternal(string key, string name = "")
 	{
-		return GetLoadObjectInternal<GameObject>(CKANLCOICIL, CBKHNNNCPLO);
+		return GetLoadObjectInternal<GameObject>(key, name);
 	}
 
 	public static GameObject GetLoadGameObject(string path)
@@ -69,9 +69,9 @@ public class GlobalLoad : GlobalPath
 		return GetLoadObject<GameObject>(path);
 	}
 
-	public static AudioClip GetLoadAudioClipInternal(string CKANLCOICIL, string CBKHNNNCPLO = "")
+	public static AudioClip GetLoadAudioClipInternal(string key, string name = "")
 	{
-		return GetLoadObjectInternal<AudioClip>(CKANLCOICIL, CBKHNNNCPLO);
+		return GetLoadObjectInternal<AudioClip>(key, name);
 	}
 
 	public static AudioClip GetLoadAudioClip(string path)
@@ -79,21 +79,21 @@ public class GlobalLoad : GlobalPath
 		return GetLoadObject<AudioClip>(path);
 	}
 
-	public static Texture2D GetLoadTexture2DInternal(string CKANLCOICIL, string CBKHNNNCPLO = "")
+	public static Texture2D GetLoadTexture2DInternal(string key, string name = "")
 	{
-		Texture2D aOMLCBHAJJH = GetLoadObjectInternal<Texture2D>(CKANLCOICIL, CBKHNNNCPLO);
-		return ObjecOrDefault(aOMLCBHAJJH, GetNoImageTexture());
+		Texture2D texture = GetLoadObjectInternal<Texture2D>(key, name);
+		return ObjecOrDefault(texture, GetNoImageTexture());
 	}
 
 	public static Texture2D GetLoadTexture2D(string path)
 	{
-		Texture2D aOMLCBHAJJH = GetLoadObject<Texture2D>(path);
-		return ObjecOrDefault(aOMLCBHAJJH, GetNoImageTexture());
+		Texture2D texture = GetLoadObject<Texture2D>(path);
+		return ObjecOrDefault(texture, GetNoImageTexture());
 	}
 
-	public static Sprite GetLoadSpriteInternal(string CKANLCOICIL, string CBKHNNNCPLO = "")
+	public static Sprite GetLoadSpriteInternal(string key, string name = "")
 	{
-		Sprite aOMLCBHAJJH = GetLoadObjectInternal<Sprite>(CKANLCOICIL, CBKHNNNCPLO);
+		Sprite aOMLCBHAJJH = GetLoadObjectInternal<Sprite>(key, name);
 		return ObjecOrDefault(aOMLCBHAJJH, GetNoImageSprite());
 	}
 
@@ -103,31 +103,31 @@ public class GlobalLoad : GlobalPath
 		return ObjecOrDefault(aOMLCBHAJJH, GetNoImageSprite());
 	}
 
-	public static Sprite GetLoadSpriteFromTextureInternal(string CKANLCOICIL, string CBKHNNNCPLO = "")
+	public static Sprite GetLoadSpriteFromTextureInternal(string key, string name = "")
 	{
-		Texture2D dAELKEKILOB = GetLoadTexture2DInternal(CKANLCOICIL, CBKHNNNCPLO);
-		return TexturesUtils.CreateSprite(dAELKEKILOB);
+		Texture2D texture = GetLoadTexture2DInternal(key, name);
+		return TexturesUtils.CreateSprite(texture);
 	}
 
 	public static Sprite GetLoadSpriteFromTexture(string path)
 	{
-		Texture2D dAELKEKILOB = GetLoadTexture2D(path);
-		return TexturesUtils.CreateSprite(dAELKEKILOB);
+		Texture2D texture = GetLoadTexture2D(path);
+		return TexturesUtils.CreateSprite(texture);
 	}
 
-	public static Sprite GetLoadSpriteFromAtlas(string NJKCBALJDMM, string KIKMPCLOBCK, string JGIGOMLGLPN)
+	public static Sprite GetLoadSpriteFromAtlas(string atlasPath, string atlasName, string spriteName)
 	{
-		return TexturesUtils.GetSpriteFromAtlas(NJKCBALJDMM, KIKMPCLOBCK, JGIGOMLGLPN);
+		return TexturesUtils.GetSpriteFromAtlas(atlasPath, atlasName, spriteName);
 	}
 
-	public static Sprite GetLoadSpriteFromAtlas(string KIKMPCLOBCK, string JGIGOMLGLPN)
+	public static Sprite GetLoadSpriteFromAtlas(string atlasPath, string spriteName)
 	{
-		return TexturesUtils.GetSpriteFromAtlas(KIKMPCLOBCK, JGIGOMLGLPN);
+		return TexturesUtils.GetSpriteFromAtlas(atlasPath, spriteName);
 	}
 
-	public static byte[] GetLoadBytesInternal(string CKANLCOICIL, string CBKHNNNCPLO = "")
+	public static byte[] GetLoadBytesInternal(string key, string name = "")
 	{
-		TextAsset textAsset = GetLoadObjectInternal<TextAsset>(CKANLCOICIL, CBKHNNNCPLO);
+		TextAsset textAsset = GetLoadObjectInternal<TextAsset>(key, name);
 		return (!(textAsset == null)) ? textAsset.bytes : null;
 	}
 
@@ -137,9 +137,9 @@ public class GlobalLoad : GlobalPath
 		return (!(textAsset == null)) ? textAsset.bytes : null;
 	}
 
-	public static string GetLoadTextInternal(string CKANLCOICIL, string CBKHNNNCPLO = "")
+	public static string GetLoadTextInternal(string key, string name = "")
 	{
-		TextAsset textAsset = GetLoadObjectInternal<TextAsset>(CKANLCOICIL, CBKHNNNCPLO);
+		TextAsset textAsset = GetLoadObjectInternal<TextAsset>(key, name);
 		return (!(textAsset == null)) ? textAsset.text : null;
 	}
 
@@ -149,25 +149,25 @@ public class GlobalLoad : GlobalPath
 		return (!(textAsset == null)) ? textAsset.text : null;
 	}
 
-	public static T GetLoadJsonInternal<T>(string CKANLCOICIL, string CBKHNNNCPLO = "") where T : class
+	public static T GetLoadJsonInternal<T>(string key, string name = "") where T : class
 	{
-		string dMNBDBJNKME = GetLoadTextInternal(CKANLCOICIL, CBKHNNNCPLO);
-		return DeserializeJson<T>(dMNBDBJNKME);
+		string json = GetLoadTextInternal(key, name);
+		return DeserializeJson<T>(json);
 	}
 
 	public static T GetLoadJson<T>(string path) where T : class
 	{
-		string dMNBDBJNKME = GetLoadText(path);
-		return DeserializeJson<T>(dMNBDBJNKME);
+		string json = GetLoadText(path);
+		return DeserializeJson<T>(json);
 	}
 
-	private static T DeserializeJson<T>(string DMNBDBJNKME) where T : class
+	private static T DeserializeJson<T>(string json) where T : class
 	{
-		if (!DMNBDBJNKME.IsNullOrEmpty())
+		if (!json.IsNullOrEmpty())
 		{
 			try
 			{
-				return JsonConvert.DeserializeObject<T>(DMNBDBJNKME);
+				return JsonConvert.DeserializeObject<T>(json);
 			}
 			catch (Exception ex)
 			{
@@ -177,36 +177,36 @@ public class GlobalLoad : GlobalPath
 		return (T)null;
 	}
 
-	private static T ObjecOrDefault<T>(T AOMLCBHAJJH, T LKJLDJGIAOJ = null) where T : UnityEngine.Object
+	private static T ObjecOrDefault<T>(T loaded, T fallback = null) where T : UnityEngine.Object
 	{
-		return AOMLCBHAJJH ?? LKJLDJGIAOJ;
+		return loaded ?? fallback;
 	}
 
-	public static T[] GetLoadObjectsInternal<T>(string CKANLCOICIL, string CBKHNNNCPLO = "") where T : UnityEngine.Object
+	public static T[] GetLoadObjectsInternal<T>(string key, string name = "") where T : UnityEngine.Object
 	{
-		return LoadAll<T>(GlobalPath.GetInternalPath(CKANLCOICIL, CBKHNNNCPLO));
+		return LoadAll<T>(GlobalPath.GetInternalPath(key, name));
 	}
 
-	public static T[] GetLoadObjects<T>(string MFBENNFFKNC) where T : UnityEngine.Object
+	public static T[] GetLoadObjects<T>(string path) where T : UnityEngine.Object
 	{
-		return LoadAll<T>(GlobalPath.GetLoaderPath(MFBENNFFKNC));
+		return LoadAll<T>(GlobalPath.GetLoaderPath(path));
 	}
 
-	public static T GetLoadObjectInternal<T>(string CKANLCOICIL, string CBKHNNNCPLO = "") where T : UnityEngine.Object
+	public static T GetLoadObjectInternal<T>(string key, string name = "") where T : UnityEngine.Object
 	{
-		return Load<T>(GlobalPath.GetInternalPath(CKANLCOICIL, CBKHNNNCPLO));
+		return Load<T>(GlobalPath.GetInternalPath(key, name));
 	}
 
-	public static T GetLoadObject<T>(string MFBENNFFKNC) where T : UnityEngine.Object
+	public static T GetLoadObject<T>(string path) where T : UnityEngine.Object
 	{
-		return Load<T>(GlobalPath.GetLoaderPath(MFBENNFFKNC));
+		return Load<T>(GlobalPath.GetLoaderPath(path));
 	}
 
-	private static TResult FirstNonNull<TResult, Arg>(Arg EHCLMBADLKH, params Func<Arg, TResult>[] EFAICNOJJIP)
+	private static TResult FirstNonNull<TResult, Arg>(Arg argument, params Func<Arg, TResult>[] loaders)
 	{
-		foreach (Func<Arg, TResult> func in EFAICNOJJIP)
+		foreach (Func<Arg, TResult> func in loaders)
 		{
-			TResult val = func(EHCLMBADLKH);
+			TResult val = func(argument);
 			if (val != null)
 			{
 				return val;
@@ -255,37 +255,37 @@ public class GlobalLoad : GlobalPath
 		return BundlesUtil.GetObject<T>(path);
 	}
 
-	public static void Unload(UnityEngine.Object AOMLCBHAJJH, bool OJCKACIMFEJ = true)
+	public static void Unload(UnityEngine.Object asset, bool immediate = true)
 	{
-		if (!(AOMLCBHAJJH == null))
+		if (!(asset == null))
 		{
 #if UNITY_6000_0_OR_NEWER
 			// Same value Object.GetInstanceID() returns in Unity 6: the low 32 bits of the EntityId. The legacy sign test still holds.
-			if (unchecked((int)EntityId.ToULong(AOMLCBHAJJH.GetEntityId())) <= 0)
+			if (unchecked((int)EntityId.ToULong(asset.GetEntityId())) <= 0)
 #else
 			if (AOMLCBHAJJH.GetInstanceID() <= 0)
 #endif
 			{
-				DestroyObject(AOMLCBHAJJH, OJCKACIMFEJ);
+				DestroyObject(asset, immediate);
 			}
 			else
 			{
-				ResourcesUtil.UnloadAsset(AOMLCBHAJJH, OJCKACIMFEJ);
+				ResourcesUtil.UnloadAsset(asset, immediate);
 			}
 		}
 	}
 
-	public static void DestroyObject(UnityEngine.Object AOMLCBHAJJH, bool OJCKACIMFEJ = true)
+	public static void DestroyObject(UnityEngine.Object obj, bool immediate = true)
 	{
 		try
 		{
-			if (!OJCKACIMFEJ)
+			if (!immediate)
 			{
-				UnityEngine.Object.Destroy(AOMLCBHAJJH);
+				UnityEngine.Object.Destroy(obj);
 			}
 			else
 			{
-				UnityEngine.Object.DestroyImmediate(AOMLCBHAJJH);
+				UnityEngine.Object.DestroyImmediate(obj);
 			}
 		}
 		catch (Exception exception)
@@ -306,13 +306,13 @@ public class GlobalLoad : GlobalPath
 		GC.WaitForPendingFinalizers();
 	}
 
-	public static string GetFileOrResourcesText(string path, string IDGLPJGEFKB, string name = "")
+	public static string GetFileOrResourcesText(string path, string key, string name = "")
 	{
 		string text = FileUtils.ReadAllText(path);
 		if (!text.IsNullOrEmpty())
 		{
 			return text;
 		}
-		return GetLoadTextInternal(IDGLPJGEFKB, name);
+		return GetLoadTextInternal(key, name);
 	}
 }

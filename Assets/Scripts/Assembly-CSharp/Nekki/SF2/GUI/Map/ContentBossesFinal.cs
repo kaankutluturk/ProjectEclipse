@@ -13,28 +13,28 @@ namespace Nekki.SF2.GUI.Map
 		[SerializeField]
 		private PrizePanel _prizePanel;
 
-		public void Init(Battle DPOOIONCEOA, FightList KOMGFJOCEDN)
+		public void Init(Battle battle, FightList fight)
 		{
 			string empty = string.Empty;
-			empty = ((DPOOIONCEOA.get_Type() == BattleType.FightBosses || DPOOIONCEOA.get_Type() == BattleType.FightBossesReplayable || DPOOIONCEOA.get_Type() == BattleType.FightFinalTitan) ? (LocalizationManager.GetString(DPOOIONCEOA.GetTitle()) + " " + LocalizationManager.GetString("challengeBoss")) : LocalizationManager.GetString(DPOOIONCEOA.GetDescription()));
-            if (DPOOIONCEOA.get_Type() == BattleType.FightRaid)
+			empty = ((battle.get_Type() == BattleType.FightBosses || battle.get_Type() == BattleType.FightBossesReplayable || battle.get_Type() == BattleType.FightFinalTitan) ? (LocalizationManager.GetString(battle.GetTitle()) + " " + LocalizationManager.GetString("challengeBoss")) : LocalizationManager.GetString(battle.GetDescription()));
+            if (battle.get_Type() == BattleType.FightRaid)
             {
-                empty = LocalizationManager.GetString(DPOOIONCEOA.GetTitle()) + " " +
+                empty = LocalizationManager.GetString(battle.GetTitle()) + " " +
                     LocalizationManager.GetString("challengeBoss") + ".";
             }
 			_lblDescription.set_text(empty);
-			UpdateReplaysLabel(DPOOIONCEOA);
-			bool mMDLKOPCFLK = (DPOOIONCEOA.get_Type() != BattleType.FightBosses && DPOOIONCEOA.get_Type() != BattleType.FightBossesReplayable && DPOOIONCEOA.get_Type() != BattleType.FightFinalTitan) || !HasRewardItem(KOMGFJOCEDN);
-			_prizePanel.Init(-1, mMDLKOPCFLK, KOMGFJOCEDN);
+			UpdateReplaysLabel(battle);
+			bool hideItems = (battle.get_Type() != BattleType.FightBosses && battle.get_Type() != BattleType.FightBossesReplayable && battle.get_Type() != BattleType.FightFinalTitan) || !HasRewardItem(fight);
+			_prizePanel.Init(-1, hideItems, fight);
 		}
 
-		private void UpdateReplaysLabel(Battle DPOOIONCEOA)
+		private void UpdateReplaysLabel(Battle battle)
 		{
-			if (DPOOIONCEOA.get_Type() == BattleType.FightFinalReplayable)
+			if (battle.get_Type() == BattleType.FightFinalReplayable)
 			{
 				_replaysLabel.gameObject.SetActive(true);
-				BattleReplayable bKKPCBGAEHC = (BattleReplayable)DPOOIONCEOA;
-				_replaysLabel.set_text(Eclipse.UI.BattleInfoText.Replays(bKKPCBGAEHC));
+				BattleReplayable replayable = (BattleReplayable)battle;
+				_replaysLabel.set_text(Eclipse.UI.BattleInfoText.Replays(replayable));
 			}
 			else
 			{
@@ -42,26 +42,26 @@ namespace Nekki.SF2.GUI.Map
 			}
 		}
 
-		private bool HasRewardItem(FightList KOMGFJOCEDN)
+		private bool HasRewardItem(FightList fight)
 		{
-			if (KOMGFJOCEDN == null)
+			if (fight == null)
 			{
 				return false;
 			}
-			RewardStruct fDFKLPHBAHJ = KOMGFJOCEDN.GetRewards()[KOMGFJOCEDN.GetRewards().Count - 1];
-			int gNLOCMLBNHF = ListSF.GetRoster().GetLevel();
-			RewardPrize cMHHEHILIIH = fDFKLPHBAHJ.GetPrizeForLevel(gNLOCMLBNHF);
-			if (cMHHEHILIIH.items.Count == 0)
+			RewardStruct rewardStruct = fight.GetRewards()[fight.GetRewards().Count - 1];
+			int level = ListSF.GetRoster().GetLevel();
+			RewardPrize prize = rewardStruct.GetPrizeForLevel(level);
+			if (prize.items.Count == 0)
 			{
 				return false;
 			}
-			RewardItem cACJANFAJEC = cMHHEHILIIH.items[0];
-			if (!cACJANFAJEC.ShowReward)
+			RewardItem rewardItem = prize.items[0];
+			if (!rewardItem.ShowReward)
 			{
 				return false;
 			}
-			ItemInfo dJKEECEOCJB = ListSF.GetItems().GetItemByName(cACJANFAJEC.Name);
-			return dJKEECEOCJB != null;
+			ItemInfo itemInfo = ListSF.GetItems().GetItemByName(rewardItem.Name);
+			return itemInfo != null;
 		}
 	}
 }

@@ -11,10 +11,10 @@ namespace Nekki.SF2.GUI.Fight
 
 		private const string RoundUndoneSprite = "FightUI.Round_Undone";
 
-		public void Init(int NPLGIKNJBKD)
+		public void Init(int count)
 		{
 			Vector2 sizeDelta = default(Vector2);
-			for (int i = 0; i < NPLGIKNJBKD; i++)
+			for (int i = 0; i < count; i++)
 			{
 				GameObject gameObject = new GameObject();
 				gameObject.name = "Round";
@@ -38,9 +38,9 @@ namespace Nekki.SF2.GUI.Fight
 			}
 		}
 
-		public void UpdateVictories(int MGBIBMMNOJL)
+		public void UpdateVictories(int victories)
 		{
-			int num = Mathf.Min(MGBIBMMNOJL, _rounds.Count);
+			int num = Mathf.Min(victories, _rounds.Count);
 			for (int i = 0; i < num; i++)
 			{
 				_rounds[i].set_SpriteName("FightUI.Round_Done");

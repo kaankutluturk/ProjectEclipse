@@ -44,9 +44,9 @@ internal sealed class ZlibCodec
 	{
 	}
 
-	public ZlibCodec(ZlibCompressionMode NMMPBADCFHK)
+	public ZlibCodec(ZlibCompressionMode compressionMode)
 	{
-		switch (NMMPBADCFHK)
+		switch (compressionMode)
 		{
 		case ZlibCompressionMode.Compress:
 			if (InitializeDeflate() != 0)
@@ -75,35 +75,35 @@ internal sealed class ZlibCodec
 		return InitializeInflate(WindowBits);
 	}
 
-	public int InitializeInflate(bool EKEOIGPLABK)
+	public int InitializeInflate(bool expectRfc1950Header)
 	{
-		return InitializeInflate(WindowBits, EKEOIGPLABK);
+		return InitializeInflate(WindowBits, expectRfc1950Header);
 	}
 
-	public int InitializeInflate(int KGFELFAKFIA)
+	public int InitializeInflate(int windowBits)
 	{
-		WindowBits = KGFELFAKFIA;
-		return InitializeInflate(KGFELFAKFIA, true);
+		WindowBits = windowBits;
+		return InitializeInflate(windowBits, true);
 	}
 
-	public int InitializeInflate(int KGFELFAKFIA, bool EKEOIGPLABK)
+	public int InitializeInflate(int windowBits, bool expectRfc1950Header)
 	{
-		WindowBits = KGFELFAKFIA;
+		WindowBits = windowBits;
 		if (DeflateState != null)
 		{
 			throw new ZlibException("You may not call InitializeInflate() after calling InitializeDeflate().");
 		}
-		InflateState = new InflateManager(EKEOIGPLABK);
-		return InflateState.Initialize(this, KGFELFAKFIA);
+		InflateState = new InflateManager(expectRfc1950Header);
+		return InflateState.Initialize(this, windowBits);
 	}
 
-	public int Inflate(FlushType NGBJDNFAPKC)
+	public int Inflate(FlushType flushType)
 	{
 		if (InflateState == null)
 		{
 			throw new ZlibException("No Inflate State!");
 		}
-		return InflateState.Inflate(NGBJDNFAPKC);
+		return InflateState.Inflate(flushType);
 	}
 
 	public int EndInflate()
@@ -131,50 +131,50 @@ internal sealed class ZlibCodec
 		return InitializeDeflateInternal(true);
 	}
 
-	public int InitializeDeflate(ZlibCompressionLevel GNLOCMLBNHF)
+	public int InitializeDeflate(ZlibCompressionLevel compressionLevel)
 	{
-		CompressLevel = GNLOCMLBNHF;
+		CompressLevel = compressionLevel;
 		return InitializeDeflateInternal(true);
 	}
 
-	public int InitializeDeflate(ZlibCompressionLevel GNLOCMLBNHF, bool JIHPEOOBCBG)
+	public int InitializeDeflate(ZlibCompressionLevel compressionLevel, bool wantRfc1950Header)
 	{
-		CompressLevel = GNLOCMLBNHF;
-		return InitializeDeflateInternal(JIHPEOOBCBG);
+		CompressLevel = compressionLevel;
+		return InitializeDeflateInternal(wantRfc1950Header);
 	}
 
-	public int InitializeDeflate(ZlibCompressionLevel GNLOCMLBNHF, int HLFOKLCKNEE)
+	public int InitializeDeflate(ZlibCompressionLevel compressionLevel, int windowBits)
 	{
-		CompressLevel = GNLOCMLBNHF;
-		WindowBits = HLFOKLCKNEE;
+		CompressLevel = compressionLevel;
+		WindowBits = windowBits;
 		return InitializeDeflateInternal(true);
 	}
 
-	public int InitializeDeflate(ZlibCompressionLevel GNLOCMLBNHF, int HLFOKLCKNEE, bool JIHPEOOBCBG)
+	public int InitializeDeflate(ZlibCompressionLevel compressionLevel, int windowBits, bool wantRfc1950Header)
 	{
-		CompressLevel = GNLOCMLBNHF;
-		WindowBits = HLFOKLCKNEE;
-		return InitializeDeflateInternal(JIHPEOOBCBG);
+		CompressLevel = compressionLevel;
+		WindowBits = windowBits;
+		return InitializeDeflateInternal(wantRfc1950Header);
 	}
 
-	private int InitializeDeflateInternal(bool JIHPEOOBCBG)
+	private int InitializeDeflateInternal(bool wantRfc1950Header)
 	{
 		if (InflateState != null)
 		{
 			throw new ZlibException("You may not call InitializeDeflate() after calling InitializeInflate().");
 		}
 		DeflateState = new DeflateManager();
-		DeflateState.SetWantRfc1950HeaderBytes(JIHPEOOBCBG);
+		DeflateState.SetWantRfc1950HeaderBytes(wantRfc1950Header);
 		return DeflateState.Initialize(this, CompressLevel, WindowBits, Strategy);
 	}
 
-	public int Deflate(FlushType NGBJDNFAPKC)
+	public int Deflate(FlushType flushType)
 	{
 		if (DeflateState == null)
 		{
 			throw new ZlibException("No Deflate State!");
 		}
-		return DeflateState.Deflate(NGBJDNFAPKC);
+		return DeflateState.Deflate(flushType);
 	}
 
 	public int EndDeflate()
@@ -196,13 +196,13 @@ internal sealed class ZlibCodec
 		DeflateState.Reset();
 	}
 
-	public int SetDeflateParams(ZlibCompressionLevel GNLOCMLBNHF, CompressionStrategy FNLGJNHJCPL)
+	public int SetDeflateParams(ZlibCompressionLevel compressionLevel, CompressionStrategy strategy)
 	{
 		if (DeflateState == null)
 		{
 			throw new ZlibException("No Deflate State!");
 		}
-		return DeflateState.SetParams(GNLOCMLBNHF, FNLGJNHJCPL);
+		return DeflateState.SetParams(compressionLevel, strategy);
 	}
 
 	public int SetDictionary(byte[] dictionary)
@@ -244,12 +244,12 @@ internal sealed class ZlibCodec
 		}
 	}
 
-	internal int read_buf(byte[] HLDLIFPJMOA, int ILENLCMAMBH, int PEEOEOMEBFG)
+	internal int read_buf(byte[] buffer, int offset, int length)
 	{
 		int num = AvailableBytesIn;
-		if (num > PEEOEOMEBFG)
+		if (num > length)
 		{
-			num = PEEOEOMEBFG;
+			num = length;
 		}
 		if (num == 0)
 		{
@@ -260,7 +260,7 @@ internal sealed class ZlibCodec
 		{
 			_Adler32 = Adler.Adler32(_Adler32, InputBuffer, NextIn, num);
 		}
-		Array.Copy(InputBuffer, NextIn, HLDLIFPJMOA, ILENLCMAMBH, num);
+		Array.Copy(InputBuffer, NextIn, buffer, offset, num);
 		NextIn += num;
 		TotalBytesIn += num;
 		return num;

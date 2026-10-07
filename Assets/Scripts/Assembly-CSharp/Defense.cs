@@ -11,26 +11,26 @@ public class Defense
 
 	public List<Evaluation> Evaluations = new List<Evaluation>();
 
-	public static int Parse(XmlNode BLLNKKNDNII, List<Defense> PNKJPOHEOJB)
+	public static int Parse(XmlNode node, List<Defense> defenses)
 	{
-		int count = PNKJPOHEOJB.Count;
-		foreach (XmlNode childNode in BLLNKKNDNII.ChildNodes)
+		int count = defenses.Count;
+		foreach (XmlNode childNode in node.ChildNodes)
 		{
 			if (childNode.Name == "Defense")
 			{
-				Defense dFKIEMBKKGA = new Defense();
-				dFKIEMBKKGA.Parse(childNode);
-				PNKJPOHEOJB.Add(dFKIEMBKKGA);
+				Defense defense = new Defense();
+				defense.Parse(childNode);
+				defenses.Add(defense);
 			}
 		}
-		return PNKJPOHEOJB.Count - count;
+		return defenses.Count - count;
 	}
 
-	public void Parse(XmlNode MEEAKLDGLDF)
+	public void Parse(XmlNode node)
 	{
-		DefenseName = XmlUtils.ParseString(MEEAKLDGLDF.Attributes["Name"]);
-		Weight = XmlUtils.ParseFloat(MEEAKLDGLDF.Attributes["Weight"]);
-		CancellingItem = XmlUtils.ParseString(MEEAKLDGLDF.Attributes["CancellingItem"]);
-		Evaluation.ParseAttributes(MEEAKLDGLDF, Evaluations);
+		DefenseName = XmlUtils.ParseString(node.Attributes["Name"]);
+		Weight = XmlUtils.ParseFloat(node.Attributes["Weight"]);
+		CancellingItem = XmlUtils.ParseString(node.Attributes["CancellingItem"]);
+		Evaluation.ParseAttributes(node, Evaluations);
 	}
 }

@@ -48,7 +48,7 @@ public class NoAnimationMove
 		return _critSettings;
 	}
 
-	public RaidMoveInfo GetMoveByName(string DGJBDENCHBJ)
+	public RaidMoveInfo GetMoveByName(string moveName)
 	{
 		return null;
 	}

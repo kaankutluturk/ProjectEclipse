@@ -1,1 +1,1 @@
-public delegate void OnAuthenticationSuccededDelegate(IAuthenticationProvider EEGMFLOPLLH);
+public delegate void OnAuthenticationSuccededDelegate(IAuthenticationProvider provider);

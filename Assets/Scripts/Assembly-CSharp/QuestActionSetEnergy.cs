@@ -5,10 +5,10 @@ public class QuestActionSetEnergy : QuestAction
 {
 	private int _value;
 
-	public override void Parse(XmlNode EPKLCPOEELO)
+	public override void Parse(XmlNode node)
 	{
-		base.Parse(EPKLCPOEELO);
-		_value = EPKLCPOEELO.Attributes["Value"].ParseInt();
+		base.Parse(node);
+		_value = node.Attributes["Value"].ParseInt();
 		if (_value < 0)
 		{
 			GameLog.Error("QuestActionSetEnergy::parse - wrong value: %i, setting to 0", _value);
@@ -16,12 +16,12 @@ public class QuestActionSetEnergy : QuestAction
 		}
 	}
 
-	public override void Execute(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters parameters)
 	{
-		base.Execute(GFIHPBCEEOB);
-		Roster nKGLHEGIKKP = ListSF.GetRoster();
-		int oGLHGFJKMCO = nKGLHEGIKKP.PowerMax;
-		nKGLHEGIKKP.SetPower(Math.Min(_value, oGLHGFJKMCO));
+		base.Execute(parameters);
+		Roster roster = ListSF.GetRoster();
+		int maxPower = roster.PowerMax;
+		roster.SetPower(Math.Min(_value, maxPower));
 		FinishAction();
 	}
 }

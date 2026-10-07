@@ -12,10 +12,10 @@ public class InFightRule : Rule
 
 	protected bool applianceLosesOnTrigger;
 
-	public InFightRule(RuleType LFLGCDNKNJI, RuleAppliance EJPOJJKKICO, XmlNode node, InFightRule CEFOMFMPHJM = null)
-		: base(LFLGCDNKNJI, node)
+	public InFightRule(RuleType ruleType, RuleAppliance ruleAppliance, XmlNode node, InFightRule sourceRule = null)
+		: base(ruleType, node)
 	{
-		appliance = EJPOJJKKICO;
+		appliance = ruleAppliance;
 		applianceLosesOnTrigger = true;
 		isDeathRule = false;
 		subscribedEvents = new HashSet<FightEvent>();
@@ -27,14 +27,14 @@ public class InFightRule : Rule
 		return null;
 	}
 
-	public void SubscribeEvent(FightEvent KOJNCHKPLLN)
+	public void SubscribeEvent(FightEvent fightEvent)
 	{
-		subscribedEvents.Add(KOJNCHKPLLN);
+		subscribedEvents.Add(fightEvent);
 	}
 
-	public bool IsSubscribedTo(FightEvent KOJNCHKPLLN)
+	public bool IsSubscribedTo(FightEvent fightEvent)
 	{
-		return subscribedEvents.Contains(KOJNCHKPLLN);
+		return subscribedEvents.Contains(fightEvent);
 	}
 
 	public virtual void Reset()
@@ -44,14 +44,14 @@ public class InFightRule : Rule
 	public override bool Compare(object data)
 	{
 		PrepareCompare(data);
-		PlayersFightData jNGGHELCPFM = (PlayersFightData)data;
+		PlayersFightData playersData = (PlayersFightData)data;
 		if (appliance == RuleAppliance.AppliancePlayer)
 		{
-			return CompareSingle(jNGGHELCPFM.PlayerData);
+			return CompareSingle(playersData.PlayerData);
 		}
 		if (appliance == RuleAppliance.ApplianceOpponent)
 		{
-			return CompareSingle(jNGGHELCPFM.EnemyData);
+			return CompareSingle(playersData.EnemyData);
 		}
 		return false;
 	}
@@ -88,9 +88,9 @@ public class InFightRule : Rule
 		return appliance;
 	}
 
-	public void SetAppliance(RuleAppliance IGFNCCEHFEK)
+	public void SetAppliance(RuleAppliance ruleAppliance)
 	{
-		appliance = IGFNCCEHFEK;
+		appliance = ruleAppliance;
 	}
 
 	public virtual RuleAppliance GetWinnerAppliance()

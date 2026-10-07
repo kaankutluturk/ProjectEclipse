@@ -17,9 +17,9 @@ public abstract class EventInfo
 		}
 	}
 
-	protected EventInfo(IObjectDescriptor BBNKIBKPBLO)
+	protected EventInfo(IObjectDescriptor source)
 	{
-		SetSource(BBNKIBKPBLO);
+		SetSource(source);
 	}
 
 	public IObjectDescriptor GetSource()

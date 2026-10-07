@@ -2,26 +2,26 @@ using System.Collections.Generic;
 
 public sealed class WWWAuthenticateHeaderParser : KeyValuePairList
 {
-	public WWWAuthenticateHeaderParser(string PNJNBBFLCAH)
+	public WWWAuthenticateHeaderParser(string header)
 	{
-		SetValues(ParseQuotedHeader(PNJNBBFLCAH));
+		SetValues(ParseQuotedHeader(header));
 	}
 
-	private List<KeyValuePair> ParseQuotedHeader(string IGGFGLLIGCG)
+	private List<KeyValuePair> ParseQuotedHeader(string header)
 	{
 		List<KeyValuePair> list = new List<KeyValuePair>();
-		if (IGGFGLLIGCG != null)
+		if (header != null)
 		{
 			int LCCLEFMKLPB = 0;
-			string kGBGENDIMBC = IGGFGLLIGCG.Read(ref LCCLEFMKLPB, (char KDFCGMMKAME) => !char.IsWhiteSpace(KDFCGMMKAME) && !char.IsControl(KDFCGMMKAME)).TrimAndLower();
-			list.Add(new KeyValuePair(kGBGENDIMBC));
-			while (LCCLEFMKLPB < IGGFGLLIGCG.Length)
+			string scheme = header.Read(ref LCCLEFMKLPB, (char ch) => !char.IsWhiteSpace(ch) && !char.IsControl(ch)).TrimAndLower();
+			list.Add(new KeyValuePair(scheme));
+			while (LCCLEFMKLPB < header.Length)
 			{
-				string kGBGENDIMBC2 = IGGFGLLIGCG.Read(ref LCCLEFMKLPB, '=').TrimAndLower();
-				KeyValuePair gGCJLGPPHKP = new KeyValuePair(kGBGENDIMBC2);
-				IGGFGLLIGCG.SkipWhiteSpace(ref LCCLEFMKLPB);
-				gGCJLGPPHKP.set_Value(IGGFGLLIGCG.ReadQuotedText(ref LCCLEFMKLPB));
-				list.Add(gGCJLGPPHKP);
+				string kGBGENDIMBC2 = header.Read(ref LCCLEFMKLPB, '=').TrimAndLower();
+				KeyValuePair keyValuePair = new KeyValuePair(kGBGENDIMBC2);
+				header.SkipWhiteSpace(ref LCCLEFMKLPB);
+				keyValuePair.set_Value(header.ReadQuotedText(ref LCCLEFMKLPB));
+				list.Add(keyValuePair);
 			}
 		}
 		return list;

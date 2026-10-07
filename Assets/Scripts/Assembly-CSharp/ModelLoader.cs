@@ -7,15 +7,15 @@ public class ModelLoader
 	{
 		private Dictionary<string, XmlDocument> documents = new Dictionary<string, XmlDocument>();
 
-		public XmlDocument GetDocument(string EFGLOMANJHN, string PMFEIPCHENB)
+		public XmlDocument GetDocument(string path, string cacheKey)
 		{
 			XmlDocument value = null;
-			if (documents.TryGetValue(PMFEIPCHENB, out value))
+			if (documents.TryGetValue(cacheKey, out value))
 			{
 				return value;
 			}
-			value = XmlUtils.OpenXMLDocument(EFGLOMANJHN, PMFEIPCHENB, XmlUtils.XmlSourceMode.ForcedResourced);
-			documents.Add(PMFEIPCHENB, value);
+			value = XmlUtils.OpenXMLDocument(path, cacheKey, XmlUtils.XmlSourceMode.ForcedResourced);
+			documents.Add(cacheKey, value);
 			return value;
 		}
 
@@ -40,9 +40,9 @@ public class ModelLoader
 	{
 	}
 
-	public static void Load(ModelObject ACENLMONNPA, List<string> CBHAEPCLDFG)
+	public static void Load(ModelObject modelObject, List<string> filePaths)
 	{
-		if (CBHAEPCLDFG.Count == 0)
+		if (filePaths.Count == 0)
 		{
 			return;
 		}
@@ -50,39 +50,39 @@ public class ModelLoader
 
         // Opt into authored body/skin contracts without changing archival model
         // parsing or first-definition bindings for recovered equipment.
-        var parameters = ACENLMONNPA.GetModel()?.Parameters;
+        var parameters = modelObject.GetModel()?.Parameters;
         if (parameters != null && parameters.HasEclipseAuthoredModels)
         {
             var authored = new HashSet<string>(System.StringComparer.Ordinal);
             foreach (var model in parameters.EclipseAuthoredModels()) if (IsAuthoredModel(model)) authored.Add(AuthoredModelPath(model));
             if (authored.Count != 0)
             {
-                var documents = new List<XmlDocument>(CBHAEPCLDFG.Count);
-                foreach (string path in CBHAEPCLDFG)
+                var documents = new List<XmlDocument>(filePaths.Count);
+                foreach (string path in filePaths)
                     documents.Add(path == "assets/models/.xml" ? null : DocumentCache.GetDocument(SF2Paths.GetModelsPath(), path));
-                Eclipse.Modding.ModCharacterGeometry.Validate(CBHAEPCLDFG, documents, authored);
+                Eclipse.Modding.ModCharacterGeometry.Validate(filePaths, documents, authored);
             }
         }
 		string text = "assets/models/.xml";
-		foreach (string item in CBHAEPCLDFG)
+		foreach (string item in filePaths)
 		{
 			if (!(item == text))
 			{
 				xmlDocument = DocumentCache.GetDocument(SF2Paths.GetModelsPath(), item);
 				if (xmlDocument != null)
 				{
-					Parse(ACENLMONNPA, xmlDocument, parameters != null && parameters.HidesEclipseFigures(item));
+					Parse(modelObject, xmlDocument, parameters != null && parameters.HidesEclipseFigures(item));
 					continue;
 				}
 				GameLog.Error("File '{0}' not found", item);
 			}
 		}
-		ACENLMONNPA.FindPivotNode();
-		ACENLMONNPA.CalculateTotalWeight();
-		PostProcessNodes(ACENLMONNPA.GetAllNodes());
-		ACENLMONNPA.SetFileNames(CBHAEPCLDFG);
-		ACENLMONNPA.BuildPairNodes();
-		ACENLMONNPA.ResolveMacroNodeWeights();
+		modelObject.FindPivotNode();
+		modelObject.CalculateTotalWeight();
+		PostProcessNodes(modelObject.GetAllNodes());
+		modelObject.SetFileNames(filePaths);
+		modelObject.BuildPairNodes();
+		modelObject.ResolveMacroNodeWeights();
 	}
 
     private static string AuthoredModelPath(string path) => path.EndsWith(".xml", System.StringComparison.OrdinalIgnoreCase) ? path : path + ".xml";
@@ -111,57 +111,57 @@ public class ModelLoader
             throw new System.IO.InvalidDataException("Prepared form requires at least one model document.");
     }
 
-	private static void Parse(ModelObject ACENLMONNPA, XmlDocument EELFNMOHGJL, bool hideFigures = false)
+	private static void Parse(ModelObject modelObject, XmlDocument document, bool hideFigures = false)
 	{
-		XmlNode eELFNMOHGJL = EELFNMOHGJL["Scene"];
-		if (!ParseNodes(ACENLMONNPA, eELFNMOHGJL))
+		XmlNode sceneNode = document["Scene"];
+		if (!ParseNodes(modelObject, sceneNode))
 		{
 			GameLog.Write("Nodes was not parsed");
 		}
-		if (!ParseEdges(ACENLMONNPA, eELFNMOHGJL))
+		if (!ParseEdges(modelObject, sceneNode))
 		{
 			GameLog.Write("Edges was not parsed");
 		}
 		// An Eclipse look keeps hidden equipment's nodes and edges but draws no figures.
 		if (hideFigures) return;
-		if (!ParseCapsules(ACENLMONNPA, eELFNMOHGJL))
+		if (!ParseCapsules(modelObject, sceneNode))
 		{
 			GameLog.Write("Capsules was not parsed");
 		}
-		if (!ParseTriangles(ACENLMONNPA, eELFNMOHGJL))
+		if (!ParseTriangles(modelObject, sceneNode))
 		{
 			GameLog.Write("Triangles was not parsed");
 		}
 	}
 
-	private static bool ParseNodes(ModelObject ACENLMONNPA, XmlNode EELFNMOHGJL)
+	private static bool ParseNodes(ModelObject modelObject, XmlNode sceneNode)
 	{
-		XmlNode xmlNode = EELFNMOHGJL["Nodes"];
+		XmlNode xmlNode = sceneNode["Nodes"];
 		if (xmlNode == null)
 		{
 			return true;
 		}
-		List<global::Pair<string, float>> mFIEGKAMKNJ = new List<global::Pair<string, float>>();
+		List<global::Pair<string, float>> centerOfMassWeights = new List<global::Pair<string, float>>();
 		foreach (XmlNode childNode in xmlNode.ChildNodes)
 		{
-			ParseNode(ACENLMONNPA, childNode, mFIEGKAMKNJ);
+			ParseNode(modelObject, childNode, centerOfMassWeights);
 		}
-		ACENLMONNPA.AddCenterOfMassNodes(mFIEGKAMKNJ);
-		if (ACENLMONNPA.GetNodeCount() == 0)
+		modelObject.AddCenterOfMassNodes(centerOfMassWeights);
+		if (modelObject.GetNodeCount() == 0)
 		{
-			ACENLMONNPA.set_NodesCount(ACENLMONNPA.GetAllNodes().Count);
+			modelObject.set_NodesCount(modelObject.GetAllNodes().Count);
 		}
 		return true;
 	}
 
-	private static bool ParseEdges(ModelObject ACENLMONNPA, XmlNode EELFNMOHGJL)
+	private static bool ParseEdges(ModelObject modelObject, XmlNode sceneNode)
 	{
-		XmlNode xmlNode = EELFNMOHGJL["Edges"];
+		XmlNode xmlNode = sceneNode["Edges"];
 		if (xmlNode == null)
 		{
 			return true;
 		}
-		ACENLMONNPA.GetAllEdges().Capacity = ACENLMONNPA.GetAllEdges().Count + xmlNode.ChildNodes.Count;
+		modelObject.GetAllEdges().Capacity = modelObject.GetAllEdges().Count + xmlNode.ChildNodes.Count;
 		foreach (XmlNode childNode in xmlNode.ChildNodes)
 		{
 			int num = childNode.Attributes["Iterations"].ParseInt(1);
@@ -174,41 +174,41 @@ public class ModelLoader
 				{
 					empty = empty + "CI" + i;
 				}
-				ParseEdge(ACENLMONNPA, childNode, empty);
+				ParseEdge(modelObject, childNode, empty);
 			}
 		}
 		return true;
 	}
 
-	private static bool ParseCapsules(ModelObject ACENLMONNPA, XmlNode EELFNMOHGJL)
+	private static bool ParseCapsules(ModelObject modelObject, XmlNode sceneNode)
 	{
-		XmlNode xmlNode = EELFNMOHGJL["Figures"];
+		XmlNode xmlNode = sceneNode["Figures"];
 		foreach (XmlNode childNode in xmlNode.ChildNodes)
 		{
 			string value = childNode.Attributes["Type"].Value;
 			if (value == "Capsule")
 			{
-				ParseCapsule(ACENLMONNPA, childNode);
+				ParseCapsule(modelObject, childNode);
 			}
 		}
 		return true;
 	}
 
-	private static bool ParseTriangles(ModelObject ACENLMONNPA, XmlNode EELFNMOHGJL)
+	private static bool ParseTriangles(ModelObject modelObject, XmlNode sceneNode)
 	{
-		XmlNode xmlNode = EELFNMOHGJL["Figures"];
+		XmlNode xmlNode = sceneNode["Figures"];
 		foreach (XmlNode childNode in xmlNode.ChildNodes)
 		{
 			string value = childNode.Attributes["Type"].Value;
 			if (value == "Triangle")
 			{
-				ParseTriangle(ACENLMONNPA, childNode);
+				ParseTriangle(modelObject, childNode);
 			}
 		}
 		return true;
 	}
 
-	private static void ParseNode(ModelObject ACENLMONNPA, XmlNode node, List<global::Pair<string, float>> MFIEGKAMKNJ)
+	private static void ParseNode(ModelObject modelObject, XmlNode node, List<global::Pair<string, float>> centerOfMassWeights)
 	{
 		ModelNode Node = null;
 		Vector3f Position = new Vector3f(node.Attributes["X"].ParseFloat(), 0f - node.Attributes["Y"].ParseFloat(), node.Attributes["Z"].ParseFloat());
@@ -218,7 +218,7 @@ public class ModelLoader
 		// weapons such as mdl_weapon_hunger redefine the skeleton's off-hand Weapon-Node*_2
 		// attachment nodes. The first definition owns the name; a later one is not created, so
 		// that file's edges bind to the existing (arm-attached) node instead of a loose copy.
-		if (ACENLMONNPA.GetNodesByName().ContainsKey(name))
+		if (modelObject.GetNodesByName().ContainsKey(name))
 		{
 			return;
 		}
@@ -230,40 +230,40 @@ public class ModelLoader
 			Node.SetAttenuation(node.Attributes["Attenuation"].ParseFloat());
 			if (flag)
 			{
-				MFIEGKAMKNJ.Clear();
-				ParseChildNodeWeights(MFIEGKAMKNJ, node, false);
+				centerOfMassWeights.Clear();
+				ParseChildNodeWeights(centerOfMassWeights, node, false);
 			}
-			ACENLMONNPA.GetPlainNodes().Add(Node);
+			modelObject.GetPlainNodes().Add(Node);
 		}
 		else if (value == "MacroNode" || value == "SkinnedNode")
 		{
 			Position.SetX(Position.GetX() * -1f);
-			ModelMacroNode gDNAJOODAGP = new ModelMacroNode(name, Position);
-			Node = gDNAJOODAGP;
-			if (value == "SkinnedNode") gDNAJOODAGP.LoadSkinBindings(ACENLMONNPA, node);
-			else ParseMacroNodeWeights(gDNAJOODAGP, node);
-			ACENLMONNPA.GetMacroNodes().Add(gDNAJOODAGP);
+			ModelMacroNode macroNode = new ModelMacroNode(name, Position);
+			Node = macroNode;
+			if (value == "SkinnedNode") macroNode.LoadSkinBindings(modelObject, node);
+			else ParseMacroNodeWeights(macroNode, node);
+			modelObject.GetMacroNodes().Add(macroNode);
 		}
 		if (Node != null)
 		{
-			Node.SetID(ACENLMONNPA.GetAllNodes().Count);
+			Node.SetID(modelObject.GetAllNodes().Count);
 			Node.SetMass(node.Attributes["Mass"].ParseFloat());
 			Node.SetFixed(node.Attributes["Fixed"].ParseBool());
 			Node.SetVisible(node.Attributes["Visible"].ParseBool());
 			Node.SetIsShock(node.Attributes["Shock"].ParseBool());
 			Node.SetCollisible(node.Attributes["Collisible"].ParseBool());
 			Node.SetWeak(node.Attributes["Weak"].ParseBool());
-			ACENLMONNPA.GetAllNodes().Add(Node);
-			ACENLMONNPA.GetNodesByName().Add(Node.GetName(), Node);
+			modelObject.GetAllNodes().Add(Node);
+			modelObject.GetNodesByName().Add(Node.GetName(), Node);
 		}
 	}
 
-	private static void ParseEdge(ModelObject ACENLMONNPA, XmlNode node, string IMGCANJHPND)
+	private static void ParseEdge(ModelObject modelObject, XmlNode node, string edgeName)
 	{
-		ModelEdge nAKBKCDKEHF = null;
-		ModelNode iLENLCMAMBH = ACENLMONNPA.GetNodeByNameOrParent(node.Attributes["End1"].Value);
-		ModelNode bFDAHEHCAGK = ACENLMONNPA.GetNodeByNameOrParent(node.Attributes["End2"].Value);
-		float bAINMLLIKOL = node.Attributes["Length"].ParseFloat();
+		ModelEdge edge = null;
+		ModelNode startNode = modelObject.GetNodeByNameOrParent(node.Attributes["End1"].Value);
+		ModelNode endNode = modelObject.GetNodeByNameOrParent(node.Attributes["End2"].Value);
+		float edgeLength = node.Attributes["Length"].ParseFloat();
 		float bAINMLLIKOL2 = node.Attributes["Radius"].ParseFloat();
 		float bAINMLLIKOL3 = node.Attributes["Margin1"].ParseFloat();
 		float bAINMLLIKOL4 = node.Attributes["Margin2"].ParseFloat();
@@ -274,24 +274,24 @@ public class ModelLoader
 		int num = node.Attributes["Collisible"].ParseInt();
 		bool bAINMLLIKOL7 = node.Attributes["Blood"].ParseBool();
 		bool bAINMLLIKOL8 = node.Attributes["Shock"].ParseBool();
-		nAKBKCDKEHF = new ModelEdge(iLENLCMAMBH, bFDAHEHCAGK);
-		nAKBKCDKEHF.set_Length(bAINMLLIKOL);
-		nAKBKCDKEHF.set_Name(IMGCANJHPND);
-		nAKBKCDKEHF.set_Collisible(num);
-		nAKBKCDKEHF.SetBodyPart(bAINMLLIKOL5);
-		nAKBKCDKEHF.SetDefense(bAINMLLIKOL6);
-		nAKBKCDKEHF.SetHasBlood(bAINMLLIKOL7);
-		nAKBKCDKEHF.set_IsShock(bAINMLLIKOL8);
-		nAKBKCDKEHF.SetCollisionRadius(bAINMLLIKOL2);
-		nAKBKCDKEHF.SetStartMargin(bAINMLLIKOL3);
-		nAKBKCDKEHF.SetEndMargin(bAINMLLIKOL4);
+		edge = new ModelEdge(startNode, endNode);
+		edge.set_Length(edgeLength);
+		edge.set_Name(edgeName);
+		edge.set_Collisible(num);
+		edge.SetBodyPart(bAINMLLIKOL5);
+		edge.SetDefense(bAINMLLIKOL6);
+		edge.SetHasBlood(bAINMLLIKOL7);
+		edge.set_IsShock(bAINMLLIKOL8);
+		edge.SetCollisionRadius(bAINMLLIKOL2);
+		edge.SetStartMargin(bAINMLLIKOL3);
+		edge.SetEndMargin(bAINMLLIKOL4);
 		if (text == "Edge")
 		{
-			nAKBKCDKEHF.SetType(EdgeType.Edge);
-			ACENLMONNPA.GetStructuralEdges().Add(nAKBKCDKEHF);
+			edge.SetType(EdgeType.Edge);
+			modelObject.GetStructuralEdges().Add(edge);
 			if (num > 0)
 			{
-				ACENLMONNPA.GetCollisionEdges().Add(nAKBKCDKEHF);
+				modelObject.GetCollisionEdges().Add(edge);
 			}
 		}
 		else
@@ -301,70 +301,70 @@ public class ModelLoader
 				GameLog.Error("Wring type edge: {0}", text);
 				return;
 			}
-			nAKBKCDKEHF.SetType(EdgeType.Muscle);
-			ACENLMONNPA.GetMuscleEdges().Add(nAKBKCDKEHF);
+			edge.SetType(EdgeType.Muscle);
+			modelObject.GetMuscleEdges().Add(edge);
 		}
 		if (text2 == "None")
 		{
-			nAKBKCDKEHF.SetSubType(EdgeSubType.None);
+			edge.SetSubType(EdgeSubType.None);
 		}
 		else if (text2 == "Blade")
 		{
-			nAKBKCDKEHF.SetSubType(EdgeSubType.Blade);
+			edge.SetSubType(EdgeSubType.Blade);
 		}
-		ACENLMONNPA.GetAllEdges().Add(nAKBKCDKEHF);
+		modelObject.GetAllEdges().Add(edge);
 	}
 
-	private static void ParseCapsule(ModelObject ACENLMONNPA, XmlNode node)
+	private static void ParseCapsule(ModelObject modelObject, XmlNode node)
 	{
 		string value = node.Attributes["Edge"].Value;
-		ModelEdge nAKBKCDKEHF = ACENLMONNPA.GetEdgeByName(value);
-		if (nAKBKCDKEHF != null)
+		ModelEdge edge = modelObject.GetEdgeByName(value);
+		if (edge != null)
 		{
-			Capsule cOGLBFKLNFC = new Capsule(nAKBKCDKEHF);
-			cOGLBFKLNFC.set_Name(node.Name);
-			cOGLBFKLNFC.SetRadius1(node.Attributes["Radius1"].ParseFloat());
-			cOGLBFKLNFC.SetRadius2(node.Attributes["Radius2"].ParseFloat());
-			cOGLBFKLNFC.SetMargin1(node.Attributes["Margin1"].ParseFloat());
-			cOGLBFKLNFC.SetMargin2(node.Attributes["Margin2"].ParseFloat());
-			cOGLBFKLNFC.SetThickness(node.Attributes["Radius1"].ParseFloat() * 2f);
-			cOGLBFKLNFC.CreateUI(ACENLMONNPA.GetModel().GetGameObject().transform).Render();
-			ACENLMONNPA.GetCapsules().Add(cOGLBFKLNFC);
+			Capsule capsule = new Capsule(edge);
+			capsule.set_Name(node.Name);
+			capsule.SetRadius1(node.Attributes["Radius1"].ParseFloat());
+			capsule.SetRadius2(node.Attributes["Radius2"].ParseFloat());
+			capsule.SetMargin1(node.Attributes["Margin1"].ParseFloat());
+			capsule.SetMargin2(node.Attributes["Margin2"].ParseFloat());
+			capsule.SetThickness(node.Attributes["Radius1"].ParseFloat() * 2f);
+			capsule.CreateUI(modelObject.GetModel().GetGameObject().transform).Render();
+			modelObject.GetCapsules().Add(capsule);
 		}
 	}
 
-	private static void ParseTriangle(ModelObject ACENLMONNPA, XmlNode node)
+	private static void ParseTriangle(ModelObject modelObject, XmlNode node)
 	{
 		string value = node.Attributes["Node1"].Value;
-		ModelNode lCDGOCIAIDK = ACENLMONNPA.GetNodeByName(value);
-		if (lCDGOCIAIDK == null)
+		ModelNode firstNode = modelObject.GetNodeByName(value);
+		if (firstNode == null)
 		{
 			return;
 		}
 		value = node.Attributes["Node2"].Value;
-		ModelNode lCDGOCIAIDK2 = ACENLMONNPA.GetNodeByName(value);
+		ModelNode lCDGOCIAIDK2 = modelObject.GetNodeByName(value);
 		if (lCDGOCIAIDK2 != null)
 		{
 			value = node.Attributes["Node3"].Value;
-			ModelNode lCDGOCIAIDK3 = ACENLMONNPA.GetNodeByName(value);
+			ModelNode lCDGOCIAIDK3 = modelObject.GetNodeByName(value);
 			if (lCDGOCIAIDK3 != null)
 			{
-				Triangle item = new Triangle(lCDGOCIAIDK, lCDGOCIAIDK2, lCDGOCIAIDK3, node.Name);
-				ACENLMONNPA.GetTriangles().Add(item);
-				ACENLMONNPA.GetModel()._MeshRender.get_Base().AddTriangle(lCDGOCIAIDK, lCDGOCIAIDK2, lCDGOCIAIDK3, node.Name);
+				Triangle item = new Triangle(firstNode, lCDGOCIAIDK2, lCDGOCIAIDK3, node.Name);
+				modelObject.GetTriangles().Add(item);
+				modelObject.GetModel()._MeshRender.get_Base().AddTriangle(firstNode, lCDGOCIAIDK2, lCDGOCIAIDK3, node.Name);
 			}
 		}
 	}
 
-	private static void ParseMacroNodeWeights(ModelMacroNode AHJOLBKABMC, XmlNode node)
+	private static void ParseMacroNodeWeights(ModelMacroNode macroNode, XmlNode node)
 	{
-		if (AHJOLBKABMC.GetNodeType() == ModelNode.NodeType.MacroNode)
+		if (macroNode.GetNodeType() == ModelNode.NodeType.MacroNode)
 		{
-			ParseChildNodeWeights(AHJOLBKABMC.NamedWeights, node, true);
+			ParseChildNodeWeights(macroNode.NamedWeights, node, true);
 		}
 	}
 
-	private static void ParseChildNodeWeights(List<global::Pair<string, float>> NBAGKJAPCFD, XmlNode node, bool OGFKPCPEDAK)
+	private static void ParseChildNodeWeights(List<global::Pair<string, float>> weights, XmlNode node, bool hasWeights)
 	{
 		int num = node.Attributes["NodesCount"].ParseInt();
 		if (0 >= num)
@@ -373,34 +373,34 @@ public class ModelLoader
 		}
 		string empty = string.Empty;
 		string empty2 = string.Empty;
-		NBAGKJAPCFD.Capacity = num;
+		weights.Capacity = num;
 		for (int i = 0; i < num; i++)
 		{
 			empty2 = (i + 1).ToString();
 			empty = "ChildNode";
 			empty += empty2;
-			string gBCLEDJAOBM = node.Attributes[empty].GetStringOrDefault(string.Empty);
-			float pOFHDGJAFMP = 0f;
-			if (OGFKPCPEDAK)
+			string childNodeName = node.Attributes[empty].GetStringOrDefault(string.Empty);
+			float weight = 0f;
+			if (hasWeights)
 			{
 				empty = "LCC";
 				empty += empty2;
-				pOFHDGJAFMP = node.Attributes[empty].ParseFloat();
+				weight = node.Attributes[empty].ParseFloat();
 			}
-			NBAGKJAPCFD.Add(new global::Pair<string, float>(gBCLEDJAOBM, pOFHDGJAFMP));
+			weights.Add(new global::Pair<string, float>(childNodeName, weight));
 		}
 	}
 
-	private static void LinkPairNodes(ModelObject ACENLMONNPA)
+	private static void LinkPairNodes(ModelObject modelObject)
 	{
-		List<ModelNode> list = ACENLMONNPA.GetAllNodes();
-		List<global::Pair<int, int>> list2 = ACENLMONNPA.GetPairNodeIds();
+		List<ModelNode> list = modelObject.GetAllNodes();
+		List<global::Pair<int, int>> list2 = modelObject.GetPairNodeIds();
 		foreach (global::Pair<int, int> item in list2)
 		{
-			ModelNode lCDGOCIAIDK = list[item.First];
+			ModelNode firstNode = list[item.First];
 			ModelNode lCDGOCIAIDK2 = list[item.Second];
-			lCDGOCIAIDK.SetPairNode(lCDGOCIAIDK2);
-			lCDGOCIAIDK2.SetPairNode(lCDGOCIAIDK);
+			firstNode.SetPairNode(lCDGOCIAIDK2);
+			lCDGOCIAIDK2.SetPairNode(firstNode);
 		}
 	}
 }

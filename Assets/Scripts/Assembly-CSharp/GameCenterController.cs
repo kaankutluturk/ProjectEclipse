@@ -4,7 +4,7 @@ public static class GameCenterController
 {
 	private static GameCenterAbstract _Current;
 
-	public static GameCenterAbstract BLOOLFFMKFI
+	public static GameCenterAbstract Current
 	{
 		get
 		{
@@ -111,19 +111,19 @@ public static class GameCenterController
 		return string.Empty;
 	}
 
-	public static void UnlockAchievement(string OKNNNLIPODI)
+	public static void UnlockAchievement(string achievementId)
 	{
 		if (GetIsAuthenticated())
 		{
-			GetCurrent().UnlockAchievement(OKNNNLIPODI);
+			GetCurrent().UnlockAchievement(achievementId);
 		}
 	}
 
-	public static void ReportAchievementProgress(string OKNNNLIPODI, double EPFBHJBNIHK)
+	public static void ReportAchievementProgress(string achievementId, double progress)
 	{
 		if (GetIsAuthenticated())
 		{
-			GetCurrent().ReportAchievementProgress(OKNNNLIPODI, EPFBHJBNIHK);
+			GetCurrent().ReportAchievementProgress(achievementId, progress);
 		}
 	}
 
@@ -156,9 +156,9 @@ public static class GameCenterController
 		return false;
 	}
 
-	public static void SyncAchievements(List<SocialAchievement> CIMGCGDDKCE)
+	public static void SyncAchievements(List<SocialAchievement> achievements)
 	{
-		foreach (SocialAchievement item in CIMGCGDDKCE)
+		foreach (SocialAchievement item in achievements)
 		{
 			if (item.value < item.TargetValue)
 			{

@@ -15,14 +15,14 @@ public class PlistElementDict : PlistElement
 	}
 
 	// C# has no syntax for parameterized property 'DLKPBAJDHBO'.
-	public PlistElement get_DLKPBAJDHBO(string KGBGENDIMBC)
+	public PlistElement get_DLKPBAJDHBO(string key)
 	{
-		return get_Item(KGBGENDIMBC);
+		return get_Item(key);
 	}
 
-	public void set_DLKPBAJDHBO(string KGBGENDIMBC, PlistElement value)
+	public void set_DLKPBAJDHBO(string key, PlistElement value)
 	{
-		SetItem(KGBGENDIMBC, value);
+		SetItem(key, value);
 	}
 
 	public IDictionary<string, PlistElement> GetValues()
@@ -30,46 +30,46 @@ public class PlistElementDict : PlistElement
 		return m_PrivateValue;
 	}
 
-	public new PlistElement get_Item(string KGBGENDIMBC)
+	public new PlistElement get_Item(string key)
 	{
-		if (GetValues().ContainsKey(KGBGENDIMBC))
+		if (GetValues().ContainsKey(key))
 		{
-			return GetValues()[KGBGENDIMBC];
+			return GetValues()[key];
 		}
 		return null;
 	}
 
-	public new void SetItem(string KGBGENDIMBC, PlistElement value)
+	public new void SetItem(string key, PlistElement value)
 	{
-		GetValues()[KGBGENDIMBC] = value;
+		GetValues()[key] = value;
 	}
 
-	public void SetInteger(string KGBGENDIMBC, int PKHDLOGJKAD)
+	public void SetInteger(string key, int value)
 	{
-		GetValues()[KGBGENDIMBC] = new PlistElementInteger(PKHDLOGJKAD);
+		GetValues()[key] = new PlistElementInteger(value);
 	}
 
-	public void SetString(string KGBGENDIMBC, string PKHDLOGJKAD)
+	public void SetString(string key, string value)
 	{
-		GetValues()[KGBGENDIMBC] = new PlistElementString(PKHDLOGJKAD);
+		GetValues()[key] = new PlistElementString(value);
 	}
 
-	public void SetBoolean(string KGBGENDIMBC, bool PKHDLOGJKAD)
+	public void SetBoolean(string key, bool value)
 	{
-		GetValues()[KGBGENDIMBC] = new PlistElementBoolean(PKHDLOGJKAD);
+		GetValues()[key] = new PlistElementBoolean(value);
 	}
 
-	public PlistElementArray CreateArray(string KGBGENDIMBC)
+	public PlistElementArray CreateArray(string key)
 	{
-		PlistElementArray gHFPDLCPEBH = new PlistElementArray();
-		GetValues()[KGBGENDIMBC] = gHFPDLCPEBH;
-		return gHFPDLCPEBH;
+		PlistElementArray array = new PlistElementArray();
+		GetValues()[key] = array;
+		return array;
 	}
 
-	public PlistElementDict CreateDict(string KGBGENDIMBC)
+	public PlistElementDict CreateDict(string key)
 	{
-		PlistElementDict jDMGABPEDFI = new PlistElementDict();
-		GetValues()[KGBGENDIMBC] = jDMGABPEDFI;
-		return jDMGABPEDFI;
+		PlistElementDict dict = new PlistElementDict();
+		GetValues()[key] = dict;
+		return dict;
 	}
 }

@@ -1,7 +1,7 @@
 public sealed class WebSocketPong : WebSocketBinaryFrame
 {
-	public WebSocketPong(WebSocketFrameReader CEHDEHABCNL)
-		: base(CEHDEHABCNL.GetData())
+	public WebSocketPong(WebSocketFrameReader pingFrame)
+		: base(pingFrame.GetData())
 	{
 	}
 

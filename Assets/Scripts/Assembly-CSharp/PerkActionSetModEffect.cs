@@ -43,11 +43,11 @@ internal class PerkActionSetModEffect : PerkAction
 	{
 	}
 
-	public PerkActionSetModEffect(PerkActionSetModEffect NOLFMPDGCOC)
-		: base(NOLFMPDGCOC)
+	public PerkActionSetModEffect(PerkActionSetModEffect source)
+		: base(source)
 	{
-		set_ModName(NOLFMPDGCOC.GetModName());
-		SetEffectType(NOLFMPDGCOC.GetEffectType());
+		set_ModName(source.GetModName());
+		SetEffectType(source.GetEffectType());
 	}
 
 	public string GetModName()
@@ -78,9 +78,9 @@ internal class PerkActionSetModEffect : PerkAction
 		SetEffectType(ParseEffectType(node.Attributes["Type"].GetStringOrDefault(string.Empty)));
 	}
 
-	private ModEffectType ParseEffectType(string CNKBLODAFDO)
+	private ModEffectType ParseEffectType(string effectTypeName)
 	{
-		if (CNKBLODAFDO.Equals("Pulse"))
+		if (effectTypeName.Equals("Pulse"))
 		{
 			return ModEffectType.EFFECT_PULSE;
 		}

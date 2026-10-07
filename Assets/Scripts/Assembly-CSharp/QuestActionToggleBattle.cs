@@ -8,10 +8,10 @@ public class QuestActionToggleBattle : QuestAction
 
 	private string _name;
 
-	public override void Parse(XmlNode EPKLCPOEELO)
+	public override void Parse(XmlNode node)
 	{
-		base.Parse(EPKLCPOEELO);
-		string text = EPKLCPOEELO.Attributes["Toggle"].GetStringOrDefault(string.Empty);
+		base.Parse(node);
+		string text = node.Attributes["Toggle"].GetStringOrDefault(string.Empty);
 		if (text.Equals("on"))
 		{
 			_toggle = true;
@@ -20,28 +20,28 @@ public class QuestActionToggleBattle : QuestAction
 		{
 			_toggle = false;
 		}
-		_name = EPKLCPOEELO.Attributes["Name"].GetStringOrDefault(string.Empty);
+		_name = node.Attributes["Name"].GetStringOrDefault(string.Empty);
 	}
 
-	public override void Execute(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters parameters)
 	{
-		base.Execute(GFIHPBCEEOB);
-		ConditionExtension.CompareResult lNIDLHOIHIM = new ConditionExtension.CompareResult();
-		QuestCondition kKDGLNECFHA = new QuestCondition();
-		kKDGLNECFHA.SetParameters(GFIHPBCEEOB);
-		kKDGLNECFHA.SetValue(_name, lNIDLHOIHIM);
-		FightIDS mOCEDDJOAEB = new FightIDS();
-		mOCEDDJOAEB.SetFightIDSByString(lNIDLHOIHIM.resultSTR);
-		Battle cGJCGEBPCAF = ListSF.GetBattleById(mOCEDDJOAEB);
-		RosterBattle dDNLCGOPAGC = ((cGJCGEBPCAF == null) ? null : cGJCGEBPCAF.GetRosterBattle());
-		if (dDNLCGOPAGC != null)
+		base.Execute(parameters);
+		ConditionExtension.CompareResult result = new ConditionExtension.CompareResult();
+		QuestCondition condition = new QuestCondition();
+		condition.SetParameters(parameters);
+		condition.SetValue(_name, result);
+		FightIDS fightIds = new FightIDS();
+		fightIds.SetFightIDSByString(result.resultSTR);
+		Battle battle = ListSF.GetBattleById(fightIds);
+		RosterBattle rosterBattle = ((battle == null) ? null : battle.GetRosterBattle());
+		if (rosterBattle != null)
 		{
-			dDNLCGOPAGC.SetHidden(!_toggle);
+			rosterBattle.SetHidden(!_toggle);
 		}
 		MapScene current = Scene<MapScene>.get_Current();
-		if (current != null && cGJCGEBPCAF != null)
+		if (current != null && battle != null)
 		{
-			current.UpdateBattleButtonHidden(cGJCGEBPCAF);
+			current.UpdateBattleButtonHidden(battle);
 		}
 		ListSF.GetInstance().RequestSave();
 		FinishAction();

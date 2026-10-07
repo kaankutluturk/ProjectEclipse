@@ -33,10 +33,10 @@ public sealed class HTTPCacheMaintananceParams
 		}
 	}
 
-	public HTTPCacheMaintananceParams(TimeSpan HJELDPKENPC, ulong EBFOBGKCGJP)
+	public HTTPCacheMaintananceParams(TimeSpan deleteOlder, ulong maxCacheSize)
 	{
-		set_DeleteOlder(HJELDPKENPC);
-		set_MaxCacheSize(EBFOBGKCGJP);
+		set_DeleteOlder(deleteOlder);
+		set_MaxCacheSize(maxCacheSize);
 	}
 
 	public TimeSpan GetDeleteOlder()

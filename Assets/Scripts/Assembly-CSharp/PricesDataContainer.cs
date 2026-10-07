@@ -17,23 +17,23 @@ public class PricesDataContainer
 		return prices;
 	}
 
-	public PricesData FindByProductId(string JKKKGIOHNMH)
+	public PricesData FindByProductId(string productId)
 	{
-		return prices.Find((PricesData DHDMNHCIPEH) => DHDMNHCIPEH.ProductId == JKKKGIOHNMH || DHDMNHCIPEH.NewProductId == JKKKGIOHNMH);
+		return prices.Find((PricesData priceData) => priceData.ProductId == productId || priceData.NewProductId == productId);
 	}
 
-	public PricesData FindByName(string BMCEHAPAJCA)
+	public PricesData FindByName(string priceName)
 	{
-		return prices.Find((PricesData DHDMNHCIPEH) => DHDMNHCIPEH.name == BMCEHAPAJCA);
+		return prices.Find((PricesData priceData) => priceData.name == priceName);
 	}
 
-	public bool TryGetPriceValue(string BMCEHAPAJCA, out float HCHKFOJEEBK)
+	public bool TryGetPriceValue(string priceName, out float priceValue)
 	{
-		HCHKFOJEEBK = 0f;
-		PricesData bEOLBLGJCKA = FindByName(BMCEHAPAJCA);
-		if (bEOLBLGJCKA != null)
+		priceValue = 0f;
+		PricesData priceData = FindByName(priceName);
+		if (priceData != null)
 		{
-			return float.TryParse(bEOLBLGJCKA.GetCurrentPrice(), out HCHKFOJEEBK);
+			return float.TryParse(priceData.GetCurrentPrice(), out priceValue);
 		}
 		return false;
 	}

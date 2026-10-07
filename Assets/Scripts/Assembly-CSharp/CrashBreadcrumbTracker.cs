@@ -19,7 +19,7 @@ public class CrashBreadcrumbTracker : SessionCrashInfo
 		return _instance;
 	}
 
-	public void AddBreadcrumb(string IEEAOCEJHGK)
+	public void AddBreadcrumb(string breadcrumb)
 	{
 	}
 }

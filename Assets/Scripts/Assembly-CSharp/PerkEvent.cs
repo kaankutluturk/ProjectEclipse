@@ -43,10 +43,10 @@ public class PerkEvent : PerkObject
 	{
 	}
 
-	public PerkEvent(PerkEvent NOLFMPDGCOC)
-		: base(NOLFMPDGCOC)
+	public PerkEvent(PerkEvent source)
+		: base(source)
 	{
-		set_Type(NOLFMPDGCOC.get_Type());
+		set_Type(source.get_Type());
 	}
 
 	public PerkEventType get_Type()
@@ -59,7 +59,7 @@ public class PerkEvent : PerkObject
 		_type = value;
 	}
 
-	public static List<PerkEvent> Create(XmlNode node, PerkInfoItem AEFFHJGMNFI)
+	public static List<PerkEvent> Create(XmlNode node, PerkInfoItem perk)
 	{
 		List<PerkEvent> list = new List<PerkEvent>();
 		if (node != null)
@@ -67,124 +67,124 @@ public class PerkEvent : PerkObject
 			foreach (XmlNode childNode in node.ChildNodes)
 			{
 				string name = childNode.Name;
-				PerkEvent gBMAKFJNAPG = null;
+				PerkEvent perkEvent = null;
 				switch (name)
 				{
 				case "RoundStageStart":
-					gBMAKFJNAPG = new PerkEventRoundStage();
+					perkEvent = new PerkEventRoundStage();
 					break;
 				case "HitPreCrit":
-					gBMAKFJNAPG = new PerkEventPostHit();
+					perkEvent = new PerkEventPostHit();
 					break;
 				case "HitPostCrit":
-					gBMAKFJNAPG = new PerkEventPostHit();
+					perkEvent = new PerkEventPostHit();
 					break;
 				case "PostHit":
-					gBMAKFJNAPG = new PerkEventPostHit();
+					perkEvent = new PerkEventPostHit();
 					break;
 				case "AnimationStart":
-					gBMAKFJNAPG = new PerkEventAnimationStart();
+					perkEvent = new PerkEventAnimationStart();
 					break;
 				case "AnimationEnd":
-					gBMAKFJNAPG = new PerkEventAnimationStart();
+					perkEvent = new PerkEventAnimationStart();
 					break;
 				case "ModExpires":
-					gBMAKFJNAPG = new PerkEventModExpires();
+					perkEvent = new PerkEventModExpires();
 					break;
 				case "EveryFrame":
-					gBMAKFJNAPG = new PerkEventEveryFrame();
+					perkEvent = new PerkEventEveryFrame();
 					break;
 				case "AreaEnter":
-					gBMAKFJNAPG = new PerkEventAreaEnter();
+					perkEvent = new PerkEventAreaEnter();
 					break;
 				case "AreaExit":
-					gBMAKFJNAPG = new PerkEventAreaEnter();
+					perkEvent = new PerkEventAreaEnter();
 					break;
 				case "MagicCharged":
-					gBMAKFJNAPG = new PerkEventAreaEnter();
+					perkEvent = new PerkEventAreaEnter();
 					break;
 				case "IntervalEnd":
-					gBMAKFJNAPG = new PerkEventIntervalEnd();
+					perkEvent = new PerkEventIntervalEnd();
 					break;
 				default:
-					gBMAKFJNAPG = new PerkEvent();
+					perkEvent = new PerkEvent();
 					break;
 				}
-				gBMAKFJNAPG.SetPerk(AEFFHJGMNFI);
-				gBMAKFJNAPG.Parse(childNode);
-				if (gBMAKFJNAPG.get_Type() != PerkEventType.EVENT_NONE)
+				perkEvent.SetPerk(perk);
+				perkEvent.Parse(childNode);
+				if (perkEvent.get_Type() != PerkEventType.EVENT_NONE)
 				{
-					list.Add(gBMAKFJNAPG);
+					list.Add(perkEvent);
 				}
 			}
 		}
 		return list;
 	}
 
-	public static PerkEvent Clone(PerkEvent BBLOGNPCPKI, PerkInfoItem AEFFHJGMNFI)
+	public static PerkEvent Clone(PerkEvent source, PerkInfoItem perk)
 	{
-		PerkEvent gBMAKFJNAPG = null;
-		if (BBLOGNPCPKI != null)
+		PerkEvent perkEvent = null;
+		if (source != null)
 		{
-			switch (BBLOGNPCPKI.get_Type())
+			switch (source.get_Type())
 			{
 			case PerkEventType.EVENT_ROUND_STAGE_START:
-				gBMAKFJNAPG = new PerkEventRoundStage((PerkEventRoundStage)BBLOGNPCPKI);
+				perkEvent = new PerkEventRoundStage((PerkEventRoundStage)source);
 				break;
 			case PerkEventType.EVENT_HIT_PRECRIT:
-				gBMAKFJNAPG = new PerkEventPostHit((PerkEventPostHit)BBLOGNPCPKI);
+				perkEvent = new PerkEventPostHit((PerkEventPostHit)source);
 				break;
 			case PerkEventType.EVENT_HIT_POSTCRIT:
-				gBMAKFJNAPG = new PerkEventPostHit((PerkEventPostHit)BBLOGNPCPKI);
+				perkEvent = new PerkEventPostHit((PerkEventPostHit)source);
 				break;
 			case PerkEventType.EVENT_POST_HIT:
-				gBMAKFJNAPG = new PerkEventPostHit((PerkEventPostHit)BBLOGNPCPKI);
+				perkEvent = new PerkEventPostHit((PerkEventPostHit)source);
 				break;
 			case PerkEventType.EVENT_ANIMATION_START:
-				gBMAKFJNAPG = new PerkEventAnimationStart((PerkEventAnimationStart)BBLOGNPCPKI);
+				perkEvent = new PerkEventAnimationStart((PerkEventAnimationStart)source);
 				break;
 			case PerkEventType.EVENT_ANIMATION_END:
-				gBMAKFJNAPG = new PerkEventAnimationStart((PerkEventAnimationStart)BBLOGNPCPKI);
+				perkEvent = new PerkEventAnimationStart((PerkEventAnimationStart)source);
 				break;
 			case PerkEventType.EVENT_MOD_EXPIRES:
-				gBMAKFJNAPG = new PerkEventModExpires((PerkEventModExpires)BBLOGNPCPKI);
+				perkEvent = new PerkEventModExpires((PerkEventModExpires)source);
 				break;
 			case PerkEventType.EVENT_EVERY_FRAME:
-				gBMAKFJNAPG = new PerkEventEveryFrame((PerkEventEveryFrame)BBLOGNPCPKI);
+				perkEvent = new PerkEventEveryFrame((PerkEventEveryFrame)source);
 				break;
 			case PerkEventType.EVENT_AREA_ENTER:
-				gBMAKFJNAPG = new PerkEventAreaEnter((PerkEventAreaEnter)BBLOGNPCPKI);
+				perkEvent = new PerkEventAreaEnter((PerkEventAreaEnter)source);
 				break;
 			case PerkEventType.EVENT_AREA_EXIT:
-				gBMAKFJNAPG = new PerkEventAreaEnter((PerkEventAreaEnter)BBLOGNPCPKI);
+				perkEvent = new PerkEventAreaEnter((PerkEventAreaEnter)source);
 				break;
 			case PerkEventType.EVENT_MAGIC_CHARGED:
-				gBMAKFJNAPG = new PerkEventAreaEnter((PerkEventAreaEnter)BBLOGNPCPKI);
+				perkEvent = new PerkEventAreaEnter((PerkEventAreaEnter)source);
 				break;
 			case PerkEventType.EVENT_INTERVAL_END:
-				gBMAKFJNAPG = new PerkEventIntervalEnd((PerkEventIntervalEnd)BBLOGNPCPKI);
+				perkEvent = new PerkEventIntervalEnd((PerkEventIntervalEnd)source);
 				break;
 			default:
-				gBMAKFJNAPG = new PerkEvent(BBLOGNPCPKI);
+				perkEvent = new PerkEvent(source);
 				GameLog.Error("PerkEvent.Clone PerkEvent type is EventType.EVENT_NONE");
 				break;
 			}
-			gBMAKFJNAPG.SetPerk(AEFFHJGMNFI);
+			perkEvent.SetPerk(perk);
 		}
-		return gBMAKFJNAPG;
+		return perkEvent;
 	}
 
-	public virtual bool IsEqual(EventStruct EJMEALJNNIL)
+	public virtual bool IsEqual(EventStruct eventData)
 	{
-		if (TargetPlayer == PlayerType.PLAYER_ME && EJMEALJNNIL.PerkOwnerModel != EJMEALJNNIL.EventModel)
+		if (TargetPlayer == PlayerType.PLAYER_ME && eventData.PerkOwnerModel != eventData.EventModel)
 		{
 			return false;
 		}
-		if (TargetPlayer == PlayerType.PLAYER_ENEMY && EJMEALJNNIL.PerkOwnerModel == EJMEALJNNIL.EventModel)
+		if (TargetPlayer == PlayerType.PLAYER_ENEMY && eventData.PerkOwnerModel == eventData.EventModel)
 		{
 			return false;
 		}
-		return EJMEALJNNIL.Type == get_Type();
+		return eventData.Type == get_Type();
 	}
 
 	public override void Parse(XmlNode node)

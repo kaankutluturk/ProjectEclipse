@@ -33,28 +33,28 @@ public class ProgressBar : MonoBehaviour
 		Stripe.fillMethod = Image.FillMethod.Horizontal;
 	}
 
-	public void SetValueBorders(float LHNCHOAEGEA, float KAEPJHHLLPK)
+	public void SetValueBorders(float newMin, float newMax)
 	{
-		minValue = LHNCHOAEGEA;
-		maxValue = KAEPJHHLLPK;
+		minValue = newMin;
+		maxValue = newMax;
 		UpdateFill();
 	}
 
-	public virtual void SetValue(float OKEFHDDPMEC, float _Duration = 0f)
+	public virtual void SetValue(float newValue, float _Duration = 0f)
 	{
-		OKEFHDDPMEC = Mathf.Clamp(OKEFHDDPMEC, minValue, maxValue);
-		if (currentValue != OKEFHDDPMEC)
+		newValue = Mathf.Clamp(newValue, minValue, maxValue);
+		if (currentValue != newValue)
 		{
 			if (_tween != null)
 			{
 				_tween.Kill();
 				_tween = null;
 			}
-			_tween = DOTween.To(() => currentValue, (float DHDMNHCIPEH) =>
+			_tween = DOTween.To(() => currentValue, (float animatedValue) =>
 			{
-				currentValue = DHDMNHCIPEH;
+				currentValue = animatedValue;
 				UpdateFill();
-			}, OKEFHDDPMEC, _Duration);
+			}, newValue, _Duration);
 			UpdateFill();
 		}
 	}

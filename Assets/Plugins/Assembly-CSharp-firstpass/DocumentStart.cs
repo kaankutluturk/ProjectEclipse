@@ -42,21 +42,21 @@ public class DocumentStart : ParsingEvent
 		}
 	}
 
-	public DocumentStart(VersionDirective version, TagDirectiveCollection CPAIGLNDIOK, bool isImplicit, Mark ILENLCMAMBH, Mark PCLFFOBJJFO)
-		: base(ILENLCMAMBH, PCLFFOBJJFO)
+	public DocumentStart(VersionDirective version, TagDirectiveCollection tags, bool isImplicit, Mark start, Mark end)
+		: base(start, end)
 	{
 		this.version = version;
-		this.tags = CPAIGLNDIOK;
+		this.tags = tags;
 		this.isImplicit = isImplicit;
 	}
 
-	public DocumentStart(VersionDirective version, TagDirectiveCollection CPAIGLNDIOK, bool isImplicit)
-		: this(version, CPAIGLNDIOK, isImplicit, Mark.Empty, Mark.Empty)
+	public DocumentStart(VersionDirective version, TagDirectiveCollection tags, bool isImplicit)
+		: this(version, tags, isImplicit, Mark.Empty, Mark.Empty)
 	{
 	}
 
-	public DocumentStart(Mark ILENLCMAMBH, Mark PCLFFOBJJFO)
-		: this(null, null, true, ILENLCMAMBH, PCLFFOBJJFO)
+	public DocumentStart(Mark start, Mark end)
+		: this(null, null, true, start, end)
 	{
 	}
 
@@ -95,8 +95,8 @@ public class DocumentStart : ParsingEvent
 		return string.Format(CultureInfo.InvariantCulture, "Document start [isImplicit = {0}]", isImplicit);
 	}
 
-	public override void Accept(IParsingEventVisitor NKECMANOOEM)
+	public override void Accept(IParsingEventVisitor visitor)
 	{
-		NKECMANOOEM.Visit(this);
+		visitor.Visit(this);
 	}
 }

@@ -19,31 +19,31 @@ public class QuestActionUnlockBattle : QuestAction
 
 	private string _hidden = string.Empty;
 
-	public override void Parse(XmlNode EPKLCPOEELO)
+	public override void Parse(XmlNode node)
 	{
-		base.Parse(EPKLCPOEELO);
-		string name = EPKLCPOEELO.Name;
+		base.Parse(node);
+		string name = node.Name;
 		_toggle = name == "ShowBattle";
-		isLocked = EPKLCPOEELO.Attributes["Locked"].ParseBool();
-		_name = EPKLCPOEELO.Attributes["Name"].GetStringOrDefault(string.Empty);
-		isInstant = EPKLCPOEELO.Attributes["Instant"].ParseBool();
-		_hidden = EPKLCPOEELO.Attributes["Hidden"].GetStringOrDefault(string.Empty);
-		replayCountExpression = EPKLCPOEELO.Attributes["ReplayCount"].GetStringOrDefault(string.Empty);
+		isLocked = node.Attributes["Locked"].ParseBool();
+		_name = node.Attributes["Name"].GetStringOrDefault(string.Empty);
+		isInstant = node.Attributes["Instant"].ParseBool();
+		_hidden = node.Attributes["Hidden"].GetStringOrDefault(string.Empty);
+		replayCountExpression = node.Attributes["ReplayCount"].GetStringOrDefault(string.Empty);
 	}
 
-	public override void Execute(QuestParameters JCICKLIMBEF)
+	public override void Execute(QuestParameters parameters)
 	{
-		base.Execute(JCICKLIMBEF);
-		ConditionExtension.CompareResult lNIDLHOIHIM = new ConditionExtension.CompareResult();
-		QuestCondition kKDGLNECFHA = new QuestCondition();
-		kKDGLNECFHA.SetParameters(JCICKLIMBEF);
-		kKDGLNECFHA.SetValue(_name, lNIDLHOIHIM);
-		int oAHPBDFKJOK = 0;
+		base.Execute(parameters);
+		ConditionExtension.CompareResult result = new ConditionExtension.CompareResult();
+		QuestCondition condition = new QuestCondition();
+		condition.SetParameters(parameters);
+		condition.SetValue(_name, result);
+		int replayCount = 0;
 		if (!string.IsNullOrEmpty(replayCountExpression))
 		{
 			ConditionExtension.CompareResult lNIDLHOIHIM2 = new ConditionExtension.CompareResult();
-			kKDGLNECFHA.SetValue(replayCountExpression, lNIDLHOIHIM2);
-			oAHPBDFKJOK = (int)lNIDLHOIHIM2.resultNumber;
+			condition.SetValue(replayCountExpression, lNIDLHOIHIM2);
+			replayCount = (int)lNIDLHOIHIM2.resultNumber;
 		}
 		if (!string.IsNullOrEmpty(_hidden))
 		{
@@ -58,24 +58,24 @@ public class QuestActionUnlockBattle : QuestAction
 			else
 			{
 				ConditionExtension.CompareResult lNIDLHOIHIM3 = new ConditionExtension.CompareResult();
-				kKDGLNECFHA.SetValue(_hidden, lNIDLHOIHIM3);
+				condition.SetValue(_hidden, lNIDLHOIHIM3);
 				isHidden = lNIDLHOIHIM3.resultNumber > 0.0;
 			}
 		}
-		FightIDS mOCEDDJOAEB = new FightIDS();
-		mOCEDDJOAEB.SetFightIDSByString(lNIDLHOIHIM.resultSTR);
-		Roster nKGLHEGIKKP = ListSF.GetRoster();
-		nKGLHEGIKKP.AddBattle(mOCEDDJOAEB, true, _toggle, isLocked, isHidden, oAHPBDFKJOK);
+		FightIDS fightIds = new FightIDS();
+		fightIds.SetFightIDSByString(result.resultSTR);
+		Roster playerRoster = ListSF.GetRoster();
+		playerRoster.AddBattle(fightIds, true, _toggle, isLocked, isHidden, replayCount);
 		ListSF.GetInstance().RequestSave();
 		ListSF.RefreshConditionStatuses();
-		Zone pKCPOJKLMOK = ListSF.GetZoneByName(mOCEDDJOAEB.GetZone());
-		bool flag = HasVisibleBattle(pKCPOJKLMOK);
-		Battle cGJCGEBPCAF = ((pKCPOJKLMOK == null) ? null : pKCPOJKLMOK.FindBattle(mOCEDDJOAEB.GetBattle()));
-		if (cGJCGEBPCAF != null)
+		Zone zone = ListSF.GetZoneByName(fightIds.GetZone());
+		bool flag = HasVisibleBattle(zone);
+		Battle battle = ((zone == null) ? null : zone.FindBattle(fightIds.GetBattle()));
+		if (battle != null)
 		{
-			cGJCGEBPCAF.IsMapVisible = _toggle;
+			battle.IsMapVisible = _toggle;
 		}
-		bool flag2 = HasVisibleBattle(pKCPOJKLMOK);
+		bool flag2 = HasVisibleBattle(zone);
 		MapScene current = Scene<MapScene>.get_Current();
 		if (current != null)
 		{
@@ -83,21 +83,21 @@ public class QuestActionUnlockBattle : QuestAction
 			{
 				current.ReloadZones();
 			}
-			current.ActiveBattleByFightIDS(mOCEDDJOAEB, _toggle, false, isInstant);
+			current.ActiveBattleByFightIDS(fightIds, _toggle, false, isInstant);
 		}
 		FinishAction();
 	}
 
-	private bool HasVisibleBattle(Zone HLJKOKMKMLM)
+	private bool HasVisibleBattle(Zone zone)
 	{
-		if (HLJKOKMKMLM == null)
+		if (zone == null)
 		{
 			return false;
 		}
-		List<Battle> lGIIBNJFADA = HLJKOKMKMLM.Battles;
-		for (int i = 0; i < lGIIBNJFADA.Count; i++)
+		List<Battle> battles = zone.Battles;
+		for (int i = 0; i < battles.Count; i++)
 		{
-			if (lGIIBNJFADA[i].IsMapVisible)
+			if (battles[i].IsMapVisible)
 			{
 				return true;
 			}

@@ -29,8 +29,8 @@ public class YamlEventParser : IParser
 		}
 	}
 
-	public YamlEventParser(TextReader NILNDHEKNLJ)
-		: this(new Scanner(NILNDHEKNLJ))
+	public YamlEventParser(TextReader input)
+		: this(new Scanner(input))
 	{
 	}
 
@@ -166,17 +166,17 @@ public class YamlEventParser : IParser
 		}
 		if (isImplicit && !(GetCurrentToken() is VersionDirective) && !(GetCurrentToken() is TagDirective) && !(GetCurrentToken() is DocumentStart) && !(GetCurrentToken() is StreamEnd))
 		{
-			TagDirectiveCollection cPAIGLNDIOK = new TagDirectiveCollection();
-			ProcessDirectives(cPAIGLNDIOK);
+			TagDirectiveCollection documentTagDirectives = new TagDirectiveCollection();
+			ProcessDirectives(documentTagDirectives);
 			states.Push(ParserState.DocumentEnd);
 			state = ParserState.BlockNode;
-			return new DocumentStart(null, cPAIGLNDIOK, true, GetCurrentToken().Start, GetCurrentToken().End);
+			return new DocumentStart(null, documentTagDirectives, true, GetCurrentToken().Start, GetCurrentToken().End);
 		}
 		if (!(GetCurrentToken() is StreamEnd))
 		{
 			Mark start = GetCurrentToken().Start;
 			TagDirectiveCollection cPAIGLNDIOK2 = new TagDirectiveCollection();
-			VersionDirective aHLPODLKBEP = ProcessDirectives(cPAIGLNDIOK2);
+			VersionDirective versionDirective = ProcessDirectives(cPAIGLNDIOK2);
 			Token token = GetCurrentToken();
 			if (!(token is DocumentStart))
 			{
@@ -184,7 +184,7 @@ public class YamlEventParser : IParser
 			}
 			states.Push(ParserState.DocumentEnd);
 			state = ParserState.DocumentContent;
-			ParsingEvent result = new DocumentStart(aHLPODLKBEP, cPAIGLNDIOK2, false, start, token.End);
+			ParsingEvent result = new DocumentStart(versionDirective, cPAIGLNDIOK2, false, start, token.End);
 			Skip();
 			return result;
 		}
@@ -197,7 +197,7 @@ public class YamlEventParser : IParser
 		return result2;
 	}
 
-	private VersionDirective ProcessDirectives(TagDirectiveCollection CPAIGLNDIOK)
+	private VersionDirective ProcessDirectives(TagDirectiveCollection directives)
 	{
 		VersionDirective versionDirective = null;
 		while (true)
@@ -227,29 +227,29 @@ public class YamlEventParser : IParser
 					throw new SemanticErrorException(tagDirective.Start, tagDirective.End, "Found duplicate %TAG directive.");
 				}
 				tagDirectives.Add(tagDirective);
-				if (CPAIGLNDIOK != null)
+				if (directives != null)
 				{
-					CPAIGLNDIOK.Add(tagDirective);
+					directives.Add(tagDirective);
 				}
 			}
 			Skip();
 		}
-		if (CPAIGLNDIOK != null)
+		if (directives != null)
 		{
-			AddDefaultTagDirectives(CPAIGLNDIOK);
+			AddDefaultTagDirectives(directives);
 		}
 		AddDefaultTagDirectives(tagDirectives);
 		return versionDirective;
 	}
 
-	private static void AddDefaultTagDirectives(TagDirectiveCollection AJGCJGFNFIP)
+	private static void AddDefaultTagDirectives(TagDirectiveCollection directives)
 	{
-		TagDirective[] gNPKLFKPLCM = YamlConstants.DefaultTagDirectives;
-		foreach (TagDirective tagDirective in gNPKLFKPLCM)
+		TagDirective[] defaultDirectives = YamlConstants.DefaultTagDirectives;
+		foreach (TagDirective tagDirective in defaultDirectives)
 		{
-			if (!AJGCJGFNFIP.Contains(tagDirective))
+			if (!directives.Contains(tagDirective))
 			{
-				AJGCJGFNFIP.Add(tagDirective);
+				directives.Add(tagDirective);
 			}
 		}
 	}
@@ -264,12 +264,12 @@ public class YamlEventParser : IParser
 		return ParseNode(true, false);
 	}
 
-	private static ParsingEvent ProcessEmptyScalar(Mark MGMMDGFPBLP)
+	private static ParsingEvent ProcessEmptyScalar(Mark mark)
 	{
-		return new Scalar(null, null, string.Empty, ScalarStyle.Plain, true, false, MGMMDGFPBLP, MGMMDGFPBLP);
+		return new Scalar(null, null, string.Empty, ScalarStyle.Plain, true, false, mark, mark);
 	}
 
-	private ParsingEvent ParseNode(bool OOCLHFGEPML, bool GGHAMOFCLMP)
+	private ParsingEvent ParseNode(bool isBlock, bool isIndentlessSequence)
 	{
 		Tokens.AnchorAlias anchorAlias = GetCurrentToken() as Tokens.AnchorAlias;
 		if (anchorAlias != null)
@@ -318,7 +318,7 @@ public class YamlEventParser : IParser
 		}
 		string text2 = ((anchor == null) ? null : ((!string.IsNullOrEmpty(anchor.Value)) ? anchor.Value : null));
 		bool flag = string.IsNullOrEmpty(text);
-		if (GGHAMOFCLMP && GetCurrentToken() is BlockEntry)
+		if (isIndentlessSequence && GetCurrentToken() is BlockEntry)
 		{
 			state = ParserState.IndentlessSequenceEntry;
 			return new SequenceStart(text2, text, flag, SequenceStyle.Block, start, GetCurrentToken().End);
@@ -326,18 +326,18 @@ public class YamlEventParser : IParser
 		Tokens.Scalar scalar = GetCurrentToken() as Tokens.Scalar;
 		if (scalar != null)
 		{
-			bool oCBIEJBMFJN = false;
-			bool fAKBCOKEHGP = false;
+			bool isPlainImplicit = false;
+			bool isQuotedImplicit = false;
 			if ((scalar.Style == ScalarStyle.Plain && text == null) || text == "!")
 			{
-				oCBIEJBMFJN = true;
+				isPlainImplicit = true;
 			}
 			else if (text == null)
 			{
-				fAKBCOKEHGP = true;
+				isQuotedImplicit = true;
 			}
 			state = states.Pop();
-			ParsingEvent result2 = new Scalar(text2, text, scalar.Value, scalar.Style, oCBIEJBMFJN, fAKBCOKEHGP, start, scalar.End);
+			ParsingEvent result2 = new Scalar(text2, text, scalar.Value, scalar.Style, isPlainImplicit, isQuotedImplicit, start, scalar.End);
 			Skip();
 			return result2;
 		}
@@ -353,7 +353,7 @@ public class YamlEventParser : IParser
 			state = ParserState.FlowMappingFirstKey;
 			return new MappingStart(text2, text, flag, MappingStyle.Flow, start, flowMappingStart.End);
 		}
-		if (OOCLHFGEPML)
+		if (isBlock)
 		{
 			BlockSequenceStart blockSequenceStart = GetCurrentToken() as BlockSequenceStart;
 			if (blockSequenceStart != null)
@@ -379,23 +379,23 @@ public class YamlEventParser : IParser
 
 	private ParsingEvent ParseDocumentEnd()
 	{
-		bool fFDGFENKBKH = true;
+		bool isImplicit = true;
 		Mark start = GetCurrentToken().Start;
-		Mark pCLFFOBJJFO = start;
+		Mark endMark = start;
 		if (GetCurrentToken() is DocumentEnd)
 		{
-			pCLFFOBJJFO = GetCurrentToken().End;
+			endMark = GetCurrentToken().End;
 			Skip();
-			fFDGFENKBKH = false;
+			isImplicit = false;
 		}
 		tagDirectives.Clear();
 		state = ParserState.DocumentStart;
-		return new DocumentEnd(fFDGFENKBKH, start, pCLFFOBJJFO);
+		return new DocumentEnd(isImplicit, start, endMark);
 	}
 
-	private ParsingEvent ParseBlockSequenceEntry(bool IKNHLPGLLKB)
+	private ParsingEvent ParseBlockSequenceEntry(bool isFirst)
 	{
-		if (IKNHLPGLLKB)
+		if (isFirst)
 		{
 			GetCurrentToken();
 			Skip();
@@ -441,9 +441,9 @@ public class YamlEventParser : IParser
 		return new SequenceEnd(GetCurrentToken().Start, GetCurrentToken().End);
 	}
 
-	private ParsingEvent ParseBlockMappingKey(bool IKNHLPGLLKB)
+	private ParsingEvent ParseBlockMappingKey(bool isFirst)
 	{
-		if (IKNHLPGLLKB)
+		if (isFirst)
 		{
 			GetCurrentToken();
 			Skip();
@@ -489,9 +489,9 @@ public class YamlEventParser : IParser
 		return ProcessEmptyScalar(GetCurrentToken().Start);
 	}
 
-	private ParsingEvent ParseFlowSequenceEntry(bool IKNHLPGLLKB)
+	private ParsingEvent ParseFlowSequenceEntry(bool isFirst)
 	{
-		if (IKNHLPGLLKB)
+		if (isFirst)
 		{
 			GetCurrentToken();
 			Skip();
@@ -499,7 +499,7 @@ public class YamlEventParser : IParser
 		ParsingEvent result;
 		if (!(GetCurrentToken() is FlowSequenceEnd))
 		{
-			if (!IKNHLPGLLKB)
+			if (!isFirst)
 			{
 				if (!(GetCurrentToken() is FlowEntry))
 				{
@@ -561,16 +561,16 @@ public class YamlEventParser : IParser
 		return new MappingEnd(GetCurrentToken().Start, GetCurrentToken().End);
 	}
 
-	private ParsingEvent ParseFlowMappingKey(bool IKNHLPGLLKB)
+	private ParsingEvent ParseFlowMappingKey(bool isFirst)
 	{
-		if (IKNHLPGLLKB)
+		if (isFirst)
 		{
 			GetCurrentToken();
 			Skip();
 		}
 		if (!(GetCurrentToken() is FlowMappingEnd))
 		{
-			if (!IKNHLPGLLKB)
+			if (!isFirst)
 			{
 				if (!(GetCurrentToken() is FlowEntry))
 				{
@@ -602,9 +602,9 @@ public class YamlEventParser : IParser
 		return result;
 	}
 
-	private ParsingEvent ParseFlowMappingValue(bool LPGLCGMMPHN)
+	private ParsingEvent ParseFlowMappingValue(bool isEmpty)
 	{
-		if (LPGLCGMMPHN)
+		if (isEmpty)
 		{
 			state = ParserState.FlowMappingKey;
 			return ProcessEmptyScalar(GetCurrentToken().Start);
