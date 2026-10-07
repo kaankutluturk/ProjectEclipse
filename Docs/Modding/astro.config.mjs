@@ -26,6 +26,7 @@ export default defineConfig({
           { slug: 'guides/fighter-motion' },
             { slug: 'guides/move-abilities' },
           { slug: 'guides/projectile-abilities' },
+          { slug: 'guides/moveset-editor' },
           { slug: 'guides/combine-mods' },
           { slug: 'guides/character-authoring' },
           { slug: 'guides/scripted-actors' },
@@ -58,6 +59,7 @@ export default defineConfig({
           { slug: 'api/items-progression-forge' },
           { slug: 'api/locations-and-locales' },
           { slug: 'api/moves-and-tactics' },
+          { slug: 'api/movesets' },
           { slug: 'api/asset-replacement' },
         ] },
         { label: 'Behavior and progression', items: [

@@ -93,7 +93,14 @@ namespace Eclipse.UI
                 Label(page, (modPage + 1) + " / " + pages, 332, 552, 105, 40, 20, Ink);
                 Button(page, "Next", 446, 552, 190, 40, () => { modPage = (modPage + 1) % pages; DrawMods(); }, UiSound.Tab);
             }
-            if (issues.Count > 0) Button(page, "Details (" + issues.Count + ")", 742, 552, 450, 40, () => DrawModIssues(issues, 0));
+            if (issues.Count > 0) Button(page, "Details (" + issues.Count + ")", 972, 552, 220, 40, () => DrawModIssues(issues, 0));
+            // Opens the multiplayer menus straight on the Moveset Lab.
+            Button(page, "Moveset Lab", 742, 552, 216, 40, () =>
+            {
+                Eclipse.Multiplayer.LocalVersusMenu.OpenMovesetLabOnEntry();
+                Eclipse.Multiplayer.LocalVersusSession.RequestEntry();
+                BeginCampaign();
+            }, UiSound.Begin);
             Button(page, "Back / Cancel", 76, 604, 290, 48, Home, UiSound.Back);
             Button(page, "Install ZIP", 380, 604, 240, 48, PickModZip);
             Button(page, "Characters", 634, 604, 260, 48, OpenCharacters, UiSound.Open);

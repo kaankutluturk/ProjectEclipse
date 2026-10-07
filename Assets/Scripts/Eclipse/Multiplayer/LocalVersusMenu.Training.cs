@@ -165,6 +165,7 @@ namespace Eclipse.Multiplayer
                 AddButton(right, "RECORD DUMMY", () => { VersusTraining.Recording.Clear(); VersusTraining.Control = DummyControl.Record; ResumeTraining(); });
                 var exits = AddRow(body);
                 AddButton(exits, "RESUME", ResumeTraining, 0, UiSound.Back);
+                if (labTesting) AddButton(exits, "MOVESET LAB", ReturnToMovesetLab, 0);
                 AddButton(exits, "LOADOUTS & ARENA", () => { LocalVersusSession.ShowMultiplayerHome(); ShowTraining(); }, 0);
                 AddButton(exits, "EXIT TRAINING", LocalVersusSession.ShowMultiplayerHome, 0, UiSound.Back);
             }, ResumeTraining, 1120);

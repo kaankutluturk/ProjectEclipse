@@ -74,6 +74,7 @@ namespace Eclipse.Multiplayer
         private void UpdateScreens()
         {
             if (!IsBackdropPage || VersusStagePicker.IsOpen) return;
+            if (page == Page.MovesetLab) UpdateMovesetLab();
             bool typing = UnityEngine.EventSystems.EventSystem.current != null &&
                 UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject != null &&
                 UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject.GetComponent<InputField>() != null;
@@ -182,8 +183,9 @@ namespace Eclipse.Multiplayer
         public void ShowModeSelect()
         {
             EnsureEventSystem();
+            EndMovesetLab();
             page = Page.ModeSelect;
-            RebuildScreen("MULTIPLAYER", "Choose how to fight", Hints("1 2 3", "Choose", "R", "Replays", "Esc", "Title"), LocalVersusSession.ReturnToTitle, content =>
+            RebuildScreen("MULTIPLAYER", "Choose how to fight", Hints("1 2 3", "Choose", "R", "Replays", "M", "Moveset Lab", "Esc", "Title"), LocalVersusSession.ReturnToTitle, content =>
             {
                 var cards = Place(content, "Modes", new Vector2(.5f, .5f), new Vector2(0, 40), new Vector2(1140, 430));
                 ModeCard(cards, 0, "LOCAL VERSUS", "Two players, one screen.\nKeyboard and gamepads.", ModeArt.Local, ShowLobby);
@@ -193,11 +195,13 @@ namespace Eclipse.Multiplayer
                 shortcuts.Add((KeyCode.Alpha2, ShowOnlineHome));
                 shortcuts.Add((KeyCode.Alpha3, ShowTraining));
                 shortcuts.Add((KeyCode.R, ShowReplays));
+                shortcuts.Add((KeyCode.M, ShowMovesetLab));
 
-                var links = Place(content, "Links", new Vector2(.5f, 0), new Vector2(0, 0), new Vector2(Debug.isDebugBuild ? 900 : 620, 46));
+                var links = Place(content, "Links", new Vector2(.5f, 0), new Vector2(0, 0), new Vector2(Debug.isDebugBuild ? 1140 : 900, 46));
                 var row = links.gameObject.AddComponent<HorizontalLayoutGroup>();
                 row.spacing = 16; row.childControlWidth = row.childControlHeight = true; row.childForceExpandWidth = true;
                 AddButton(links, "REPLAYS", ShowReplays, 0);
+                AddButton(links, "MOVESET LAB", ShowMovesetLab, 0);
                 // A netcode self-test for development; players have no use for it.
                 if (Debug.isDebugBuild) AddButton(links, "ROLLBACK TEST", TestRollbackOnLastReplay, 0);
                 AddButton(links, "RETURN TO TITLE", LocalVersusSession.ReturnToTitle, 0);

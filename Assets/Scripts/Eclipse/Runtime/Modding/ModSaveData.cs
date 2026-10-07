@@ -1292,6 +1292,24 @@ namespace Eclipse.Modding
                         }
                     }
                 }
+                if (patches.Exists(patch => patch.Animation?.NativeValue != null))
+                {
+                    Append(canonical, "move-combat-animation-native-v1");
+                    foreach (var patch in patches)
+                    {
+                        Append(canonical, patch.MoveName);
+                        Append(canonical, patch.Animation?.NativeValue ?? string.Empty);
+                    }
+                }
+                if (patches.Exists(patch => !patch.Extras.IsEmpty))
+                {
+                    Append(canonical, "move-combat-extras-v1");
+                    foreach (var patch in patches)
+                    {
+                        Append(canonical, patch.MoveName);
+                        AppendCombatExtras(canonical, patch.Extras);
+                    }
+                }
                 if (patches.Exists(patch => patch.AddInterval != null))
                 {
                     Append(canonical, "move-combat-add-interval-v1");
@@ -1307,6 +1325,25 @@ namespace Eclipse.Modding
                         }
                     }
                 }
+            }
+            if (content.MoveForks.Count > 0)
+            {
+                Append(canonical, "move-forks-v1"); Append(canonical, content.MoveForks.Count);
+                foreach (var fork in content.MoveForks)
+                {
+                    Append(canonical, fork.Owner.Value); Append(canonical, fork.RuntimeName); Append(canonical, fork.Source);
+                    Append(canonical, fork.ItemType); Append(canonical, fork.Subtype ?? string.Empty); Append(canonical, fork.RuntimeItemName ?? string.Empty);
+                }
+            }
+            if (content.MoveItemLockRemovals.Count > 0 || content.MoveItemExclusions.Count > 0)
+            {
+                var removals = new List<MoveItemLockRemoval>(content.MoveItemLockRemovals);
+                removals.Sort((a, b) => string.CompareOrdinal(a.ConflictKey, b.ConflictKey));
+                var exclusions = new List<MoveItemExclusion>(content.MoveItemExclusions);
+                exclusions.Sort((a, b) => string.CompareOrdinal(a.ConflictKey, b.ConflictKey));
+                Append(canonical, "move-item-lock-edits-v1"); Append(canonical, removals.Count); Append(canonical, exclusions.Count);
+                foreach (var removal in removals) { Append(canonical, removal.MoveName); Append(canonical, removal.ItemType); Append(canonical, removal.Subtype); }
+                foreach (var exclusion in exclusions) { Append(canonical, exclusion.MoveName); Append(canonical, exclusion.ItemType); Append(canonical, exclusion.RuntimeItemName); }
             }
             if (content.MoveItemLockExtensions.Count > 0)
             {
@@ -1635,6 +1672,59 @@ namespace Eclipse.Modding
         private static int CompareIds(DefinitionId left, DefinitionId right)
         {
             return string.CompareOrdinal(left.ToString(), right.ToString());
+        }
+
+        private static void AppendCombatExtras(StringBuilder canonical, ModMoveCombatExtras extras)
+        {
+            Append(canonical, extras.PlaybackRate != null);
+            if (extras.PlaybackRate != null) { Append(canonical, extras.PlaybackRate.Expected); Append(canonical, extras.PlaybackRate.Value); }
+            Append(canonical, extras.Intervals.Count);
+            foreach (var edit in extras.Intervals)
+            {
+                Append(canonical, (int)edit.Kind);
+                Append(canonical, edit.Select != null);
+                if (edit.Select != null)
+                {
+                    Append(canonical, edit.Select.Type); Append(canonical, edit.Select.Name); Append(canonical, edit.Select.Start);
+                    Append(canonical, edit.Select.End.HasValue); Append(canonical, edit.Select.End ?? 0);
+                }
+                Append(canonical, edit.Start.HasValue); Append(canonical, edit.Start ?? 0);
+                Append(canonical, edit.End.HasValue); Append(canonical, edit.End ?? 0);
+                Append(canonical, edit.AddType); Append(canonical, edit.AddName);
+            }
+            Append(canonical, extras.Attacks.Count);
+            foreach (var edit in extras.Attacks)
+            {
+                Append(canonical, edit.Id);
+                foreach (var frame in new[] { edit.Start, edit.End })
+                {
+                    Append(canonical, frame != null);
+                    if (frame != null) { Append(canonical, frame.Expected); Append(canonical, frame.Value); }
+                }
+                Append(canonical, edit.Damage != null);
+                if (edit.Damage != null) { Append(canonical, (float)edit.Damage.Expected); Append(canonical, (float)edit.Damage.Value); }
+                Append(canonical, edit.DamageTerms != null);
+                if (edit.DamageTerms != null)
+                    foreach (var terms in new[] { edit.DamageTerms.Expected, edit.DamageTerms.Value })
+                    {
+                        var keys = new List<string>(terms.Keys); keys.Sort(string.CompareOrdinal);
+                        Append(canonical, keys.Count);
+                        foreach (string key in keys) { Append(canonical, key); Append(canonical, (float)terms[key]); }
+                    }
+                Append(canonical, edit.Edges != null);
+                if (edit.Edges != null)
+                    foreach (var edges in new[] { edit.Edges.Expected, edit.Edges.Value })
+                    {
+                        Append(canonical, edges.Count);
+                        foreach (string edge in edges) Append(canonical, edge);
+                    }
+                Append(canonical, edit.Impulse != null);
+                if (edit.Impulse != null)
+                    foreach (var impulse in new[] { edit.Impulse.Expected, edit.Impulse.Value })
+                        foreach (double axis in impulse) Append(canonical, (float)axis);
+                Append(canonical, edit.Hit != null);
+                if (edit.Hit != null) { Append(canonical, edit.Hit.Expected); Append(canonical, edit.Hit.Value); }
+            }
         }
 
         private static void Append(StringBuilder builder, int value)

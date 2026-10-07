@@ -313,6 +313,19 @@ public class IntervalAttack : IntervalAnimation
 		return defenseTypes;
 	}
 
+	// Eclipse: guarded mod patches edit an already-parsed attack in place and restore it.
+	internal void EclipseSetDamage(float value)
+	{
+		_Damage = value;
+	}
+
+	internal void EclipseSetAttackingParts(IEnumerable<string> parts)
+	{
+		attackingParts.Clear();
+		attackingParts.AddRange(parts);
+		hasAttackingParts = attackingParts.Count > 0;
+	}
+
 	public string GetReactionName(int frame)
 	{
 		foreach (Reaction item in hitReactions)

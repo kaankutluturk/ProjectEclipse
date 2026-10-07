@@ -14,10 +14,11 @@ $marker = 'namespace Eclipse.Modding' + "`n" + '{' + "`n" + '    // Validate the
 $source = $source.Replace("`r`n", "`n")
 $start = $source.IndexOf($marker)
 if ($start -lt 0) { throw 'Production move patch runtime marker is missing.' }
-$projection = 'using System; using System.Collections.Generic; using System.Xml;' + $source.Substring($start)
+$projection = 'using System; using System.Collections.Generic; using System.Linq; using System.Xml;' + $source.Substring($start)
 Set-Content -Encoding UTF8 -LiteralPath (Join-Path $fixture 'Runtime.cs') -Value $projection
 $sources = @(Get-ChildItem -LiteralPath (Join-Path $root 'Assets/Scripts/Eclipse/Runtime/Modding') -Filter '*.cs' -File | Select-Object -ExpandProperty FullName)
 $sources += @(Join-Path $PSScriptRoot 'MoveCombatPatchTests.cs')
+$sources += @(Join-Path $root 'Assets/Scripts/Eclipse/Runtime/PlaybackTiming.cs')
 $sources += @(Join-Path $fixture 'Runtime.cs')
 $includes = $sources | ForEach-Object { '<Compile Include="' + [Security.SecurityElement]::Escape($_) + '" />' }
 $project = '<Project Sdk="Microsoft.NET.Sdk"><PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net10.0</TargetFramework><EnableDefaultCompileItems>false</EnableDefaultCompileItems></PropertyGroup><ItemGroup>' + ($includes -join "`n") + '</ItemGroup></Project>'

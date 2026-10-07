@@ -135,3 +135,59 @@ An isolated Unity Play Mode fixture exercises the real overlay's F3/F4 update
 paths with controlled key/session sources, rendered text and the saved report.
 Physical keyboard/device input and full-game callback/frame attribution remain
 separate acceptance work.
+
+## Tune move patches without restarting
+
+When you adjust a move edit, such as an interval's frames, a move's damage or its
+speed, you can try the new values in the game you are already running instead of
+restarting. This covers [`sf2.moves.patch`](../../api/moves-and-tactics/#sf2movespatch),
+[`sf2.moves.fork`](../../api/moves-and-tactics/#sf2movesfork),
+`sf2.moves.remove_item_lock`, `sf2.moves.exclude_item` and
+[moveset files](../../api/movesets/). The [Moveset Lab](../moveset-editor/) uses the
+same reload every time you press **APPLY**.
+
+1. Install your mod as a folder in the game's `Mods` folder (see
+   [Install a folder manually](../../api/installing-mods/#install-a-folder-manually)),
+   so you can edit its files in place.
+2. Start any fight. Press **F1** to open the fight debug menu.
+3. Edit and save your mod's Lua file or `movesets/*.json` file.
+4. Press **F9**, or click **RELOAD MOD MOVE EDITS** in the menu. The result
+   appears at the bottom of the menu, for example
+   `Applied 3 move patch(es) and 1 fork(s) from 2 mod(s).`
+
+On reload the game registers every enabled mod again in a separate, temporary
+session that reads the edited files. It then removes the move edits currently
+applied and applies the new set. `expected` guards are always checked against the
+original native values, so keep them unchanged while you tune `value`. If any edit
+is rejected, the previous edits stay active and the menu shows why.
+
+**When the change shows up:**
+
+- Patches change the shared move data, so a move started after the reload uses the
+  new values. A move already in progress can keep values it has read.
+- Forks and lock edits change which moves a fighter can use. A fighter decides that
+  when it is built, so they apply to the next fight (or after restarting training).
+
+The reload is refused, with the reason shown, when:
+
+- a mod's script or moveset file fails to load, for example after a Lua syntax error
+  or a JSON typo;
+- the set of enabled mods, or a mod's ID or version, has changed since startup;
+- an online match or room is active.
+
+Only move edits take effect. Everything else your mod registers — new moves,
+`sf2.moves.replace` replacements, items, behaviors, text and assets — keeps its
+state from game startup, and running Lua callbacks are not reloaded. Any messages
+your entrypoint logs are written again. Animation files used by a patch's `animation`
+field must already have been present, at the same size, when the game started; add
+or change them with **Apply & Restart**.
+
+Saves keep describing the startup content until you restart. After a reload, online
+play stays unavailable until you restart, because the other player cannot check
+edits that were not part of your startup mods. Restart and test once more before you
+publish.
+
+Controlled tests cover removing one set of edits, applying an edited set and restoring
+the previous set after a rejection. In the Unity editor, reloading patches, subtype
+forks and weapon forks was checked in training. How fighters already mid-move
+respond still needs to be checked in play.

@@ -47,12 +47,12 @@ namespace Eclipse.Multiplayer
         private OnlinePhase builtPhase;
         private UnityEngine.UI.InputField nameField, addressField, portField;
 
-        private enum Page { Hidden, Lobby, Pause, Result, OnlineSetup, OnlineLobby, OnlineHome, RoomBrowser, RoomCreate, Room, ModeSelect, Armory, Replays, Training, Splash }
+        private enum Page { Hidden, Lobby, Pause, Result, OnlineSetup, OnlineLobby, OnlineHome, RoomBrowser, RoomCreate, Room, ModeSelect, Armory, Replays, Training, Splash, MovesetLab }
 
         /// <summary>Menu pages drawn over the living arena backdrop rather than over a fight.</summary>
         private bool IsBackdropPage => page == Page.Lobby || page == Page.OnlineSetup || page == Page.OnlineLobby ||
             page == Page.OnlineHome || page == Page.RoomBrowser || page == Page.RoomCreate || page == Page.Room || page == Page.ModeSelect ||
-            page == Page.Armory || page == Page.Replays || page == Page.Training || page == Page.Splash;
+            page == Page.Armory || page == Page.Replays || page == Page.Training || page == Page.Splash || page == Page.MovesetLab;
 
         public static LocalVersusMenu Ensure()
         {

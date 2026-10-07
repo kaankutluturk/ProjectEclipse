@@ -9,6 +9,7 @@ namespace Eclipse.Diagnostics
 	/// Lightweight, scene-independent fight diagnostics. F1 opens the menu and
 	/// F8 invokes the same opponent-defeat path as the menu action. F7 runs
 	/// complete fights quickly while preserving their normal progression path.
+	/// F9 re-runs mod registration and applies edited move patches, forks and moveset files.
 	/// </summary>
 	public sealed class EclipseFightDebugMenu : MonoBehaviour
 	{
@@ -84,6 +85,11 @@ namespace Eclipse.Diagnostics
 				DefeatOpponent();
 			}
 
+			if (Eclipse.Input.EclipseInput.GetKeyDown(KeyCode.F9) && fight != null)
+			{
+				ReloadMovePatches();
+			}
+
 			UpdateProgressionSprint(fight);
 		}
 
@@ -139,7 +145,7 @@ namespace Eclipse.Diagnostics
 
 		private void DrawMenu(Fight fight)
 		{
-			Rect panel = new Rect(12f, 12f, PanelWidth, 304f);
+			Rect panel = new Rect(12f, 12f, PanelWidth, 354f);
 			GUI.DrawTexture(panel, Texture2D.whiteTexture, ScaleMode.StretchToFill, true, 0f,
 				new Color(0.035f, 0.045f, 0.06f, 0.96f), 8f, 12f);
 			GUI.Label(new Rect(28f, 24f, 210f, 28f), "FIGHT DEBUG", _titleStyle);
@@ -168,10 +174,15 @@ namespace Eclipse.Diagnostics
 			}
 			GUI.backgroundColor = oldColor;
 
+			if (GUI.Button(new Rect(28f, 268f, 256f, 42f), "RELOAD MOD MOVE EDITS   [F9]"))
+			{
+				ReloadMovePatches();
+			}
+
 			string footer = Time.unscaledTime < _actionStatusUntil
 				? _actionStatus
 				: "Sprint: auto-win + 8x + skip results";
-			GUI.Label(new Rect(28f, 268f, 256f, 18f), footer, _smallStyle);
+			GUI.Label(new Rect(28f, 316f, 256f, 32f), footer, _smallStyle);
 		}
 
 		private bool DrawToggle(Rect rect, string text, bool value)
@@ -194,6 +205,13 @@ namespace Eclipse.Diagnostics
 			bool defeated = fight != null && fight.DebugDefeatOpponent();
 			_actionStatus = defeated ? "Opponent defeat triggered." : "No vulnerable opponent is active.";
 			_actionStatusUntil = Time.unscaledTime + 2.5f;
+		}
+
+		private void ReloadMovePatches()
+		{
+			Eclipse.Modding.ModRuntime.TryReloadMovePatches(out string report);
+			_actionStatus = report;
+			_actionStatusUntil = Time.unscaledTime + 6f;
 		}
 
 		private void SetProgressionSprint(bool enabled)
@@ -477,6 +495,7 @@ namespace Eclipse.Diagnostics
 			_smallStyle = new GUIStyle(_labelStyle)
 			{
 				fontSize = 11,
+				wordWrap = true,
 				normal = { textColor = new Color(0.65f, 0.7f, 0.78f) }
 			};
 			_healthStyle = new GUIStyle(_labelStyle)

@@ -281,6 +281,26 @@ input callbacks. See the Custom UI reference for lifetime and input rules.
   localization, texture, sprite descriptor, and editor settings. It never overwrites
   an existing folder.
 - **Validate Open Mod** refreshes diagnostics and opens Problems; **Open Documentation** opens the wiki.
+- Vanilla move data for `sf2.moves.patch`, `replace`, `extend_item_lock`,
+  `remove_perk_lock` and `extend_perk_lock`: native move names complete and hover
+  with their animation, priority, templates, keys, intervals and scheduled sounds.
+  `expected_file`, interval/sound names, `core_templates` and current `hit`,
+  `input` and `animation` values complete from the target move. Literal targets
+  and `expected` guards are checked against the same normalized vanilla data the
+  game loads, so unknown names and mismatched guards are flagged before launch.
+- Cross-mod claims: exclusive `moves.patch` and `moves.replace` targets,
+  `assets.replace` targets, `localization.patch` target/language pairs and
+  `battles.patch` positions are compared across every mod in the workspace and
+  the optional `eclipseModding.modsRoot` folder, as are duplicate mod IDs in one folder.
+- Moveset files (`movesets/*.json`, used by data-only mods and the in-game Moveset Lab)
+  get JSON Schema completion and hovers (`schemas/moveset.schema.json`), strict-format
+  diagnostics, the same vanilla guard checks as `sf2.moves.patch`, fork checks against the
+  source move's weapon lock groups, and conflict claims. `templates/moveset` is a
+  data-only starter. `sf2.moves.fork`, `remove_item_lock` and `exclude_item` calls are
+  checked against the vanilla lock groups too.
+- **Show Move Changes** opens a report of every vanilla move the current mod
+  touches: vanilla value beside the patched value, guard problems, behavior a
+  `moves.replace` drops because nothing is inherited, and conflicting claims.
 - Move short-form tables are typed: one-key conditions such as `{ not_mod = "Stun" }`
   and `{ controllable = true }`, points such as `{ node = "NPivot", player = "Enemy" }`,
   `timeline` keyed by frame or event, `events = "controlled"`,
@@ -305,6 +325,10 @@ sets this automatically.
 Project assistance finds the nearest `mod.toml` within the workspace folder and
 reads unsaved text edits. Disable removes this extension's registered library and
 turns off project assistance. `eclipseModding.enabled` controls the latter independently.
+
+`eclipseModding.modsRoot` optionally names a folder of installed mods, such as the
+game's `Mods` folder, absolute or relative to the workspace folder. Its mods join the
+workspace mods in the cross-mod claim check; they are indexed, never modified.
 Never copy `library/sf2.d.lua` into mod scripts: it is editor metadata.
 
 ## Limits
@@ -322,8 +346,16 @@ Numeric checks currently cover literal prices; other runtime limits remain autho
 Validate Open Mod checks open Lua documents and their mod's manifest/assets/localizations,
 not every unopened script. Indexes allow up to 10,000 files per asset/localization
 directory. Indexing failures appear in **Output > Eclipse Modding**.
-There is no debugger, live reload, mod installation, or game launch. A clean Problems
-panel is not a gameplay test.
+There is no debugger, mod installation, or game launch. The game's fight debug menu
+can reload edited `sf2.moves.patch` values (F9); the editor does not trigger it.
+A clean Problems panel is not a gameplay test.
+
+Vanilla move checks use literal values only and model the base game. Another
+enabled mod's `moves.replace` of the same move changes what the runtime's patch
+guards see, and computed move names are not checked. Claim checks index literal
+arguments only: item setters, fight rule patches and other semantic fields keep
+their runtime conflict rules without editor warnings. Enabled state is not known,
+so every indexed mod is assumed enabled.
 
 ## Build and maintain
 
@@ -336,6 +368,18 @@ npm run check
 npm test
 npm run package
 ```
+
+`data/native-moves.json` is generated from `Assets/vanillaXml/animations/moves.xml`
+by `python Tools/Audits/QueryMoves.py export-index` (run from the repository root);
+`npm test` fails when it is stale (the check is skipped when Python is not installed).
+Regenerate it after changing base move XML.
+
+`schemas/moveset.schema.json` is authored; `npm test` checks that its hit reaction list
+matches `data/api.json`. Keep it in step with `ModMovesetJson` in the runtime.
+
+`node scripts/report.cjs <mod folder> [--mods <folder>]...` prints the Show Move
+Changes report without VS Code and exits 1 on an unknown move, a vanilla guard
+mismatch or a cross-mod claim conflict, so it can gate CI for a mod repository.
 
 Edit `scripts/api-schema.cjs` for contracts. `generate` reads runtime bindings and
 wiki sections, verifies complete member/constant coverage, then writes tracked

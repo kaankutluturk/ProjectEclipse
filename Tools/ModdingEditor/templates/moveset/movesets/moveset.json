@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "kind": "eclipse.moveset",
+  "name": "Moveset starter",
+  "moves": [
+    {
+      "move": "HighKick",
+      "note": "A quicker, lighter high kick for everyone.",
+      "playback_rate": {
+        "expected": 1.0,
+        "value": 1.2
+      },
+      "attacks": [
+        {
+          "id": 0,
+          "damage": {
+            "expected": 0.12,
+            "value": 0.1
+          }
+        }
+      ]
+    }
+  ],
+  "forks": [
+    {
+      "id": "KatanaHeavySlash_Ninja",
+      "move": "KatanaHeavySlash",
+      "subtype": "NinjaSword",
+      "note": "Ninja swords get a faster heavy slash; katanas keep the original.",
+      "playback_rate": {
+        "expected": 1.0,
+        "value": 1.25
+      }
+    }
+  ]
+}

@@ -1775,6 +1775,24 @@ local MoveReplacementDefinition = {}
 ---@field subtype string
 local MoveItemLockExtension = {}
 
+---@class (exact) Eclipse.MoveFork
+---@field id string Local fork ID; the copy is named "<mod id>.<id>".
+---@field source string Exact native move name, or an earlier fork name, to copy.
+---@field subtype? string Weapon subtype that gets the copy (removed from the source lock group).
+---@field item? Eclipse.ItemHandle|string One item that gets the copy (excluded from the source); a handle or qualified item ID.
+local MoveFork = {}
+
+---@class (exact) Eclipse.MoveItemLockRemoval
+---@field move string
+---@field item_type "Weapon"|"Ranged"|"Magic"|"Armor"|"Helm"|"Skeleton"
+---@field subtype string Subtype removed from the positive lock group.
+local MoveItemLockRemoval = {}
+
+---@class (exact) Eclipse.MoveItemExclusion
+---@field move string
+---@field item Eclipse.ItemHandle|string Item handle or qualified item ID that stops getting the move.
+local MoveItemExclusion = {}
+
 ---@class (exact) Eclipse.MoveIntervalEndPatch
 ---@field name "SemiUninterrupt"|"Uninterrupt"|"SelfUninterrupt"|"Unstable"
 ---@field expected integer
@@ -1788,8 +1806,8 @@ local MoveIntervalEndPatch = {}
 local MoveIntervalStartPatch = {}
 
 ---@class (exact) Eclipse.MoveHitPatch
----@field expected "High"|"Middle"|"Low"|"Spinning"|"HighHeavy"|"MiddleShortPlus"|"Physycal"|"HighLong"|"NoReaction"
----@field value "High"|"Middle"|"Low"|"Spinning"|"HighHeavy"|"MiddleShortPlus"|"Physycal"|"HighLong"|"NoReaction"
+---@field expected "Earthquake"|"Electrocution"|"ElectrocutionPowerfield"|"HermitStorm"|"High"|"HighHeavy"|"HighHeavyDeflect"|"HighLong"|"HighPlus"|"HighShort"|"HighShortPlus"|"HoaxenPierce"|"Low"|"LowHeavy"|"LowHeavyDeflect"|"LowPull"|"Middle"|"MiddleHeavy"|"MiddleHeavyDeflect"|"MiddlePlus"|"MiddleShort"|"MiddleShortPlus"|"MindThrowHit"|"MindThrowHitNormal"|"NoReaction"|"Overhead"|"OverheadHeavy"|"OverheadHeavyDeflect"|"Physycal"|"RatWaveHit"|"RootHit"|"Spinning"|"SpinningHeavy"|"SpinningHeavyDeflect"|"Sweep"|"SweepHeavy"|"SweepHeavyDeflect"|"TitanHighHeavy"|"TitanMiddleHeavy"|"TitanOverhead"|"TitanSweep"|"TitansHarpoonHit"|"TitansHarpoonHitGrab"|"TitansHarpoonStrikeFall"|"TornadoHit"|"ToxicCloud"|"WaspFly"|"WaterWaveHit"
+---@field value "Earthquake"|"Electrocution"|"ElectrocutionPowerfield"|"HermitStorm"|"High"|"HighHeavy"|"HighHeavyDeflect"|"HighLong"|"HighPlus"|"HighShort"|"HighShortPlus"|"HoaxenPierce"|"Low"|"LowHeavy"|"LowHeavyDeflect"|"LowPull"|"Middle"|"MiddleHeavy"|"MiddleHeavyDeflect"|"MiddlePlus"|"MiddleShort"|"MiddleShortPlus"|"MindThrowHit"|"MindThrowHitNormal"|"NoReaction"|"Overhead"|"OverheadHeavy"|"OverheadHeavyDeflect"|"Physycal"|"RatWaveHit"|"RootHit"|"Spinning"|"SpinningHeavy"|"SpinningHeavyDeflect"|"Sweep"|"SweepHeavy"|"SweepHeavyDeflect"|"TitanHighHeavy"|"TitanMiddleHeavy"|"TitanOverhead"|"TitanSweep"|"TitansHarpoonHit"|"TitansHarpoonHitGrab"|"TitansHarpoonStrikeFall"|"TornadoHit"|"ToxicCloud"|"WaspFly"|"WaterWaveHit"
 local MoveHitPatch = {}
 
 ---@class (exact) Eclipse.MoveSoundFramePatch
@@ -1810,7 +1828,7 @@ local MovePriorityPatch = {}
 
 ---@class (exact) Eclipse.MoveAnimationPatch
 ---@field expected string
----@field value Eclipse.BinaryHandle
+---@field value Eclipse.BinaryHandle|string Binary handle of a clip shipped by the mod, or another native .bytes filename.
 local MoveAnimationPatch = {}
 
 ---@class (exact) Eclipse.MoveIntervalRemoval
@@ -1826,6 +1844,69 @@ local MoveIntervalRemoval = {}
 ---@field end integer
 local MoveIntervalAddition = {}
 
+---@class (exact) Eclipse.MovePlaybackRatePatch
+---@field expected number Current speed multiplier; 1.0 for an unedited native move.
+---@field value number New speed 0.5..2.0 (faster above 1.0). Limited to MidFrames + 1; unavailable for looped or physics moves.
+local MovePlaybackRatePatch = {}
+
+---@class (exact) Eclipse.MoveIntervalSelector
+---@field type? string Authored Type attribute, such as Block; omit when the interval has none.
+---@field name? string Authored Name attribute, such as Uninterrupt; omit when the interval has none.
+---@field start? integer Authored Start frame, default 0.
+---@field end? integer Authored End frame; omit for an open-ended interval.
+local MoveIntervalSelector = {}
+
+---@class (exact) Eclipse.MoveIntervalAdd
+---@field type? "Block"|"Invulnerable"|"Invisible"|"Throwable"
+---@field name? string
+---@field start integer
+---@field end? integer Omit for an interval that runs to the end of the move.
+local MoveIntervalAdd = {}
+
+---@class (exact) Eclipse.MoveIntervalEdit
+---@field select? Eclipse.MoveIntervalSelector The exact existing interval to edit or remove.
+---@field start? integer New start frame for the selected interval.
+---@field end? integer New end frame for the selected interval.
+---@field remove? true Remove the selected interval.
+---@field add? Eclipse.MoveIntervalAdd Add a new non-attack interval; use alone.
+local MoveIntervalEdit = {}
+
+---@class (exact) Eclipse.MoveFrameGuard
+---@field expected integer
+---@field value integer
+local MoveFrameGuard = {}
+
+---@class (exact) Eclipse.MoveNumberGuard
+---@field expected number
+---@field value number
+local MoveNumberGuard = {}
+
+---@class (exact) Eclipse.MoveDamageTermsGuard
+---@field expected table<string, number> Current damage terms: type name to Shift.
+---@field value Eclipse.MoveDamageTermMap Replacement terms (1..4).
+local MoveDamageTermsGuard = {}
+
+---@class (exact) Eclipse.MoveEdgesGuard
+---@field expected string[]
+---@field value string[] 1..64 attacking edges.
+local MoveEdgesGuard = {}
+
+---@class (exact) Eclipse.MoveImpulseGuard
+---@field expected Eclipse.MoveImpulse
+---@field value Eclipse.MoveImpulse
+local MoveImpulseGuard = {}
+
+---@class (exact) Eclipse.MoveAttackEdit
+---@field id integer Authored attack interval ID.
+---@field start? Eclipse.MoveFrameGuard
+---@field end? Eclipse.MoveFrameGuard
+---@field damage? Eclipse.MoveNumberGuard
+---@field damage_terms? Eclipse.MoveDamageTermsGuard
+---@field edges? Eclipse.MoveEdgesGuard
+---@field impulse? Eclipse.MoveImpulseGuard
+---@field hit? Eclipse.MoveHitPatch
+local MoveAttackEdit = {}
+
 ---@class (exact) Eclipse.MovePatch
 ---@field move string
 ---@field disable? boolean
@@ -1839,6 +1920,9 @@ local MoveIntervalAddition = {}
 ---@field animation? Eclipse.MoveAnimationPatch
 ---@field remove_interval? Eclipse.MoveIntervalRemoval
 ---@field add_interval? Eclipse.MoveIntervalAddition
+---@field playback_rate? Eclipse.MovePlaybackRatePatch
+---@field intervals? Eclipse.MoveIntervalEdit[]
+---@field attacks? Eclipse.MoveAttackEdit[]
 local MovePatch = {}
 
 ---@class (exact) Eclipse.MovePerkLockRemoval
@@ -3684,6 +3768,28 @@ function moves.replace(definition) end
 ---[Full reference](https://dawc17.github.io/ProjectEclipse/api/moves-and-tactics/#sf2movesextend_item_lock)
 ---@param definition Eclipse.MoveItemLockExtension
 function moves.extend_item_lock(definition) end
+
+---Requires: `content.patch`, plus a dependency on `core` (or the item's owner) when you name an item.
+---When: During registration. The copy is created when native moves are loaded, after replacements and before move patches, so patches can target it. Requires Apply & Restart when changing enabled content.
+---Returns: The copy's runtime move name (a string such as `"myname.blades.KatanaHeavySlash_Ninja"`). Pass it as `move` to [`sf2.moves.patch`](#sf2movespatch) to edit the copy.
+---[Full reference](https://dawc17.github.io/ProjectEclipse/api/moves-and-tactics/#sf2movesfork)
+---@param definition Eclipse.MoveFork
+---@return string
+function moves.fork(definition) end
+
+---Requires: `content.patch`.
+---When: During registration. Applied with the other lock edits when native moves load, before fighters are built. Requires Apply & Restart when changing enabled content.
+---Returns: Nothing (`nil`).
+---[Full reference](https://dawc17.github.io/ProjectEclipse/api/moves-and-tactics/#sf2movesremove_item_lock)
+---@param definition Eclipse.MoveItemLockRemoval
+function moves.remove_item_lock(definition) end
+
+---Requires: `content.patch`, plus a dependency on the item's owner (`core` for native items).
+---When: During registration. Applied with the other lock edits when native moves load, before fighters are built. Requires Apply & Restart when changing enabled content.
+---Returns: Nothing (`nil`).
+---[Full reference](https://dawc17.github.io/ProjectEclipse/api/moves-and-tactics/#sf2movesexclude_item)
+---@param definition Eclipse.MoveItemExclusion
+function moves.exclude_item(definition) end
 
 ---Requires: `content.patch` and any dependencies required by referenced conditions.
 ---When: Entrypoint. Registration records the patch; native application validates its target after base animations are available, before a fight starts.

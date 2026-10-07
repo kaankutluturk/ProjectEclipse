@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "kind": "eclipse.moveset",
+  "moves": [],
+  "forks": [
+    {
+      "id": "KatanaDoubleSlash_Katana",
+      "subtype": "Katana",
+      "move": "KatanaDoubleSlash"
+    }
+  ]
+}

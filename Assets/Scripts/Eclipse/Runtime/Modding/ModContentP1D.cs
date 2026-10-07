@@ -1238,7 +1238,7 @@ namespace Eclipse.Modding
         private readonly Dictionary<DefinitionId, TacticDefinition> _p1dTactics = new Dictionary<DefinitionId, TacticDefinition>();
 
         private int P1DRegistrationCount => _pendingActors.Count + _pendingProjectiles.Count + _p1dLocales.Count + _p1dLocations.Count + _p1dMoveTemplates.Count +
-            _p1dMoves.Count + _p1dMoveTriggers.Count + _p1dTactics.Count + MovePerkLockRegistrationCount + _moveItemLockExtensions.Count + _movePerkLockExtensions.Count + _moveCombatPatches.Count;
+            _p1dMoves.Count + _p1dMoveTriggers.Count + _p1dTactics.Count + MovePerkLockRegistrationCount + _moveItemLockExtensions.Count + _movePerkLockExtensions.Count + _moveCombatPatches.Count + ForkRegistrationCount;
 
         public LocaleMetadataDefinition RegisterLocaleMetadata(string localId, string name, string locale, string alias,
             string fileIcon, string fileIconSelected, string loaderImage, string preloaderImage, bool isAsian,
@@ -1367,6 +1367,7 @@ namespace Eclipse.Modding
             _catalog.ValidateItemLockExtensions(_moveItemLockExtensions);
             _catalog.ValidatePerkLockExtensions(_movePerkLockExtensions);
             _catalog.ValidateCombatPatches(_moveCombatPatches);
+            ValidateForkCommit();
             foreach (var patch in _moveCombatPatches) ValidateMovePerkRefs(patch.Conditions);
             for (int i = 0; i < templates.Length; i++) ValidateTemplateRefs(templates[i]);
             for (int i = 0; i < moves.Length; i++) ValidateTemplateRefs(moves[i]);
@@ -1390,6 +1391,7 @@ namespace Eclipse.Modding
             _catalog.AddItemLockExtensions(_moveItemLockExtensions);
             _catalog.AddPerkLockExtensions(_movePerkLockExtensions);
             _catalog.AddCombatPatches(_moveCombatPatches);
+            ApplyForkCommit();
         }
 
         private void ClearP1DPending()
@@ -1402,6 +1404,7 @@ namespace Eclipse.Modding
             _moveItemLockExtensions.Clear();
             _movePerkLockExtensions.Clear();
             _moveCombatPatches.Clear();
+            ClearForkPending();
         }
 
         private void ValidateProjectileReferences(ModMoveProjectile projectile)

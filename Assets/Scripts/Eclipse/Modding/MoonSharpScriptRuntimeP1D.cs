@@ -83,7 +83,8 @@ namespace Eclipse.Modding
                 {
                     const string function = "sf2.moves.patch";
                     Table table = args.AsType(0, function, DataType.Table, false).Table;
-                    ValidateFields(table, function, "move", "conditions", "interval_end", "interval_start", "hit", "sound_frame", "input", "priority", "animation", "remove_interval", "add_interval", "disable");
+                    ValidateFields(table, function, "move", "conditions", "interval_end", "interval_start", "hit", "sound_frame", "input", "priority", "animation", "remove_interval", "add_interval", "disable",
+                        "playback_rate", "intervals", "attacks");
                     ModMoveFramePatch Frame(string key)
                     {
                         DynValue value = table.Get(key); if (value.IsNil()) return null;
@@ -120,8 +121,11 @@ namespace Eclipse.Modding
                     {
                         if (rawAnimation.Type != DataType.Table) throw new ModContentException(function + ".animation must be a table.");
                         ValidateFields(rawAnimation.Table, function + ".animation", "expected", "value");
-                        animation = new ModMoveAnimationPatch(RequiredString(rawAnimation.Table,"expected",function),
-                            RequiredHandle(rawAnimation.Table,"value",_binaryHandles,"binary",function));
+                        // A string value names another native clip; a binary handle ships the clip in the mod.
+                        animation = rawAnimation.Table.Get("value").Type == DataType.String
+                            ? new ModMoveAnimationPatch(RequiredString(rawAnimation.Table,"expected",function), RequiredString(rawAnimation.Table,"value",function))
+                            : new ModMoveAnimationPatch(RequiredString(rawAnimation.Table,"expected",function),
+                                RequiredHandle(rawAnimation.Table,"value",_binaryHandles,"binary",function));
                     }
                     ModMoveIntervalRemoval removeInterval = null; DynValue rawRemoval = table.Get("remove_interval");
                     if (!rawRemoval.IsNil())
@@ -140,11 +144,47 @@ namespace Eclipse.Modding
                         addInterval = new ModMoveIntervalAddition(RequiredString(rawAddition.Table,"name",function),
                             RequiredInt(rawAddition.Table,"start",function), RequiredInt(rawAddition.Table,"end",function));
                     }
+                    var extras = new ModMoveCombatExtras(ReadIntervalEdits(table.Get("intervals"), function + ".intervals"),
+                        ReadAttackEdits(table.Get("attacks"), function + ".attacks"), ReadPlaybackRateGuard(table.Get("playback_rate"), function + ".playback_rate"));
                     _api.PatchMove(RequiredString(table,"move",function),ReadMoveConditions(table.Get("conditions"),function + ".conditions"),
                         Frame("interval_end"), hit, Frame("sound_frame"), OptionalBool(table,"disable",false,function),
-                        input, priority, Frame("interval_start"), animation, removeInterval, addInterval);
+                        input, priority, Frame("interval_start"), animation, removeInterval, addInterval, extras);
                     return DynValue.Nil;
                 })));
+                moves.Set("fork", DynValue.NewCallback((context, args) =>
+                {
+                    const string function = "sf2.moves.fork";
+                    Table table = args.AsType(0, function, DataType.Table, false).Table;
+                    return ApiCall(function, () =>
+                    {
+                        ValidateFields(table, function, "id", "source", "subtype", "item");
+                        string subtype = table.Get("subtype").IsNil() ? null : RequiredString(table, "subtype", function);
+                        string item = table.Get("item").IsNil() ? null : ItemReference(table.Get("item"), function + ".item");
+                        return DynValue.NewString(_api.ForkMove(RequiredString(table, "id", function), RequiredString(table, "source", function), subtype, item));
+                    });
+                }));
+                moves.Set("remove_item_lock", DynValue.NewCallback((context, args) =>
+                {
+                    const string function = "sf2.moves.remove_item_lock";
+                    Table table = args.AsType(0, function, DataType.Table, false).Table;
+                    return ApiCall(function, () =>
+                    {
+                        ValidateFields(table, function, "move", "item_type", "subtype");
+                        _api.RemoveMoveItemLock(RequiredString(table, "move", function), RequiredString(table, "item_type", function), RequiredString(table, "subtype", function));
+                        return DynValue.Nil;
+                    });
+                }));
+                moves.Set("exclude_item", DynValue.NewCallback((context, args) =>
+                {
+                    const string function = "sf2.moves.exclude_item";
+                    Table table = args.AsType(0, function, DataType.Table, false).Table;
+                    return ApiCall(function, () =>
+                    {
+                        ValidateFields(table, function, "move", "item");
+                        _api.ExcludeMoveItem(RequiredString(table, "move", function), ItemReference(table.Get("item"), function + ".item"));
+                        return DynValue.Nil;
+                    });
+                }));
                 moves.Set("register_template", DynValue.NewCallback(RegisterMoveTemplate));
                 moves.Set("register", DynValue.NewCallback(RegisterMove));
                 moves.Set("replace", DynValue.NewCallback(ReplaceMove));
@@ -784,6 +824,180 @@ namespace Eclipse.Modding
                         ReadMoveAttack(interval.Get("attack"),where+".attack")));
                 }
                 EnsureDenseArray(array, result.Count, function);
+                return result.ToArray();
+            }
+
+            // An item handle, or a qualified item ID string such as core:items/weapon/weapon_katana.
+            private string ItemReference(DynValue value, string function)
+            {
+                if (value.Type == DataType.String && value.String.Length != 0) return value.String;
+                if (value.Type == DataType.Table && _itemHandles.TryGetValue(value.Table, out DefinitionId id)) return id.ToString();
+                throw new ModContentException(function + " must be an item handle or a qualified item ID.");
+            }
+
+            // ---- sf2.moves.patch list-based edits ----
+
+            private static Table PatchTable(DynValue value, string function)
+            {
+                if (value.Type != DataType.Table) throw new ModContentException(function + " must be a table.");
+                return value.Table;
+            }
+
+            private static List<Table> PatchArray(DynValue value, string function)
+            {
+                var result = new List<Table>();
+                if (value.IsNil()) return result;
+                var array = RequireArray(value, function);
+                for (int i = 1; ; i++)
+                {
+                    var item = array.Get(i);
+                    if (item.IsNil()) break;
+                    result.Add(PatchTable(item, function + "[" + i + "]"));
+                }
+                EnsureDenseArray(array, result.Count, function);
+                return result;
+            }
+
+            private static double PatchNumber(Table table, string field, string function)
+            {
+                var value = table.Get(field);
+                if (value.Type != DataType.Number) throw new ModContentException(function + "." + field + " must be a number.");
+                return value.Number;
+            }
+
+            private static int? OptionalEnd(Table table, string function)
+            {
+                var value = table.Get("end");
+                if (value.IsNil()) return null;
+                if (value.Type != DataType.Number || value.Number != Math.Truncate(value.Number))
+                    throw new ModContentException(function + ".end must be an integer frame.");
+                return (int)value.Number;
+            }
+
+            private static string OptionalSymbol(Table table, string field, string function) =>
+                table.Get(field).IsNil() ? string.Empty : RequiredString(table, field, function);
+
+            private static ModMoveGuard<int> ReadPlaybackRateGuard(DynValue value, string function)
+            {
+                if (value.IsNil()) return null;
+                var table = PatchTable(value, function);
+                ValidateFields(table, function, "expected", "value");
+                return new ModMoveGuard<int>((int)Math.Round(PatchNumber(table, "expected", function) * 1000),
+                    (int)Math.Round(PatchNumber(table, "value", function) * 1000));
+            }
+
+            private static ModMoveIntervalSelector ReadIntervalSelector(DynValue value, string function)
+            {
+                var table = PatchTable(value, function);
+                ValidateFields(table, function, "type", "name", "start", "end");
+                return new ModMoveIntervalSelector(OptionalSymbol(table, "type", function), OptionalSymbol(table, "name", function),
+                    OptionalInt(table, "start", 0, function), OptionalEnd(table, function));
+            }
+
+            private static ModMoveIntervalEdit[] ReadIntervalEdits(DynValue value, string function)
+            {
+                var result = new List<ModMoveIntervalEdit>();
+                int index = 0;
+                foreach (var entry in PatchArray(value, function))
+                {
+                    string where = function + "[" + (++index) + "]";
+                    ValidateFields(entry, where, "select", "add", "remove", "start", "end");
+                    if (!entry.Get("add").IsNil())
+                    {
+                        if (!entry.Get("select").IsNil() || !entry.Get("remove").IsNil() || !entry.Get("start").IsNil() || !entry.Get("end").IsNil())
+                            throw new ModContentException(where + " uses add alone; put start and end inside add.");
+                        var add = PatchTable(entry.Get("add"), where + ".add");
+                        ValidateFields(add, where + ".add", "type", "name", "start", "end");
+                        result.Add(ModMoveIntervalEdit.Addition(OptionalSymbol(add, "type", where), OptionalSymbol(add, "name", where),
+                            RequiredInt(add, "start", where + ".add"), OptionalEnd(add, where + ".add")));
+                        continue;
+                    }
+                    if (entry.Get("select").IsNil()) throw new ModContentException(where + " needs select or add.");
+                    var select = ReadIntervalSelector(entry.Get("select"), where + ".select");
+                    if (OptionalBool(entry, "remove", false, where))
+                    {
+                        if (!entry.Get("start").IsNil() || !entry.Get("end").IsNil()) throw new ModContentException(where + " cannot both remove and set bounds.");
+                        result.Add(ModMoveIntervalEdit.Removal(select));
+                    }
+                    else
+                        result.Add(ModMoveIntervalEdit.Bounds(select, entry.Get("start").IsNil() ? (int?)null : RequiredInt(entry, "start", where),
+                            OptionalEnd(entry, where)));
+                }
+                return result.ToArray();
+            }
+
+            private static ModMoveGuard<T> ReadGuard<T>(Table attack, string field, string function, Func<DynValue, string, T> read)
+            {
+                var value = attack.Get(field);
+                if (value.IsNil()) return null;
+                var table = PatchTable(value, function + "." + field);
+                ValidateFields(table, function + "." + field, "expected", "value");
+                return new ModMoveGuard<T>(read(table.Get("expected"), function + "." + field + ".expected"),
+                    read(table.Get("value"), function + "." + field + ".value"));
+            }
+
+            private static int GuardInt(DynValue value, string function)
+            {
+                if (value.Type != DataType.Number || value.Number != Math.Truncate(value.Number)) throw new ModContentException(function + " must be an integer.");
+                return (int)value.Number;
+            }
+
+            private static double GuardNumber(DynValue value, string function)
+            {
+                if (value.Type != DataType.Number) throw new ModContentException(function + " must be a number.");
+                return value.Number;
+            }
+
+            private static string GuardString(DynValue value, string function)
+            {
+                if (value.Type != DataType.String || value.String.Length == 0) throw new ModContentException(function + " must be a non-empty string.");
+                return value.String;
+            }
+
+            private static IReadOnlyList<string> GuardStrings(DynValue value, string function)
+            {
+                var table = RequireArray(value, function);
+                var result = new List<string>();
+                for (int i = 1; ; i++) { var item = table.Get(i); if (item.IsNil()) break; result.Add(GuardString(item, function + "[" + i + "]")); }
+                EnsureDenseArray(table, result.Count, function);
+                return result.AsReadOnly();
+            }
+
+            private static IReadOnlyDictionary<string, double> GuardTerms(DynValue value, string function)
+            {
+                var table = PatchTable(value, function);
+                var result = new Dictionary<string, double>(StringComparer.Ordinal);
+                foreach (TablePair pair in table.Pairs)
+                {
+                    if (pair.Value.IsNil()) continue;
+                    if (pair.Key.Type != DataType.String || pair.Value.Type != DataType.Number)
+                        throw new ModContentException(function + " maps damage term names to shift numbers.");
+                    result[pair.Key.String] = pair.Value.Number;
+                }
+                return result;
+            }
+
+            private static IReadOnlyList<double> GuardImpulse(DynValue value, string function)
+            {
+                var table = PatchTable(value, function);
+                ValidateFields(table, function, "x", "y", "z");
+                return new[] { UiNumber(table, "x"), UiNumber(table, "y"), UiNumber(table, "z") };
+            }
+
+            private static ModMoveAttackEdit[] ReadAttackEdits(DynValue value, string function)
+            {
+                var result = new List<ModMoveAttackEdit>();
+                int index = 0;
+                foreach (var entry in PatchArray(value, function))
+                {
+                    string where = function + "[" + (++index) + "]";
+                    ValidateFields(entry, where, "id", "start", "end", "damage", "damage_terms", "edges", "impulse", "hit");
+                    result.Add(new ModMoveAttackEdit(RequiredInt(entry, "id", where),
+                        ReadGuard(entry, "start", where, GuardInt), ReadGuard(entry, "end", where, GuardInt),
+                        ReadGuard(entry, "damage", where, GuardNumber), ReadGuard(entry, "damage_terms", where, GuardTerms),
+                        ReadGuard(entry, "edges", where, GuardStrings), ReadGuard(entry, "impulse", where, GuardImpulse),
+                        ReadGuard(entry, "hit", where, GuardString)));
+                }
                 return result.ToArray();
             }
 

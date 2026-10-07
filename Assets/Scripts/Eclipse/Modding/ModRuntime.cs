@@ -1817,7 +1817,8 @@ namespace Eclipse.Modding
             {
                 foreach (Recipe recipe in forge.Recipes)
                 {
-                    if (recipe == null || string.IsNullOrEmpty(recipe.Name)) continue;
+                    // Mod-registered recipes carry qualified names; core import covers native ones only.
+                    if (recipe == null || string.IsNullOrEmpty(recipe.Name) || recipe.Name.IndexOf(':') >= 0) continue;
                     forgeProfileNames.Add(recipe.Name);
                 }
             }

@@ -13,6 +13,12 @@ Archived DE XML is evidence, not the authority for base-game behavior.
 | [AuditUnderworld.py](AuditUnderworld.py) | Installed raid XML, location params and real packaged sprite names | Does not edit assets; extracts/cache-writes under `Library/UnderworldAudit`; requires AssetPacker and actual installed bundle bytes |
 | [AuditRecoveredTextureCompression.py](AuditRecoveredTextureCompression.py) | Source bundle texture formats plus recovered PNG import settings | Read-only report; `--bundle-root` defaults to local `ResearchSources/CDNBundles/downloads`, `--project-root` defaults to this directory; requires UnityPy |
 
+## Native moves
+
+| Tool | Inputs and result | Writes and requirements |
+| --- | --- | --- |
+| [QueryMoves.py](QueryMoves.py) | Base `moves.xml` after the runtime's legacy merge, template filtering and template inheritance (via [MoveCorpus.py](MoveCorpus.py)); `show`, `search`, `uses TAG --attr K=V`, `values TAG ATTR` and `templates` answer corpus questions before a patch operation or hook is designed | Read-only, except `export-index`, which rewrites `Tools/ModdingEditor/data/native-moves.json`; `export-index --check` fails when that file is stale. Static XML evidence, not parser execution or gameplay |
+
 ## Archived XML and downstream evidence
 
 | Tool | Inputs and result | Writes and requirements |
@@ -40,6 +46,7 @@ migration and are not the current base XML contract.
 python Tools/Audits/AuditAssemblyCleanup.py
 python Tools/Audits/AuditDEXmlApi.py
 python Tools/Audits/AuditPhase3Configuration.py
+python Tools/Audits/QueryMoves.py export-index --check
 python Tools/Tests/Runtime/TestAuditDECorpus.py
 python Tools/Tests/Runtime/TestDEXmlAudit.py
 ```

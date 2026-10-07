@@ -94,7 +94,7 @@ namespace Eclipse.Modding
                     string manifestPath = Path.Combine(stagedMod, "mod.toml");
                     ModManifest manifest = ModManifestReader.ReadExternalFile(manifestPath);
                     if (manifest.Id != plan.Manifest.Id ||
-                        !File.Exists(Path.Combine(stagedMod, manifest.Entrypoint.Replace('/', Path.DirectorySeparatorChar))))
+                        (manifest.HasEntrypoint && !File.Exists(Path.Combine(stagedMod, manifest.Entrypoint.Replace('/', Path.DirectorySeparatorChar)))))
                         throw new InvalidDataException("Installed files do not match the manifest or its Lua entrypoint.");
                     // Index assets before exposing a package to the game.
                     new LooseModProvider(new ModDescriptor(manifest, stagedMod, ModSourceKind.Loose));

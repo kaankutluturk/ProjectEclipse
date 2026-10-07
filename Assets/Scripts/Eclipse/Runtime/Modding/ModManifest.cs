@@ -22,7 +22,9 @@ namespace Eclipse.Modding
         public string Name { get; }
         public SemanticVersion Version { get; }
         public IReadOnlyList<string> Authors { get; }
+        /// <summary>The Lua entrypoint, or null for a data-only mod.</summary>
         public string Entrypoint { get; }
+        public bool HasEntrypoint => Entrypoint != null;
         public IReadOnlyList<string> Capabilities { get; }
         public IReadOnlyList<ModDependency> Dependencies { get; }
 

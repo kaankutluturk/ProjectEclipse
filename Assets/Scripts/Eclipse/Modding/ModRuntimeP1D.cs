@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System;
 using UnityEngine;
 
@@ -178,6 +179,134 @@ namespace Eclipse.Modding
                 Debug.LogError("[ModContent] Failed to apply P1D content; mod startup is invalid. " + exception);
                 throw;
             }
+        }
+
+        // Developer live tuning for move edits (sf2.moves.patch, forks, item lock edits and
+        // movesets/*.json). Re-runs every enabled mod's registration in a scratch host and
+        // session (loose files are re-indexed, so edited Lua and moveset files are read) and
+        // swaps only the move overlay. All other content, running Lua behaviors and the save
+        // fingerprint keep the startup session until the game restarts.
+        public static bool TryReloadMovePatches(out string report) => TryApplyMoveOverlay(null, out report);
+
+        /// <summary>True while a reload or the Moveset Lab has replaced the startup move edits.</summary>
+        public static bool IsMoveOverlayActive => _legacyContent != null && _legacyContent.HasReplacedOverlay;
+
+        /// <summary>
+        /// Applies the move edits of every enabled mod as currently saved on disk.
+        /// <paramref name="labModId"/> names the Moveset Lab's own mod, which may be new since
+        /// startup; every other active mod must be unchanged.
+        /// </summary>
+        public static bool TryApplyMoveOverlay(string labModId, out string report)
+        {
+            if (labModId != null) _labMods.Add(labModId);
+            if (_host == null || _scripts == null || _legacyContent == null)
+            {
+                report = "Mod content is not active.";
+                return false;
+            }
+            if (Eclipse.Multiplayer.OnlineVersusSession.IsActive || Eclipse.Multiplayer.RoomSession.IsActive ||
+                Eclipse.Multiplayer.LocalVersusSession.IsOnline)
+            {
+                report = "Move edits cannot be reloaded during an online session.";
+                return false;
+            }
+            ModHost scratchHost = null;
+            ModScriptSession scratch = null;
+            try
+            {
+                scratchHost = ModHost.Build(_host.ModsRoot);
+                scratch = scratchHost.StartScripts(new MoonSharpScriptRuntime(null,
+                    () => LocalizationManager.CurrentLanguage == null ? LocalizationManager.DefaultLanguageName : LocalizationManager.CurrentLanguage.name,
+                    new ModDojoSelection(), new ModStoryEvents(), () => new ModAudioBackend()), LogScript, ImportCoreContent);
+                string mismatch = DescribeReloadMismatch(scratch, labModId);
+                if (mismatch != null)
+                {
+                    report = "Move edits were not applied: " + mismatch;
+                    Debug.LogWarning("[ModContent] " + report);
+                    return false;
+                }
+                var content = scratch.Content;
+                _legacyContent.ReplaceMoveOverlay(LegacyContentAdapter.MoveOverlaySet.From(content));
+                report = "Applied " + content.MoveCombatPatches.Count + " move patch(es) and " + content.MoveForks.Count +
+                    " fork(s) from " + scratch.ActiveMods.Count + " mod(s).";
+                Debug.Log("[ModContent] " + report);
+                return true;
+            }
+            catch (Exception exception)
+            {
+                report = "Move edits were not applied; the previous edits remain: " + exception.Message;
+                Debug.LogWarning("[ModContent] " + report + "\n" + exception);
+                return false;
+            }
+            finally
+            {
+                scratch?.Dispose();
+                scratchHost?.Dispose();
+                LoadTimings.Take();
+            }
+        }
+
+        /// <summary>Runs <paramref name="read"/> against base-game moves (no mod move edits applied).</summary>
+        internal static void WithoutMoveOverlay(Action read)
+        {
+            if (_legacyContent == null) read();
+            else _legacyContent.WithoutMoveOverlay(read);
+        }
+
+        /// <summary>Restores the move edits the game started with (closing the Moveset Lab).</summary>
+        public static void ClearMoveOverlay()
+        {
+            try { _legacyContent?.RestoreStartupMoveOverlay(); }
+            catch (Exception exception) { Debug.LogError("[ModContent] Could not restore startup move edits: " + exception); }
+        }
+
+        /// <summary>
+        /// Why online play is unavailable, or null. Moveset files and the Moveset Lab change
+        /// combat without changing a mod's version, which online play cannot verify.
+        /// </summary>
+        public static string OnlineBlockReason()
+        {
+            if (IsMoveOverlayActive) return "Move edits are being tested. Leave the Moveset Lab (or restart after a move reload) to play online.";
+            var files = _scripts?.Content.MovesetFiles;
+            if (files == null || files.Count == 0) return null;
+            var owners = new SortedSet<string>(StringComparer.Ordinal);
+            foreach (var file in files) owners.Add(file.Owner.Value);
+            return "Moveset mods are offline only. Disable " + string.Join(", ", owners) + " in Mods to play online.";
+        }
+
+        public static void RequireOnlineAllowed()
+        {
+            string reason = OnlineBlockReason();
+            if (reason != null) throw new InvalidOperationException(reason);
+        }
+
+        // The scratch session must activate the same mods as the running one (except the
+        // Moveset Lab's own mod); otherwise its overlay would silently drop or add whole mods.
+        // Mods the Moveset Lab has saved this session; they may be new since startup.
+        private static readonly HashSet<string> _labMods = new HashSet<string>(StringComparer.Ordinal);
+
+        private static string DescribeReloadMismatch(ModScriptSession scratch, string labModId)
+        {
+            foreach (ModDiagnostic diagnostic in scratch.Diagnostics)
+                if (diagnostic.Severity == ModDiagnosticSeverity.Error) return diagnostic.ToString();
+            var live = new Dictionary<string, SemanticVersion>(StringComparer.Ordinal);
+            foreach (var mod in _scripts.ActiveMods) live[mod.Id.Value] = mod.Version;
+            var seen = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var mod in scratch.ActiveMods)
+            {
+                seen.Add(mod.Id.Value);
+                if (mod.Id.Value == labModId) continue;
+                if (!live.ContainsKey(mod.Id.Value) && _labMods.Contains(mod.Id.Value)) continue;
+                if (!live.TryGetValue(mod.Id.Value, out var version))
+                    return "mod '" + mod.Id + "' was enabled since startup; restart the game to apply it.";
+                if (!version.Equals(mod.Version))
+                    return "mod '" + mod.Id + "' changed version; restart the game to apply it.";
+            }
+            foreach (var id in live.Keys)
+                if (!seen.Contains(id)) return "mod '" + id + "' is no longer active; restart the game to apply the change.";
+            if (labModId != null && !seen.Contains(labModId))
+                return "the Moveset Lab mod '" + labModId + "' is disabled; enable it in Mods.";
+            return null;
         }
     }
 }

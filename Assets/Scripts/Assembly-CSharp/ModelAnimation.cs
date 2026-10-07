@@ -1201,7 +1201,7 @@ public class ModelAnimation : global::EventDispatcher<object>
 		float startX = pivotTargetX;
 		int firstFrame = currentInfo.FirstFrame;
 		int num = GetStartFrame();
-		startFrameOffset = (num - firstFrame) * (currentInfo.MidFrames + 1);
+		startFrameOffset = Eclipse.Runtime.PlaybackTiming.TicksBefore(currentInfo.MidFrames + 1, num - firstFrame, currentInfo.PlaybackRatePermille);
 		float num2 = 0f;
 		if (0 < startFrameOffset && currentInfo.MoveData.AlignData.PivotObjectType == InfoAnimation.AlignObjectType.ObjectNodes)
 		{
@@ -1430,8 +1430,11 @@ public class ModelAnimation : global::EventDispatcher<object>
 		}
 		bufferState = 1;
 		interpolationSteps = GameUtils.GetSlowMode();
-		subFrameScale = 1f / (float)interpolationSteps;
-		int steps = (GetFrameStep() + 1) * interpolationSteps;
+		// Eclipse: a playback rate resizes each keyframe segment; velocity is scaled
+		// so a segment still travels its authored distance.
+		int rate = currentInfo.PlaybackRatePermille;
+		subFrameScale = (float)rate / (1000f * (float)interpolationSteps);
+		int steps = Mathf.Max(1, Eclipse.Runtime.PlaybackTiming.SegmentSteps((GetFrameStep() + 1) * interpolationSteps, firstFrameIndex, rate));
 		List<Vector3f> startPoints = _Frames.GetFrame(firstFrameIndex).Data;
 		List<Vector3f> secondFramePoints = _Frames.GetFrame(secondFrameIndex).Data;
 		List<Vector3f> thirdFramePoints = _Frames.GetFrame(secondFrameIndex + 1).Data;

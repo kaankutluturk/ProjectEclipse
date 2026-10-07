@@ -41,6 +41,8 @@ Forge candidate exclusions and deviation overrides participate in the content co
 
 Default equipment enchantment loadouts also participate in that fingerprint, including entry order and optional aspects. Changing or disabling a loadout restores acquisition defaults without rewriting enchantments already saved on inventory items.
 
+Move patches, including their playback rates, interval edits and attack edits, and move forks with their subtype or item lock edits participate in the fingerprint, whether they come from Lua or from [moveset files](../movesets/). Mods without these edits keep their previous fingerprint. Move changes affect fights only; saved equipment and progress are unchanged.
+
 Innate equipment loadouts are definition-level effects, not saved enchantments. Their ordered perks and named numeric parameters affect the fingerprint. Disabling them restores the original effects for subsequently built fighters without modifying the inventory's saved enchantments.
 
 ## When a mod is disabled or missing

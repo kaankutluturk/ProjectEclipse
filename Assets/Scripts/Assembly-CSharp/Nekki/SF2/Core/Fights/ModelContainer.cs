@@ -591,8 +591,19 @@ namespace Nekki.SF2.Core.Fights
 			CallEvent(1, data);
 		}
 
+		// Eclipse: Moveset Lab preview control. A paused preview advances only through PreviewStep.
+		internal bool PreviewPaused { get; set; }
+
+		internal Model PreviewModel => _playerModel;
+
+		internal void PreviewStep(int ticks)
+		{
+			for (int i = 0; i < ticks; i++) Render();
+		}
+
 		private void FixedUpdate()
 		{
+			if (PreviewPaused) return;
 			if (isRenderEnabled || Eclipse.Input.EclipseInput.GetKeyDown(KeyCode.Equals))
 			{
 				Render();

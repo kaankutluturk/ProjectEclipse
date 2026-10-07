@@ -54,6 +54,10 @@
       {
         "command": "eclipseModding.docs",
         "title": "Eclipse Modding: Open Documentation"
+      },
+      {
+        "command": "eclipseModding.showMoveChanges",
+        "title": "Eclipse Modding: Show Move Changes"
       }
     ],
     "snippets": [
@@ -70,9 +74,23 @@
           "default": true,
           "scope": "resource",
           "description": "Enable project-aware Eclipse mod suggestions and diagnostics in this folder. Use the Enable/Disable commands to also configure LuaLS."
+        },
+        "eclipseModding.modsRoot": {
+          "type": "string",
+          "default": "",
+          "scope": "resource",
+          "description": "Optional folder of installed mods, such as the game's Mods folder, absolute or relative to this workspace folder. Its mods are checked for conflicting patch and replacement claims alongside mods in the workspace."
         }
       }
-    }
+    },
+    "jsonValidation": [
+      {
+        "fileMatch": [
+          "**/movesets/*.json"
+        ],
+        "url": "./schemas/moveset.schema.json"
+      }
+    ]
   },
   "scripts": {
     "generate": "node scripts/generate.cjs",
@@ -93,6 +111,7 @@
   },
   "activationEvents": [
     "onLanguage:lua",
-    "workspaceContains:**/mod.toml"
+    "workspaceContains:**/mod.toml",
+    "workspaceContains:**/movesets/*.json"
   ]
 }

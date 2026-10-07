@@ -32,6 +32,13 @@ public class IntervalAnimation
 
 	public XmlNode NodeInterval;
 
+	// Eclipse: authored identity kept after lazy parsing, so guarded mod patches can
+	// select an already-parsed interval exactly ("Throwable" types and open ends
+	// are otherwise indistinguishable once parsed).
+	public string AuthoredType = string.Empty;
+
+	public bool HasAuthoredEnd = true;
+
 	public int AnimationId
 	{
 		get
@@ -69,6 +76,7 @@ public class IntervalAnimation
 	{
 		NodeInterval = node;
 		_Id = XmlUtils.ParseInt(node.Attributes["ID"], -1);
+		AuthoredType = node.Attributes["Type"]?.Value ?? string.Empty;
 	}
 
 	public virtual void Init()
@@ -88,6 +96,7 @@ public class IntervalAnimation
 		}
 		Start = XmlUtils.ParseInt(NodeInterval.Attributes["Start"]);
 		bool flag = NodeInterval.Attributes["End"] != null;
+		HasAuthoredEnd = flag;
 		EndFrameValue = ((!flag) ? (animationFinishFrame + 2) : XmlUtils.ParseInt(NodeInterval.Attributes["End"], int.MaxValue));
 		if (Start > EndFrameValue)
 		{

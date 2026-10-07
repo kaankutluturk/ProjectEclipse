@@ -1474,6 +1474,39 @@
       "requires": "`content.patch`.",
       "when": "During registration. Applied to already-loaded native moves before external moves and fighters are built. Requires Apply & Restart when changing enabled content; it does not rebuild already-created fighter snapshots in place."
     },
+    "sf2.moves.fork": {
+      "params": {
+        "definition": "Eclipse.MoveFork"
+      },
+      "returns": "The copy's runtime move name (a string such as `\"myname.blades.KatanaHeavySlash_Ninja\"`). Pass it as `move` to [`sf2.moves.patch`](#sf2movespatch) to edit the copy.",
+      "capability": "content.patch",
+      "url": "https://dawc17.github.io/ProjectEclipse/api/moves-and-tactics/#sf2movesfork",
+      "summary": "",
+      "requires": "`content.patch`, plus a dependency on `core` (or the item's owner) when you name an item.",
+      "when": "During registration. The copy is created when native moves are loaded, after replacements and before move patches, so patches can target it. Requires Apply & Restart when changing enabled content."
+    },
+    "sf2.moves.remove_item_lock": {
+      "params": {
+        "definition": "Eclipse.MoveItemLockRemoval"
+      },
+      "returns": "Nothing (`nil`).",
+      "capability": "content.patch",
+      "url": "https://dawc17.github.io/ProjectEclipse/api/moves-and-tactics/#sf2movesremove_item_lock",
+      "summary": "",
+      "requires": "`content.patch`.",
+      "when": "During registration. Applied with the other lock edits when native moves load, before fighters are built. Requires Apply & Restart when changing enabled content."
+    },
+    "sf2.moves.exclude_item": {
+      "params": {
+        "definition": "Eclipse.MoveItemExclusion"
+      },
+      "returns": "Nothing (`nil`).",
+      "capability": "content.patch",
+      "url": "https://dawc17.github.io/ProjectEclipse/api/moves-and-tactics/#sf2movesexclude_item",
+      "summary": "",
+      "requires": "`content.patch`, plus a dependency on the item's owner (`core` for native items).",
+      "when": "During registration. Applied with the other lock edits when native moves load, before fighters are built. Requires Apply & Restart when changing enabled content."
+    },
     "sf2.moves.patch": {
       "params": {
         "definition": "Eclipse.MovePatch"
@@ -4836,6 +4869,45 @@
         "subtype": "string"
       }
     },
+    "MoveFork": {
+      "fields": {
+        "id": [
+          "string",
+          "Local fork ID; the copy is named \"<mod id>.<id>\"."
+        ],
+        "source": [
+          "string",
+          "Exact native move name, or an earlier fork name, to copy."
+        ],
+        "subtype?": [
+          "string",
+          "Weapon subtype that gets the copy (removed from the source lock group)."
+        ],
+        "item?": [
+          "Eclipse.ItemHandle|string",
+          "One item that gets the copy (excluded from the source); a handle or qualified item ID."
+        ]
+      }
+    },
+    "MoveItemLockRemoval": {
+      "fields": {
+        "move": "string",
+        "item_type": "\"Weapon\"|\"Ranged\"|\"Magic\"|\"Armor\"|\"Helm\"|\"Skeleton\"",
+        "subtype": [
+          "string",
+          "Subtype removed from the positive lock group."
+        ]
+      }
+    },
+    "MoveItemExclusion": {
+      "fields": {
+        "move": "string",
+        "item": [
+          "Eclipse.ItemHandle|string",
+          "Item handle or qualified item ID that stops getting the move."
+        ]
+      }
+    },
     "MoveIntervalEndPatch": {
       "fields": {
         "name": "\"SemiUninterrupt\"|\"Uninterrupt\"|\"SelfUninterrupt\"|\"Unstable\"",
@@ -4852,8 +4924,8 @@
     },
     "MoveHitPatch": {
       "fields": {
-        "expected": "\"High\"|\"Middle\"|\"Low\"|\"Spinning\"|\"HighHeavy\"|\"MiddleShortPlus\"|\"Physycal\"|\"HighLong\"|\"NoReaction\"",
-        "value": "\"High\"|\"Middle\"|\"Low\"|\"Spinning\"|\"HighHeavy\"|\"MiddleShortPlus\"|\"Physycal\"|\"HighLong\"|\"NoReaction\""
+        "expected": "\"Earthquake\"|\"Electrocution\"|\"ElectrocutionPowerfield\"|\"HermitStorm\"|\"High\"|\"HighHeavy\"|\"HighHeavyDeflect\"|\"HighLong\"|\"HighPlus\"|\"HighShort\"|\"HighShortPlus\"|\"HoaxenPierce\"|\"Low\"|\"LowHeavy\"|\"LowHeavyDeflect\"|\"LowPull\"|\"Middle\"|\"MiddleHeavy\"|\"MiddleHeavyDeflect\"|\"MiddlePlus\"|\"MiddleShort\"|\"MiddleShortPlus\"|\"MindThrowHit\"|\"MindThrowHitNormal\"|\"NoReaction\"|\"Overhead\"|\"OverheadHeavy\"|\"OverheadHeavyDeflect\"|\"Physycal\"|\"RatWaveHit\"|\"RootHit\"|\"Spinning\"|\"SpinningHeavy\"|\"SpinningHeavyDeflect\"|\"Sweep\"|\"SweepHeavy\"|\"SweepHeavyDeflect\"|\"TitanHighHeavy\"|\"TitanMiddleHeavy\"|\"TitanOverhead\"|\"TitanSweep\"|\"TitansHarpoonHit\"|\"TitansHarpoonHitGrab\"|\"TitansHarpoonStrikeFall\"|\"TornadoHit\"|\"ToxicCloud\"|\"WaspFly\"|\"WaterWaveHit\"",
+        "value": "\"Earthquake\"|\"Electrocution\"|\"ElectrocutionPowerfield\"|\"HermitStorm\"|\"High\"|\"HighHeavy\"|\"HighHeavyDeflect\"|\"HighLong\"|\"HighPlus\"|\"HighShort\"|\"HighShortPlus\"|\"HoaxenPierce\"|\"Low\"|\"LowHeavy\"|\"LowHeavyDeflect\"|\"LowPull\"|\"Middle\"|\"MiddleHeavy\"|\"MiddleHeavyDeflect\"|\"MiddlePlus\"|\"MiddleShort\"|\"MiddleShortPlus\"|\"MindThrowHit\"|\"MindThrowHitNormal\"|\"NoReaction\"|\"Overhead\"|\"OverheadHeavy\"|\"OverheadHeavyDeflect\"|\"Physycal\"|\"RatWaveHit\"|\"RootHit\"|\"Spinning\"|\"SpinningHeavy\"|\"SpinningHeavyDeflect\"|\"Sweep\"|\"SweepHeavy\"|\"SweepHeavyDeflect\"|\"TitanHighHeavy\"|\"TitanMiddleHeavy\"|\"TitanOverhead\"|\"TitanSweep\"|\"TitansHarpoonHit\"|\"TitansHarpoonHitGrab\"|\"TitansHarpoonStrikeFall\"|\"TornadoHit\"|\"ToxicCloud\"|\"WaspFly\"|\"WaterWaveHit\""
       }
     },
     "MoveSoundFramePatch": {
@@ -4878,7 +4950,10 @@
     "MoveAnimationPatch": {
       "fields": {
         "expected": "string",
-        "value": "Eclipse.BinaryHandle"
+        "value": [
+          "Eclipse.BinaryHandle|string",
+          "Binary handle of a clip shipped by the mod, or another native .bytes filename."
+        ]
       }
     },
     "MoveIntervalRemoval": {
@@ -4896,6 +4971,127 @@
         "end": "integer"
       }
     },
+    "MovePlaybackRatePatch": {
+      "fields": {
+        "expected": [
+          "number",
+          "Current speed multiplier; 1.0 for an unedited native move."
+        ],
+        "value": [
+          "number",
+          "New speed 0.5..2.0 (faster above 1.0). Limited to MidFrames + 1; unavailable for looped or physics moves."
+        ]
+      }
+    },
+    "MoveIntervalSelector": {
+      "fields": {
+        "type?": [
+          "string",
+          "Authored Type attribute, such as Block; omit when the interval has none."
+        ],
+        "name?": [
+          "string",
+          "Authored Name attribute, such as Uninterrupt; omit when the interval has none."
+        ],
+        "start?": [
+          "integer",
+          "Authored Start frame, default 0."
+        ],
+        "end?": [
+          "integer",
+          "Authored End frame; omit for an open-ended interval."
+        ]
+      }
+    },
+    "MoveIntervalAdd": {
+      "fields": {
+        "type?": "\"Block\"|\"Invulnerable\"|\"Invisible\"|\"Throwable\"",
+        "name?": "string",
+        "start": "integer",
+        "end?": [
+          "integer",
+          "Omit for an interval that runs to the end of the move."
+        ]
+      }
+    },
+    "MoveIntervalEdit": {
+      "fields": {
+        "select?": [
+          "Eclipse.MoveIntervalSelector",
+          "The exact existing interval to edit or remove."
+        ],
+        "start?": [
+          "integer",
+          "New start frame for the selected interval."
+        ],
+        "end?": [
+          "integer",
+          "New end frame for the selected interval."
+        ],
+        "remove?": [
+          "true",
+          "Remove the selected interval."
+        ],
+        "add?": [
+          "Eclipse.MoveIntervalAdd",
+          "Add a new non-attack interval; use alone."
+        ]
+      }
+    },
+    "MoveFrameGuard": {
+      "fields": {
+        "expected": "integer",
+        "value": "integer"
+      }
+    },
+    "MoveNumberGuard": {
+      "fields": {
+        "expected": "number",
+        "value": "number"
+      }
+    },
+    "MoveDamageTermsGuard": {
+      "fields": {
+        "expected": [
+          "table<string, number>",
+          "Current damage terms: type name to Shift."
+        ],
+        "value": [
+          "Eclipse.MoveDamageTermMap",
+          "Replacement terms (1..4)."
+        ]
+      }
+    },
+    "MoveEdgesGuard": {
+      "fields": {
+        "expected": "string[]",
+        "value": [
+          "string[]",
+          "1..64 attacking edges."
+        ]
+      }
+    },
+    "MoveImpulseGuard": {
+      "fields": {
+        "expected": "Eclipse.MoveImpulse",
+        "value": "Eclipse.MoveImpulse"
+      }
+    },
+    "MoveAttackEdit": {
+      "fields": {
+        "id": [
+          "integer",
+          "Authored attack interval ID."
+        ],
+        "start?": "Eclipse.MoveFrameGuard",
+        "end?": "Eclipse.MoveFrameGuard",
+        "damage?": "Eclipse.MoveNumberGuard",
+        "damage_terms?": "Eclipse.MoveDamageTermsGuard",
+        "edges?": "Eclipse.MoveEdgesGuard",
+        "impulse?": "Eclipse.MoveImpulseGuard",
+        "hit?": "Eclipse.MoveHitPatch"
+      }
+    },
     "MovePatch": {
       "fields": {
         "move": "string",
@@ -4909,7 +5105,10 @@
         "priority?": "Eclipse.MovePriorityPatch",
         "animation?": "Eclipse.MoveAnimationPatch",
         "remove_interval?": "Eclipse.MoveIntervalRemoval",
-        "add_interval?": "Eclipse.MoveIntervalAddition"
+        "add_interval?": "Eclipse.MoveIntervalAddition",
+        "playback_rate?": "Eclipse.MovePlaybackRatePatch",
+        "intervals?": "Eclipse.MoveIntervalEdit[]",
+        "attacks?": "Eclipse.MoveAttackEdit[]"
       }
     },
     "MovePerkLockRemoval": {

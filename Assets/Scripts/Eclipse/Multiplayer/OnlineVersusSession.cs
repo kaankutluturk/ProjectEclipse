@@ -104,6 +104,7 @@ namespace Eclipse.Multiplayer
 
         public static void Host(string playerName, int port)
         {
+            Eclipse.Modding.ModRuntime.RequireOnlineAllowed();
             var session = Create(playerName);
             try { session.Peer = NetplayPeer.Host(port, session.Identity(), NowMs); }
             catch (Exception exception)
@@ -127,6 +128,7 @@ namespace Eclipse.Multiplayer
 
         public static void Join(string playerName, string address)
         {
+            Eclipse.Modding.ModRuntime.RequireOnlineAllowed();
             if (!NetplayPeer.TryParseAddress(address, out var endPoint, out var error)) throw new ArgumentException(error);
             var session = Create(playerName);
             try { session.Peer = NetplayPeer.Join(endPoint, session.Identity(), NowMs); }

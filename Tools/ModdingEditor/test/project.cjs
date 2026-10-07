@@ -684,3 +684,125 @@ test('ranged actor starter mirrors flight assets and terminal projectile command
  const terminal='local sf2=require("sf2");sf2.behaviors.register{id="x",on_actor_end=function(_,fighter) fighter:projectiles();fighter:spawn_projectile(dart,0,0) end}';
  assert.equal(p.analyze(terminal,mod).issues.filter(issue=>issue.code==='callback-timing').length,2);
 });
+
+const patchMod={data:{id:'test.patches',capabilities:['content.patch','content.register','assets.replace'],dependencies:[]},assets:new Map(),localizations:new Map()};
+const nativeIssues=source=>p.analyze(header+source,patchMod).issues.filter(i=>i.code.startsWith('native'));
+test('vanilla move data is generated from the current XML',t=>{
+ const {spawnSync}=require('node:child_process'),script=path.resolve(__dirname,'../../Audits/QueryMoves.py');
+ const python=['python3','python'].find(name=>!spawnSync(name,['--version']).error);
+ if(!python){t.skip('Python is unavailable');return;}
+ const result=spawnSync(python,[script,'export-index','--check'],{encoding:'utf8'});
+ assert.equal(result.status,0,result.stdout+result.stderr);
+});
+test('documented move patches pass vanilla guards and mismatches are reported',()=>{
+ for(const source of [
+  'sf2.moves.patch{move="RangedHeavyPlayer",interval_end={name="Uninterrupt",expected=42,value=40}}',
+  'sf2.moves.patch{move="ChakramFly",hit={expected="High",value="MiddleShortPlus"}}',
+  'sf2.moves.patch{move="ShopRangedTryOnHeavyPlayer",sound_frame={name="snd_disk",expected=18,value=16}}',
+  'sf2.moves.patch{move="FrontKick",add_interval={name="SemiUninterrupt",start=0,["end"]=4},interval_start={name="Uninterrupt",expected=0,value=5}}',
+  'sf2.moves.patch{move="LightingChainPlayer",input={expected="Super",value="RaidCharge"},priority={expected=9000,value=200},interval_start={name="Uninterrupt",expected=9,value=0}}',
+  'sf2.moves.patch{move="RatWavePlayer",input={expected="Up",value="RaidCharge"},animation={expected="rats_wave.bytes",value=clip}}',
+  'sf2.moves.patch{move="PerkFearRayPlayer",remove_interval={name="Evade",type="Invulnerable",start=0,["end"]=47}}',
+  'sf2.moves.replace{id="x",target="HighKick",expected_file="high_kick.bytes",animation=clip}',
+  'sf2.moves.patch{move=name,priority={expected=1,value=2}}',
+ ])assert.deepEqual(nativeIssues(source),[],source);
+ const messages=source=>nativeIssues(source).map(i=>i.message);
+ assert.match(messages('sf2.moves.patch{move="Highkick",disable=true}')[0],/No vanilla move is named "Highkick"/);
+ assert.match(messages('sf2.moves.patch{move="HighKick",priority={expected=100,value=90}}')[0],/priority 110, not 100/);
+ assert.match(messages('sf2.moves.patch{move="RangedHeavyPlayer",interval_end={name="Uninterrupt",expected=41,value=40}}')[0],/ends at 42, not 41/);
+ assert.match(messages('sf2.moves.patch{move="HighKick",hit={expected="Low",value="High"}}')[0],/hits with "High", not "Low"/);
+ assert.match(messages('sf2.moves.patch{move="HighKick",sound_frame={name="snd_swish5",expected=3,value=2}}')[0],/frame 4, not 3/);
+ assert.match(messages('sf2.moves.patch{move="HighKick",input={expected="Punch",value="Kick"}}')[0],/uses Kick, not "Punch"/);
+ assert.match(messages('sf2.moves.patch{move="PerkFearRayPlayer",remove_interval={name="Evade",type="Invulnerable",start=0,["end"]=46}}')[0],/must match exactly/);
+ assert.match(messages('sf2.moves.patch{move="FrontKick",add_interval={name="Uninterrupt",start=0,["end"]=4}}')[0],/already has an interval named "Uninterrupt"/);
+ assert.match(messages('sf2.moves.replace{id="x",target="HighKick",expected_file="x.bytes",animation=clip}')[0],/plays "high_kick.bytes"/);
+ assert.match(messages('sf2.moves.patch{move="HighKick",interval_start={name="Block",expected=16,value=20}}')[0],/no "Block" interval/);
+});
+test('move fields complete vanilla names and hover summarizes the target',()=>{
+ const native=require('../src/native.cjs');
+ const at=(source,offset=source.length)=>p.moveFieldContext(header+source,header.length+offset,patchMod);
+ let context=at('sf2.moves.patch{move="HighK');assert.deepEqual([context.name,context.path,context.prefix],['sf2.moves.patch',['move'],'HighK']);
+ assert(native.completions(context.name,context.path,context.definition,p.literal).some(c=>c.label==='HighKick'));
+ context=at('sf2.moves.patch{move="HighKick",interval_end={name="');
+ assert.deepEqual(native.completions(context.name,context.path,context.definition,p.literal).map(c=>c.label),['Unstable','Uninterrupt']);
+ context=at('sf2.moves.replace{target="HighKick",expected_file="');
+ assert.deepEqual(native.completions(context.name,context.path,context.definition,p.literal).map(c=>c.label),['high_kick.bytes']);
+ const source='sf2.moves.patch{move="HighKick"}';
+ const hover=p.moveFieldContext(header+source,header.length+source.indexOf('High')+2,patchMod,false);
+ assert.equal(hover.value,'HighKick');
+ assert.match(native.describe(hover.value),/Priority: 110[\s\S]*Interval Attack 6\.\.8 · hit High[\s\S]*Attack id 0: damage 0.12/);
+});
+test('exclusive claims conflict across mods, within a mod, and by sibling mod ID',async t=>{
+ const claims=require('../src/claims.cjs'),report=require('../src/report.cjs');
+ const root=await fs.mkdtemp(path.join(os.tmpdir(),'eclipse-claims-'));t.after(()=>fs.rm(root,{recursive:true,force:true}));
+ const make=async(id,lua)=>{const dir=await createMod(template,root,id,id,'Author');
+  const manifest=path.join(dir,'mod.toml');await fs.writeFile(manifest,(await fs.readFile(manifest,'utf8')).replace('capabilities = [','capabilities = ["content.patch", "assets.replace", '));
+  await fs.appendFile(path.join(dir,'scripts/main.lua'),'\n'+lua+'\n');return p.indexMod(dir);};
+ const alice=await make('alice.tuning','sf2.moves.patch{move="HighKick",priority={expected=110,value=90}}\nsf2.assets.replace{target="core:Sprites\\\\Icon",replacement="sprites/weapon"}\nsf2.moves.replace{id="step",target="FrontKick",expected_file="front_kick.bytes",animation=clip}');
+ const bob=await make('bob.tuning','sf2.moves.patch{move="HighKick",disable=true}\nsf2.assets.replace{target="core:sprites/icon",replacement="sprites/weapon"}\nsf2.localization.patch{target="core:localization/x",language="ENG",value="a"}\nsf2.localization.patch{target="core:localization/x",language="eng",value="b"}');
+ assert.deepEqual(alice.claims.map(c=>c.key),['move-patch:HighKick','asset-replace:core:sprites/icon','move-replace:FrontKick']);
+ const result=claims.conflicts([alice,bob]);
+ const keys=result.claims.map(c=>`${c.mod.data.id} ${c.claim.key} ${c.duplicate}`).sort();
+ assert.deepEqual(keys,['alice.tuning asset-replace:core:sprites/icon false','alice.tuning move-patch:HighKick false','bob.tuning asset-replace:core:sprites/icon false','bob.tuning localization:core:localization/x|eng true','bob.tuning localization:core:localization/x|eng true','bob.tuning move-patch:HighKick false']);
+ assert.match(claims.message(result.claims.find(c=>c.mod===alice&&c.claim.kind==='move patch')),/also claimed by "bob.tuning"/);
+ // Copies of one mod never conflict with each other; siblings with one ID are reported.
+ const copy={...alice,root:path.join(root,'copy','alice.tuning')};
+ assert.deepEqual(claims.conflicts([alice,copy]).claims,[]);
+ assert.deepEqual(claims.conflicts([alice,copy]).duplicateIds,[]);
+ const sibling={...alice,root:path.join(root,'alice-again')};
+ assert.equal(claims.conflicts([alice,sibling]).duplicateIds.length,2);
+ const markdown=report.moveReport(alice,p,[bob]);
+ assert.match(markdown,/\| Priority \| 110 \| 90 \|/);
+ assert.match(markdown,/\| Intervals \| .*Attack \| \*\*omitted — not inherited\*\* \|/);
+ assert.match(markdown,/Move patch "HighKick" is also claimed by "bob.tuning"/);
+});
+test('list-based move patch fields are checked against vanilla data and reported',()=>{
+ const report=require('../src/report.cjs');
+ const good='sf2.moves.patch{move="HighKick",playback_rate={expected=1.0,value=1.25},intervals={{select={name="Uninterrupt",start=0,["end"]=15},["end"]=12},{select={type="Block",start=16},remove=true},{add={type="Invulnerable",name="Dodge",start=0,["end"]=3}}},'+
+  'attacks={{id=0,damage={expected=0.12,value=0.2},damage_terms={expected={UnarmedDamage=0},value={UnarmedDamage=0,WeaponDamage=0}},edges={expected={"EThigh_2","ECalf_2","EInstep_2","EToe_2","EFoot_2"},value={"EFoot_2"}},impulse={expected={x=245,y=0,z=350},value={x=300}},hit={expected="High",value="Middle"},start={expected=6,value=5}}}}';
+ assert.deepEqual(nativeIssues(good),[]);
+ const messages=nativeIssues('sf2.moves.patch{move="HighKick",playback_rate={expected=1.0,value=1.5},intervals={{select={type="Block",start=16,["end"]=20},remove=true}},attacks={{id=4,damage={expected=0.1,value=0.2}},{id=0,damage={expected=0.13,value=0.2}}}}').map(i=>i.message);
+ assert(messages.some(m=>/No vanilla "HighKick" interval matches Block 16\.\.20/.test(m)));
+ assert(messages.some(m=>/no attack with id 4 \(ids: 0\)/.test(m)));
+ assert(messages.some(m=>/attack 0 has damage 0\.12/.test(m)));
+ assert.match(nativeIssues('sf2.moves.patch{move="SaturnProjectileStart1",playback_rate={expected=1.0,value=1.5}}')[0]?.message??'',/unavailable for looped/);
+ const mod={...patchMod,root:'/tmp/x',moveCalls:[],sources:new Map([['/tmp/x/scripts/main.lua',header+good]]),claims:[]};
+ const call=p.analyze(header+good,mod).calls.find(c=>c.name==='sf2.moves.patch');
+ mod.moveCalls.push({...call,file:'/tmp/x/scripts/main.lua',line:1});
+ const markdown=report.moveReport(mod,p);
+ assert.match(markdown,/\| Speed \| 1\.0 \| 1\.25× \|/);
+ assert.match(markdown,/\| Interval Block \| 16\.\.open \| \*\*removed\*\* \|/);
+ assert.match(markdown,/\| Attack 0 damage \| `0\.12` \| `0\.2` \|/);
+});
+test('data-only moveset mods index, validate against vanilla and claim forks',async t=>{
+ const moveset=require('../src/moveset.cjs'),claims=require('../src/claims.cjs');
+ assert.deepEqual(p.manifest('schema = 1\nid = "x.y"\nname = "X"\nversion = "1.0.0"\nauthors = ["A"]\ncapabilities = []\n').issues,[]);
+ const starter=await p.indexMod(path.resolve(__dirname,'../templates/moveset'));
+ assert.deepEqual(starter.issues,[]);
+ assert.deepEqual(starter.claims.map(c=>c.key),['move-patch:HighKick','lock-removal:KatanaHeavySlash|Weapon|NinjaSword','move-patch:tutorial.moveset.KatanaHeavySlash_Ninja']);
+ const head='{"schema":1,"kind":"eclipse.moveset",';
+ const issues=text=>moveset.parse(text).issues.map(i=>i.message);
+ assert.match(issues(head+'"moves":[{"move":"A","move":"B","disable":true}]}').join(),/Duplicate field "move"/);
+ assert.match(issues(head+'"moves":[{"move":"A","colour":1}]}').join(),/Unknown field "colour"/);
+ assert.match(issues(head+'"moves":[{"move":"A","priority":{"expected":1.5,"value":2}}]}').join(),/must be an integer/);
+ assert.match(issues(head+'"moves":[{"move":"A"}]}').join(),/must change at least one field/);
+ assert.match(issues(head+'"forks":[{"id":"F","move":"A"}]}').join(),/exactly one of "subtype" or "item"/);
+ assert.match(issues('{"schema":1,"kind":"eclipse.moveset",}').join(),/Invalid JSON/);
+ const root=await fs.mkdtemp(path.join(os.tmpdir(),'eclipse-moveset-'));t.after(()=>fs.rm(root,{recursive:true,force:true}));
+ const make=async(id,json,extra='')=>{const dir=path.join(root,id);await fs.mkdir(path.join(dir,'movesets'),{recursive:true});
+  await fs.writeFile(path.join(dir,'mod.toml'),`schema = 1\nid = "${id}"\nname = "${id}"\nversion = "1.0.0"\nauthors = ["A"]\ncapabilities = ["content.patch"]\n${extra}`);
+  await fs.writeFile(path.join(dir,'movesets/moveset.json'),json);return p.indexMod(dir);};
+ const bad=await make('bad.moves',head+'\n"moves":[{"move":"HighKick",\n"priority":{"expected":100,"value":90}}],\n"forks":[{"id":"F","move":"HighKick","subtype":"Katana"},{"id":"G","move":"KatanaHeavySlash","item":"core:items/weapon/weapon_golden_katana"}]}');
+ const messages=bad.issues.map(i=>`${i.line}:${i.message}`);
+ assert(messages.some(m=>/^2:.*priority 110, not 100/.test(m)),messages.join('\n'));
+ assert(messages.some(m=>/not locked to subtype "Katana".*fork it for an item instead/.test(m)),messages.join('\n'));
+ assert(messages.some(m=>/needs a \[\[dependencies\]\] entry for "core"/.test(m)),messages.join('\n'));
+ const a=await make('alice.moves',head+'"forks":[{"id":"N","move":"KatanaHeavySlash","subtype":"NinjaSword"}]}');
+ const b=await make('bob.moves',head+'"forks":[{"id":"M","move":"KatanaHeavySlash","subtype":"NinjaSword"}]}');
+ const conflict=claims.conflicts([a,b]).claims.find(c=>c.mod===a);
+ assert.match(claims.message(conflict),/Subtype fork "KatanaHeavySlash for NinjaSword" is also claimed by "bob.moves"/);
+ const schema=require('../schemas/moveset.schema.json'),api=require('../data/api.json');
+ assert.deepEqual(schema.properties.moves.items.properties.attacks.items.properties.hit.properties.value.enum,JSON.parse('['+api.types.MoveHitPatch.fields.expected.split('|').join(',')+']'));
+ const forkLua=p.analyze(header+'local n=sf2.moves.fork{id="F",source="HighKick",subtype="Katana"}\nsf2.moves.patch{move="test.patches.F",priority={expected=1,value=2}}',patchMod).issues.filter(i=>i.code.startsWith('native')).map(i=>i.message);
+ assert.equal(forkLua.length,1);assert.match(forkLua[0],/not locked to subtype "Katana"/);
+});

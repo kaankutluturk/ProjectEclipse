@@ -247,3 +247,100 @@ use `--playable` for native player-controlled testing. Generated moves use the
 same declarative conditions/events/intervals as the editor contracts; the owned
 fight selects its player_character. See [Gymnast packaging](../gymnast/#play-your-exported-character).
 This is a package option, not a new Lua method or permission.
+
+## Check patches against vanilla moves
+
+`sf2.moves.patch`, `sf2.moves.replace`, `sf2.moves.extend_item_lock`,
+`sf2.moves.remove_perk_lock` and `sf2.moves.extend_perk_lock` name an existing
+**native move**: one of the base game's moves, spelled exactly, with matching case.
+The extension ships the base game's move data so it can help with those names.
+
+- Inside `move = "` or `target = "`, press **Ctrl+Space** to choose from every
+  native move. Hover a name to see its animation file, priority, templates,
+  input keys, intervals and scheduled sounds.
+- Once the target is known, completion also offers its `expected_file`, the
+  interval names for `interval_start`, `interval_end` and `remove_interval`,
+  its sound names for `sound_frame`, its current `hit`, `input` and `animation`
+  values, and native template names for `core_templates`.
+- The game rejects a patch whose `expected` value does not match the native move.
+  The extension compares literal values with the same base data and warns first:
+
+```lua
+sf2.moves.patch {
+    move = "HighKick",
+    -- Warning: Vanilla "HighKick" has priority 110, not 100; the runtime rejects this patch.
+    priority = { expected = 100, value = 90 },
+}
+```
+
+Guards are checked for interval bounds, the hit reaction, sound frames, the input
+key, priority, the animation file, interval removal and addition, the replacement
+`expected_file`, `playback_rate` limits, every `intervals` selector and every
+`attacks` field (id, frames, damage, damage terms, edges, impulse and hit).
+A misspelled move name is reported as unknown. Hovering a move shows each interval
+as `Type/Name start..end`, with `open` for an interval that runs to the end of the
+move, which is the same notation `intervals` selectors use.
+
+These checks read literal strings and numbers only, so a name built at runtime
+(for example `"WaspFly_" .. suffix`) is not checked. They model the base game:
+if another enabled mod replaces the same move with `sf2.moves.replace`, the game
+checks your guards against that replacement instead. The game remains the authority.
+
+## Edit moveset files
+
+[Moveset files](../../api/movesets/) (`movesets/*.json`) get completion and hover
+descriptions for every field from a JSON Schema, plus the same checks as Lua: unknown
+fields, wrong value types, duplicate fields, vanilla guard mismatches and missing
+`content.patch` or `core` dependencies appear in **Problems** with their line. Forks are
+checked against the source move's weapon lock: forking a subtype the move is not locked
+to, or the only subtype of its lock, is reported before you launch.
+
+## See what your mod changes
+
+Run **Eclipse Modding: Show Move Changes** from a file in your mod. A report opens
+with one section per native move your mod touches:
+
+- for `sf2.moves.patch`, a table of each field's vanilla value beside the value
+  after your patch, followed by any guard problem;
+- for `sf2.moves.replace`, the vanilla animation, priority, templates, intervals,
+  key conditions and sounds, with every field your replacement omits marked
+  **omitted — not inherited**. A replacement keeps nothing from the original move,
+  so this list shows exactly what you must define again;
+- item and perk lock changes, and the exclusive claims described below.
+
+The same report is available without VS Code. From the repository root:
+
+```sh
+node Tools/ModdingEditor/scripts/report.cjs path/to/my.mod --mods path/to/Mods
+```
+
+`--mods` is optional and may repeat. The command exits with status 1 when it finds
+an unknown move, a guard mismatch or a conflict, so a mod repository can run it in CI.
+
+## Find conflicts with other mods
+
+Some changes can have only one owner. If two enabled mods claim the same one, the
+mod that registers second fails to load as a whole (see [Combine mods](../combine-mods/#understand-a-conflict)).
+The extension compares these literal claims across every mod in your workspace:
+
+| Claim | One owner per |
+| --- | --- |
+| `sf2.moves.patch` | native move |
+| `sf2.moves.replace` | native `target` |
+| `sf2.assets.replace` | `target` asset (case-insensitive path) |
+| `sf2.localization.patch` | `target` and `language` pair |
+| `sf2.battles.patch` | `target` battle position |
+
+A conflict appears as a warning on your claim, naming the other mod and its file.
+Claiming the same thing twice inside one mod is reported too. Two mod folders
+with the same ID in one parent folder are flagged on `mod.toml`; the game rejects
+duplicate IDs in one mods folder. Copies of the same mod in different folders,
+such as a backup, are not treated as conflicting with each other.
+
+To include mods that live outside your workspace, set **Eclipse Modding: Mods Root**
+(`eclipseModding.modsRoot`) to the game's `Mods` folder, either absolute or relative
+to your workspace folder. Those mods are read, never changed.
+
+The extension cannot know which mods a player enables, so it treats every indexed
+mod as enabled. Claims built from computed values, item setters that take an item
+handle, and fight rule patches are not compared; the game still enforces their rules.

@@ -261,6 +261,9 @@ checked. `-ExistingFixture` accepts marked projectile/playback projects inside
 repository Temp. Immutable TAR cache sharing avoids repeated system-drive data;
 profiles/caches are not deleted. Controls/AI/spacing and post-tutorial state are
 controlled; physical inputs, reverse facing, Eclipse mode and exports are separate.
+`Combat/TestPlaybackTiming.ps1` checks the integer move playback-rate math: exact
+parity with the recovered frame formulas at normal speed, at least one tick per
+keyframe segment for playable rates, and inverse tick/segment conversion.
 `Combat/TestFighterPlayback.ps1` also exercises the shipped Lua graph and ability
 lifecycle with controlled models. `Combat/TestScheduledMoveEvents.ps1` checks
 the actual native action batch retains events raised by scheduled playback;

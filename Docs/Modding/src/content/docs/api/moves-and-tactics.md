@@ -751,6 +751,111 @@ The runtime must find exactly one positive direct item lock, or one positive top
 
 Different additions to the same group compose. The source selector must exist before the batch; it cannot depend on a subtype another pending extension adds. The same move/type/additional-subtype combination is a registration conflict, including across mods, even if the source selector differs. Subtype matching is exact and case-sensitive. The selector and addition are fingerprinted. Native teardown restores the original condition objects; unrelated sibling edits are preserved. This endpoint supplies no missing animations, attacks or preview behavior by itself.
 
+## sf2.moves.fork
+
+**Signature:** `sf2.moves.fork { id, source, subtype? , item? }`
+
+**Returns:** The copy's runtime move name (a string such as `"myname.blades.KatanaHeavySlash_Ninja"`). Pass it as `move` to [`sf2.moves.patch`](#sf2movespatch) to edit the copy.
+
+**When:** During registration. The copy is created when native moves are loaded, after replacements and before move patches, so patches can target it. Requires Apply & Restart when changing enabled content.
+
+**Requires:** `content.patch`, plus a dependency on `core` (or the item's owner) when you name an item.
+
+Make a move behave differently for one weapon subtype or one weapon without changing it for
+everyone else. A **fork** is a copy of an existing move that only the chosen subtype or item
+uses; the original keeps working for every other fighter.
+
+| Field | Required meaning |
+| --- | --- |
+| `id` | Your local name for the copy: 1–128 letters, digits, `_`, `.` or `-`, unique in your mod. The runtime name is `<your mod id>.<id>`. |
+| `source` | The move to copy: an exact native move name, or the runtime name of a fork registered earlier (by your mod or a dependency). |
+| `subtype` | Give the copy to one weapon subtype, e.g. `"NinjaSword"`. The source must be locked to a group that contains this subtype; the copy is locked to the subtype alone, and the subtype is removed from the source's group. |
+| `item` | Give the copy to one item instead: an item handle, or a qualified ID such as `"core:items/weapon/weapon_golden_katana"` (a mod weapon uses its own ID). The copy keeps the source's locks plus a lock to this item, and the source gains a "not this item" lock. |
+
+Set exactly one of `subtype` or `item`. Item forks work for any move, including moves every
+weapon shares, such as kicks: a sword can have its own `HighKick`.
+
+```lua
+local sf2 = require("sf2")
+-- NinjaSword gets its own heavy slash; Katana and ShogunKatana keep the original.
+local ninja_slash = sf2.moves.fork { id = "KatanaHeavySlash_Ninja", source = "KatanaHeavySlash", subtype = "NinjaSword" }
+sf2.moves.patch { move = ninja_slash, playback_rate = { expected = 1.0, value = 1.2 } }
+
+-- Only the Golden Katana gets a slower, heavier kick.
+local golden_kick = sf2.moves.fork { id = "HighKick_Golden", source = "HighKick", item = "core:items/weapon/weapon_golden_katana" }
+sf2.moves.patch { move = golden_kick, attacks = { { id = 0, damage = { expected = 0.12, value = 0.18 } } } }
+```
+
+The copy starts from the source move's authored definition (its name, templates,
+conditions, intervals, actions, animation and AI data), not from another mod's
+`sf2.moves.replace` of it. It answers to every name the source answers to, so combos,
+transitions and conditions that name the source also match the copy. It does not get a
+second movelist (profile) entry. Patches registered on the source do not apply to the copy;
+patch the copy separately.
+
+One mod can own a given source/subtype or source/item fork: a second mod forking the same
+move for the same subtype or item fails registration, as does removing the last subtype
+of a group. Forking a subtype the source is not locked to fails when native moves load.
+Forks, their lock edits and edits on the copies participate in save compatibility
+fingerprints. Removing the mod removes the copies and restores the source's locks.
+
+## sf2.moves.remove_item_lock
+
+**Signature:** `sf2.moves.remove_item_lock { move, item_type, subtype }`
+
+**Returns:** Nothing (`nil`).
+
+**When:** During registration. Applied with the other lock edits when native moves load, before fighters are built. Requires Apply & Restart when changing enabled content.
+
+**Requires:** `content.patch`.
+
+Take one subtype out of a move's equipment lock, so fighters using that subtype no longer
+get the move. This is the source-side half of a subtype [fork](#sf2movesfork); use it alone
+when a subtype should simply lose a move.
+
+| Field | Required meaning |
+| --- | --- |
+| `move` | Exact move name. |
+| `item_type` | `Weapon`, `Ranged`, `Magic`, `Armor`, `Helm`, or `Skeleton`. |
+| `subtype` | The subtype to remove from the move's positive lock group. |
+
+```lua
+local sf2 = require("sf2")
+-- ShogunKatana no longer uses KatanaUpperSlash; Katana and NinjaSword keep it.
+sf2.moves.remove_item_lock { move = "KatanaUpperSlash", item_type = "Weapon", subtype = "ShogunKatana" }
+```
+
+The move must have exactly one positive lock clause (a direct item lock or a top-level OR
+group) containing the subtype. Removing the only subtype is rejected, because the move would
+then be available to every fighter. The same move/type/subtype removal is a registration
+conflict across mods.
+
+## sf2.moves.exclude_item
+
+**Signature:** `sf2.moves.exclude_item { move, item }`
+
+**Returns:** Nothing (`nil`).
+
+**When:** During registration. Applied with the other lock edits when native moves load, before fighters are built. Requires Apply & Restart when changing enabled content.
+
+**Requires:** `content.patch`, plus a dependency on the item's owner (`core` for native items).
+
+Stop one item from getting a move, leaving every other item of its subtype unchanged. This is
+the source-side half of an item [fork](#sf2movesfork).
+
+| Field | Required meaning |
+| --- | --- |
+| `move` | Exact move name. |
+| `item` | Item handle or qualified item ID, e.g. `"core:items/weapon/weapon_golden_katana"`. |
+
+```lua
+local sf2 = require("sf2")
+sf2.moves.exclude_item { move = "KatanaSpinningSlash", item = "core:items/weapon/weapon_golden_katana" }
+```
+
+The runtime adds a negated lock for the item's runtime name to the move. Excluding the same
+item from the same move twice, including across mods, is a registration conflict.
+
 ## sf2.moves.extend_perk_lock
 
 **Signature:** `sf2.moves.extend_perk_lock { move, source_perk, perk }`
@@ -802,7 +907,7 @@ moves you register yourself, write `locks = { { any = { { perk = a }, { perk = b
 
 ## sf2.moves.patch
 
-**Signature:** `sf2.moves.patch { move, disable?, conditions?, interval_start?, interval_end?, hit?, sound_frame?, input?, priority?, animation?, remove_interval?, add_interval? }`
+**Signature:** `sf2.moves.patch { move, disable?, conditions?, interval_start?, interval_end?, hit?, sound_frame?, input?, priority?, animation?, remove_interval?, add_interval?, playback_rate?, intervals?, attacks? }`
 
 **Returns:** Nothing.
 
@@ -821,13 +926,17 @@ dots or hyphens. At least one nonempty operation is required.
 | `conditions` | Up to 32 additional typed move conditions, using the same records as `moves.register`. They are appended as extra requirements; existing conditions remain. |
 | `interval_start` | `{ name, expected, value }`. `name` is `SemiUninterrupt`, `Uninterrupt`, `SelfUninterrupt` or `Unstable`. Exactly one matching named interval must exist. Its start must equal `expected`; `value` becomes the start and cannot exceed its end. A missing native `Start` means zero. |
 | `interval_end` | `{ name, expected, value }`. `name` is `SemiUninterrupt`, `Uninterrupt`, `SelfUninterrupt` or `Unstable`. Exactly one matching named interval must exist. Its end must equal `expected`; `value` becomes the end and cannot precede its start. |
-| `hit` | `{ expected, value }`. Requires exactly one attack interval with exactly one full-interval reaction matching `expected`. Replaces only its reaction name. Supported names: `High`, `Middle`, `Low`, `Spinning`, `HighHeavy`, `MiddleShortPlus`, `Physycal`, `HighLong`, `NoReaction`. |
+| `hit` | `{ expected, value }`. Requires exactly one attack interval with exactly one full-interval reaction matching `expected`. Replaces only its reaction name. Both values are native hit reaction names, the same list `sf2.moves.register` accepts for `attack.hit`. For a move with several attacks, use `attacks` instead. |
 | `sound_frame` | `{ name, expected, value }`. Requires exactly one native direct Sound action with this clip name, scheduled at `expected`. Moves it to `value`. Event-driven and RandomSound actions are not supported by this selector. |
 | `input` | `{ expected, value }` replaces one direct native Keys condition. Both values are supported control names, such as `Super` and `RaidCharge`, with `Tap` timing. The move must have exactly one direct Keys condition, and its authored key requirement must match `expected`. Native AI may temporarily invert the parsed key state while dispatching a move; that transient state is ignored by this guard. Other conditions remain intact. |
 | `priority` | `{ expected, value }` replaces a native selection priority. Both are distinct integers in 0–100,000. The current priority must match `expected`. |
-| `animation` | `{ expected, value }` replaces a parsed native move's clip. `expected` is its exact existing `.bytes` filename; `value` is a binary handle from `sf2.assets.binary` for a file shipped by the mod. The runtime loads the new clip and updates its frame count while keeping the move's name, conditions, actions and linked children. The clip must have usable frames; check its node layout and action timing against the fighter in combat. |
+| `animation` | `{ expected, value }` replaces a parsed native move's clip. `expected` is its exact existing `.bytes` filename; `value` is either a binary handle from `sf2.assets.binary` for a file shipped by the mod, or another native clip's `.bytes` filename such as `"front_kick.bytes"`. The runtime loads the new clip and updates its frame count while keeping the move's name, conditions, actions and linked children. The clip must have usable frames; check its node layout and action timing against the fighter in combat. |
 | `remove_interval` | `{ name, type, start, ["end"] }` removes exactly one native interval. All four fields are required guards: the interval's name, type, and inclusive sample bounds must match. Supported types are `Attack`, `Block`, `Invulnerable`, `Invisible`, `Uninterrupt`, `SelfUninterrupt`, and `Unstable`; bounds are integers from 0 through 100000 with end at least start. A removed interval cannot also receive a bounds patch. Use this for a verified native combat difference, since removing an attack or protection window can substantially change a fight. |
 | `add_interval` | `{ name, start, ["end"] }` adds one named interval. `name` is `SemiUninterrupt`, `Uninterrupt`, `SelfUninterrupt`, `Unstable` or `Throwable`; `start` and `end` are required inclusive frames from 0 through 100000, with end at least start. The move must already have native intervals and no interval of the same name. The added interval cannot also be bounds-patched or removed in the same patch. It is parsed together with the move's own intervals and is removed when the patch is removed. A common use is a `SemiUninterrupt` window, during which double-tap follow-ups (moves allowed to cancel `1key`/`2key` moves) can cancel this move. |
+
+| `playback_rate` | `{ expected, value }`, numbers. Changes how fast the move plays: `1.25` is 25% faster, `0.5` half speed. `expected` is the current speed, `1.0` for a native move. `value` is 0.5–2.0 and at most the move's `MidFrames + 1` (moves authored with `MidFrames` 0 cannot be sped up). Unavailable for looped and physics moves. See [playback rate](#playback-rate). |
+| `intervals` | Array of interval changes, each one of: `{ select, start?, ["end"]? }` to move an interval's bounds, `{ select, remove = true }` to remove it, or `{ add = { type?, name?, start, ["end"]? } }` to add one. See [interval edits](#interval-edits). Up to 64 entries. |
+| `attacks` | Array of `{ id, start?, ["end"]?, damage?, damage_terms?, edges?, impulse?, hit? }` edits to attack intervals, each field a guarded `{ expected, value }` pair. See [attack edits](#attack-edits). Up to 32 entries. |
 
 Frame values must be distinct integers from 0 through 100000. Reaction names
 must also differ. Hit records with explicit start/end bounds in a deferred move,
@@ -889,6 +998,83 @@ sf2.moves.patch {
 }
 ```
 
+### Playback rate
+
+`playback_rate` keeps every interval, sound and event attached to the same animation
+keyframe, so a faster move hits sooner and recovers sooner while its attack window,
+damage and travel distance stay the same. The speed is applied as whole game ticks
+per keyframe, so the move's total length rounds to the nearest tick. The AI's
+estimates of the move's length follow the new speed. The opponent's hit reaction is
+not affected; only the patched move changes speed.
+
+```lua
+sf2.moves.patch {
+    move = "HighKick",
+    playback_rate = { expected = 1.0, value = 1.5 }, -- 54 ticks become 36
+}
+```
+
+### Interval edits
+
+Each `intervals` entry names one existing interval exactly with `select`:
+
+| `select` field | Meaning |
+| --- | --- |
+| `type` | The interval's `Type`, such as `Block`, `Invulnerable` or `Invisible`. Omit it when the interval has no type (most named intervals such as `Uninterrupt`). Attack intervals are edited through `attacks`, not here. |
+| `name` | The interval's `Name`, such as `Uninterrupt` or `Throwable`. Omit it when the interval has none. |
+| `start` | Its start frame. Defaults to 0, which is also what a native interval without a start means. |
+| `end` | Its end frame. **Omit it for an open-ended interval**, one that runs to the end of the move. |
+
+The selector must match exactly one interval, or the patch fails. In VS Code, hover
+the move name to see its intervals in this notation. A bounds edit gives a new `start`,
+a new `["end"]` or both; the result must not start after it ends. An added interval
+takes `type` (`Block`, `Invulnerable`, `Invisible`, `Throwable` or omitted), `name`
+(required when there is no type, and new to the move), `start`, and an optional
+`["end"]`. The move must already have intervals. No two entries may edit the same
+interval, and an interval edited here cannot also use `interval_start`,
+`interval_end`, `remove_interval` or `add_interval`.
+
+```lua
+sf2.moves.patch {
+    move = "HighKick",
+    intervals = {
+        { select = { name = "Uninterrupt", start = 0, ["end"] = 15 }, ["end"] = 12 },
+        { select = { type = "Block", start = 16 }, remove = true }, -- open-ended Block
+        { add = { type = "Invulnerable", name = "Dodge", start = 0, ["end"] = 3 } },
+    },
+}
+```
+
+### Attack edits
+
+`attacks` edits attack intervals by their authored `id` (every native attack has
+one; the first is usually 0). Each field names the current value in `expected`:
+
+| Field | `expected` and `value` |
+| --- | --- |
+| `start`, `["end"]` | Attack frames, integers. The attack's hit reactions must cover the whole interval. |
+| `damage` | Base damage, 0–16, compared as the game stores it (single precision). |
+| `damage_terms` | Map of damage term type to shift, such as `{ UnarmedDamage = -10 }`. The replacement has 1–4 terms of `UnarmedDamage`, `WeaponDamage`, `RangedDamage` or `MagicDamage`; it may not add or remove `RangedDamage`, `MagicDamage` or `RaidChargeDamage`, which change how the attack is blocked or paid for. Order does not matter. |
+| `edges` | The attacking edges in order, such as `{ "EThigh_2", "ECalf_2" }`. Edges are the fighter's (or weapon's) segments that can hit; the replacement has 1–64 distinct names. Use names from the same rig. |
+| `impulse` | `{ x, y, z }` push applied on hit; omitted axes are 0. |
+| `hit` | The hit reaction name, as for `hit` above; the attack must have exactly one full-interval reaction. |
+
+```lua
+sf2.moves.patch {
+    move = "HighKick",
+    attacks = {
+        { id = 0,
+          damage = { expected = 0.12, value = 0.15 },
+          edges = { expected = { "EThigh_2", "ECalf_2", "EInstep_2", "EToe_2", "EFoot_2" },
+                    value = { "EInstep_2", "EFoot_2" } },
+          hit = { expected = "High", value = "Middle" } },
+    },
+}
+```
+
+Use `python Tools/Audits/QueryMoves.py show HighKick` in the repository, or hover the
+move in VS Code, to read a move's current attacks, edges and intervals.
+
 Only one `moves.patch` declaration may own a given move, including across mods;
 combine operations in one table. Conflicts reject the registration transaction.
 Expected source values make incompatible base data fail explicitly instead of
@@ -900,9 +1086,13 @@ replacement bytes fail the native batch. Existing item/perk-lock APIs remain sep
 The runtime supports deferred and already-parsed intervals. Removing the content
 restores its edited fields and removes its added condition objects, preserving
 unrelated conditions and later field values that no longer equal the patch's
-values. This is content teardown during Apply & Restart, not an API for changing
-moves mid-fight. Patch owners, selectors, expected values, replacements and
-conditions and `disable` participate in compatibility fingerprints. Mods without patches retain
+values. This is content teardown during Apply & Restart, not a Lua API for changing
+moves mid-fight. While developing, the fight debug menu can
+[reload edited patches](../../guides/runtime-diagnostics/#tune-move-patches-without-restarting)
+in a running game. The VS Code extension
+[checks literal targets and expected values](../../guides/vscode/#check-patches-against-vanilla-moves)
+against the base game's moves before you launch. Patch owners, selectors, expected values, replacements and
+conditions, `disable`, playback rates and every interval and attack edit participate in compatibility fingerprints. Mods without patches retain
 their previous fingerprint representation.
 
 ## sf2.moves.remove_perk_lock

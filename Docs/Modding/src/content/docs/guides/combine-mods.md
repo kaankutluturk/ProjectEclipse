@@ -69,6 +69,12 @@ different results when their order changes.
 | The combined list exceeds 100 handles | The later registering transaction fails. |
 | One mod patches the same fight rule field twice | Rejected within that transaction; combine its handles into one list. |
 
+Exclusive claims such as one `sf2.moves.patch` owner per native move, one
+`sf2.moves.replace` owner per target and one `sf2.assets.replace` owner per asset
+follow the same rule. The VS Code extension
+[warns about these claims](../vscode/#find-conflicts-with-other-mods) across the
+mods in your workspace before you test them together.
+
 A commit conflict discards all definitions and fields from that mod's transaction.
 An already active mod keeps its committed content. Later independent mods can
 still load; a mod depending on the failed owner remains unavailable. Distinct

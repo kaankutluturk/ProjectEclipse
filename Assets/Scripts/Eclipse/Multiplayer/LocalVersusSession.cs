@@ -52,7 +52,8 @@ namespace Eclipse.Multiplayer
                 _instance = new GameObject("Eclipse Local Versus Session").AddComponent<LocalVersusSession>();
                 DontDestroyOnLoad(_instance.gameObject);
             }
-            LocalVersusMenu.Ensure().ShowModeSelect();
+            if (LocalVersusMenu.ConsumeMovesetLabEntry()) LocalVersusMenu.Ensure().ShowMovesetLab();
+            else LocalVersusMenu.Ensure().ShowModeSelect();
         }
 
         public static bool DevicesReady(LocalVersusSettings settings)
@@ -72,6 +73,7 @@ namespace Eclipse.Multiplayer
             if (!IsActive || !IsReady || _starting || _returning)
                 throw new InvalidOperationException("Local versus is not ready to start.");
             if (settings == null) throw new ArgumentNullException(nameof(settings));
+            if (settings.Mode == VersusMode.Online) Eclipse.Modding.ModRuntime.RequireOnlineAllowed();
             if (settings.Mode == VersusMode.Local && !DevicesReady(settings))
                 throw new InvalidOperationException(settings.KeyboardPlayerOne ? "Connect a gamepad for player two." : "Connect two gamepads.");
             if (settings.Mode != VersusMode.Local && settings.Mode != VersusMode.Training && sourceFactory == null)

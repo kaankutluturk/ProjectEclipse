@@ -47,6 +47,7 @@ namespace Eclipse.Multiplayer
         /// <summary>Connects (or reuses the connection) and then runs <paramref name="then"/>.</summary>
         public static void Connect(string playerName, Action then)
         {
+            Eclipse.Modding.ModRuntime.RequireOnlineAllowed();
             if (!NetplayPeer.TryParseAddress(DefaultServer, RoomProtocol.DefaultPort, out var endPoint, out var error))
                 throw new ArgumentException(error.Replace("host's", "room server's"));
             string name = new NetIdentity("", "", playerName).PlayerName;

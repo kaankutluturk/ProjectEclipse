@@ -14,6 +14,8 @@ namespace Eclipse.Modding
         private ExternalCombatContentRuntime.MoveItemLockRollback _movePerkLockExtensionRollback;
         private MoveCombatPatchRuntime.Lifetime _moveCombatPatchLifetime;
         private AnimationData.ExternalMoveReplacementLifetime _moveReplacementLifetime;
+        private AnimationData.ExternalMoveAddLifetime _moveForkLifetime;
+        private ExternalCombatContentRuntime.LockEditRollback _itemLockEditRollback;
         private bool _p1dApplied;
 
         public void ApplyP1DContent()
@@ -164,7 +166,8 @@ namespace Eclipse.Modding
         private void ApplyMoves()
         {
             if (_content.MoveTemplates.Count == 0 && _content.Moves.Count == 0 && _content.MoveTriggers.Count == 0 &&
-                _content.MovePerkLockRemovals.Count == 0 && _content.MoveItemLockExtensions.Count == 0 && _content.MovePerkLockExtensions.Count == 0 && _content.MoveCombatPatches.Count == 0)
+                _content.MovePerkLockRemovals.Count == 0 && _content.MoveItemLockExtensions.Count == 0 && _content.MovePerkLockExtensions.Count == 0 && _content.MoveCombatPatches.Count == 0 &&
+                _content.MoveForks.Count == 0 && _content.MoveItemLockRemovals.Count == 0 && _content.MoveItemExclusions.Count == 0)
                 return;
             var expectedFiles = new Dictionary<string, string>(StringComparer.Ordinal);
             var replacementDocument = new XmlDocument { XmlResolver = null };
@@ -184,7 +187,112 @@ namespace Eclipse.Modding
             if (expectedFiles.Count != 0)
                 _moveReplacementLifetime = AnimationData.ReplaceExternalMoves(replacementDocument, expectedFiles);
             ModRuntime.LoadTimings.Mark("move replacements");
-            _moveCombatPatchLifetime = MoveCombatPatchRuntime.Apply(AnimationData.Animations,_content.MoveCombatPatches,
+            _moveForkLifetime = ApplyForks(_content.MoveForks);
+            ModRuntime.LoadTimings.Mark("move forks");
+            _moveCombatPatchLifetime = ApplyMoveCombatPatches(_content.MoveCombatPatches);
+            ModRuntime.LoadTimings.Mark("move combat patches");
+            _p1dMovePerkLockRollback = ExternalCombatContentRuntime.ApplyMovePerkLocks(_content.MovePerkLockRemovals);
+            _moveItemLockRollback = ExternalCombatContentRuntime.ApplyItemLockExtensions(AnimationData.Animations,_content.MoveItemLockExtensions);
+            _movePerkLockExtensionRollback = ExternalCombatContentRuntime.ApplyPerkLockExtensions(AnimationData.Animations,_content.MovePerkLockExtensions);
+            _itemLockEditRollback = ExternalCombatContentRuntime.ApplyItemLockEdits(AnimationData.Animations,_content.MoveItemLockRemovals,_content.MoveItemExclusions);
+            ModRuntime.LoadTimings.Mark("move locks");
+            if (_content.MoveTemplates.Count != 0 || _content.Moves.Count > expectedFiles.Count || _content.MoveTriggers.Count != 0)
+                ExternalCombatContentRuntime.ApplyMoves(BuildMovesDocument());
+            ModRuntime.LoadTimings.Mark("mod moves");
+        }
+
+        private static AnimationData.ExternalMoveAddLifetime ApplyForks(IReadOnlyList<MoveForkDefinition> forks)
+        {
+            if (forks.Count == 0) return null;
+            var lifetime = AnimationData.AddExternalMovesWithLifetime(ExternalCombatContentRuntime.BuildForkDocument(forks));
+            try
+            {
+                // A fork answers to every name its source answers to, so combos, transitions
+                // and conditions that name the source also match the copy.
+                foreach (var fork in forks)
+                {
+                    InfoAnimation copy = AnimationData.GetAnimationByName(fork.RuntimeName, false);
+                    InfoAnimation source = AnimationData.GetAnimationByName(fork.Source, false);
+                    if (copy == null || source == null) throw new ModContentException("Move fork was not created: " + fork.RuntimeName);
+                    foreach (string name in source.GetTemplateNames()) copy.AddTemplateName(name);
+                }
+                return lifetime;
+            }
+            catch { lifetime.Dispose(); throw; }
+        }
+
+        /// <summary>The mod move edits that can be swapped while the game runs.</summary>
+        internal sealed class MoveOverlaySet
+        {
+            internal IReadOnlyList<MoveCombatPatch> Patches = Array.Empty<MoveCombatPatch>();
+            internal IReadOnlyList<MoveForkDefinition> Forks = Array.Empty<MoveForkDefinition>();
+            internal IReadOnlyList<MoveItemLockRemoval> Removals = Array.Empty<MoveItemLockRemoval>();
+            internal IReadOnlyList<MoveItemExclusion> Exclusions = Array.Empty<MoveItemExclusion>();
+            internal static MoveOverlaySet From(ModContentCatalog content) => new MoveOverlaySet
+            { Patches = content.MoveCombatPatches, Forks = content.MoveForks, Removals = content.MoveItemLockRemovals, Exclusions = content.MoveItemExclusions };
+        }
+
+        private MoveOverlaySet _activeOverlay;
+        internal bool HasReplacedOverlay => _activeOverlay != null;
+
+        /// <summary>
+        /// Swaps the applied forks, move patches and item lock edits for another set (a
+        /// live reload, or the Moveset Lab's working copy). Everything is undone first
+        /// because guards compare unpatched native values; a rejected set restores the
+        /// previous one. Replacements, perk locks and new mod moves are unchanged. Fighters
+        /// already in a fight keep the moves they were built with.
+        /// </summary>
+        internal void ReplaceMoveOverlay(MoveOverlaySet next)
+        {
+            ThrowIfDisposed();
+            if (!_p1dApplied) throw new InvalidOperationException("Mod moves are not applied.");
+            var previous = _activeOverlay ?? MoveOverlaySet.From(_content);
+            TearDownMoveOverlay();
+            try { ApplyMoveOverlay(next); _activeOverlay = next; }
+            catch
+            {
+                TearDownMoveOverlay();
+                ApplyMoveOverlay(previous);
+                throw;
+            }
+        }
+
+        /// <summary>Runs <paramref name="read"/> with every mod move edit removed, then restores them.</summary>
+        internal void WithoutMoveOverlay(Action read)
+        {
+            ThrowIfDisposed();
+            if (!_p1dApplied) { read(); return; }
+            var current = _activeOverlay ?? MoveOverlaySet.From(_content);
+            TearDownMoveOverlay();
+            try { read(); }
+            finally { ApplyMoveOverlay(current); }
+        }
+
+        /// <summary>Restores the move edits the game started with.</summary>
+        internal void RestoreStartupMoveOverlay()
+        {
+            if (_activeOverlay == null) return;
+            ReplaceMoveOverlay(MoveOverlaySet.From(_content));
+            _activeOverlay = null;
+        }
+
+        private void TearDownMoveOverlay()
+        {
+            _itemLockEditRollback?.Dispose(); _itemLockEditRollback = null;
+            _moveCombatPatchLifetime?.Dispose(); _moveCombatPatchLifetime = null;
+            _moveForkLifetime?.Dispose(); _moveForkLifetime = null;
+        }
+
+        private void ApplyMoveOverlay(MoveOverlaySet set)
+        {
+            _moveForkLifetime = ApplyForks(set.Forks);
+            _moveCombatPatchLifetime = ApplyMoveCombatPatches(set.Patches);
+            _itemLockEditRollback = ExternalCombatContentRuntime.ApplyItemLockEdits(AnimationData.Animations, set.Removals, set.Exclusions);
+        }
+
+        private MoveCombatPatchRuntime.Lifetime ApplyMoveCombatPatches(IReadOnlyList<MoveCombatPatch> patches)
+        {
+            return MoveCombatPatchRuntime.Apply(AnimationData.Animations, patches,
                 condition =>
                 {
                     var node = BuildMoveCondition(new XmlDocument { XmlResolver = null },condition);
@@ -192,14 +300,6 @@ namespace Eclipse.Modding
                     parsed?.Parse(node);
                     return parsed;
                 }, AnimationData.RebuildCapabilityTables);
-            ModRuntime.LoadTimings.Mark("move combat patches");
-            _p1dMovePerkLockRollback = ExternalCombatContentRuntime.ApplyMovePerkLocks(_content.MovePerkLockRemovals);
-            _moveItemLockRollback = ExternalCombatContentRuntime.ApplyItemLockExtensions(AnimationData.Animations,_content.MoveItemLockExtensions);
-            _movePerkLockExtensionRollback = ExternalCombatContentRuntime.ApplyPerkLockExtensions(AnimationData.Animations,_content.MovePerkLockExtensions);
-            ModRuntime.LoadTimings.Mark("move locks");
-            if (_content.MoveTemplates.Count != 0 || _content.Moves.Count > expectedFiles.Count || _content.MoveTriggers.Count != 0)
-                ExternalCombatContentRuntime.ApplyMoves(BuildMovesDocument());
-            ModRuntime.LoadTimings.Mark("mod moves");
         }
 
         private XmlDocument BuildMovesDocument()
@@ -763,8 +863,13 @@ namespace Eclipse.Modding
         {
             for (int i = _p1dTactics.Count - 1; i >= 0; i--) ExternalCombatContentRuntime.RemoveTactic(_p1dTactics[i]);
             _p1dTactics.Clear();
+            _itemLockEditRollback?.Dispose();
+            _itemLockEditRollback = null;
             _moveCombatPatchLifetime?.Dispose();
             _moveCombatPatchLifetime = null;
+            _activeOverlay = null;
+            _moveForkLifetime?.Dispose();
+            _moveForkLifetime = null;
             _moveReplacementLifetime?.Dispose();
             _moveReplacementLifetime = null;
             _movePerkLockExtensionRollback?.Dispose();

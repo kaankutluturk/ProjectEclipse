@@ -323,6 +323,43 @@ exports.run = async function () {
         assert(keys.items.some(i => i.label === 'hits'), 'Declared state key completion missing');
         passed.push('PASS: state schema keys complete inside inline callbacks');
 
+        const rivalRoot = path.join(folder.uri.fsPath, 'rival');
+        fs.cpSync(path.join(root, 'templates/weapon'), rivalRoot, { recursive: true });
+        const rivalManifest = path.join(rivalRoot, 'mod.toml');
+        fs.writeFileSync(rivalManifest, fs.readFileSync(rivalManifest, 'utf8').replace('id = "tutorial.blade"', 'id = "rival.tuning"'));
+        fs.appendFileSync(path.join(rivalRoot, 'scripts/main.lua'), '\nsf2.moves.patch { move = "HighKick", disable = true }\n');
+        const mainUri = vscode.Uri.joinPath(folder.uri, 'scripts', 'main.lua');
+        const mainText = fs.readFileSync(mainUri.fsPath, 'utf8');
+        const patchLine = 'sf2.moves.patch { move = "HighKick", priority = { expected = 100, value = 90 } }';
+        fs.writeFileSync(mainUri.fsPath, mainText + '\n' + patchLine + '\nsf2.moves.patch { move = "HighK" }\n');
+        const mainDocument = await vscode.workspace.openTextDocument(mainUri);
+        await vscode.window.showTextDocument(mainDocument);
+        const lines = mainDocument.getText().split('\n'), patchRow = lines.indexOf(patchLine), partialRow = patchRow + 1;
+        let moveDiagnostics = [];
+        const moveDeadline = Date.now() + 15000;
+        while (Date.now() < moveDeadline) {
+            await extension.exports.refresh();
+            moveDiagnostics = vscode.languages.getDiagnostics(mainUri);
+            if (moveDiagnostics.some(d => d.code === 'native-guard') && moveDiagnostics.some(d => d.code === 'mod-conflict')) break;
+            await new Promise(resolve => setTimeout(resolve, 200));
+        }
+        assert(moveDiagnostics.some(d => d.code === 'native-guard' && d.message.includes('priority 110, not 100')), 'Vanilla priority guard mismatch was not diagnosed');
+        assert(moveDiagnostics.some(d => d.code === 'native-move' && d.range.start.line === partialRow), 'Unknown move name was not diagnosed');
+        const conflict = moveDiagnostics.find(d => d.code === 'mod-conflict');
+        assert(conflict && conflict.message.includes('"rival.tuning"') && conflict.range.start.line === patchRow, 'Cross-mod move patch conflict was not diagnosed on the claim');
+        passed.push('PASS: vanilla move guards and cross-mod patch conflicts are diagnosed');
+        const completion = await vscode.commands.executeCommand('vscode.executeCompletionItemProvider', mainUri, new vscode.Position(partialRow, lines[partialRow].indexOf('HighK') + 5));
+        assert(completion.items.some(i => i.label === 'HighKick'), 'Vanilla move name completion missing');
+        const hovers = await vscode.commands.executeCommand('vscode.executeHoverProvider', mainUri, new vscode.Position(patchRow, lines[patchRow].indexOf('HighKick') + 3));
+        assert(hovers.some(h => h.contents.some(c => String(c.value ?? c).includes('Priority: 110'))), 'Vanilla move hover missing');
+        passed.push('PASS: vanilla move names complete and hover with their native values');
+        const changes = await vscode.commands.executeCommand('eclipseModding.showMoveChanges');
+        assert(changes?.getText().includes('| Priority | 110 | 90 |') && changes.getText().includes('also claimed by "rival.tuning"'), 'Move change report is incomplete');
+        passed.push('PASS: Show Move Changes reports vanilla values and conflicts');
+        fs.writeFileSync(mainUri.fsPath, mainText);
+        fs.rmSync(rivalRoot, { recursive: true, force: true });
+        await extension.exports.refresh();
+
         const luarcUri = vscode.Uri.joinPath(folder.uri, '.luarc.json');
         if (!fs.existsSync(luarcUri.fsPath)) fs.writeFileSync(luarcUri.fsPath, '{}');
         const luarcDoc = await vscode.workspace.openTextDocument(luarcUri);

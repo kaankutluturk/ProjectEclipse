@@ -145,6 +145,58 @@ public static class AnimationData
 		return added;
 	}
 
+	// Eclipse: an undoable AddExternalMoves for mod content that can be removed or
+	// reloaded (move forks). Disposing removes the moves and their template membership.
+	internal sealed class ExternalMoveAddLifetime : System.IDisposable
+	{
+		internal readonly List<InfoAnimation> Added = new List<InfoAnimation>();
+		internal List<KeyValuePair<List<InfoAnimation>, InfoAnimation[]>> TemplateSnapshot;
+		internal HashSet<string> TemplateNames;
+		private bool _disposed;
+
+		public void Dispose()
+		{
+			if (_disposed) return;
+			_disposed = true;
+			if (Added.Count == 0) return;
+			foreach (InfoAnimation move in Added)
+			{
+				_Animations.Remove(move);
+				if (_AnimationsByName.TryGetValue(move.Name, out InfoAnimation current) && ReferenceEquals(current, move))
+					_AnimationsByName.Remove(move.Name);
+			}
+			foreach (var list in TemplateSnapshot)
+				list.Key.RemoveAll(member => Added.Contains(member));
+			foreach (string name in new List<string>(_TemplatesByName.Keys))
+				if (!TemplateNames.Contains(name)) _TemplatesByName.Remove(name);
+			RebuildCapabilityTables();
+		}
+	}
+
+	internal static ExternalMoveAddLifetime AddExternalMovesWithLifetime(XmlDocument document)
+	{
+		var lifetime = new ExternalMoveAddLifetime
+		{
+			TemplateSnapshot = new List<KeyValuePair<List<InfoAnimation>, InfoAnimation[]>>(),
+			TemplateNames = new HashSet<string>(_TemplatesByName.Keys, System.StringComparer.Ordinal)
+		};
+		foreach (TemplateAnimation template in _TemplatesByName.Values)
+			lifetime.TemplateSnapshot.Add(new KeyValuePair<List<InfoAnimation>, InfoAnimation[]>(template.GetAnimations(), template.GetAnimations().ToArray()));
+		int before = _Animations.Count;
+		try
+		{
+			AddExternalMoves(document);
+			lifetime.Added.AddRange(_Animations.GetRange(before, _Animations.Count - before));
+			return lifetime;
+		}
+		catch
+		{
+			if (_Animations.Count > before) lifetime.Added.AddRange(_Animations.GetRange(before, _Animations.Count - before));
+			lifetime.Dispose();
+			throw;
+		}
+	}
+
 	internal sealed class ExternalMoveReplacementLifetime : System.IDisposable
 	{
 		internal sealed class Entry

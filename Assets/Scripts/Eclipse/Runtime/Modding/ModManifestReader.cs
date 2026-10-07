@@ -80,10 +80,10 @@ namespace Eclipse.Modding
             }
 
             if (schema != 1) Fail(sourceName, 0, "Manifest schema must be exactly 1.");
-            if (id == null || name == null || version == null || authors == null ||
-                entrypoint == null || capabilities == null)
+            // entrypoint is optional: a data-only mod (localizations, movesets) has no Lua.
+            if (id == null || name == null || version == null || authors == null || capabilities == null)
                 Fail(sourceName, 0,
-                    "Manifest requires schema, id, name, version, authors, entrypoint and capabilities.");
+                    "Manifest requires schema, id, name, version, authors and capabilities.");
             if (string.IsNullOrWhiteSpace(name)) Fail(sourceName, 0, "Manifest name must not be empty.");
             if (authors.Length == 0) Fail(sourceName, 0, "Manifest authors must contain at least one author.");
 
@@ -97,11 +97,12 @@ namespace Eclipse.Modding
             try { semanticVersion = SemanticVersion.Parse(version); }
             catch (FormatException ex) { Fail(sourceName, 0, ex.Message); throw; }
 
-            string normalizedEntrypoint;
+            string normalizedEntrypoint = null;
             string pathError;
-            if (!ModIdentityRules.TryNormalizePath(entrypoint, out normalizedEntrypoint, out pathError) ||
+            if (entrypoint != null &&
+                (!ModIdentityRules.TryNormalizePath(entrypoint, out normalizedEntrypoint, out pathError) ||
                 !normalizedEntrypoint.StartsWith("scripts/", StringComparison.Ordinal) ||
-                !normalizedEntrypoint.EndsWith(".lua", StringComparison.Ordinal))
+                !normalizedEntrypoint.EndsWith(".lua", StringComparison.Ordinal)))
                 Fail(sourceName, 0, "Entrypoint must be a safe scripts/*.lua path: '" + entrypoint + "'.");
 
             NormalizeSimpleList(authors, "author", sourceName, false);

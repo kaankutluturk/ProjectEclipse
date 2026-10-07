@@ -138,20 +138,25 @@ namespace Eclipse.Modding
                     registration = content.BeginRegistration(mod);
                     watch.Restart();
                     ModLocalizationLoader.Load(mod, host.Assets, registration);
+                    ModMovesetLoader.Load(mod, host.Assets, registration);
                     localizationMs += watch.ElapsedMilliseconds;
-                    var api = new ModApiFacade(mod, host.Assets, registration, state, logger, extensions, callbackDiagnostics);
-                    watch.Restart();
-                    context = runtime.CreateContext(mod, api);
-                    contextMs += watch.ElapsedMilliseconds;
-                    if (context == null) throw new InvalidOperationException("Script runtime returned a null context.");
-                    watch.Restart();
-                    context.ExecuteEntrypoint();
-                    executeMs += watch.ElapsedMilliseconds;
+                    // A data-only mod has no Lua context; its declarative content still commits.
+                    if (mod.Manifest.HasEntrypoint)
+                    {
+                        var api = new ModApiFacade(mod, host.Assets, registration, state, logger, extensions, callbackDiagnostics);
+                        watch.Restart();
+                        context = runtime.CreateContext(mod, api);
+                        contextMs += watch.ElapsedMilliseconds;
+                        if (context == null) throw new InvalidOperationException("Script runtime returned a null context.");
+                        watch.Restart();
+                        context.ExecuteEntrypoint();
+                        executeMs += watch.ElapsedMilliseconds;
+                    }
                     watch.Restart();
                     registration.Commit();
                     extensions.Activate(mod.Id);
                     commitMs += watch.ElapsedMilliseconds;
-                    contexts.Add(context);
+                    if (context != null) contexts.Add(context);
                     active.Add(mod);
                     activeIds.Add(mod.Id);
                     context = null;
@@ -160,7 +165,7 @@ namespace Eclipse.Modding
                 {
                     state.RemoveDefinition(mod.Id);
                     extensions.RemoveOwner(mod.Id);
-                    string source = mod.Manifest.Entrypoint;
+                    string source = mod.Manifest.Entrypoint ?? "mod.toml";
                     ModScriptException scriptException = exception as ModScriptException;
                     if (scriptException != null && !string.IsNullOrEmpty(scriptException.SourceName))
                         source = scriptException.SourceName;

@@ -1,6 +1,6 @@
 ---
 title: The mod manifest
-description: Define your mod's identity, entry script, dependencies, and permissions.
+description: Define your mod's identity, optional entry script, dependencies, and permissions.
 ---
 
 Every mod needs a UTF-8 `mod.toml` directly inside its folder. Eclipse reads this file before running Lua. Use the supported simple TOML format shown below: double-quoted strings, one-line arrays, and one `[[dependencies]]` block per dependency. Put all main fields before the first dependency block.
@@ -21,7 +21,7 @@ version = ">=1.0 <2.0"
 
 ## Main fields
 
-All main fields in the example are required.
+All main fields in the example are required except `entrypoint`.
 
 | Field | Meaning |
 | --- | --- |
@@ -30,10 +30,30 @@ All main fields in the example are required.
 | `name` | Human-readable name shown in the mod menu. |
 | `version` | Your mod's release version, such as `1.0.0`. Increase it when publishing changes. |
 | `authors` | Nonempty array of author names. |
-| `entrypoint` | Relative Lua path inside `scripts/`, ending in `.lua`. No absolute paths or `..`. |
+| `entrypoint` | Optional. Relative Lua path inside `scripts/`, ending in `.lua`. No absolute paths or `..`. Omit it for a [data-only mod](#data-only-mods). |
 | `capabilities` | Array of permission names. Use `[]` if none are needed. Duplicate entries are rejected. |
 
 Changing `name` changes the display label. Changing `id` creates a different content owner and can make existing saved items unavailable. Choose the ID before distributing your mod and keep it stable.
+
+## Data-only mods
+
+A mod without `entrypoint` runs no Lua. It can still ship content from its data folders:
+translations in `localizations/` and move edits in `movesets/*.json` (see
+[Moveset files](../../api/movesets/)). The in-game Moveset Lab saves mods this way. Data
+files are loaded inside the same registration as a Lua mod's script, so the same
+capabilities, dependencies and conflict rules apply: a moveset file still needs
+`content.patch`, and naming a `core:` item still needs the `core` dependency.
+
+```toml
+schema = 1
+id = "yourname.faster-kicks"
+name = "Faster Kicks"
+version = "1.0.0"
+authors = ["Your Name"]
+capabilities = ["content.patch"]
+```
+
+A mod may have both an entrypoint and data files; the data files load first.
 
 ## Version ranges
 

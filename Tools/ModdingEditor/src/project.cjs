@@ -1,5 +1,6 @@
 const fs=require('node:fs/promises'),path=require('node:path'),lua=require('luaparse');
 const api=require('../data/api.json');
+const native=require('./native.cjs'),claims=require('./claims.cjs'),moveset=require('./moveset.cjs');
 const MAX_FILES=10000;
 const MANIFEST_FIELDS=['schema','id','name','version','authors','entrypoint','capabilities'];
 const slash=s=>s.replaceAll('\\','/');
@@ -26,13 +27,14 @@ function manifest(text){
         try{target[key]=parseValue(raw);}catch(e){issues.push({line:lineNo,message:e.message});}
     });
     const issue=(key,message)=>issues.push({line:positions[key]??0,message});
-    for(const key of MANIFEST_FIELDS)if(data[key]===undefined)issue(key,`Missing required manifest field: ${key}.`);
+    for(const key of MANIFEST_FIELDS)if(key!=='entrypoint'&&data[key]===undefined)issue(key,`Missing required manifest field: ${key}.`);
     if(data.schema!==1)issue('schema','schema must be 1.');
     if(typeof data.id!=='string'||!/^[-a-z0-9_.]+$/.test(data.id)||['core','sf2de'].includes(data.id))issue('id','Choose a unique lowercase mod ID; core and sf2de are reserved.');
     if(typeof data.name!=='string'||!data.name.trim())issue('name','name must be a nonempty string.');
     if(typeof data.version!=='string'||!/^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$/.test(data.version))issue('version','Use a semantic version such as 1.0.0.');
     for(const key of ['authors','capabilities'])if(!Array.isArray(data[key])||!data[key].every(v=>typeof v==='string'&&v.trim())||(key==='authors'&&!data[key].length))issue(key,`${key} must be a ${key==='authors'?'nonempty ':''}one-line array of nonempty strings.`);else if(new Set(data[key]).size!==data[key].length)issue(key,`${key} contains duplicates.`);
-    if(!safe(data.entrypoint)||!slash(data.entrypoint).startsWith('scripts/')||!data.entrypoint.endsWith('.lua'))issue('entrypoint','Use a safe path inside scripts/, ending in .lua.');
+    // entrypoint is optional: a data-only mod ships localizations and movesets without Lua.
+    if(data.entrypoint!==undefined&&(!safe(data.entrypoint)||!slash(data.entrypoint).startsWith('scripts/')||!data.entrypoint.endsWith('.lua')))issue('entrypoint','Use a safe path inside scripts/, ending in .lua.');
     const ids=new Set();for(const d of data.dependencies){if(typeof d.id!=='string'||!/^[-a-z0-9_.]+$/.test(d.id)||typeof d.version!=='string')issue('id','Each dependency needs a valid id and version range.');if(ids.has(d.id))issue('id',`Duplicate dependency: ${d.id}.`);ids.add(d.id);}
     return {data,issues,positions};
 }
@@ -51,7 +53,7 @@ function literalRequires(text){
     visit(ast);return modules;
 }
 async function indexMod(root,read=async f=>fs.readFile(f,'utf8')){
-    const parsed=manifest(await read(path.join(root,'mod.toml'))),assets=new Map(),localizations=new Map(),issues=[];
+    const parsed=manifest(await read(path.join(root,'mod.toml'))),assets=new Map(),localizations=new Map(),issues=[],claimList=[],moveCalls=[],sources=new Map();
     const addLocalization=(id,language,value,file,line)=>{
         const normalized=normalizeLocalizationLanguage(language);
         if(!normalized){issues.push({file,line,message:`Unsafe localization language: ${language}.`});return;}
@@ -83,6 +85,32 @@ async function indexMod(root,read=async f=>fs.readFile(f,'utf8')){
             addLocalization(id,language,value,file,line);
         });
     }
+    const lineOf=(text,offset)=>text.slice(0,offset).split('\n').length-1;
+    for(const file of (await walk(path.join(root,'movesets'))).filter(f=>f.endsWith('.json')).sort()){
+        const text=await read(file);sources.set(file,text);
+        const result=moveset.parse(text);
+        for(const issue of result.issues)issues.push({file,line:lineOf(text,issue.offset),message:issue.message});
+        if(result.entries.length&&!(parsed.data.capabilities??[]).includes('content.patch'))issues.push({file,line:0,message:'This moveset file edits moves; declare "content.patch" in mod.toml capabilities.'});
+        const deps=new Set((parsed.data.dependencies??[]).map(d=>d.id));
+        for(const entry of result.entries){
+            const line=lineOf(text,entry.offset);
+            if(entry.kind==='fork'&&typeof entry.item==='string'){const owner=entry.item.split(':')[0];if(owner!==parsed.data.id&&!deps.has(owner))issues.push({file,line,message:`Fork item "${entry.item}" needs a [[dependencies]] entry for "${owner}".`});}
+            const call=entry.kind==='fork'?{name:'sf2.moves.fork',args:[{...entry.table,fields:[...entry.table.fields,{type:'TableKeyString',key:{name:'source'},value:moveset.field(entry.table,'move')}]}],node:entry.table}:{name:'sf2.moves.patch',args:[entry.table],node:entry.table};
+            const claim=claims.claimOf(call,{literal,fields});
+            if(claim)claimList.push({kind:claim.kind,key:claim.key,label:claim.label,file,line:claim.node?.range?lineOf(text,claim.node.range[0]):line,range:claim.node?.range??entry.table.range});
+            moveCalls.push({name:call.name,args:call.args,node:entry.table,file,line});
+            if(entry.kind==='fork'&&moveset.field(entry.table,'id')){
+                // The copy's edits are an ordinary patch of the fork's runtime name.
+                const forkName=`${parsed.data.id}.${entry.id}`;
+                if(entry.table.fields.some(f=>f.type==='TableKeyString'&&!['id','move','subtype','item','note'].includes(f.key.name))){
+                    const patch={...entry.table,fields:entry.table.fields.filter(f=>!['id','subtype','item'].includes(f.key?.name)).map(f=>f.key?.name==='move'?{...f,value:{...f.value,value:forkName}}:f)};
+                    claimList.push({kind:'move patch',key:'move-patch:'+forkName,label:forkName,file,line,range:entry.table.range});
+                    moveCalls.push({name:'sf2.moves.patch',args:[patch],node:entry.table,file,line,forkOf:entry.move});
+                }
+            }
+        }
+        for(const issue of moveset.check(result.entries,{literal,fields},parsed.data.id))issues.push({file,line:lineOf(text,issue.offset),message:issue.message,code:'native-guard'});
+    }
     if(safe(parsed.data.entrypoint)){
         const entrypoint=path.join(root,parsed.data.entrypoint);
         try{
@@ -91,16 +119,23 @@ async function indexMod(root,read=async f=>fs.readFile(f,'utf8')){
             while(pending.length){
                 const file=pending.pop(),key=path.resolve(file).toLowerCase();if(visited.has(key))continue;visited.add(key);
                 let source;try{source=await read(file);}catch(e){if(e.code==='ENOENT')continue;throw e;}
-                for(const call of analyze(source,temporary).calls.filter(c=>c.name==='sf2.localization.register')){
-                    const definition=fields(call.args[0]),id=literal(definition.id),language=literal(definition.language),value=literal(definition.value);
-                    if(typeof id==='string'&&id.length&&typeof language==='string'&&typeof value==='string'&&value.length)
-                        addLocalization(id,language,value,file,call.node.loc?.start?.line?call.node.loc.start.line-1:undefined);
+                sources.set(file,source);
+                for(const call of analyze(source,temporary).calls){
+                    const line=call.node.loc?.start?.line?call.node.loc.start.line-1:undefined;
+                    if(call.name==='sf2.localization.register'){
+                        const definition=fields(call.args[0]),id=literal(definition.id),language=literal(definition.language),value=literal(definition.value);
+                        if(typeof id==='string'&&id.length&&typeof language==='string'&&typeof value==='string'&&value.length)
+                            addLocalization(id,language,value,file,line);
+                    }
+                    const claim=claims.claimOf(call,{literal,fields});
+                    if(claim)claimList.push({kind:claim.kind,key:claim.key,label:claim.label,file,line:claim.node?.loc?claim.node.loc.start.line-1:line,range:claim.node?.range??call.node.range});
+                    if(native.MOVE_FIELDS[call.name])moveCalls.push({name:call.name,args:call.args,node:call.node,file,line});
                 }
                 for(const module of literalRequires(source))pending.push(path.join(root,'scripts',...module.split('.'))+'.lua');
             }
         }catch(e){if(e.code==='ENOENT')parsed.issues.push({line:parsed.positions.entrypoint??0,message:`Entrypoint file is missing: ${parsed.data.entrypoint}.`});else throw e;}
     }
-    return {root,...parsed,assets,localizations,issues:[...issues,...parsed.issues.map(x=>({...x,file:path.join(root,'mod.toml')}))]};
+    return {root,...parsed,assets,localizations,claims:claimList,moveCalls,sources,issues:[...issues,...parsed.issues.map(x=>({...x,file:path.join(root,'mod.toml')}))]};
 }
 function normalizeLocalizationLanguage(language){if(typeof language!=='string'||!language.trim())return null;const value=language.trim().toLowerCase();return /^[a-z0-9_-]+$/.test(value)?value:null;}
 const literal=n=>n?.type==='UnaryExpression'&&n.operator==='-'?-literal(n.argument):n?.type==='StringLiteral'?(n.value??n.raw.slice(1,-1).replace(/\\(["'\\])/g,'$1')):n?.type==='NumericLiteral'||n?.type==='BooleanLiteral'?n.value:undefined;
@@ -118,6 +153,7 @@ function analyze(text,mod){
             const symbol=resolve(n.base,env),args=Array.isArray(n.arguments)?n.arguments:n.arguments?[n.arguments]:n.argument?[n.argument]:[];
             const name=api.aliases[symbol]??symbol,info=api.functions[name];
             if(info){calls.push({name,node:n,args});required(n,info.capability);
+                native.checkCall(name,args,{literal,fields,forkPrefix:typeof mod.data.id==='string'?mod.data.id+'.':undefined},(node,code,message)=>add(node??n,code,message));
                 if(name==='sf2.audio.play'||name==='sf2.audio.set_volume'){
                     const volume=name==='sf2.audio.play'?fields(args[1]).volume:args[1],value=literal(volume);
                     if(typeof value==='number'&&(!Number.isFinite(value)||value<0||value>1))add(volume,'range','Audio volume must be finite from 0 through 1.');
@@ -173,4 +209,29 @@ function completionContext(text,offset,mod){
     }
     if(!result)return null;return {name:result.name,kind:api.functions[result.name]?.referenceKind,start,prefix:match[2]};
 }
-module.exports={manifest,indexMod,walk,assetKind,analyze,completionContext,literal,fields,safe,stripComment,parseValue,normalizeLocalizationLanguage,canonicalModuleName,literalRequires};
+// String literal inside an sf2.moves.* definition table, with the field path from
+// the call's table to it. Completion repairs the unterminated string first.
+function moveFieldContext(text,offset,mod,repair=true){
+    const find=(source,at)=>{
+        for(const call of analyze(source,mod).calls){
+            if(!native.MOVE_FIELDS[call.name]||call.args[0]?.type!=='TableConstructorExpression')continue;
+            const visit=(node,keys)=>{
+                for(const field of node.fields??[]){
+                    const key=field.type==='TableKeyString'?field.key.name:field.type==='TableKey'?literal(field.key):undefined,next=key===undefined?keys:[...keys,key];
+                    if(field.value?.type==='StringLiteral'&&field.value.range[0]<at&&at<=field.value.range[1])return {node:field.value,path:next};
+                    if(field.value?.type==='TableConstructorExpression'){const found=visit(field.value,next);if(found)return found;}
+                }
+            };
+            const found=visit(call.args[0],[]);
+            if(found)return {name:call.name,path:found.path,definition:fields(call.args[0]),node:found.node,value:literal(found.node)};
+        }
+    };
+    if(!repair)return find(text,offset);
+    const prefix=text.slice(0,offset),match=/(["'])([^"'\n]*)$/.exec(prefix);if(!match)return null;
+    for(const ending of [match[1],match[1]+'}',match[1]+'}\n}',match[1]+'}\n}\n}',match[1]+'}\nend']){
+        const found=find(prefix+ending+text.slice(offset).replace(/^[^"'\r\n]*["']/,''),offset);
+        if(found)return {...found,start:offset-match[2].length,prefix:match[2]};
+    }
+    return null;
+}
+module.exports={moveFieldContext,manifest,indexMod,walk,assetKind,analyze,completionContext,literal,fields,safe,stripComment,parseValue,normalizeLocalizationLanguage,canonicalModuleName,literalRequires};

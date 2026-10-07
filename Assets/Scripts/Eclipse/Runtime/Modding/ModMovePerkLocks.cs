@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Eclipse.Modding
 {
@@ -179,7 +180,7 @@ namespace Eclipse.Modding
         public string Value { get; }
         public ModMoveHitPatch(string expected, string value)
         {
-            var names = new[] { "High", "Middle", "Low", "Spinning", "HighHeavy", "MiddleShortPlus", "Physycal", "HighLong", "NoReaction" };
+            var names = ModMoveAttack.NativeHitReactions;
             if (Array.IndexOf(names, expected) < 0 || Array.IndexOf(names, value) < 0 || expected == value)
                 throw new ModContentException("Move hit patch requires distinct supported expected/value reactions.");
             Expected = expected; Value = value;
@@ -214,6 +215,10 @@ namespace Eclipse.Modding
     {
         public string Expected { get; }
         public AssetId Value { get; }
+        /// <summary>A native .bytes clip used instead of a mod binary asset, or null.</summary>
+        public string NativeValue { get; }
+        /// <summary>The clip name handed to the native loader.</summary>
+        public string ClipName => NativeValue ?? Value.ToString();
         public ModMoveAnimationPatch(string expected, AssetId value)
         {
             MoveCombatPatch.ValidateName(expected);
@@ -221,6 +226,55 @@ namespace Eclipse.Modding
                 throw new ModContentException("Move animation patch requires an exact native .bytes filename and a binary asset handle.");
             Expected = expected; Value = value;
         }
+        public ModMoveAnimationPatch(string expected, string nativeValue)
+        {
+            MoveCombatPatch.ValidateName(expected); MoveCombatPatch.ValidateName(nativeValue);
+            if (!expected.EndsWith(".bytes", StringComparison.Ordinal) || !nativeValue.EndsWith(".bytes", StringComparison.Ordinal) || expected == nativeValue)
+                throw new ModContentException("Move animation patch requires exact, distinct native .bytes filenames.");
+            Expected = expected; NativeValue = nativeValue;
+        }
+    }
+
+    /// <summary>List-based combat edits of one move patch: intervals, attacks and playback rate.</summary>
+    public sealed class ModMoveCombatExtras
+    {
+        public IReadOnlyList<ModMoveIntervalEdit> Intervals { get; }
+        public IReadOnlyList<ModMoveAttackEdit> Attacks { get; }
+        /// <summary>Playback rate in permille (1000 = authored speed).</summary>
+        public ModMoveGuard<int> PlaybackRate { get; }
+        public bool IsEmpty => Intervals.Count == 0 && Attacks.Count == 0 && PlaybackRate == null;
+
+        public ModMoveCombatExtras(IEnumerable<ModMoveIntervalEdit> intervals = null, IEnumerable<ModMoveAttackEdit> attacks = null,
+            ModMoveGuard<int> playbackRate = null)
+        {
+            var intervalList = new List<ModMoveIntervalEdit>(intervals ?? Array.Empty<ModMoveIntervalEdit>());
+            var attackList = new List<ModMoveAttackEdit>(attacks ?? Array.Empty<ModMoveAttackEdit>());
+            if (intervalList.Count > 64 || attackList.Count > 32) throw new ModContentException("A move patch accepts at most 64 interval and 32 attack edits.");
+            var selectors = new HashSet<ModMoveIntervalSelector>();
+            var added = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var edit in intervalList)
+            {
+                if (edit == null) throw new ModContentException("Interval edits cannot contain null.");
+                if (edit.Select != null && !selectors.Add(edit.Select))
+                    throw new ModContentException("Two interval edits select the same interval: " + edit.Select + ".");
+                if (edit.Kind == ModMoveIntervalEditKind.Add && edit.AddName.Length != 0 && !added.Add(edit.AddName))
+                    throw new ModContentException("Two added intervals share the name " + edit.AddName + ".");
+            }
+            var ids = new HashSet<int>();
+            foreach (var edit in attackList)
+                if (edit == null || !ids.Add(edit.Id)) throw new ModContentException("Attack edits must be non-null with distinct ids.");
+            if (playbackRate != null)
+            {
+                if (playbackRate.Expected == playbackRate.Value) throw new ModContentException("A playback_rate edit must change the rate.");
+                foreach (int rate in new[] { playbackRate.Expected, playbackRate.Value })
+                    if (rate < Eclipse.Runtime.PlaybackTiming.Minimum || rate > Eclipse.Runtime.PlaybackTiming.Maximum)
+                        throw new ModContentException("playback_rate must be " + (Eclipse.Runtime.PlaybackTiming.Minimum / 1000.0).ToString(System.Globalization.CultureInfo.InvariantCulture) +
+                            ".." + (Eclipse.Runtime.PlaybackTiming.Maximum / 1000.0).ToString(System.Globalization.CultureInfo.InvariantCulture) + ".");
+            }
+            Intervals = intervalList.AsReadOnly(); Attacks = attackList.AsReadOnly(); PlaybackRate = playbackRate;
+        }
+
+        public static readonly ModMoveCombatExtras None = new ModMoveCombatExtras();
     }
 
     public sealed class ModMoveIntervalRemoval
@@ -267,23 +321,26 @@ namespace Eclipse.Modding
         public ModMoveAnimationPatch Animation { get; }
         public ModMoveIntervalRemoval RemoveInterval { get; }
         public ModMoveIntervalAddition AddInterval { get; }
+        public ModMoveCombatExtras Extras { get; }
         public bool Disable { get; }
         public MoveCombatPatch(ModId owner, string moveName, ModMoveCondition[] conditions = null,
             ModMoveFramePatch intervalEnd = null, ModMoveHitPatch hit = null, ModMoveFramePatch soundFrame = null,
             bool disable = false, ModMoveInputPatch input = null, ModMovePriorityPatch priority = null,
             ModMoveFramePatch intervalStart = null, ModMoveAnimationPatch animation = null,
-            ModMoveIntervalRemoval removeInterval = null, ModMoveIntervalAddition addInterval = null)
+            ModMoveIntervalRemoval removeInterval = null, ModMoveIntervalAddition addInterval = null,
+            ModMoveCombatExtras extras = null)
         {
+            extras = extras ?? ModMoveCombatExtras.None;
             ValidateName(moveName);
             conditions = conditions ?? new ModMoveCondition[0];
             if (conditions.Length > 32) throw new ModContentException("Move patch accepts at most 32 added conditions.");
             foreach (var condition in conditions)
                 if (condition == null) throw new ModContentException("Move patch conditions cannot contain null.");
             if (conditions.Length == 0 && intervalEnd == null && intervalStart == null && hit == null && soundFrame == null &&
-                input == null && priority == null && animation == null && removeInterval == null && addInterval == null && !disable)
+                input == null && priority == null && animation == null && removeInterval == null && addInterval == null && !disable && extras.IsEmpty)
                 throw new ModContentException("Move patch must change at least one supported field.");
             if (disable && (conditions.Length != 0 || intervalEnd != null || intervalStart != null || hit != null || soundFrame != null ||
-                input != null || priority != null || animation != null || removeInterval != null || addInterval != null))
+                input != null || priority != null || animation != null || removeInterval != null || addInterval != null || !extras.IsEmpty))
                 throw new ModContentException("A disabled move cannot also receive combat field patches.");
             if (intervalEnd != null && Array.IndexOf(new[] { "SemiUninterrupt", "Uninterrupt", "SelfUninterrupt", "Unstable" }, intervalEnd.Name) < 0)
                 throw new ModContentException("interval_end requires SemiUninterrupt, Uninterrupt, SelfUninterrupt or Unstable.");
@@ -294,9 +351,17 @@ namespace Eclipse.Modding
                 throw new ModContentException("An added interval cannot also be bounds-patched or removed in the same patch.");
             if (removeInterval != null && (removeInterval.Name == intervalStart?.Name || removeInterval.Name == intervalEnd?.Name))
                 throw new ModContentException("A removed interval cannot also receive a bounds patch.");
+            // The single-interval fields and the interval list must not touch the same interval.
+            var singleNames = new HashSet<string>(new[] { intervalStart?.Name, intervalEnd?.Name, removeInterval?.Name, addInterval?.Name }.Where(n => n != null), StringComparer.Ordinal);
+            foreach (var edit in extras.Intervals)
+                if (singleNames.Contains(edit.Select?.Name ?? edit.AddName))
+                    throw new ModContentException("Interval '" + (edit.Select?.Name ?? edit.AddName) + "' is edited by both a single-interval field and intervals.");
+            if (hit != null && extras.Attacks.Count != 0)
+                throw new ModContentException("Use hit or attacks in one move patch, not both.");
             Owner = owner; MoveName = moveName; Conditions = Array.AsReadOnly((ModMoveCondition[])conditions.Clone());
             IntervalEnd = intervalEnd; IntervalStart = intervalStart; Hit = hit; SoundFrame = soundFrame;
             Input = input; Priority = priority; Animation = animation; RemoveInterval = removeInterval; AddInterval = addInterval; Disable = disable;
+            Extras = extras;
         }
         internal static void ValidateName(string name)
         {
@@ -329,11 +394,12 @@ namespace Eclipse.Modding
             ModMoveFramePatch intervalEnd = null, ModMoveHitPatch hit = null, ModMoveFramePatch soundFrame = null,
             bool disable = false, ModMoveInputPatch input = null, ModMovePriorityPatch priority = null,
             ModMoveFramePatch intervalStart = null, ModMoveAnimationPatch animation = null,
-            ModMoveIntervalRemoval removeInterval = null, ModMoveIntervalAddition addInterval = null)
+            ModMoveIntervalRemoval removeInterval = null, ModMoveIntervalAddition addInterval = null,
+            ModMoveCombatExtras extras = null)
         {
             ThrowIfCompleted();
             var patch = new MoveCombatPatch(Mod.Id, moveName, conditions, intervalEnd, hit, soundFrame,
-                disable, input, priority, intervalStart, animation, removeInterval, addInterval);
+                disable, input, priority, intervalStart, animation, removeInterval, addInterval, extras);
             foreach (var prior in _moveCombatPatches)
                 if (prior.MoveName == patch.MoveName) throw new ModContentException("Duplicate move combat patch: " + moveName);
             EnsureCapacityForNewRegistration();
@@ -347,11 +413,12 @@ namespace Eclipse.Modding
             ModMoveFramePatch intervalEnd = null, ModMoveHitPatch hit = null, ModMoveFramePatch soundFrame = null,
             bool disable = false, ModMoveInputPatch input = null, ModMovePriorityPatch priority = null,
             ModMoveFramePatch intervalStart = null, ModMoveAnimationPatch animation = null,
-            ModMoveIntervalRemoval removeInterval = null, ModMoveIntervalAddition addInterval = null)
+            ModMoveIntervalRemoval removeInterval = null, ModMoveIntervalAddition addInterval = null,
+            ModMoveCombatExtras extras = null)
         {
             RequireCapability("content.patch");
             RequireRegistration().PatchMove(moveName, conditions, intervalEnd, hit, soundFrame,
-                disable, input, priority, intervalStart, animation, removeInterval, addInterval);
+                disable, input, priority, intervalStart, animation, removeInterval, addInterval, extras);
         }
     }
 }

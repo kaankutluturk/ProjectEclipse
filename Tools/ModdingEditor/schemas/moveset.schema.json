@@ -1,0 +1,1123 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://dawc17.github.io/ProjectEclipse/api/movesets/",
+  "title": "Eclipse moveset file",
+  "description": "Tune and fork native moves without Lua. Reference: https://dawc17.github.io/ProjectEclipse/api/movesets/",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "kind"
+  ],
+  "properties": {
+    "schema": {
+      "const": 1
+    },
+    "kind": {
+      "const": "eclipse.moveset"
+    },
+    "name": {
+      "type": "string",
+      "description": "Label for people reading the file."
+    },
+    "moves": {
+      "type": "array",
+      "maxItems": 2048,
+      "description": "Edits of native moves.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "move"
+        ],
+        "minProperties": 2,
+        "properties": {
+          "move": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9_.-]+$",
+            "description": "Exact, case-sensitive native move name (or, for a fork, the move to copy)."
+          },
+          "note": {
+            "type": "string",
+            "maxLength": 2000,
+            "description": "Free text for people; kept by the Moveset Lab."
+          },
+          "disable": {
+            "type": "boolean",
+            "description": "true makes the move unselectable. Must be the only change."
+          },
+          "priority": {
+            "type": "object",
+            "description": "Selection priority.",
+            "additionalProperties": false,
+            "required": [
+              "expected",
+              "value"
+            ],
+            "properties": {
+              "expected": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 100000,
+                "description": "The value the base game has now. The mod fails to load if it differs."
+              },
+              "value": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 100000,
+                "description": "The new value."
+              }
+            }
+          },
+          "playback_rate": {
+            "type": "object",
+            "description": "Speed multiplier; 1.0 is authored speed.",
+            "additionalProperties": false,
+            "required": [
+              "expected",
+              "value"
+            ],
+            "properties": {
+              "expected": {
+                "type": "number",
+                "minimum": 0.5,
+                "maximum": 2,
+                "description": "The value the base game has now. The mod fails to load if it differs."
+              },
+              "value": {
+                "type": "number",
+                "minimum": 0.5,
+                "maximum": 2,
+                "description": "The new value."
+              }
+            }
+          },
+          "animation": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "expected",
+              "value"
+            ],
+            "description": "Swap the animation clip.",
+            "properties": {
+              "expected": {
+                "type": "string",
+                "pattern": "\\.bytes$",
+                "description": "Current .bytes clip."
+              },
+              "value": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "pattern": "\\.bytes$",
+                    "description": "Another native clip."
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "asset"
+                    ],
+                    "properties": {
+                      "asset": {
+                        "type": "string",
+                        "description": "Binary asset path in this mod, e.g. animations/my_clip."
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          "input": {
+            "type": "object",
+            "description": "Key control, e.g. Kick.",
+            "additionalProperties": false,
+            "required": [
+              "expected",
+              "value"
+            ],
+            "properties": {
+              "expected": {
+                "type": "string",
+                "description": "The value the base game has now. The mod fails to load if it differs."
+              },
+              "value": {
+                "type": "string",
+                "description": "The new value."
+              }
+            }
+          },
+          "sound_frame": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "name",
+              "expected",
+              "value"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "expected": {
+                "type": "integer"
+              },
+              "value": {
+                "type": "integer"
+              }
+            }
+          },
+          "intervals": {
+            "type": "array",
+            "maxItems": 64,
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "select"
+                  ],
+                  "properties": {
+                    "select": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "description": "Selects one existing non-attack interval exactly.",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "description": "The interval Type, such as Block. Omit when it has none."
+                        },
+                        "name": {
+                          "type": "string",
+                          "description": "The interval Name, such as Uninterrupt. Omit when it has none."
+                        },
+                        "start": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "description": "Its start frame (default 0)."
+                        },
+                        "end": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "description": "Its end frame. Omit to select an open-ended interval."
+                        }
+                      }
+                    },
+                    "start": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "description": "New start frame."
+                    },
+                    "end": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "description": "New end frame."
+                    },
+                    "remove": {
+                      "type": "boolean",
+                      "description": "true removes the selected interval."
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "add"
+                  ],
+                  "properties": {
+                    "add": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "start"
+                      ],
+                      "properties": {
+                        "type": {
+                          "enum": [
+                            "Block",
+                            "Invulnerable",
+                            "Invisible",
+                            "Throwable"
+                          ],
+                          "description": "Type of the new interval."
+                        },
+                        "name": {
+                          "type": "string",
+                          "description": "Name of the new interval; required without a type."
+                        },
+                        "start": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "end": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "description": "Omit for an interval that runs to the end of the move."
+                        }
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            "description": "Interval edits."
+          },
+          "attacks": {
+            "type": "array",
+            "maxItems": 32,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "id"
+              ],
+              "properties": {
+                "id": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 999,
+                  "description": "The attack interval ID (usually 0 for the first attack)."
+                },
+                "start": {
+                  "type": "object",
+                  "description": "Attack start frame.",
+                  "additionalProperties": false,
+                  "required": [
+                    "expected",
+                    "value"
+                  ],
+                  "properties": {
+                    "expected": {
+                      "type": "integer",
+                      "description": "The value the base game has now. The mod fails to load if it differs."
+                    },
+                    "value": {
+                      "type": "integer",
+                      "description": "The new value."
+                    }
+                  }
+                },
+                "end": {
+                  "type": "object",
+                  "description": "Attack end frame.",
+                  "additionalProperties": false,
+                  "required": [
+                    "expected",
+                    "value"
+                  ],
+                  "properties": {
+                    "expected": {
+                      "type": "integer",
+                      "description": "The value the base game has now. The mod fails to load if it differs."
+                    },
+                    "value": {
+                      "type": "integer",
+                      "description": "The new value."
+                    }
+                  }
+                },
+                "damage": {
+                  "type": "object",
+                  "description": "Base damage.",
+                  "additionalProperties": false,
+                  "required": [
+                    "expected",
+                    "value"
+                  ],
+                  "properties": {
+                    "expected": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 16,
+                      "description": "The value the base game has now. The mod fails to load if it differs."
+                    },
+                    "value": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 16,
+                      "description": "The new value."
+                    }
+                  }
+                },
+                "damage_terms": {
+                  "type": "object",
+                  "description": "Damage terms (1–4 of UnarmedDamage, WeaponDamage, RangedDamage, MagicDamage).",
+                  "additionalProperties": false,
+                  "required": [
+                    "expected",
+                    "value"
+                  ],
+                  "properties": {
+                    "expected": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "number"
+                      },
+                      "description": "The value the base game has now. The mod fails to load if it differs."
+                    },
+                    "value": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "number"
+                      },
+                      "description": "The new value."
+                    }
+                  }
+                },
+                "edges": {
+                  "type": "object",
+                  "description": "Attacking edges: the body or weapon parts that hit.",
+                  "additionalProperties": false,
+                  "required": [
+                    "expected",
+                    "value"
+                  ],
+                  "properties": {
+                    "expected": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "minItems": 1,
+                      "maxItems": 64,
+                      "uniqueItems": true,
+                      "description": "The value the base game has now. The mod fails to load if it differs."
+                    },
+                    "value": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "minItems": 1,
+                      "maxItems": 64,
+                      "uniqueItems": true,
+                      "description": "The new value."
+                    }
+                  }
+                },
+                "impulse": {
+                  "type": "object",
+                  "description": "[x, y, z] push applied on hit.",
+                  "additionalProperties": false,
+                  "required": [
+                    "expected",
+                    "value"
+                  ],
+                  "properties": {
+                    "expected": {
+                      "type": "array",
+                      "items": {
+                        "type": "number"
+                      },
+                      "minItems": 3,
+                      "maxItems": 3,
+                      "description": "The value the base game has now. The mod fails to load if it differs."
+                    },
+                    "value": {
+                      "type": "array",
+                      "items": {
+                        "type": "number"
+                      },
+                      "minItems": 3,
+                      "maxItems": 3,
+                      "description": "The new value."
+                    }
+                  }
+                },
+                "hit": {
+                  "type": "object",
+                  "description": "Hit reaction name.",
+                  "additionalProperties": false,
+                  "required": [
+                    "expected",
+                    "value"
+                  ],
+                  "properties": {
+                    "expected": {
+                      "enum": [
+                        "Earthquake",
+                        "Electrocution",
+                        "ElectrocutionPowerfield",
+                        "HermitStorm",
+                        "High",
+                        "HighHeavy",
+                        "HighHeavyDeflect",
+                        "HighLong",
+                        "HighPlus",
+                        "HighShort",
+                        "HighShortPlus",
+                        "HoaxenPierce",
+                        "Low",
+                        "LowHeavy",
+                        "LowHeavyDeflect",
+                        "LowPull",
+                        "Middle",
+                        "MiddleHeavy",
+                        "MiddleHeavyDeflect",
+                        "MiddlePlus",
+                        "MiddleShort",
+                        "MiddleShortPlus",
+                        "MindThrowHit",
+                        "MindThrowHitNormal",
+                        "NoReaction",
+                        "Overhead",
+                        "OverheadHeavy",
+                        "OverheadHeavyDeflect",
+                        "Physycal",
+                        "RatWaveHit",
+                        "RootHit",
+                        "Spinning",
+                        "SpinningHeavy",
+                        "SpinningHeavyDeflect",
+                        "Sweep",
+                        "SweepHeavy",
+                        "SweepHeavyDeflect",
+                        "TitanHighHeavy",
+                        "TitanMiddleHeavy",
+                        "TitanOverhead",
+                        "TitanSweep",
+                        "TitansHarpoonHit",
+                        "TitansHarpoonHitGrab",
+                        "TitansHarpoonStrikeFall",
+                        "TornadoHit",
+                        "ToxicCloud",
+                        "WaspFly",
+                        "WaterWaveHit"
+                      ],
+                      "description": "The value the base game has now. The mod fails to load if it differs."
+                    },
+                    "value": {
+                      "enum": [
+                        "Earthquake",
+                        "Electrocution",
+                        "ElectrocutionPowerfield",
+                        "HermitStorm",
+                        "High",
+                        "HighHeavy",
+                        "HighHeavyDeflect",
+                        "HighLong",
+                        "HighPlus",
+                        "HighShort",
+                        "HighShortPlus",
+                        "HoaxenPierce",
+                        "Low",
+                        "LowHeavy",
+                        "LowHeavyDeflect",
+                        "LowPull",
+                        "Middle",
+                        "MiddleHeavy",
+                        "MiddleHeavyDeflect",
+                        "MiddlePlus",
+                        "MiddleShort",
+                        "MiddleShortPlus",
+                        "MindThrowHit",
+                        "MindThrowHitNormal",
+                        "NoReaction",
+                        "Overhead",
+                        "OverheadHeavy",
+                        "OverheadHeavyDeflect",
+                        "Physycal",
+                        "RatWaveHit",
+                        "RootHit",
+                        "Spinning",
+                        "SpinningHeavy",
+                        "SpinningHeavyDeflect",
+                        "Sweep",
+                        "SweepHeavy",
+                        "SweepHeavyDeflect",
+                        "TitanHighHeavy",
+                        "TitanMiddleHeavy",
+                        "TitanOverhead",
+                        "TitanSweep",
+                        "TitansHarpoonHit",
+                        "TitansHarpoonHitGrab",
+                        "TitansHarpoonStrikeFall",
+                        "TornadoHit",
+                        "ToxicCloud",
+                        "WaspFly",
+                        "WaterWaveHit"
+                      ],
+                      "description": "The new value."
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Attack edits by id."
+          }
+        }
+      }
+    },
+    "forks": {
+      "type": "array",
+      "maxItems": 512,
+      "description": "Copies of a move for one subtype or one item.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "move"
+        ],
+        "oneOf": [
+          {
+            "required": [
+              "subtype"
+            ]
+          },
+          {
+            "required": [
+              "item"
+            ]
+          }
+        ],
+        "properties": {
+          "move": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9_.-]+$",
+            "description": "Exact, case-sensitive native move name (or, for a fork, the move to copy)."
+          },
+          "note": {
+            "type": "string",
+            "maxLength": 2000,
+            "description": "Free text for people; kept by the Moveset Lab."
+          },
+          "disable": {
+            "type": "boolean",
+            "description": "true makes the move unselectable. Must be the only change."
+          },
+          "priority": {
+            "type": "object",
+            "description": "Selection priority.",
+            "additionalProperties": false,
+            "required": [
+              "expected",
+              "value"
+            ],
+            "properties": {
+              "expected": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 100000,
+                "description": "The value the base game has now. The mod fails to load if it differs."
+              },
+              "value": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 100000,
+                "description": "The new value."
+              }
+            }
+          },
+          "playback_rate": {
+            "type": "object",
+            "description": "Speed multiplier; 1.0 is authored speed.",
+            "additionalProperties": false,
+            "required": [
+              "expected",
+              "value"
+            ],
+            "properties": {
+              "expected": {
+                "type": "number",
+                "minimum": 0.5,
+                "maximum": 2,
+                "description": "The value the base game has now. The mod fails to load if it differs."
+              },
+              "value": {
+                "type": "number",
+                "minimum": 0.5,
+                "maximum": 2,
+                "description": "The new value."
+              }
+            }
+          },
+          "animation": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "expected",
+              "value"
+            ],
+            "description": "Swap the animation clip.",
+            "properties": {
+              "expected": {
+                "type": "string",
+                "pattern": "\\.bytes$",
+                "description": "Current .bytes clip."
+              },
+              "value": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "pattern": "\\.bytes$",
+                    "description": "Another native clip."
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "asset"
+                    ],
+                    "properties": {
+                      "asset": {
+                        "type": "string",
+                        "description": "Binary asset path in this mod, e.g. animations/my_clip."
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          "input": {
+            "type": "object",
+            "description": "Key control, e.g. Kick.",
+            "additionalProperties": false,
+            "required": [
+              "expected",
+              "value"
+            ],
+            "properties": {
+              "expected": {
+                "type": "string",
+                "description": "The value the base game has now. The mod fails to load if it differs."
+              },
+              "value": {
+                "type": "string",
+                "description": "The new value."
+              }
+            }
+          },
+          "sound_frame": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "name",
+              "expected",
+              "value"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "expected": {
+                "type": "integer"
+              },
+              "value": {
+                "type": "integer"
+              }
+            }
+          },
+          "intervals": {
+            "type": "array",
+            "maxItems": 64,
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "select"
+                  ],
+                  "properties": {
+                    "select": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "description": "Selects one existing non-attack interval exactly.",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "description": "The interval Type, such as Block. Omit when it has none."
+                        },
+                        "name": {
+                          "type": "string",
+                          "description": "The interval Name, such as Uninterrupt. Omit when it has none."
+                        },
+                        "start": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "description": "Its start frame (default 0)."
+                        },
+                        "end": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "description": "Its end frame. Omit to select an open-ended interval."
+                        }
+                      }
+                    },
+                    "start": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "description": "New start frame."
+                    },
+                    "end": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "description": "New end frame."
+                    },
+                    "remove": {
+                      "type": "boolean",
+                      "description": "true removes the selected interval."
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "add"
+                  ],
+                  "properties": {
+                    "add": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "start"
+                      ],
+                      "properties": {
+                        "type": {
+                          "enum": [
+                            "Block",
+                            "Invulnerable",
+                            "Invisible",
+                            "Throwable"
+                          ],
+                          "description": "Type of the new interval."
+                        },
+                        "name": {
+                          "type": "string",
+                          "description": "Name of the new interval; required without a type."
+                        },
+                        "start": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "end": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "description": "Omit for an interval that runs to the end of the move."
+                        }
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            "description": "Interval edits."
+          },
+          "attacks": {
+            "type": "array",
+            "maxItems": 32,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "id"
+              ],
+              "properties": {
+                "id": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 999,
+                  "description": "The attack interval ID (usually 0 for the first attack)."
+                },
+                "start": {
+                  "type": "object",
+                  "description": "Attack start frame.",
+                  "additionalProperties": false,
+                  "required": [
+                    "expected",
+                    "value"
+                  ],
+                  "properties": {
+                    "expected": {
+                      "type": "integer",
+                      "description": "The value the base game has now. The mod fails to load if it differs."
+                    },
+                    "value": {
+                      "type": "integer",
+                      "description": "The new value."
+                    }
+                  }
+                },
+                "end": {
+                  "type": "object",
+                  "description": "Attack end frame.",
+                  "additionalProperties": false,
+                  "required": [
+                    "expected",
+                    "value"
+                  ],
+                  "properties": {
+                    "expected": {
+                      "type": "integer",
+                      "description": "The value the base game has now. The mod fails to load if it differs."
+                    },
+                    "value": {
+                      "type": "integer",
+                      "description": "The new value."
+                    }
+                  }
+                },
+                "damage": {
+                  "type": "object",
+                  "description": "Base damage.",
+                  "additionalProperties": false,
+                  "required": [
+                    "expected",
+                    "value"
+                  ],
+                  "properties": {
+                    "expected": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 16,
+                      "description": "The value the base game has now. The mod fails to load if it differs."
+                    },
+                    "value": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 16,
+                      "description": "The new value."
+                    }
+                  }
+                },
+                "damage_terms": {
+                  "type": "object",
+                  "description": "Damage terms (1–4 of UnarmedDamage, WeaponDamage, RangedDamage, MagicDamage).",
+                  "additionalProperties": false,
+                  "required": [
+                    "expected",
+                    "value"
+                  ],
+                  "properties": {
+                    "expected": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "number"
+                      },
+                      "description": "The value the base game has now. The mod fails to load if it differs."
+                    },
+                    "value": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "number"
+                      },
+                      "description": "The new value."
+                    }
+                  }
+                },
+                "edges": {
+                  "type": "object",
+                  "description": "Attacking edges: the body or weapon parts that hit.",
+                  "additionalProperties": false,
+                  "required": [
+                    "expected",
+                    "value"
+                  ],
+                  "properties": {
+                    "expected": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "minItems": 1,
+                      "maxItems": 64,
+                      "uniqueItems": true,
+                      "description": "The value the base game has now. The mod fails to load if it differs."
+                    },
+                    "value": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "minItems": 1,
+                      "maxItems": 64,
+                      "uniqueItems": true,
+                      "description": "The new value."
+                    }
+                  }
+                },
+                "impulse": {
+                  "type": "object",
+                  "description": "[x, y, z] push applied on hit.",
+                  "additionalProperties": false,
+                  "required": [
+                    "expected",
+                    "value"
+                  ],
+                  "properties": {
+                    "expected": {
+                      "type": "array",
+                      "items": {
+                        "type": "number"
+                      },
+                      "minItems": 3,
+                      "maxItems": 3,
+                      "description": "The value the base game has now. The mod fails to load if it differs."
+                    },
+                    "value": {
+                      "type": "array",
+                      "items": {
+                        "type": "number"
+                      },
+                      "minItems": 3,
+                      "maxItems": 3,
+                      "description": "The new value."
+                    }
+                  }
+                },
+                "hit": {
+                  "type": "object",
+                  "description": "Hit reaction name.",
+                  "additionalProperties": false,
+                  "required": [
+                    "expected",
+                    "value"
+                  ],
+                  "properties": {
+                    "expected": {
+                      "enum": [
+                        "Earthquake",
+                        "Electrocution",
+                        "ElectrocutionPowerfield",
+                        "HermitStorm",
+                        "High",
+                        "HighHeavy",
+                        "HighHeavyDeflect",
+                        "HighLong",
+                        "HighPlus",
+                        "HighShort",
+                        "HighShortPlus",
+                        "HoaxenPierce",
+                        "Low",
+                        "LowHeavy",
+                        "LowHeavyDeflect",
+                        "LowPull",
+                        "Middle",
+                        "MiddleHeavy",
+                        "MiddleHeavyDeflect",
+                        "MiddlePlus",
+                        "MiddleShort",
+                        "MiddleShortPlus",
+                        "MindThrowHit",
+                        "MindThrowHitNormal",
+                        "NoReaction",
+                        "Overhead",
+                        "OverheadHeavy",
+                        "OverheadHeavyDeflect",
+                        "Physycal",
+                        "RatWaveHit",
+                        "RootHit",
+                        "Spinning",
+                        "SpinningHeavy",
+                        "SpinningHeavyDeflect",
+                        "Sweep",
+                        "SweepHeavy",
+                        "SweepHeavyDeflect",
+                        "TitanHighHeavy",
+                        "TitanMiddleHeavy",
+                        "TitanOverhead",
+                        "TitanSweep",
+                        "TitansHarpoonHit",
+                        "TitansHarpoonHitGrab",
+                        "TitansHarpoonStrikeFall",
+                        "TornadoHit",
+                        "ToxicCloud",
+                        "WaspFly",
+                        "WaterWaveHit"
+                      ],
+                      "description": "The value the base game has now. The mod fails to load if it differs."
+                    },
+                    "value": {
+                      "enum": [
+                        "Earthquake",
+                        "Electrocution",
+                        "ElectrocutionPowerfield",
+                        "HermitStorm",
+                        "High",
+                        "HighHeavy",
+                        "HighHeavyDeflect",
+                        "HighLong",
+                        "HighPlus",
+                        "HighShort",
+                        "HighShortPlus",
+                        "HoaxenPierce",
+                        "Low",
+                        "LowHeavy",
+                        "LowHeavyDeflect",
+                        "LowPull",
+                        "Middle",
+                        "MiddleHeavy",
+                        "MiddleHeavyDeflect",
+                        "MiddlePlus",
+                        "MiddleShort",
+                        "MiddleShortPlus",
+                        "MindThrowHit",
+                        "MindThrowHitNormal",
+                        "NoReaction",
+                        "Overhead",
+                        "OverheadHeavy",
+                        "OverheadHeavyDeflect",
+                        "Physycal",
+                        "RatWaveHit",
+                        "RootHit",
+                        "Spinning",
+                        "SpinningHeavy",
+                        "SpinningHeavyDeflect",
+                        "Sweep",
+                        "SweepHeavy",
+                        "SweepHeavyDeflect",
+                        "TitanHighHeavy",
+                        "TitanMiddleHeavy",
+                        "TitanOverhead",
+                        "TitanSweep",
+                        "TitansHarpoonHit",
+                        "TitansHarpoonHitGrab",
+                        "TitansHarpoonStrikeFall",
+                        "TornadoHit",
+                        "ToxicCloud",
+                        "WaspFly",
+                        "WaterWaveHit"
+                      ],
+                      "description": "The new value."
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Attack edits by id."
+          },
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9_.-]+$",
+            "description": "Local fork ID; the copy is named \"<mod id>.<id>\"."
+          },
+          "subtype": {
+            "type": "string",
+            "description": "Weapon subtype that gets the copy."
+          },
+          "item": {
+            "type": "string",
+            "description": "Qualified item ID that gets the copy, e.g. core:items/weapon/weapon_golden_katana."
+          }
+        }
+      }
+    }
+  }
+}

@@ -121,6 +121,7 @@ namespace Eclipse.Multiplayer
         private void LateUpdate()
         {
             if (_rebuildAt >= 0f && Time.unscaledTime >= _rebuildAt) Rebuild();
+            UpdateEdgeLines();
             if (_camera == null) return;
             if (Time.unscaledTime >= _nextRendererScan)
             {
@@ -156,6 +157,80 @@ namespace Eclipse.Multiplayer
             return any;
         }
 
+        // ---- Moveset Lab playback ----
+
+        private readonly Dictionary<ModelEdge, LineRenderer> _edgeLines = new Dictionary<ModelEdge, LineRenderer>();
+        private Material _lineMaterial;
+        /// <summary>Draws the playing move's active attacking edges as red capsules.</summary>
+        public bool ShowAttackEdges { get; set; }
+
+        /// <summary>Rebuilds the fighter even for the same loadout (after move edits change availability).</summary>
+        public void Refresh() { if (Loadout == null) return; _wanted = Loadout; _shown = null; _rebuildAt = 0f; }
+
+        public bool IsReady => _container != null && _container.PreviewModel != null;
+        public bool Paused { get => _container != null && _container.PreviewPaused; set { if (_container != null) _container.PreviewPaused = value; } }
+
+        /// <summary>Starts <paramref name="move"/> on the fighter. False when the fighter cannot use it.</summary>
+        public bool PlayMove(string move)
+        {
+            if (!IsReady) return false;
+            var animation = AnimationData.GetAnimationByName(move, false);
+            if (animation == null) return false;
+            _container.PreviewModel.PlayAnimationDelay(animation);
+            // Apply the pending request so a paused preview shows the first frame.
+            _container.PreviewStep(1);
+            return true;
+        }
+
+        public void Step(int ticks) { if (IsReady) _container.PreviewStep(Mathf.Max(0, ticks)); }
+
+        public string PlayingMove => IsReady ? _container.PreviewModel.GetCurrentAnimation()?.Name : null;
+        /// <summary>Ticks since the playing move started.</summary>
+        public int MoveTick => IsReady ? _container.PreviewModel.GetAnimationModule().GetFrameInMove() : 0;
+        /// <summary>Current keyframe (the frame numbers intervals use).</summary>
+        public int Keyframe => IsReady && _container.PreviewModel.GetAnimationModule().GetCurrentInfo() != null ? _container.PreviewModel.GetAnimationModule().GetCurrentFrame() : 0;
+
+        /// <summary>Names of the fighter's edges (body and weapon), for the hitbox editor.</summary>
+        public List<string> EdgeNames()
+        {
+            var names = new List<string>();
+            if (!IsReady) return names;
+            foreach (var edge in _container.PreviewModel.Body.GetAllEdges()) if (!string.IsNullOrEmpty(edge.get_Name()) && !names.Contains(edge.get_Name())) names.Add(edge.get_Name());
+            return names;
+        }
+
+        private void UpdateEdgeLines()
+        {
+            var active = new HashSet<ModelEdge>();
+            if (ShowAttackEdges && IsReady)
+            {
+                var model = _container.PreviewModel;
+                var edges = model.GetAnimationModule()?.GetAttackingEdges();
+                if (edges != null)
+                    foreach (var edge in edges)
+                    {
+                        active.Add(edge);
+                        if (!_edgeLines.TryGetValue(edge, out var line) || line == null)
+                        {
+                            var host = new GameObject("Lab edge " + edge.get_Name());
+                            host.transform.SetParent(model.UnityObject.transform, false);
+                            line = host.AddComponent<LineRenderer>();
+                            if (_lineMaterial == null) _lineMaterial = new Material(Shader.Find("Sprites/Default"));
+                            line.sharedMaterial = _lineMaterial; line.useWorldSpace = false; line.positionCount = 2; line.numCapVertices = 8;
+                            line.alignment = LineAlignment.TransformZ; line.sortingOrder = 32760;
+                            line.startColor = line.endColor = new Color(1f, .22f, .18f, .92f);
+                            _edgeLines[edge] = line;
+                        }
+                        var start = edge.CollisionStart; var end = edge.CollisionEnd;
+                        line.SetPosition(0, new Vector3(start.GetX(), start.GetY(), -1.6f));
+                        line.SetPosition(1, new Vector3(end.GetX(), end.GetY(), -1.6f));
+                        line.startWidth = line.endWidth = Mathf.Max(.04f, edge.CollisionRadius * 2f);
+                        line.enabled = true;
+                    }
+            }
+            foreach (var pair in _edgeLines) if (pair.Value != null && !active.Contains(pair.Key)) pair.Value.enabled = false;
+        }
+
         /// <summary>Keeps the live model and camera through the fight scene transition.</summary>
         internal void KeepAliveDuringLoading()
         {
@@ -182,6 +257,7 @@ namespace Eclipse.Multiplayer
         {
             if (_world != null) Destroy(_world);
             if (_texture != null) { _texture.Release(); Destroy(_texture); }
+            if (_lineMaterial != null) Destroy(_lineMaterial);
         }
     }
 }

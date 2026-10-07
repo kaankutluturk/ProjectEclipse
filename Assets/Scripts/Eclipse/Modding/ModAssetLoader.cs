@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Text;
 using System.Xml;
 using Eclipse.Content.TarAssets;
@@ -715,6 +716,128 @@ namespace Eclipse.Modding
             return rollback;
         }
 
+        // Eclipse move forks: narrow a positive item lock group (subtype scope) or add a
+        // negated item-name lock (item scope). Validated as a batch; disposing restores.
+        internal sealed class LockEditRollback : IDisposable
+        {
+            internal readonly List<Action> Undo = new List<Action>();
+            public void Dispose() { for (int i = Undo.Count - 1; i >= 0; i--) Undo[i](); Undo.Clear(); }
+        }
+
+        private static Dictionary<string,InfoAnimation> MovesByName(IReadOnlyList<InfoAnimation> moves)
+        {
+            var byName=new Dictionary<string,InfoAnimation>(StringComparer.Ordinal);
+            foreach (var move in moves)
+                if (move != null && !string.IsNullOrEmpty(move.Name))
+                {
+                    if (byName.ContainsKey(move.Name)) throw new InvalidOperationException("Ambiguous live move name: " + move.Name);
+                    byName.Add(move.Name,move);
+                }
+            return byName;
+        }
+
+        internal static LockEditRollback ApplyItemLockEdits(IReadOnlyList<InfoAnimation> moves,
+            IReadOnlyList<MoveItemLockRemoval> removals, IReadOnlyList<MoveItemExclusion> exclusions)
+        {
+            if ((removals == null || removals.Count == 0) && (exclusions == null || exclusions.Count == 0)) return null;
+            var byName=MovesByName(moves);
+            var rollback=new LockEditRollback();
+            var apply=new List<Action>();
+            var document=new XmlDocument { XmlResolver=null };
+            foreach (var removal in removals ?? Array.Empty<MoveItemLockRemoval>())
+            {
+                if (!byName.TryGetValue(removal.MoveName,out var move) || move.MoveData == null)
+                    throw new InvalidOperationException("Item lock removal references unavailable move '"+removal.MoveName+"'.");
+                var locks=move.MoveData.Locks;
+                int match=-1;
+                for(int i=0;i<locks.Count;i++)
+                {
+                    var candidate=locks[i];
+                    bool found=MatchesItemLock(candidate,removal.ItemType,removal.Subtype);
+                    if (candidate is ConditionList group && !group.IsNot && group.get_Type()==ConditionList.OperatorType.OR)
+                        foreach (var child in group.GetConditions()) found |= MatchesItemLock(child,removal.ItemType,removal.Subtype);
+                    if (!found) continue;
+                    if (match>=0) throw new InvalidOperationException("Ambiguous item lock clause for '"+removal.MoveName+"'.");
+                    match=i;
+                }
+                if (match<0) throw new InvalidOperationException("'"+removal.MoveName+"' is not locked to "+removal.ItemType+" subtype "+removal.Subtype+".");
+                var original=locks[match];
+                var kept=new List<ConditionAnimation>();
+                if (original is ConditionList existing)
+                    foreach (var child in existing.GetConditions()) if (!MatchesItemLock(child,removal.ItemType,removal.Subtype)) kept.Add(child);
+                if (kept.Count==0)
+                    throw new InvalidOperationException("Removing "+removal.Subtype+" would unlock '"+removal.MoveName+"' for every fighter; use a fork of another subtype instead.");
+                var op=document.CreateElement("Operator"); op.SetAttribute("Type","Or");
+                var replacement=new ConditionList(op,kept); replacement.Parse(op);
+                var target=locks; var selected=original;
+                apply.Add(() => { int index=target.IndexOf(selected); if (index>=0) target[index]=replacement; });
+                rollback.Undo.Add(() => { int index=target.IndexOf(replacement); if (index>=0) target[index]=selected; });
+            }
+            foreach (var exclusion in exclusions ?? Array.Empty<MoveItemExclusion>())
+            {
+                if (!byName.TryGetValue(exclusion.MoveName,out var move) || move.MoveData == null)
+                    throw new InvalidOperationException("Item exclusion references unavailable move '"+exclusion.MoveName+"'.");
+                var item=document.CreateElement("Item"); item.SetAttribute("Type",exclusion.ItemType); item.SetAttribute("Name",exclusion.RuntimeItemName); item.SetAttribute("Not","1");
+                var added=new ConditionItemInfo(item); added.Parse(item);
+                var locks=move.MoveData.Locks;
+                apply.Add(() => locks.Add(added));
+                rollback.Undo.Add(() => locks.Remove(added));
+            }
+            foreach (var action in apply) action();
+            return rollback;
+        }
+
+        /// <summary>Builds the XML of each fork: a copy of its source with narrowed locks.</summary>
+        internal static XmlDocument BuildForkDocument(IReadOnlyList<MoveForkDefinition> forks)
+        {
+            var document=new XmlDocument { XmlResolver=null };
+            var root=document.CreateElement("Movesxml"); document.AppendChild(root);
+            var movesNode=document.CreateElement("Moves"); root.AppendChild(movesNode);
+            var built=new Dictionary<string,XmlNode>(StringComparer.Ordinal);
+            foreach (var fork in forks)
+            {
+                XmlNode source;
+                if (built.TryGetValue(fork.Source,out var earlier)) source=earlier;
+                else if (!MovesParser.TryReadBaseMoveSource(fork.Source,out source))
+                    throw new InvalidOperationException("Move fork source is not a native move or earlier fork: '"+fork.Source+"'.");
+                var copy=(XmlElement)document.ImportNode(source,true);
+                copy.SetAttribute("Name",fork.RuntimeName);
+                // The source keeps its profile/trick entry; a copy must not list a second one.
+                var profile=copy["Profile"]; if (profile!=null) copy.RemoveChild(profile);
+                var locks=copy["Locks"];
+                if (locks==null) { locks=document.CreateElement("Locks"); copy.AppendChild(locks); }
+                if (fork.Subtype != null)
+                {
+                    XmlNode match=null;
+                    foreach (XmlNode clause in locks.ChildNodes)
+                    {
+                        if (clause.NodeType!=XmlNodeType.Element) continue;
+                        bool found=MatchesItemNode(clause,fork.ItemType,fork.Subtype);
+                        if (clause.Name=="Operator" && clause.Attributes["Type"]?.Value=="Or" && clause.Attributes["Not"]?.Value!="1")
+                            foreach (XmlNode child in clause.ChildNodes) found |= MatchesItemNode(child,fork.ItemType,fork.Subtype);
+                        if (!found) continue;
+                        if (match!=null) throw new InvalidOperationException("Ambiguous item lock clause for fork source '"+fork.Source+"'.");
+                        match=clause;
+                    }
+                    if (match==null) throw new InvalidOperationException("Fork source '"+fork.Source+"' is not locked to "+fork.ItemType+" subtype "+fork.Subtype+".");
+                    var narrowed=document.CreateElement("Item"); narrowed.SetAttribute("Type",fork.ItemType); narrowed.SetAttribute("SubType",fork.Subtype);
+                    locks.ReplaceChild(narrowed,match);
+                }
+                else
+                {
+                    var only=document.CreateElement("Item"); only.SetAttribute("Type",fork.ItemType); only.SetAttribute("Name",fork.RuntimeItemName);
+                    locks.AppendChild(only);
+                }
+                movesNode.AppendChild(copy);
+                built[fork.RuntimeName]=copy;
+            }
+            return document;
+        }
+
+        private static bool MatchesItemNode(XmlNode node,string itemType,string subtype) =>
+            node.NodeType==XmlNodeType.Element && node.Name=="Item" && node.Attributes["Type"]?.Value==itemType &&
+            node.Attributes["SubType"]?.Value==subtype && node.Attributes["Name"]==null && node.Attributes["Not"]?.Value!="1";
+
         private static bool MatchesPerkLock(ConditionAnimation condition,string perkName)
             => condition is ConditionPerk perk && !perk.IsNot && string.Equals(perk.get_Name(),perkName,StringComparison.Ordinal);
 
@@ -951,7 +1074,7 @@ namespace Eclipse.Modding
         }
 
         internal static Lifetime Apply(IReadOnlyList<InfoAnimation> moves, IReadOnlyList<MoveCombatPatch> patches,
-            Func<ModMoveCondition, ConditionAnimation> parse, Action rebuildPriorityConflicts = null)
+            Func<ModMoveCondition, ConditionAnimation> parse, Action rebuildPriorityConflicts = null, bool dryRun = false)
         {
             var lifetime = new Lifetime();
             // Native priority-conflict tables are derived from each move's key
@@ -1004,7 +1127,10 @@ namespace Eclipse.Modding
                 if (patch.Animation != null) PrepareAnimation(target, patch.Animation, lifetime);
                 if (patch.RemoveInterval != null) PrepareRemoveInterval(target, patch.RemoveInterval, lifetime);
                 if (patch.AddInterval != null) PrepareAddInterval(target, patch.AddInterval, lifetime);
+                PrepareExtras(target, patch.Extras, lifetime);
             }
+            // A dry run validates every guard and selector without touching the moves.
+            if (dryRun) return lifetime;
             if (changesConflicts && rebuildPriorityConflicts != null) lifetime.Apply.Add(rebuildPriorityConflicts);
             try { foreach (var apply in lifetime.Apply) apply(); }
             catch { lifetime.Dispose(); throw; }
@@ -1153,7 +1279,7 @@ namespace Eclipse.Modding
                 throw new InvalidOperationException("Move animation expected filename mismatch: " + move.Name);
             string original = move.FileName;
             int originalEndFrame = move.AnimationEndFrame;
-            string replacement = patch.Value.ToString();
+            string replacement = patch.ClipName;
             lifetime.Apply.Add(() => move.ReplaceClip(replacement, 0));
             lifetime.Undo.Add(() =>
             {
@@ -1214,6 +1340,331 @@ namespace Eclipse.Modding
             lifetime.Undo.Add(() =>
             {
                 if (!intervals.Contains(matched)) intervals.Insert(Math.Min(index, intervals.Count), matched);
+            });
+        }
+
+        // ---- List-based edits: playback rate, interval list and attacks by ID. ----
+
+        private static void PrepareExtras(InfoAnimation move, ModMoveCombatExtras extras, Lifetime lifetime)
+        {
+            if (extras == null || extras.IsEmpty) return;
+            if (extras.PlaybackRate != null) PreparePlaybackRate(move, extras.PlaybackRate, lifetime);
+            var claimed = new HashSet<IntervalAnimation>();
+            foreach (var edit in extras.Intervals) PrepareIntervalEdit(move, edit, claimed, lifetime);
+            foreach (var edit in extras.Attacks) PrepareAttackEdit(move, edit, claimed, lifetime);
+        }
+
+        private static void PreparePlaybackRate(InfoAnimation move, ModMoveGuard<int> patch, Lifetime lifetime)
+        {
+            if (move.PlaybackRatePermille != patch.Expected)
+                throw new InvalidOperationException("Move playback_rate expected value mismatch: " + move.Name);
+            if (move.HasPhysics || move.GetIsLooped())
+                throw new InvalidOperationException("playback_rate is unavailable for physics or looped moves: " + move.Name);
+            if (!Eclipse.Runtime.PlaybackTiming.IsPlayable(move.MidFrames, patch.Value))
+                throw new InvalidOperationException("playback_rate " + patch.Value + " permille would skip keyframes of " + move.Name +
+                    " (MidFrames " + move.MidFrames + " allows at most " + (move.MidFrames + 1) * 1000 + ").");
+            lifetime.Apply.Add(() => move.PlaybackRatePermille = patch.Value);
+            lifetime.Undo.Add(() => { if (move.PlaybackRatePermille == patch.Value) move.PlaybackRatePermille = patch.Expected; });
+        }
+
+        private static string IntervalName(IntervalAnimation interval) =>
+            interval.NodeInterval != null ? Attribute(interval.NodeInterval, "Name") ?? string.Empty : interval.Name ?? string.Empty;
+        private static string IntervalType(IntervalAnimation interval) =>
+            interval.NodeInterval != null ? Attribute(interval.NodeInterval, "Type") ?? string.Empty : interval.AuthoredType ?? string.Empty;
+        private static int IntervalStart(IntervalAnimation interval) =>
+            interval.NodeInterval != null ? Integer(interval.NodeInterval, "Start", 0) : interval.Start;
+        private static int? IntervalEnd(IntervalAnimation interval)
+        {
+            if (interval.NodeInterval != null)
+                return Attribute(interval.NodeInterval, "End") == null ? (int?)null : Integer(interval.NodeInterval, "End", -1);
+            return interval.HasAuthoredEnd ? interval.EndFrame : (int?)null;
+        }
+
+        private static IntervalAnimation SelectInterval(InfoAnimation move, ModMoveIntervalSelector select, HashSet<IntervalAnimation> claimed)
+        {
+            IntervalAnimation found = null;
+            foreach (var candidate in move.MoveData.Intervals)
+            {
+                if (candidate is IntervalAttack || IntervalType(candidate) != select.Type || IntervalName(candidate) != select.Name ||
+                    IntervalStart(candidate) != select.Start || IntervalEnd(candidate) != select.End) continue;
+                if (found != null) throw new InvalidOperationException("Ambiguous interval selector: " + move.Name + "/" + select);
+                found = candidate;
+            }
+            if (found == null) throw new InvalidOperationException("Interval selector matches nothing: " + move.Name + "/" + select);
+            if (!claimed.Add(found)) throw new InvalidOperationException("Interval edited twice: " + move.Name + "/" + select);
+            return found;
+        }
+
+        private static void PrepareIntervalEdit(InfoAnimation move, ModMoveIntervalEdit edit, HashSet<IntervalAnimation> claimed, Lifetime lifetime)
+        {
+            var intervals = move.MoveData.Intervals;
+            if (edit.Kind == ModMoveIntervalEditKind.Add)
+            {
+                if (intervals.Count == 0) throw new InvalidOperationException("intervals.add requires a move with native intervals: " + move.Name);
+                bool deferred = false;
+                foreach (var candidate in intervals)
+                {
+                    if (candidate.NodeInterval != null) deferred = true;
+                    if (edit.AddName.Length != 0 && IntervalName(candidate) == edit.AddName)
+                        throw new InvalidOperationException("Move already has interval: " + move.Name + "/" + edit.AddName);
+                }
+                var node = new XmlDocument().CreateElement("Interval");
+                if (edit.AddType.Length != 0) node.SetAttribute("Type", edit.AddType);
+                if (edit.AddName.Length != 0) node.SetAttribute("Name", edit.AddName);
+                node.SetAttribute("Start", edit.Start.Value.ToString(System.Globalization.CultureInfo.InvariantCulture));
+                if (edit.End.HasValue) node.SetAttribute("End", edit.End.Value.ToString(System.Globalization.CultureInfo.InvariantCulture));
+                var added = new IntervalAnimation(IntervalAnimation.ParseIntervalType(edit.AddType));
+                added.Parse(node);
+                added.FinishFrame = move.AnimationEndFrame;
+                if (!deferred) added.Init();
+                lifetime.Apply.Add(() => intervals.Add(added));
+                lifetime.Undo.Add(() => intervals.Remove(added));
+                return;
+            }
+            var target = SelectInterval(move, edit.Select, claimed);
+            if (edit.Kind == ModMoveIntervalEditKind.Remove)
+            {
+                int index = intervals.IndexOf(target);
+                lifetime.Apply.Add(() => intervals.Remove(target));
+                lifetime.Undo.Add(() => { if (!intervals.Contains(target)) intervals.Insert(Math.Min(index, intervals.Count), target); });
+                return;
+            }
+            int start = edit.Start ?? edit.Select.Start;
+            if (target.NodeInterval != null)
+            {
+                var original = target.NodeInterval;
+                var replacement = (XmlElement)original.CloneNode(true);
+                replacement.SetAttribute("Start", start.ToString(System.Globalization.CultureInfo.InvariantCulture));
+                if (edit.End.HasValue) replacement.SetAttribute("End", edit.End.Value.ToString(System.Globalization.CultureInfo.InvariantCulture));
+                int? authoredEnd = edit.Select.End;
+                lifetime.Apply.Add(() => target.NodeInterval = replacement);
+                lifetime.Undo.Add(() =>
+                {
+                    if (ReferenceEquals(target.NodeInterval, replacement)) { target.NodeInterval = original; return; }
+                    // The move parsed the patched node meanwhile: restore its parsed bounds.
+                    if (target.NodeInterval != null || target.Start != start || (edit.End.HasValue && target.EndFrame != edit.End.Value)) return;
+                    target.Start = edit.Select.Start;
+                    if (edit.End.HasValue)
+                    {
+                        if (authoredEnd.HasValue) target.EndFrame = authoredEnd.Value;
+                        else { target.HasAuthoredEnd = false; target.EndFrame = move.AnimationEndFrame + 2; }
+                    }
+                });
+                return;
+            }
+            int originalStart = target.Start, originalEnd = target.EndFrame; bool originalAuthored = target.HasAuthoredEnd;
+            int end = edit.End ?? originalEnd;
+            if (start > end) throw new InvalidOperationException("Interval edit would start after it ends: " + move.Name + "/" + edit.Select);
+            lifetime.Apply.Add(() => { target.Start = start; target.EndFrame = end; if (edit.End.HasValue) target.HasAuthoredEnd = true; });
+            lifetime.Undo.Add(() =>
+            {
+                if (target.NodeInterval == null && target.Start == start && target.EndFrame == end)
+                { target.Start = originalStart; target.EndFrame = originalEnd; target.HasAuthoredEnd = originalAuthored; }
+            });
+        }
+
+        private static float ParseFloat(string raw) =>
+            raw == null ? 0f : float.Parse(raw, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture);
+        private static string Number(double value) => ((float)value).ToString("R", System.Globalization.CultureInfo.InvariantCulture);
+
+        private static bool SameTerms(IEnumerable<KeyValuePair<string, float>> actual, IReadOnlyDictionary<string, double> expected)
+        {
+            int count = 0;
+            foreach (var pair in actual)
+            {
+                count++;
+                if (!expected.TryGetValue(pair.Key, out double shift) || (float)shift != pair.Value) return false;
+            }
+            return count == expected.Count;
+        }
+
+        private static void PrepareAttackEdit(InfoAnimation move, ModMoveAttackEdit edit, HashSet<IntervalAnimation> claimed, Lifetime lifetime)
+        {
+            IntervalAttack attack = null;
+            foreach (var candidate in move.MoveData.Intervals)
+                if (candidate is IntervalAttack found && (found.NodeInterval != null ? Integer(found.NodeInterval, "ID", -1) : found.GetAnimationId()) == edit.Id)
+                {
+                    if (attack != null) throw new InvalidOperationException("Ambiguous attack id: " + move.Name + "/" + edit.Id);
+                    attack = found;
+                }
+            if (attack == null) throw new InvalidOperationException("Move has no attack with id " + edit.Id + ": " + move.Name);
+            if (!claimed.Add(attack)) throw new InvalidOperationException("Attack edited twice: " + move.Name + "/" + edit.Id);
+            string where = move.Name + "/attack " + edit.Id;
+            if (attack.NodeInterval != null) { PrepareDeferredAttack(attack, edit, where, lifetime); return; }
+
+            int start = attack.Start, end = attack.EndFrame;
+            if ((edit.Start != null && start != edit.Start.Expected) || (edit.End != null && end != edit.End.Expected))
+                throw new InvalidOperationException("Attack frame expected value mismatch: " + where);
+            int newStart = edit.Start?.Value ?? start, newEnd = edit.End?.Value ?? end;
+            if (newStart > newEnd) throw new InvalidOperationException("Attack edit would start after it ends: " + where);
+            var reactions = attack.HitReactions;
+            if (edit.ChangesBounds)
+                foreach (var reaction in reactions)
+                    if (reaction.Start != start || reaction.EndFrameValue != end)
+                        throw new InvalidOperationException("Attack bounds edits require full-interval hit reactions: " + where);
+            if (edit.Hit != null && (reactions.Count != 1 || reactions[0].Name != edit.Hit.Expected || reactions[0].Start != start || reactions[0].EndFrameValue != end))
+                throw new InvalidOperationException("Attack hit edit requires one matching full-interval reaction: " + where);
+            if (edit.Damage != null && attack.GetDamage() != (float)edit.Damage.Expected)
+                throw new InvalidOperationException("Attack damage expected value mismatch: " + where);
+            var terms = attack.GetDamageAttributes();
+            if (edit.DamageTerms != null && !SameTerms(terms.Select(t => new KeyValuePair<string, float>(t.First, t.Second)), edit.DamageTerms.Expected))
+                throw new InvalidOperationException("Attack damage_terms expected value mismatch: " + where);
+            var parts = attack.GetAttackingParts();
+            if (edit.Edges != null && !parts.SequenceEqual(edit.Edges.Expected))
+                throw new InvalidOperationException("Attack edges expected value mismatch: " + where);
+            var impulse = attack.GetImpulse();
+            if (edit.Impulse != null && (impulse.GetX() != (float)edit.Impulse.Expected[0] || impulse.GetY() != (float)edit.Impulse.Expected[1] || impulse.GetZ() != (float)edit.Impulse.Expected[2]))
+                throw new InvalidOperationException("Attack impulse expected value mismatch: " + where);
+
+            float damage = attack.GetDamage();
+            var originalTerms = terms.Select(t => new global::Pair<string, float>(t.First, t.Second)).ToList();
+            var originalParts = parts.ToList();
+            float ix = impulse.GetX(), iy = impulse.GetY(), iz = impulse.GetZ();
+            string hitName = reactions.Count == 1 ? reactions[0].Name : null;
+            lifetime.Apply.Add(() =>
+            {
+                attack.Start = newStart; attack.EndFrame = newEnd;
+                foreach (var reaction in attack.HitReactions)
+                    if (edit.ChangesBounds) { reaction.Start = newStart; reaction.EndFrameValue = newEnd; }
+                if (edit.Hit != null) attack.HitReactions[0].Name = edit.Hit.Value;
+                if (edit.Damage != null) attack.EclipseSetDamage((float)edit.Damage.Value);
+                if (edit.DamageTerms != null)
+                {
+                    var list = attack.GetDamageAttributes(); list.Clear();
+                    foreach (string type in ModMoveCombatTermOrder.Ordered(edit.DamageTerms.Value.Keys))
+                        list.Add(new global::Pair<string, float>(type, (float)edit.DamageTerms.Value[type]));
+                }
+                if (edit.Edges != null) attack.EclipseSetAttackingParts(edit.Edges.Value);
+                if (edit.Impulse != null) { var v = attack.GetImpulse(); v.SetX((float)edit.Impulse.Value[0]); v.SetY((float)edit.Impulse.Value[1]); v.SetZ((float)edit.Impulse.Value[2]); }
+            });
+            lifetime.Undo.Add(() =>
+            {
+                if (attack.NodeInterval != null) return;
+                attack.Start = start; attack.EndFrame = end;
+                foreach (var reaction in attack.HitReactions)
+                    if (edit.ChangesBounds) { reaction.Start = start; reaction.EndFrameValue = end; }
+                if (edit.Hit != null && attack.HitReactions.Count == 1) attack.HitReactions[0].Name = hitName;
+                if (edit.Damage != null) attack.EclipseSetDamage(damage);
+                if (edit.DamageTerms != null) { var list = attack.GetDamageAttributes(); list.Clear(); list.AddRange(originalTerms); }
+                if (edit.Edges != null) attack.EclipseSetAttackingParts(originalParts);
+                if (edit.Impulse != null) { var v = attack.GetImpulse(); v.SetX(ix); v.SetY(iy); v.SetZ(iz); }
+            });
+        }
+
+        private static void PrepareDeferredAttack(IntervalAttack attack, ModMoveAttackEdit edit, string where, Lifetime lifetime)
+        {
+            var original = attack.NodeInterval;
+            int start = Integer(original, "Start", 0);
+            string rawEnd = Attribute(original, "End");
+            if (edit.Start != null && start != edit.Start.Expected)
+                throw new InvalidOperationException("Attack start expected value mismatch: " + where);
+            if (edit.End != null && (rawEnd == null || Integer(original, "End", -1) != edit.End.Expected))
+                throw new InvalidOperationException("Attack end expected value mismatch: " + where);
+            var hits = original.SelectNodes("Hit");
+            if (edit.ChangesBounds)
+                foreach (XmlNode hit in hits)
+                    if (Attribute(hit, "Start") != null || Attribute(hit, "End") != null)
+                        throw new InvalidOperationException("Attack bounds edits require full-interval hit reactions: " + where);
+            if (edit.Hit != null && (hits.Count != 1 || Attribute(hits[0], "Name") != edit.Hit.Expected ||
+                Attribute(hits[0], "Start") != null || Attribute(hits[0], "End") != null))
+                throw new InvalidOperationException("Attack hit edit requires one matching full-interval reaction: " + where);
+            var damage = original["Damage"];
+            if ((edit.Damage != null || edit.DamageTerms != null) && damage == null)
+                throw new InvalidOperationException("Attack has no Damage node: " + where);
+            if (edit.Damage != null && ParseFloat(Attribute(damage, "Value")) != (float)edit.Damage.Expected)
+                throw new InvalidOperationException("Attack damage expected value mismatch: " + where);
+            if (edit.DamageTerms != null)
+            {
+                var actual = new List<KeyValuePair<string, float>>();
+                foreach (XmlNode child in damage.ChildNodes)
+                    if (child.Name == "Damage") actual.Add(new KeyValuePair<string, float>(Attribute(child, "Type") ?? string.Empty, ParseFloat(Attribute(child, "Shift"))));
+                if (!SameTerms(actual, edit.DamageTerms.Expected))
+                    throw new InvalidOperationException("Attack damage_terms expected value mismatch: " + where);
+            }
+            if (edit.Edges != null)
+            {
+                var parts = new List<string>();
+                var partsNode = original["AttackingParts"];
+                if (partsNode != null) foreach (XmlNode edge in partsNode.ChildNodes) parts.Add(Attribute(edge, "Name") ?? string.Empty);
+                if (!parts.SequenceEqual(edit.Edges.Expected))
+                    throw new InvalidOperationException("Attack edges expected value mismatch: " + where);
+            }
+            if (edit.Impulse != null)
+            {
+                var impulse = original["Impulse"];
+                float[] actual = { ParseFloat(Attribute(impulse, "X")), ParseFloat(Attribute(impulse, "Y")), ParseFloat(Attribute(impulse, "Z")) };
+                for (int i = 0; i < 3; i++)
+                    if (actual[i] != (float)edit.Impulse.Expected[i]) throw new InvalidOperationException("Attack impulse expected value mismatch: " + where);
+            }
+
+            var replacement = (XmlElement)original.CloneNode(true);
+            var document = replacement.OwnerDocument;
+            if (edit.Start != null) replacement.SetAttribute("Start", edit.Start.Value.ToString(System.Globalization.CultureInfo.InvariantCulture));
+            if (edit.End != null) replacement.SetAttribute("End", edit.End.Value.ToString(System.Globalization.CultureInfo.InvariantCulture));
+            if (edit.Start != null && edit.End == null && rawEnd != null && edit.Start.Value > Integer(original, "End", -1))
+                throw new InvalidOperationException("Attack edit would start after it ends: " + where);
+            if (edit.Hit != null) ((XmlElement)replacement.SelectSingleNode("Hit")).SetAttribute("Name", edit.Hit.Value);
+            if (edit.Damage != null) ((XmlElement)replacement["Damage"]).SetAttribute("Value", Number(edit.Damage.Value));
+            if (edit.DamageTerms != null)
+            {
+                var damageNode = (XmlElement)replacement["Damage"];
+                var stale = new List<XmlNode>();
+                foreach (XmlNode child in damageNode.ChildNodes) if (child.Name == "Damage") stale.Add(child);
+                foreach (var child in stale) damageNode.RemoveChild(child);
+                XmlNode insertBefore = damageNode.FirstChild;
+                foreach (string type in ModMoveCombatTermOrder.Ordered(edit.DamageTerms.Value.Keys))
+                {
+                    var term = document.CreateElement("Damage");
+                    term.SetAttribute("Type", type);
+                    double shift = edit.DamageTerms.Value[type];
+                    if (shift != 0) term.SetAttribute("Shift", Number(shift));
+                    damageNode.InsertBefore(term, insertBefore);
+                }
+            }
+            if (edit.Edges != null)
+            {
+                var partsNode = replacement["AttackingParts"];
+                if (partsNode == null) { partsNode = document.CreateElement("AttackingParts"); replacement.PrependChild(partsNode); }
+                partsNode.RemoveAll();
+                foreach (string edge in edit.Edges.Value)
+                {
+                    var node = document.CreateElement("Edge"); node.SetAttribute("Name", edge); partsNode.AppendChild(node);
+                }
+            }
+            if (edit.Impulse != null)
+            {
+                var impulse = (XmlElement)replacement["Impulse"];
+                if (impulse == null) { impulse = document.CreateElement("Impulse"); replacement.AppendChild(impulse); }
+                impulse.SetAttribute("X", Number(edit.Impulse.Value[0]));
+                impulse.SetAttribute("Y", Number(edit.Impulse.Value[1]));
+                impulse.SetAttribute("Z", Number(edit.Impulse.Value[2]));
+            }
+            // Parsed originals, restored if the move parses the patched node before teardown.
+            int originalEnd = rawEnd != null ? Integer(original, "End", -1) : -1;
+            float originalDamage = damage != null ? ParseFloat(Attribute(damage, "Value")) : 0f;
+            var originalTerms = new List<global::Pair<string, float>>();
+            if (damage != null)
+                foreach (XmlNode child in damage.ChildNodes)
+                    if (child.Name == "Damage") originalTerms.Add(new global::Pair<string, float>(Attribute(child, "Type") ?? string.Empty, ParseFloat(Attribute(child, "Shift"))));
+            var originalParts = new List<string>();
+            if (original["AttackingParts"] != null) foreach (XmlNode edge in original["AttackingParts"].ChildNodes) originalParts.Add(Attribute(edge, "Name") ?? string.Empty);
+            var originalImpulse = original["Impulse"];
+            float ix = ParseFloat(Attribute(originalImpulse, "X")), iy = ParseFloat(Attribute(originalImpulse, "Y")), iz = ParseFloat(Attribute(originalImpulse, "Z"));
+            string originalHit = hits.Count == 1 ? Attribute(hits[0], "Name") : null;
+            lifetime.Apply.Add(() => attack.NodeInterval = replacement);
+            lifetime.Undo.Add(() =>
+            {
+                if (ReferenceEquals(attack.NodeInterval, replacement)) { attack.NodeInterval = original; return; }
+                if (attack.NodeInterval != null) return;
+                if (edit.Start != null && attack.Start == edit.Start.Value) attack.Start = start;
+                if (edit.End != null && attack.EndFrame == edit.End.Value) attack.EndFrame = originalEnd;
+                if (edit.ChangesBounds)
+                    foreach (var reaction in attack.HitReactions) { reaction.Start = attack.Start; reaction.EndFrameValue = attack.EndFrame; }
+                if (edit.Hit != null && attack.HitReactions.Count == 1 && attack.HitReactions[0].Name == edit.Hit.Value) attack.HitReactions[0].Name = originalHit;
+                if (edit.Damage != null) attack.EclipseSetDamage(originalDamage);
+                if (edit.DamageTerms != null) { var list = attack.GetDamageAttributes(); list.Clear(); list.AddRange(originalTerms); }
+                if (edit.Edges != null) attack.EclipseSetAttackingParts(originalParts);
+                if (edit.Impulse != null) { var v = attack.GetImpulse(); v.SetX(ix); v.SetY(iy); v.SetZ(iz); }
             });
         }
     }

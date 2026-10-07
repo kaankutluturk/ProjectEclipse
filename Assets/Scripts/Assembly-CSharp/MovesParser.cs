@@ -16,12 +16,18 @@ public static class MovesParser
 
 	private static Dictionary<string, XmlNode> _baseMoveLockSources;
 
+	// Eclipse: complete authored base move nodes (before template expansion), so a mod
+	// can fork a native move into a subtype- or item-specific copy.
+	private static Dictionary<string, XmlNode> _baseMoveSources;
+
 	public static void Parse(string path, List<InfoAnimation> animations, Dictionary<string, TemplateAnimation> templateMap, List<Trick> tricks, List<Trigger> triggers, bool flag)
 	{
 		_baseMoveLockSources = null;
+		_baseMoveSources = null;
 		MovesMaps.Init();
 		XmlDocument xmlDocument = XmlUtils.OpenXMLDocument(path + "/moves.xml", string.Empty);
 		var moveLockSources = CaptureBaseMoveLockSources(xmlDocument["Movesxml"]?["Moves"]);
+		var moveSources = CaptureBaseMoveSources(xmlDocument["Movesxml"]?["Moves"]);
 #if UNITY_EDITOR
 		Eclipse.Content.LocalAnimationPreview.Apply(xmlDocument);
 #endif
@@ -46,6 +52,29 @@ public static class MovesParser
 		_LegacyTemplateTemp.Clear();
 		_LegacyTemplateTemp = null;
 		_baseMoveLockSources = moveLockSources;
+		_baseMoveSources = moveSources;
+	}
+
+	private static Dictionary<string, XmlNode> CaptureBaseMoveSources(XmlNode moves)
+	{
+		if (moves == null) return null;
+		var sources = new Dictionary<string, XmlNode>(System.StringComparer.Ordinal);
+		var snapshot = new XmlDocument { XmlResolver = null };
+		foreach (XmlNode move in moves.ChildNodes)
+		{
+			if (move.NodeType != XmlNodeType.Element || move.Name != "Move") continue;
+			string name = move.Attributes?["Name"]?.Value;
+			if (!string.IsNullOrEmpty(name)) sources[name] = snapshot.ImportNode(move, true);
+		}
+		return sources;
+	}
+
+	internal static bool TryReadBaseMoveSource(string name, out XmlNode source)
+	{
+		source = null;
+		if (_baseMoveSources == null || !_baseMoveSources.TryGetValue(name, out XmlNode found)) return false;
+		source = found.CloneNode(true);
+		return true;
 	}
 
 	private static Dictionary<string, XmlNode> CaptureBaseMoveLockSources(XmlNode moves)

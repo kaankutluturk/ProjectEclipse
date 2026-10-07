@@ -302,6 +302,11 @@ public class InfoAnimation
 
 	public int MidFrames;
 
+	// Eclipse: playback rate in permille (1000 = authored speed). Keyframe-attached
+	// timing (intervals, actions, events) follows automatically; tick-based helpers
+	// below convert through Eclipse.Runtime.PlaybackTiming.
+	public int PlaybackRatePermille = Eclipse.Runtime.PlaybackTiming.Normal;
+
 	public int Priority;
 
 	public int Rank;
@@ -875,6 +880,13 @@ public class InfoAnimation
 
 	// Used by guarded content patches after the native parser has already loaded
 	// the original clip. Keep the parsed move identity and its linked actions.
+	/// <summary>Keyframes in a native clip file (the Moveset Lab's clip picker), or -1 when it is missing.</summary>
+	internal static int ReadClipFrameCount(string fileName)
+	{
+		byte[] data = ResourceManager.GetBinary(SF2Paths.GetBinaryAnimationsPath() + "/" + fileName);
+		return data != null && data.Length >= 4 ? System.BitConverter.ToInt32(data, 0) : -1;
+	}
+
 	public void ReplaceClip(string fileName, int endFrame)
 	{
 		string oldFileName = FileName;
@@ -1180,7 +1192,7 @@ public class InfoAnimation
 
 	public uint GetTotalFramesUnsigned()
 	{
-		return (uint)(GetFrameCount() * (MidFrames + 1));
+		return (uint)GetTotalFrames();
 	}
 
 	public int GetLastAttackFrame(bool interpolated)
@@ -1453,12 +1465,12 @@ public class InfoAnimation
 
 	public int ToInterpolatedFrame(int frame)
 	{
-		return (frame - FirstFrame + 1) * (MidFrames + 1) + 1;
+		return Eclipse.Runtime.PlaybackTiming.TicksBefore(MidFrames + 1, frame - FirstFrame + 1, PlaybackRatePermille) + 1;
 	}
 
 	public int FromInterpolatedFrame(int interpolatedFrame)
 	{
-		return FirstFrame - 1 + (interpolatedFrame - 1) / (MidFrames + 1);
+		return FirstFrame - 1 + Eclipse.Runtime.PlaybackTiming.SegmentAt(MidFrames + 1, interpolatedFrame - 1, PlaybackRatePermille);
 	}
 
 	public void SetVelocity(Vector3f value)
@@ -1588,12 +1600,12 @@ public class InfoAnimation
 
 	public int GetTotalFrames()
 	{
-		return (MidFrames + 1) * GetFrameCount();
+		return Eclipse.Runtime.PlaybackTiming.TicksBefore(MidFrames + 1, GetFrameCount(), PlaybackRatePermille);
 	}
 
 	public int GetBlendFrameCount()
 	{
-		return 2 * (MidFrames + 1);
+		return Eclipse.Runtime.PlaybackTiming.TicksBefore(MidFrames + 1, 2, PlaybackRatePermille);
 	}
 
 	public void PreloadEffects()
