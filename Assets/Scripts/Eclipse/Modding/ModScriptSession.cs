@@ -138,6 +138,7 @@ namespace Eclipse.Modding
                     registration = content.BeginRegistration(mod);
                     watch.Restart();
                     ModLocalizationLoader.Load(mod, host.Assets, registration);
+                    ModWeaponLoader.Load(mod, host.Assets, registration);
                     ModMovesetLoader.Load(mod, host.Assets, registration);
                     localizationMs += watch.ElapsedMilliseconds;
                     // A data-only mod has no Lua context; its declarative content still commits.

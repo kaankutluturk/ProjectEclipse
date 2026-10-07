@@ -311,11 +311,37 @@ namespace Eclipse.Modding
         public IReadOnlyList<ModMoveAttackEdit> Attacks { get; }
         /// <summary>Playback rate in permille (1000 = authored speed).</summary>
         public ModMoveGuard<int> PlaybackRate { get; }
-        public bool IsEmpty => Intervals.Count == 0 && Attacks.Count == 0 && PlaybackRate == null;
+        /// <summary>Attacks added to the move.</summary>
+        public IReadOnlyList<ModMoveAttackAddition> NewAttacks { get; }
+        /// <summary>The keyframes the move plays, first to last; null keeps the native range.</summary>
+        public ModMoveGuard<ModMoveClipRange> ClipRange { get; }
+        /// <summary>Moves this move may follow during a window, even inside their uninterruptible part.</summary>
+        public IReadOnlyList<ModMoveChain> Chains { get; }
+        public bool IsEmpty => Intervals.Count == 0 && Attacks.Count == 0 && PlaybackRate == null && NewAttacks.Count == 0 &&
+            ClipRange == null && Chains.Count == 0;
 
         public ModMoveCombatExtras(IEnumerable<ModMoveIntervalEdit> intervals = null, IEnumerable<ModMoveAttackEdit> attacks = null,
-            ModMoveGuard<int> playbackRate = null)
+            ModMoveGuard<int> playbackRate = null, IEnumerable<ModMoveAttackAddition> newAttacks = null,
+            ModMoveGuard<ModMoveClipRange> clipRange = null, IEnumerable<ModMoveChain> chains = null)
         {
+            if (clipRange != null)
+            {
+                if (clipRange.Expected == null || clipRange.Value == null) throw new ModContentException("clip_range needs expected and value.");
+                if (clipRange.Expected.Equals(clipRange.Value)) throw new ModContentException("A clip_range edit must change the range.");
+            }
+            ClipRange = clipRange;
+            var chainList = new List<ModMoveChain>(chains ?? Array.Empty<ModMoveChain>());
+            if (chainList.Count > ModMoveChain.MaxPerMove) throw new ModContentException("A move follows at most " + ModMoveChain.MaxPerMove + " chains.");
+            var froms = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var chain in chainList)
+                if (chain == null || !froms.Add(chain.From)) throw new ModContentException("Chains must be non-null and follow distinct moves.");
+            Chains = chainList.AsReadOnly();
+            var additions = new List<ModMoveAttackAddition>(newAttacks ?? Array.Empty<ModMoveAttackAddition>());
+            if (additions.Count > 32) throw new ModContentException("A move patch adds at most 32 attacks.");
+            var addedIds = new HashSet<int>();
+            foreach (var addition in additions)
+                if (addition == null || !addedIds.Add(addition.Id)) throw new ModContentException("New attacks must be non-null with distinct ids.");
+            NewAttacks = additions.AsReadOnly();
             var intervalList = new List<ModMoveIntervalEdit>(intervals ?? Array.Empty<ModMoveIntervalEdit>());
             var attackList = new List<ModMoveAttackEdit>(attacks ?? Array.Empty<ModMoveAttackEdit>());
             if (intervalList.Count > 64 || attackList.Count > 32) throw new ModContentException("A move patch accepts at most 64 interval and 32 attack edits.");
@@ -332,6 +358,8 @@ namespace Eclipse.Modding
             var ids = new HashSet<int>();
             foreach (var edit in attackList)
                 if (edit == null || !ids.Add(edit.Id)) throw new ModContentException("Attack edits must be non-null with distinct ids.");
+            foreach (int id in addedIds)
+                if (ids.Contains(id)) throw new ModContentException("Attack " + id + " is both edited and added; give the new attack another id.");
             if (playbackRate != null)
             {
                 if (playbackRate.Expected == playbackRate.Value) throw new ModContentException("A playback_rate edit must change the rate.");
@@ -344,6 +372,48 @@ namespace Eclipse.Modding
         }
 
         public static readonly ModMoveCombatExtras None = new ModMoveCombatExtras();
+    }
+
+    /// <summary>The first and last keyframe of a move's clip that it plays.</summary>
+    public sealed class ModMoveClipRange : IEquatable<ModMoveClipRange>
+    {
+        public int First { get; }
+        public int Last { get; }
+
+        public ModMoveClipRange(int first, int last)
+        {
+            if (first < 0 || last < 0 || first > 100000 || last > 100000) throw new ModContentException("clip_range keyframes must be 0..100000.");
+            if (last <= first) throw new ModContentException("clip_range must end after it starts.");
+            First = first; Last = last;
+        }
+
+        public bool Equals(ModMoveClipRange other) => other != null && First == other.First && Last == other.Last;
+        public override bool Equals(object obj) => Equals(obj as ModMoveClipRange);
+        public override int GetHashCode() => First * 397 ^ Last;
+        public override string ToString() => "[" + First + ", " + Last + "]";
+    }
+
+    /// <summary>
+    /// A combo link: this move may start, on its own input, while <see cref="From"/> plays
+    /// keyframes <see cref="Start"/>..<see cref="End"/>, even inside the part of From that
+    /// otherwise cannot be interrupted. Its other conditions (input, locks, round) still apply.
+    /// </summary>
+    public sealed class ModMoveChain
+    {
+        public const int MaxPerMove = 16;
+        /// <summary>Name of the interval the link adds to <see cref="From"/>.</summary>
+        public static string WindowName(string move) => "EclipseChain>" + move;
+
+        public string From { get; }
+        public int Start { get; }
+        public int End { get; }
+
+        public ModMoveChain(string from, int start, int end)
+        {
+            MoveCombatPatch.ValidateName(from);
+            if (start < 0 || end < start || end > 100000) throw new ModContentException("A chain window must be 0 <= start <= end <= 100000.");
+            From = from; Start = start; End = end;
+        }
     }
 
     public sealed class ModMoveIntervalRemoval

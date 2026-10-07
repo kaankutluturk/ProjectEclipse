@@ -887,6 +887,15 @@ public class InfoAnimation
 		return data != null && data.Length >= 4 ? System.BitConverter.ToInt32(data, 0) : -1;
 	}
 
+	/// <summary>
+	/// A shallow copy (Eclipse Moveset Lab ghost): clip, frame range and timing are its own;
+	/// MoveData is shared. Only for drawing a move as it was when copied.
+	/// </summary>
+	internal InfoAnimation EclipseSnapshot()
+	{
+		return (InfoAnimation)MemberwiseClone();
+	}
+
 	public void ReplaceClip(string fileName, int endFrame)
 	{
 		string oldFileName = FileName;

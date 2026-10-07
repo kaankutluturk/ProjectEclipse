@@ -88,6 +88,7 @@ function checkPatch(move,definition,{literal,fields},add){
             if(permille<500||permille>limit*1000)add(f.value,'native-guard',`playback_rate for "${move.name}" must be 0.5..${limit}`+(limit<2?` (MidFrames ${move.midFrames} allows at most ${limit}).`:'.'));
         }
     }
+    if(definition.clip_range&&(move.looped||move.physics))add(definition.clip_range,'native-guard',`clip_range is unavailable for ${move.looped?'looped':'physics'} moves such as "${move.name}".`);
     checkIntervalList(move,definition.intervals,{literal,fields},add);
     checkAttackList(move,definition.attacks,{literal,fields},add);
     if(definition.add_interval){const name=literal(fields(definition.add_interval).name);
@@ -226,4 +227,6 @@ function completions(call,path,definition,literal){
     }
     return [];
 }
-module.exports={data,lookup,ambiguous,checkCall,describe,completions,MOVE_FIELDS,intervalLabel,range};
+// ModMoveAttack.NativeHitReactions (ModContentP1D.cs).
+const HIT_REACTIONS=["Earthquake", "Electrocution", "ElectrocutionPowerfield", "HermitStorm", "High", "HighHeavy", "HighHeavyDeflect", "HighLong", "HighPlus", "HighShort", "HighShortPlus", "HoaxenPierce", "Low", "LowHeavy", "LowHeavyDeflect", "LowPull", "Middle", "MiddleHeavy", "MiddleHeavyDeflect", "MiddlePlus", "MiddleShort", "MiddleShortPlus", "MindThrowHit", "MindThrowHitNormal", "NoReaction", "Overhead", "OverheadHeavy", "OverheadHeavyDeflect", "Physycal", "RatWaveHit", "RootHit", "Spinning", "SpinningHeavy", "SpinningHeavyDeflect", "Sweep", "SweepHeavy", "SweepHeavyDeflect", "TitanHighHeavy", "TitanMiddleHeavy", "TitanOverhead", "TitanSweep", "TitansHarpoonHit", "TitansHarpoonHitGrab", "TitansHarpoonStrikeFall", "TornadoHit", "ToxicCloud", "WaspFly", "WaterWaveHit"];
+module.exports={HIT_REACTIONS,data,lookup,ambiguous,checkCall,describe,completions,MOVE_FIELDS,intervalLabel,range};

@@ -53,6 +53,8 @@ namespace Eclipse.Modding
             _items = items ?? throw new ArgumentNullException(nameof(items));
             ModRuntime.LoadTimings.Group("items");
 
+            // Weapons the Moveset Lab loaded for a preview give way to the real ones.
+            ModRuntime.RemoveLabItems();
             foreach (ItemDefinition definition in ExternalEquipment())
             {
                 if (_items.GetItemByName(definition.Id.ToString()) != null)

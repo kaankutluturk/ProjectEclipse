@@ -1,5 +1,13 @@
 {
   "schema": 1,
   "kind": "eclipse.moveset",
-  "moves": []
+  "moves": [
+    {
+      "move": "DoubleSweep",
+      "playback_rate": {
+        "expected": 1.0,
+        "value": 1.3
+      }
+    }
+  ]
 }

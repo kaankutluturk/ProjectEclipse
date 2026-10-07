@@ -53,7 +53,12 @@ namespace Eclipse.UI
         {
             Clear("Mods");
             Label(page, "Mods", 76, 96, 500, 64, 46, Ink);
-            Label(page, "Core " + ModPlatformVersions.Core + "  ·  Always enabled", 730, 108, 465, 40, 20, Ink, TextAnchor.MiddleRight);
+            if (CommunityModsSetting.Enabled)
+            {
+                Label(page, "Core " + ModPlatformVersions.Core + "  ·  Always enabled", 420, 108, 516, 40, 20, Ink, TextAnchor.MiddleRight);
+                Button(page, "Community mods", 952, 100, 240, 48, OpenCommunity, UiSound.Open);
+            }
+            else Label(page, "Core " + ModPlatformVersions.Core + "  ·  Always enabled", 730, 108, 465, 40, 20, Ink, TextAnchor.MiddleRight);
             Label(page, "Enable or disable mods, then apply to restart. Dependencies are toggled together.", 76, 166, 1120, 40, 19, Ink);
             var mods = modDiscovery.Mods;
             int pages = Math.Max(1, (mods.Count + ModsPerPage - 1) / ModsPerPage);

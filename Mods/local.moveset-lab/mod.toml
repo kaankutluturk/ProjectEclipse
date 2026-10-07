@@ -3,7 +3,7 @@ id = "local.moveset-lab"
 name = "Moveset Lab"
 version = "1.0.0"
 authors = ["Moveset Lab"]
-capabilities = ["content.patch"]
+capabilities = ["content.register", "content.patch"]
 
 [[dependencies]]
 id = "core"

@@ -362,7 +362,13 @@ namespace Eclipse.Modding
             data = null;
             AssetId id;
             if (!TryParseExternal(reference, out id) || !ModRuntime.IsInitialized) return false;
-            data = ModRuntime.Host.TypedAssets.LoadBinary(id);
+            // The Moveset Lab's own clips first: they may be new or changed since startup.
+            data = ModRuntime.TryReadLabBinary(id);
+            if (data == null)
+            {
+                try { data = ModRuntime.Host.TypedAssets.LoadBinary(id); }
+                catch (Exception) when (ModRuntime.IsLabMod(id.Namespace.Value)) { data = null; }
+            }
             return data != null;
         }
 
@@ -1130,7 +1136,7 @@ namespace Eclipse.Modding
                 if (patch.Animation != null) PrepareAnimation(target, patch.Animation, lifetime);
                 if (patch.RemoveInterval != null) PrepareRemoveInterval(target, patch.RemoveInterval, lifetime);
                 if (patch.AddInterval != null) PrepareAddInterval(target, patch.AddInterval, lifetime);
-                PrepareExtras(target, patch.Extras, lifetime);
+                PrepareExtras(target, moves, patch.Extras, lifetime);
             }
             // A dry run validates every guard and selector without touching the moves.
             if (dryRun) return lifetime;
@@ -1389,13 +1395,201 @@ namespace Eclipse.Modding
 
         // ---- List-based edits: playback rate, interval list and attacks by ID. ----
 
-        private static void PrepareExtras(InfoAnimation move, ModMoveCombatExtras extras, Lifetime lifetime)
+        private static void PrepareExtras(InfoAnimation move, IReadOnlyList<InfoAnimation> moves, ModMoveCombatExtras extras, Lifetime lifetime)
         {
             if (extras == null || extras.IsEmpty) return;
             if (extras.PlaybackRate != null) PreparePlaybackRate(move, extras.PlaybackRate, lifetime);
             var claimed = new HashSet<IntervalAnimation>();
             foreach (var edit in extras.Intervals) PrepareIntervalEdit(move, edit, claimed, lifetime);
             foreach (var edit in extras.Attacks) PrepareAttackEdit(move, edit, claimed, lifetime);
+            foreach (var addition in extras.NewAttacks) PrepareAttackAddition(move, addition, lifetime);
+            if (extras.ClipRange != null) PrepareClipRange(move, extras.ClipRange, lifetime);
+            if (extras.Chains.Count != 0) PrepareChains(move, moves, extras.Chains, lifetime);
+        }
+
+        /// <summary>
+        /// Plays keyframes First..Last of the move's clip. Runs after a clip swap (applied
+        /// earlier in the same patch), so the range is checked against the clip actually loaded.
+        /// </summary>
+        private static void PrepareClipRange(InfoAnimation move, ModMoveGuard<ModMoveClipRange> patch, Lifetime lifetime)
+        {
+            // A move without an authored EndFrame learns its last keyframe when its clip loads.
+            if (move.AnimationEndFrame == 0) move.LoadAnimationClip();
+            if (move.FirstFrame != patch.Expected.First || move.AnimationEndFrame != patch.Expected.Last)
+                throw new InvalidOperationException("Move clip_range expected " + patch.Expected + " but it is [" + move.FirstFrame + ", " + move.AnimationEndFrame + "]: " + move.Name);
+            if (move.HasPhysics || move.GetIsLooped())
+                throw new InvalidOperationException("clip_range is unavailable for physics or looped moves: " + move.Name);
+            var value = patch.Value;
+            lifetime.Apply.Add(() =>
+            {
+                var frames = move.GetAnimationFrames();
+                if (frames != null && value.Last >= frames.Length)
+                    throw new InvalidOperationException("clip_range " + value + " ends after the clip's last keyframe " + (frames.Length - 1) + ": " + move.Name);
+                move.FirstFrame = value.First;
+                move.AnimationEndFrame = value.Last;
+            });
+            lifetime.Undo.Add(() =>
+            {
+                if (move.FirstFrame == value.First && move.AnimationEndFrame == value.Last)
+                {
+                    move.FirstFrame = patch.Expected.First;
+                    move.AnimationEndFrame = patch.Expected.Last;
+                }
+            });
+        }
+
+        /// <summary>
+        /// A combo link. The source move gets a window interval; the follow-up's checks of the
+        /// current move and interval (its "cannot interrupt" gates) also pass inside that window.
+        /// Its input, locks, round and distance conditions are unchanged.
+        /// </summary>
+        private static void PrepareChains(InfoAnimation move, IReadOnlyList<InfoAnimation> moves, IReadOnlyList<ModMoveChain> chains, Lifetime lifetime)
+        {
+            string window = ModMoveChain.WindowName(move.Name);
+            foreach (var chain in chains)
+            {
+                InfoAnimation source = null;
+                foreach (var candidate in moves)
+                    if (candidate != null && candidate.Name == chain.From)
+                    {
+                        if (source != null) throw new InvalidOperationException("Ambiguous chain source: " + chain.From);
+                        source = candidate;
+                    }
+                if (source == null || source.MoveData == null) throw new InvalidOperationException("Chain source move does not exist: " + chain.From + " (for " + move.Name + ")");
+                var intervals = source.MoveData.Intervals;
+                bool deferred = false;
+                foreach (var candidate in intervals)
+                {
+                    if (candidate.NodeInterval != null) deferred = true;
+                    if (IntervalName(candidate) == window) throw new InvalidOperationException("Move " + chain.From + " already has a chain window for " + move.Name);
+                }
+                var node = new XmlDocument().CreateElement("Interval");
+                node.SetAttribute("Name", window);
+                node.SetAttribute("Start", chain.Start.ToString(System.Globalization.CultureInfo.InvariantCulture));
+                node.SetAttribute("End", chain.End.ToString(System.Globalization.CultureInfo.InvariantCulture));
+                var added = new IntervalAnimation(default) { NodeInterval = node };
+                if (!deferred) added.Init();
+                lifetime.Apply.Add(() => intervals.Add(added));
+                lifetime.Undo.Add(() => intervals.Remove(added));
+            }
+            var conditions = move.SelectionConditions;
+            var gates = new List<ConditionAnimation>();
+            foreach (var condition in conditions) if (ChainCondition.IsGate(condition)) gates.Add(condition);
+            if (gates.Count == 0) return;
+            var wrapped = new List<ChainCondition>();
+            lifetime.Apply.Add(() =>
+            {
+                wrapped.Clear();
+                foreach (var gate in gates)
+                {
+                    int index = conditions.IndexOf(gate);
+                    if (index < 0) continue;
+                    var wrapper = new ChainCondition(gate, window);
+                    conditions[index] = wrapper;
+                    wrapped.Add(wrapper);
+                }
+            });
+            lifetime.Undo.Add(() =>
+            {
+                foreach (var wrapper in wrapped)
+                {
+                    int index = conditions.IndexOf(wrapper);
+                    if (index >= 0) conditions[index] = wrapper.Inner;
+                }
+                wrapped.Clear();
+            });
+        }
+
+        /// <summary>A follow-up's current-move or current-interval gate, also true inside its chain window.</summary>
+        private sealed class ChainCondition : ConditionAnimation
+        {
+            internal ConditionAnimation Inner { get; }
+            private readonly string _window;
+
+            internal ChainCondition(ConditionAnimation inner, string window) : base(ConditionType.NONE)
+            {
+                Inner = inner;
+                _window = window;
+                SetTargetModelType(ModelType.ModelTargetType.MODEL_THIS);
+            }
+
+            /// <summary>Checks of this fighter's own current move or interval, alone or combined with Or/And.</summary>
+            internal static bool IsGate(ConditionAnimation condition)
+            {
+                if (condition == null || condition.GetTargetModelType() != ModelType.ModelTargetType.MODEL_THIS && condition.Type != ConditionType.LIST) return false;
+                if (condition.Type == ConditionType.CURRENT_INTERVAL || condition.Type == ConditionType.CURRENT_ANIMATION) return true;
+                if (condition.Type != ConditionType.LIST || !(condition is ConditionList list)) return false;
+                var nested = list.GetConditions();
+                if (nested == null || nested.Count == 0) return false;
+                foreach (var item in nested) if (!IsGate(item)) return false;
+                return true;
+            }
+
+            private bool InWindow(ModelConditions conditions)
+            {
+                var intervals = conditions?.Intervals;
+                if (intervals == null) return false;
+                foreach (var interval in intervals) if (interval != null && interval.Name == _window) return true;
+                return false;
+            }
+
+            public override bool IsEqual(ModelConditions conditions) => InWindow(conditions) || Inner.IsEqual(conditions);
+
+            public override bool IsEqual(Model model, InfoAnimation animationInfo)
+            {
+                if (InWindow(model.GetConditions())) return true;
+                if (Inner is ConditionList list) return list.EvaluateWithModel(model.GetConditions(), model);
+                return Inner.IsEqual(model, animationInfo);
+            }
+        }
+
+        /// <summary>
+        /// Adds an attack interval, built from the same XML a registered move's attack uses
+        /// (LegacyContentAdapter.BuildMoveNode), so it parses and initializes like a native one.
+        /// </summary>
+        private static void PrepareAttackAddition(InfoAnimation move, ModMoveAttackAddition addition, Lifetime lifetime)
+        {
+            var intervals = move.MoveData.Intervals;
+            bool deferred = false;
+            foreach (var candidate in intervals)
+            {
+                if (candidate.NodeInterval != null) deferred = true;
+                if (candidate is IntervalAttack existing &&
+                    (existing.NodeInterval != null ? Integer(existing.NodeInterval, "ID", -1) : existing.GetAnimationId()) == addition.Id)
+                    throw new InvalidOperationException("Move already has an attack with id " + addition.Id + ": " + move.Name);
+            }
+            var culture = System.Globalization.CultureInfo.InvariantCulture;
+            var document = new XmlDocument();
+            var node = document.CreateElement("Interval");
+            node.SetAttribute("Type", "Attack");
+            node.SetAttribute("ID", addition.Id.ToString(culture));
+            node.SetAttribute("Start", addition.Start.ToString(culture));
+            node.SetAttribute("End", addition.End.ToString(culture));
+            var parts = document.CreateElement("AttackingParts");
+            foreach (string edge in addition.Edges) { var part = document.CreateElement("Edge"); part.SetAttribute("Name", edge); parts.AppendChild(part); }
+            node.AppendChild(parts);
+            var damage = document.CreateElement("Damage");
+            damage.SetAttribute("Value", addition.Damage.ToString("R", culture));
+            foreach (string type in ModMoveCombatTermOrder.Ordered(addition.Terms.Keys))
+            {
+                var term = document.CreateElement("Damage");
+                term.SetAttribute("Type", type);
+                if (addition.Terms[type] != 0) term.SetAttribute("Shift", addition.Terms[type].ToString("R", culture));
+                damage.AppendChild(term);
+            }
+            node.AppendChild(damage);
+            var impulse = document.CreateElement("Impulse");
+            impulse.SetAttribute("X", addition.Impulse[0].ToString("R", culture));
+            impulse.SetAttribute("Y", addition.Impulse[1].ToString("R", culture));
+            impulse.SetAttribute("Z", addition.Impulse[2].ToString("R", culture));
+            node.AppendChild(impulse);
+            var hit = document.CreateElement("Hit"); hit.SetAttribute("Name", addition.Hit); node.AppendChild(hit);
+            var added = new IntervalAttack();
+            added.Parse(node);
+            added.FinishFrame = move.AnimationEndFrame;
+            if (!deferred) added.Init();
+            lifetime.Apply.Add(() => intervals.Add(added));
+            lifetime.Undo.Add(() => intervals.Remove(added));
         }
 
         private static void PreparePlaybackRate(InfoAnimation move, ModMoveGuard<int> patch, Lifetime lifetime)

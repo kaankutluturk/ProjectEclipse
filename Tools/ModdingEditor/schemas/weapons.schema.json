@@ -1,0 +1,99 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://eclipse.local/schemas/weapons.schema.json",
+  "title": "Eclipse weapons file",
+  "description": "weapons/*.json: new weapons with a name, animation subtype, model, icon and shop listing. Needs the content.register capability.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "kind",
+    "weapons"
+  ],
+  "properties": {
+    "schema": {
+      "const": 1,
+      "description": "Format version. Must be 1."
+    },
+    "kind": {
+      "const": "eclipse.weapons",
+      "description": "Must be \"eclipse.weapons\"."
+    },
+    "weapons": {
+      "type": "array",
+      "maxItems": 256,
+      "description": "The weapons this file adds.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "subtype",
+          "model"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9_]{1,48}$",
+            "description": "Local ID; the item is <mod>:items/weapon/<id>. Keep it stable once players own the weapon."
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "description": "The English name players see."
+          },
+          "subtype": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Animation subtype, which picks the native moves the weapon uses, such as \"Katana\"."
+          },
+          "tactic_subtype": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_]{1,128}$",
+            "description": "Optional AI table group; defaults to the subtype."
+          },
+          "model": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Model asset: \"models/<name>\" in this mod, or a qualified ID such as \"core:gamedata/models/mdl_weapon_katana\"."
+          },
+          "icon": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Optional shop icon sprite: \"sprites/<name>\" in this mod, or a qualified ID."
+          },
+          "shop": {
+            "type": "object",
+            "additionalProperties": false,
+            "description": "The weapon shop listing. Every data weapon is listed.",
+            "properties": {
+              "level": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 52,
+                "default": 1,
+                "description": "Shop level the weapon appears at."
+              },
+              "price": {
+                "type": "integer",
+                "minimum": 0,
+                "default": 100,
+                "description": "Price."
+              },
+              "currency": {
+                "enum": [
+                  "coins",
+                  "gems"
+                ],
+                "default": "coins",
+                "description": "Currency of the price."
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

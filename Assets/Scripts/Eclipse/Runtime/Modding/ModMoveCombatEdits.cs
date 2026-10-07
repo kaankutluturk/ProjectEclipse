@@ -91,6 +91,45 @@ namespace Eclipse.Modding
         }
     }
 
+    /// <summary>
+    /// A new attack added to an existing move: an attack interval with its own id, frames,
+    /// damage, damage terms, attacking edges, impulse and hit reaction, built like the attacks
+    /// of moves registered from Lua.
+    /// </summary>
+    public sealed class ModMoveAttackAddition
+    {
+        public const int MaxId = 100000;
+        public int Id { get; }
+        public int Start { get; }
+        public int End { get; }
+        public double Damage { get; }
+        /// <summary>Damage terms keyed by type (Shift values), 1..4 of them.</summary>
+        public IReadOnlyDictionary<string, double> Terms { get; }
+        public IReadOnlyList<string> Edges { get; }
+        /// <summary>[x, y, z].</summary>
+        public IReadOnlyList<double> Impulse { get; }
+        public string Hit { get; }
+
+        public ModMoveAttackAddition(int id, int start, int end, double damage, IReadOnlyDictionary<string, double> terms,
+            IReadOnlyList<string> edges, IReadOnlyList<double> impulse, string hit)
+        {
+            if (id < 0 || id > MaxId) throw new ModContentException("A new attack id must be 0.." + MaxId + ".");
+            ModMoveIntervalEdit.ValidateBounds(start, end);
+            if (double.IsNaN(damage) || damage < 0 || damage > 16) throw new ModContentException("A new attack's damage must be 0..16.");
+            if (terms == null || terms.Count < 1 || terms.Count > 4) throw new ModContentException("A new attack needs 1..4 damage terms.");
+            foreach (var term in terms) new ModMoveDamageTerm(term.Key, term.Value);
+            if (edges == null || edges.Count < 1 || edges.Count > 64 || edges.Distinct(StringComparer.Ordinal).Count() != edges.Count)
+                throw new ModContentException("A new attack needs 1..64 distinct attacking edges.");
+            foreach (string edge in edges) MoveCombatPatch.ValidateName(edge);
+            if (impulse == null || impulse.Count != 3 || impulse.Any(v => double.IsNaN(v) || double.IsInfinity(v) || Math.Abs(v) > 100000))
+                throw new ModContentException("A new attack's impulse must be [x, y, z] in -100000..100000.");
+            if (Array.IndexOf(ModMoveAttack.NativeHitReactions, hit) < 0) throw new ModContentException("Unknown hit reaction '" + hit + "'.");
+            Id = id; Start = start; End = end; Damage = damage;
+            Terms = new Dictionary<string, double>(terms, StringComparer.Ordinal);
+            Edges = edges.ToList().AsReadOnly(); Impulse = impulse.ToList().AsReadOnly(); Hit = hit;
+        }
+    }
+
     /// <summary>A guarded value: the native value the patch expects, and its replacement.</summary>
     public sealed class ModMoveGuard<T>
     {

@@ -1,0 +1,10 @@
+schema = 1
+id = "local.knivesmod"
+name = "Knivesmod"
+version = "1.0.0"
+authors = ["Moveset Lab"]
+capabilities = ["content.patch"]
+
+[[dependencies]]
+id = "core"
+version = ">=1.0 <2.0"

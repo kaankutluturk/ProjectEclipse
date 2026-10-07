@@ -221,6 +221,34 @@ namespace Eclipse.Multiplayer
             _byId[(int)slot][id] = item;
         }
 
+        // Items added for this session only (the Moveset Lab's new weapons). They are local:
+        // the online fingerprint was computed without them, and moveset mods block online play.
+        private static readonly List<VersusItem> _extras = new List<VersusItem>();
+
+        /// <summary>Lets a loaded item the roster file does not list be chosen this session.</summary>
+        public static void AddExtra(LoadoutSlot slot, string id, string name)
+        {
+            EnsureLoaded();
+            if (string.IsNullOrEmpty(id) || _byId[(int)slot].ContainsKey(id)) return;
+            var info = ListSF.GetItems().GetItemByName(id);
+            if (info == null) return;
+            var item = new VersusItem { Id = id, Name = string.IsNullOrEmpty(name) ? id : name, Slot = slot, SubType = info.SubType ?? string.Empty, Level = info.ItemLevel, Icon = string.Empty };
+            _slots[(int)slot].Add(item);
+            _byId[(int)slot][id] = item;
+            _extras.Add(item);
+        }
+
+        public static void RemoveExtras()
+        {
+            foreach (var item in _extras)
+            {
+                if (!_loaded) break;
+                _slots[(int)item.Slot].Remove(item);
+                if (_byId[(int)item.Slot].TryGetValue(item.Id, out var current) && current == item) _byId[(int)item.Slot].Remove(item.Id);
+            }
+            _extras.Clear();
+        }
+
         private static string Humanize(string id)
         {
             string text = id;

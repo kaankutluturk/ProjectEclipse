@@ -96,15 +96,15 @@ namespace Eclipse.Modding
 
         /// <summary>Packages an installed mod folder as an installable ZIP (one top-level
         /// folder, as Mods > Install ZIP expects) in "Eclipse characters" on the desktop.</summary>
-        public static string ExportZip(string modRoot)
+        public static string ExportZip(string modRoot, string desktopFolder = "Eclipse characters", string zipName = null)
         {
             if (string.IsNullOrEmpty(modRoot) || !File.Exists(Path.Combine(modRoot, "mod.toml")))
-                throw new DirectoryNotFoundException("This character's mod folder is missing.");
+                throw new DirectoryNotFoundException("The mod folder is missing.");
             string desktop = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
-            string folder = Path.Combine(string.IsNullOrEmpty(desktop) ? Application.persistentDataPath : desktop, "Eclipse characters");
+            string folder = Path.Combine(string.IsNullOrEmpty(desktop) ? Application.persistentDataPath : desktop, desktopFolder);
             Directory.CreateDirectory(folder);
             string name = Path.GetFileName(modRoot.TrimEnd('/', '\\'));
-            string zip = Path.Combine(folder, name + ".zip");
+            string zip = Path.Combine(folder, (zipName ?? name) + ".zip");
             string temporary = zip + ".partial";
             if (File.Exists(temporary)) File.Delete(temporary);
             using (var stream = File.Create(temporary))
@@ -112,6 +112,8 @@ namespace Eclipse.Modding
             {
                 foreach (string file in Directory.GetFiles(modRoot, "*", SearchOption.AllDirectories))
                 {
+                    // Half-written files from an interrupted save never ship.
+                    if (file.EndsWith("write", StringComparison.Ordinal) || file.EndsWith(".partial", StringComparison.Ordinal)) continue;
                     string relative = file.Substring(modRoot.TrimEnd('/', '\\').Length + 1).Replace('\\', '/');
                     var entry = archive.CreateEntry(name + "/" + relative, System.IO.Compression.CompressionLevel.Optimal);
                     using (var input = File.OpenRead(file))

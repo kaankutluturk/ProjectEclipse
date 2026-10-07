@@ -86,6 +86,9 @@ namespace Eclipse.Multiplayer
             parameters.WarriorPerks.Clear();
             parameters.LearnedPerks.Clear();
             parameters.Perks.Clear();
+            // Both sides know every perk-tree move (Double Sweep, Suplex...): the tree's move
+            // perks (CharacterProgress.xml entries with Move=) only unlock those moves.
+            foreach (var perk in PerkTreeMovePerks()) parameters.LearnedPerks.Add(perk);
             // This device's own fighter shows the player's chosen look, drawn locally only
             // (geometry, not physics), so peers and replays stay in sync.
             parameters.EclipseVersusLook = IsOwnFighter(left, aiTactic);
@@ -104,6 +107,22 @@ namespace Eclipse.Multiplayer
             }
             ModelLoader.RequireModelDocuments(parameters.ModelDocuments);
             return parameters;
+        }
+
+        /// <summary>
+        /// The perk tree's move perks, one per perk name (its first level), in tree order. They
+        /// carry no effects of their own; moves list them in their locks.
+        /// </summary>
+        internal static List<PerkInfoItem> PerkTreeMovePerks()
+        {
+            var result = new List<PerkInfoItem>();
+            var progression = GameUtils.PerkItemList?.GetProgressionPerks();
+            if (progression == null) return result;
+            var seen = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var perk in progression)
+                if (perk != null && !string.IsNullOrEmpty(perk.MoveName) && !string.IsNullOrEmpty(perk.Name) && seen.Add(perk.Name))
+                    result.Add(perk);
+            return result;
         }
 
         private static bool IsOwnFighter(bool left, string aiTactic)

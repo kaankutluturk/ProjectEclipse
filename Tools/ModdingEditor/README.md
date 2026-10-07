@@ -295,9 +295,12 @@ input callbacks. See the Custom UI reference for lifetime and input rules.
 - Moveset files (`movesets/*.json`, used by data-only mods and the in-game Moveset Lab)
   get JSON Schema completion and hovers (`schemas/moveset.schema.json`), strict-format
   diagnostics, the same vanilla guard checks as `sf2.moves.patch`, fork checks against the
-  source move's weapon lock groups, and conflict claims. `templates/moveset` is a
+  source move's weapon lock groups, and conflict claims. Combo `chains` must follow a
+  base-game move or a fork in the same file. `templates/moveset` is a
   data-only starter. `sf2.moves.fork`, `remove_item_lock` and `exclude_item` calls are
   checked against the vanilla lock groups too.
+- Weapon files (`weapons/*.json`, written by the Moveset Lab's **+ WEAPON**) get JSON
+  Schema completion and hovers (`schemas/weapons.schema.json`).
 - **Show Move Changes** opens a report of every vanilla move the current mod
   touches: vanilla value beside the patched value, guard problems, behavior a
   `moves.replace` drops because nothing is inherited, and conflicting claims.
@@ -375,7 +378,8 @@ by `python Tools/Audits/QueryMoves.py export-index` (run from the repository roo
 Regenerate it after changing base move XML.
 
 `schemas/moveset.schema.json` is authored; `npm test` checks that its hit reaction list
-matches `data/api.json`. Keep it in step with `ModMovesetJson` in the runtime.
+matches `data/api.json`. Keep it in step with `ModMovesetJson` in the runtime, and
+`schemas/weapons.schema.json` in step with `ModWeaponJson`.
 
 `node scripts/report.cjs <mod folder> [--mods <folder>]...` prints the Show Move
 Changes report without VS Code and exits 1 on an unknown move, a vanilla guard

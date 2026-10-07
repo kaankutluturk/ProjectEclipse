@@ -89,6 +89,12 @@
           "**/movesets/*.json"
         ],
         "url": "./schemas/moveset.schema.json"
+      },
+      {
+        "fileMatch": [
+          "**/weapons/*.json"
+        ],
+        "url": "./schemas/weapons.schema.json"
       }
     ]
   },

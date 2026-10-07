@@ -26,7 +26,8 @@ registration. A mod with only data files can omit `entrypoint`; see
 [data-only mods](../../guides/manifest/#data-only-mods).
 
 **Requires:** `content.patch` in `capabilities` whenever a file lists moves or forks, and a
-dependency on `core` (or the item's owner) when a fork names an item.
+dependency on `core` (or the item's owner) when a fork names an item. A mod can also add
+weapons in [weapon files](#weapon-files).
 
 ## A complete example
 
@@ -102,6 +103,9 @@ edit.
 | `sound_frame` | `{ "name", "expected", "value" }`: move one directly scheduled sound to another frame. |
 | `intervals` | Array of [interval edits](#intervals), up to 64. |
 | `attacks` | Array of [attack edits](#attacks), up to 32. |
+| `new_attacks` | Array of [new attacks](#new-attacks) added to the move, up to 32. |
+| `clip_range` | `{ "expected", "value" }`, each `[first, last]`: the keyframes of the clip the move plays. See [trimming](#trimming). |
+| `chains` | Array of [combo links](#combo-links): moves this move may start out of, up to 16. |
 
 Only one mod can patch a given move. A second mod (or Lua patch) on the same move fails
 to load; the VS Code extension [warns about this](../../guides/vscode/#find-conflicts-with-other-mods).
@@ -170,6 +174,74 @@ the fields to change, each guarded:
 
 See [attack edits](../moves-and-tactics/#attack-edits) for the exact rules.
 
+### New attacks
+
+`new_attacks` adds attacks to a move: another hit in a combo move, or a hit for a move that
+had none. Each one is a full attack, so every field is required:
+
+| Field | Meaning |
+| --- | --- |
+| `id` | Attack id, 0–100000. It must not repeat one of the move's own attack ids (the Moveset Lab picks the next free one). |
+| `start`, `end` | The keyframes during which the attack can hit, `start` ≤ `end`. |
+| `damage` | Base damage, 0–16. Base-game hits mostly sit between 0.06 and 0.45. |
+| `damage_terms` | 1–4 damage types with their shifts, such as `{ "WeaponDamage": 0 }`: `WeaponDamage`, `UnarmedDamage`, `RangedDamage` or `MagicDamage` (the last two make the attack unblockable). Each shift is −1000 to 1000. |
+| `edges` | 1–64 distinct attacking edges: the body or weapon parts that hit, such as `"EHand_2"` or `"WEAPON_KATANA-Blade"`. |
+| `impulse` | `[x, y, z]` push given on hit. |
+| `hit` | The hit reaction, such as `"Middle"` or `"HighShort"`. |
+
+```json
+{ "move": "KatanaDoubleSlash",
+  "new_attacks": [
+    { "id": 90, "start": 26, "end": 28, "damage": 0.08,
+      "damage_terms": { "WeaponDamage": 0, "UnarmedDamage": -10 },
+      "edges": [ "WEAPON_KATANA-Blade", "WEAPON_KATANA-Edge24" ],
+      "impulse": [ 245, 0, 0 ], "hit": "HighShort" } ] }
+```
+
+A new attack has no `expected` values: it is not in the base game, so the mod owns it. It
+counts as an edit of the move, so only one mod can patch that move. To change a base-game
+attack instead, use [`attacks`](#attacks).
+
+### Trimming
+
+`clip_range` sets which keyframes of its clip a move plays, `[first, last]`. Start later to
+skip a wind-up; end earlier to cut a long recovery.
+
+| Part | Meaning |
+| --- | --- |
+| `expected` | The move's base-game `[FirstFrame, last keyframe]`. A move without an authored `EndFrame` plays to its clip's last keyframe. The Moveset Lab fills this in. |
+| `value` | The new range. `last` must be after `first` and inside the clip the move plays, including a clip swapped in with [`animation`](#move-edits). |
+
+```json
+{ "move": "KatanaHeavySlash", "clip_range": { "expected": [2, 48], "value": [6, 40] } }
+```
+
+Attacks, windows and sounds keep their keyframe numbers, so an attack that starts before
+the new `first` or after the new `last` never happens. Looped and physics moves cannot be
+trimmed.
+
+### Combo links
+
+`chains` lets this move start out of another move during a window of that move's
+keyframes, even inside the part of it that normally cannot be interrupted. This move's own
+input still starts it, and its other conditions (weapon locks, the round, distance for the
+AI) still apply. Each link is required to have:
+
+| Field | Meaning |
+| --- | --- |
+| `from` | The move to follow: a native move name, or a fork's runtime name `<mod id>.<id>`. Each move may be followed once per entry. |
+| `start`, `end` | The window, in keyframes of the followed move, `0 ≤ start ≤ end`. |
+
+```json
+{ "move": "KatanaDoubleSlash",
+  "chains": [ { "from": "KatanaHeavySlash", "start": 20, "end": 34 } ] }
+```
+
+Here Double Slash may start once Heavy Slash reaches keyframe 20, until keyframe 34. The
+link adds a window named `EclipseChain>KatanaDoubleSlash` to the followed move; its other
+moves and the AI are unchanged. Combo links count as an edit of this move, not of the
+followed one.
+
 ## Forks
 
 A fork copies a move for one weapon subtype or one weapon, leaving the original for
@@ -219,6 +291,46 @@ New moves are copies of existing moves: they reuse a game clip, or a clip swappe
 [`animation`](#move-edits). For a move built from your own data, use
 [`sf2.moves.register`](../moves-and-tactics/#sf2movesregister).
 
+## Weapon files
+
+A data-only mod can also add weapons, with a `weapons/` folder of `.json` files next to
+`movesets/`. The Moveset Lab's **+ WEAPON** writes `weapons/weapons.json`. Each weapon is
+the same as [`sf2.items.register_weapon`](../items-progression-forge/) plus a weapon shop
+listing:
+
+```json
+{
+  "schema": 1,
+  "kind": "eclipse.weapons",
+  "weapons": [
+    { "id": "heavy_blade", "name": "Heavy Blade", "subtype": "Katana",
+      "model": "core:gamedata/models/mdl_weapon_katana",
+      "icon": "sprites/heavy_blade_icon",
+      "shop": { "level": 1, "price": 100, "currency": "coins" } }
+  ]
+}
+```
+
+| Field | Required | Meaning |
+| --- | --- | --- |
+| `id` | yes | 1–48 lowercase letters, digits or `_`. The item becomes `<mod id>:items/weapon/<id>`; keep it the same once players own the weapon. |
+| `name` | yes | The English name players see, up to 64 characters. |
+| `subtype` | yes | The animation subtype, such as `"Katana"`: the weapon uses that subtype's moves. |
+| `tactic_subtype` | no | AI table group; defaults to the subtype. |
+| `model` | yes | The model: `"models/<name>"` for `assets/models/<name>.xml` (or `.modelz`) in this mod, or a game model such as `"core:gamedata/models/mdl_weapon_katana"`. |
+| `icon` | no | A [sprite](../sprites-and-textures/) for the shop, such as `"sprites/<name>"`. Without one the shop shows no picture. |
+| `shop` | no | `level` (1–52, default 1), `price` (default 100) and `currency` (`"coins"`, the default, or `"gems"`). Every data weapon is listed in the weapon shop, which is what makes the game create it. |
+
+**Requires:** `content.register` in `capabilities`, and a dependency on `core` (or the
+owner) for a model or icon from another namespace. Weapons load when the game starts.
+The Moveset Lab also loads its own mod's weapons into the running game, for its preview
+and training, without a restart.
+
+A weapon's hitting parts are the edges named in its model, such as `WEAPON_KATANA-Blade`.
+Native moves find them by name: a model of your own needs edges with the same names as
+the subtype's models, or its attacks must name its own edges (see
+[`attacks`](#attacks)).
+
 ## Finding the current values
 
 Every `expected` value must match the base game exactly. To read a move's current
@@ -241,7 +353,7 @@ after the reload, such as the next fight.
 ## Limits
 
 Moveset files edit and copy existing moves, and add new moves copied from them; they do
-not define moves from scratch or new transitions (use
+not define moves from scratch or new blending transitions (use
 [`sf2.moves.register`](../moves-and-tactics/#sf2movesregister) for that). Edits
 are checked against the base game when the mod loads. They are not checked against
 gameplay, so test changed hitboxes, timings and speeds in a fight. Online versus refuses

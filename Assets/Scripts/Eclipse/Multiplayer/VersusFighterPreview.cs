@@ -139,7 +139,13 @@ namespace Eclipse.Multiplayer
             _center = _center == Vector3.zero ? center : Vector3.Lerp(_center, center, 1f - Mathf.Exp(-Time.unscaledDeltaTime * 4f));
             _camera.orthographicSize = Mathf.Max(.01f, _size);
             _camera.transform.position = new Vector3(_center.x, _center.y - _size * .04f, bounds.min.z - 50f);
-            float alpha = Mathf.MoveTowards(_image.color.a, 1f, Time.unscaledDeltaTime * 4f);
+            if (FollowCamera != null && FollowCamera._camera != null && FollowCamera._world != null)
+            {
+                // Draw from exactly where the leader looks, so the two fighters overlap.
+                _camera.orthographicSize = FollowCamera._camera.orthographicSize;
+                _camera.transform.position = FollowCamera._camera.transform.position - FollowCamera._world.transform.position + _world.transform.position;
+            }
+            float alpha = Mathf.MoveTowards(_image.color.a, Opacity, Time.unscaledDeltaTime * 4f);
             _image.color = new Color(1, 1, 1, alpha);
         }
 
@@ -169,6 +175,27 @@ namespace Eclipse.Multiplayer
         public void Refresh() { if (Loadout == null) return; _wanted = Loadout; _shown = null; _rebuildAt = 0f; }
 
         public bool IsReady => _container != null && _container.PreviewModel != null;
+
+        /// <summary>How opaque the fighter is drawn (a ghost behind another preview is faint).</summary>
+        public float Opacity { get; set; } = 1f;
+
+        /// <summary>When set, frames the fighter with this preview's camera instead of its own.</summary>
+        public VersusFighterPreview FollowCamera { get; set; }
+
+        /// <summary>
+        /// Shows <paramref name="animation"/> <paramref name="ticks"/> ticks after it starts, paused.
+        /// Returns false when the move ends sooner or the fighter cannot play it.
+        /// </summary>
+        public bool SeekTicks(InfoAnimation animation, int ticks)
+        {
+            if (!IsReady || animation == null) return false;
+            Paused = true;
+            ResetPosition();
+            _container.PreviewModel.PlayAnimationDelay(animation);
+            _container.PreviewStep(1);
+            for (int i = 1; i < ticks && i < MaxSeekTicks && PlayingMove == animation.Name; i++) _container.PreviewStep(1);
+            return PlayingMove == animation.Name;
+        }
         public bool Paused { get => _container != null && _container.PreviewPaused; set { if (_container != null) _container.PreviewPaused = value; } }
 
         /// <summary>Starts <paramref name="move"/> on the fighter. False when the fighter cannot use it.</summary>
@@ -301,6 +328,20 @@ namespace Eclipse.Multiplayer
         /// </summary>
         public Func<string, Color?> EdgeOverlay { get; set; }
 
+        /// <summary>True while the playing move runs mirrored: its attacks then hit with the other side's parts.</summary>
+        public bool IsMirrored => IsReady && _container.PreviewModel.GetAnimationModule().GetIsMirrored();
+
+        /// <summary>
+        /// The name an attack lists for edge <paramref name="name"/> in the current pose. A mirrored
+        /// move swaps a trailing _1/_2 (ModelAnimation.SetAttackingEdges), so EHand_2 hits with EHand_1.
+        /// </summary>
+        public string AuthoredEdgeName(string name)
+        {
+            if (string.IsNullOrEmpty(name) || name.Length < 2 || !IsMirrored || name[name.Length - 2] != '_') return name;
+            char side = name[name.Length - 1];
+            return side == '1' ? name.Substring(0, name.Length - 1) + "2" : side == '2' ? name.Substring(0, name.Length - 1) + "1" : name;
+        }
+
         /// <summary>The drawn edge nearest a screen point over this preview, or null when none is within <paramref name="maxPixels"/>.</summary>
         public string EdgeAt(Vector2 screenPoint, UnityEngine.Camera uiCamera, float maxPixels)
         {
@@ -320,7 +361,7 @@ namespace Eclipse.Multiplayer
             foreach (var edge in model.Body.GetAllEdges())
             {
                 string name = edge.get_Name();
-                if (string.IsNullOrEmpty(name) || EdgeOverlay != null && EdgeOverlay(name) == null) continue;
+                if (string.IsNullOrEmpty(name) || EdgeOverlay != null && EdgeOverlay(AuthoredEdgeName(name)) == null) continue;
                 edge.UpdateCollisionPoints();
                 var a = Pixels(root, edge.CollisionStart, size); var b = Pixels(root, edge.CollisionEnd, size);
                 var ab = b - a;
@@ -328,7 +369,7 @@ namespace Eclipse.Multiplayer
                 float distance = Vector2.Distance(p, a + ab * t);
                 if (distance < bestDistance) { bestDistance = distance; best = name; }
             }
-            return best;
+            return AuthoredEdgeName(best);
         }
 
         private Vector2 Pixels(Transform root, Vector3f point, Vector2 size)
@@ -359,7 +400,7 @@ namespace Eclipse.Multiplayer
                 foreach (var edge in model.Body.GetAllEdges())
                 {
                     string name = edge.get_Name();
-                    var color = string.IsNullOrEmpty(name) ? null : EdgeOverlay(name);
+                    var color = string.IsNullOrEmpty(name) ? null : EdgeOverlay(AuthoredEdgeName(name));
                     if (color == null) continue;
                     active.Add(edge);
                     edge.UpdateCollisionPoints();

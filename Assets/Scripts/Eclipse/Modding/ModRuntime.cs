@@ -1655,6 +1655,12 @@ namespace Eclipse.Modding
         public static ModHost Initialize(string modsRoot)
         {
             Shutdown();
+            // Community (mod.io) updates downloaded last session install before mods load.
+            try
+            {
+                foreach (string name in ModIoPendingUpdates.Apply(modsRoot)) Debug.Log("[mod.io] Updated " + name + ".");
+            }
+            catch (Exception error) { Debug.LogWarning("[mod.io] Pending updates were not applied: " + error.Message); }
             _host = ModHost.Build(modsRoot);
             Debug.Log("[ModHost] " + _host.EnabledMods.Count + " mod(s) enabled; " +
                 _host.Diagnostics.Count + " diagnostic(s). Root: " + _host.ModsRoot);
@@ -1747,7 +1753,9 @@ namespace Eclipse.Modding
             AssetId id;
             if (!TryParseQualified(reference, out id) ||
                 !id.Path.StartsWith("models/", StringComparison.Ordinal)) return null;
-            string text = Host.TypedAssets.LoadModelText(id);
+            // A model the Moveset Lab saved since startup is not in the running asset index.
+            string text = TryReadLabModelText(id);
+            if (string.IsNullOrEmpty(text)) text = Host.TypedAssets.LoadModelText(id);
             if (string.IsNullOrEmpty(text))
                 throw new System.IO.FileNotFoundException("Qualified mod model is unavailable: " + id);
             return text;

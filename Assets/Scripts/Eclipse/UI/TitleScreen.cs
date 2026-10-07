@@ -512,6 +512,7 @@ namespace Eclipse.UI
             HomeButton("QUIT", 548, 48, QuitPrompt, UiSound.Open, 23);
             FocusFirst();
             BuildHomePresentation();
+            StartCommunityUpdates();
         }
 
         // A separate parent multiplies the existing entrance fades without touching scenery.
@@ -855,17 +856,19 @@ namespace Eclipse.UI
 
         private static readonly string[] SettingsTabs = { "Display", "Controls", "Controller", "Audio", "Accessibility", "Mod settings" };
 
-        private const int ModSettingsPerPage = 6;
+        private const int ModSettingsPerPage = 5;
         private int modSettingsPage;
 
         // Toggles registered by enabled mods through sf2.settings.toggle, grouped
         // by mod in load order. Values are stored per installation and save immediately.
         private void ModSettingsPage()
         {
+            // Opt-in for the mod.io browser on the Mods screen; off until the player turns it on.
+            Row("Community mods (mod.io)", () => OnOff(CommunityModsSetting.Enabled), 244, CommunityModsSetting.Toggle);
             var toggles = Eclipse.Modding.ModVisuals.Settings;
             if (toggles.Count == 0)
             {
-                Label(page, "No enabled mod provides settings. Enable a mod in the Mods menu, then Apply & Restart.", 76, 260, 1120, 48, 20, Ink);
+                Label(page, "No enabled mod provides settings. Enable a mod in the Mods menu, then Apply & Restart.", 76, 312, 1120, 48, 20, Ink);
                 return;
             }
             int pages = (toggles.Count + ModSettingsPerPage - 1) / ModSettingsPerPage;
@@ -876,7 +879,7 @@ namespace Eclipse.UI
                 if (index >= toggles.Count) break;
                 var toggle = toggles[index];
                 string owner = ModDisplayName(toggle.Owner);
-                Row(owner + ": " + toggle.Label, () => OnOff(Eclipse.Modding.ModSettingsStore.Get(toggle)), 244 + i * 52,
+                Row(owner + ": " + toggle.Label, () => OnOff(Eclipse.Modding.ModSettingsStore.Get(toggle)), 296 + i * 52,
                     () => Eclipse.Modding.ModSettingsStore.Set(toggle, !Eclipse.Modding.ModSettingsStore.Get(toggle)));
             }
             // Paging and the note share the Back row, to its right, so nothing overlaps it.

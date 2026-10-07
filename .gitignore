@@ -89,3 +89,6 @@ unity-agent-plugin/
 /Assets/StreamingAssets/ControlPacks
 /Assets/StreamingAssets/ControlPacks
 /Assets/StreamingAssets/ControlPacks/Moonforge
+
+# Community mod (mod.io) install records, next to the Mods folder
+.eclipse-modio/

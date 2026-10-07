@@ -285,6 +285,79 @@ namespace Eclipse.Modding
         // Mods the Moveset Lab has saved this session; they may be new since startup.
         private static readonly HashSet<string> _labMods = new HashSet<string>(StringComparer.Ordinal);
 
+        /// <summary>
+        /// A clip the Moveset Lab saved into its mod this session. The running asset index was
+        /// built at startup and does not know files added since, so read them from disk.
+        /// </summary>
+        internal static bool IsLabMod(string modId) => _labMods.Contains(modId);
+
+        /// <summary>Marks a mod the Moveset Lab edits: its new files are read from disk.</summary>
+        internal static void AddLabMod(string modId) { if (!string.IsNullOrEmpty(modId)) _labMods.Add(modId); }
+
+        // Weapons the Moveset Lab loaded into the running game (preview and training) before
+        // a restart loads them for real. They are removed before content is applied again.
+        private static readonly List<string> _labItems = new List<string>();
+
+        internal static void AddLabItem(string name) { if (!_labItems.Contains(name)) _labItems.Add(name); }
+
+        internal static void RemoveLabItems()
+        {
+            if (_labItems.Count == 0) return;
+            try
+            {
+                var items = ListSF.GetItems();
+                if (items != null) foreach (string name in _labItems) items.RemoveExternalItem(name);
+            }
+            catch (Exception exception) { Debug.LogWarning("[Moveset Lab] Could not remove preview weapons: " + exception.Message); }
+            _labItems.Clear();
+            Eclipse.Multiplayer.VersusRoster.RemoveExtras();
+        }
+
+        /// <summary>Model geometry a Lab mod saved this session (assets/&lt;path&gt;.xml or .modelz), or null.</summary>
+        internal static string TryReadLabModelText(AssetId id)
+        {
+            if (_host == null || !_labMods.Contains(id.Namespace.Value)) return null;
+            try
+            {
+                string assets = System.IO.Path.GetFullPath(System.IO.Path.Combine(_host.ModsRoot, id.Namespace.Value, "assets"));
+                string stem = System.IO.Path.GetFullPath(System.IO.Path.Combine(assets, id.Path.Replace('/', System.IO.Path.DirectorySeparatorChar)));
+                if (!stem.StartsWith(assets + System.IO.Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase)) return null;
+                if (System.IO.File.Exists(stem + ".xml")) return System.IO.File.ReadAllText(stem + ".xml");
+                if (!System.IO.File.Exists(stem + ".modelz")) return null;
+                using (var input = System.IO.File.OpenRead(stem + ".modelz"))
+                using (var gzip = new System.IO.Compression.GZipStream(input, System.IO.Compression.CompressionMode.Decompress))
+                using (var reader = new System.IO.StreamReader(gzip, new System.Text.UTF8Encoding(false, true)))
+                    return reader.ReadToEnd();
+            }
+            catch (Exception) { return null; }
+        }
+
+        // Clips the Moveset Lab previews before they are saved (imported, not yet applied).
+        private static readonly Dictionary<AssetId, byte[]> _previewBinaries = new Dictionary<AssetId, byte[]>();
+
+        /// <summary>Serves <paramref name="data"/> as asset <paramref name="id"/> for a preview; null removes it.</summary>
+        internal static void SetPreviewBinary(AssetId id, byte[] data)
+        {
+            if (data == null) _previewBinaries.Remove(id);
+            else _previewBinaries[id] = data;
+        }
+
+        internal static void ClearPreviewBinaries() => _previewBinaries.Clear();
+
+        internal static byte[] TryReadLabBinary(AssetId id)
+        {
+            if (_previewBinaries.TryGetValue(id, out var preview)) return preview;
+            if (_host == null || !_labMods.Contains(id.Namespace.Value)) return null;
+            try
+            {
+                string assets = System.IO.Path.GetFullPath(System.IO.Path.Combine(_host.ModsRoot, id.Namespace.Value, "assets"));
+                string file = System.IO.Path.GetFullPath(MovesetClipFile.PathOf(_host.ModsRoot, id.Namespace.Value, id.Path));
+                if (!file.StartsWith(assets + System.IO.Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase)) return null;
+                return System.IO.File.Exists(file) ? System.IO.File.ReadAllBytes(file) : null;
+            }
+            catch (Exception) { return null; }
+        }
+
         private static string DescribeReloadMismatch(ModScriptSession scratch, string labModId)
         {
             foreach (ModDiagnostic diagnostic in scratch.Diagnostics)

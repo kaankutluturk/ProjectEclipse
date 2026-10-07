@@ -32,6 +32,11 @@ namespace Eclipse.Multiplayer
         private bool labOverlayApplied, labTesting, labReturning, labDiscardArmed, labSwitchArmed;
         private List<string> labClips;
         private readonly Dictionary<string, int> labClipFrames = new Dictionary<string, int>(StringComparer.Ordinal);
+        // Clips imported into the Lab's mod and not yet written: asset path -> bytes. APPLY writes them.
+        private readonly Dictionary<string, byte[]> labPendingClips = new Dictionary<string, byte[]>(StringComparer.Ordinal);
+        private readonly Dictionary<string, int> labClipNodes = new Dictionary<string, int>(StringComparer.Ordinal);
+        // Picker keys for the mod's own clips: this prefix and the asset path ("animations/name").
+        private const string LabAssetClip = "asset:";
         private static readonly string[] LabAddTypes = { "Block", "Invulnerable", "Invisible", "Throwable" };
 
         private sealed class LabWeapon { public string Id, RuntimeName, Name, Owner; }
@@ -85,6 +90,8 @@ namespace Eclipse.Multiplayer
         private void EndMovesetLab()
         {
             if (labReturning) return;
+            EndLabClipPreview();
+            ModRuntime.RemoveLabItems();
             labTesting = false;
             labPreview = null;
             labVictim = null;
@@ -97,8 +104,11 @@ namespace Eclipse.Multiplayer
         {
             string manifest = System.IO.Path.Combine(ModRuntime.Host.ModsRoot, modId, "mod.toml");
             var copy = new MovesetWorkingCopy(modId, MovesetModWriter.Load(ModRuntime.Host.ModsRoot, modId));
+            EndLabClipPreview();
             labModId = modId;
             labCopy = copy;
+            labPendingClips.Clear();
+            ForgetLabAssetClips();
             if (System.IO.File.Exists(manifest)) labModName = ModManifestReader.ReadExternalFile(manifest).Name;
             labWholeFamily.Clear();
         }
@@ -179,6 +189,8 @@ namespace Eclipse.Multiplayer
         private void AfterLabModChanged(string message)
         {
             labDiscardArmed = false;
+            LoadLabWeaponsLive();
+            OnLabScopeChanged();
             var moves = LabMoves();
             if (labMove == null || !moves.Contains(labMove)) labMove = moves.FirstOrDefault();
             RefreshLab();
@@ -221,8 +233,8 @@ namespace Eclipse.Multiplayer
             labReplayAt = Time.unscaledTime + .3f;
         }
 
-        /// <summary>Weapons of a subtype, from core and enabled mods, that the preview can wear.</summary>
-        private static List<LabWeapon> LabWeaponsOf(string subtype)
+        /// <summary>Weapons of a subtype, from core and enabled mods (and this mod's new ones), that the preview can wear.</summary>
+        private List<LabWeapon> LabWeaponsOf(string subtype)
         {
             var result = new List<LabWeapon>();
             var content = ModRuntime.Scripts?.Content;
@@ -235,6 +247,9 @@ namespace Eclipse.Multiplayer
                 string name = VersusRoster.Find(LoadoutSlot.Weapon, runtime)?.Name ?? LocalizationManager.GetStringOrDefault(runtime, runtime);
                 result.Add(new LabWeapon { Id = weapon.Id.ToString(), RuntimeName = runtime, Name = weapon.IsCore ? name : name + " (" + weapon.Id.Namespace.Value + ")", Owner = weapon.Id.Namespace.Value });
             }
+            foreach (var weapon in labModWeapons)
+                if (weapon.Subtype == subtype && !result.Any(w => w.Id == weapon.Id) && ListSF.GetItems().GetItemByName(weapon.Id) != null)
+                    result.Add(new LabWeapon { Id = weapon.Id, RuntimeName = weapon.Id, Name = weapon.Name + " (" + labModId + ")", Owner = labModId });
             result.Sort((a, b) => string.CompareOrdinal(a.Name, b.Name));
             return result;
         }
@@ -425,8 +440,38 @@ namespace Eclipse.Multiplayer
             if (entry != null)
                 foreach (var edit in entry.Intervals)
                     if (edit.Kind == ModMoveIntervalEditKind.Add) result.Add(new LabInterval { Added = edit, Start = edit.Start ?? 0, End = edit.End });
+            foreach (var interval in LabNewAttackIntervals())
+                result.Add(new LabInterval { Baseline = interval, Start = interval.Start, End = interval.End });
             return result;
         }
+
+        // New attacks are shown through interval records like the native ones, so the timeline,
+        // tabs and previews treat them alike; editing one rewrites its new_attacks entry.
+        private readonly System.Runtime.CompilerServices.ConditionalWeakTable<ModMoveAttackAddition, MovesetBaselineInterval> labNewAttackViews =
+            new System.Runtime.CompilerServices.ConditionalWeakTable<ModMoveAttackAddition, MovesetBaselineInterval>();
+        private readonly Dictionary<MovesetBaselineInterval, int> labNewAttackIds = new Dictionary<MovesetBaselineInterval, int>();
+
+        private List<MovesetBaselineInterval> LabNewAttackIntervals()
+        {
+            var result = new List<MovesetBaselineInterval>();
+            var entry = LabEntry;
+            if (entry == null) return result;
+            foreach (var addition in entry.NewAttacks)
+            {
+                var interval = labNewAttackViews.GetValue(addition, a =>
+                {
+                    var attack = new MovesetBaselineAttack { Id = a.Id, Damage = a.Damage, Impulse = a.Impulse.ToArray(), Hit = a.Hit };
+                    foreach (var term in a.Terms) attack.Terms[term.Key] = term.Value;
+                    attack.Edges.AddRange(a.Edges);
+                    return new MovesetBaselineInterval { Type = "Attack", Start = a.Start, End = a.End, Attack = attack };
+                });
+                labNewAttackIds[interval] = addition.Id;
+                result.Add(interval);
+            }
+            return result;
+        }
+
+        private bool LabIsNewAttack(MovesetBaselineInterval interval) => interval != null && labNewAttackIds.ContainsKey(interval);
 
         private LabAttack LabAttackState(MovesetBaselineInterval interval)
         {
@@ -446,6 +491,17 @@ namespace Eclipse.Multiplayer
 
         private void LabEditAttack(MovesetBaselineInterval interval, Action<LabAttack> change)
         {
+            if (labNewAttackIds.TryGetValue(interval, out int newId))
+            {
+                LabEdit((copy, target) =>
+                {
+                    var state = LabAttackState(interval);
+                    change(state);
+                    copy.ReplaceNewAttack(target, newId, new ModMoveAttackAddition(newId, state.Start, state.End, state.Damage, state.Terms,
+                        state.Edges, state.Impulse, state.Hit));
+                });
+                return;
+            }
             LabEdit((copy, target) =>
             {
                 string previous = labMove;
@@ -458,23 +514,155 @@ namespace Eclipse.Multiplayer
             });
         }
 
-        /// <summary>The move's last keyframe, with a swapped native clip's own length.</summary>
-        private int LabLastFrame(MovesetBaselineMove baseline)
+        /// <summary>The keyframes a native move plays. Without an authored EndFrame it plays to its clip's end.</summary>
+        private ModMoveClipRange LabNativeRange(MovesetBaselineMove baseline)
         {
-            string clip = LabEntry?.Animation?.NativeValue;
-            int frames = clip != null ? LabClipFrames(clip) : -1;
-            return frames > baseline.FirstFrame ? frames - 1 : baseline.FirstFrame + Math.Max(1, baseline.FrameCount) - 1;
+            int last = baseline.FirstFrame + baseline.FrameCount - 1;
+            if (last <= baseline.FirstFrame)
+            {
+                int frames = LabClipFrames(baseline.File);
+                last = frames > baseline.FirstFrame + 1 ? frames - 1 : baseline.FirstFrame + 1;
+            }
+            return new ModMoveClipRange(baseline.FirstFrame, last);
         }
 
+        /// <summary>The last keyframe of the clip the move plays now (a swapped clip's own length).</summary>
+        private int LabClipLast(MovesetBaselineMove baseline)
+        {
+            string clip = LabCurrentClip(null);
+            int frames = clip != null ? LabClipFrames(clip) : -1;
+            return frames > baseline.FirstFrame ? frames - 1 : LabNativeRange(baseline).Last;
+        }
+
+        /// <summary>The move's first keyframe, after a trim.</summary>
+        private int LabFirstFrame(MovesetBaselineMove baseline) => LabEntry?.ClipRange?.Value.First ?? baseline.FirstFrame;
+
+        /// <summary>The move's last keyframe, after a trim or with a swapped clip's own length.</summary>
+        private int LabLastFrame(MovesetBaselineMove baseline) => LabEntry?.ClipRange?.Value.Last ?? LabClipLast(baseline);
+
         // ---- Animation clips ----
+
+        /// <summary>The picker key of the clip the selected move plays now, or <paramref name="original"/> when unswapped.</summary>
+        private string LabCurrentClip(string original)
+        {
+            var animation = LabEntry?.Animation;
+            if (animation?.NativeValue != null) return animation.NativeValue;
+            if (animation?.AssetValue != null) return LabAssetClip + animation.AssetValue;
+            return original;
+        }
+
+        private static bool IsLabAssetClip(string clip) => clip.StartsWith(LabAssetClip, StringComparison.Ordinal);
+
+        /// <summary>How a clip key reads in the Lab: native file name, or the mod asset's name.</summary>
+        private static string LabClipLabel(string clip) => IsLabAssetClip(clip) ? clip.Substring(LabAssetClip.Length) + "  (this mod)" : clip;
 
         private int LabClipFrames(string clip)
         {
             if (labClipFrames.TryGetValue(clip, out int frames)) return frames;
-            try { frames = InfoAnimation.ReadClipFrameCount(clip); }
-            catch (Exception) { frames = -1; }
+            if (IsLabAssetClip(clip))
+            {
+                var data = LabAssetClipBytes(clip.Substring(LabAssetClip.Length));
+                int nodes = -1;
+                frames = data != null && MovesetClipFile.Inspect(data, out int count, out nodes) == null ? count : -1;
+                if (frames > 0) labClipNodes[clip] = nodes;
+            }
+            else
+            {
+                try { frames = InfoAnimation.ReadClipFrameCount(clip); }
+                catch (Exception) { frames = -1; }
+            }
             labClipFrames[clip] = frames;
             return frames;
+        }
+
+        /// <summary>Nodes per keyframe of a clip, or -1: a clip made for another rig has a different count.</summary>
+        private int LabClipNodes(string clip)
+        {
+            if (labClipNodes.TryGetValue(clip, out int nodes)) return nodes;
+            nodes = -1;
+            if (IsLabAssetClip(clip)) { LabClipFrames(clip); return labClipNodes.TryGetValue(clip, out nodes) ? nodes : -1; }
+            try
+            {
+                var data = ResourceManager.GetBinary(SF2Paths.GetBinaryAnimationsPath() + "/" + clip);
+                if (data != null && MovesetClipFile.Inspect(data, out _, out int count) == null) nodes = count;
+            }
+            catch (Exception) { nodes = -1; }
+            labClipNodes[clip] = nodes;
+            return nodes;
+        }
+
+        private byte[] LabAssetClipBytes(string assetPath)
+        {
+            if (labPendingClips.TryGetValue(assetPath, out var pending)) return pending;
+            try
+            {
+                string file = MovesetClipFile.PathOf(ModRuntime.Host.ModsRoot, labModId, assetPath);
+                return System.IO.File.Exists(file) ? System.IO.File.ReadAllBytes(file) : null;
+            }
+            catch (Exception) { return null; }
+        }
+
+        private void ForgetLabAssetClips()
+        {
+            foreach (string key in labClipFrames.Keys.Where(IsLabAssetClip).ToList()) labClipFrames.Remove(key);
+            foreach (string key in labClipNodes.Keys.Where(IsLabAssetClip).ToList()) labClipNodes.Remove(key);
+        }
+
+        /// <summary>The Lab mod's clips (saved and imported), as picker keys.</summary>
+        private List<string> LabModClips()
+        {
+            var paths = new SortedSet<string>(StringComparer.Ordinal);
+            try { foreach (string path in MovesetClipFile.InMod(ModRuntime.Host.ModsRoot, labModId)) paths.Add(path); }
+            catch (Exception) { }
+            foreach (string path in labPendingClips.Keys) paths.Add(path);
+            return paths.Select(p => LabAssetClip + p).ToList();
+        }
+
+        /// <summary>
+        /// Reads a native clip file into the Lab's mod as assets/animations/&lt;name&gt;.bytes (written
+        /// on APPLY). Returns its picker key, or null with <paramref name="error"/>.
+        /// </summary>
+        private string ImportLabClip(string file, MovesetBaselineMove baseline, out string error)
+        {
+            error = null;
+            byte[] data;
+            try
+            {
+                if (new System.IO.FileInfo(file).Length > MovesetClipFile.MaxBytes) { error = "The file is larger than " + MovesetClipFile.MaxBytes / (1024 * 1024) + " MB."; return null; }
+                data = System.IO.File.ReadAllBytes(file);
+            }
+            catch (Exception exception) { error = "Could not read the file: " + exception.Message; return null; }
+            string problem = MovesetClipFile.Inspect(data, out _, out int nodes);
+            if (problem != null) { error = problem; return null; }
+            int rig = LabClipNodes(baseline.File);
+            if (rig > 0 && nodes != rig) { error = "The clip moves " + nodes + " nodes; this move's fighter has " + rig + ". It was made for a different rig."; return null; }
+            string name = MovesetClipFile.SafeName(file);
+            string path = MovesetClipFile.Folder + "/" + name;
+            for (int i = 2; ; i++)
+            {
+                var existing = LabAssetClipBytes(path);
+                if (existing == null || existing.SequenceEqual(data)) break;
+                path = MovesetClipFile.Folder + "/" + name + "_" + i;
+            }
+            labPendingClips[path] = data;
+            labClipFrames.Remove(LabAssetClip + path);
+            labClipNodes.Remove(LabAssetClip + path);
+            return LabAssetClip + path;
+        }
+
+        /// <summary>Writes imported clips into the Lab mod's folder.</summary>
+        private void WriteLabPendingClips()
+        {
+            foreach (var pair in labPendingClips)
+            {
+                string file = MovesetClipFile.PathOf(ModRuntime.Host.ModsRoot, labModId, pair.Key);
+                System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(file));
+                string temp = file + ".write";
+                System.IO.File.WriteAllBytes(temp, pair.Value);
+                if (System.IO.File.Exists(file)) System.IO.File.Delete(file);
+                System.IO.File.Move(temp, file);
+            }
+            labPendingClips.Clear();
         }
 
         /// <summary>Native clips, those the current view's moves use first.</summary>
@@ -483,13 +671,13 @@ namespace Eclipse.Multiplayer
             if (labClips == null)
                 labClips = labBaseline.Values.Select(m => m.File).Where(f => !string.IsNullOrEmpty(f)).Distinct(StringComparer.Ordinal)
                     .OrderBy(f => f, StringComparer.OrdinalIgnoreCase).ToList();
-            var first = new List<string>();
+            var first = LabModClips();
             foreach (string move in LabMoves())
             {
                 var baseline = LabBaselineOf(move);
                 if (baseline != null && baseline.File.Length != 0 && !first.Contains(baseline.File)) first.Add(baseline.File);
             }
-            first.Sort(StringComparer.OrdinalIgnoreCase);
+            first.Sort((a, b) => IsLabAssetClip(a) != IsLabAssetClip(b) ? (IsLabAssetClip(a) ? -1 : 1) : StringComparer.OrdinalIgnoreCase.Compare(a, b));
             scoped = first.Count;
             first.AddRange(labClips.Where(c => !first.Contains(c)));
             return first;
@@ -503,6 +691,13 @@ namespace Eclipse.Multiplayer
             blocked = frames <= baseline.FirstFrame;
             if (frames < 0) { problems.Add("The clip could not be read."); return problems; }
             if (blocked) { problems.Add("This move starts at keyframe " + baseline.FirstFrame + "; the clip has only " + frames + "."); return problems; }
+            int nodes = LabClipNodes(clip), rig = LabClipNodes(baseline.File);
+            if (nodes > 0 && rig > 0 && nodes != rig)
+            {
+                blocked = true;
+                problems.Add("The clip moves " + nodes + " nodes; this move's fighter has " + rig + ". It was made for a different rig.");
+                return problems;
+            }
             int last = frames - 1;
             foreach (var item in LabIntervals(baseline))
             {
@@ -518,12 +713,32 @@ namespace Eclipse.Multiplayer
         // ---- Apply, save and training ----
 
         /// <summary>Saves the working copy as the Lab's mod and applies every enabled mod's move edits.</summary>
-        private bool ApplyLab()
+        /// <summary>
+        /// Saves the mod with its Eclipse core range declared and zips it, ready for Mods >
+        /// Install ZIP or a mod.io upload, into "Eclipse mods" on the desktop.
+        /// </summary>
+        private void ExportLab()
+        {
+            if (labCopy == null) return;
+            if (!ApplyLab(true)) return;
+            try
+            {
+                string root = System.IO.Path.Combine(ModRuntime.Host.ModsRoot, labModId);
+                var manifest = ModManifestReader.ReadExternalFile(System.IO.Path.Combine(root, "mod.toml"));
+                string zip = CharacterImporter.ExportZip(root, "Eclipse mods", labModId + "-" + manifest.Version);
+                CharacterImporter.Reveal(zip);
+                SetStatus("Exported " + System.IO.Path.GetFileName(zip) + " to Eclipse mods on the desktop. Raise the version in mod.toml before uploading an update.");
+            }
+            catch (Exception exception) { SetStatus("Not exported: " + exception.Message); }
+        }
+
+        private bool ApplyLab(bool declareCore = false)
         {
             if (labCopy == null) return false;
+            EndLabClipPreview();
             string root = ModRuntime.Host.ModsRoot;
             var dependencies = new Dictionary<string, string>(StringComparer.Ordinal);
-            bool needsCore = false;
+            bool needsCore = declareCore;
             foreach (var fork in labCopy.Document.Forks)
             {
                 if (fork.Item == null) continue;
@@ -532,7 +747,12 @@ namespace Eclipse.Multiplayer
                 var mod = ModRuntime.Scripts?.ActiveMods.FirstOrDefault(m => m.Id.Value == owner);
                 if (mod != null && owner != labModId) dependencies[owner] = mod.Version.ToString();
             }
-            try { MovesetModWriter.Save(root, labModId, labModName ?? "Moveset Lab", labCopy.Document, needsCore, dependencies); }
+            try
+            {
+                MovesetModWriter.Save(root, labModId, labModName ?? "Moveset Lab", labCopy.Document, needsCore, dependencies);
+                WriteLabPendingClips();
+                ForgetLabAssetClips();
+            }
             catch (Exception exception) { SetStatus("Not saved: " + exception.Message); return false; }
             labCopy.MarkSaved();
             labDiscardArmed = false;

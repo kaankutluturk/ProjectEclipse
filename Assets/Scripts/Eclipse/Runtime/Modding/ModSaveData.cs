@@ -1728,6 +1728,34 @@ namespace Eclipse.Modding
                 Append(canonical, edit.Hit != null);
                 if (edit.Hit != null) { Append(canonical, edit.Hit.Expected); Append(canonical, edit.Hit.Value); }
             }
+            // Added attacks are a newer kind of edit; patches without them keep their fingerprint.
+            if (extras.NewAttacks.Count != 0)
+            {
+                Append(canonical, "new-attacks-v1"); Append(canonical, extras.NewAttacks.Count);
+                foreach (var addition in extras.NewAttacks)
+                {
+                    Append(canonical, addition.Id); Append(canonical, addition.Start); Append(canonical, addition.End);
+                    Append(canonical, (float)addition.Damage);
+                    var keys = new List<string>(addition.Terms.Keys); keys.Sort(string.CompareOrdinal);
+                    Append(canonical, keys.Count);
+                    foreach (string key in keys) { Append(canonical, key); Append(canonical, (float)addition.Terms[key]); }
+                    Append(canonical, addition.Edges.Count);
+                    foreach (string edge in addition.Edges) Append(canonical, edge);
+                    foreach (double axis in addition.Impulse) Append(canonical, (float)axis);
+                    Append(canonical, addition.Hit);
+                }
+            }
+            if (extras.ClipRange != null)
+            {
+                Append(canonical, "clip-range-v1");
+                Append(canonical, extras.ClipRange.Expected.First); Append(canonical, extras.ClipRange.Expected.Last);
+                Append(canonical, extras.ClipRange.Value.First); Append(canonical, extras.ClipRange.Value.Last);
+            }
+            if (extras.Chains.Count != 0)
+            {
+                Append(canonical, "chains-v1"); Append(canonical, extras.Chains.Count);
+                foreach (var chain in extras.Chains) { Append(canonical, chain.From); Append(canonical, chain.Start); Append(canonical, chain.End); }
+            }
         }
 
         private static void Append(StringBuilder builder, int value)

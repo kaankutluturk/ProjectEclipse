@@ -23,6 +23,7 @@ namespace Eclipse.Modding
         public string ScriptsRoot { get; }
         public string LocalizationsRoot { get; }
         public string MovesetsRoot { get; }
+        public string WeaponsRoot { get; }
         public IReadOnlyList<AssetMetadata> Assets => _readOnlyMetadata;
 
         public LooseModProvider(ModDescriptor mod)
@@ -37,14 +38,17 @@ namespace Eclipse.Modding
             ScriptsRoot = Path.GetFullPath(Path.Combine(modRoot, "scripts"));
             LocalizationsRoot = Path.GetFullPath(Path.Combine(modRoot, "localizations"));
             MovesetsRoot = Path.GetFullPath(Path.Combine(modRoot, "movesets"));
+            WeaponsRoot = Path.GetFullPath(Path.Combine(modRoot, "weapons"));
             EnsureContained(modRoot, AssetsRoot, "Loose assets root escapes the mod root.");
             EnsureContained(modRoot, ScriptsRoot, "Loose scripts root escapes the mod root.");
             EnsureContained(modRoot, LocalizationsRoot, "Loose localizations root escapes the mod root.");
             EnsureContained(modRoot, MovesetsRoot, "Loose movesets root escapes the mod root.");
+            EnsureContained(modRoot, WeaponsRoot, "Loose weapons root escapes the mod root.");
             if (Directory.Exists(AssetsRoot)) IndexDirectory(AssetsRoot, string.Empty);
             if (Directory.Exists(ScriptsRoot)) IndexDirectory(ScriptsRoot, "scripts/");
             if (Directory.Exists(LocalizationsRoot)) IndexDirectory(LocalizationsRoot, "localizations/");
             if (Directory.Exists(MovesetsRoot)) IndexDirectory(MovesetsRoot, "movesets/");
+            if (Directory.Exists(WeaponsRoot)) IndexDirectory(WeaponsRoot, "weapons/");
         }
 
         public bool TryDescribe(AssetId id, out AssetMetadata metadata)

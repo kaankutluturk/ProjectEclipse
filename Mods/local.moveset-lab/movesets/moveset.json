@@ -55,14 +55,248 @@
       "move": "KatanaDoubleSlash"
     },
     {
-      "id": "CuckSlash",
-      "subtype": "Katana",
-      "add": true,
-      "move": "KatanaSlash",
+      "id": "AxesSlash_dualblud",
+      "item": "local.moveset-lab:items/weapon/dualblud",
+      "move": "AxesSlash",
+      "attacks": [
+        {
+          "id": 216,
+          "edges": {
+            "expected": ["WEAPON_DOUBLE_AXE-Edge6_2", "WEAPON_DOUBLE_AXE-Edge7_2", "WEAPON_BUTHER_KNIVES-Edge1_2", "WEAPON_BUTHER_KNIVES-Edge2_2", "EForearm_2", "EHand_2", "EFingers_2"],
+            "value": ["EForearm_2", "EHand_2", "EFingers_2", "WEAPON_KATANA-Edge23_2", "WEAPON_KATANA-Edge24_2", "WEAPON_KATANA-Blade_2"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "AxesDoubleSlash_dualblud",
+      "item": "local.moveset-lab:items/weapon/dualblud",
+      "move": "AxesDoubleSlash",
+      "attacks": [
+        {
+          "id": 217,
+          "edges": {
+            "expected": ["WEAPON_DOUBLE_AXE-Edge6_2", "WEAPON_DOUBLE_AXE-Edge7_2", "WEAPON_BUTHER_KNIVES-Edge1_2", "WEAPON_BUTHER_KNIVES-Edge2_2", "EForearm_2", "EHand_2", "EFingers_2"],
+            "value": ["EForearm_2", "EHand_2", "EFingers_2", "WEAPON_KATANA-Blade_2", "WEAPON_KATANA-Edge24_2", "WEAPON_KATANA-Edge23_2"]
+          }
+        },
+        {
+          "id": 218,
+          "start": {
+            "expected": 20,
+            "value": 21
+          },
+          "end": {
+            "expected": 21,
+            "value": 23
+          },
+          "edges": {
+            "expected": ["WEAPON_DOUBLE_AXE-Edge6_1", "WEAPON_DOUBLE_AXE-Edge7_1", "WEAPON_DOUBLE_AXE-Edge6_2", "WEAPON_DOUBLE_AXE-Edge7_2", "WEAPON_BUTHER_KNIVES-Edge1_1", "WEAPON_BUTHER_KNIVES-Edge2_1", "WEAPON_BUTHER_KNIVES-Edge1_2", "WEAPON_BUTHER_KNIVES-Edge2_2", "EForearm_1", "EHand_1", "EFingers_1", "EForearm_2", "EHand_2", "EFingers_2"],
+            "value": ["EForearm_2", "EHand_2", "EFingers_2", "EForearm_1", "EHand_1", "EFingers_1", "WEAPON_KATANA-Edge24_2", "WEAPON_KATANA-Blade_1", "WEAPON_KATANA-Edge23_2", "WEAPON_KATANA-Edge24_1", "WEAPON_KATANA-Edge23_1", "WEAPON_KATANA-Blade_2"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "AxesHeavySlash_dualblud",
+      "item": "local.moveset-lab:items/weapon/dualblud",
+      "move": "AxesHeavySlash",
+      "attacks": [
+        {
+          "id": 219,
+          "edges": {
+            "expected": ["WEAPON_DOUBLE_AXE-Edge6_1", "WEAPON_DOUBLE_AXE-Edge7_1", "WEAPON_BUTHER_KNIVES-Edge1_1", "WEAPON_BUTHER_KNIVES-Edge2_1", "EForearm_1", "EHand_1", "EFingers_1"],
+            "value": ["EForearm_1", "EHand_1", "EFingers_1", "WEAPON_KATANA-Edge23_1", "WEAPON_KATANA-Edge24_1", "WEAPON_KATANA-Blade_1"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "AxesLowSlash_dualblud",
+      "item": "local.moveset-lab:items/weapon/dualblud",
+      "move": "AxesLowSlash",
+      "attacks": [
+        {
+          "id": 225,
+          "edges": {
+            "expected": ["WEAPON_DOUBLE_AXE-Edge6_1", "WEAPON_DOUBLE_AXE-Edge7_1", "WEAPON_DOUBLE_AXE-Edge6_2", "WEAPON_DOUBLE_AXE-Edge7_2", "WEAPON_BUTHER_KNIVES-Edge1_1", "WEAPON_BUTHER_KNIVES-Edge2_1", "WEAPON_BUTHER_KNIVES-Edge1_2", "WEAPON_BUTHER_KNIVES-Edge2_2", "EForearm_1", "EHand_1", "EFingers_1", "EForearm_2", "EHand_2", "EFingers_2"],
+            "value": ["EForearm_1", "EHand_1", "EFingers_1", "EForearm_2", "EHand_2", "EFingers_2", "WEAPON_KATANA-Edge24_1", "WEAPON_KATANA-Edge24_2", "WEAPON_KATANA-Edge23_1", "WEAPON_KATANA-Blade_2", "WEAPON_KATANA-Edge23_2", "WEAPON_KATANA-Blade_1"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "AxesSpinningSlash_dualblud",
+      "item": "local.moveset-lab:items/weapon/dualblud",
+      "move": "AxesSpinningSlash",
+      "attacks": [
+        {
+          "id": 223,
+          "edges": {
+            "expected": ["WEAPON_DOUBLE_AXE-Edge6_2", "WEAPON_DOUBLE_AXE-Edge7_2", "WEAPON_BUTHER_KNIVES-Edge1_2", "WEAPON_BUTHER_KNIVES-Edge2_2", "EForearm_2", "EHand_2", "EFingers_2"],
+            "value": ["WEAPON_KATANA-Edge24_2", "WEAPON_KATANA-Edge23_2", "WEAPON_KATANA-Blade_2", "EForearm_2", "EFingers_2", "EHand_2"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "AxesSuperSlash_dualblud",
+      "item": "local.moveset-lab:items/weapon/dualblud",
+      "move": "AxesSuperSlash",
       "animation": {
-        "expected": "katana_slash.bytes",
-        "value": "chinese_sabers_super_slash.bytes"
+        "expected": "axe_super_slash.bytes",
+        "value": "fans_super_slash.bytes"
+      },
+      "attacks": [
+        {
+          "id": 220,
+          "start": {
+            "expected": 10,
+            "value": 11
+          },
+          "end": {
+            "expected": 11,
+            "value": 14
+          },
+          "edges": {
+            "expected": ["WEAPON_DOUBLE_AXE-Edge6_2", "WEAPON_DOUBLE_AXE-Edge7_2", "EForearm_2", "EHand_2", "EFingers_2"],
+            "value": ["WEAPON_KATANA-Blade_1", "WEAPON_KATANA-Edge23_1", "WEAPON_KATANA-Edge24_1", "EForearm_1", "EFingers_1", "EHand_1"]
+          }
+        },
+        {
+          "id": 221,
+          "start": {
+            "expected": 13,
+            "value": 21
+          },
+          "end": {
+            "expected": 14,
+            "value": 24
+          },
+          "edges": {
+            "expected": ["WEAPON_DOUBLE_AXE-Edge6_1", "WEAPON_DOUBLE_AXE-Edge7_1", "EForearm_1", "EHand_1", "EFingers_1"],
+            "value": ["WEAPON_DOUBLE_AXE-Edge6_2", "WEAPON_DOUBLE_AXE-Edge7_2", "EForearm_2", "EHand_2", "EFingers_2", "WEAPON_KATANA-Edge23_2", "WEAPON_KATANA-Blade_2", "WEAPON_KATANA-Edge24_2"]
+          }
+        },
+        {
+          "id": 222,
+          "end": {
+            "expected": 35,
+            "value": 44
+          },
+          "edges": {
+            "expected": ["WEAPON_DOUBLE_AXE-Edge6_2", "WEAPON_DOUBLE_AXE-Edge7_2", "WEAPON_BUTHER_KNIVES-Edge1_2", "WEAPON_BUTHER_KNIVES-Edge2_2", "EForearm_2", "EHand_2", "EFingers_2"],
+            "value": ["EForearm_2", "EHand_2", "EFingers_2", "WEAPON_KATANA-Edge24_2", "WEAPON_KATANA-Edge23_2", "WEAPON_KATANA-Blade_2", "WEAPON_KATANA-Edge24_1", "WEAPON_KATANA-Edge23_1", "WEAPON_KATANA-Blade_1", "EForearm_1", "EFingers_1", "EHand_1"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "AxesUpperSlash_dualblud",
+      "item": "local.moveset-lab:items/weapon/dualblud",
+      "move": "AxesUpperSlash",
+      "animation": {
+        "expected": "axe_upper_slash.bytes",
+        "value": "daggers_upper_slash.bytes"
+      },
+      "attacks": [
+        {
+          "id": 224,
+          "edges": {
+            "expected": ["WEAPON_DOUBLE_AXE-Edge6_2", "WEAPON_DOUBLE_AXE-Edge7_2", "WEAPON_BUTHER_KNIVES-Edge1_2", "WEAPON_BUTHER_KNIVES-Edge2_2", "EForearm_2", "EHand_2", "EFingers_2"],
+            "value": ["EForearm_2", "EHand_2", "EFingers_2", "WEAPON_KATANA-Edge23_2", "WEAPON_KATANA-Edge24_2", "WEAPON_KATANA-Blade_2"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "AxesIdle_dualblud",
+      "item": "local.moveset-lab:items/weapon/dualblud",
+      "move": "AxesIdle",
+      "animation": {
+        "expected": "axe_idle.bytes",
+        "value": "claws_idle.bytes"
       }
+    },
+    {
+      "id": "AxesStartStance-Left_dualblud",
+      "item": "local.moveset-lab:items/weapon/dualblud",
+      "move": "AxesStartStance-Left",
+      "animation": {
+        "expected": "axe_stance.bytes",
+        "value": "stance_weapon_1.bytes"
+      }
+    },
+    {
+      "id": "AxesStartStance-Right_dualblud",
+      "item": "local.moveset-lab:items/weapon/dualblud",
+      "move": "AxesStartStance-Right",
+      "animation": {
+        "expected": "axe_stance.bytes",
+        "value": "stance_weapon_1.bytes"
+      }
+    },
+    {
+      "id": "AxesStartStanceIdle_dualblud",
+      "item": "local.moveset-lab:items/weapon/dualblud",
+      "move": "AxesStartStanceIdle",
+      "animation": {
+        "expected": "axe_stance_idle.bytes",
+        "value": "swords_stance_idle.bytes"
+      }
+    },
+    {
+      "id": "SetDirectionAxesIdle_dualblud",
+      "item": "local.moveset-lab:items/weapon/dualblud",
+      "move": "SetDirectionAxesIdle",
+      "animation": {
+        "expected": "axe_idle.bytes",
+        "value": "claws_idle.bytes"
+      }
+    },
+    {
+      "id": "ShopAxesSuperSlash_dualblud",
+      "item": "local.moveset-lab:items/weapon/dualblud",
+      "move": "ShopAxesSuperSlash",
+      "animation": {
+        "expected": "axe_super_slash.bytes",
+        "value": "fans_super_slash.bytes"
+      }
+    },
+    {
+      "id": "TwoHandedHeavySlash_cursed",
+      "item": "local.moveset-lab:items/weapon/cursed",
+      "move": "TwoHandedHeavySlash",
+      "attacks": [
+        {
+          "id": 146,
+          "edges": {
+            "expected": ["WEAPON_TWO-HAND_SWORD-Edge1", "WEAPON_TWO-HAND_SWORD-Edge2", "WEAPON_TWO-HAND_SWORD-Edge3", "WEAPON_HEAVY_HAMMER-Edge2", "WEAPON_HEAVY_HAMMER-Edge3", "WEAPON_TWO-HAND_MACE-Edge3", "WEAPON_TWO-HAND_MACE-Edge2", "WEAPON_SCYTHE-Edge1", "WEAPON_SCYTHE-Edge2", "WEAPON_SCYTHE-Edge3", "WEAPON_SCYTHE-Edge4"],
+            "value": ["WEAPON_SCYTHE-Edge4", "WEAPON_KNIVES-Edge17_2", "WEAPON_KNIVES-Edge18_1", "WEAPON_KNIVES-Edge18_2", "WEAPON_KNIVES-Edge17_1"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "SwordsDoubleSlash_dualcursed",
+      "item": "local.moveset-lab:items/weapon/dualcursed",
+      "move": "SwordsDoubleSlash",
+      "attacks": [
+        {
+          "id": 79,
+          "edges": {
+            "expected": ["WEAPON_SWORDS-Blade_2", "WEAPON_SWORDS-Blade_1_2", "WEAPON_SWORDS-Edge19_2", "MoonSwordsAttack-Edge1_2", "MoonSwordsAttack-Edge2_2", "MoonSwordsAttack-Edge3_2", "Fans-Blade2_2", "Fans-Blade3_2", "EForearm_2", "EHand_2", "EFingers_2"],
+            "value": ["WEAPON_SWORDS-Blade_2", "WEAPON_SWORDS-Blade_1_2", "WEAPON_SWORDS-Edge19_2", "MoonSwordsAttack-Edge1_2", "MoonSwordsAttack-Edge2_2", "MoonSwordsAttack-Edge3_2", "Fans-Blade2_2", "Fans-Blade3_2", "EForearm_2", "EHand_2", "EFingers_2", "WEAPON_KNIVES-Edge18_2", "WEAPON_KNIVES-Edge17_2"]
+          }
+        },
+        {
+          "id": 80,
+          "edges": {
+            "expected": ["WEAPON_SWORDS-Blade_1", "WEAPON_SWORDS-Blade_1_1", "WEAPON_SWORDS-Edge19_1", "MoonSwordsAttack-Edge1_1", "MoonSwordsAttack-Edge2_1", "MoonSwordsAttack-Edge3_1", "Fans-Blade2_1", "Fans-Blade3_1", "EForearm_1", "EHand_1", "EFingers_1"],
+            "value": ["WEAPON_SWORDS-Blade_1", "WEAPON_SWORDS-Blade_1_1", "WEAPON_SWORDS-Edge19_1", "MoonSwordsAttack-Edge1_1", "MoonSwordsAttack-Edge2_1", "MoonSwordsAttack-Edge3_1", "Fans-Blade2_1", "Fans-Blade3_1", "EForearm_1", "EHand_1", "EFingers_1", "WEAPON_KNIVES-Edge17_1", "WEAPON_KNIVES-Edge18_1"]
+          }
+        }
+      ]
     }
   ]
 }

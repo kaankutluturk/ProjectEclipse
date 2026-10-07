@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "kind": "eclipse.moveset",
+  "moves": [],
+  "forks": [
+    {
+      "id": "KnivesSpinningSlash_weapon_knives",
+      "item": "core:items/weapon/weapon_knives",
+      "move": "KnivesSpinningSlash",
+      "playback_rate": {
+        "expected": 1.0,
+        "value": 1.5
+      },
+      "attacks": [
+        {
+          "id": 36,
+          "damage": {
+            "expected": 0.12,
+            "value": 0.9
+          },
+          "impulse": {
+            "expected": [245.0, 0.0, -350.0],
+            "value": [20045.0, 0.0, -350.0]
+          }
+        }
+      ]
+    }
+  ]
+}

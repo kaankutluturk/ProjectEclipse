@@ -4,7 +4,7 @@
 // vanilla guard checks, conflict claims and move-change report as sf2.moves.patch.
 const jsonc=require('jsonc-parser');
 const native=require('./native.cjs');
-const MOVE_FIELDS=['move','note','disable','priority','playback_rate','animation','input','sound_frame','intervals','attacks'];
+const MOVE_FIELDS=['move','note','disable','priority','playback_rate','animation','input','sound_frame','intervals','attacks','new_attacks','clip_range','chains'];
 const FORK_FIELDS=[...MOVE_FIELDS,'id','subtype','item','add'];
 const GUARD=['expected','value'];
 const SHAPES={
@@ -81,6 +81,59 @@ function parse(text){
                 if(shape.guard){known(value,GUARD,`${where}.${name}`);for(const k of GUARD){if(!inner.has(k))at(value,`${where}.${name} needs "${k}".`);else type(inner.get(k),shape.guard,`${where}.${name}.${k}`);}}
                 else{known(value,Object.keys(shape.fields),`${where}.${name}`);for(const k of shape.required)if(!inner.has(k))at(value,`${where}.${name} needs "${k}".`);for(const [k,t] of Object.entries(shape.fields))if(inner.has(k))type(inner.get(k),t,`${where}.${name}.${k}`);}
             }
+            const additions=map.get('new_attacks');
+            if(additions&&type(additions,'array',`${where}.new_attacks`)){
+                if(additions.children.length>32)at(additions,`${where}.new_attacks adds more than 32 attacks.`);
+                const REACTIONS=new Set(require('./native.cjs').HIT_REACTIONS??[]);
+                const ids=new Set();
+                additions.children.forEach((attack,i)=>{
+                    const here=`${where}.new_attacks[${i}]`;if(!type(attack,'object',here))return;
+                    const f=props(attack);known(attack,['id','start','end','damage','damage_terms','edges','impulse','hit'],here);
+                    for(const k of ['id','start','end','damage','damage_terms','edges','impulse','hit'])if(!f.has(k))at(attack,`${here} needs "${k}".`);
+                    for(const k of ['id','start','end'])if(f.has(k))type(f.get(k),'integer',`${here}.${k}`);
+                    if(f.has('id')&&ids.has(f.get('id').value))at(f.get('id'),`${here}.id repeats another new attack.`);if(f.has('id'))ids.add(f.get('id').value);
+                    if(f.has('start')&&f.has('end')&&f.get('end').value<f.get('start').value)at(f.get('end'),`${here}.end is before start.`);
+                    if(f.has('damage')&&type(f.get('damage'),'number',`${here}.damage`)&&(f.get('damage').value<0||f.get('damage').value>16))at(f.get('damage'),`${here}.damage must be 0..16.`);
+                    if(f.has('damage_terms')&&type(f.get('damage_terms'),'object',`${here}.damage_terms`)){
+                        const terms=props(f.get('damage_terms'));
+                        if(terms.size<1||terms.size>4)at(f.get('damage_terms'),`${here}.damage_terms needs 1-4 terms.`);
+                        for(const [k,v] of terms){if(!['UnarmedDamage','WeaponDamage','RangedDamage','MagicDamage'].includes(k))at(v,`${here}.damage_terms: unknown type "${k}".`);else type(v,'number',`${here}.damage_terms.${k}`);}
+                    }
+                    if(f.has('edges')&&type(f.get('edges'),'array',`${here}.edges`)&&(!f.get('edges').children.length||f.get('edges').children.length>64))at(f.get('edges'),`${here}.edges needs 1-64 edge names.`);
+                    if(f.has('impulse')&&type(f.get('impulse'),'array',`${here}.impulse`)&&f.get('impulse').children.length!==3)at(f.get('impulse'),`${here}.impulse must be [x, y, z].`);
+                    if(f.has('hit')&&type(f.get('hit'),'string',`${here}.hit`)&&REACTIONS.size&&!REACTIONS.has(f.get('hit').value))at(f.get('hit'),`${here}.hit is not a hit reaction the game knows.`);
+                });
+            }
+            const range=map.get('clip_range');
+            if(range&&type(range,'object',`${where}.clip_range`)){
+                const inner=props(range);known(range,GUARD,`${where}.clip_range`);
+                const pairs={};
+                for(const k of GUARD){
+                    if(!inner.has(k)){at(range,`${where}.clip_range needs "${k}".`);continue;}
+                    const pair=inner.get(k);
+                    if(!type(pair,'array',`${where}.clip_range.${k}`))continue;
+                    if(pair.children.length!==2){at(pair,`${where}.clip_range.${k} must be [first, last].`);continue;}
+                    if(pair.children.every((n,i)=>type(n,'integer',`${where}.clip_range.${k}[${i}]`))){
+                        const [first,last]=pair.children.map(n=>n.value);pairs[k]=[first,last];
+                        if(first<0||last>100000)at(pair,`${where}.clip_range.${k} keyframes must be 0..100000.`);
+                        else if(last<=first)at(pair,`${where}.clip_range.${k} must end after it starts.`);
+                    }
+                }
+                if(pairs.expected&&pairs.value&&pairs.expected[0]===pairs.value[0]&&pairs.expected[1]===pairs.value[1])at(range,`${where}.clip_range must change the range.`);
+            }
+            const chains=map.get('chains');
+            if(chains&&type(chains,'array',`${where}.chains`)){
+                if(chains.children.length>16)at(chains,`${where}.chains lists more than 16 chains.`);
+                const froms=new Set();
+                chains.children.forEach((chain,i)=>{
+                    const here=`${where}.chains[${i}]`;if(!type(chain,'object',here))return;
+                    const f=props(chain);known(chain,['from','start','end'],here);
+                    for(const k of ['from','start','end'])if(!f.has(k))at(chain,`${here} needs "${k}".`);
+                    if(f.has('from')&&type(f.get('from'),'string',`${here}.from`)){if(froms.has(f.get('from').value))at(f.get('from'),`${here} follows the same move twice.`);froms.add(f.get('from').value);}
+                    for(const k of ['start','end'])if(f.has(k))type(f.get(k),'integer',`${here}.${k}`);
+                    if(f.has('start')&&f.has('end')&&(f.get('start').value<0||f.get('end').value<f.get('start').value||f.get('end').value>100000))at(chain,`${here} needs 0 <= start <= end <= 100000.`);
+                });
+            }
             if(isFork){
                 for(const k of ['id'])if(!map.has(k))at(entry,`${where} needs "${k}".`);
                 const adds=map.get('add')?.value===true;
@@ -99,8 +152,21 @@ function parse(text){
 function check(entries,helpers,modId){
     const issues=[],forks=new Map();
     const add=(node,_code,message)=>issues.push({offset:node?.range?.[0]??0,length:node?.range?(node.range[1]-node.range[0]):0,message});
+    // A combo link follows a native move or one of this file's forks.
+    const forkNames=new Set(entries.filter(e=>e.kind==='fork'&&e.id).map(e=>`${modId}.${e.id}`));
+    for(const entry of entries)for(const chain of arrayValues(field(entry.table,'chains'))){
+        const from=field(chain,'from');
+        if(from?.type==='StringLiteral'&&!native.lookup(from.value)&&!forkNames.has(from.value))
+            add(from,'native-guard',`No base-game move or fork in this file is named "${from.value}".`);
+    }
     for(const entry of entries){
         const sourceName=forks.get(entry.move)??entry.move;
+        // A new attack's id must not repeat one of the move's own attacks.
+        const vanilla=native.lookup(sourceName),additions=field(entry.table,'new_attacks');
+        if(vanilla&&additions)for(const attack of arrayValues(additions)){
+            const id=field(attack,'id');
+            if(id&&vanilla.attacks.some(a=>a.id===id.value))add(id,'native-guard',`"${sourceName}" already has attack id ${id.value}; give the new attack another id.`);
+        }
         if(entry.kind==='fork'){
             // A new move ("add": true) keeps its source untouched, so fork lock rules do not apply.
             if(!entry.add)native.checkCall('sf2.moves.fork',[withMove(entry.table,sourceName)],{...helpers,fields:t=>{const f=helpers.fields(t);return {...f,source:f.move};}},add);

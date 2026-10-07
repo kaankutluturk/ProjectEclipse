@@ -1,0 +1,63 @@
+{
+  "schema": 1,
+  "kind": "eclipse.weapons",
+  "weapons": [
+    {
+      "id": "blade_of_blud",
+      "name": "Blade Of Blud",
+      "subtype": "Katana",
+      "model": "models/blade_of_blud",
+      "icon": "sprites/blade_of_blud_icon",
+      "shop": {
+        "level": 1,
+        "price": 100,
+        "currency": "coins"
+      }
+    },
+    {
+      "id": "dualblud",
+      "name": "Dualblud",
+      "subtype": "Axes",
+      "model": "models/dualblud",
+      "icon": "sprites/dualblud_icon",
+      "shop": {
+        "level": 1,
+        "price": 1,
+        "currency": "coins"
+      }
+    },
+    {
+      "id": "weapon",
+      "name": "Weapon",
+      "subtype": "Staff",
+      "model": "models/weapon",
+      "shop": {
+        "level": 1,
+        "price": 100,
+        "currency": "coins"
+      }
+    },
+    {
+      "id": "cursed",
+      "name": "Cursed",
+      "subtype": "TwoHandedBlunt",
+      "model": "models/cursed",
+      "shop": {
+        "level": 1,
+        "price": 100,
+        "currency": "coins"
+      }
+    },
+    {
+      "id": "dualcursed",
+      "name": "DualCursed",
+      "subtype": "Swords",
+      "model": "models/dualcursed",
+      "shop": {
+        "level": 1,
+        "price": 100,
+        "currency": "coins"
+      }
+    }
+  ]
+}

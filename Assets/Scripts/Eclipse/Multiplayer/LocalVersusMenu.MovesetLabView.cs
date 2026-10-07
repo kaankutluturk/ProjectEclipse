@@ -43,7 +43,7 @@ namespace Eclipse.Multiplayer
         private Button labLoopButton, labVictimButton;
         private LabTab labTab = LabTab.Attack;
         private int labAttackId = -1, labWindowIndex = -1, labAddType;
-        private bool labEditedOnly, labShowBracing, labEdgesKnown, labLoop = true, labUserPaused, labVictimOn = true, labPickingClip;
+        private bool labEditedOnly, labShowBracing, labEdgesKnown, labLoop = true, labUserPaused, labVictimOn = true, labPickingClip, labGhostOn;
         private float labSpeed = 1f, labStepClock, labReplayAt = -1f, labPlayedAt;
         private string labPlaying, labHoverEdge, labClipChoice;
         private int labTimelineFrom, labTimelineTo, labLastKeyframe = -1, labReactionChoice;
@@ -62,6 +62,7 @@ namespace Eclipse.Multiplayer
             {
                 if (labBaseline == null) labBaseline = MovesetBaselineReader.ReadAll();
                 if (labCopy == null) LoadLabMod(labModId);
+                LoadLabWeaponsLive();
                 if (labScopes.Count == 0) BuildLabScopes();
             }
             catch (Exception exception)
@@ -120,12 +121,14 @@ namespace Eclipse.Multiplayer
             LabSpacer(row, 6);
             labScopeValue = LabSelector(row, "FIGHTERS", 160, LabScopeItems, out _);
             labWeaponValue = LabSelector(row, "WEAPON", 160, LabWeaponItems, out labWeaponButton);
+            LabBtn(row, "+ WEAPON", ShowLabNewWeapon, 66, LabStyle.Quiet, 11, "Create a weapon in this mod, based on a game weapon");
             LabSpacer(row, 0, 1);
             LabBtn(row, "UNDO", () => LabHistory(true), 50, LabStyle.Normal, 12);
             LabBtn(row, "REDO", () => LabHistory(false), 50, LabStyle.Normal, 12);
             labDirty = LabText(row, "", 12, Gold, TextAnchor.MiddleRight); LabSize(labDirty, 104);
             LabBtn(row, "APPLY  F5", () => ApplyLab(), 88, LabStyle.Primary, 13);
             LabBtn(row, "TEST  T", TestLabInTraining, 66, LabStyle.Normal, 13);
+            LabBtn(row, "EXPORT", ExportLab, 60, LabStyle.Normal, 12, "Save and zip this mod for sharing or mod.io");
             LabBtn(row, "CLOSE", LeaveMovesetLab, 56, LabStyle.Quiet, 12);
         }
 
@@ -294,8 +297,12 @@ namespace Eclipse.Multiplayer
             var attacker = LabArea(stage, "Attacker", new Vector2(0, 0), new Vector2(.6f, 1), new Vector2(0, 0), new Vector2(-1, 0), LabWell);
             var victim = LabArea(stage, "Victim", new Vector2(.6f, 0), new Vector2(1, 1), Vector2.zero, Vector2.zero, LabWell);
             labAttackerStage = LabArea(attacker, "Fighter", Vector2.zero, Vector2.one, new Vector2(6, 6), new Vector2(-6, -26), null);
+            // The base-game move, faint behind the edited one (GHOST).
+            labGhost = VersusFighterPreview.Create(labAttackerStage, false, new Color32(110, 170, 230, 255));
+            labGhost.Opacity = 0f;
             labPreview = VersusFighterPreview.Create(labAttackerStage, false, new Color32(205, 196, 182, 255));
             labPreview.ShowAttackEdges = true;
+            labGhost.FollowCamera = labPreview;
             labStageCaption = LabText(attacker, "", 12, LabDim, TextAnchor.UpperLeft);
             labStageCaption.rectTransform.offsetMin = new Vector2(10, 0); labStageCaption.rectTransform.offsetMax = new Vector2(-10, -6);
             labHoverCaption = LabText(attacker, "", 12, Gold, TextAnchor.LowerLeft);
@@ -338,6 +345,51 @@ namespace Eclipse.Multiplayer
             }
             LabSpacer(row, 6);
             labVictimButton = LabBtn(row, "VICTIM", () => { labVictimOn = !labVictimOn; SetLabOn(labVictimButton, labVictimOn); }, 58, labVictimOn ? LabStyle.On : LabStyle.Normal, 11, "Play the hit reaction on the second fighter");
+            labGhostButton = LabBtn(row, "GHOST", () => { labGhostOn = !labGhostOn; SetLabOn(labGhostButton, labGhostOn); labGhostTick = -1; }, 56, labGhostOn ? LabStyle.On : LabStyle.Normal, 11, "Show the base-game move faintly behind your edit");
+        }
+
+        // ---- Ghost: the base-game move behind the edited one ----
+
+        private VersusFighterPreview labGhost;
+        private Button labGhostButton;
+        private int labGhostTick = -1;
+        private readonly Dictionary<string, InfoAnimation> labGhostMoves = new Dictionary<string, InfoAnimation>(StringComparer.Ordinal);
+
+        /// <summary>A copy of the native move with no mod edits, taken once.</summary>
+        private InfoAnimation LabGhostMove(string move)
+        {
+            string native = labCopy.NativeSource(move);
+            if (labGhostMoves.TryGetValue(native, out var ghost)) return ghost;
+            // Lifting the overlay would disturb a clip the picker has swapped in; copy later.
+            if (labSwapMove != null) return null;
+            ModRuntime.WithoutMoveOverlay(() =>
+            {
+                var animation = AnimationData.GetAnimationByName(native, false);
+                if (animation == null) return;
+                if (animation.AnimationEndFrame == 0) animation.LoadAnimationClip();
+                ghost = animation.EclipseSnapshot();
+            });
+            labGhostMoves[native] = ghost;
+            return ghost;
+        }
+
+        /// <summary>Keeps the ghost on the same tick of its move as the edited fighter.</summary>
+        private void SyncLabGhost(bool playing)
+        {
+            if (labGhost == null) return;
+            bool show = labGhostOn && playing && labPreview.Loadout != null;
+            labGhost.Opacity = show ? .42f : 0f;
+            if (!show) { labGhostTick = -1; return; }
+            labGhost.Show(labPreview.Loadout);
+            var move = LabGhostMove(labPlaying);
+            if (move == null || !labGhost.IsReady) return;
+            int tick = labPreview.MoveTick;
+            bool ghostPlaying = labGhost.PlayingMove == move.Name;
+            bool resync = labGhostTick < 0 || tick < labGhostTick
+                || (ghostPlaying ? Math.Abs(labGhost.MoveTick - tick) > 2 : labPreview.Paused && tick != labGhostTick);
+            if (resync) labGhost.SeekTicks(move, tick);
+            labGhost.Paused = labPreview.Paused;
+            labGhostTick = tick;
         }
 
         private void SetLabSpeed(float speed)
@@ -380,7 +432,7 @@ namespace Eclipse.Multiplayer
             var baseline = LabBaselineOf(labMove);
             if (baseline == null) return;
             string name = labPlaying ?? LabPlayableName();
-            frame = Mathf.Clamp(frame, baseline.FirstFrame, LabLastFrame(baseline));
+            frame = Mathf.Clamp(frame, LabFirstFrame(baseline), LabLastFrame(baseline));
             labUserPaused = true;
             if (labPreview.SeekMove(name, frame) < 0) { SetStatus("This fighter cannot play " + name + "."); return; }
             labPlaying = name;
@@ -412,8 +464,8 @@ namespace Eclipse.Multiplayer
         {
             var baseline = LabBaselineOf(labMove);
             if (baseline == null) return;
-            if (!LabIsPlaying) { LabSeek(baseline.FirstFrame); return; }
-            if (step < 0) { LabSeek(Math.Max(baseline.FirstFrame, labPreview.Keyframe + step)); return; }
+            if (!LabIsPlaying) { LabSeek(LabFirstFrame(baseline)); return; }
+            if (step < 0) { LabSeek(Math.Max(LabFirstFrame(baseline), labPreview.Keyframe + step)); return; }
             labUserPaused = true;
             int last = LabLastFrame(baseline);
             for (int i = 0; i < step && labPreview.Keyframe < last; i++)
@@ -429,7 +481,7 @@ namespace Eclipse.Multiplayer
         private void LabSeekEdge(bool last)
         {
             var baseline = LabBaselineOf(labMove);
-            if (baseline != null) LabSeek(last ? LabLastFrame(baseline) : baseline.FirstFrame);
+            if (baseline != null) LabSeek(last ? LabLastFrame(baseline) : LabFirstFrame(baseline));
         }
 
         private void UpdateMovesetLab()
@@ -455,9 +507,11 @@ namespace Eclipse.Multiplayer
                     labStepClock -= ticks * Time.fixedDeltaTime;
                     labPreview.Step(ticks);
                     labVictim?.Step(ticks);
+                    if (labGhostOn) labGhost?.Step(ticks);
                 }
             }
             if (playing) LabCheckContact();
+            SyncLabGhost(playing);
             if (labLoop && labPlayedAt > 0f && !playing && !labUserPaused && Time.unscaledTime > labPlayedAt + .3f)
             {
                 labPlayedAt = 0f;
@@ -467,8 +521,8 @@ namespace Eclipse.Multiplayer
             var baseline = LabBaselineOf(labMove);
             if (labFrameReadout != null)
                 labFrameReadout.text = playing && baseline != null
-                    ? "FRAME <color=#D6AA4E>" + labPreview.Keyframe + "</color> / " + baseline.FirstFrame + "–" + LabLastFrame(baseline) + "    tick " + labPreview.MoveTick
-                    : baseline == null ? "" : "frames " + baseline.FirstFrame + "–" + LabLastFrame(baseline);
+                    ? "FRAME <color=#D6AA4E>" + labPreview.Keyframe + "</color> / " + LabFirstFrame(baseline) + "–" + LabLastFrame(baseline) + "    tick " + labPreview.MoveTick
+                    : baseline == null ? "" : "frames " + LabFirstFrame(baseline) + "–" + LabLastFrame(baseline);
             if (labPlayButton != null) labPlayButton.GetComponentInChildren<Text>().text = playing && !labUserPaused ? "PAUSE" : "PLAY";
             if (labDirty != null) labDirty.text = labCopy == null ? "" : labCopy.IsDirty ? "● Unapplied edits" : labOverlayApplied ? "Applied" : "";
             if (labStageCaption != null)
@@ -543,7 +597,43 @@ namespace Eclipse.Multiplayer
         }
 
         private List<LabAttackView> LabAttacks(MovesetBaselineMove baseline) =>
-            baseline.Intervals.Where(i => i.Attack != null).Select(i => new LabAttackView { Id = i.Attack.Id, Interval = i, State = LabAttackState(i) }).ToList();
+            baseline.Intervals.Where(i => i.Attack != null).Concat(LabNewAttackIntervals())
+                .Select(i => new LabAttackView { Id = i.Attack.Id, Interval = i, State = LabAttackState(i) }).ToList();
+
+        /// <summary>
+        /// Adds an attack to the move: a copy of the selected attack's damage, edges, push and
+        /// reaction (or plain defaults), two frames long at the playhead, with the next free id.
+        /// </summary>
+        private void AddLabAttack(MovesetBaselineMove baseline)
+        {
+            var attacks = LabAttacks(baseline);
+            var source = attacks.FirstOrDefault(a => a.Id == labAttackId) ?? attacks.FirstOrDefault();
+            int id = Math.Max(1, attacks.Count == 0 ? 1 : attacks.Max(a => a.Id) + 1);
+            int last = LabLastFrame(baseline);
+            int start = LabAddStart(baseline), end = Math.Min(last, start + 2);
+            var terms = source != null ? new Dictionary<string, double>(source.State.Terms)
+                : new Dictionary<string, double> { [LabSubtype == LabUnarmed || LabSubtype == LabShared ? "UnarmedDamage" : "WeaponDamage"] = 0 };
+            if (terms.Count == 0) terms["WeaponDamage"] = 0;
+            var edges = source != null ? source.State.Edges.ToList() : new List<string>();
+            if (edges.Count == 0 && labPreview != null)
+            {
+                var hand = labPreview.Edges().Where(e => e.Body && e.Radius > 0).Select(e => e.Name)
+                    .FirstOrDefault(n => n.StartsWith("EFingers", StringComparison.Ordinal) || n.StartsWith("EHand", StringComparison.Ordinal));
+                if (hand != null) edges.Add(hand);
+            }
+            if (edges.Count == 0) edges.Add("EFingers_2");
+            ModMoveAttackAddition attack;
+            try
+            {
+                attack = new ModMoveAttackAddition(id, start, end, source?.State.Damage ?? 0.1, terms, edges,
+                    source?.State.Impulse.ToArray() ?? new[] { 200.0, 0, 0 }, source?.State.Hit ?? "Middle");
+            }
+            catch (ModContentException exception) { SetStatus(exception.Message); return; }
+            labAttackId = id;
+            labReactionChoice = 0;
+            LabEdit((copy, target) => copy.AddNewAttack(target, attack));
+            SetStatus("Added attack #" + id + " at frames " + start + "–" + end + ". Set its frames, damage, reaction and hitbox; APPLY (F5) to try it.");
+        }
 
         private LabAttackView LabSelectedAttack(MovesetBaselineMove baseline)
         {
@@ -661,6 +751,7 @@ namespace Eclipse.Multiplayer
 
         private void RefreshLabInspector()
         {
+            if (!labPickingClip) EndLabClipPreview();
             if (labInspector == null) return;
             for (int i = labInspector.childCount - 1; i >= 0; i--) Destroy(labInspector.GetChild(i).gameObject);
             if (labPreview != null) labPreview.EdgeOverlay = labTab == LabTab.Hitbox ? LabEdgeColor : null;
@@ -705,14 +796,13 @@ namespace Eclipse.Multiplayer
             LabSection(labInspector, "ANIMATION");
             string clipName = entry?.Animation?.NativeValue ?? (entry?.Animation?.AssetValue != null ? "mod asset " + entry.Animation.AssetValue : baseline.File);
             LabField(labInspector, "Clip", clipName, entry?.Animation != null);
-            LabField(labInspector, "Keyframes", baseline.FirstFrame + "–" + LabLastFrame(baseline) + "  (" + (LabLastFrame(baseline) - baseline.FirstFrame + 1) + ")", false);
+            LabField(labInspector, "Keyframes", LabFirstFrame(baseline) + "–" + LabLastFrame(baseline) + "  (" + (LabLastFrame(baseline) - LabFirstFrame(baseline) + 1) + ")", false);
             if (entry?.Animation != null) LabField(labInspector, "Original", baseline.File, false);
-            if (entry?.Animation?.AssetValue == null)
-            {
-                var row = LabHBox(labInspector, 26, 6, null);
-                LabBtn(row, "CHANGE CLIP...", () => { labPickingClip = true; labClipChoice = null; RefreshLabInspector(); }, -1, LabStyle.Normal, 12);
-                if (entry?.Animation != null) LabBtn(row, "RESTORE ORIGINAL", () => LabEdit((copy, target) => copy.SetNativeAnimation(target, baseline.File, baseline.File)), -1, LabStyle.Normal, 12);
-            }
+            var row = LabHBox(labInspector, 26, 6, null);
+            LabBtn(row, "CHANGE CLIP...", () => { labPickingClip = true; labClipChoice = null; RefreshLabInspector(); }, -1, LabStyle.Normal, 12);
+            if (entry?.Animation != null) LabBtn(row, "RESTORE ORIGINAL", () => LabEdit((copy, target) => copy.SetNativeAnimation(target, baseline.File, baseline.File)), -1, LabStyle.Normal, 12);
+            BuildLabTrimSection(baseline, entry);
+            BuildLabChainSection(baseline, entry);
 
             LabSection(labInspector, "MOVE");
             var actions = LabHBox(labInspector, 26, 6, null);
@@ -731,12 +821,24 @@ namespace Eclipse.Multiplayer
         private void BuildLabAttackTab(MovesetBaselineMove baseline)
         {
             var attack = LabSelectedAttack(baseline);
-            if (attack == null) { LabNoteText(labInspector, "This move has no attack. Frame windows are in WINDOWS."); return; }
+            if (attack == null)
+            {
+                LabNoteText(labInspector, "This move has no attack. Frame windows are in WINDOWS.");
+                LabBtn(labInspector, "+ NEW ATTACK", () => AddLabAttack(baseline), -1, LabStyle.Primary, 12, "Add an attack to this move");
+                return;
+            }
             LabAttackChooser(baseline, attack);
             var interval = attack.Interval;
             var state = attack.State;
             var original = interval.Attack;
             int last = LabLastFrame(baseline);
+            if (LabIsNewAttack(interval))
+            {
+                var row = LabHBox(labInspector, 26, 6, null);
+                var note = LabText(row, "<color=#D6AA4E>New attack</color>, added by this mod.", 12, LabDim, TextAnchor.MiddleLeft); LabSize(note, -1, -1, 1);
+                int id = attack.Id;
+                LabBtn(row, "DELETE ATTACK", () => { labAttackId = -1; LabEdit((copy, target) => copy.RemoveNewAttack(target, id)); }, 110, LabStyle.Danger, 11);
+            }
 
             LabSection(labInspector, "TIMING");
             LabNumber(labInspector, "Starts at frame", state.Start, interval.Start, "0", 1, 0, state.End, value => LabEditAttack(interval, s => s.Start = Mathf.Clamp((int)Math.Round(value), 0, s.End)), null, "First keyframe that can hit. Drag the bar's left edge on the timeline too.");
@@ -803,15 +905,20 @@ namespace Eclipse.Multiplayer
         private void LabAttackChooser(MovesetBaselineMove baseline, LabAttackView selected)
         {
             var attacks = LabAttacks(baseline);
-            if (attacks.Count < 2) { LabSection(labInspector, "ATTACK " + selected.Id + "   ·   FRAMES " + selected.State.Start + "–" + selected.State.End); return; }
-            LabSection(labInspector, "ATTACKS");
-            var row = LabHBox(labInspector, 26, 4, null);
-            foreach (var attack in attacks)
-            {
-                var captured = attack;
-                LabBtn(row, "#" + attack.Id + "  " + attack.State.Start + "–" + attack.State.End, () => { labAttackId = captured.Id; labReactionChoice = 0; RefreshLabInspector(); RefreshLabTimeline(); }, -1,
-                    attack.Id == selected.Id ? LabStyle.On : LabStyle.Normal, 11);
-            }
+            LabSection(labInspector, attacks.Count < 2 ? "ATTACK " + selected.Id + "   ·   FRAMES " + selected.State.Start + "–" + selected.State.End : "ATTACKS");
+            var grid = Rect(labInspector, "Attacks");
+            var layout = grid.gameObject.AddComponent<GridLayoutGroup>(); layout.cellSize = new Vector2(124, 24); layout.spacing = new Vector2(4, 4);
+            layout.constraint = GridLayoutGroup.Constraint.FixedColumnCount; layout.constraintCount = 3;
+            LabSize(grid, -1, (attacks.Count + 1 + 2) / 3 * 28);
+            if (attacks.Count >= 2)
+                foreach (var attack in attacks)
+                {
+                    var captured = attack;
+                    LabBtn(grid, "#" + attack.Id + "  " + attack.State.Start + "–" + attack.State.End + (LabIsNewAttack(attack.Interval) ? "  new" : ""),
+                        () => { labAttackId = captured.Id; labReactionChoice = 0; RefreshLabInspector(); RefreshLabTimeline(); }, -1,
+                        attack.Id == selected.Id ? LabStyle.On : LabStyle.Normal, 11);
+                }
+            LabBtn(grid, "+ NEW ATTACK", () => AddLabAttack(baseline), -1, LabStyle.Primary, 11, "Add another attack to this move, starting at the playhead");
         }
 
         private void BuildLabWindowsTab(MovesetBaselineMove baseline)
@@ -875,7 +982,7 @@ namespace Eclipse.Multiplayer
 
         private int LabAddStart(MovesetBaselineMove baseline)
         {
-            int frame = LabIsPlaying ? labPreview.Keyframe : baseline.FirstFrame;
+            int frame = LabIsPlaying ? labPreview.Keyframe : LabFirstFrame(baseline);
             return Mathf.Clamp(frame, 0, LabLastFrame(baseline));
         }
 
@@ -1024,6 +1131,71 @@ namespace Eclipse.Multiplayer
             string hover = labHoverEdge;
             labHoverCaption.text = hover == null ? "Click a part to make it hit" :
                 hover + "   " + (labHitboxSelection != null && labHitboxSelection.Contains(hover) ? "<color=#DE543E>hits</color> · click to remove" : "click to add");
+            // A mirrored move hits with the other side's parts; names follow what the attack lists.
+            if (labPreview.IsMirrored) labHoverCaption.text += "   <color=#9AA4B0>mirrored pose: _1 and _2 parts swap sides</color>";
+        }
+
+        // ---- Trim and combo links ----
+
+        private void BuildLabTrimSection(MovesetBaselineMove baseline, ModMovesetMove entry)
+        {
+            LabSection(labInspector, "TRIM");
+            if (baseline.Looped || baseline.Physics) { LabNoteText(labInspector, "Looped and physics moves play their whole clip."); return; }
+            var native = LabNativeRange(baseline);
+            int clipLast = LabClipLast(baseline);
+            int first = LabFirstFrame(baseline), last = Math.Min(LabLastFrame(baseline), clipLast);
+            LabNumber(labInspector, "Starts at keyframe", first, native.First, "0", 1, 0, last - 1,
+                value => LabEdit((copy, target) => copy.SetClipRange(target, native, new ModMoveClipRange((int)Math.Round(value), last))), null,
+                "The first keyframe of the clip the move plays. Start later to skip a wind-up. Frame windows and attacks keep their keyframe numbers.");
+            LabNumber(labInspector, "Ends at keyframe", last, Math.Min(native.Last, clipLast), "0", 1, first + 1, clipLast,
+                value => LabEdit((copy, target) => copy.SetClipRange(target, native, new ModMoveClipRange(first, (int)Math.Round(value)))), null,
+                "The last keyframe the move plays (the clip has " + (clipLast + 1) + "). End earlier to cut a long recovery.");
+            if (entry?.ClipRange != null)
+                LabSize(LabBtn(labInspector, "UNDO TRIM", () => LabEdit((copy, target) => copy.SetClipRange(target, native, native)), -1, LabStyle.Normal, 12), -1, 24);
+        }
+
+        private void BuildLabChainSection(MovesetBaselineMove baseline, ModMovesetMove entry)
+        {
+            LabSection(labInspector, "COMBOS");
+            LabNoteText(labInspector, "Let this move start out of another move during a window of that move's keyframes, even where it normally cannot be interrupted. This move's own input still starts it.");
+            var chains = entry?.Chains ?? new List<ModMoveChain>();
+            foreach (var chain in chains)
+            {
+                var captured = chain;
+                var source = LabBaselineOf(chain.From);
+                int sourceLast = source != null ? LabNativeRange(source).Last : 100000;
+                LabField(labInspector, "After", LabDisplayName(chain.From), true);
+                LabNumber(labInspector, "Window from keyframe", chain.Start, null, "0", 1, 0, chain.End,
+                    value => LabEdit((copy, target) => copy.SetChain(target, new ModMoveChain(captured.From, (int)Math.Round(value), captured.End))), null,
+                    "The first keyframe of " + LabDisplayName(chain.From) + " at which this move may start.");
+                LabNumber(labInspector, "Window to keyframe", chain.End, null, "0", 1, chain.Start, sourceLast,
+                    value => LabEdit((copy, target) => copy.SetChain(target, new ModMoveChain(captured.From, captured.Start, (int)Math.Round(value)))), null,
+                    "The last keyframe of " + LabDisplayName(chain.From) + " at which this move may start.");
+                LabSize(LabBtn(labInspector, "REMOVE LINK", () => LabEdit((copy, target) => copy.RemoveChain(target, captured.From)), -1, LabStyle.Danger, 12), -1, 24);
+            }
+            if (chains.Count >= ModMoveChain.MaxPerMove) { LabNoteText(labInspector, "A move follows at most " + ModMoveChain.MaxPerMove + " moves."); return; }
+            Button add = null;
+            add = LabBtn(labInspector, "+ CAN FOLLOW...", () =>
+            {
+                var items = new List<LabChoice>();
+                foreach (string move in LabMoves())
+                {
+                    if (chains.Any(c => c.From == move)) continue;
+                    var source = LabBaselineOf(move);
+                    if (source == null || source.Looped) continue;
+                    string from = move;
+                    items.Add(new LabChoice { Label = LabDisplayName(move), Detail = LabBadge(move), Pick = () =>
+                    {
+                        var range = LabNativeRange(source);
+                        int start = range.First + (range.Last - range.First) / 2;
+                        LabEdit((copy, target) => copy.SetChain(target, new ModMoveChain(from, start, range.Last)));
+                        SetStatus(LabDisplayName(labMove) + " can now start out of " + LabDisplayName(from) + " at keyframes " + start + "–" + range.Last + ". Test it in training after APPLY.");
+                    } });
+                }
+                if (items.Count == 0) { SetStatus("No other move in this view to follow."); return; }
+                OpenLabChoices((RectTransform)add.transform, items, 320);
+            }, -1, LabStyle.Normal, 12);
+            LabSize(add, -1, 24);
         }
 
         // ---- Animation picker ----
@@ -1035,7 +1207,7 @@ namespace Eclipse.Multiplayer
         private void BuildLabClipPicker(MovesetBaselineMove baseline)
         {
             LabSection(labInspector, "CHANGE CLIP");
-            LabNoteText(labInspector, "Click a clip to watch it on the fighter, then USE THIS CLIP. The move keeps its frame windows, attacks and sounds, which may need moving to fit the new clip.");
+            LabNoteText(labInspector, "Click a clip to watch it on the fighter, then USE THIS CLIP. The move keeps its frame windows, attacks and sounds, which may need moving to fit the new clip. IMPORT CLIP adds a .bytes clip of your own to this mod.");
             var filterRow = Rect(labInspector, "Clip filter"); LabSize(filterRow, -1, 26);
             labClipFilter = LabInput(filterRow, "", "Search clips", InputField.ContentType.Standard);
             labClipFilter.characterLimit = 64;
@@ -1044,6 +1216,7 @@ namespace Eclipse.Multiplayer
             var buttons = LabHBox(labInspector, 26, 6, null);
             LabBtn(buttons, "USE THIS CLIP", () => UseLabClip(baseline, labClipChoice), -1, LabStyle.Primary, 12);
             LabBtn(buttons, "ORIGINAL", () => UseLabClip(baseline, baseline.File), -1, LabStyle.Normal, 12);
+            LabBtn(buttons, "IMPORT CLIP...", () => PickLabClip(baseline), -1, LabStyle.Normal, 12);
             LabBtn(buttons, "CANCEL", () => { labPickingClip = false; RefreshLabInspector(); }, -1, LabStyle.Quiet, 12);
             labClipRows = LabVBox(labInspector, 1, null);
             RefreshLabClipInfo(baseline);
@@ -1056,18 +1229,18 @@ namespace Eclipse.Multiplayer
             for (int i = labClipRows.childCount - 1; i >= 0; i--) Destroy(labClipRows.GetChild(i).gameObject);
             string filter = labClipFilter != null ? labClipFilter.text.Trim() : string.Empty;
             var clips = LabClipOrder(out int scoped);
-            string current = LabEntry?.Animation?.NativeValue ?? baseline.File;
+            string current = LabCurrentClip(baseline.File);
             int shown = 0, matches = 0;
             for (int i = 0; i < clips.Count; i++)
             {
                 string clip = clips[i];
-                if (filter.Length > 0 && clip.IndexOf(filter, StringComparison.OrdinalIgnoreCase) < 0) continue;
+                if (filter.Length > 0 && LabClipLabel(clip).IndexOf(filter, StringComparison.OrdinalIgnoreCase) < 0) continue;
                 matches++;
                 if (shown >= LabClipRowLimit) continue;
                 if (shown == 0 && i < scoped && filter.Length == 0) LabSection(labClipRows, "USED IN THIS VIEW");
                 if (i == scoped && filter.Length == 0) LabSection(labClipRows, "ALL CLIPS");
                 string captured = clip;
-                var row = LabBtn(labClipRows, clip + (clip == current ? "   <color=#D6AA4E>current</color>" : ""), () => PreviewLabClip(baseline, captured), -1, clip == labClipChoice ? LabStyle.On : LabStyle.Quiet, 12);
+                var row = LabBtn(labClipRows, LabClipLabel(clip) + (clip == current ? "   <color=#D6AA4E>current</color>" : ""), () => PreviewLabClip(baseline, captured), -1, clip == labClipChoice ? LabStyle.On : LabStyle.Quiet, 12);
                 var text = row.GetComponentInChildren<Text>(); text.alignment = TextAnchor.MiddleLeft; text.rectTransform.offsetMin = new Vector2(8, 0);
                 LabSize(row, -1, 22);
                 shown++;
@@ -1081,12 +1254,57 @@ namespace Eclipse.Multiplayer
             labClipChoice = clip;
             RefreshLabClipInfo(baseline);
             RefreshLabClipRows(baseline);
-            // Watch the clip through a native move that plays it, preferring one from this view.
-            var view = LabMoves();
-            var player = labBaseline.Values.Where(m => m.File == clip).OrderBy(m => view.Contains(m.Name) ? 0 : 1).ThenBy(m => m.Name, StringComparer.Ordinal).FirstOrDefault();
-            if (player == null || labPreview == null) return;
+            if (labPreview == null) return;
+            LabClipProblems(baseline, clip, out bool blocked);
+            if (blocked) { EndLabClipPreview(); SetStatus("This clip cannot play as this move; see the checks."); return; }
+            // Play the move itself with the clip swapped in, as USE THIS CLIP would, until the picker closes.
+            if (!BeginLabClipPreview(clip, out string error)) { SetStatus("Cannot preview: " + error); return; }
             labUserPaused = false;
-            if (labPreview.PlayMove(player.Name)) { labPlaying = player.Name; labPlayedAt = Time.unscaledTime; }
+            string move = LabPlayableName();
+            if (move != null && labPreview.PlayMove(move)) { labPlaying = move; labPlayedAt = Time.unscaledTime; }
+            SetStatus("Previewing " + LabClipLabel(clip) + " as " + LabDisplayName(labMove) + ". Nothing changes until USE THIS CLIP.");
+        }
+
+        // The move whose clip the picker has swapped for a preview, and what to restore.
+        private InfoAnimation labSwapMove;
+        private string labSwapFile;
+        private int labSwapEnd;
+
+        /// <summary>Swaps <paramref name="clip"/> into the selected move for the preview only.</summary>
+        private bool BeginLabClipPreview(string clip, out string error)
+        {
+            error = null;
+            EndLabClipPreview();
+            string name = LabPlayableName();
+            var animation = name != null ? AnimationData.GetAnimationByName(name, false) : null;
+            if (animation == null) { error = "the move is not in the game yet; APPLY first."; return false; }
+            string file = clip;
+            if (IsLabAssetClip(clip))
+            {
+                string path = clip.Substring(LabAssetClip.Length);
+                var data = LabAssetClipBytes(path);
+                if (data == null) { error = "the clip file is missing."; return false; }
+                var id = AssetId.Parse(labModId + ":" + path);
+                ModRuntime.SetPreviewBinary(id, data);
+                file = id.ToString();
+            }
+            string oldFile = animation.FileName;
+            int oldEnd = animation.AnimationEndFrame;
+            try { animation.ReplaceClip(file, 0); }
+            catch (Exception exception) { ModRuntime.ClearPreviewBinaries(); error = exception.Message; return false; }
+            labSwapMove = animation; labSwapFile = oldFile; labSwapEnd = oldEnd;
+            return true;
+        }
+
+        /// <summary>Puts back the clip a preview swapped in.</summary>
+        private void EndLabClipPreview()
+        {
+            if (labSwapMove == null) return;
+            var animation = labSwapMove;
+            labSwapMove = null;
+            try { animation.ReplaceClip(labSwapFile, labSwapEnd); }
+            catch (Exception exception) { Debug.LogWarning("[Moveset Lab] Could not restore " + animation.Name + "'s clip: " + exception.Message); }
+            ModRuntime.ClearPreviewBinaries();
         }
 
         private void RefreshLabClipInfo(MovesetBaselineMove baseline)
@@ -1095,7 +1313,7 @@ namespace Eclipse.Multiplayer
             for (int i = labClipInfo.childCount - 1; i >= 0; i--) Destroy(labClipInfo.GetChild(i).gameObject);
             if (labClipChoice == null) { LabNoteText(labClipInfo, "No clip chosen yet."); return; }
             int frames = LabClipFrames(labClipChoice);
-            LabField(labClipInfo, labClipChoice, frames >= 0 ? Math.Max(0, frames - baseline.FirstFrame) + " keyframes for this move" : "", false);
+            LabField(labClipInfo, LabClipLabel(labClipChoice), frames >= 0 ? Math.Max(0, frames - baseline.FirstFrame) + " keyframes for this move" : "", false);
             var problems = LabClipProblems(baseline, labClipChoice, out bool blocked);
             if (problems.Count == 0) LabNoteText(labClipInfo, "Every attack and frame window fits inside this clip.");
             foreach (string problem in problems.Take(6)) LabNoteText(labClipInfo, "<color=#DE543E>" + (blocked ? "Cannot use: " : "Check: ") + "</color>" + problem);
@@ -1108,8 +1326,30 @@ namespace Eclipse.Multiplayer
             LabClipProblems(baseline, clip, out bool blocked);
             if (blocked && clip != baseline.File) { SetStatus("That clip is too short for this move."); return; }
             labPickingClip = false;
-            LabEdit((copy, target) => copy.SetNativeAnimation(target, baseline.File, clip));
+            EndLabClipPreview();
+            if (IsLabAssetClip(clip)) LabEdit((copy, target) => copy.SetAssetAnimation(target, baseline.File, clip.Substring(LabAssetClip.Length)));
+            else LabEdit((copy, target) => copy.SetNativeAnimation(target, baseline.File, clip));
             RefreshLabInspector();
+        }
+
+        /// <summary>Picks a native .bytes clip from disk and adds it to this mod's clips.</summary>
+        private void PickLabClip(MovesetBaselineMove baseline)
+        {
+#if UNITY_ANDROID && !UNITY_EDITOR
+            SetStatus("Importing clips works on desktop. Copy the .bytes file into the mod's assets/animations folder instead.");
+#else
+            string file;
+            try { file = Eclipse.UI.ModZipPicker.PickDesktop("Import an animation clip", "Animation clips", "bytes"); }
+            catch (Exception exception) { SetStatus("Could not open the file picker: " + exception.Message); return; }
+            if (string.IsNullOrEmpty(file)) return;
+            string clip = ImportLabClip(file, baseline, out string error);
+            if (clip == null) { SetStatus("Not imported: " + error); return; }
+            labClipChoice = clip;
+            if (labClipFilter != null) labClipFilter.text = string.Empty;
+            RefreshLabClipInfo(baseline);
+            RefreshLabClipRows(baseline);
+            SetStatus("Imported " + clip.Substring(LabAssetClip.Length) + ". USE THIS CLIP, then APPLY to save it into " + labModId + ".");
+#endif
         }
 
         // ---- Timeline ----
@@ -1162,7 +1402,7 @@ namespace Eclipse.Multiplayer
             if (baseline == null) return;
             var intervals = LabIntervals(baseline);
             int last = LabLastFrame(baseline);
-            labTimelineFrom = Math.Min(baseline.FirstFrame, intervals.Count == 0 ? baseline.FirstFrame : intervals.Min(i => i.Start));
+            labTimelineFrom = Math.Min(LabFirstFrame(baseline), intervals.Count == 0 ? LabFirstFrame(baseline) : intervals.Min(i => i.Start));
             labTimelineTo = Math.Max(last, intervals.Count == 0 ? 0 : intervals.Max(i => i.End ?? i.Start)) + 1;
             Canvas.ForceUpdateCanvases();
             float width = labRuler.rect.width > 0 ? labRuler.rect.width : 480f;
@@ -1174,7 +1414,7 @@ namespace Eclipse.Multiplayer
                 bool label = (frame - labTimelineFrom) % labelEvery == 0;
                 var tick = LabArea(labRuler, "Tick", new Vector2(0, 0), new Vector2(0, label ? .45f : .25f), new Vector2(LabFrameX(frame, width), 0), new Vector2(LabFrameX(frame, width) + 1, 0), LabLine);
                 tick.GetComponent<Image>().raycastTarget = false;
-                if (frame < baseline.FirstFrame || frame > last) { var shade = LabArea(labRuler, "Outside", Vector2.zero, new Vector2(0, 1), new Vector2(LabFrameX(frame, width), 0), new Vector2(LabFrameX(frame + 1, width), 0), new Color(0, 0, 0, .35f)); shade.GetComponent<Image>().raycastTarget = false; }
+                if (frame < LabFirstFrame(baseline) || frame > last) { var shade = LabArea(labRuler, "Outside", Vector2.zero, new Vector2(0, 1), new Vector2(LabFrameX(frame, width), 0), new Vector2(LabFrameX(frame + 1, width), 0), new Color(0, 0, 0, .35f)); shade.GetComponent<Image>().raycastTarget = false; }
                 if (!label) continue;
                 var number = LabText(labRuler, frame.ToString(CultureInfo.InvariantCulture), 10, LabDim, TextAnchor.UpperCenter);
                 number.rectTransform.anchorMin = new Vector2(0, 0); number.rectTransform.anchorMax = new Vector2(0, 1);
@@ -1196,7 +1436,9 @@ namespace Eclipse.Multiplayer
 
                 var lane = Rect(labTimelineLanes, item.Label); LabSize(lane, -1, LabLaneHeight);
                 var laneBack = lane.gameObject.AddComponent<Image>(); laneBack.color = selected ? new Color(Gold.r, Gold.g, Gold.b, .08f) : new Color(1, 1, 1, .02f);
-                var name = LabText(lane, (edited ? "<color=#D6AA4E>●</color> " : "") + (attack ? "Attack #" + view.Id : item.Label), 11, item.Removed ? LabFaint : attack ? LabHot : LabFore, TextAnchor.MiddleLeft);
+                bool isNew = attack && LabIsNewAttack(item.Baseline);
+                if (isNew) edited = true;
+                var name = LabText(lane, (edited ? "<color=#D6AA4E>●</color> " : "") + (attack ? "Attack #" + view.Id + (isNew ? " (new)" : "") : item.Label), 11, item.Removed ? LabFaint : attack ? LabHot : LabFore, TextAnchor.MiddleLeft);
                 name.rectTransform.anchorMax = new Vector2(0, 1); name.rectTransform.offsetMin = new Vector2(8, 0); name.rectTransform.offsetMax = new Vector2(LabLaneLabelWidth - 4, 0);
                 var track = LabArea(lane, "Track", Vector2.zero, Vector2.one, new Vector2(LabLaneLabelWidth, 0), new Vector2(0, 0), new Color(0, 0, 0, .18f));
                 LabScrub(track);
@@ -1329,7 +1571,13 @@ namespace Eclipse.Multiplayer
                     var row = LabBtn(rows, (item.Current ? "<color=#D6AA4E>" + item.Label + "</color>" : item.Label), () => { CloseLabPopup(); captured.Pick(); }, -1, item.Current ? LabStyle.On : LabStyle.Quiet, 12);
                     LabSize(row, -1, 24);
                     var label = row.GetComponentInChildren<Text>(); label.alignment = TextAnchor.MiddleLeft; label.rectTransform.offsetMin = new Vector2(8, 0);
-                    if (!string.IsNullOrEmpty(item.Detail)) { var detail = LabText(row.transform, item.Detail, 10, LabFaint, TextAnchor.MiddleRight); detail.rectTransform.offsetMax = new Vector2(-8, 0); }
+                    if (!string.IsNullOrEmpty(item.Detail))
+                    {
+                        var detail = LabText(row.transform, item.Detail, 10, LabFaint, TextAnchor.MiddleRight); detail.rectTransform.offsetMax = new Vector2(-8, 0);
+                        // Keep the label clear of the detail text.
+                        label.rectTransform.offsetMax = new Vector2(-(detail.preferredWidth + 18), 0);
+                        label.horizontalOverflow = HorizontalWrapMode.Wrap; label.resizeTextForBestFit = true; label.resizeTextMinSize = 9; label.resizeTextMaxSize = label.fontSize;
+                    }
                 }
             }
             Fill();

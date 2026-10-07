@@ -33,9 +33,15 @@ namespace Eclipse.Modding
         public ModMovesetSoundFrame SoundFrame { get; set; }
         public List<ModMoveIntervalEdit> Intervals { get; } = new List<ModMoveIntervalEdit>();
         public List<ModMoveAttackEdit> Attacks { get; } = new List<ModMoveAttackEdit>();
+        /// <summary>Attacks added to the move.</summary>
+        public List<ModMoveAttackAddition> NewAttacks { get; } = new List<ModMoveAttackAddition>();
+        /// <summary>The keyframes of the clip the move plays.</summary>
+        public ModMoveGuard<ModMoveClipRange> ClipRange { get; set; }
+        /// <summary>Combo links: moves this one may follow.</summary>
+        public List<ModMoveChain> Chains { get; } = new List<ModMoveChain>();
 
         public bool HasEdits => Disable || Priority != null || PlaybackRate != null || Animation != null || Input != null ||
-            SoundFrame != null || Intervals.Count != 0 || Attacks.Count != 0;
+            SoundFrame != null || Intervals.Count != 0 || Attacks.Count != 0 || NewAttacks.Count != 0 || ClipRange != null || Chains.Count != 0;
     }
 
     /// <summary>
@@ -123,7 +129,7 @@ namespace Eclipse.Modding
             return document;
         }
 
-        private static readonly string[] MoveFields = { "move", "note", "disable", "priority", "playback_rate", "animation", "input", "sound_frame", "intervals", "attacks" };
+        private static readonly string[] MoveFields = { "move", "note", "disable", "priority", "playback_rate", "animation", "input", "sound_frame", "intervals", "attacks", "new_attacks", "clip_range", "chains" };
 
         private static void ReadMove(ModJsonNode entry, ModMovesetMove move, string where)
         {
@@ -179,6 +185,38 @@ namespace Eclipse.Modding
                     var attacks = Arr(entry["attacks"], where + ".attacks");
                     for (int i = 0; i < attacks.Count; i++) move.Attacks.Add(ReadAttack(attacks[i], where + ".attacks[" + i + "]"));
                 }
+                if (entry["new_attacks"] != null)
+                {
+                    var additions = Arr(entry["new_attacks"], where + ".new_attacks");
+                    if (additions.Count > 32) throw Fail(where, "adds more than 32 attacks");
+                    for (int i = 0; i < additions.Count; i++) move.NewAttacks.Add(ReadNewAttack(additions[i], where + ".new_attacks[" + i + "]"));
+                }
+                if (entry["clip_range"] != null)
+                {
+                    move.ClipRange = Guard(entry["clip_range"], where + ".clip_range", Range);
+                    if (move.ClipRange.Expected.Equals(move.ClipRange.Value)) throw Fail(where, "clip_range must change the range");
+                }
+                if (entry["chains"] != null)
+                {
+                    var chains = Arr(entry["chains"], where + ".chains");
+                    if (chains.Count > ModMoveChain.MaxPerMove) throw Fail(where, "lists more than " + ModMoveChain.MaxPerMove + " chains");
+                    for (int i = 0; i < chains.Count; i++)
+                    {
+                        string at = where + ".chains[" + i + "]";
+                        var chain = Obj(chains[i], at);
+                        Fields(chain, at, "from", "start", "end");
+                        try
+                        {
+                            move.Chains.Add(new ModMoveChain(Str(Required(chain, "from", at), at + ".from"),
+                                Int(Required(chain, "start", at), at + ".start"), Int(Required(chain, "end", at), at + ".end")));
+                        }
+                        catch (ModContentException exception) when (!exception.Message.StartsWith(at, StringComparison.Ordinal))
+                        {
+                            throw Fail(at, exception.Message.TrimEnd('.'));
+                        }
+                    }
+                    if (move.Chains.Select(c => c.From).Distinct(StringComparer.Ordinal).Count() != move.Chains.Count) throw Fail(where, "chains must follow distinct moves");
+                }
                 if (!(move is ModMovesetFork) && !move.HasEdits) throw Fail(where, "must change at least one field");
             }
             catch (ModContentException exception) when (!exception.Message.StartsWith(where, StringComparison.Ordinal))
@@ -233,6 +271,24 @@ namespace Eclipse.Modding
                 entry["edges"] == null ? null : Guard(entry["edges"], where + ".edges", Strings),
                 entry["impulse"] == null ? null : Guard(entry["impulse"], where + ".impulse", Impulse),
                 entry["hit"] == null ? null : Guard(entry["hit"], where + ".hit", Str));
+        }
+
+        private static ModMoveAttackAddition ReadNewAttack(ModJsonNode node, string where)
+        {
+            var entry = Obj(node, where);
+            Fields(entry, where, "id", "start", "end", "damage", "damage_terms", "edges", "impulse", "hit");
+            try
+            {
+                return new ModMoveAttackAddition(Int(Required(entry, "id", where), where + ".id"),
+                    Int(Required(entry, "start", where), where + ".start"), Int(Required(entry, "end", where), where + ".end"),
+                    Num(Required(entry, "damage", where), where + ".damage"), Terms(Required(entry, "damage_terms", where), where + ".damage_terms"),
+                    Strings(Required(entry, "edges", where), where + ".edges"), Impulse(Required(entry, "impulse", where), where + ".impulse"),
+                    Str(Required(entry, "hit", where), where + ".hit"));
+            }
+            catch (ModContentException exception) when (!exception.Message.StartsWith(where, StringComparison.Ordinal))
+            {
+                throw Fail(where, exception.Message.TrimEnd('.'));
+            }
         }
 
         // ---- Canonical writer: fixed key order, invariant numbers, stable diffs. ----
@@ -334,6 +390,29 @@ namespace Eclipse.Modding
                 }
                 node.Set("attacks", attacks);
             }
+            if (move.NewAttacks.Count != 0)
+            {
+                var additions = ModJsonNode.NewArray();
+                foreach (var addition in move.NewAttacks)
+                {
+                    var terms = ModJsonNode.NewObject();
+                    foreach (string type in ModMoveCombatTermOrder.Ordered(addition.Terms.Keys)) terms.Set(type, ModJsonNode.Of(addition.Terms[type]));
+                    var edges = ModJsonNode.NewArray(); foreach (string edge in addition.Edges) edges.Add(ModJsonNode.Of(edge));
+                    var impulse = ModJsonNode.NewArray(); foreach (double axis in addition.Impulse) impulse.Add(ModJsonNode.Of(axis));
+                    additions.Add(ModJsonNode.NewObject().Set("id", ModJsonNode.Of(addition.Id)).Set("start", ModJsonNode.Of(addition.Start))
+                        .Set("end", ModJsonNode.Of(addition.End)).Set("damage", ModJsonNode.Of(addition.Damage)).Set("damage_terms", terms)
+                        .Set("edges", edges).Set("impulse", impulse).Set("hit", ModJsonNode.Of(addition.Hit)));
+                }
+                node.Set("new_attacks", additions);
+            }
+            WriteGuard(node, "clip_range", move.ClipRange, range => ModJsonNode.NewArray().Add(ModJsonNode.Of(range.First)).Add(ModJsonNode.Of(range.Last)));
+            if (move.Chains.Count != 0)
+            {
+                var chains = ModJsonNode.NewArray();
+                foreach (var chain in move.Chains)
+                    chains.Add(ModJsonNode.NewObject().Set("from", ModJsonNode.Of(chain.From)).Set("start", ModJsonNode.Of(chain.Start)).Set("end", ModJsonNode.Of(chain.End)));
+                node.Set("chains", chains);
+            }
             return node;
         }
 
@@ -384,6 +463,14 @@ namespace Eclipse.Modding
             if (items.Count != 3) throw Fail(where, "must be [x, y, z]");
             return items.Select((item, i) => Num(item, where + "[" + i + "]")).ToList().AsReadOnly();
         }
+        private static ModMoveClipRange Range(ModJsonNode node, string where)
+        {
+            var items = Arr(node, where);
+            if (items.Count != 2) throw Fail(where, "must be [first, last]");
+            try { return new ModMoveClipRange(Int(items[0], where + "[0]"), Int(items[1], where + "[1]")); }
+            catch (ModContentException exception) when (!exception.Message.StartsWith(where, StringComparison.Ordinal)) { throw Fail(where, exception.Message.TrimEnd('.')); }
+        }
+
         private static IReadOnlyDictionary<string, double> Terms(ModJsonNode node, string where)
         {
             var map = Obj(node, where);
@@ -500,12 +587,225 @@ namespace Eclipse.Modding
                     move.SoundFrame == null ? null : new ModMoveFramePatch(move.SoundFrame.Name, move.SoundFrame.Expected, move.SoundFrame.Value),
                     move.Disable, move.Input == null ? null : new ModMoveInputPatch(move.Input.Expected, move.Input.Value),
                     move.Priority == null ? null : new ModMovePriorityPatch(move.Priority.Expected, move.Priority.Value),
-                    null, animation, null, null, new ModMoveCombatExtras(move.Intervals, move.Attacks, rate));
+                    null, animation, null, null, new ModMoveCombatExtras(move.Intervals, move.Attacks, rate, move.NewAttacks, move.ClipRange, move.Chains));
             }
             catch (ModContentException exception)
             {
                 throw new ModContentException(source + " (" + move.Move + "): " + exception.Message, exception);
             }
+        }
+    }
+
+
+    /// <summary>
+    /// A declarative weapon file (<c>weapons/*.json</c>): new weapons with a name, animation
+    /// subtype, model, icon and shop listing, the same as <c>sf2.items.register_weapon</c> plus
+    /// <c>sf2.shop.addItem</c>, so editor-made mods need no Lua.
+    /// </summary>
+    public sealed class ModWeaponDocument
+    {
+        public const int CurrentSchema = 1;
+        public const string DocumentKind = "eclipse.weapons";
+        public List<ModWeaponEntry> Weapons { get; } = new List<ModWeaponEntry>();
+    }
+
+    public sealed class ModWeaponEntry
+    {
+        public const int MaxIdLength = 48;
+        /// <summary>Local ID: the item becomes &lt;mod&gt;:items/weapon/&lt;id&gt;.</summary>
+        public string Id { get; set; }
+        /// <summary>The English name players see.</summary>
+        public string Name { get; set; }
+        /// <summary>Animation subtype: which native moves the weapon uses (Katana, Naginata...).</summary>
+        public string Subtype { get; set; }
+        /// <summary>AI table group, or null for the subtype's own.</summary>
+        public string TacticSubtype { get; set; }
+        /// <summary>Model asset: "models/name" in this mod, or a qualified ID such as core:gamedata/models/mdl_weapon_katana.</summary>
+        public string Model { get; set; }
+        /// <summary>Sprite asset for the shop icon, in this mod or qualified; null shows no icon.</summary>
+        public string Icon { get; set; }
+        public int ShopLevel { get; set; } = 1;
+        public long Price { get; set; } = 100;
+        public ModPriceCurrency Currency { get; set; } = ModPriceCurrency.Coins;
+
+        /// <summary>The runtime item name (definition ID) of this weapon in mod <paramref name="modId"/>.</summary>
+        public string ItemId(string modId) => modId + ":items/weapon/" + Id;
+
+        public static bool IsValidId(string id) =>
+            !string.IsNullOrEmpty(id) && id.Length <= MaxIdLength && id.All(c => c >= 'a' && c <= 'z' || c >= '0' && c <= '9' || c == '_');
+    }
+
+    /// <summary>Strict reader and canonical writer for weapon files.</summary>
+    public static class ModWeaponJson
+    {
+        public const int MaxWeapons = 256;
+
+        public static ModWeaponDocument Parse(string json, string source = "weapons")
+        {
+            if (json == null) throw new ArgumentNullException(nameof(json));
+            ModJsonNode root;
+            try { root = ModJsonNode.Parse(json, 8); }
+            catch (FormatException exception) { throw Fail(source, "is not valid JSON: " + exception.Message); }
+            Obj(root, source);
+            Fields(root, source, "schema", "kind", "weapons");
+            if (Int(Required(root, "schema", source), source + ".schema") != ModWeaponDocument.CurrentSchema)
+                throw Fail(source, "schema must be " + ModWeaponDocument.CurrentSchema);
+            if (Str(Required(root, "kind", source), source + ".kind") != ModWeaponDocument.DocumentKind)
+                throw Fail(source, "kind must be \"" + ModWeaponDocument.DocumentKind + "\"");
+            var document = new ModWeaponDocument();
+            var weapons = Required(root, "weapons", source);
+            if (weapons.Kind != ModJsonKind.Array) throw Fail(source + ".weapons", "must be an array");
+            if (weapons.Items.Count > MaxWeapons) throw Fail(source, "lists more than " + MaxWeapons + " weapons");
+            var ids = new HashSet<string>(StringComparer.Ordinal);
+            for (int i = 0; i < weapons.Items.Count; i++)
+            {
+                string where = source + ".weapons[" + i + "]";
+                var entry = Obj(weapons.Items[i], where);
+                Fields(entry, where, "id", "name", "subtype", "tactic_subtype", "model", "icon", "shop");
+                var weapon = new ModWeaponEntry
+                {
+                    Id = Str(Required(entry, "id", where), where + ".id"),
+                    Name = Str(Required(entry, "name", where), where + ".name"),
+                    Subtype = Str(Required(entry, "subtype", where), where + ".subtype"),
+                    Model = Str(Required(entry, "model", where), where + ".model"),
+                };
+                if (entry["icon"] != null) weapon.Icon = Str(entry["icon"], where + ".icon");
+                if (!ModWeaponEntry.IsValidId(weapon.Id)) throw Fail(where + ".id", "must be 1-" + ModWeaponEntry.MaxIdLength + " lowercase letters, digits or _");
+                if (!ids.Add(weapon.Id)) throw Fail(where + ".id", "repeats '" + weapon.Id + "'");
+                if (weapon.Name.Length > 64) throw Fail(where + ".name", "is longer than 64 characters");
+                if (entry["tactic_subtype"] != null) weapon.TacticSubtype = Str(entry["tactic_subtype"], where + ".tactic_subtype");
+                if (entry["shop"] != null)
+                {
+                    var shop = Obj(entry["shop"], where + ".shop");
+                    Fields(shop, where + ".shop", "level", "price", "currency");
+                    if (shop["level"] != null) weapon.ShopLevel = Int(shop["level"], where + ".shop.level");
+                    if (shop["price"] != null) weapon.Price = Int(shop["price"], where + ".shop.price");
+                    if (weapon.Price < 0) throw Fail(where + ".shop.price", "must not be negative");
+                    if (shop["currency"] != null)
+                    {
+                        string currency = Str(shop["currency"], where + ".shop.currency");
+                        weapon.Currency = currency == "coins" ? ModPriceCurrency.Coins : currency == "gems" ? ModPriceCurrency.Gems
+                            : throw Fail(where + ".shop.currency", "must be \"coins\" or \"gems\"");
+                    }
+                }
+                document.Weapons.Add(weapon);
+            }
+            return document;
+        }
+
+        public static string Write(ModWeaponDocument document)
+        {
+            var list = ModJsonNode.NewArray();
+            foreach (var weapon in document.Weapons)
+            {
+                var node = ModJsonNode.NewObject().Set("id", ModJsonNode.Of(weapon.Id)).Set("name", ModJsonNode.Of(weapon.Name))
+                    .Set("subtype", ModJsonNode.Of(weapon.Subtype));
+                if (weapon.TacticSubtype != null) node.Set("tactic_subtype", ModJsonNode.Of(weapon.TacticSubtype));
+                node.Set("model", ModJsonNode.Of(weapon.Model));
+                if (weapon.Icon != null) node.Set("icon", ModJsonNode.Of(weapon.Icon));
+                node.Set("shop", ModJsonNode.NewObject().Set("level", ModJsonNode.Of(weapon.ShopLevel)).Set("price", ModJsonNode.Of((int)Math.Min(weapon.Price, int.MaxValue)))
+                        .Set("currency", ModJsonNode.Of(weapon.Currency == ModPriceCurrency.Gems ? "gems" : "coins")));
+                list.Add(node);
+            }
+            return ModJsonNode.NewObject().Set("schema", ModJsonNode.Of(ModWeaponDocument.CurrentSchema))
+                .Set("kind", ModJsonNode.Of(ModWeaponDocument.DocumentKind)).Set("weapons", list).ToJson();
+        }
+
+        private static ModContentException Fail(string where, string message) => new ModContentException(where + " " + message + ".");
+        private static void Fields(ModJsonNode value, string where, params string[] allowed)
+        {
+            foreach (var member in value.Members)
+                if (Array.IndexOf(allowed, member.Key) < 0) throw Fail(where, "has unknown field '" + member.Key + "'");
+        }
+        private static ModJsonNode Required(ModJsonNode value, string name, string where) => value[name] ?? throw Fail(where, "requires " + name);
+        private static ModJsonNode Obj(ModJsonNode node, string where) => node.Kind == ModJsonKind.Object ? node : throw Fail(where, "must be an object");
+        private static string Str(ModJsonNode node, string where) =>
+            node.Kind == ModJsonKind.String && node.String.Length != 0 ? node.String : throw Fail(where, "must be a non-empty string");
+        private static int Int(ModJsonNode node, string where) =>
+            node.Kind == ModJsonKind.Number && node.IsInteger && node.Number >= int.MinValue && node.Number <= int.MaxValue ? (int)node.Number : throw Fail(where, "must be an integer");
+    }
+
+    /// <summary>Registers <c>weapons/*.json</c> into a mod's registration transaction.</summary>
+    public static class ModWeaponLoader
+    {
+        public const string Folder = "weapons/";
+        public const string Language = "eng";
+
+        /// <summary>The localization key of a data weapon's name.</summary>
+        public static string NameKey(string id) => "weapon_name_" + id;
+
+        public static int Load(ModDescriptor mod, AssetResolver assets, ModRegistrationTransaction registration)
+        {
+            if (mod == null) throw new ArgumentNullException(nameof(mod));
+            if (assets == null) throw new ArgumentNullException(nameof(assets));
+            if (registration == null) throw new ArgumentNullException(nameof(registration));
+            if (!assets.TryGetProvider(mod.Id, out var provider) || !(provider is IAssetEnumerableProvider enumerable)) return 0;
+            var files = enumerable.Assets.Where(m => m.Kind == AssetKind.Text && m.Format == ".json" && m.Id.Path.StartsWith(Folder, StringComparison.Ordinal)).ToList();
+            files.Sort((a, b) => string.CompareOrdinal(a.Id.Path, b.Id.Path));
+            int count = 0;
+            foreach (var metadata in files)
+            {
+                string source = metadata.Id.Path + ".json";
+                if (!assets.TryRead(metadata.Id, out AssetBytes bytes)) throw new ModContentException("Weapon file disappeared: " + source + ".");
+                var document = ModWeaponJson.Parse(ModMovesetJson.Decode(bytes.Data, source), source);
+                if (document.Weapons.Count != 0 && !mod.Manifest.Capabilities.Contains("content.register"))
+                    throw new ModContentException(source + " adds weapons; declare the content.register capability in mod.toml.");
+                foreach (var weapon in document.Weapons)
+                {
+                    string where = source + " (" + weapon.Id + ")";
+                    try
+                    {
+                        var name = registration.AddLocalization(NameKey(weapon.Id), Language, weapon.Name);
+                        var icon = weapon.Icon == null ? default : Require(mod, assets, weapon.Icon, AssetKind.Sprite, "icon");
+                        var model = Require(mod, assets, weapon.Model, AssetKind.Model, "model");
+                        var definition = registration.RegisterWeapon(weapon.Id, name, icon, model, weapon.Subtype, weapon.TacticSubtype);
+                        // A listing is what makes the game create the item.
+                        registration.RegisterShopListing(definition.Id, ModShopSection.Weapons, weapon.ShopLevel, new ModPrice(weapon.Currency, weapon.Price));
+                        count++;
+                    }
+                    catch (ModContentException exception) { throw new ModContentException(where + ": " + exception.Message, exception); }
+                    catch (FormatException exception) { throw new ModContentException(where + ": " + exception.Message, exception); }
+                }
+            }
+            return count;
+        }
+
+        private static AssetId Require(ModDescriptor mod, AssetResolver assets, string reference, AssetKind kind, string field)
+        {
+            AssetId id = assets.Qualify(mod.Id, reference);
+            if (id.Namespace != mod.Id && !mod.Manifest.Dependencies.Any(d => d.Id == id.Namespace))
+                throw new ModContentException(field + " '" + id + "' belongs to '" + id.Namespace + "'; declare it as a dependency");
+            if (!assets.TryDescribe(id, out AssetMetadata metadata)) throw new ModContentException(field + " '" + id + "' does not exist");
+            if (metadata.Kind != kind) throw new ModContentException(field + " '" + id + "' is " + metadata.Kind + ", expected " + kind);
+            return id;
+        }
+    }
+
+    /// <summary>The weapon file the Moveset Lab writes, weapons/weapons.json.</summary>
+    public static class ModWeaponWriter
+    {
+        public const string File = "weapons/weapons.json";
+
+        public static string PathIn(string modsRoot, string modId) =>
+            System.IO.Path.Combine(modsRoot, modId, File.Replace('/', System.IO.Path.DirectorySeparatorChar));
+
+        public static ModWeaponDocument Load(string modsRoot, string modId)
+        {
+            string path = PathIn(modsRoot, modId);
+            return System.IO.File.Exists(path) ? ModWeaponJson.Parse(System.IO.File.ReadAllText(path), File) : new ModWeaponDocument();
+        }
+
+        /// <summary>Writes the weapon file and makes sure mod.toml allows registering content.</summary>
+        public static void Save(string modsRoot, string modId, string displayName, ModWeaponDocument document)
+        {
+            ModWeaponJson.Parse(ModWeaponJson.Write(document), File);
+            MovesetModWriter.EnsureManifest(modsRoot, modId, displayName, true, null, new[] { "content.patch", "content.register" });
+            string path = PathIn(modsRoot, modId);
+            System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(path));
+            string temp = path + ".eclipse-write";
+            System.IO.File.WriteAllText(temp, ModWeaponJson.Write(document), new System.Text.UTF8Encoding(false));
+            if (System.IO.File.Exists(path)) System.IO.File.Replace(temp, path, null);
+            else System.IO.File.Move(temp, path);
         }
     }
 }

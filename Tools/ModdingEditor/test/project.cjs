@@ -828,3 +828,35 @@ test('moveset key inputs and new moves', async () => {
  const found=moveset.check(parsed.entries,helpers,'test.mod').map(i=>i.message).join('\n');
  assert.match(found,/uses Punch \+ Punch, not "Punch"/);
 });
+
+test('moveset clip ranges and combo chains validate shape and sources', async () => {
+ const moveset=require('../src/moveset.cjs');
+ const head='{"schema":1,"kind":"eclipse.moveset",';
+ const good=head+'"moves":[{"move":"KatanaDoubleSlash","clip_range":{"expected":[2,30],"value":[4,26]},"chains":[{"from":"KatanaSlash","start":10,"end":18}]}]}';
+ assert.deepEqual(moveset.parse(good).issues,[]);
+ const issues=text=>moveset.parse(text).issues.map(i=>i.message).join('\n');
+ assert.match(issues(head+'"moves":[{"move":"A","clip_range":{"expected":[2,30],"value":[9,4]},"chains":[{"from":"B","start":9,"end":3},{"from":"B","start":1,"end":2}]}]}'),
+  /end after it starts[\s\S]*0 <= start <= end[\s\S]*same move twice/);
+ assert.match(issues(head+'"moves":[{"move":"A","clip_range":{"expected":[2,30],"value":[2,30]}}]}'),/must change the range/);
+ const helpers={literal:n=>n&&('value' in n)&&n.type!=='TableConstructorExpression'?n.value:undefined,
+  fields:t=>Object.fromEntries((t?.fields??[]).filter(f=>f.type==='TableKeyString').map(f=>[f.key.name,f.value]))};
+ const parsed=moveset.parse(head+'"moves":[{"move":"KatanaDoubleSlash","chains":[{"from":"NoSuchMove","start":1,"end":2}]}],"forks":[{"id":"x","move":"KatanaSlash","add":true,"chains":[{"from":"test.mod.x","start":1,"end":2}]}]}');
+ const found=moveset.check(parsed.entries,helpers,'test.mod').map(i=>i.message).join('\n');
+ assert.match(found,/named "NoSuchMove"/);
+ assert.doesNotMatch(found,/named "test\.mod\.x"/);
+});
+
+test('moveset new attacks validate shape and native ids', async () => {
+ const moveset=require('../src/moveset.cjs');
+ const head='{"schema":1,"kind":"eclipse.moveset",';
+ const good='{"id":90,"start":5,"end":7,"damage":0.1,"damage_terms":{"WeaponDamage":0},"edges":["EHand_2"],"impulse":[200,0,0],"hit":"Middle"}';
+ assert.deepEqual(moveset.parse(head+'"moves":[{"move":"KatanaHeavySlash","new_attacks":['+good+']}]}').issues,[]);
+ const issues=text=>moveset.parse(text).issues.map(i=>i.message).join('\n');
+ assert.match(issues(head+'"moves":[{"move":"A","new_attacks":[{"id":1,"start":5,"end":3,"damage":20,"damage_terms":{},"edges":[],"impulse":[1,2],"hit":"Bonk"}]}]}'),
+  /end is before start[\s\S]*damage must be 0..16[\s\S]*1-4 terms[\s\S]*1-64 edge names[\s\S]*\[x, y, z\][\s\S]*not a hit reaction/);
+ // KatanaHeavySlash already has attack 65.
+ const parsed=moveset.parse(head+'"moves":[{"move":"KatanaHeavySlash","new_attacks":['+good.replace('"id":90','"id":65')+']}]}');
+ const helpers={literal:n=>n&&('value' in n)&&n.type!=='TableConstructorExpression'?n.value:undefined,
+  fields:t=>Object.fromEntries((t?.fields??[]).filter(f=>f.type==='TableKeyString').map(f=>[f.key.name,f.value]))};
+ assert.match(moveset.check(parsed.entries,helpers,'test.mod').map(i=>i.message).join('\n'),/already has attack id 65/);
+});

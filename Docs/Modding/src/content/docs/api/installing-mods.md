@@ -53,4 +53,61 @@ the mods that require it. Core remains enabled. Unmet requirements appear under
 selections persist across launches without moving or deleting mod folders.
 Mod-owned saved progress is retained while a mod is disabled.
 
+## Community mods (mod.io)
+
+Players can also browse and install mods from
+[Project Eclipse on mod.io](https://mod.io/g/project-eclipse) without leaving the
+game. The browser is **off by default**: turn on **Options > Mod settings >
+Community mods (mod.io)**, and a **Community mods** button appears at the top of
+the **Mods** screen. No mod.io account or login is needed. Definitive Edition
+ships with the game and is never listed there.
+
+The browser lists mods that have a downloadable file. You can search by name,
+sort by **Popular**, **Newest**, **Recently updated** or **Top rated**, and open
+**Details** for the description, author, version, size and tags. **View on
+mod.io** opens the mod's page, where you can rate or report it. Community mods are
+made by players, not by the Eclipse or Definitive Edition team.
+
+**Install** downloads the mod's ZIP, checks its size and checksum, and installs it
+exactly like [Install a ZIP](#install-a-zip), with the same safety limits. Choose
+**Apply & Restart** on the Mods screen to load it. **Remove** deletes the mod's
+folder.
+
+| Situation | What happens |
+| --- | --- |
+| The mod needs a different Eclipse core version | It is not installed; the message names the version it needs. |
+| The mod names no `core` version | It installs, with a note that it may not work. |
+| The mod ships `movesets/` files | It installs, with a note that online versus is off while it is enabled. |
+| A mod with the same ID is already installed by hand | It is not installed; remove the existing mod first. |
+
+### Updates
+
+While the opt-in is on, Eclipse checks installed community mods once per launch,
+when the title screen first opens, and installs newer files automatically. A mod
+that is already loaded in this session cannot be replaced while running: its
+update is downloaded now and installed the next time the game starts, before mods
+load. Only mods installed through the browser are updated; a hand-installed mod
+with the same ID is never touched.
+
+Eclipse remembers which mods came from mod.io in `.eclipse-modio/installs.json`,
+beside (not inside) the Mods folder. Deleting a mod's folder by hand also stops
+its updates.
+
+### Publishing to mod.io
+
+Upload one mod per mod.io entry, as a ZIP laid out like any
+[installable ZIP](#install-a-zip) (`mod.toml` at the root or inside one folder).
+Give the file a version on mod.io, and declare the Eclipse core range your mod
+was made for in `mod.toml`, so players are told when it will not work:
+
+```toml
+[[dependencies]]
+id = "core"
+version = ">=1.0 <2.0"
+```
+
+Keep the same mod `id` in every file you upload: an update whose `mod.toml` has a
+different ID is refused. Mods that change movesets work offline; online versus
+support for them is planned.
+
 If a mod does not appear or cannot load, follow [Troubleshooting](../../guides/troubleshooting/).

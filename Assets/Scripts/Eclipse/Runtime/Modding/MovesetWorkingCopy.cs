@@ -209,6 +209,29 @@ namespace Eclipse.Modding
         public void SetNativeAnimation(string move, string baselineFile, string file) =>
             Entry(move, true).Animation = file == baselineFile ? null : new ModMovesetAnimation { Expected = baselineFile, NativeValue = file };
 
+        /// <summary>Plays a clip from the mod's own assets, such as "animations/my_clip".</summary>
+        public void SetAssetAnimation(string move, string baselineFile, string assetPath) =>
+            Entry(move, true).Animation = new ModMovesetAnimation { Expected = baselineFile, AssetValue = assetPath };
+
+        /// <summary>The keyframes the move plays; the native range removes the edit.</summary>
+        public void SetClipRange(string move, ModMoveClipRange native, ModMoveClipRange value) =>
+            Entry(move, true).ClipRange = value.Equals(native) ? null : new ModMoveGuard<ModMoveClipRange>(native, value);
+
+        /// <summary>Adds or replaces the combo link from <see cref="ModMoveChain.From"/>.</summary>
+        public void SetChain(string move, ModMoveChain chain)
+        {
+            var chains = Entry(move, true).Chains;
+            int index = chains.FindIndex(c => c.From == chain.From);
+            if (index >= 0) chains[index] = chain;
+            else
+            {
+                if (chains.Count >= ModMoveChain.MaxPerMove) throw new ArgumentException("A move follows at most " + ModMoveChain.MaxPerMove + " moves.");
+                chains.Add(chain);
+            }
+        }
+
+        public void RemoveChain(string move, string from) => Entry(move, true).Chains.RemoveAll(c => c.From == from);
+
         public void SetNote(string move, string note) => Entry(move, true).Note = note ?? string.Empty;
 
         /// <summary>The move's key input; the base-game input removes the edit.</summary>
@@ -264,12 +287,33 @@ namespace Eclipse.Modding
 
         public ModMoveAttackEdit AttackEdit(string move, int id) => Entry(move, false)?.Attacks.FirstOrDefault(a => a.Id == id);
 
+        // ---- New attacks ----
+
+        public void AddNewAttack(string move, ModMoveAttackAddition attack)
+        {
+            var entry = Entry(move, true);
+            if (entry.NewAttacks.Any(a => a.Id == attack.Id)) throw new ArgumentException("The move already has a new attack " + attack.Id + ".");
+            entry.NewAttacks.Add(attack);
+        }
+
+        /// <summary>Replaces the new attack with id <paramref name="id"/> (its values change; its id stays).</summary>
+        public void ReplaceNewAttack(string move, int id, ModMoveAttackAddition attack)
+        {
+            var entry = Entry(move, true);
+            int index = entry.NewAttacks.FindIndex(a => a.Id == id);
+            if (index < 0) throw new ArgumentException("The move has no new attack " + id + ".");
+            entry.NewAttacks[index] = attack;
+        }
+
+        public void RemoveNewAttack(string move, int id) => Entry(move, true).NewAttacks.RemoveAll(a => a.Id == id);
+
         // ---- Housekeeping ----
 
         private static void ClearEdits(ModMovesetMove entry)
         {
             entry.Priority = null; entry.PlaybackRate = null; entry.Animation = null; entry.Input = null; entry.SoundFrame = null;
-            entry.Intervals.Clear(); entry.Attacks.Clear();
+            entry.Intervals.Clear(); entry.Attacks.Clear(); entry.NewAttacks.Clear();
+            entry.ClipRange = null; entry.Chains.Clear();
         }
 
         /// <summary>Drops move entries left without edits (forks stay: they matter by themselves).</summary>
@@ -285,28 +329,44 @@ namespace Eclipse.Modding
         public static string Save(string modsRoot, string modId, string displayName, ModMovesetDocument document, bool needsCore,
             IReadOnlyDictionary<string, string> dependencies = null)
         {
+            string root = System.IO.Path.Combine(modsRoot, modId);
+            // A mod that also defines weapons keeps the capability they need.
+            bool weapons = System.IO.Directory.Exists(System.IO.Path.Combine(root, "weapons"));
+            EnsureManifest(modsRoot, modId, displayName, needsCore || weapons, dependencies,
+                weapons ? new[] { "content.patch", "content.register" } : new[] { "content.patch" });
+            System.IO.Directory.CreateDirectory(System.IO.Path.Combine(root, "movesets"));
+            WriteAtomic(System.IO.Path.Combine(root, MovesetFile.Replace('/', System.IO.Path.DirectorySeparatorChar)), ModMovesetJson.Write(document));
+            return root;
+        }
+
+        /// <summary>
+        /// Creates the data-only mod's mod.toml, or adds the capabilities and dependencies it
+        /// lacks to the author's own file in place (fields this writer does not know survive).
+        /// </summary>
+        public static void EnsureManifest(string modsRoot, string modId, string displayName, bool needsCore,
+            IReadOnlyDictionary<string, string> dependencies, IReadOnlyList<string> capabilities)
+        {
             dependencies = dependencies ?? new Dictionary<string, string>();
             ModId.Parse(modId);
             string root = System.IO.Path.Combine(modsRoot, modId);
             string manifestPath = System.IO.Path.Combine(root, "mod.toml");
-            System.IO.Directory.CreateDirectory(System.IO.Path.Combine(root, "movesets"));
+            System.IO.Directory.CreateDirectory(root);
             if (System.IO.File.Exists(manifestPath))
             {
                 var manifest = ModManifestReader.ReadExternalFile(manifestPath);
                 if (manifest.Id.Value != modId) throw new ModContentException("Folder " + modId + " holds a different mod: " + manifest.Id + ".");
                 if (manifest.HasEntrypoint) throw new ModContentException("Mod " + modId + " has a Lua entrypoint; the Moveset Lab only edits data-only mods.");
-                bool hasPatch = manifest.Capabilities.Contains("content.patch");
+                var missingCapabilities = capabilities.Where(c => !manifest.Capabilities.Contains(c)).ToList();
                 bool hasCore = manifest.Dependencies.Any(d => d.Id.Value == "core");
                 bool hasOthers = dependencies.Keys.All(id => manifest.Dependencies.Any(d => d.Id.Value == id));
-                if (!hasPatch || needsCore && !hasCore || !hasOthers)
+                if (missingCapabilities.Count != 0 || needsCore && !hasCore || !hasOthers)
                 {
-                    // Edit the author's file in place, so fields this writer does not know survive.
                     var missing = new Dictionary<string, string>(StringComparer.Ordinal);
                     if (needsCore && !hasCore) missing["core"] = ">=1.0 <2.0";
                     foreach (var pair in dependencies)
                         if (!manifest.Dependencies.Any(d => d.Id.Value == pair.Key)) missing[pair.Key] = ">=" + pair.Value;
                     string text = System.IO.File.ReadAllText(manifestPath).Replace("\r\n", "\n");
-                    if (!hasPatch) text = AddPatchCapability(text);
+                    foreach (string capability in missingCapabilities) text = AddCapability(text, capability);
                     if (!text.EndsWith("\n", StringComparison.Ordinal)) text += "\n";
                     foreach (var pair in missing.OrderBy(pair => pair.Key, StringComparer.Ordinal))
                         text += "\n[[dependencies]]\nid = \"" + pair.Key + "\"\nversion = \"" + pair.Value + "\"\n";
@@ -315,13 +375,11 @@ namespace Eclipse.Modding
                 }
             }
             else WriteAtomic(manifestPath, Manifest(modId, string.IsNullOrWhiteSpace(displayName) ? modId : displayName, "1.0.0", new[] { "Moveset Lab" }, true,
-                dependencies.ToDictionary(pair => pair.Key, pair => ">=" + pair.Value)));
-            WriteAtomic(System.IO.Path.Combine(root, MovesetFile.Replace('/', System.IO.Path.DirectorySeparatorChar)), ModMovesetJson.Write(document));
-            return root;
+                dependencies.ToDictionary(pair => pair.Key, pair => ">=" + pair.Value), capabilities));
         }
 
-        /// <summary>Adds "content.patch" to a one-line capabilities array, or adds the key before the first table.</summary>
-        private static string AddPatchCapability(string text)
+        /// <summary>Adds a capability to a one-line capabilities array, or adds the key before the first table.</summary>
+        private static string AddCapability(string text, string capability)
         {
             var lines = text.Split('\n').ToList();
             int index = lines.FindIndex(line => System.Text.RegularExpressions.Regex.IsMatch(line, @"^\s*capabilities\s*=\s*\[.*\]\s*(#.*)?$"));
@@ -330,17 +388,18 @@ namespace Eclipse.Modding
                 string line = lines[index];
                 int open = line.IndexOf('[');
                 bool empty = System.Text.RegularExpressions.Regex.IsMatch(line.Substring(open), @"^\[\s*\]");
-                lines[index] = line.Substring(0, open + 1) + "\"content.patch\"" + (empty ? "" : ", ") + line.Substring(open + 1).TrimStart();
+                lines[index] = line.Substring(0, open + 1) + "\"" + capability + "\"" + (empty ? "" : ", ") + line.Substring(open + 1).TrimStart();
                 return string.Join("\n", lines);
             }
             if (lines.Any(line => System.Text.RegularExpressions.Regex.IsMatch(line, @"^\s*capabilities\s*=")))
-                throw new ModContentException("Add \"content.patch\" to capabilities in mod.toml; the Moveset Lab cannot edit a multi-line capabilities list.");
+                throw new ModContentException("Add \"" + capability + "\" to capabilities in mod.toml; the Moveset Lab cannot edit a multi-line capabilities list.");
             int table = lines.FindIndex(line => line.TrimStart().StartsWith("[", StringComparison.Ordinal));
-            lines.Insert(table < 0 ? lines.Count : table, "capabilities = [\"content.patch\"]");
+            lines.Insert(table < 0 ? lines.Count : table, "capabilities = [\"" + capability + "\"]");
             return string.Join("\n", lines);
         }
 
-        private static string Manifest(string id, string name, string version, IEnumerable<string> authors, bool core, IDictionary<string, string> others)
+        private static string Manifest(string id, string name, string version, IEnumerable<string> authors, bool core, IDictionary<string, string> others,
+            IEnumerable<string> capabilities)
         {
             string Quote(string s) => "\"" + s.Replace("\\", "\\\\").Replace("\"", "\\\"") + "\"";
             var text = new System.Text.StringBuilder()
@@ -349,7 +408,7 @@ namespace Eclipse.Modding
                 .Append("name = ").Append(Quote(name)).Append('\n')
                 .Append("version = ").Append(Quote(version)).Append('\n')
                 .Append("authors = [").Append(string.Join(", ", authors.Select(Quote))).Append("]\n")
-                .Append("capabilities = [\"content.patch\"]\n");
+                .Append("capabilities = [").Append(string.Join(", ", capabilities.Select(Quote))).Append("]\n");
             if (core) text.Append("\n[[dependencies]]\nid = \"core\"\nversion = \">=1.0 <2.0\"\n");
             foreach (var pair in others.OrderBy(pair => pair.Key, StringComparer.Ordinal))
                 text.Append("\n[[dependencies]]\nid = ").Append(Quote(pair.Key)).Append("\nversion = ").Append(Quote(pair.Value)).Append('\n');
@@ -368,6 +427,66 @@ namespace Eclipse.Modding
         {
             string path = System.IO.Path.Combine(modsRoot, modId, MovesetFile.Replace('/', System.IO.Path.DirectorySeparatorChar));
             return System.IO.File.Exists(path) ? ModMovesetJson.Parse(System.IO.File.ReadAllText(path), MovesetFile) : new ModMovesetDocument();
+        }
+    }
+
+    /// <summary>
+    /// Native animation clips (.bytes) the Moveset Lab imports into a mod's assets/animations
+    /// folder. A clip is a little-endian Int32 keyframe count, then per keyframe one flag byte,
+    /// an Int32 node count and that many (x, y, z) floats.
+    /// </summary>
+    public static class MovesetClipFile
+    {
+        public const string Folder = "animations";
+        public const int MaxBytes = 32 * 1024 * 1024;
+
+        /// <summary>Why <paramref name="data"/> is not a clip, or null with its keyframes and nodes per keyframe.</summary>
+        public static string Inspect(byte[] data, out int frames, out int nodes)
+        {
+            frames = 0; nodes = 0;
+            if (data == null || data.Length < 4) return "The file is empty or too short to be a clip.";
+            if (data.Length > MaxBytes) return "The file is larger than " + MaxBytes / (1024 * 1024) + " MB.";
+            frames = BitConverter.ToInt32(data, 0);
+            if (frames <= 0 || frames > 100000) return "The file does not start with a keyframe count; it is not a native clip.";
+            long position = 4;
+            for (int i = 0; i < frames; i++)
+            {
+                if (position + 5 > data.Length) return "The clip ends early, inside keyframe " + i + ".";
+                int count = BitConverter.ToInt32(data, (int)position + 1);
+                if (count <= 0 || count > 4096) return "Keyframe " + i + " has an impossible node count (" + count + ").";
+                if (i == 0) nodes = count;
+                else if (count != nodes) return "Keyframe " + i + " has " + count + " nodes; keyframe 0 has " + nodes + ".";
+                position += 5 + (long)count * 12;
+            }
+            if (position != data.Length) return "The clip has " + (data.Length - position) + " unexpected byte(s) after its last keyframe.";
+            return null;
+        }
+
+        /// <summary>A file name made safe for an asset path: lowercase letters, digits, _ and -.</summary>
+        public static string SafeName(string fileName)
+        {
+            string stem = System.IO.Path.GetFileNameWithoutExtension(fileName ?? string.Empty).ToLowerInvariant();
+            var text = new System.Text.StringBuilder();
+            foreach (char c in stem) text.Append(c >= 'a' && c <= 'z' || c >= '0' && c <= '9' || c == '_' || c == '-' ? c : '_');
+            string name = text.ToString().Trim('_', '-');
+            if (name.Length > 48) name = name.Substring(0, 48);
+            return name.Length == 0 ? "clip" : name;
+        }
+
+        /// <summary>The file of asset <paramref name="assetPath"/> ("animations/name") in a mod folder.</summary>
+        public static string PathOf(string modsRoot, string modId, string assetPath) =>
+            System.IO.Path.Combine(modsRoot, modId, "assets", assetPath.Replace('/', System.IO.Path.DirectorySeparatorChar) + ".bytes");
+
+        /// <summary>Asset paths of the clips already in the mod's assets/animations folder.</summary>
+        public static List<string> InMod(string modsRoot, string modId)
+        {
+            var result = new List<string>();
+            string folder = System.IO.Path.Combine(modsRoot, modId, "assets", Folder);
+            if (!System.IO.Directory.Exists(folder)) return result;
+            foreach (string file in System.IO.Directory.GetFiles(folder, "*.bytes"))
+                result.Add(Folder + "/" + System.IO.Path.GetFileNameWithoutExtension(file));
+            result.Sort(StringComparer.Ordinal);
+            return result;
         }
     }
 }
