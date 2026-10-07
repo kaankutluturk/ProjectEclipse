@@ -41,8 +41,8 @@
         <Point Period="2.5" Value="100" Ease="1" />
       </Transparency>
     </SimpleEffect>
-    <Image X="-695" Y="-120" ClassName="left" Width="1600" Height="600" />
-    <Image X="705" Y="-120" ClassName="right" Width="1600" Height="600" />
+    <Image X="-1095" Y="-120" ClassName="left" Width="800" Height="600" />
+    <Image X="1105" Y="-120" ClassName="right" Width="800" Height="600" />
     <Image X="-1408" Y="160" ClassName="floor_1" Width="256" Height="64" />
     <Image X="-1152" Y="160" ClassName="floor_2" Width="256" Height="64" />
     <Image X="-896" Y="160" ClassName="floor_1" Width="256" Height="64" />

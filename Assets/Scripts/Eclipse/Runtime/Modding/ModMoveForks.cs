@@ -40,6 +40,9 @@ namespace Eclipse.Modding
     /// A copy of a move for one item subtype or one item. The copy keeps the source's
     /// definition and template names (so combos naming the source also match it), its
     /// lock is narrowed to the subtype or item, and the source stops matching them.
+    /// An added move (<see cref="Adds"/>) is a copy beside its source instead: the source is
+    /// untouched, the copy answers only to its own name and templates, and it may keep the
+    /// source's locks (no subtype or item).
     /// </summary>
     public sealed class MoveForkDefinition
     {
@@ -53,13 +56,17 @@ namespace Eclipse.Modding
         /// <summary>Item scope, or null for a subtype fork.</summary>
         public DefinitionId? Item { get; }
         public string RuntimeItemName { get; }
+        /// <summary>A new move beside its source rather than a replacement of it.</summary>
+        public bool Adds { get; }
 
-        public MoveForkDefinition(ModId owner, string localId, string source, string itemType, string subtype, DefinitionId? item, string runtimeItemName)
+        public MoveForkDefinition(ModId owner, string localId, string source, string itemType, string subtype, DefinitionId? item, string runtimeItemName,
+            bool adds = false)
         {
             MoveCombatPatch.ValidateName(localId); MoveCombatPatch.ValidateName(source); MoveCombatPatch.ValidateName(itemType);
-            if ((subtype == null) == (item == null)) throw new ModContentException("A move fork needs exactly one of subtype or item.");
+            if (subtype != null && item != null || !adds && subtype == null && item == null)
+                throw new ModContentException(adds ? "A new move takes at most one of subtype or item." : "A move fork needs exactly one of subtype or item.");
             if (subtype != null) MoveCombatPatch.ValidateName(subtype);
-            Owner = owner; LocalId = localId; Source = source; ItemType = itemType; Subtype = subtype; Item = item; RuntimeItemName = runtimeItemName;
+            Owner = owner; LocalId = localId; Source = source; ItemType = itemType; Subtype = subtype; Item = item; RuntimeItemName = runtimeItemName; Adds = adds;
             RuntimeName = RuntimeNameFor(owner, localId);
             if (RuntimeName.Length > 128) throw new ModContentException("Move fork id is too long: " + localId);
         }
@@ -150,27 +157,30 @@ namespace Eclipse.Modding
 
         /// <summary>
         /// Registers a fork of <paramref name="source"/> (a native move, or an earlier fork's
-        /// runtime name) for one subtype or one item, and the matching source lock edit.
+        /// runtime name) for one subtype or one item, and the matching source lock edit. With
+        /// <paramref name="adds"/>, registers a new move copied from the source instead: the
+        /// source keeps its locks, and the subtype or item (both optional) limit only the copy.
         /// </summary>
-        public MoveForkDefinition ForkMove(string localId, string source, string subtype, string itemReference)
+        public MoveForkDefinition ForkMove(string localId, string source, string subtype, string itemReference, bool adds = false)
         {
             ThrowIfCompleted();
-            if ((subtype == null) == (itemReference == null)) throw new ModContentException("A move fork needs exactly one of subtype or item.");
+            if (subtype != null && itemReference != null || !adds && subtype == null && itemReference == null)
+                throw new ModContentException(adds ? "A new move takes at most one of subtype or item." : "A move fork needs exactly one of subtype or item.");
             MoveForkDefinition fork;
-            if (subtype != null)
+            if (itemReference == null)
             {
-                fork = new MoveForkDefinition(Mod.Id, localId, source, "Weapon", subtype, null, null);
+                fork = new MoveForkDefinition(Mod.Id, localId, source, "Weapon", subtype, null, null, adds);
                 foreach (var prior in _moveForks)
                     if (prior.RuntimeName == fork.RuntimeName) throw new ModContentException("Duplicate move fork: " + localId);
-                RemoveMoveItemLock(source, "Weapon", subtype);
+                if (!adds) RemoveMoveItemLock(source, "Weapon", subtype);
             }
             else
             {
                 ResolveLockItem(itemReference, out var item, out string itemType, out string runtimeName);
-                fork = new MoveForkDefinition(Mod.Id, localId, source, itemType, null, item, runtimeName);
+                fork = new MoveForkDefinition(Mod.Id, localId, source, itemType, null, item, runtimeName, adds);
                 foreach (var prior in _moveForks)
                     if (prior.RuntimeName == fork.RuntimeName) throw new ModContentException("Duplicate move fork: " + localId);
-                ExcludeMoveItem(source, itemReference);
+                if (!adds) ExcludeMoveItem(source, itemReference);
             }
             EnsureCapacityForNewRegistration();
             _moveForks.Add(fork);

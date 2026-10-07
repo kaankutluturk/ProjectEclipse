@@ -4,22 +4,48 @@ using UnityEngine.EventSystems;
 
 namespace Eclipse.Multiplayer
 {
-    /// <summary>A blue ground highlight that identifies player two independently of camera focus.</summary>
+    /// <summary>
+    /// Player two's blue ground arrow, drawn like player one's pointer (same size, flip and pulse)
+    /// so both fighters are marked independently of camera focus. Falls back to a blue glow when
+    /// the arrow sprite is missing.
+    /// </summary>
     internal sealed class VersusGroundHighlight
     {
+        public const string ArrowSpritePath = "Textures/fight/pointers/arrowSecondPlayer";
         private readonly SpriteRenderer renderer;
+        private readonly bool arrow;
 
         public VersusGroundHighlight(Transform parent)
         {
-            renderer = new GameObject("Player two ground highlight").AddComponent<SpriteRenderer>();
+            renderer = new GameObject("Player two arrow").AddComponent<SpriteRenderer>();
             renderer.transform.SetParent(parent, false);
-            renderer.sprite = Eclipse.Rendering.FxBuilder.ShapeSprite(Eclipse.Modding.ModFxShape.Glow);
-            renderer.color = new Color(.2f, .6f, 1f, .85f);
+            renderer.sprite = ResourcesAndBundles.Load<Sprite>(ArrowSpritePath);
+            arrow = renderer.sprite != null;
+            if (arrow)
+            {
+                renderer.flipY = true;
+                renderer.transform.localScale = new Vector3(.5f, -.5f, 1f);
+            }
+            else
+            {
+                renderer.sprite = Eclipse.Rendering.FxBuilder.ShapeSprite(Eclipse.Modding.ModFxShape.Glow);
+                renderer.color = new Color(.2f, .6f, 1f, .85f);
+            }
         }
 
-        public void Update(float x, float y, float scale)
+        /// <param name="alpha">Player one's pointer pulse, so both arrows flash together.</param>
+        /// <param name="visible">Player one's pointer visibility.</param>
+        public void Update(float x, float y, float scale, float alpha, bool visible)
         {
+            renderer.enabled = visible;
             renderer.transform.localPosition = new Vector3(x, y, -40f);
+            if (arrow)
+            {
+                var color = renderer.color;
+                color.a = alpha;
+                renderer.color = color;
+                return;
+            }
             var size = renderer.sprite.bounds.size;
             renderer.transform.localScale = new Vector3(100f * scale / size.x, 12f * scale / size.y, 1f);
         }

@@ -351,7 +351,10 @@ public class Render
         _eclipseCameraProjection.Begin();
         var camera = Fight.GetCurrentFight()?.GetEclipseCameraSettings(this);
 		RefreshViewportMetrics();
-		cameraOffsetX = _location.width / 2f - (camera?.CenterX.HasValue == true ? (float)camera.CenterX.Value : centerPosition.GetX());
+		// Eclipse: triggered sf2.fx.screen grades with zoom push the view in toward their fighter.
+		Eclipse.Modding.ModVisuals.CameraPush(out float pushZoom, out float pushFocus, out float pushX, out float pushOffsetY);
+		float centerX = camera?.CenterX.HasValue == true ? (float)camera.CenterX.Value : centerPosition.GetX();
+		cameraOffsetX = _location.width / 2f - centerX;
 		zoom = camera?.Zoom.HasValue == true ? (float)camera.Zoom.Value : ((!(forcedZoom > 0f)) ? CalculateAutoZoom() : forcedZoom);
 		float num = 1f;
 		if (GameUtils.GetCameraSettings().MaxWidth > 0f)
@@ -376,6 +379,8 @@ public class Render
 		}
 		float maxWidthDelta = GameUtils.GetCameraSettings().MaxWidthDelta;
 		zoom = ((!lockMinZoom) ? Mathf.Max(zoom, minZoom) : minZoom);
+		if (!lockMinZoom && (pushZoom > 1f || pushFocus > 0f)) ApplyEclipsePush(pushZoom, pushFocus, pushX);
+		double offsetY = (camera?.OffsetY ?? 0d) + pushOffsetY;
 		float num9 = (_location.width - maxWidthDelta) * zoom / 2f - visibleWidth / 2f;
 		cameraOffsetX *= zoom;
 		if (Mathf.Abs(cameraOffsetX) > num9)
@@ -407,7 +412,7 @@ public class Render
 				factor = Eclipse.Modding.ModVisuals.BackgroundLayerFactor(factor);
 			}
 			item.SetPositionX(cameraOffsetX * factor);
-            if (camera != null) _eclipseCameraProjection.ApplyVertical(item, camera.OffsetY, zoom, factor);
+            if (offsetY != 0d) _eclipseCameraProjection.ApplyVertical(item, offsetY, zoom, factor);
 		}
 		float arrowX = cameraOffsetX - (_location.width / 2f - targetX) * zoom;
 		float arrowY = _location.gameLayer.GetLayerObject().transform.localPosition.y - 2f * verticalOffset * zoom - 10f;
@@ -422,10 +427,37 @@ public class Render
 				if (_versusPlayerTwoMarker == null)
 					_versusPlayerTwoMarker = new Eclipse.Multiplayer.VersusGroundHighlight(_UnityObject.transform);
 				float x = cameraOffsetX - (_location.width / 2f - enemy.InterpolatedPivot().GetX()) * zoom;
-				_versusPlayerTwoMarker.Update(x, arrowY, zoom);
+				_versusPlayerTwoMarker.Update(x, arrowY, zoom, pointerArrow.color.a, pointerArrow.enabled);
 			}
 		}
 		UpdateArrowPointer(arrowX, arrowY);
+	}
+
+	// Eclipse: a screen grade's push-in. Zooms by `pushZoom` and moves the centre toward
+	// `focusX` by `focus`, but never so far that either main fighter (with a body's
+	// margin) leaves the view: the zoom is capped to fit both and the centre clamped
+	// so both stay inside. Called with the native centre and zoom already settled.
+	private const float EclipsePushMargin = 170f;
+	private void ApplyEclipsePush(float pushZoom, float focus, float focusX)
+	{
+		float half = _location.width / 2f;
+		float center = half - cameraOffsetX;
+		float target = zoom * Mathf.Max(1f, pushZoom);
+		var fight = Fight.GetCurrentFight();
+		Model player = fight?.GetPlayerModel(), enemy = fight?.GetEnemyModel();
+		if (player != null && enemy != null)
+		{
+			float a = player.InterpolatedPivot().GetX(), b = enemy.InterpolatedPivot().GetX();
+			float low = Mathf.Min(a, b) - EclipsePushMargin, high = Mathf.Max(a, b) + EclipsePushMargin;
+			// Visible half-width in arena units is visibleWidth / zoom / 2.
+			target = Mathf.Max(zoom, Mathf.Min(target, visibleWidth / Mathf.Max(high - low, 1f)));
+			float reach = visibleWidth / target / 2f;
+			center = Mathf.Lerp(center, focusX, focus);
+			float left = high - reach, right = low + reach;
+			center = left <= right ? Mathf.Clamp(center, left, right) : (low + high) / 2f;
+		}
+		zoom = target;
+		cameraOffsetX = half - center;
 	}
 
 	public void SetRootPosition(float x, float y)

@@ -41,6 +41,15 @@ Unity 6.6 project/profile, exercising native fields, Lua callbacks/getter,
 HUD capture, multiline, Tab/Back, ancestor/dialog and owner cleanup. Synthetic
 native key Events do not establish physical keyboard/IME or mobile acceptance.
 
+Showcase mods: `Modding/TestShowcaseMods.ps1` loads Final Blow, Shadow Clones,
+Umbra, Home Run, The Mirror, Combo Hype and The Gauntlet through the real Lua runtime and drives their behaviors with controlled
+fighter hosts: clone cast flag/cooldown, script-triggered grades (`sf2.fx.play`),
+spawns, camera take/release, boss phase forms, shields, lightning damage, the
+home-run contact and distance, the Mirror's echo/read decisions, combo tiers,
+gauntlet waves, Umbra's fight-entry story binding, and cleanup. Native rendering, camera push-in framing, input, AI and contact are not
+exercised. `Modding/TestVisualsApi.ps1` covers the `script` trigger, `zoom` and
+`sf2.fx.play` validation.
+
 Camera control: `Modding/TestCameraRuntime.ps1` executes actual Lua capability,
 settings, ownership, callback/registration/cleanup and shipped Camera Lab HUD
 tests with a controlled provider. `TestCameraNativePolicies.ps1` compiles the

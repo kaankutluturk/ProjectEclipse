@@ -98,13 +98,43 @@ edit.
 | `priority` | `{ "expected", "value" }`, integers 0–100000. Higher-priority moves win when several match the same input. |
 | `playback_rate` | `{ "expected", "value" }`, numbers 0.5–2.0. `1.25` is 25% faster. `expected` is `1.0` for a native move. At most `MidFrames + 1`; not for looped or physics moves. See [playback rate](../moves-and-tactics/#playback-rate). |
 | `animation` | `{ "expected", "value" }`. `expected` is the current `.bytes` file. `value` is another native clip's filename, or `{ "asset": "animations/my_clip" }` for a clip in your mod's `assets/` folder. |
-| `input` | `{ "expected", "value" }`, control names such as `"Kick"` and `"Punch"`. The move must have exactly one key condition. |
+| `input` | `{ "expected", "value" }`, the move's key [input](#input): `expected` is the base game's input, `value` the new one. |
 | `sound_frame` | `{ "name", "expected", "value" }`: move one directly scheduled sound to another frame. |
 | `intervals` | Array of [interval edits](#intervals), up to 64. |
 | `attacks` | Array of [attack edits](#attacks), up to 32. |
 
 Only one mod can patch a given move. A second mod (or Lua patch) on the same move fails
 to load; the VS Code extension [warns about this](../../guides/vscode/#find-conflicts-with-other-mods).
+
+### Input
+
+A move's input is the keys that start it. It is a list of *alternatives*; pressing any one
+of them starts the move (for example a dash that starts on Up-Back, or on Back tapped
+twice). Each alternative is a *chord*: the keys pressed together, 1–14 of them. A key is
+written as its name, which means it is tapped, or as `{ "key": ..., "press": ... }` with
+`press` one of `"Tap"`, `"Hold"` (keep it held) or `"Release"` (let it go):
+
+```json
+"input": {
+  "expected": [ [ "Punch", { "key": "Forward", "press": "Hold" } ] ],
+  "value":    [ [ "Kick",  { "key": "Back", "press": "Hold" } ] ]
+}
+```
+
+- Key names: `Punch`, `Kick`, `Ranged`, `Magic`, `RaidCharge`, `Super`, and the directions
+  `Forward`, `Back`, `Up`, `Down`, `Up-Forward`, `Up-Back`, `Down-Forward`, `Down-Back`.
+  Directions are for a fighter facing right; the game mirrors them when it faces left.
+- The same key tapped twice in one chord (`[ "Punch", "Punch" ]`) is a two-tap sequence.
+- Up to 8 alternatives. `[]` is no input: a move without one is started by the game itself
+  (hit reactions, combo steps, AI actions). Giving such a move an input, or removing a
+  move's input, changes when it can happen; test it in a fight.
+- A single tapped key can still be written as a plain string, as in older files:
+  `"input": { "expected": "Kick", "value": "Punch" }`.
+- The edit replaces the move's whole input. It works on moves whose keys form one chord,
+  or one set of alternatives. Moves whose keys are mixed into other conditions report
+  that their input is not editable; edit those in Lua.
+- What a move must follow (a combo step, being in the air) is not part of its input and
+  stays as it is.
 
 ### Intervals
 
@@ -152,6 +182,7 @@ fork) plus:
 | `move` | yes | The move to copy: a native move, or an earlier fork's runtime name. |
 | `subtype` | one of these | Weapon subtype that gets the copy. Removed from the original's lock group. |
 | `item` | one of these | Qualified item ID, such as `"core:items/weapon/weapon_golden_katana"`, that gets the copy. The original stops matching that item. |
+| `add` | no, default `false` | `true` makes a [new move](#new-moves) instead of a replacement. |
 
 ```json
 { "id": "HighKick_Golden", "move": "HighKick", "item": "core:items/weapon/weapon_golden_katana",
@@ -161,6 +192,32 @@ fork) plus:
 Guards in a fork compare against the copied source move. Read
 [`sf2.moves.fork`](../moves-and-tactics/#sf2movesfork) for how copies keep combos and
 which conflicts are rejected.
+
+### New moves
+
+With `"add": true` the copy is a new move beside the original rather than a replacement
+for some fighters. The original keeps all its fighters and is not changed. The new move:
+
+- starts as an exact copy of `move`: its animation, attacks, frame windows, sounds and
+  the conditions it must follow;
+- goes to the fighters named by `subtype` or `item` (at most one of them), or, with
+  neither, to the same fighters as the original;
+- shares the original's templates, so moves that follow a template (for example a
+  `"Central"` step) can follow it too, but it does not answer to the original's own name:
+  combos written for that exact move do not continue from the new one;
+- should get its own [`input`](#input); with the original's input both moves compete and
+  the higher [`priority`](#move-edits) wins.
+
+```json
+{ "id": "rising_slash", "move": "KatanaUpperSlash", "subtype": "Katana", "add": true,
+  "input": { "expected": [ [ "Punch", { "key": "Up", "press": "Hold" } ] ],
+             "value":    [ [ "Kick",  { "key": "Up", "press": "Hold" } ] ] },
+  "priority": { "expected": 120, "value": 122 } }
+```
+
+New moves are copies of existing moves: they reuse a game clip, or a clip swapped in with
+[`animation`](#move-edits). For a move built from your own data, use
+[`sf2.moves.register`](../moves-and-tactics/#sf2movesregister).
 
 ## Finding the current values
 
@@ -183,8 +240,9 @@ after the reload, such as the next fight.
 
 ## Limits
 
-Moveset files edit and copy existing moves; they do not create brand-new moves or
-transitions (use [`sf2.moves.register`](../moves-and-tactics/#sf2movesregister) for that). Edits
+Moveset files edit and copy existing moves, and add new moves copied from them; they do
+not define moves from scratch or new transitions (use
+[`sf2.moves.register`](../moves-and-tactics/#sf2movesregister) for that). Edits
 are checked against the base game when the mod loads. They are not checked against
 gameplay, so test changed hitboxes, timings and speeds in a fight. Online versus refuses
 to start while moveset content is active.

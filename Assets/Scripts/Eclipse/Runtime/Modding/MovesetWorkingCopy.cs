@@ -26,6 +26,10 @@ namespace Eclipse.Modding
         public List<string> WeaponItems { get; } = new List<string>();
         public bool PlayerSkeleton { get; set; }
         public List<MovesetBaselineInterval> Intervals { get; } = new List<MovesetBaselineInterval>();
+        /// <summary>The base-game key input (no chords: the move has none), or null when it is not editable.</summary>
+        public ModMoveInput Input { get; set; }
+        /// <summary>Why <see cref="Input"/> is null.</summary>
+        public string InputProblem { get; set; }
 
         public int MaxRatePermille => Looped || Physics ? Eclipse.Runtime.PlaybackTiming.Normal :
             Math.Min(Eclipse.Runtime.PlaybackTiming.Maximum, (MidFrames + 1) * 1000);
@@ -154,6 +158,20 @@ namespace Eclipse.Modding
             return fork;
         }
 
+        /// <summary>
+        /// A new move copied from <paramref name="source"/> and added beside it, for one subtype,
+        /// one weapon item, or (both null) the same fighters as the source.
+        /// </summary>
+        public ModMovesetFork CreateAddedMove(string localId, string source, string subtype, string itemId)
+        {
+            string id = Sanitize(localId ?? string.Empty).Trim('_');
+            if (id.Length == 0) throw new ArgumentException("Give the new move a name with letters or digits.");
+            if (Document.Forks.Any(f => f.Id == id)) throw new ArgumentException("This mod already has a move called " + id + ".");
+            var fork = new ModMovesetFork { Id = id, Move = source, Subtype = subtype, Item = itemId, Add = true };
+            Document.Forks.Add(fork);
+            return fork;
+        }
+
         public void RemoveFork(string runtimeName)
         {
             var fork = FindFork(runtimeName);
@@ -192,6 +210,10 @@ namespace Eclipse.Modding
             Entry(move, true).Animation = file == baselineFile ? null : new ModMovesetAnimation { Expected = baselineFile, NativeValue = file };
 
         public void SetNote(string move, string note) => Entry(move, true).Note = note ?? string.Empty;
+
+        /// <summary>The move's key input; the base-game input removes the edit.</summary>
+        public void SetInput(string move, ModMoveInput baseline, ModMoveInput value) =>
+            Entry(move, true).Input = value.SameAs(baseline) ? null : new ModMoveGuard<ModMoveInput>(baseline, value);
 
         // ---- Intervals ----
 

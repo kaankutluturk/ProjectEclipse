@@ -560,7 +560,8 @@ test('DE128 native map button uses a typed packaged sprite and click notificatio
  assert.deepEqual(mod.issues,[]);
  const source=await fs.readFile(path.join(dir,'scripts/content/dojo_changer.lua'),'utf8');
  assert.deepEqual(p.analyze(source,mod).issues,[]);
- assert.equal(mod.assets.get('sprites/dojo_changer/credits').kind,'sprite');
+ assert.equal(mod.assets.get('sprites/dojo_changer/button').kind,'sprite');
+ assert.equal(mod.assets.get('sprites/dojo_changer/button_pressed').kind,'sprite');
  const api=require('../data/api.json');
  assert.equal(api.types.Action_show_map_button.fields.image,'Eclipse.SpriteHandle|string');
  assert.match(api.types.StoryEvent.fields.kind,/map_button/);
@@ -805,4 +806,25 @@ test('data-only moveset mods index, validate against vanilla and claim forks',as
  assert.deepEqual(schema.properties.moves.items.properties.attacks.items.properties.hit.properties.value.enum,JSON.parse('['+api.types.MoveHitPatch.fields.expected.split('|').join(',')+']'));
  const forkLua=p.analyze(header+'local n=sf2.moves.fork{id="F",source="HighKick",subtype="Katana"}\nsf2.moves.patch{move="test.patches.F",priority={expected=1,value=2}}',patchMod).issues.filter(i=>i.code.startsWith('native')).map(i=>i.message);
  assert.equal(forkLua.length,1);assert.match(forkLua[0],/not locked to subtype "Katana"/);
+});
+
+test('moveset key inputs and new moves', async () => {
+ const moveset=require('../src/moveset.cjs');
+ const head='{"schema":1,"kind":"eclipse.moveset",';
+ const issues=text=>moveset.parse(text).issues.map(i=>i.message);
+ // Chord alternatives, press types and the legacy single-key string all parse.
+ assert.deepEqual(issues(head+'"moves":[{"move":"KatanaHeavySlash","input":{"expected":[["Punch",{"key":"Forward","press":"Hold"}]],"value":[["Kick",{"key":"Back","press":"Hold"}],["Up-Back"]]}}]}'),[]);
+ assert.deepEqual(issues(head+'"moves":[{"move":"HighKick","input":{"expected":"Kick","value":[]}}]}'),[]);
+ assert.match(issues(head+'"moves":[{"move":"A","input":{"expected":[["Jump"]],"value":"Kick"}}]}').join(),/not a key name/);
+ assert.match(issues(head+'"moves":[{"move":"A","input":{"expected":[["Kick",{"key":"Back","press":"Twice"}]],"value":"Kick"}}]}').join(),/press must be "Tap", "Hold" or "Release"/);
+ // A new move may skip subtype and item, but not name both.
+ assert.deepEqual(issues(head+'"forks":[{"id":"rising","move":"KatanaUpperSlash","add":true}]}'),[]);
+ assert.match(issues(head+'"forks":[{"id":"rising","move":"A","add":true,"subtype":"Katana","item":"core:items/weapon/x"}]}').join(),/at most one of "subtype" or "item"/);
+ // Chords compare with vanilla: KatanaDoubleSlash is two Punch taps.
+ const native=require('../src/native.cjs');
+ const parsed=moveset.parse(head+'"moves":[{"move":"KatanaDoubleSlash","input":{"expected":[["Punch"]],"value":[["Kick"]]}}]}');
+ const helpers={literal:n=>n&&('value' in n)&&n.type!=='TableConstructorExpression'?n.value:undefined,
+  fields:t=>Object.fromEntries((t?.fields??[]).filter(f=>f.type==='TableKeyString').map(f=>[f.key.name,f.value]))};
+ const found=moveset.check(parsed.entries,helpers,'test.mod').map(i=>i.message).join('\n');
+ assert.match(found,/uses Punch \+ Punch, not "Punch"/);
 });

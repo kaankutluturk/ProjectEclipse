@@ -15,6 +15,53 @@ and follow that example's README and verification limits. The
 folders for supported examples. An archived source link is a reference, not a
 claim of a fresh game playtest.
 
+## Showcase mods
+
+Seven player-facing mods in `Mods/` show what the pieces do together. Enable
+them, choose **Apply & Restart** and play; each README lists its controls.
+
+- **Final Blow** (`Mods/final-blow`) is a kill cam for every fight, written only
+  with screen grades: the knockout hit pulls the camera in on the fallen fighter
+  while time nearly stops, and critical hits and wall slams jolt it briefly. It
+  needs no Lua at fight time. See the
+  <a href={pageUrl('api/visuals')+'#camera-push-in'}>camera push-in</a>.
+  It stacks with Chiaroscuro's knockout fade.
+- **Shadow Clones** (`Mods/shadow-clones`) sells a **Faceless Mask** helm for one
+  coin in the helmet shop. Its innate Lua perk shows the RaidCharge button; pressing
+  it plays the Grasp of Darkness cast, stalls time with a script-triggered grade
+  and raises three allied clones (independent actors with the game's own AI) for
+  ten seconds while the camera pulls back to frame everyone. A timed flag gates
+  the cast and the button shows its 20-second recharge.
+- **Umbra, the Last Eclipse** (`Mods/umbra`) adds a three-phase boss battle on
+  its own map page at the Gate of Shadows. One opponent rule watches his health
+  and caps incoming damage so no phase can be skipped: at two thirds he changes
+  form behind a shield and a shockwave and summons two shades; at one third the
+  arena goes dark and lightning columns hunt the player. Banners,
+  intro and phase moments use the UI API and `sf2.fx.play`. Its prologue holds
+  the fight entry with `sf2.story.before_fight` and plays a narrator card and
+  portrait dialogs with `sf2.story.play_sequence`; a `battle_result`
+  subscription queues an epilogue for the next map visit.
+- **Home Run** (`Mods/home-run`) sells **The Slugger**, a war hammer. Its
+  RaidCharge swing is an owned move with a physical-fall hit and a launch
+  impulse; the perk recognises the swing in `on_post_hit` by
+  `event.attack.animation_name`, stalls time, shows a banner and measures the
+  flight distance from snapshots.
+- **The Mirror** (`Mods/mirror`) is a fight against an opponent with your weapon
+  type and level, chosen in the mode's `on_prepare` from `sf2.profile.equipment`.
+  A rule records the attacks you start; its
+  <a href={pageUrl('api/moves-and-tactics')+'#on_decide'}>Lua tactic</a> echoes
+  each one back and steps out of any attack you have used three times.
+- **Combo Hype** (`Mods/combo-hype`) sells an armour whose perk listens to
+  `on_combo_changed` and holds a script-triggered grade per tier (3, 5, 8 and 12
+  hits), refreshed by every hit, with stingers and a counter.
+- **The Gauntlet** (`Mods/gauntlet`) is one fight against five opponents, one per
+  health bar. An opponent rule caps damage at each bar, then swaps the fighter
+  with `fighter:change_form`, slides the newcomer back and heals the player.
+
+Their Lua runs headlessly against controlled fighters (registration, casts,
+spawns, form changes, lightning damage and cleanup). Native rendering, the RaidCharge input,
+camera framing, actor AI and contact still need a playtest.
+
 ## Equipment and behavior
 
 [Authored Fighter Lab](https://github.com/dawc17/ProjectEclipse/tree/main/Mods/example.authored-fighter)

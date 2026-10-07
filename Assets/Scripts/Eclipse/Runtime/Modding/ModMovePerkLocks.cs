@@ -187,15 +187,84 @@ namespace Eclipse.Modding
         }
     }
 
+    /// <summary>
+    /// A move's key input: alternative chords, any one of which starts the move. A chord is
+    /// the keys pressed together (each tapped, held or released; repeated taps stay a
+    /// sequence). No chords means the move has no key input: the game starts it by itself.
+    /// </summary>
+    public sealed class ModMoveInput
+    {
+        public const int MaxChords = 8;
+        public const int MaxKeys = 14;
+        public static readonly ModMoveInput None = new ModMoveInput(Array.Empty<IEnumerable<ModMoveKey>>());
+        public IReadOnlyList<IReadOnlyList<ModMoveKey>> Chords { get; }
+
+        public ModMoveInput(IEnumerable<IEnumerable<ModMoveKey>> chords)
+        {
+            if (chords == null) throw new ArgumentNullException(nameof(chords));
+            var list = new List<IReadOnlyList<ModMoveKey>>();
+            foreach (var chord in chords)
+            {
+                var keys = new List<ModMoveKey>(chord ?? throw new ModContentException("Null move input chord."));
+                if (keys.Count < 1 || keys.Count > MaxKeys) throw new ModContentException("A move input chord needs 1.." + MaxKeys + " keys.");
+                foreach (var key in keys) if (key == null) throw new ModContentException("Null move key.");
+                list.Add(keys.AsReadOnly());
+            }
+            if (list.Count > MaxChords) throw new ModContentException("A move input has at most " + MaxChords + " alternative chords.");
+            Chords = list.AsReadOnly();
+        }
+
+        /// <summary>One tapped key (the original single-key input form).</summary>
+        public static ModMoveInput Single(string key) => new ModMoveInput(new[] { new[] { new ModMoveKey(key) } });
+
+        public bool IsNone => Chords.Count == 0;
+
+        /// <summary>The single tapped key when the input is just that, else null.</summary>
+        public string SingleKey => Chords.Count == 1 && Chords[0].Count == 1 && Chords[0][0].Press == "Tap" ? Chords[0][0].Key : null;
+
+        public bool SameAs(ModMoveInput other)
+        {
+            if (other == null || other.Chords.Count != Chords.Count) return false;
+            for (int i = 0; i < Chords.Count; i++)
+            {
+                if (Chords[i].Count != other.Chords[i].Count) return false;
+                for (int k = 0; k < Chords[i].Count; k++)
+                    if (Chords[i][k].Key != other.Chords[i][k].Key || Chords[i][k].Press != other.Chords[i][k].Press) return false;
+            }
+            return true;
+        }
+
+        public override string ToString()
+        {
+            if (IsNone) return "no input";
+            var parts = new List<string>();
+            foreach (var chord in Chords)
+            {
+                var keys = new List<string>();
+                foreach (var key in chord) keys.Add(key.Press == "Tap" ? key.Key : key.Press + " " + key.Key);
+                parts.Add(string.Join(" + ", keys));
+            }
+            return string.Join("  or  ", parts);
+        }
+    }
+
+    /// <summary>Replaces a move's whole key input, guarded by the input it must currently have.</summary>
     public sealed class ModMoveInputPatch
     {
-        public ModMoveKey Expected { get; }
-        public ModMoveKey Value { get; }
+        public ModMoveInput Expected { get; }
+        public ModMoveInput Value { get; }
+
         public ModMoveInputPatch(string expected, string value)
+            : this(ModMoveInput.Single(expected), ModMoveInput.Single(value))
         {
-            Expected = new ModMoveKey(expected);
-            Value = new ModMoveKey(value);
             if (expected == value) throw new ModContentException("Move input patch requires distinct Tap keys.");
+        }
+
+        public ModMoveInputPatch(ModMoveInput expected, ModMoveInput value)
+        {
+            Expected = expected ?? throw new ArgumentNullException(nameof(expected));
+            Value = value ?? throw new ArgumentNullException(nameof(value));
+            if (expected.SameAs(value)) throw new ModContentException("Move input patch must change the input.");
         }
     }
 

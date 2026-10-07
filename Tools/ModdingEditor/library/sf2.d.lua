@@ -1424,6 +1424,7 @@ local DojoPickerChoice = {}
 ---@class (exact) Eclipse.DojoPickerDefinition
 ---@field id string 1-64 lowercase letters, digits, _ or -; the dojo-menu button is named modid.id.
 ---@field button Eclipse.SpriteHandle The dojo-menu button image.
+---@field button_pressed? Eclipse.SpriteHandle Shown while the dojo-menu button is held; default: the button image.
 ---@field title? Eclipse.LocalizationHandle Heading; defaults to CHOOSE YOUR DOJO.
 ---@field choices Eclipse.DojoPickerChoice[] 1-64 choices in display order.
 local DojoPickerDefinition = {}
@@ -2197,6 +2198,7 @@ local StoryDialogDefinition = {}
 ---@class (exact) Eclipse.DojoButtonDefinition
 ---@field id string 1-64 lowercase letters, digits, _ or -; qualified as modid.id in click events.
 ---@field image Eclipse.SpriteHandle
+---@field pressed_image? Eclipse.SpriteHandle Shown while the button is held; default: image.
 local DojoButtonDefinition = {}
 
 ---@class (exact) Eclipse.SettingToggleDefinition
@@ -2356,7 +2358,7 @@ local FxSound = {}
 ---@field vignette? number 0-1, default 0.
 ---@field vignette_x? number -1 to 1 vignette centre, default 0.
 ---@field vignette_y? number -1 to 1 vignette centre, default 0.
----@field trigger? "always"|"hit"|"critical"|"ko"|"land"|"knockdown"|"wall" Default always.
+---@field trigger? "always"|"hit"|"critical"|"ko"|"land"|"knockdown"|"wall"|"script" Default always. script fires only when this mod calls sf2.fx.play.
 ---@field duration? number 0.02-10 seconds fade of a triggered grade, default 0.25.
 ---@field hold? number 0-10 seconds at full strength, default 0.
 ---@field time_scale? number 0.05-1 game speed while a triggered grade is active, default 1.
@@ -2372,7 +2374,13 @@ local FxSound = {}
 ---@field sound? Eclipse.AudioHandle|string|Eclipse.FxSound|(Eclipse.AudioHandle|string|Eclipse.FxSound)[] Triggered grades only: plays once each time the trigger fires. Audio handle for a sound the mod ships, a native sound name such as snd_time_shift, a { sound, volume } table, or an array of up to 16 of these to pick one from at random.
 ---@field sound_volume? number 0-1 volume of sound, scaled by the sound setting, default 1.
 ---@field muffle? number 0-1 low-pass on the other game audio while the grade is active, default 0.
+---@field zoom? number 1-3 triggered grades only: the camera pushes in by this factor toward the fighter involved, following the grade strength, default 1.
+---@field zoom_offset_y? number -400 to 400 triggered grades only: positive-down camera pan during the push-in, default 0.
 local FxScreenDefinition = {}
+
+---@class (exact) Eclipse.FxPlayOptions
+---@field x? number Arena X, finite -10000..10000, that the zoom frames. Omit to keep the camera centre.
+local FxPlayOptions = {}
 
 ---@class (exact) Eclipse.FxShadowDefinition
 ---@field id string 1-64 lowercase letters, digits, _ or -; unique within the mod.
@@ -4072,7 +4080,7 @@ function ui.set_visible(view, widget_id, visible) end
 ---@param enabled boolean
 function ui.set_enabled(view, widget_id, enabled) end
 
----Requires: `content.register`. `id` (required) is 1–64 lowercase ASCII letters, digits, `_` or `-`, unique within the mod. `image` (required) is a sprite handle from `sf2.assets.sprite`; the button uses the sprite's size, scaled down if it would be larger than the disciple button. A mod can register at most 4 dojo buttons. Nothing is saved to the profile: removing the mod or the registration removes the button. React to clicks with [`sf2.story.on("dojo_button", ...)`](../story/#sf2storyon), which needs `story.events`.
+---Requires: `content.register`. `id` (required) is 1–64 lowercase ASCII letters, digits, `_` or `-`, unique within the mod. `image` (required) is a sprite handle from `sf2.assets.sprite`; the button uses the sprite's size, scaled down if it would be larger than the disciple button. `pressed_image` (optional) is a sprite handle shown while the button is held down; without it the button keeps `image` and only darkens while pressed. Draw it at the same size as `image`, because it fills the same box. A mod can register at most 4 dojo buttons. Nothing is saved to the profile: removing the mod or the registration removes the button. React to clicks with [`sf2.story.on("dojo_button", ...)`](../story/#sf2storyon), which needs `story.events`.
 ---When: During loading, like other registrations. The button is added to the game's side menu whenever the dojo is the current screen. It sits below the disciple button's slot, whether or not the player has unlocked the disciple yet. Buttons from several mods stack downward in load order.
 ---Returns: The button's qualified name, `<mod-id>.<id>`, as a string.
 ---[Full reference](https://dawc17.github.io/ProjectEclipse/api/ui/#sf2uidojo_button)
@@ -4176,6 +4184,15 @@ function fx.trail(definition) end
 ---@param definition Eclipse.FxScreenDefinition
 ---@return string
 function fx.screen(definition) end
+
+---Requires: `presentation.visuals`. `effect` is the name a screen grade with `trigger = "script"` registered by this mod returned, or its local `id`. Another mod's effect, or a grade with any other trigger, raises an error.
+---When: Any time after loading, normally inside a combat callback such as `on_tick` or `on_animation_start`. Calling it again restarts the grade, its sound and its slow motion from full strength. Hold and duration use real time.
+---Returns: `true` when the grade started, or `false` when it cannot show: its setting switch is off, its `match`/`exclude` words rule out the current location, or no game presentation is running (as in a headless check).
+---[Full reference](https://dawc17.github.io/ProjectEclipse/api/visuals/#sf2fxplay)
+---@param effect string
+---@param options? Eclipse.FxPlayOptions
+---@return boolean
+function fx.play(effect, options) end
 
 ---Requires: `presentation.visuals`.
 ---When: During loading.

@@ -1,40 +1,68 @@
 {
   "schema": 1,
   "kind": "eclipse.moveset",
-  "moves": [],
-  "forks": [
+  "moves": [
     {
-      "id": "KatanaDoubleSlash_Katana",
-      "subtype": "Katana",
-      "move": "KatanaDoubleSlash",
+      "move": "BatonsDoubleSlash",
       "animation": {
-        "expected": "katana_double_slash.bytes",
+        "expected": "sticks_double_slash.bytes",
         "value": "axe_double_slash.bytes"
       },
       "attacks": [
         {
-          "id": 64,
-          "start": {
-            "expected": 16,
-            "value": 20
-          },
+          "id": 49,
           "end": {
-            "expected": 18,
-            "value": 23
+            "expected": 10,
+            "value": 11
           }
         },
         {
-          "id": 63,
-          "start": {
-            "expected": 10,
-            "value": 8
-          },
+          "id": 50,
           "end": {
-            "expected": 10,
-            "value": 9
+            "expected": 19,
+            "value": 21
           }
         }
       ]
+    }
+  ],
+  "forks": [
+    {
+      "id": "BatonsDoubleSlash_batons",
+      "item": "de128:items/weapon/batons",
+      "move": "BatonsDoubleSlash",
+      "animation": {
+        "expected": "sticks_double_slash.bytes",
+        "value": "axe_double_slash.bytes"
+      },
+      "attacks": [
+        {
+          "id": 50,
+          "start": {
+            "expected": 18,
+            "value": 20
+          },
+          "end": {
+            "expected": 19,
+            "value": 23
+          }
+        }
+      ]
+    },
+    {
+      "id": "KatanaDoubleSlash_Katana",
+      "subtype": "Katana",
+      "move": "KatanaDoubleSlash"
+    },
+    {
+      "id": "CuckSlash",
+      "subtype": "Katana",
+      "add": true,
+      "move": "KatanaSlash",
+      "animation": {
+        "expected": "katana_slash.bytes",
+        "value": "chinese_sabers_super_slash.bytes"
+      }
     }
   ]
 }

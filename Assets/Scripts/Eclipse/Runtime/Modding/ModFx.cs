@@ -24,7 +24,16 @@ namespace Eclipse.Modding
 	// triggers come from how a fighter moves: Land when a fall ends on the floor,
 	// Knockdown when the body hits the floor, Slide repeatedly while the feet skid
 	// fast along the floor, and Wall when a fighter starts a wall-hit recoil move.
-	public enum ModFxTrigger { Always, Hit, Critical, Block, Ko, Land, Knockdown, Slide, Wall }
+	// Script fires only when the owning mod's Lua calls sf2.fx.play (screen effects).
+	public enum ModFxTrigger { Always, Hit, Critical, Block, Ko, Land, Knockdown, Slide, Wall, Script }
+
+	// Lua-fired screen effects. The presentation runtime installs Fire; the scripting
+	// facade calls it for sf2.fx.play with the effect and an optional arena X to frame.
+	// It returns false when no fight presentation is listening.
+	public static class ModFxScriptTriggers
+	{
+		public static Func<ModFxDefinition, float?, bool> Fire;
+	}
 
 	// Built-in overlay art when no sprite is given: Rect is a flat fill, Shaft a
 	// soft vertical light beam and Glow a soft round light.
@@ -195,7 +204,8 @@ namespace Eclipse.Modding
 					("flicker", 0f, 0f, 1f), ("flicker_speed", 6f, 0.1f, 30f),
 					("accent_strength", 0f, 0f, 1f), ("accent_width", 0.08f, 0.01f, 0.5f),
 					("duration", 0.25f, 0.02f, 10f), ("hold", 0f, 0f, 10f), ("time_scale", 1f, 0.05f, 1f),
-					("sound_volume", 1f, 0f, 1f), ("muffle", 0f, 0f, 1f) } },
+					("sound_volume", 1f, 0f, 1f), ("muffle", 0f, 0f, 1f),
+					("zoom", 1f, 1f, 3f), ("zoom_offset_y", 0f, -400f, 400f) } },
 				{ ModFxKind.Shadow, new[] {
 					("alpha", 0.45f, 0f, 1f), ("width", 150f, 1f, 2000f), ("height", 28f, 1f, 1000f),
 					("fade_height", 350f, 1f, 5000f), ("min_scale", 0.35f, 0f, 1f) } },
@@ -327,14 +337,18 @@ namespace Eclipse.Modding
 			else if (kind == ModFxKind.Screen)
 			{
 				if (trigger == ModFxTrigger.Block || trigger == ModFxTrigger.Slide)
-					throw new ModContentException("Screen effects trigger always, on hit, critical, ko, land, knockdown or wall.");
+					throw new ModContentException("Screen effects trigger always, on hit, critical, ko, land, knockdown, wall or script.");
 				if (trigger == ModFxTrigger.Always && numbers["time_scale"] < 1f)
 					throw new ModContentException("Screen.time_scale needs a trigger; a grade that is always on cannot slow the game.");
+				if (trigger == ModFxTrigger.Always && (numbers["zoom"] > 1f || numbers["zoom_offset_y"] != 0f))
+					throw new ModContentException("Screen.zoom needs a trigger; a grade that is always on cannot push the camera in.");
 				if (trigger == ModFxTrigger.Always && request.Sounds != null && request.Sounds.Count != 0)
 					throw new ModContentException("Screen.sound needs a trigger; it plays once each time the trigger fires.");
 			}
 			else if (trigger != ModFxTrigger.Always)
 				throw new ModContentException("Only screen effects, stains and hit or contact particles accept a trigger.");
+			if (trigger == ModFxTrigger.Script && kind != ModFxKind.Screen)
+				throw new ModContentException("Only screen effects accept trigger = \"script\".");
 			if (kind != ModFxKind.Overlay && request.Shape != ModFxShape.Rect)
 				throw new ModContentException("Only overlays accept a shape.");
 			ModFxSound[] sounds = request.Sounds != null ? request.Sounds.ToArray() : Array.Empty<ModFxSound>();

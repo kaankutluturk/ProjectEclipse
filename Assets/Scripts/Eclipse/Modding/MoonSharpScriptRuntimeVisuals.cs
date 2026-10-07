@@ -9,6 +9,8 @@ namespace Eclipse.Modding
         private sealed partial class MoonSharpScriptContext
         {
             private readonly Dictionary<Table, ModSettingToggle> _settingHandles = new Dictionary<Table, ModSettingToggle>();
+            // Screen effects with trigger = "script", by qualified name, for sf2.fx.play.
+            private readonly Dictionary<string, ModFxDefinition> _scriptFx = new Dictionary<string, ModFxDefinition>(StringComparer.Ordinal);
 
             // sf2.settings: installation-wide toggles shown under Options > Mod settings.
             // sf2.visuals: typed configuration for the engine's optional fight visuals.
@@ -54,6 +56,29 @@ namespace Eclipse.Modding
                 fx.Set("glint", DynValue.NewCallback(Fx("glint", ModFxKind.Glint, "fighters", "color")));
                 fx.Set("light", DynValue.NewCallback(Fx("light", ModFxKind.Light, "source", "weapons", "fighters", "color")));
                 fx.Set("stain", DynValue.NewCallback(Fx("stain", ModFxKind.Stain, "trigger", "fighters", "color", "sprite")));
+                fx.Set("play", DynValue.NewCallback((ctx, args) => ApiCall("sf2.fx.play", () =>
+                {
+                    const string function = "sf2.fx.play";
+                    string name = args.AsType(0, function, DataType.String, false).String;
+                    if (!_scriptFx.TryGetValue(name, out ModFxDefinition definition) &&
+                        !_scriptFx.TryGetValue(Mod.Id.Value + "." + name, out definition))
+                        throw new ModContentException(function + " needs the name of a screen effect with trigger = \"script\" registered by this mod.");
+                    float? focusX = null;
+                    DynValue options = args[1];
+                    if (!options.IsNil())
+                    {
+                        if (options.Type != DataType.Table) throw new ModContentException(function + " options must be a table.");
+                        ValidateFields(options.Table, function, "x");
+                        if (!options.Table.Get("x").IsNil())
+                        {
+                            float x = OptionalFloat(options.Table, "x", 0f, function);
+                            if (float.IsNaN(x) || float.IsInfinity(x) || x < -10000f || x > 10000f)
+                                throw new ModContentException(function + ".x must be a finite number from -10000 to 10000.");
+                            focusX = x;
+                        }
+                    }
+                    return DynValue.NewBoolean(_api.PlayFx(definition, focusX));
+                })));
                 root.Set("fx", DynValue.NewTable(fx));
             }
 
@@ -166,8 +191,8 @@ namespace Eclipse.Modding
                         : trigger == "critical" ? ModFxTrigger.Critical : trigger == "block" ? ModFxTrigger.Block
                         : trigger == "ko" ? ModFxTrigger.Ko : trigger == "land" ? ModFxTrigger.Land
                         : trigger == "knockdown" ? ModFxTrigger.Knockdown : trigger == "slide" ? ModFxTrigger.Slide
-                        : trigger == "wall" ? ModFxTrigger.Wall
-                        : throw new ModContentException(function + ".trigger must be always, hit, critical, block, ko, land, knockdown, slide or wall.");
+                        : trigger == "wall" ? ModFxTrigger.Wall : trigger == "script" ? ModFxTrigger.Script
+                        : throw new ModContentException(function + ".trigger must be always, hit, critical, block, ko, land, knockdown, slide, wall or script.");
                     string shape = OptionalString(table, "shape", "rect", function);
                     request.Shape = shape == "rect" ? ModFxShape.Rect : shape == "shaft" ? ModFxShape.Shaft : shape == "glow" ? ModFxShape.Glow
                         : throw new ModContentException(function + ".shape must be rect, shaft or glow.");
@@ -193,6 +218,7 @@ namespace Eclipse.Modding
                     request.Sounds = OptionalSounds(table, "sound", function);
 
                     ModFxDefinition definition = _api.RegisterFx(kind, id, request);
+                    if (definition.Trigger == ModFxTrigger.Script) _scriptFx[definition.Name] = definition;
                     return DynValue.NewString(definition.Name);
                 });
             }

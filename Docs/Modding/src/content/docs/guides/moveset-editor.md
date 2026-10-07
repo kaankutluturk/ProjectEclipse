@@ -4,13 +4,14 @@ description: Tune moves in game — speed, damage, hit frames, hitboxes and prio
 ---
 
 The **Moveset Lab** is an in-game editor for existing moves. You pick a weapon subtype
-(or one weapon), watch a move on a live fighter with its hitting parts drawn in red,
-change its values, and save the result as an ordinary mod. You don't need Lua or a
+(or one weapon), watch a move on a live fighter with its hitting parts drawn in red and a
+victim playing the hit reaction, change its values, and save the result as an ordinary mod. You don't need Lua or a
 text editor. The Lab writes a [moveset file](../../api/movesets/) that you can share,
 edit by hand, or combine with other mods.
 
-The Lab tunes moves that already exist. It cannot create brand-new moves or animations
-yet; use [`sf2.moves.register`](../../api/moves-and-tactics/#sf2movesregister) for those.
+The Lab tunes existing moves, changes their inputs, and adds [new moves](#make-a-new-move)
+based on existing ones. It cannot make animations or define moves from scratch; use
+[`sf2.moves.register`](../../api/moves-and-tactics/#sf2movesregister) for those.
 
 ## Open the Lab
 
@@ -23,30 +24,104 @@ Either:
 
 | Area | What it does |
 | --- | --- |
-| Left, first row | The **mod** you are editing. `<` `>` switch between the data-only mods in your Mods folder (those without a Lua `entrypoint`); **NEW** starts another. **(OFF)** marks a mod switched off in **Mods**. |
-| Left, next rows | `<` `>` choose the **scope**: **Shared** (moves every fighter has, like most kicks), **Unarmed**, or a weapon subtype such as **Katana**. The second row picks one **weapon** of that subtype, or **Whole subtype**. |
-| Left, list | The moves fighters in this scope use. **family of 3** means three subtypes share the move; **shared** means every fighter has it; a gold dot marks moves you changed. Type in **Search** to filter. |
-| Centre | The fighter wearing the chosen weapon. **PLAY** starts the move, **PAUSE** freezes it, **STEP** advances one game tick, **LOOP** repeats it. The readout shows the tick and the *keyframe*, the frame number that intervals and attacks use. |
-| Centre, timeline | One bar per frame window: red bars are attacks, grey bars are windows such as `Uninterrupt` or `Block`, gold bars are windows you added. The gold line is the current keyframe. |
-| Right | The **inspector**: every value you can change, each with `−` and `+` buttons. |
+| Top bar | **MOD** is the mod you are editing; **NEW** starts another. **FIGHTERS** chooses the *scope*: **Shared** (moves every fighter has, like most kicks), **Unarmed**, or a weapon subtype such as **Katana**. **WEAPON** narrows it to one weapon of that subtype (its subtype moves plus moves made only for that weapon; shared moves stay under **Shared**), or **Every Katana**. On the right are **UNDO**, **REDO**, **APPLY**, **TEST** and **CLOSE**. *Unapplied edits* means the fighters still show the last applied version. |
+| Left | The moves fighters in this scope use. **family of 3** means three subtypes share the move; **shared** means every fighter has it; a gold dot marks moves you changed. **Search** filters by name; **EDITED** shows only moves you changed. **+ NEW MOVE** adds a [new move](#make-a-new-move); new moves are listed under the move they are based on, marked **new move**. |
+| Centre, stage | Left: the attacker wearing the chosen weapon. Right: the *victim*, a training dummy that plays the hit reaction when an attack lands. |
+| Centre, transport | `\|<` `<` **PLAY** `>` `>\|` jump to the first frame, step one keyframe back, play or pause, step one keyframe forward, and jump to the last frame. **RESTART** plays from the start, **LOOP** repeats the move, **0.1x**–**1x** slow the preview down, and **VICTIM** turns the reaction preview on or off. The readout shows the current *keyframe* (the frame number that attacks and windows use) and the game tick. |
+| Centre, timeline | One lane per attack and frame window: red bars are attacks, blue-grey bars are windows such as `Uninterrupt` or `Block`, gold bars are windows you added. The gold line is the current keyframe. Click or drag along the ruler or an empty lane to scrub. Drag a bar to move it, or its left or right end to resize it; the change is one undo step when you let go. Click a bar to open it in the inspector. |
+| Right | The **inspector**, one tab at a time: **MOVE**, **ATTACK**, **WINDOWS** and **HITBOX**. |
 
-Keys: **P** play, **K** pause, **L** step, **Z** undo, **Y** redo, **F5** apply,
-**T** test in training, **Esc** back.
+Number fields have `−` and `+` buttons and a box you can type in: press **Enter** or click
+away to set the value. Hold **Shift** for ten steps at a time, or **Ctrl** for a tenth of
+a step on fractional values such as damage. A changed value shows a gold dot, its
+base-game value, and **RESET**.
+
+Keys: **Space** play or pause, **Left**/**Right** one keyframe (**Shift**: five),
+**Home**/**End** first or last keyframe, **Up**/**Down** previous or next move,
+**1**–**4** inspector tabs, **Ctrl+Z** undo, **Ctrl+Y** or **Ctrl+Shift+Z** redo,
+**Ctrl+F** search, **F5** apply, **T** test in training, **Esc** close a list or leave.
+Keys do nothing while you type in a field.
 
 ## What you can change
 
-| Field | Meaning |
-| --- | --- |
-| Speed | How fast the whole move plays, from 0.50× to 2.00× in steps of 0.05. Faster moves keep their reach; everything timed by frames (attacks, windows, sounds) moves with them. Looped and physics moves keep their speed. |
-| Priority | Which move wins when several match the same input. Higher wins. |
-| Attack: damage | Base damage of the hit. |
-| Attack: starts / ends | The keyframes during which the attack can hit. |
-| Attack: hit reaction | How the opponent reacts, such as `High` or `MiddleShortPlus`. Only shown when the attack has one reaction; attacks with several are edited in Lua. |
-| Attack: push X / Y | The push (impulse) applied on hit. |
-| Attack: edges | The **hitbox**: the body or weapon parts that hit. Red toggles are active; at least one must stay on. During PLAY the active edges are drawn as red capsules. |
-| Frame windows | Move a window's start and end, remove it, or restore a removed one. **New window type** and **Add** insert a `Block`, `Invulnerable`, `Invisible` or `Throwable` window at the current keyframe. |
-| Animation | **Change animation** swaps the clip the move plays for another native clip. See [swap an animation](#swap-an-animation). |
-| Move | **Reset to base game** drops your changes; **Disable move** makes it unselectable. |
+| Tab | Field | Meaning |
+| --- | --- | --- |
+| Move | Input | The keys that start the move. See [change a move's input](#change-a-moves-input). |
+| Move | Speed | How fast the whole move plays, from 0.50× up to the clip's limit (at most 2.00×), in steps of 0.05. Everything timed by frames (attacks, windows, sounds) moves with it. Looped and physics moves keep their speed. |
+| Move | Priority | Which move wins when several match the same input. Higher wins. |
+| Move | Clip | **CHANGE CLIP...** swaps the clip the move plays for another native clip. See [swap an animation](#swap-an-animation). |
+| Move | Move | **Reset to base game** drops your changes; **Disable move** makes it unselectable; **Delete this copy** removes a fork. |
+| Attack | Starts / ends at frame | The keyframes during which the attack can hit. A move with several attacks shows one button per attack. |
+| Attack | Base damage | The attack's damage value, 0–16. Base-game hits mostly sit between 0.06 and 0.45; the fighters' attributes, blocking and critical hits scale it. |
+| Attack | Damage shifts | One row per damage type the attack already has (`Weapon`, `Ranged`, `Magic`, `Unarmed`): a number from −1000 to 1000 added to the attacker's matching attribute before it is weighed against the defender's defence. Damage types cannot be added or removed here. |
+| Attack | Reaction | How the opponent reacts, such as `High` or `SpinningHeavy`. Only shown when the attack has one reaction; attacks with several are edited in Lua. |
+| Attack | Victim plays | The victim moves that answer this reaction. The game picks among them by the victim's state (blocking, critical hits and so on); `<` `>` browse them and **PLAY** shows the chosen one. Entries marked *near wall* play the same move with a wall behind the victim, set by **Wall behind victim**; if the victim reaches it during the move's wall-hit window, the game turns the recoil into `WallHit` or `WallHitFall`. Otherwise the preview has no walls. This is a preview only and is not saved. |
+| Attack | Push X / Y / Z | The push (impulse) given to the victim on hit. |
+| Windows | Start / End | Each window's frames, with **REMOVE**, **RESTORE** (for a removed window) or **DELETE** (for one you added). A window without an end lasts to the end of the move. |
+| Windows | Add a window | Inserts a `Block`, `Invulnerable`, `Invisible` or `Throwable` window at the current keyframe, four frames long. |
+| Hitbox | Hitting parts | The body or weapon parts that deal the attack's hit. See [edit a hitbox](#edit-a-hitbox). |
+
+## Change a move's input
+
+The **INPUT** section at the top of the **MOVE** tab shows the keys that start the move,
+for example `Punch + hold Forward`. It works for every move whose keys form one chord, or a
+set of alternative chords; a few moves mix their keys into other conditions, and the Lab
+says so instead.
+
+- A *chord* is the keys pressed together. Each key has a press type: **TAP** (press once),
+  **HOLD** (keep it held) or **RELEASE** (let it go). Click a key to choose another one and
+  its press type to change how it is pressed. The same key tapped twice is a two-tap
+  sequence.
+- **+ KEY** adds a key to the chord (up to 14); **x** removes one.
+- **+ ALTERNATIVE** adds another chord that also starts the move, such as a dash that
+  starts on Up-Back or on Back tapped twice. Up to 8 alternatives.
+- **REMOVE INPUT** leaves the move without keys, and **ADD AN INPUT** gives one to a move
+  that has none. Moves without keys are started by the game itself (hit reactions, combo
+  steps, AI actions), so both change when the move can happen; the Lab warns you.
+- **RESET** returns to the base game's input.
+
+Directions are for a fighter facing right; the game mirrors them when it faces left. The
+input does not change what the move must follow: a combo step still needs the move before
+it. When two moves have the same input in the same situation, the higher **Priority** wins.
+
+## Make a new move
+
+**+ NEW MOVE** (under the move list's filters) adds a move based on an existing one:
+
+1. Give it a name. It becomes the move's ID in your mod, for example `rising_slash`.
+2. **Based on** is the move it starts as a copy of: animation, attacks, frame windows,
+   sounds and what it must follow. It defaults to the selected move; the list shows the
+   moves in the current view first.
+3. **Who can use it**: the same fighters as the original, only the current subtype (for
+   example only Katana), or only the chosen weapon.
+4. **CREATE** selects the new move. Give it its own input under **INPUT**; with the
+   original's input both moves compete and priority decides. Then edit it like any other
+   move.
+
+The original move is not changed. Combos written for the original's exact name do not
+continue from the new move, but moves that follow a shared template still can. The preview
+plays the original until you **APPLY**. **DELETE THIS MOVE** on the **MOVE** tab removes a new
+move.
+
+## Edit a hitbox
+
+The **HITBOX** tab edits the selected attack's hitting parts (*edges*). The fighter shows
+every part you can pick: red parts hit, grey parts don't, and the part under the pointer
+turns gold.
+
+- Click a part on the fighter, or its button in the list, to add or remove it. At least
+  one part must stay on.
+- Parts are grouped as **Weapon**, **Arm** and **Leg** for each side, and **Head and torso**.
+  *Side 1* and *side 2* are the game's two limbs; a mirrored move swaps them. Hover a
+  button to see which limb it is.
+- **MIRROR SIDES** moves the hitbox to the other arm or leg; **RESET HITBOX** restores
+  the base game's parts.
+- Extra letters after a part's name, such as `Hand S` or `Chest HD`, mark extra edges
+  that shape the body. Edges with no collision size are *braces*: they hold the rig's
+  shape and rarely make sense as hitting parts, so they are hidden until you press
+  **SHOW BRACES**.
+- Parts that belong to another weapon or rig are listed under **Not on this fighter**.
+  They still hit when a fighter that has them uses the move.
 
 ## Who gets a change
 
@@ -63,11 +138,11 @@ the Lab asks who should get the change:
 
 Copies are called *forks*. They appear in the list under their own name (for example
 `HighKick_weapon_golden_katana`) and keep the original's combos. **Delete this copy**
-in the inspector removes one.
+on the **MOVE** tab removes one.
 
 ## Swap an animation
 
-**Change animation** turns the inspector into a clip list. Clips used by moves in the
+**CHANGE CLIP...** on the **MOVE** tab turns the inspector into a clip list. Clips used by moves in the
 current view come first; type in the search box to find any of the game's clips.
 
 1. Click a clip. The fighter plays it, through a base-game move that uses it, and the
@@ -89,18 +164,19 @@ in the preview. Clips shipped inside a mod's `assets/` folder are not listed; us
 
 ## Choose or start a mod
 
-The Lab saves into one mod at a time, shown in the first row of the left panel. The first
+The Lab saves into one mod at a time, shown as **MOD** in the top bar. The first
 time, that is **Moveset Lab** (`local.moveset-lab`).
 
 - **NEW** asks for a name and makes the ID from it: "Heavy Katana" becomes
   `local.heavy-katana`. Nothing is written until **APPLY**, which creates
   `Mods/local.heavy-katana/`.
-- `<` `>` open another data-only mod, including one you installed. Its saved edits load
+- The **MOD** list opens another data-only mod (one without a Lua `entrypoint`),
+  including one you installed. *(off)* marks a mod switched off in **Mods**. Its saved edits load
   into the Lab, and APPLY writes back into that mod's own folder, keeping its name,
   version and dependencies.
 
-If you have unapplied changes, the first press of `<`, `>` or **NEW** warns you and the
-second discards them. APPLY needs the mod switched on in **Mods**; a new mod is on until
+If you have unapplied changes, the first choice of another mod or **NEW** warns you and
+the second discards them. APPLY needs the mod switched on in **Mods**; a new mod is on until
 you switch it off.
 
 ## Apply, test and share
@@ -110,7 +186,7 @@ Changes stay in the Lab until you press **APPLY**. Applying:
 1. saves the mod you are editing to its folder, for example `Mods/local.moveset-lab/`
    (`mod.toml` and `movesets/moveset.json`);
 2. applies it, with every other enabled mod's move edits, to the running game;
-3. rebuilds the preview fighter, so forks and speed changes show at once.
+3. rebuilds the preview fighters, so forks and speed changes show at once.
 
 **TEST** applies unsaved changes, then starts training with the
 Lab's fighter. In the training menu (**Esc**), **MOVESET LAB** returns to the Lab.
@@ -142,6 +218,10 @@ so the moveset loads only when the weapon does.
   enabled.
 - Edits are checked against the game data, not against gameplay. Test changed timings
   and hitboxes in a fight before you share them.
-- Dragging bars on the timeline, editing damage types, swapping in clips from a mod's
-  `assets/` folder and editing a weapon's subtype are not in the Lab yet. Use a
-  [moveset file](../../api/movesets/) or Lua for those.
+- Adding or removing damage types, attacks with several reactions, swapping in clips
+  from a mod's `assets/` folder and editing a weapon's subtype are not in the Lab yet. Use
+  a [moveset file](../../api/movesets/) or Lua for those.
+- Scrubbing and stepping back replay the move from the fighter's start position up to the
+  chosen keyframe, so every pose is one normal playback reaches. Stepping forward stops at
+  the move's last keyframe. The victim's reaction while scrubbing is an approximation: it is
+  matched by keyframe count since the hit, not by exact game ticks.

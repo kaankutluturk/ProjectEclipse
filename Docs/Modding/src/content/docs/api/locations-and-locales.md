@@ -190,7 +190,7 @@ and scene transitions still need a game test. See the Animated Arena example.
 
 ## sf2.locations.dojo_picker
 
-**Signature:** `sf2.locations.dojo_picker { id = "...", button = sprite, title = key, choices = { { location = ..., name = key, preview = sprite }, ... } }`
+**Signature:** `sf2.locations.dojo_picker { id = "...", button = sprite, button_pressed = sprite, title = key, choices = { { location = ..., name = key, preview = sprite }, ... } }`
 
 **Returns:** The qualified name of the picker's dojo-menu button, `<mod-id>.<id>`.
 
@@ -222,6 +222,7 @@ gold and labelled **CURRENT DOJO**.
 | --- | --- | --- |
 | `id` | Required | 1–64 lowercase ASCII letters, digits, `_` or `-`. The button is named `<mod-id>.<id>` and counts toward your mod's four dojo buttons. |
 | `button` | Required | Sprite handle for the dojo-menu button. |
+| `button_pressed` | The `button` sprite, darkened | Sprite handle shown while the dojo-menu button is held down. Same size as `button`. |
 | `title` | `"CHOOSE YOUR DOJO"` | Localization handle for the heading (shown in capitals). |
 | `choices` | Required | 1–64 choices, in display order, without duplicate locations. |
 | `choices[i].location` | Required | A `core:locations/<name>` string or a location handle this mod registered with `dojo = true`. |
@@ -249,6 +250,7 @@ end
 sf2.locations.dojo_picker {
     id = "dojo_picker",
     button = sf2.assets.sprite("sprites/dojos/button"),
+    button_pressed = sf2.assets.sprite("sprites/dojos/button_pressed"),
     title = sf2.localization.key("dojo_picker.title"),
     choices = choices,
 }

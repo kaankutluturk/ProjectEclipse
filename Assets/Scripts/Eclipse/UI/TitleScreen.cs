@@ -198,12 +198,7 @@ namespace Eclipse.UI
                 fit.aspectMode = AspectRatioFitter.AspectMode.FitInParent;
                 fit.aspectRatio = (float)image.texture.width / image.texture.height;
             }
-            // The credit sits under the figure and shares its fade and push-in.
-            var credit = Label(art, "TEAM DEFINITIVE™", 0, 0, 0, 0, 30, Paper, TextAnchor.MiddleCenter);
-            var creditRect = credit.rectTransform;
-            creditRect.anchorMin = new Vector2(0f, .25f); creditRect.anchorMax = new Vector2(1f, .31f);
-            creditRect.offsetMin = creditRect.offsetMax = Vector2.zero;
-            credit.color = new Color(Paper.r, Paper.g, Paper.b, 0f);
+            // The splash art (EclipseTitle/splash) carries its own "TEAM DEFINITIVE" credit.
             // Let the first (often slow) launch frames pass on black before starting the clock.
             for (int i = 0; i < 3; i++) yield return null;
             yield return PlayDisclaimer(layer);
@@ -221,7 +216,6 @@ namespace Eclipse.UI
                 float alpha = t < fadeOutAt ? Mathf.Clamp01((t - Lead) / FadeIn) : 1f - Mathf.Clamp01((t - fadeOutAt) / FadeOut);
                 alpha = alpha * alpha * (3f - 2f * alpha);
                 image.color = new Color(1f, 1f, 1f, alpha);
-                credit.color = new Color(Paper.r, Paper.g, Paper.b, alpha * .9f);
                 // A slow push-in while it is on screen.
                 float zoom = 1.025f - .025f * Mathf.Clamp01((t - Lead) / (FadeIn + Hold + FadeOut));
                 art.localScale = new Vector3(zoom, zoom, 1f);

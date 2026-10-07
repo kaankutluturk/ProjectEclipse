@@ -601,6 +601,30 @@ namespace Nekki.SF2.Core.Fights
 			for (int i = 0; i < ticks; i++) Render();
 		}
 
+		// Eclipse: a paused preview shows each model's current pose (see ModelPresentation.Frozen).
+		// Synced every frame so models rebuilt or spawned during a pause are frozen too.
+		internal void SyncPreviewFreeze()
+		{
+			FreezePresentation(_playerModel);
+			foreach (Model model in _models) FreezePresentation(model);
+		}
+
+		// Eclipse: the preview owns its fighter's walls. The model is built through the menu
+		// path, whose walls follow the scene camera (or stay at zero without one), which put
+		// a wall right behind a preview fighter and turned recoils into wall hits.
+		internal void KeepPreviewWalls(float left, float right)
+		{
+			if (_playerModel != null && (_playerModel.GetLeftWallX() != left || _playerModel.GetRightWallX() != right))
+				_playerModel.SetWalls(left, right, 0, 0);
+		}
+
+		private void FreezePresentation(Model model)
+		{
+			var root = model?.UnityObject;
+			var presentation = root != null ? root.GetComponent<Eclipse.Rendering.ModelPresentation>() : null;
+			if (presentation != null) presentation.Frozen = PreviewPaused;
+		}
+
 		private void FixedUpdate()
 		{
 			if (PreviewPaused) return;

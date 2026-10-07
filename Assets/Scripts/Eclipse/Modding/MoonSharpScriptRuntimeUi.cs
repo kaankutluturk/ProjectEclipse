@@ -60,10 +60,12 @@ namespace Eclipse.Modding
                 ui.Set("dojo_button", DynValue.NewCallback((ctx, args) => ApiCall("sf2.ui.dojo_button", () => {
                     const string function = "sf2.ui.dojo_button";
                     Table table = args.AsType(0, function, DataType.Table, false).Table;
-                    ValidateFields(table, function, "id", "image");
+                    ValidateFields(table, function, "id", "image", "pressed_image");
                     string id = ReadButtonId(table, function);
+                    AssetId? pressed = table.Get("pressed_image").IsNil() ? (AssetId?)null
+                        : RequiredHandle(table, "pressed_image", _spriteHandles, "sprite", function);
                     ModDojoButton button = _api.RegisterDojoButton(id,
-                        RequiredHandle(table, "image", _spriteHandles, "sprite", function));
+                        RequiredHandle(table, "image", _spriteHandles, "sprite", function), pressed);
                     return DynValue.NewString(button.Name);
                 })));
                 root.Set("ui", DynValue.NewTable(ui));

@@ -25,7 +25,7 @@
   <Layer Type="2" Factor="1">
     <ModelsViewer PlayerPositionX="500" PlayerPositionY="-93" EnemyPositionX="763" EnemyPositionY="-110"/>
   </Layer>
-  <Layer Type="1" Factor="1" Atlas="dojo_atlas_layer3" Path="Locations/dojo/" Scaling="1">
+  <Layer Type="1" Factor="1" Path="Locations/dojo/" Scaling="1">
     <Image X="-640" Y="232" ClassName="dojo_floor_1" Width="256" Height="59" Color="0x361022"/>
     <Image X="-384" Y="232" ClassName="dojo_floor_2" Width="256" Height="59" Color="0x361022"/>
     <Image X="-128" Y="232" ClassName="dojo_floor_1" Width="256" Height="59" Color="0x361022"/>

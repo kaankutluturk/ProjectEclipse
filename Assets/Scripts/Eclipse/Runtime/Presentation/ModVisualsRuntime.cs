@@ -47,6 +47,11 @@ namespace Eclipse.Modding
 
 		// When each fight event last fired (unscaled seconds), for triggered effects.
 		private static readonly float[] _triggerTimes = { -1f, -1f, -1f, -1f, -1f, -1f, -1f, -1f, -1f };
+		// Arena X where each fight event last happened, when known, for screen zoom.
+		private static readonly float?[] _triggerFocus = new float?[9];
+		// Script-triggered effects fire one at a time, so each keeps its own time and focus.
+		private static readonly Dictionary<ModFxDefinition, float> _scriptTimes = new Dictionary<ModFxDefinition, float>();
+		private static readonly Dictionary<ModFxDefinition, float?> _scriptFocus = new Dictionary<ModFxDefinition, float?>();
 
 		public static void Bind(ModContentCatalog catalog)
 		{
@@ -54,6 +59,7 @@ namespace Eclipse.Modding
 			_impactStart = -1f;
 			ResetTriggers();
 			ModSettingsStore.Install();
+			ModFxScriptTriggers.Fire = FireScript;
 		}
 
 		// The running fight's location name; screen effects use it for match/exclude.
@@ -61,7 +67,52 @@ namespace Eclipse.Modding
 
 		public static void ResetTriggers()
 		{
-			for (int i = 0; i < _triggerTimes.Length; i++) _triggerTimes[i] = -1f;
+			for (int i = 0; i < _triggerTimes.Length; i++) { _triggerTimes[i] = -1f; _triggerFocus[i] = null; }
+			_scriptTimes.Clear();
+			_scriptFocus.Clear();
+		}
+
+		// sf2.fx.play: starts one script-triggered screen effect now, if its switch is
+		// on and it applies to this location. `focusX` is the arena X its zoom frames.
+		private static bool FireScript(ModFxDefinition definition, float? focusX)
+		{
+			if (_catalog == null || definition == null || definition.Trigger != ModFxTrigger.Script) return false;
+			if (!SettingOn(definition.Setting) || !definition.MatchesLocation(CurrentLocation)) return false;
+			_scriptTimes[definition] = Time.unscaledTime;
+			_scriptFocus[definition] = focusX;
+			if (PlayEffectSound != null && definition.Sounds.Count != 0)
+			{
+				ModFxSound sound = definition.Sounds[UnityEngine.Random.Range(0, definition.Sounds.Count)];
+				PlayEffectSound(sound.Reference, sound.Volume * definition.Number("sound_volume"));
+			}
+			return true;
+		}
+
+		// Camera push-in from triggered screen grades with zoom: the strongest one
+		// wins. `zoom` multiplies the camera's scale, `focus` (0..1) is how far the
+		// view moves toward `focusX`, and `offsetY` pans like the camera API's offset_y.
+		public static void CameraPush(out float zoom, out float focus, out float focusX, out float offsetY)
+		{
+			zoom = 1f; focus = 0f; focusX = 0f; offsetY = 0f;
+			float best = 0f;
+			foreach (ModFxDefinition definition in EnumerateActiveFx(ModFxKind.Screen))
+			{
+				if (definition.Trigger == ModFxTrigger.Always) continue;
+				float target = definition.Number("zoom"), lift = definition.Number("zoom_offset_y");
+				if (target <= 1f && lift == 0f) continue;
+				if (!definition.MatchesLocation(CurrentLocation)) continue;
+				float w = TriggerWeight(definition);
+				float strength = w * Mathf.Max(target - 1f, 0.001f);
+				if (w <= 0f || strength <= best) continue;
+				best = strength;
+				zoom = Mathf.Lerp(1f, target, w);
+				offsetY = lift * w;
+				float? x = definition.Trigger == ModFxTrigger.Script
+					? (_scriptFocus.TryGetValue(definition, out float? scripted) ? scripted : null)
+					: _triggerFocus[(int)definition.Trigger];
+				focus = x.HasValue ? w : 0f;
+				focusX = x ?? 0f;
+			}
 		}
 
 		// Slow motion from triggered screen grades (time_scale < 1): the game
@@ -106,16 +157,17 @@ namespace Eclipse.Modding
 
 		// Records a resolved hit for triggered screen effects. A ko also counts as
 		// a hit (and a critical ko as a critical).
-		public static void NotifyHit(bool critical, bool blocked, bool ko)
+		// `focusX` is the struck fighter's arena X when known, framed by screen zoom.
+		public static void NotifyHit(bool critical, bool blocked, bool ko, float? focusX = null)
 		{
 			float now = Time.unscaledTime;
-			if (blocked) _triggerTimes[(int)ModFxTrigger.Block] = now;
+			if (blocked) Mark(ModFxTrigger.Block, now, focusX);
 			else
 			{
-				_triggerTimes[(int)ModFxTrigger.Hit] = now;
-				if (critical) _triggerTimes[(int)ModFxTrigger.Critical] = now;
+				Mark(ModFxTrigger.Hit, now, focusX);
+				if (critical) Mark(ModFxTrigger.Critical, now, focusX);
 			}
-			if (ko) _triggerTimes[(int)ModFxTrigger.Ko] = now;
+			if (ko) Mark(ModFxTrigger.Ko, now, focusX);
 			if (blocked) PlayTriggerSounds(ModFxTrigger.Block);
 			else
 			{
@@ -126,11 +178,17 @@ namespace Eclipse.Modding
 		}
 
 		// Records a fighter's landing, knockdown, slide or wall impact for triggered screen effects.
-		public static void NotifyMotion(ModFxTrigger trigger)
+		public static void NotifyMotion(ModFxTrigger trigger, float? focusX = null)
 		{
 			if (!ModFxParameters.IsMotionTrigger(trigger)) return;
-			_triggerTimes[(int)trigger] = Time.unscaledTime;
+			Mark(trigger, Time.unscaledTime, focusX);
 			PlayTriggerSounds(trigger);
+		}
+
+		private static void Mark(ModFxTrigger trigger, float now, float? focusX)
+		{
+			_triggerTimes[(int)trigger] = now;
+			_triggerFocus[(int)trigger] = focusX;
 		}
 
 		// Plays a screen effect's sound; installed by the game assembly, which
@@ -208,7 +266,12 @@ namespace Eclipse.Modding
 		public static float TriggerWeight(ModFxDefinition definition)
 		{
 			if (definition.Trigger == ModFxTrigger.Always) return 1f;
-			float start = _triggerTimes[(int)definition.Trigger];
+			float start;
+			if (definition.Trigger == ModFxTrigger.Script)
+			{
+				if (!_scriptTimes.TryGetValue(definition, out start)) return 0f;
+			}
+			else start = _triggerTimes[(int)definition.Trigger];
 			if (start < 0f) return 0f;
 			float t = Time.unscaledTime - start - definition.Number("hold");
 			if (t <= 0f) return 1f;

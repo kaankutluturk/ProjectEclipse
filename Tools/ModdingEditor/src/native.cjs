@@ -55,9 +55,16 @@ function checkPatch(move,definition,{literal,fields},add){
             else if(typeof expected==='number'&&found[0].frame!==expected)add(at('sound_frame','expected'),'native-guard',`Vanilla "${move.name}" plays "${name}" at frame ${found[0].frame}, not ${expected}; the runtime rejects this patch.`);}
     }
     if(definition.input){
-        const expected=literal(fields(definition.input).expected);
-        if(move.keys.length!==1)add(definition.input,'native-guard',`input patches need exactly one top-level key condition; vanilla "${move.name}" has ${move.keys.length}.`);
-        else if(typeof expected==='string'&&!(move.keys[0].length===1&&move.keys[0][0].type===expected))add(at('input','expected'),'native-guard',`Vanilla "${move.name}" uses ${move.keys[0].map(k=>k.type).join(' + ')||'no key'}, not "${expected}"; the runtime rejects this patch.`);
+        // expected: one tapped key (string) or alternatives of keys (moveset files). The index
+        // records only top-level chords, so inputs written as alternatives are not checked here.
+        const node=fields(definition.input).expected,expected=inputChords(node,literal);
+        const show=chord=>chord.map(k=>k.press&&k.press!=='Tap'?`${k.press} ${k.type}`:k.type).join(' + ');
+        if(move.keys.length>1)add(definition.input,'native-guard',`input patches need one key condition; vanilla "${move.name}" has ${move.keys.length}.`);
+        else if(expected&&move.keys.length===1){
+            const ok=expected.length===1&&sameChord(expected[0],move.keys[0]);
+            if(!ok)add(at('input','expected'),'native-guard',`Vanilla "${move.name}" uses ${show(move.keys[0])||'no key'}, not ${expected.map(c=>`"${show(c)}"`).join(' or ')||'no input'}; the runtime rejects this patch.`);
+        }
+        else if(expected&&expected.length===1&&move.keys.length===0&&!move.templates)add(at('input','expected'),'native-guard',`Vanilla "${move.name}" has no top-level key input.`);
     }
     if(definition.priority){const expected=literal(fields(definition.priority).expected);
         if(typeof expected==='number'&&expected!==move.priority)add(at('priority','expected'),'native-guard',`Vanilla "${move.name}" has priority ${move.priority}, not ${expected}; the runtime rejects this patch.`);}
@@ -158,6 +165,33 @@ function checkCall(name,args,helpers,add){
             else if(group.length===1)add(definition.subtype,'native-guard',`"${subtype}" is the only subtype in "${target}"'s lock; removing it would unlock the move for every fighter.`);
         }
     }
+}
+// A literal input as [[{type, press}]], or null when it is not a literal.
+function inputChords(node,literal){
+    const value=literal(node);
+    if(typeof value==='string')return [[{type:value,press:'Tap'}]];
+    if(node?.type!=='TableConstructorExpression')return null;
+    const chords=[];
+    for(const alternative of node.fields){
+        if(alternative.type!=='TableValue'||alternative.value.type!=='TableConstructorExpression')return null;
+        const chord=[];
+        for(const entry of alternative.value.fields){
+            if(entry.type!=='TableValue')return null;
+            const key=entry.value,text=literal(key);
+            if(typeof text==='string'){chord.push({type:text,press:'Tap'});continue;}
+            if(key.type!=='TableConstructorExpression')return null;
+            const parts=Object.fromEntries(key.fields.filter(f=>f.type==='TableKeyString').map(f=>[f.key.name,literal(f.value)]));
+            if(typeof parts.key!=='string')return null;
+            chord.push({type:parts.key,press:typeof parts.press==='string'?parts.press:'Tap'});
+        }
+        chords.push(chord);
+    }
+    return chords;
+}
+// Same keys and press types; taps keep their order (repeated taps are a sequence).
+function sameChord(a,b){
+    const group=(chord,press)=>chord.filter(k=>(k.press||'Tap')===press).map(k=>k.type);
+    return ['Tap','Hold','Release'].every(p=>JSON.stringify(group(a,p))===JSON.stringify(group(b,p)));
 }
 function describe(name){
     const move=lookup(name);if(!move)return;

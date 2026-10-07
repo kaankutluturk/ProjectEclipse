@@ -29,7 +29,7 @@ namespace Eclipse.Modding
         /// <summary>Speed multiplier guard (1.0 = authored speed).</summary>
         public ModMoveGuard<double> PlaybackRate { get; set; }
         public ModMovesetAnimation Animation { get; set; }
-        public ModMoveGuard<string> Input { get; set; }
+        public ModMoveGuard<ModMoveInput> Input { get; set; }
         public ModMovesetSoundFrame SoundFrame { get; set; }
         public List<ModMoveIntervalEdit> Intervals { get; } = new List<ModMoveIntervalEdit>();
         public List<ModMoveAttackEdit> Attacks { get; } = new List<ModMoveAttackEdit>();
@@ -40,15 +40,19 @@ namespace Eclipse.Modding
 
     /// <summary>
     /// A copy of a native move used only by one weapon subtype or one weapon item; the
-    /// source move stops matching that subtype or item. Edits apply to the copy.
+    /// source move stops matching that subtype or item. Edits apply to the copy. With
+    /// <see cref="Add"/> it is a new move beside the source instead (the source is unchanged),
+    /// for the subtype or item when one is given, else for the same fighters as the source.
     /// </summary>
     public sealed class ModMovesetFork : ModMovesetMove
     {
-        /// <summary>Local fork ID; the runtime move is named "&lt;mod&gt;:moves/&lt;id&gt;".</summary>
+        /// <summary>Local fork ID; the runtime move is named "&lt;mod&gt;.&lt;id&gt;".</summary>
         public string Id { get; set; }
         public string Subtype { get; set; }
         /// <summary>Definition ID of a weapon item, e.g. core:items/weapon/weapon_katana.</summary>
         public string Item { get; set; }
+        /// <summary>A new move copied from <see cref="ModMovesetMove.Move"/>, not a replacement of it.</summary>
+        public bool Add { get; set; }
     }
 
     public sealed class ModMovesetAnimation
@@ -105,12 +109,14 @@ namespace Eclipse.Modding
             {
                 string where = source + ".forks[" + i + "]";
                 var entry = Obj(forks[i], where);
-                Fields(entry, where, MoveFields.Concat(new[] { "id", "subtype", "item" }).ToArray());
+                Fields(entry, where, MoveFields.Concat(new[] { "id", "subtype", "item", "add" }).ToArray());
                 var fork = new ModMovesetFork { Id = Str(Required(entry, "id", where), where + ".id") };
                 MoveCombatPatch.ValidateName(fork.Id);
                 if (entry["subtype"] != null) fork.Subtype = Str(entry["subtype"], where + ".subtype");
                 if (entry["item"] != null) fork.Item = Str(entry["item"], where + ".item");
-                if ((fork.Subtype == null) == (fork.Item == null)) throw Fail(where, "needs exactly one of subtype or item");
+                if (entry["add"] != null) fork.Add = Bool(entry["add"], where + ".add");
+                if (fork.Subtype != null && fork.Item != null) throw Fail(where, "takes at most one of subtype or item");
+                if (!fork.Add && fork.Subtype == null && fork.Item == null) throw Fail(where, "needs exactly one of subtype or item (or \"add\": true for a new move)");
                 ReadMove(entry, fork, where);
                 document.Forks.Add(fork);
             }
@@ -136,7 +142,11 @@ namespace Eclipse.Modding
                         if (rate < Eclipse.Runtime.PlaybackTiming.Minimum / 1000.0 || rate > Eclipse.Runtime.PlaybackTiming.Maximum / 1000.0)
                             throw Fail(where, "playback_rate must be 0.5..2.0");
                 }
-                if (entry["input"] != null) move.Input = Guard(entry["input"], where + ".input", Str);
+                if (entry["input"] != null)
+                {
+                    move.Input = Guard(entry["input"], where + ".input", Input);
+                    if (move.Input.Expected.SameAs(move.Input.Value)) throw Fail(where, "input must change the input");
+                }
                 if (entry["sound_frame"] != null)
                 {
                     var sound = Obj(entry["sound_frame"], where + ".sound_frame");
@@ -245,6 +255,7 @@ namespace Eclipse.Modding
                     var node = ModJsonNode.NewObject().Set("id", ModJsonNode.Of(fork.Id));
                     if (fork.Subtype != null) node.Set("subtype", ModJsonNode.Of(fork.Subtype));
                     if (fork.Item != null) node.Set("item", ModJsonNode.Of(fork.Item));
+                    if (fork.Add) node.Set("add", ModJsonNode.Of(true));
                     forks.Add(WriteMove(node, fork));
                 }
                 root.Set("forks", forks);
@@ -263,7 +274,7 @@ namespace Eclipse.Modding
                 node.Set("animation", ModJsonNode.NewObject().Set("expected", ModJsonNode.Of(move.Animation.Expected))
                     .Set("value", move.Animation.NativeValue != null ? ModJsonNode.Of(move.Animation.NativeValue)
                         : ModJsonNode.NewObject().Set("asset", ModJsonNode.Of(move.Animation.AssetValue))));
-            WriteGuard(node, "input", move.Input, ModJsonNode.Of);
+            WriteGuard(node, "input", move.Input, WriteInput);
             if (move.SoundFrame != null)
                 node.Set("sound_frame", ModJsonNode.NewObject().Set("name", ModJsonNode.Of(move.SoundFrame.Name))
                     .Set("expected", ModJsonNode.Of(move.SoundFrame.Expected)).Set("value", ModJsonNode.Of(move.SoundFrame.Value)));
@@ -326,6 +337,22 @@ namespace Eclipse.Modding
             return node;
         }
 
+        /// <summary>A single tapped key stays a plain string, as in the original input form.</summary>
+        private static ModJsonNode WriteInput(ModMoveInput input)
+        {
+            if (input.SingleKey != null) return ModJsonNode.Of(input.SingleKey);
+            var chords = ModJsonNode.NewArray();
+            foreach (var chord in input.Chords)
+            {
+                var keys = ModJsonNode.NewArray();
+                foreach (var key in chord)
+                    keys.Add(key.Press == "Tap" ? ModJsonNode.Of(key.Key)
+                        : ModJsonNode.NewObject().Set("key", ModJsonNode.Of(key.Key)).Set("press", ModJsonNode.Of(key.Press)));
+                chords.Add(keys);
+            }
+            return chords;
+        }
+
         private static void WriteGuard<T>(ModJsonNode node, string name, ModMoveGuard<T> guard, Func<T, ModJsonNode> write)
         {
             if (guard == null) return;
@@ -364,6 +391,39 @@ namespace Eclipse.Modding
             foreach (var member in map.Members) result[member.Key] = Num(member.Value, where + "." + member.Key);
             return result;
         }
+        /// <summary>
+        /// A key input: one tapped key as a string ("Kick"), or an array of alternative chords,
+        /// each an array of keys; a key is a name (tapped) or { "key", "press" }. [] is no input.
+        /// </summary>
+        private static ModMoveInput Input(ModJsonNode node, string where)
+        {
+            try
+            {
+                if (node.Kind == ModJsonKind.String) return ModMoveInput.Single(Str(node, where));
+                var chords = new List<List<ModMoveKey>>();
+                var alternatives = Arr(node, where);
+                for (int c = 0; c < alternatives.Count; c++)
+                {
+                    string at = where + "[" + c + "]";
+                    var keys = new List<ModMoveKey>();
+                    foreach (var (item, k) in Arr(alternatives[c], at).Select((item, k) => (item, k)))
+                    {
+                        if (item.Kind == ModJsonKind.String) { keys.Add(new ModMoveKey(Str(item, at + "[" + k + "]"))); continue; }
+                        var key = Obj(item, at + "[" + k + "]");
+                        Fields(key, at + "[" + k + "]", "key", "press");
+                        keys.Add(new ModMoveKey(Str(Required(key, "key", at), at + "[" + k + "].key"),
+                            key["press"] == null ? "Tap" : Str(key["press"], at + "[" + k + "].press")));
+                    }
+                    chords.Add(keys);
+                }
+                return new ModMoveInput(chords);
+            }
+            catch (ModContentException exception) when (!exception.Message.StartsWith(where, StringComparison.Ordinal))
+            {
+                throw Fail(where, exception.Message.TrimEnd('.'));
+            }
+        }
+
         private static ModMoveGuard<T> Guard<T>(ModJsonNode node, string where, Func<ModJsonNode, string, T> read)
         {
             var guard = Obj(node, where);
@@ -404,7 +464,7 @@ namespace Eclipse.Modding
                 if ((document.Moves.Count != 0 || document.Forks.Count != 0) && !HasCapability(mod, "content.patch"))
                     throw new ModContentException(source + " edits moves; declare the content.patch capability in mod.toml.");
                 foreach (var move in document.Moves) { Register(mod, assets, registration, move, source); count++; }
-                foreach (var fork in document.Forks) { registration.ForkMove(fork.Id, fork.Move, fork.Subtype, fork.Item); if (fork.HasEdits) Register(mod, assets, registration, fork, source, registration.ForkRuntimeName(fork.Id)); count++; }
+                foreach (var fork in document.Forks) { registration.ForkMove(fork.Id, fork.Move, fork.Subtype, fork.Item, fork.Add); if (fork.HasEdits) Register(mod, assets, registration, fork, source, registration.ForkRuntimeName(fork.Id)); count++; }
                 if (document.Moves.Count != 0 || document.Forks.Count != 0) registration.RecordMovesetFile(source);
             }
             return count;

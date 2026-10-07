@@ -7,6 +7,9 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
+    <InternalsVisibleTo Include="AssetPackerGui" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="K4os.Compression.LZ4.Streams" Version="1.2.16" />
   </ItemGroup>
 </Project>

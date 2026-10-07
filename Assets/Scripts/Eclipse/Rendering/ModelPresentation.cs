@@ -55,10 +55,16 @@ namespace Eclipse.Rendering
 			_slowFrame = frame;
 		}
 
+		// Set while a menu preview (the Moveset Lab) holds the model paused. Its previous
+		// and current poses still differ by the last tick, and the free-running render
+		// alpha would sweep between them; a frozen model is shown at its current pose.
+		public bool Frozen { get; set; }
+
 		public float Alpha
 		{
 			get
 			{
+				if (Frozen) return 1f;
 				float alpha = FightInterpolation.FightAlpha;
 				if (_slowFactor <= 1 || !FightInterpolation.Enabled) return alpha;
 				return Mathf.Clamp01((_slowFrame + alpha) / _slowFactor);

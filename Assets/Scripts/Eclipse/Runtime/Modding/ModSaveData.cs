@@ -1236,8 +1236,9 @@ namespace Eclipse.Modding
                         Append(canonical, patch.Input != null);
                         if (patch.Input != null)
                         {
-                            Append(canonical, patch.Input.Expected.Key);
-                            Append(canonical, patch.Input.Value.Key);
+                            // Single tapped keys keep their original fingerprint form.
+                            Append(canonical, patch.Input.Expected.SingleKey ?? "input-v2 " + patch.Input.Expected);
+                            Append(canonical, patch.Input.Value.SingleKey ?? "input-v2 " + patch.Input.Value);
                         }
                         Append(canonical, patch.Priority != null);
                         if (patch.Priority != null)
@@ -1333,6 +1334,8 @@ namespace Eclipse.Modding
                 {
                     Append(canonical, fork.Owner.Value); Append(canonical, fork.RuntimeName); Append(canonical, fork.Source);
                     Append(canonical, fork.ItemType); Append(canonical, fork.Subtype ?? string.Empty); Append(canonical, fork.RuntimeItemName ?? string.Empty);
+                    // Added moves are a new kind; replacement forks keep their original form.
+                    if (fork.Adds) Append(canonical, "adds");
                 }
             }
             if (content.MoveItemLockRemovals.Count > 0 || content.MoveItemExclusions.Count > 0)

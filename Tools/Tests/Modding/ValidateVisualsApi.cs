@@ -253,6 +253,22 @@ static class Program
         Rejects(fixtures, "fx-glint-nodes", "'presentation.visuals'", "sf2.fx.glint{id='g',nodes={'NPivot'}}", "nodes");
         Rejects(fixtures, "fx-shadow-everywhere", "'presentation.visuals'", "sf2.fx.shadow{id='s',scenes='everywhere'}", "run everywhere");
         Rejects(fixtures, "fx-speed-order", "'presentation.visuals'", "sf2.fx.particles{id='p',placement='hit',speed_min=9,speed_max=3}", "speed_min");
+        // Script triggers and camera zoom: screen grades only, fired by name from this mod.
+        Rejects(fixtures, "fx-script-stain", "'presentation.visuals'", "sf2.fx.stain{id='s',trigger='script'}", "Only screen effects accept trigger");
+        Rejects(fixtures, "fx-script-particles", "'presentation.visuals'", "sf2.fx.particles{id='p',trigger='script'}", "trigger");
+        Rejects(fixtures, "fx-zoom-always", "'presentation.visuals'", "sf2.fx.screen{id='s',zoom=1.5}", "zoom needs a trigger");
+        Rejects(fixtures, "fx-zoom-lift-always", "'presentation.visuals'", "sf2.fx.screen{id='s',zoom_offset_y=-20}", "zoom needs a trigger");
+        Rejects(fixtures, "fx-zoom-range", "'presentation.visuals'", "sf2.fx.screen{id='s',trigger='ko',zoom=4}", "zoom");
+        Rejects(fixtures, "fx-play-unknown", "'presentation.visuals'", "sf2.fx.screen{id='s',trigger='ko'}\nsf2.fx.play('s')", "trigger = \"script\"");
+        Rejects(fixtures, "fx-play-x", "'presentation.visuals'", "sf2.fx.screen{id='s',trigger='script'}\nsf2.fx.play('s',{x=1/0})", "'x' must be");
+        Rejects(fixtures, "fx-play-range", "'presentation.visuals'", "sf2.fx.screen{id='s',trigger='script'}\nsf2.fx.play('s',{x=20000})", ".x must be a finite number");
+        Rejects(fixtures, "fx-play-field", "'presentation.visuals'", "sf2.fx.screen{id='s',trigger='script'}\nsf2.fx.play('s',{y=1})", "'y'");
+        var scripted = Load(Fixture(fixtures, "fixture.fx-script", "'presentation.visuals'",
+            "local name = sf2.fx.screen{id='flash',trigger='script',brightness=0.5,zoom=1.4,zoom_offset_y=-30,time_scale=0.5,sound='snd_gong'}\n" +
+            "assert(sf2.fx.play(name) == false and sf2.fx.play('flash', {x=12}) == false)"));
+        var flash = scripted.Effects.Single();
+        Check(flash.Trigger == ModFxTrigger.Script && flash.Number("zoom") == 1.4f && flash.Number("zoom_offset_y") == -30f &&
+            flash.Sounds.Count == 1, "Script-triggered grade lost its trigger, zoom or sound.");
         // Motion triggers: contact particles on landings, knockdowns, slides and walls, and
         // screen effects on the one-off motion events.
         var motion = Load(Fixture(fixtures, "fixture.fx-motion", "'presentation.visuals'",

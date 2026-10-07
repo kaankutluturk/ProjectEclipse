@@ -166,13 +166,13 @@ namespace Eclipse.UI
             foreach (var graphic in frame.GetComponentsInChildren<Graphic>()) graphic.raycastTarget = false;
         }
 
-        // The splash's white fighter becomes a transparent-backed shadow, cropped to the figure.
+        // The former splash's white fighter becomes a transparent-backed shadow, cropped to the figure.
         private static Texture2D silhouetteCache;
 
         private static Texture2D SilhouetteTexture()
         {
             if (silhouetteCache != null) return silhouetteCache;
-            var source = Resources.Load<Texture2D>("EclipseTitle/splash");
+            var source = Resources.Load<Texture2D>("EclipseTitle/splash_fighter");
             if (source == null) return null;
             int w = Mathf.Max(1, source.width / 2), h = Mathf.Max(1, source.height / 2);
             var target = RenderTexture.GetTemporary(w, h, 0, RenderTextureFormat.ARGB32);

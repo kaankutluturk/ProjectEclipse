@@ -1,0 +1,4 @@
+mirror.name = "The Mirror"
+zones/mirror = "The Mirror"
+battle.title = "The Mirror"
+battle.description = "It fights with your own weapon and learns from you. Every attack you throw, it throws back. Repeat yourself and it will read you."

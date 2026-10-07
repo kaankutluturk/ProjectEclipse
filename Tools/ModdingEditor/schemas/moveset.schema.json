@@ -134,7 +134,7 @@
           },
           "input": {
             "type": "object",
-            "description": "Key control, e.g. Kick.",
+            "description": "The move's key input: expected is the base game's, value the new one.",
             "additionalProperties": false,
             "required": [
               "expected",
@@ -142,12 +142,192 @@
             ],
             "properties": {
               "expected": {
-                "type": "string",
-                "description": "The value the base game has now. The mod fails to load if it differs."
+                "description": "The input the base game has now. The mod fails to load if it differs. One tapped key name, or an array of alternative chords (any one starts the move); each chord is 1-14 keys pressed together. [] is no input.",
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "Up",
+                      "Up-Forward",
+                      "Forward",
+                      "Down-Forward",
+                      "Down",
+                      "Down-Back",
+                      "Back",
+                      "Up-Back",
+                      "Punch",
+                      "Kick",
+                      "Ranged",
+                      "Magic",
+                      "RaidCharge",
+                      "Super"
+                    ]
+                  },
+                  {
+                    "type": "array",
+                    "maxItems": 8,
+                    "items": {
+                      "type": "array",
+                      "minItems": 1,
+                      "maxItems": 14,
+                      "items": {
+                        "description": "A key name (tapped) or { key, press }.",
+                        "oneOf": [
+                          {
+                            "type": "string",
+                            "enum": [
+                              "Up",
+                              "Up-Forward",
+                              "Forward",
+                              "Down-Forward",
+                              "Down",
+                              "Down-Back",
+                              "Back",
+                              "Up-Back",
+                              "Punch",
+                              "Kick",
+                              "Ranged",
+                              "Magic",
+                              "RaidCharge",
+                              "Super"
+                            ]
+                          },
+                          {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "required": [
+                              "key"
+                            ],
+                            "properties": {
+                              "key": {
+                                "type": "string",
+                                "enum": [
+                                  "Up",
+                                  "Up-Forward",
+                                  "Forward",
+                                  "Down-Forward",
+                                  "Down",
+                                  "Down-Back",
+                                  "Back",
+                                  "Up-Back",
+                                  "Punch",
+                                  "Kick",
+                                  "Ranged",
+                                  "Magic",
+                                  "RaidCharge",
+                                  "Super"
+                                ]
+                              },
+                              "press": {
+                                "type": "string",
+                                "enum": [
+                                  "Tap",
+                                  "Hold",
+                                  "Release"
+                                ],
+                                "description": "Tap (default), Hold (keep held) or Release (let go)."
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                ]
               },
               "value": {
-                "type": "string",
-                "description": "The new value."
+                "description": "The new input. One tapped key name, or an array of alternative chords (any one starts the move); each chord is 1-14 keys pressed together. [] is no input.",
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "Up",
+                      "Up-Forward",
+                      "Forward",
+                      "Down-Forward",
+                      "Down",
+                      "Down-Back",
+                      "Back",
+                      "Up-Back",
+                      "Punch",
+                      "Kick",
+                      "Ranged",
+                      "Magic",
+                      "RaidCharge",
+                      "Super"
+                    ]
+                  },
+                  {
+                    "type": "array",
+                    "maxItems": 8,
+                    "items": {
+                      "type": "array",
+                      "minItems": 1,
+                      "maxItems": 14,
+                      "items": {
+                        "description": "A key name (tapped) or { key, press }.",
+                        "oneOf": [
+                          {
+                            "type": "string",
+                            "enum": [
+                              "Up",
+                              "Up-Forward",
+                              "Forward",
+                              "Down-Forward",
+                              "Down",
+                              "Down-Back",
+                              "Back",
+                              "Up-Back",
+                              "Punch",
+                              "Kick",
+                              "Ranged",
+                              "Magic",
+                              "RaidCharge",
+                              "Super"
+                            ]
+                          },
+                          {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "required": [
+                              "key"
+                            ],
+                            "properties": {
+                              "key": {
+                                "type": "string",
+                                "enum": [
+                                  "Up",
+                                  "Up-Forward",
+                                  "Forward",
+                                  "Down-Forward",
+                                  "Down",
+                                  "Down-Back",
+                                  "Back",
+                                  "Up-Back",
+                                  "Punch",
+                                  "Kick",
+                                  "Ranged",
+                                  "Magic",
+                                  "RaidCharge",
+                                  "Super"
+                                ]
+                              },
+                              "press": {
+                                "type": "string",
+                                "enum": [
+                                  "Tap",
+                                  "Hold",
+                                  "Release"
+                                ],
+                                "description": "Tap (default), Hold (keep held) or Release (let go)."
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                ]
               }
             }
           },
@@ -559,25 +739,13 @@
     "forks": {
       "type": "array",
       "maxItems": 512,
-      "description": "Copies of a move for one subtype or one item.",
+      "description": "Copies of a move for one subtype or one item, or (add: true) new moves copied from a move.",
       "items": {
         "type": "object",
         "additionalProperties": false,
         "required": [
           "id",
           "move"
-        ],
-        "oneOf": [
-          {
-            "required": [
-              "subtype"
-            ]
-          },
-          {
-            "required": [
-              "item"
-            ]
-          }
         ],
         "properties": {
           "move": {
@@ -682,7 +850,7 @@
           },
           "input": {
             "type": "object",
-            "description": "Key control, e.g. Kick.",
+            "description": "The move's key input: expected is the base game's, value the new one.",
             "additionalProperties": false,
             "required": [
               "expected",
@@ -690,12 +858,192 @@
             ],
             "properties": {
               "expected": {
-                "type": "string",
-                "description": "The value the base game has now. The mod fails to load if it differs."
+                "description": "The input the base game has now. The mod fails to load if it differs. One tapped key name, or an array of alternative chords (any one starts the move); each chord is 1-14 keys pressed together. [] is no input.",
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "Up",
+                      "Up-Forward",
+                      "Forward",
+                      "Down-Forward",
+                      "Down",
+                      "Down-Back",
+                      "Back",
+                      "Up-Back",
+                      "Punch",
+                      "Kick",
+                      "Ranged",
+                      "Magic",
+                      "RaidCharge",
+                      "Super"
+                    ]
+                  },
+                  {
+                    "type": "array",
+                    "maxItems": 8,
+                    "items": {
+                      "type": "array",
+                      "minItems": 1,
+                      "maxItems": 14,
+                      "items": {
+                        "description": "A key name (tapped) or { key, press }.",
+                        "oneOf": [
+                          {
+                            "type": "string",
+                            "enum": [
+                              "Up",
+                              "Up-Forward",
+                              "Forward",
+                              "Down-Forward",
+                              "Down",
+                              "Down-Back",
+                              "Back",
+                              "Up-Back",
+                              "Punch",
+                              "Kick",
+                              "Ranged",
+                              "Magic",
+                              "RaidCharge",
+                              "Super"
+                            ]
+                          },
+                          {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "required": [
+                              "key"
+                            ],
+                            "properties": {
+                              "key": {
+                                "type": "string",
+                                "enum": [
+                                  "Up",
+                                  "Up-Forward",
+                                  "Forward",
+                                  "Down-Forward",
+                                  "Down",
+                                  "Down-Back",
+                                  "Back",
+                                  "Up-Back",
+                                  "Punch",
+                                  "Kick",
+                                  "Ranged",
+                                  "Magic",
+                                  "RaidCharge",
+                                  "Super"
+                                ]
+                              },
+                              "press": {
+                                "type": "string",
+                                "enum": [
+                                  "Tap",
+                                  "Hold",
+                                  "Release"
+                                ],
+                                "description": "Tap (default), Hold (keep held) or Release (let go)."
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                ]
               },
               "value": {
-                "type": "string",
-                "description": "The new value."
+                "description": "The new input. One tapped key name, or an array of alternative chords (any one starts the move); each chord is 1-14 keys pressed together. [] is no input.",
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "Up",
+                      "Up-Forward",
+                      "Forward",
+                      "Down-Forward",
+                      "Down",
+                      "Down-Back",
+                      "Back",
+                      "Up-Back",
+                      "Punch",
+                      "Kick",
+                      "Ranged",
+                      "Magic",
+                      "RaidCharge",
+                      "Super"
+                    ]
+                  },
+                  {
+                    "type": "array",
+                    "maxItems": 8,
+                    "items": {
+                      "type": "array",
+                      "minItems": 1,
+                      "maxItems": 14,
+                      "items": {
+                        "description": "A key name (tapped) or { key, press }.",
+                        "oneOf": [
+                          {
+                            "type": "string",
+                            "enum": [
+                              "Up",
+                              "Up-Forward",
+                              "Forward",
+                              "Down-Forward",
+                              "Down",
+                              "Down-Back",
+                              "Back",
+                              "Up-Back",
+                              "Punch",
+                              "Kick",
+                              "Ranged",
+                              "Magic",
+                              "RaidCharge",
+                              "Super"
+                            ]
+                          },
+                          {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "required": [
+                              "key"
+                            ],
+                            "properties": {
+                              "key": {
+                                "type": "string",
+                                "enum": [
+                                  "Up",
+                                  "Up-Forward",
+                                  "Forward",
+                                  "Down-Forward",
+                                  "Down",
+                                  "Down-Back",
+                                  "Back",
+                                  "Up-Back",
+                                  "Punch",
+                                  "Kick",
+                                  "Ranged",
+                                  "Magic",
+                                  "RaidCharge",
+                                  "Super"
+                                ]
+                              },
+                              "press": {
+                                "type": "string",
+                                "enum": [
+                                  "Tap",
+                                  "Hold",
+                                  "Release"
+                                ],
+                                "description": "Tap (default), Hold (keep held) or Release (let go)."
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                ]
               }
             }
           },
@@ -1115,8 +1463,41 @@
           "item": {
             "type": "string",
             "description": "Qualified item ID that gets the copy, e.g. core:items/weapon/weapon_golden_katana."
+          },
+          "add": {
+            "type": "boolean",
+            "default": false,
+            "description": "true: a new move beside the original (the original is unchanged), for subtype or item if given, else for the same fighters as the original."
           }
-        }
+        },
+        "not": {
+          "required": [
+            "subtype",
+            "item"
+          ]
+        },
+        "anyOf": [
+          {
+            "required": [
+              "subtype"
+            ]
+          },
+          {
+            "required": [
+              "item"
+            ]
+          },
+          {
+            "required": [
+              "add"
+            ],
+            "properties": {
+              "add": {
+                "const": true
+              }
+            }
+          }
+        ]
       }
     }
   }

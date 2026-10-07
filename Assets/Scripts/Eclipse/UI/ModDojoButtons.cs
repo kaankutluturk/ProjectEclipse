@@ -63,6 +63,19 @@ namespace Eclipse.UI
                 rect.pivot = new Vector2(.5f, 1f);
                 rect.anchoredPosition = new Vector2(0f, top);
                 top -= rect.sizeDelta.y + Gap;
+                if (definition.PressedImage.HasValue)
+                {
+                    // A pressed image swaps in while the button is held.
+                    Sprite pressed = null;
+                    try { pressed = ModRuntime.Host.TypedAssets.LoadSprite(definition.PressedImage.Value); }
+                    catch (Exception error) { Debug.LogWarning("[ModUI] Dojo button '" + definition.Name + "' pressed image failed: " + error.Message); }
+                    if (pressed != null)
+                    {
+                        var button = item.GetComponent<Button>();
+                        button.transition = Selectable.Transition.SpriteSwap;
+                        button.spriteState = new SpriteState { pressedSprite = pressed };
+                    }
+                }
                 string name = definition.Name;
                 item.GetComponent<Button>().onClick.AddListener(() =>
                 {

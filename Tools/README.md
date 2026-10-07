@@ -13,6 +13,8 @@ fixtures normally go under ignored `Temp/`; each tool documents its own inputs.
 | [UnityUpgrade](UnityUpgrade/) | Historical editor-upgrade preparation and finalization |
 | [Animation](Animation/README.md) | Character authoring, animation conversion and its focused tests |
 | [AssetPacker](AssetPacker/README.md) | TAR/LZ4 content archive commands |
+| [AssetPackerGui](AssetPacker/README.md#gui) | Windows app to browse, regroup, delete and repack all art bundles |
+| [LocationParamsEditor](LocationParamsEditor/README.md) | Standalone Windows app to view and edit location layouts (params) over their pictures |
 | [ModdingEditor](ModdingEditor/README.md) | VS Code extension, Lua definitions and mod starter templates |
 | [ModZipInstallerTests](ModZipInstallerTests/) | Standalone mod ZIP installer tests |
 | [NetplayTests](NetplayTests/) | Standalone online-versus core and room-server tests |

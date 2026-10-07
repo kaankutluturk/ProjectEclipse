@@ -64,6 +64,14 @@ local ally = sf2.actors.register {
 | `behavior` | Optional behavior handle registered by this mod in the same transaction. Each spawned actor has its own instance state. |
 | `parameters` | Optional typed configuration resolved against that behavior's schema, including defaults. Requires `behavior`; unknown fields or wrong types reject registration. |
 
+When a round is decided, every actor retires (`actor_end_reason = "round_ended"`)
+before the victory and defeat stances, and the round finishes on the two main
+fighters alone, whoever was targeting whom.
+
+The native fight camera keeps framing the two main fighters; actors never
+replace either of them as its focus, so spawning or removing one does not move or
+freeze the view. Use [camera control](../camera/) to frame actors yourself.
+
 An actor starts at its own maximum health. Equipment/tactic/rig must form a
 usable native warrior; field validation does not guarantee every recovered rig
 or outfit can run. Definition content participates in the mod compatibility

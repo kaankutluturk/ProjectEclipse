@@ -5,10 +5,10 @@
 const jsonc=require('jsonc-parser');
 const native=require('./native.cjs');
 const MOVE_FIELDS=['move','note','disable','priority','playback_rate','animation','input','sound_frame','intervals','attacks'];
-const FORK_FIELDS=[...MOVE_FIELDS,'id','subtype','item'];
+const FORK_FIELDS=[...MOVE_FIELDS,'id','subtype','item','add'];
 const GUARD=['expected','value'];
 const SHAPES={
-    priority:{guard:'integer'},playback_rate:{guard:'number'},input:{guard:'string'},
+    priority:{guard:'integer'},playback_rate:{guard:'number'},input:{guard:'input'},
     sound_frame:{fields:{name:'string',expected:'integer',value:'integer'},required:['name','expected','value']},
 };
 // Convert a jsonc node into a luaparse-like node with a [start,end] range.
@@ -41,7 +41,26 @@ function parse(text){
     if(tree.type!=='object'){at(tree,'A moveset file must be a JSON object.');return {issues,entries};}
     const props=node=>{const seen=new Map();for(const p of node.children??[]){const name=p.children[0].value;if(seen.has(name))at(p.children[0],`Duplicate field "${name}".`);seen.set(name,p.children[1]);}return seen;};
     const known=(node,allowed,where)=>{for(const p of node.children??[])if(!allowed.includes(p.children[0].value))at(p.children[0],`Unknown field "${p.children[0].value}" in ${where}.`);};
+    // A key input: one tapped key name, or alternatives (arrays) of keys (a name or { key, press }).
+    const KEYS=['Up','Up-Forward','Forward','Down-Forward','Down','Down-Back','Back','Up-Back','Punch','Kick','Ranged','Magic','RaidCharge','Super'];
+    const input=(node,where)=>{
+        if(node.type==='string'){if(!KEYS.includes(node.value))at(node,`${where} must be a key name such as "Punch".`);return;}
+        if(node.type!=='array'){at(node,`${where} must be a key name or an array of key chords.`);return;}
+        if(node.children.length>8)at(node,`${where} has more than 8 alternatives.`);
+        node.children.forEach((chord,c)=>{
+            if(chord.type!=='array'||!chord.children.length||chord.children.length>14){at(chord,`${where}[${c}] must be an array of 1-14 keys.`);return;}
+            chord.children.forEach((key,k)=>{
+                const here=`${where}[${c}][${k}]`;
+                if(key.type==='string'){if(!KEYS.includes(key.value))at(key,`${here} is not a key name.`);return;}
+                if(key.type!=='object'){at(key,`${here} must be a key name or { "key", "press" }.`);return;}
+                const parts=props(key);known(key,['key','press'],here);
+                if(!parts.has('key')||!KEYS.includes(parts.get('key').value))at(key,`${here} needs a "key" name.`);
+                if(parts.has('press')&&!['Tap','Hold','Release'].includes(parts.get('press').value))at(parts.get('press'),`${here}.press must be "Tap", "Hold" or "Release".`);
+            });
+        });
+    };
     const type=(node,expected,where)=>{
+        if(expected==='input'){input(node,where);return true;}
         const ok=expected==='integer'?node.type==='number'&&Number.isInteger(node.value)&&/^-?\d+$/.test(text.substr(node.offset,node.length)):expected==='number'?node.type==='number':expected==='string'?node.type==='string'&&node.value.length>0:node.type===expected;
         if(!ok)at(node,`${where} must be ${expected==='integer'?'an integer':expected==='number'?'a number':expected==='string'?'a non-empty string':'a'+(/^[aeiou]/.test(expected)?'n ':' ')+expected}.`);
         return ok;
@@ -64,11 +83,14 @@ function parse(text){
             }
             if(isFork){
                 for(const k of ['id'])if(!map.has(k))at(entry,`${where} needs "${k}".`);
-                if(map.has('subtype')===map.has('item'))at(entry,`${where} needs exactly one of "subtype" or "item".`);
+                const adds=map.get('add')?.value===true;
+                if(map.has('add')&&map.get('add').type!=='boolean')at(map.get('add'),`${where}.add must be true or false.`);
+                if(map.has('subtype')&&map.has('item'))at(entry,`${where} takes at most one of "subtype" or "item".`);
+                else if(!adds&&!map.has('subtype')&&!map.has('item'))at(entry,`${where} needs exactly one of "subtype" or "item" (or "add": true for a new move).`);
             }else if(map.size===1||(map.size===2&&map.has('note')))at(entry,`${where} must change at least one field.`);
             const table=lua(entry,text);normalizeImpulse(table);
             entries.push({kind:isFork?'fork':'move',table,offset:entry.offset,
-                move:map.get('move').value,id:map.get('id')?.value,subtype:map.get('subtype')?.value,item:map.get('item')?.value});
+                move:map.get('move').value,id:map.get('id')?.value,subtype:map.get('subtype')?.value,item:map.get('item')?.value,add:map.get('add')?.value===true});
         });
     }
     return {issues,entries};
@@ -80,7 +102,8 @@ function check(entries,helpers,modId){
     for(const entry of entries){
         const sourceName=forks.get(entry.move)??entry.move;
         if(entry.kind==='fork'){
-            native.checkCall('sf2.moves.fork',[withMove(entry.table,sourceName)],{...helpers,fields:t=>{const f=helpers.fields(t);return {...f,source:f.move};}},add);
+            // A new move ("add": true) keeps its source untouched, so fork lock rules do not apply.
+            if(!entry.add)native.checkCall('sf2.moves.fork',[withMove(entry.table,sourceName)],{...helpers,fields:t=>{const f=helpers.fields(t);return {...f,source:f.move};}},add);
             if(entry.id)forks.set(`${modId}.${entry.id}`,sourceName);
             if(native.lookup(sourceName))native.checkCall('sf2.moves.patch',[withMove(entry.table,sourceName)],helpers,add);
         }else native.checkCall('sf2.moves.patch',[withMove(entry.table,sourceName)],helpers,add);

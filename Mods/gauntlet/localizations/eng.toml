@@ -1,0 +1,8 @@
+zones/gauntlet = "The Gauntlet"
+battle.title = "The Gauntlet"
+battle.description = "Five fighters, one fight, no break. Each health bar is a new opponent."
+wave.1 = "Sai Dancer"
+wave.2 = "Chain Widow"
+wave.3 = "The Hammer"
+wave.4 = "Lynx"
+wave.5 = "The Butcher"

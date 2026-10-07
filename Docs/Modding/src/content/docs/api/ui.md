@@ -531,7 +531,7 @@ gameplay, physical input and visual acceptance remain pending.
 
 ## sf2.ui.dojo_button
 
-**Signature:** `sf2.ui.dojo_button { id = "...", image = sprite }`
+**Signature:** `sf2.ui.dojo_button { id = "...", image = sprite, pressed_image = sprite }`
 
 **Returns:** The button's qualified name, `<mod-id>.<id>`, as a string.
 
@@ -543,7 +543,10 @@ yet. Buttons from several mods stack downward in load order.
 **Requires:** `content.register`. `id` (required) is 1–64 lowercase ASCII
 letters, digits, `_` or `-`, unique within the mod. `image` (required) is a
 sprite handle from `sf2.assets.sprite`; the button uses the sprite's size,
-scaled down if it would be larger than the disciple button. A mod can register
+scaled down if it would be larger than the disciple button. `pressed_image`
+(optional) is a sprite handle shown while the button is held down; without it
+the button keeps `image` and only darkens while pressed. Draw it at the same size
+as `image`, because it fills the same box. A mod can register
 at most 4 dojo buttons. Nothing is saved to the profile: removing the mod or
 the registration removes the button. React to clicks with
 [`sf2.story.on("dojo_button", ...)`](../story/#sf2storyon), which needs
@@ -551,7 +554,8 @@ the registration removes the button. React to clicks with
 
 ```lua
 local name = sf2.ui.dojo_button { id = "wardrobe",
-    image = sf2.assets.sprite("sprites/wardrobe_button") }
+    image = sf2.assets.sprite("sprites/wardrobe_button"),
+    pressed_image = sf2.assets.sprite("sprites/wardrobe_button_pressed") }
 
 sf2.story.on("dojo_button", function(event)
     if event.button == name then
@@ -561,7 +565,8 @@ end)
 ```
 
 A missing or unloadable image is logged and that button is skipped; the rest
-of the menu keeps working.
+of the menu keeps working. A pressed image that fails to load is logged, and the
+button works without it.
 
 For a dojo selector, [`sf2.locations.dojo_picker`](../locations-and-locales/#sf2locationsdojo_picker)
 registers the button and a ready-made picker in one declaration.

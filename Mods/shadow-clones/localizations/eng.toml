@@ -1,0 +1,3 @@
+helm.faceless_mask = "Faceless Mask"
+perk.shadow_clones = "Shadow Clones"
+perk.shadow_clones.description = "Press RaidCharge to raise three shadows that fight beside you for 10 seconds. Recharges in 20 seconds."

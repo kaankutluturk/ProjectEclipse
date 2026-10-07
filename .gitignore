@@ -73,6 +73,9 @@ crashlytics-build.properties
 
 # AssetPacker build output
 /Tools/AssetPacker/bin/
+/Tools/AssetPackerGui/bin/
+/Tools/LocationParamsEditor/bin/
+/Tools/AssetPackerGui/obj/
 avatar.zip
 Assets/Resources/EclipseTitleBackground.png
 Assets/Resources/EclipseTitleBackground.png.meta
@@ -83,3 +86,6 @@ unity-agent-plugin/
 /Mods/de128
 /.codex-remote-attachments
 *.env
+/Assets/StreamingAssets/ControlPacks
+/Assets/StreamingAssets/ControlPacks
+/Assets/StreamingAssets/ControlPacks/Moonforge

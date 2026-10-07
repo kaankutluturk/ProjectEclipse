@@ -1,0 +1,3 @@
+weapon.slugger = "The Slugger"
+perk.home_run = "Home Run"
+perk.home_run.description = "Press RaidCharge to swing for the fences: the hit breaks guard and launches the opponent across the arena. Recharges in 1 second."

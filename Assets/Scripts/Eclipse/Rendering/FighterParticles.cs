@@ -136,7 +136,7 @@ namespace Eclipse.Rendering
 			// Title combat may draw local particles, but must not trigger global
 			// screen grades, slow motion, audio muffle or effect sounds.
 			if (Fight.GetCurrentFight()?.IsTitleSparring != true)
-				ModVisuals.NotifyHit(critical, blocked, ko);
+				ModVisuals.NotifyHit(critical, blocked, ko, victim?.InterpolatedPivot()?.GetX());
 			if (attacker != null && attacker.GetParentModel() != null)
 				foreach (FighterParticles live in Live)
 					if (live != null && live._model == attacker) live._spent = true;
@@ -446,7 +446,7 @@ namespace Eclipse.Rendering
 		private void Fire(ModFxTrigger trigger, Vector3 point)
 		{
 			if (Fight.GetCurrentFight()?.IsTitleSparring != true)
-				ModVisuals.NotifyMotion(trigger);
+				ModVisuals.NotifyMotion(trigger, _model?.InterpolatedPivot()?.GetX());
 			foreach (Burst contact in _contacts)
 			{
 				if (contact.System == null || contact.Definition.Trigger != trigger) continue;

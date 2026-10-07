@@ -4,7 +4,7 @@
     <Image X="0" Y="-15" ClassName="pixel_1" Width="2350" Height="512" Color="0x000000" IsOpaque="1" />
   </Layer>
   <Layer Type="1" Factor="0.1">
-    <Image X="0" Y="0" ClassName="background_1" Width="1300" Height="512" />
+    <Image X="0" Y="0" ClassName="background_1" Width="1536" Height="512" />
   </Layer>
   <Layer Type="1" Factor="0.3">
     <Image X="-364" Y="193" ClassName="layer_1_1" Width="512" Height="246" />

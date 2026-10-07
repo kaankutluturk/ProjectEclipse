@@ -10,7 +10,8 @@ Mods can change how fights look in two ways:
   overlays placed at a chosen depth (with built-in light-beam and glow
   shapes), trails on weapons or any two fighter nodes, contact shadows, blade
   glints, lights carried by weapons and magic, floor stains, and screen colour
-  grading that can also fire on hits and knockouts.
+  grading that can also fire on hits and knockouts, or when your Lua says so,
+  and push the camera in for a kill cam.
   Any number of mods can add these, and they stack.
 - **Presets (`sf2.visuals`)** are seven ready-made effects: deeper background
   parallax, weapon trails, depth haze, a rim light on the fighters, bloom,
@@ -18,7 +19,9 @@ Mods can change how fights look in two ways:
   their numbers, and each preset has one owner.
 
 Everything is off until a mod asks for it. The engine does the drawing; a mod
-describes effects with typed tables when it loads. No Lua runs per frame.
+describes effects with typed tables when it loads. No Lua runs per frame. A
+combat callback can still fire one of its own screen grades with
+[`sf2.fx.play`](#sf2fxplay).
 
 The built-in **Options > Display > 3D fighters (experimental)** switch is a
 separate player preference, off by default. Standard recovered fighter rigs use
@@ -73,7 +76,8 @@ Things to know first:
 - **Triggers.** Most effects run continuously. Hit particles, stains and screen
   grades with a `trigger` fire once per matching hit instead: `hit` is any unblocked
   hit, `critical` a critical hit, `block` a blocked hit (particles only) and
-  `ko` the hit that empties a fighter's health.
+  `ko` the hit that empties a fighter's health. A screen grade with
+  `trigger = "script"` fires only when your Lua calls [`sf2.fx.play`](#sf2fxplay).
 - **Motion triggers.** Contact particles and screen grades can also fire from
   how a fighter moves: `land` when a fall ends on the floor, `knockdown` when
   the body hits the floor, `slide` repeatedly while the feet skid fast along the
@@ -84,7 +88,11 @@ Things to know first:
 - **Defaults.** Every numeric field is optional. Omitted fields use the
   defaults shown. Out-of-range values and unknown fields raise an error.
 
-Two complete examples ship with Eclipse. **Custom FX Showcase**
+Complete examples ship with Eclipse. **Final Blow** (`Mods/final-blow`) is a
+kill cam built only from screen grades with `zoom`. **Shadow Clones**
+(`Mods/shadow-clones`) and **Umbra, the Last Eclipse** (`Mods/umbra`) fire
+script-triggered grades from Lua with `sf2.fx.play`. See [Examples](../../examples/).
+**Custom FX Showcase**
 (`Mods/example.custom-fx`) builds weapon sparks, kick trails, ground fog, a
 dojo light wash and a screen grade from building blocks. **Chiaroscuro -
 Cinematic Visuals** (`Mods/chiaroscuro`) builds weapon trails, light shafts
@@ -335,7 +343,8 @@ strongest vignette, grain and accent win.
 
 With a `trigger` other than `always`, the grade is off until a matching hit or,
 for `land`, `knockdown` and `wall`, a matching movement by either fighter (see
-[contact particles](#contact-particles) for when they fire).
+[contact particles](#contact-particles) for when they fire). With
+`trigger = "script"`, it waits for your Lua to call [`sf2.fx.play`](#sf2fxplay).
 It then applies fully for `hold` seconds and eases smoothly back to nothing
 over `duration` seconds. Each new matching hit or movement restarts it. Hold and duration are
 measured in real time, so they are not stretched by slow motion.
@@ -370,7 +379,7 @@ underneath. When several grades muffle at once, the strongest wins.
 | `tint`, `tint_strength` | `nil`, `0` | A colour multiplied into the picture, and how strongly (0–1). |
 | `vignette` | `0` | 0–1 darkening toward the edges. |
 | `vignette_x`, `vignette_y` | `0`, `0` | −1 to 1: moves the vignette's centre; `-0.35, 0.25` centres it up and to the left, so the lower right is darkest. |
-| `trigger` | `"always"` | `always`, `hit`, `critical`, `ko`, `land`, `knockdown` or `wall`. `slide` is not accepted because it repeats while a fighter skids. |
+| `trigger` | `"always"` | `always`, `hit`, `critical`, `ko`, `land`, `knockdown`, `wall` or `script`. `slide` is not accepted because it repeats while a fighter skids. `script` fires only from [`sf2.fx.play`](#sf2fxplay); only screen grades accept it. |
 | `duration` | `0.25` | 0.02–10 seconds for a triggered grade to fade out. |
 | `hold` | `0` | 0–10 seconds a triggered grade stays at full strength first. |
 | `time_scale` | `1` | 0.05–1, triggered grades only: game speed while the grade is at full strength. Speed returns to normal as the grade fades, so slow motion lasts exactly as long as the grade. The slowest active grade wins. It never overrides a pause or another speed change already in effect. |
@@ -382,6 +391,8 @@ underneath. When several grades muffle at once, the strongest wins.
 | `sound` | `nil` | Triggered grades only. A native sound name such as `"snd_time_shift"` (letters, digits, `_`, `-` and `/`), an audio handle from [`sf2.assets.audio`](../assets/#sf2assetsaudio) for a sound your mod ships, a table `{ sound = <name or handle>, volume = 0..1 }`, or an array of 1–16 of these to pick one from at random. A choice's `volume` (default 1) multiplies `sound_volume`. A native name that a mod has replaced plays the replacement. A missing sound is skipped with one warning in the log. |
 | `sound_volume` | `1` | 0–1 volume of `sound`, multiplied by the player's sound volume. |
 | `muffle` | `0` | 0–1 low-pass filter over the other game sounds while the grade is active. 1 leaves only a dull thud. Works on always-on grades too, for example an underwater location. |
+| `zoom` | `1` | 1–3, triggered grades only: the camera pushes in by this factor while the grade is active. See [camera push-in](#camera-push-in). |
+| `zoom_offset_y` | `0` | −400 to 400, triggered grades only: camera pan during the push-in, positive down like the camera API's `offset_y`. Negative values raise the framing so heads stay in view. |
 
 ```lua
 sf2.fx.screen {
@@ -398,6 +409,13 @@ sf2.fx.screen {
     muffle = 0.75,                                -- ...a muffled fight
 }
 
+-- A kill cam: on the knockout hit the camera slams in on the fallen fighter
+-- while time nearly stops, then drifts back out as the speed returns.
+sf2.fx.screen {
+    id = "kill_cam", trigger = "ko", zoom = 1.65, zoom_offset_y = -70,
+    hold = 0.7, duration = 2.2, time_scale = 0.12, vignette = 0.5,
+}
+
 -- A sound the mod ships, on every critical hit, with no change to the picture.
 local sting = sf2.assets.audio("audio/crit_sting")
 sf2.fx.screen { id = "crit_sting", trigger = "critical", sound = sting, sound_volume = 0.6 }
@@ -412,6 +430,68 @@ sf2.fx.screen {
         "snd_super_hit1",
     },
 }
+```
+
+### Camera push-in
+
+A triggered grade with `zoom` above 1 or a nonzero `zoom_offset_y` moves the
+fight camera while it is active. The push follows the grade's strength: full
+during `hold`, then easing back to the normal view over `duration`. The view
+also moves toward the fighter involved: the struck fighter for `hit`,
+`critical` and `ko`, the moving fighter for `land`, `knockdown` and `wall`, and
+the `x` passed to [`sf2.fx.play`](#sf2fxplay) for `script` (without `x` the
+centre stays where it is). When several grades push at once, the strongest
+wins; zooms do not multiply each other.
+
+The push always keeps both main fighters in view. If they stand far apart (after
+a knockback, say) the zoom stops at whatever still fits them both, with room for
+a body on either side, and the centre only moves toward the focus as far as it
+can without dropping either fighter. Independent actors are not part of this
+framing.
+
+The push multiplies whatever zoom the camera already has, including a mod that
+owns the camera through [camera control](../camera/). The arena's edge limits
+still apply, so the view never shows past the art, and a native rule that forces
+the minimum zoom turns the push off. Strong zoom crops the top of the picture,
+and a high jump can still leave the frame vertically;
+`zoom_offset_y` around −40 to −70 keeps heads in view at 1.3–1.7. An always-on
+grade cannot push the camera.
+
+## sf2.fx.play
+
+**Signature:** `sf2.fx.play(effect, options?)`
+
+**Returns:** `true` when the grade started, or `false` when it cannot show:
+its setting switch is off, its `match`/`exclude` words rule out the current
+location, or no game presentation is running (as in a headless check).
+
+**When:** Any time after loading, normally inside a combat callback such as
+`on_tick` or `on_animation_start`. Calling it again restarts the grade, its
+sound and its slow motion from full strength. Hold and duration use real time.
+
+**Requires:** `presentation.visuals`. `effect` is the name a screen grade with
+`trigger = "script"` registered by this mod returned, or its local `id`. Another
+mod's effect, or a grade with any other trigger, raises an error.
+
+| Option | Default | Meaning |
+| --- | --- | --- |
+| `x` | `nil` | Arena X (−10000 to 10000) that the grade's [camera push-in](#camera-push-in) frames, for example a fighter's `snapshot().self.position.x`. |
+
+This is how Lua makes a moment happen: a boss changing phase, a summon, a bolt of
+lightning. The grade carries everything else: colour, slow motion, sound,
+muffle and zoom. It is presentation only and never changes the fight.
+
+```lua
+-- During loading:
+local stall = sf2.fx.screen {
+    id = "stall", trigger = "script",
+    saturation = 0.2, contrast = 1.4, vignette = 0.75,
+    hold = 0.3, duration = 1.1, time_scale = 0.3, zoom = 1.3, zoom_offset_y = -40,
+    sound = "snd_time_shift",
+}
+-- Inside a combat callback, when your ability fires:
+local view = fighter:snapshot()
+if view then sf2.fx.play(stall, { x = view.self.position.x }) end
 ```
 
 ## sf2.fx.shadow
@@ -869,8 +949,9 @@ sf2.visuals.impact { critical = 1, head = 0, shock = 0, setting = impact }
 ## Verification limits
 
 The API contract (fields, defaults, ranges, triggers, shapes, capabilities,
-conflicts and the shipped Chiaroscuro package) is checked headlessly. The
+conflicts, `sf2.fx.play` and the shipped Chiaroscuro, Final Blow, Shadow Clones
+and Umbra packages) is checked headlessly. The
 rendering itself, including hit timing, floor detection for shadows and glint
 placement, and when the motion triggers (`land`, `knockdown`, `slide`, `wall`)
-fire, is only verified by playing the game. The `land`, `knockdown` and `slide`
+fire, and the camera push-in's framing, is only verified by playing the game. The `land`, `knockdown` and `slide`
 thresholds may be tuned.

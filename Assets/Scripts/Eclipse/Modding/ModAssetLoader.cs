@@ -809,6 +809,9 @@ namespace Eclipse.Modding
                 if (fork.Subtype != null)
                 {
                     XmlNode match=null;
+                    // A new move limited to a subtype its source is not locked to (a shared
+                    // move, say) simply gains that lock.
+                    bool adds=fork.Adds;
                     foreach (XmlNode clause in locks.ChildNodes)
                     {
                         if (clause.NodeType!=XmlNodeType.Element) continue;
@@ -819,11 +822,11 @@ namespace Eclipse.Modding
                         if (match!=null) throw new InvalidOperationException("Ambiguous item lock clause for fork source '"+fork.Source+"'.");
                         match=clause;
                     }
-                    if (match==null) throw new InvalidOperationException("Fork source '"+fork.Source+"' is not locked to "+fork.ItemType+" subtype "+fork.Subtype+".");
+                    if (match==null && !adds) throw new InvalidOperationException("Fork source '"+fork.Source+"' is not locked to "+fork.ItemType+" subtype "+fork.Subtype+".");
                     var narrowed=document.CreateElement("Item"); narrowed.SetAttribute("Type",fork.ItemType); narrowed.SetAttribute("SubType",fork.Subtype);
-                    locks.ReplaceChild(narrowed,match);
+                    if (match!=null) locks.ReplaceChild(narrowed,match); else locks.AppendChild(narrowed);
                 }
-                else
+                else if (fork.RuntimeItemName != null)
                 {
                     var only=document.CreateElement("Item"); only.SetAttribute("Type",fork.ItemType); only.SetAttribute("Name",fork.RuntimeItemName);
                     locks.AppendChild(only);
@@ -1237,31 +1240,72 @@ namespace Eclipse.Modding
             lifetime.Apply.Add(() => target.SetScheduledFrame(patch.Value));
             lifetime.Undo.Add(() => { if (target.ScheduledFrame == patch.Value) target.SetScheduledFrame(patch.Expected); });
         }
+        /// <summary>
+        /// The selection condition holding a move's key input: one top-level key chord, or one
+        /// top-level "Or" whose members are all key chords (alternatives). -1 when the move has
+        /// no key input. Throws when keys appear in any other shape (not editable as an input).
+        /// </summary>
+        internal static int FindInputSlot(IList<ConditionAnimation> conditions, out List<ConditionKeys> chords)
+        {
+            chords = new List<ConditionKeys>();
+            int slot = -1;
+            for (int i = 0; i < conditions.Count; i++)
+            {
+                var condition = conditions[i];
+                List<ConditionKeys> found = null;
+                if (condition is ConditionKeys keys && !keys.IsNot) found = new List<ConditionKeys> { keys };
+                else if (condition is ConditionList list && !list.IsNot && list.get_Type() == ConditionList.OperatorType.OR &&
+                    list.Conditions.Count != 0 && list.Conditions.TrueForAll(c => c is ConditionKeys member && !member.IsNot))
+                    found = list.Conditions.ConvertAll(c => (ConditionKeys)c);
+                else if (ContainsKeys(condition))
+                    throw new InvalidOperationException("its keys are combined with other conditions");
+                if (found == null) continue;
+                if (slot >= 0) throw new InvalidOperationException("it has more than one key condition");
+                slot = i;
+                chords = found;
+            }
+            return slot;
+        }
+
+        private static bool ContainsKeys(ConditionAnimation condition) =>
+            condition is ConditionKeys || condition is ConditionList list && list.Conditions.Exists(ContainsKeys);
+
         private static void PrepareInput(InfoAnimation move, ModMoveInputPatch patch,
             Func<ModMoveCondition, ConditionAnimation> parse, Lifetime lifetime)
         {
-            var expected = parse(new ModMoveCondition(ModMoveConditionKind.Keys,
-                keys: new[] { patch.Expected })) as ConditionKeys;
-            var replacement = parse(new ModMoveCondition(ModMoveConditionKind.Keys,
-                keys: new[] { patch.Value })) as ConditionKeys;
-            if (expected == null || replacement == null)
-                throw new InvalidOperationException("Move input patch could not parse native keys: " + move.Name);
+            ConditionKeys Chord(IReadOnlyList<ModMoveKey> keys) =>
+                parse(new ModMoveCondition(ModMoveConditionKind.Keys, keys: keys.ToArray())) as ConditionKeys
+                ?? throw new InvalidOperationException("Move input patch could not parse native keys: " + move.Name);
             var conditions = move.SelectionConditions;
-            int index = -1;
-            for (int i = 0; i < conditions.Count; i++)
-                if (conditions[i] is ConditionKeys)
-                {
-                    if (index >= 0) throw new InvalidOperationException("Ambiguous native key condition: " + move.Name);
-                    index = i;
-                }
-            var original = index >= 0 ? conditions[index] as ConditionKeys : null;
-            if (original == null || !original.HasSameKeyRequirementAs(expected))
-                throw new InvalidOperationException("Move input expected key mismatch: " + move.Name);
-            lifetime.Apply.Add(() => conditions[index] = replacement);
+            int index;
+            List<ConditionKeys> current;
+            try { index = FindInputSlot(conditions, out current); }
+            catch (InvalidOperationException reason) { throw new InvalidOperationException("Move input of " + move.Name + " is not editable: " + reason.Message); }
+            var expected = patch.Expected.Chords.Select(Chord).ToList();
+            bool matches = expected.Count == current.Count;
+            for (int i = 0; matches && i < expected.Count; i++) matches = current[i].HasSameKeyRequirementAs(expected[i]);
+            if (!matches) throw new InvalidOperationException("Move input expected key mismatch: " + move.Name);
+            ConditionAnimation replacement = patch.Value.IsNone ? null
+                : patch.Value.Chords.Count == 1 ? Chord(patch.Value.Chords[0])
+                : parse(new ModMoveCondition(ModMoveConditionKind.Any, children: patch.Value.Chords
+                    .Select(chord => new ModMoveCondition(ModMoveConditionKind.Keys, keys: chord.ToArray())).ToArray()));
+            if (replacement == null && !patch.Value.IsNone)
+                throw new InvalidOperationException("Move input patch could not parse native keys: " + move.Name);
+            var original = index >= 0 ? conditions[index] : null;
+            lifetime.Apply.Add(() =>
+            {
+                if (index >= 0) { if (replacement == null) conditions.RemoveAt(index); else conditions[index] = replacement; }
+                else if (replacement != null) conditions.Insert(0, replacement);
+            });
             lifetime.Undo.Add(() =>
             {
-                int currentIndex = conditions.IndexOf(replacement);
-                if (currentIndex >= 0) conditions[currentIndex] = original;
+                if (replacement != null)
+                {
+                    int at = conditions.IndexOf(replacement);
+                    if (at < 0) return;
+                    if (original != null) conditions[at] = original; else conditions.RemoveAt(at);
+                }
+                else if (original != null) conditions.Insert(Math.Min(index, conditions.Count), original);
             });
         }
 

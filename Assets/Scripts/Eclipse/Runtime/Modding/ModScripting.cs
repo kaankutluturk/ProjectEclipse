@@ -558,17 +558,28 @@ namespace Eclipse.Modding
             return RequireRegistration().RegisterFx(kind, localId, request);
         }
 
-        public ModDojoButton RegisterDojoButton(string localId, AssetId image)
+        // sf2.fx.play: fires one of this mod's script-triggered screen effects.
+        public bool PlayFx(ModFxDefinition definition, float? focusX)
         {
-            RequireCapability("content.register");
-            return RequireRegistration().RegisterDojoButton(localId, image);
+            RequireCapability("presentation.visuals");
+            if (definition == null || definition.Owner != Mod.Id || definition.Trigger != ModFxTrigger.Script)
+                throw new ModContentException("sf2.fx.play needs a screen effect with trigger = \"script\" registered by this mod.");
+            Func<ModFxDefinition, float?, bool> fire = ModFxScriptTriggers.Fire;
+            return fire != null && fire(definition, focusX);
         }
 
-        public ModDojoPicker RegisterDojoPicker(string localId, AssetId button, DefinitionId? title, IList<ModDojoPickerChoice> choices)
+        public ModDojoButton RegisterDojoButton(string localId, AssetId image, AssetId? pressedImage = null)
+        {
+            RequireCapability("content.register");
+            return RequireRegistration().RegisterDojoButton(localId, image, pressedImage);
+        }
+
+        public ModDojoPicker RegisterDojoPicker(string localId, AssetId button, DefinitionId? title, IList<ModDojoPickerChoice> choices,
+            AssetId? buttonPressed = null)
         {
             RequireCapability("content.register");
             RequireCapability("presentation.dojo");
-            return RequireRegistration().RegisterDojoPicker(localId, button, title, choices);
+            return RequireRegistration().RegisterDojoPicker(localId, button, title, choices, buttonPressed);
         }
 
         public bool HasCapability(string capability)

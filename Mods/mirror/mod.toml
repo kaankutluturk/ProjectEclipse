@@ -1,0 +1,11 @@
+schema = 1
+id = "mirror"
+name = "The Mirror"
+version = "1.0.0"
+authors = ["czapla"]
+entrypoint = "scripts/main.lua"
+capabilities = ["content.register", "profile.read", "presentation.visuals", "ui.create"]
+
+[[dependencies]]
+id = "core"
+version = ">=1.0 <2.0"

@@ -11,8 +11,10 @@ namespace Eclipse.UI
     // pack is the reference). Each FightButtons atlas member is composited from its
     // layers: centred at their native pixel size on a canvas the size of the first
     // layer, later layers drawn over earlier ones, or cut out of them on pressed
-    // buttons so the icon reads on the solid background. Members whose layers are not
-    // all present, and members without a recipe, keep the built-in art.
+    // buttons so the icon reads on the solid background. A PNG named after a member
+    // (e.g. Joystick_norm.png) is used as that member's finished image instead of its
+    // recipe. Members whose layers are not all present, and members without a recipe or
+    // an image, keep the built-in art.
     // Pack folders are looked up, first match by name wins, in:
     //   <Application.persistentDataPath>/ControlPacks/<name>/
     //   <game folder next to the data folder>/ControlPacks/<name>/
@@ -169,7 +171,10 @@ namespace Eclipse.UI
         private static Sprite Load(string folder, string atlas, string member, Func<string, string, Sprite> original)
         {
             string shortName = member.StartsWith(MemberPrefix, StringComparison.OrdinalIgnoreCase) ? member.Substring(MemberPrefix.Length) : member;
-            if (!Recipes.TryGetValue(shortName, out Layer[] layers)) return null;
+            // A finished image named after the member (e.g. Joystick_norm.png) wins over its recipe.
+            Layer[] layers = File.Exists(LayerPath(folder, shortName)) ? new[] { new Layer(shortName) }
+                : Recipes.TryGetValue(shortName, out Layer[] recipe) ? recipe : null;
+            if (layers == null) return null;
             foreach (Layer layer in layers)
                 if (!File.Exists(LayerPath(folder, layer.File))) return null;
             Sprite source = original != null ? original(atlas, member) : null;

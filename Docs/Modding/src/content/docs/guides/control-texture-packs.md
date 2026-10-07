@@ -17,7 +17,21 @@ Loaded images are cached for the game session; restart after editing a pack's PN
 Each pack is a folder of layer images with fixed file names. The game builds every
 on-screen control from these layers, so draw them as plain white (or any colour)
 shapes on a transparent background. The `DE128` pack in `StreamingAssets/ControlPacks/`
-is a complete example.
+is a complete example. `Clean` is an alternative pack with simplified white icons,
+thin borders and restrained highlight rings. It keeps the same layer names and
+dimensions as `DE128`, including the original background discs for consistent
+idle transparency and solid pressed states.
+
+`Moonforge` uses a lunar metal theme: translucent navy backgrounds, silver-blue
+borders, and violet/gold highlights. Its action icons are an armored gauntlet,
+armored boot, lunar flame, four-bladed throwing glaive, and crescent charge vortex.
+It uses the same filenames and dimensions as `DE128`. Its pressed background
+lights up blue-violet, with the action icon cut out by the existing compositor.
+
+`Definitive` is the outline style of the 2026 Definitive Edition controls: thin
+white rings with white icons on a transparent button. A pressed button fills
+solid white with its icon cut out. Its joystick knob is a filled white dot, shipped
+as finished images (see below).
 
 | File | Size in DE128 | Used for |
 | --- | --- | --- |
@@ -50,6 +64,14 @@ How the layers combine:
   with `fight_bg_frame.png` on top.
 - **Single images** (rings, ready icons and highlights) are used as they are.
 
+A pack can also replace a whole control with a finished image. Name the PNG after
+the `UI/Atlases/FightButtons` member it replaces, for example `Joystick_norm.png`
+and `Joystick_action.png` for the idle and held joystick knob, or
+`btn_punch_normal.png` and `btn_punch_action.png` for the idle and pressed punch
+button. A finished image is used as it is, instead of that control's layers, and
+is shown at the built-in control's size. The `Definitive` pack uses this for its
+knob.
+
 Size the icons relative to the 200-pixel background, because they are placed at
 their own pixel size before the whole control is scaled to its on-screen size. A
 control is shown at the built-in control's size, so higher-resolution layers stay
@@ -59,6 +81,11 @@ built-in artwork. The pause button and the ranged ammo ring always use the
 built-in artwork. Only the `UI/Atlases/FightButtons` atlas is affected. A mod's
 explicit sprite replacement takes priority over the selected local control pack.
 
+The example folders also include `fight_glow_big.png` and `fight_glow_small.png`.
+The current control-pack loader does not use these two layers; they are included
+for artwork completeness and do not add an in-game glow effect.
+
 These are image folders, with no manifest or executable scripts. They do not
 change bindings or gameplay and are not part of campaign saves. Eclipse ships
-one example pack, `DE128`. A missing selected folder falls back to `Default`.
+three example packs, `DE128`, `Clean`, and `Moonforge`. A missing selected folder falls back to
+`Default`.

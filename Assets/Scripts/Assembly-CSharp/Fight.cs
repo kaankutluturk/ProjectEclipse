@@ -1776,8 +1776,12 @@ public partial class Fight
 		perksStage.GetPerkMap()["Animation"] = value;
 		perksStage.FireEvent(eventModel.sourceModel, PerkEvent.PerkEventType.EVENT_ANIMATION_END, true);
         NotifyEclipseAnimation(eventModel.SourceModel, value, ModEffectEvent.AnimationEnd);
-		Model combatTarget = eventModel.sourceModel.GetCombatTarget();
-		bool flag = eventModel.sourceModel.IsFinished() && combatTarget != null && combatTarget.IsFinished();
+		// Eclipse: the two main fighters start and end a round together. Pair them
+		// directly, so a mod-owned actor that is a fighter's current target can
+		// never hold the stance (and the round) open.
+		Model source = eventModel.sourceModel;
+		Model combatTarget = source == GetPlayerModel() ? GetEnemyModel() : source == GetEnemyModel() ? GetPlayerModel() : source.GetCombatTarget();
+		bool flag = source.IsFinished() && combatTarget != null && combatTarget.IsFinished();
 		if (stageType == StageType.Stage.STAGE_START_STANCE && flag)
 		{
 			ClearModelsStanceFlag();
@@ -3035,7 +3039,9 @@ public partial class Fight
         };
         try
         {
-            model.Index = _Camera.AddModel(model, false, true); camera = true;
+            // Not a primary camera fighter: the camera keeps framing the two main
+            // fighters, and an actor's removal cannot clear their focus slot.
+            model.Index = _Camera.AddModel(model, false, false); camera = true;
             SetModelOnListening(model);
             perksStage.AddModel(model); perks = true;
             _SelectAnimation.AddModel(model); animation = true;
@@ -3706,6 +3712,9 @@ public partial class Fight
 	private void FinishStance(ModelParameters winnerParameters, ModelParameters loserParameters, EndRoundType endRoundType)
 	{
 		endStanceCounter = 0;
+		// Eclipse: the round is decided; mod-owned actors leave rather than keep
+		// fighting through the victory and defeat stances.
+		CancelEclipseActors("round_ended");
 		SetStage(StageType.Stage.STAGE_END_STANCE);
 	}
 

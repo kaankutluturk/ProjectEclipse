@@ -114,6 +114,11 @@ paths, duplicate/case-colliding entries, links/devices, unsupported descriptor t
 files, and missing or cross-archive payload references. `.xml` files are accepted only when referenced
 by a `type=model` descriptor; immutable TexturePacker plist XML is stored as `.txt` behind `type=atlas`.
 
+To audit or regroup the whole set, `unpack-all` extracts every group into one workspace folder;
+`move`, `delete`, `prune`, and `report` reorganize it by asset address; and `repack-all` repacks
+changed groups and rewrites `catalog.json`. `Tools/AssetPackerGui` is a Windows app with the same
+workflow plus image preview and sound playback. See `Tools/AssetPacker/README.md`.
+
 After intentionally repacking an archive, run:
 
 ```powershell

@@ -1,0 +1,11 @@
+schema = 1
+id = "gauntlet"
+name = "The Gauntlet"
+version = "1.0.0"
+authors = ["czapla"]
+entrypoint = "scripts/main.lua"
+capabilities = ["content.register", "combat.effects", "combat.transform", "combat.target", "combat.change_life", "combat.modify_hit", "combat.motion", "presentation.visuals", "ui.create"]
+
+[[dependencies]]
+id = "core"
+version = ">=1.0 <2.0"

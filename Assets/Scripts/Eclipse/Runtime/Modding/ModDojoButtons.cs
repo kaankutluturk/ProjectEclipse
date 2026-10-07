@@ -10,8 +10,13 @@ namespace Eclipse.Modding
     {
         public string Name { get; }
         public AssetId Image { get; }
+        /// <summary>Shown while the button is held; null keeps <see cref="Image"/> (tinted by the press).</summary>
+        public AssetId? PressedImage { get; }
 
-        internal ModDojoButton(string name, AssetId image) { Name = name; Image = image; }
+        internal ModDojoButton(string name, AssetId image, AssetId? pressedImage = null)
+        {
+            Name = name; Image = image; PressedImage = pressedImage;
+        }
     }
 
     // One choice of a dojo picker: a location (a core location or a dojo registered by the
@@ -62,7 +67,7 @@ namespace Eclipse.Modding
         private readonly List<ModDojoPicker> _dojoPickers = new List<ModDojoPicker>();
         private int DojoButtonRegistrationCount => _dojoButtons.Count + _dojoPickers.Count;
 
-        public ModDojoButton RegisterDojoButton(string localId, AssetId image)
+        public ModDojoButton RegisterDojoButton(string localId, AssetId image, AssetId? pressedImage = null)
         {
             ThrowIfCompleted();
             if (string.IsNullOrEmpty(localId) || localId.Length > 64)
@@ -77,13 +82,14 @@ namespace Eclipse.Modding
             if (_dojoButtons.Count >= MaxDojoButtonsPerMod)
                 throw new ModContentException("A mod may register at most " + MaxDojoButtonsPerMod + " dojo buttons.");
             EnsureCapacityForNewRegistration();
-            var button = new ModDojoButton(name, image);
+            var button = new ModDojoButton(name, image, pressedImage);
             _dojoButtons.Add(button);
             return button;
         }
 
         // One picker per mod. Its button is an ordinary dojo button named "<mod>.<id>".
-        public ModDojoPicker RegisterDojoPicker(string localId, AssetId button, DefinitionId? title, IList<ModDojoPickerChoice> choices)
+        public ModDojoPicker RegisterDojoPicker(string localId, AssetId button, DefinitionId? title, IList<ModDojoPickerChoice> choices,
+            AssetId? buttonPressed = null)
         {
             ThrowIfCompleted();
             if (_dojoPickers.Count != 0) throw new ModContentException("A mod may register only one dojo picker.");
@@ -98,7 +104,7 @@ namespace Eclipse.Modding
                     throw new ModContentException("Dojo picker locations must be core locations or this mod's dojos: " + choice.Location);
                 if (!seen.Add(choice.Location)) throw new ModContentException("Duplicate dojo picker choice: " + choice.Location);
             }
-            ModDojoButton entry = RegisterDojoButton(localId, button);
+            ModDojoButton entry = RegisterDojoButton(localId, button, buttonPressed);
             var picker = new ModDojoPicker(Mod.Id, entry, title, new List<ModDojoPickerChoice>(choices).AsReadOnly());
             _dojoPickers.Add(picker);
             return picker;

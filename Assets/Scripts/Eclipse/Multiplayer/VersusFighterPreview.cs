@@ -121,6 +121,7 @@ namespace Eclipse.Multiplayer
         private void LateUpdate()
         {
             if (_rebuildAt >= 0f && Time.unscaledTime >= _rebuildAt) Rebuild();
+            if (_container != null) { _container.SyncPreviewFreeze(); _container.KeepPreviewWalls(_wallLeft, _wallRight); }
             UpdateEdgeLines();
             if (_camera == null) return;
             if (Time.unscaledTime >= _nextRendererScan)
@@ -184,6 +185,81 @@ namespace Eclipse.Multiplayer
 
         public void Step(int ticks) { if (IsReady) _container.PreviewStep(Mathf.Max(0, ticks)); }
 
+        private const int MaxSeekTicks = 2000;
+
+        /// <summary>
+        /// Shows <paramref name="move"/> at keyframe <paramref name="frame"/>, paused. The move
+        /// replays from the fighter's start position and is simulated tick by tick up to the
+        /// frame, so the pose (and any travel) is exactly what normal playback reaches there.
+        /// Returns the ticks simulated, or -1 when the fighter cannot play the move.
+        /// </summary>
+        public int SeekMove(string move, int frame)
+        {
+            if (!IsReady) return -1;
+            var animation = AnimationData.GetAnimationByName(move, false);
+            if (animation == null) return -1;
+            Paused = true;
+            ResetPosition();
+            _container.PreviewModel.PlayAnimationDelay(animation);
+            _container.PreviewStep(1);
+            int ticks = 1;
+            while (ticks < MaxSeekTicks && PlayingMove == animation.Name && Keyframe < frame) { _container.PreviewStep(1); ticks++; }
+            return PlayingMove == animation.Name ? ticks : -1;
+        }
+
+        /// <summary>
+        /// Simulates until the playing move reaches its next keyframe. Returns the ticks taken,
+        /// or -1 when the move ended (the fighter moved on to another move) first.
+        /// </summary>
+        public int StepKeyframe()
+        {
+            if (!IsReady) return -1;
+            string move = PlayingMove;
+            int start = Keyframe;
+            for (int ticks = 1; ticks <= 64; ticks++)
+            {
+                _container.PreviewStep(1);
+                if (PlayingMove != move) return -1;
+                if (Keyframe != start) return ticks;
+            }
+            return -1;
+        }
+
+        /// <summary>Puts the fighter back on its start position (moves that travel otherwise drift on replay).</summary>
+        public void ResetPosition()
+        {
+            if (!IsReady) return;
+            _container.ResetModelPosition();
+            PlaceWalls();
+        }
+
+        private const float OpenWall = 4000f;
+        private float? _wallBehind;
+        private float _wallLeft = -OpenWall, _wallRight = OpenWall;
+
+        /// <summary>
+        /// Puts a wall <paramref name="gap"/> units behind the fighter's start position, or none
+        /// (null). The game's own wall rules then decide wall hits, as against an arena wall.
+        /// </summary>
+        public void SetWallBehind(float? gap)
+        {
+            _wallBehind = gap;
+            PlaceWalls();
+        }
+
+        private void PlaceWalls()
+        {
+            _wallLeft = -OpenWall; _wallRight = OpenWall;
+            if (IsReady && _wallBehind.HasValue)
+            {
+                var model = _container.PreviewModel;
+                float x = model.Body.GetCenterOfMassNode().GetStart().GetX();
+                if (model.GetFacingSign() >= 0) _wallLeft = x - _wallBehind.Value;
+                else _wallRight = x + _wallBehind.Value;
+            }
+            if (IsReady) _container.KeepPreviewWalls(_wallLeft, _wallRight);
+        }
+
         public string PlayingMove => IsReady ? _container.PreviewModel.GetCurrentAnimation()?.Name : null;
         /// <summary>Ticks since the playing move started.</summary>
         public int MoveTick => IsReady ? _container.PreviewModel.GetAnimationModule().GetFrameInMove() : 0;
@@ -199,10 +275,104 @@ namespace Eclipse.Multiplayer
             return names;
         }
 
+        /// <summary>An edge of the fighter: body edges join two skeleton (N*) nodes; the rest are weapon or rig parts.</summary>
+        public struct EdgeInfo { public string Name; public float Radius; public bool Body; }
+
+        /// <summary>Every named edge of the fighter, with what the hitbox editor groups them by.</summary>
+        public List<EdgeInfo> Edges()
+        {
+            var result = new List<EdgeInfo>();
+            if (!IsReady) return result;
+            var seen = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var edge in _container.PreviewModel.Body.GetAllEdges())
+            {
+                string name = edge.get_Name();
+                if (string.IsNullOrEmpty(name) || !seen.Add(name)) continue;
+                string from = edge.FromNode?.GetName() ?? string.Empty, to = edge.ToNode?.GetName() ?? string.Empty;
+                bool body = from.StartsWith("N", StringComparison.Ordinal) && to.StartsWith("N", StringComparison.Ordinal) && from.IndexOf('-') < 0 && to.IndexOf('-') < 0;
+                result.Add(new EdgeInfo { Name = name, Radius = edge.CollisionRadius, Body = body });
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// When set, draws every edge it gives a colour (instead of only the playing move's
+        /// active attacking edges), for the hitbox editor.
+        /// </summary>
+        public Func<string, Color?> EdgeOverlay { get; set; }
+
+        /// <summary>The drawn edge nearest a screen point over this preview, or null when none is within <paramref name="maxPixels"/>.</summary>
+        public string EdgeAt(Vector2 screenPoint, UnityEngine.Camera uiCamera, float maxPixels)
+        {
+            if (!IsReady || _camera == null) return null;
+            var rect = (RectTransform)transform;
+            if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(rect, screenPoint, uiCamera, out var local)) return null;
+            var size = rect.rect.size;
+            if (size.x <= 0 || size.y <= 0) return null;
+            var uv = new Vector2((local.x - rect.rect.xMin) / size.x, (local.y - rect.rect.yMin) / size.y);
+            if (uv.x < 0 || uv.x > 1 || uv.y < 0 || uv.y > 1) return null;
+            if (_mirror) uv.x = 1f - uv.x;
+            var model = _container.PreviewModel;
+            var root = model.UnityObject.transform;
+            var p = new Vector2(uv.x * size.x, uv.y * size.y);
+            string best = null;
+            float bestDistance = maxPixels;
+            foreach (var edge in model.Body.GetAllEdges())
+            {
+                string name = edge.get_Name();
+                if (string.IsNullOrEmpty(name) || EdgeOverlay != null && EdgeOverlay(name) == null) continue;
+                edge.UpdateCollisionPoints();
+                var a = Pixels(root, edge.CollisionStart, size); var b = Pixels(root, edge.CollisionEnd, size);
+                var ab = b - a;
+                float t = ab.sqrMagnitude < 1e-4f ? 0f : Mathf.Clamp01(Vector2.Dot(p - a, ab) / ab.sqrMagnitude);
+                float distance = Vector2.Distance(p, a + ab * t);
+                if (distance < bestDistance) { bestDistance = distance; best = name; }
+            }
+            return best;
+        }
+
+        private Vector2 Pixels(Transform root, Vector3f point, Vector2 size)
+        {
+            var viewport = _camera.WorldToViewportPoint(root.TransformPoint(new Vector3(point.GetX(), point.GetY(), -1.6f)));
+            return new Vector2(viewport.x * size.x, viewport.y * size.y);
+        }
+
+        private LineRenderer EdgeLine(Model model, ModelEdge edge)
+        {
+            if (_edgeLines.TryGetValue(edge, out var line) && line != null) return line;
+            var host = new GameObject("Lab edge " + edge.get_Name());
+            host.transform.SetParent(model.UnityObject.transform, false);
+            line = host.AddComponent<LineRenderer>();
+            if (_lineMaterial == null) _lineMaterial = new Material(Shader.Find("Sprites/Default"));
+            line.sharedMaterial = _lineMaterial; line.useWorldSpace = false; line.positionCount = 2; line.numCapVertices = 8;
+            line.alignment = LineAlignment.TransformZ; line.sortingOrder = 32760;
+            _edgeLines[edge] = line;
+            return line;
+        }
+
         private void UpdateEdgeLines()
         {
             var active = new HashSet<ModelEdge>();
-            if (ShowAttackEdges && IsReady)
+            if (EdgeOverlay != null && IsReady)
+            {
+                var model = _container.PreviewModel;
+                foreach (var edge in model.Body.GetAllEdges())
+                {
+                    string name = edge.get_Name();
+                    var color = string.IsNullOrEmpty(name) ? null : EdgeOverlay(name);
+                    if (color == null) continue;
+                    active.Add(edge);
+                    edge.UpdateCollisionPoints();
+                    var line = EdgeLine(model, edge);
+                    line.startColor = line.endColor = color.Value;
+                    var start = edge.CollisionStart; var end = edge.CollisionEnd;
+                    line.SetPosition(0, new Vector3(start.GetX(), start.GetY(), -1.6f));
+                    line.SetPosition(1, new Vector3(end.GetX(), end.GetY(), -1.6f));
+                    line.startWidth = line.endWidth = Mathf.Max(.035f, edge.CollisionRadius * 2f);
+                    line.enabled = true;
+                }
+            }
+            else if (ShowAttackEdges && IsReady)
             {
                 var model = _container.PreviewModel;
                 var edges = model.GetAnimationModule()?.GetAttackingEdges();
@@ -210,17 +380,8 @@ namespace Eclipse.Multiplayer
                     foreach (var edge in edges)
                     {
                         active.Add(edge);
-                        if (!_edgeLines.TryGetValue(edge, out var line) || line == null)
-                        {
-                            var host = new GameObject("Lab edge " + edge.get_Name());
-                            host.transform.SetParent(model.UnityObject.transform, false);
-                            line = host.AddComponent<LineRenderer>();
-                            if (_lineMaterial == null) _lineMaterial = new Material(Shader.Find("Sprites/Default"));
-                            line.sharedMaterial = _lineMaterial; line.useWorldSpace = false; line.positionCount = 2; line.numCapVertices = 8;
-                            line.alignment = LineAlignment.TransformZ; line.sortingOrder = 32760;
-                            line.startColor = line.endColor = new Color(1f, .22f, .18f, .92f);
-                            _edgeLines[edge] = line;
-                        }
+                        var line = EdgeLine(model, edge);
+                        line.startColor = line.endColor = new Color(1f, .22f, .18f, .92f);
                         var start = edge.CollisionStart; var end = edge.CollisionEnd;
                         line.SetPosition(0, new Vector3(start.GetX(), start.GetY(), -1.6f));
                         line.SetPosition(1, new Vector3(end.GetX(), end.GetY(), -1.6f));

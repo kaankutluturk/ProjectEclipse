@@ -44,6 +44,13 @@ across launches. Disabling a mod retains its saved progress.
 - [Active Strike Trial](example.active-strike/README.md) starts an authored move through a Lua HUD ability and observes its playback receipt.
 - [Audio Lab](example.audio-lab/README.md) plays an original beacon through owned sound instances, with volume, stop and game/real pause clocks.
 - [Chiaroscuro](chiaroscuro/README.md) is the cinematic visuals mod kept here.
+- [Final Blow](final-blow/README.md) is a kill cam: the knockout hit pulls the camera in while time nearly stops.
+- [Shadow Clones](shadow-clones/README.md) sells a mask whose RaidCharge cast raises three allied shadow fighters.
+- [Umbra, the Last Eclipse](umbra/README.md) is a three-phase boss chapter with a prologue, form changes, summons, lightning and an epilogue.
+- [Home Run](home-run/README.md) sells a hammer whose RaidCharge swing launches the opponent across the arena.
+- [The Mirror](mirror/README.md) is an opponent with your weapon that echoes your attacks and learns to read them.
+- [Combo Hype](combo-hype/README.md) sells an armour that turns the fight up with every combo tier.
+- [The Gauntlet](gauntlet/README.md) is five opponents in one fight, one per health bar.
 - [Archived examples](../ArchivedMods/) preserve earlier showcases outside the active mod directory.
 - [Engineering records](../Docs/Engineering/Modding/README.md) contain plans, audits and verification history.
 - [Historical mod guide](../Docs/Engineering/Modding/LEGACY_MOD_GUIDE.md) preserves the former long README, including superseded API notes.

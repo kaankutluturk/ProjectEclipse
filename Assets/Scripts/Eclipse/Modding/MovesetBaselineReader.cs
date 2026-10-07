@@ -52,7 +52,54 @@ namespace Eclipse.Modding
                 }
             }
             foreach (var interval in move.MoveData.Intervals) baseline.Intervals.Add(DescribeInterval(interval));
+            DescribeInput(move, baseline);
             return baseline;
+        }
+
+        private static readonly string[] KeyNames =
+            { "Up", "Up-Forward", "Forward", "Down-Forward", "Down", "Down-Back", "Back", "Up-Back", "Punch", "Kick", "Ranged", "Magic", "RaidCharge", "Super" };
+        private static Dictionary<int, string> keyNamesById;
+
+        /// <summary>The move's key input in the shape the input patch edits (see MoveCombatPatchRuntime.FindInputSlot).</summary>
+        private static void DescribeInput(InfoAnimation move, MovesetBaselineMove baseline)
+        {
+            if (keyNamesById == null)
+            {
+                keyNamesById = new Dictionary<int, string>();
+                foreach (string name in KeyNames)
+                {
+                    int id = MovesMaps.GetMappedIndex(MovesMaps.MapType.KEY_TYPE, name);
+                    if (!keyNamesById.ContainsKey(id)) keyNamesById.Add(id, name);
+                }
+            }
+            try
+            {
+                MoveCombatPatchRuntime.FindInputSlot(move.SelectionConditions, out List<ConditionKeys> chords);
+                var result = new List<List<ModMoveKey>>();
+                foreach (var chord in chords)
+                {
+                    var keys = new List<ModMoveKey>();
+                    void Add(List<int> ids, string press)
+                    {
+                        foreach (int id in ids)
+                        {
+                            if (!keyNamesById.TryGetValue(id, out string name)) throw new InvalidOperationException("it uses a key the editor cannot name");
+                            keys.Add(new ModMoveKey(name, press));
+                        }
+                    }
+                    Add(chord.RequiredKeys.StarterKeys, "Tap");
+                    Add(chord.RequiredKeys.AdditionalKeys, "Hold");
+                    Add(chord.RequiredKeys.ReleaseKeys, "Release");
+                    if (keys.Count == 0 || keys.Count > ModMoveInput.MaxKeys) throw new InvalidOperationException("its key chord is empty or too long");
+                    result.Add(keys);
+                }
+                if (result.Count > ModMoveInput.MaxChords) throw new InvalidOperationException("it has more than " + ModMoveInput.MaxChords + " alternatives");
+                baseline.Input = new ModMoveInput(result);
+            }
+            catch (Exception reason) when (reason is InvalidOperationException || reason is ModContentException)
+            {
+                baseline.InputProblem = reason.Message;
+            }
         }
 
         private static string Attribute(XmlNode node, string name) => node?.Attributes?[name]?.Value;

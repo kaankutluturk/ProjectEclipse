@@ -5,15 +5,15 @@ using K4os.Compression.LZ4.Streams;
 
 namespace Eclipse.AssetPacker;
 
-internal static class Program
+internal static partial class Program
 {
     private static readonly StringComparer PathComparer = StringComparer.OrdinalIgnoreCase;
 
-    private static int Main(string[] args)
+    internal static int Main(string[] args)
     {
         try
         {
-            if (args.Length < 2)
+            if (args.Length < 2 || args[0] is "-h" or "--help" or "help")
                 return Usage();
 
             string command = args[0].ToLowerInvariant();
@@ -38,7 +38,7 @@ internal static class Program
                     CompressTar(args[1], args[2]);
                     return 0;
                 default:
-                    return Usage();
+                    return RunWorkspaceCommand(args);
             }
         }
         catch (Exception exception)
@@ -57,6 +57,17 @@ internal static class Program
         Console.Error.WriteLine("  extract <bundle.tar.lz4> <directory>");
         Console.Error.WriteLine("  info <bundle.tar.lz4>");
         Console.Error.WriteLine("  compress <bundle.tar> <bundle.tar.lz4>");
+        Console.Error.WriteLine();
+        Console.Error.WriteLine("Whole-catalog workspace (run from the repository root):");
+        Console.Error.WriteLine("  unpack-all <workspace> [--only GROUP,GROUP] [--catalog file] [--bundles dir]");
+        Console.Error.WriteLine("  check <workspace>");
+        Console.Error.WriteLine("  report <workspace> <out.csv> [--refs dir]...");
+        Console.Error.WriteLine("  move <workspace> <address-glob> <GROUP> [--from GROUP] [--dry-run]");
+        Console.Error.WriteLine("  delete <workspace> <address-glob> [--from GROUP] [--dry-run]");
+        Console.Error.WriteLine("  prune <workspace> [--dry-run]");
+        Console.Error.WriteLine("  repack-all <workspace> [--catalog file] [--bundles dir] [--dry-run]");
+        Console.Error.WriteLine("Address globs: * = one path segment, ** = any depth, ? = one char (case-insensitive).");
+        Console.Error.WriteLine("@file instead of a glob selects the exact addresses listed in that file, one per line.");
         return 2;
     }
 

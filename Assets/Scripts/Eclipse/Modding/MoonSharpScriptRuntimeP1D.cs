@@ -330,15 +330,17 @@ namespace Eclipse.Modding
                 });
             }
 
-            // sf2.locations.dojo_picker { id, button = sprite, title = key?, choices = { { location, name, preview }, ... } }
+            // sf2.locations.dojo_picker { id, button = sprite, button_pressed = sprite?, title = key?, choices = { { location, name, preview }, ... } }
             private DynValue DojoPicker(ScriptExecutionContext context, CallbackArguments args)
             {
                 const string function = "sf2.locations.dojo_picker";
                 Table table = args.AsType(0, function, DataType.Table, false).Table;
                 return ApiCall(function, () => {
-                    ValidateFields(table, function, "id", "button", "title", "choices");
+                    ValidateFields(table, function, "id", "button", "button_pressed", "title", "choices");
                     string id = ReadButtonId(table, function);
                     AssetId button = RequiredHandle(table, "button", _spriteHandles, "sprite", function);
+                    AssetId? buttonPressed = table.Get("button_pressed").IsNil() ? (AssetId?)null
+                        : RequiredHandle(table, "button_pressed", _spriteHandles, "sprite", function);
                     DefinitionId? title = null;
                     if (!table.Get("title").IsNil())
                         title = RequiredHandle(table, "title", _localizationHandles, "localization", function);
@@ -357,7 +359,7 @@ namespace Eclipse.Modding
                             RequiredHandle(choice, "preview", _spriteHandles, "sprite", at)));
                     }
                     if (array.Length != choices.Count) throw new ModContentException(function + ".choices must be a sequence without gaps.");
-                    return DynValue.NewString(_api.RegisterDojoPicker(id, button, title, choices).Button.Name);
+                    return DynValue.NewString(_api.RegisterDojoPicker(id, button, title, choices, buttonPressed).Button.Name);
                 });
             }
 

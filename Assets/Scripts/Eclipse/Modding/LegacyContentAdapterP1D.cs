@@ -208,13 +208,15 @@ namespace Eclipse.Modding
             try
             {
                 // A fork answers to every name its source answers to, so combos, transitions
-                // and conditions that name the source also match the copy.
+                // and conditions that name the source also match the copy. A new move keeps
+                // its own identity: it shares the source's templates but not its name.
                 foreach (var fork in forks)
                 {
                     InfoAnimation copy = AnimationData.GetAnimationByName(fork.RuntimeName, false);
                     InfoAnimation source = AnimationData.GetAnimationByName(fork.Source, false);
                     if (copy == null || source == null) throw new ModContentException("Move fork was not created: " + fork.RuntimeName);
-                    foreach (string name in source.GetTemplateNames()) copy.AddTemplateName(name);
+                    foreach (string name in source.GetTemplateNames())
+                        if (!fork.Adds || name != source.Name) copy.AddTemplateName(name);
                 }
                 return lifetime;
             }

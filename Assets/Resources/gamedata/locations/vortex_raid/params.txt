@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <Root Music="6|7" Color="0x000000" Wall="400" Floor="80" Width="2336" Height="512">
   <Layer Type="1" Factor="0.1">
-    <Image X="0" Y="-15" ClassName="background_1" Width="1300" Height="512" IsOpaque="1" />
+    <Image X="0" Y="-15" ClassName="background_1" Width="1536" Height="512" IsOpaque="1" />
   </Layer>
   <Layer Type="1" Factor="0.12">
     <Image X="0" Y="-20" ClassName="layer_2_1" Width="1536" Height="512" />
