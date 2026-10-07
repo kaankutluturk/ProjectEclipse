@@ -108,9 +108,9 @@ public class RingOutRule : InFightRule
 		{
 			return false;
 		}
-		Vector3f eMAFACPEPDK = _node.GetStart();
-		eMAFACPEPDK = new Vector3f(eMAFACPEPDK.GetX() + originOffsetX, 0f - eMAFACPEPDK.GetY() + originOffsetY, eMAFACPEPDK.GetZ());
-		bool flag = eMAFACPEPDK.GetX() > maxX || eMAFACPEPDK.GetX() < minX || eMAFACPEPDK.GetY() > maxY || eMAFACPEPDK.GetY() < minY;
+		Vector3f edgePosition = _node.GetStart();
+		edgePosition = new Vector3f(edgePosition.GetX() + originOffsetX, 0f - edgePosition.GetY() + originOffsetY, edgePosition.GetZ());
+		bool flag = edgePosition.GetX() > maxX || edgePosition.GetX() < minX || edgePosition.GetY() > maxY || edgePosition.GetY() < minY;
 		if (flag)
 		{
 			SetActive(false);

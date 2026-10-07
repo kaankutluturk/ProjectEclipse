@@ -384,11 +384,11 @@ namespace Nekki.SF2.GUI
 
 		public void ScrollToCell(int row, float time = 0f)
 		{
-			float fFMJGKPCBNK = PositionForRow(row);
-			SetPosition(fFMJGKPCBNK, time);
+			float rowPosition = PositionForRow(row);
+			SetPosition(rowPosition, time);
 		}
 
-		public void SetPosition(float FFMJGKPCBNK, float time = 0f)
+		public void SetPosition(float targetPosition, float time = 0f)
 		{
 			KillTween();
 			if (_isDragging)
@@ -397,25 +397,25 @@ namespace Nekki.SF2.GUI
 			}
 			if (!base.gameObject.activeSelf || time <= 0f)
 			{
-				SetPosition(FFMJGKPCBNK);
+				SetPosition(targetPosition);
 				return;
 			}
-			_tween = DOTween.To(() => _currentPosition, (float DHDMNHCIPEH) =>
+			_tween = DOTween.To(() => _currentPosition, (float tweenedPosition) =>
 			{
-				SetPosition(DHDMNHCIPEH);
-			}, FFMJGKPCBNK, time);
+				SetPosition(tweenedPosition);
+			}, targetPosition, time);
 		}
 
-		private void SetPosition(float FFMJGKPCBNK)
+		private void SetPosition(float scrollPosition)
 		{
 			if (!_isEmpty)
 			{
-				FFMJGKPCBNK = Mathf.Clamp(FFMJGKPCBNK, PositionForRow(0), PositionForRow(_cellSizes.GetRowCount() - 1));
-				if (_currentPosition != FFMJGKPCBNK)
+				scrollPosition = Mathf.Clamp(scrollPosition, PositionForRow(0), PositionForRow(_cellSizes.GetRowCount() - 1));
+				if (_currentPosition != scrollPosition)
 				{
 					_needsCellUpdate = true;
-					_currentPosition = FFMJGKPCBNK;
-					float num = FFMJGKPCBNK - GetViewportExtent() / 2f;
+					_currentPosition = scrollPosition;
+					float num = scrollPosition - GetViewportExtent() / 2f;
 					float num2 = num / get_ContentSize();
 					float num3 = 0f;
 					num3 = ((!CheckIsVertical()) ? num2 : (1f - num2));
@@ -491,20 +491,20 @@ namespace Nekki.SF2.GUI
 
 		private Range CalculateVisibleRange()
 		{
-			float mGMMDGFPBLP = Math.Max(_currentPosition - GetViewportExtent() * 1.5f, PositionForRow(0));
-			float mGMMDGFPBLP2 = Math.Min(_currentPosition + GetViewportExtent() * 1.5f, PositionForRow(_cellSizes.GetRowCount() - 1));
-			int num = FindIndexOfRowAtPosition(mGMMDGFPBLP);
-			int num2 = FindIndexOfRowAtPosition(mGMMDGFPBLP2);
+			float firstVisiblePosition = Math.Max(_currentPosition - GetViewportExtent() * 1.5f, PositionForRow(0));
+			float lastVisiblePosition = Math.Min(_currentPosition + GetViewportExtent() * 1.5f, PositionForRow(_cellSizes.GetRowCount() - 1));
+			int num = FindIndexOfRowAtPosition(firstVisiblePosition);
+			int num2 = FindIndexOfRowAtPosition(lastVisiblePosition);
 			int valueCount = num2 - num + 1;
 			return new Range(num, valueCount);
 		}
 
-		public int FindIndexOfRowAtPosition(float MGMMDGFPBLP)
+		public int FindIndexOfRowAtPosition(float searchPosition)
 		{
-			return FindIndexOfRowAtPosition(MGMMDGFPBLP, 0, _cellSizes.GetRowCount() - 1);
+			return FindIndexOfRowAtPosition(searchPosition, 0, _cellSizes.GetRowCount() - 1);
 		}
 
-		public int FindIndexOfRowAtPosition(float MGMMDGFPBLP, int startRow, int endRow)
+		public int FindIndexOfRowAtPosition(float searchPosition, int startRow, int endRow)
 		{
 			if (startRow >= endRow)
 			{
@@ -512,8 +512,8 @@ namespace Nekki.SF2.GUI
 			}
 			if (endRow - startRow == 1)
 			{
-				float num = Mathf.Abs(MGMMDGFPBLP - PositionForRow(startRow));
-				float num2 = Mathf.Abs(MGMMDGFPBLP - PositionForRow(endRow));
+				float num = Mathf.Abs(searchPosition - PositionForRow(startRow));
+				float num2 = Mathf.Abs(searchPosition - PositionForRow(endRow));
 				if (num <= num2)
 				{
 					return startRow;
@@ -522,11 +522,11 @@ namespace Nekki.SF2.GUI
 			}
 			int num3 = (startRow + endRow) / 2;
 			float num4 = PositionForRow(num3);
-			if (num4 >= MGMMDGFPBLP)
+			if (num4 >= searchPosition)
 			{
-				return FindIndexOfRowAtPosition(MGMMDGFPBLP, startRow, num3);
+				return FindIndexOfRowAtPosition(searchPosition, startRow, num3);
 			}
-			return FindIndexOfRowAtPosition(MGMMDGFPBLP, num3, endRow);
+			return FindIndexOfRowAtPosition(searchPosition, num3, endRow);
 		}
 
 		private void CreateVisibleCells()

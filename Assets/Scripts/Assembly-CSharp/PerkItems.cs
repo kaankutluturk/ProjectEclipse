@@ -162,10 +162,10 @@ public class PerkItems
 			}
 			if (childNode.ChildNodes.Count > 0)
 			{
-				PerkInfoItem aCONCDFDNJH2 = CloneIfOverridden(basePerk, childNode);
-				if (aCONCDFDNJH2 != basePerk)
+				PerkInfoItem progressionPerk = CloneIfOverridden(basePerk, childNode);
+				if (progressionPerk != basePerk)
 				{
-					AddProgressionVariant(aCONCDFDNJH2, level, descriptionKey, moveName);
+					AddProgressionVariant(progressionPerk, level, descriptionKey, moveName);
 				}
 				foreach (XmlNode childNode2 in childNode.ChildNodes)
 				{

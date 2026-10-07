@@ -5,8 +5,8 @@ public sealed class WebSocketContinuationFrame : WebSocketBinaryFrame
 	{
 	}
 
-	public WebSocketContinuationFrame(byte[] data, ulong LCCLEFMKLPB, ulong length, bool isFinal)
-		: base(data, LCCLEFMKLPB, length, isFinal)
+	public WebSocketContinuationFrame(byte[] data, ulong dataPosition, ulong length, bool isFinal)
+		: base(data, dataPosition, length, isFinal)
 	{
 	}
 

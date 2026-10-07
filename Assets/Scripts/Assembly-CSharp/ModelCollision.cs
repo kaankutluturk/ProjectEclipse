@@ -191,7 +191,7 @@ public class ModelCollision
 	private bool CrossModel(List<ModelEdge> victimEdges, ModelEdge attackerEdge)
 	{
 		Vector3f firstIntersection = new Vector3f();
-		Vector3f eMAFACPEPDK2 = new Vector3f();
+		Vector3f secondIntersection = new Vector3f();
 		float attackerRadius = attackerEdge.GetCollisionRadius();
 		Vector3f attackerStart = attackerEdge.GetCollisionStart();
 		Vector3f attackerEnd = attackerEdge.GetCollisionEnd();
@@ -201,10 +201,10 @@ public class ModelCollision
 			float victimRadius = item.GetCollisionRadius();
 			Vector3f victimStart = item.GetCollisionStart();
 			Vector3f victimEnd = item.GetCollisionEnd();
-			EquationLine hENNAFMBEAG2 = item.LineEquation;
-			if (Vector2f.TryIntersectThickSegments(attackerStart, attackerEnd, attackerRadius, victimStart, victimEnd, victimRadius, firstIntersection, eMAFACPEPDK2, attackerLine, hENNAFMBEAG2))
+			EquationLine victimLine = item.LineEquation;
+			if (Vector2f.TryIntersectThickSegments(attackerStart, attackerEnd, attackerRadius, victimStart, victimEnd, victimRadius, firstIntersection, secondIntersection, attackerLine, victimLine))
 			{
-				AddStrike(attackerEdge, item, firstIntersection, eMAFACPEPDK2);
+				AddStrike(attackerEdge, item, firstIntersection, secondIntersection);
 				return true;
 			}
 		}

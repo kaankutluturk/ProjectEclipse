@@ -117,9 +117,9 @@ namespace Nekki.SF2.GUI
 		private void MoveTo(Vector2 targetPosition, float _Duration)
 		{
 			KillTween();
-			_tween = DOTween.To(() => GetContentPosition(), (Vector2Wrapper HBLGAEMOHAL) =>
+			_tween = DOTween.To(() => GetContentPosition(), (Vector2Wrapper positionWrapper) =>
 			{
-				SetContentPosition(HBLGAEMOHAL);
+				SetContentPosition(positionWrapper);
 			}, targetPosition, _Duration);
 			_tween.OnComplete(OnTweenComplete);
 		}
@@ -139,11 +139,11 @@ namespace Nekki.SF2.GUI
 			return new Vector2(0f, 0f);
 		}
 
-		private void SetContentPosition(Vector2 LCCLEFMKLPB)
+		private void SetContentPosition(Vector2 contentPosition)
 		{
 			if (scrollContent != null)
 			{
-				((RectTransform)scrollContent.transform).anchoredPosition = LCCLEFMKLPB;
+				((RectTransform)scrollContent.transform).anchoredPosition = contentPosition;
 			}
 		}
 

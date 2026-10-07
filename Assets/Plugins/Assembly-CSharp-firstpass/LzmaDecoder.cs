@@ -141,19 +141,19 @@ public class LzmaDecoder : ICoder, ISetDecoderProperties
 			}
 		}
 
-		private uint GetState(uint LCCLEFMKLPB, byte prevByte)
+		private uint GetState(uint literalPosition, byte prevByte)
 		{
-			return ((LCCLEFMKLPB & m_PosMask) << m_NumPrevBits) + (uint)(prevByte >> 8 - m_NumPrevBits);
+			return ((literalPosition & m_PosMask) << m_NumPrevBits) + (uint)(prevByte >> 8 - m_NumPrevBits);
 		}
 
-		public byte DecodeNormal(RangeDecoder rangeDecoder, uint LCCLEFMKLPB, byte prevByte)
+		public byte DecodeNormal(RangeDecoder rangeDecoder, uint literalPosition, byte prevByte)
 		{
-			return m_Coders[GetState(LCCLEFMKLPB, prevByte)].DecodeNormal(rangeDecoder);
+			return m_Coders[GetState(literalPosition, prevByte)].DecodeNormal(rangeDecoder);
 		}
 
-		public byte DecodeWithMatchByte(RangeDecoder rangeDecoder, uint LCCLEFMKLPB, byte prevByte, byte matchByte)
+		public byte DecodeWithMatchByte(RangeDecoder rangeDecoder, uint literalPosition, byte prevByte, byte matchByte)
 		{
-			return m_Coders[GetState(LCCLEFMKLPB, prevByte)].DecodeWithMatchByte(rangeDecoder, matchByte);
+			return m_Coders[GetState(literalPosition, prevByte)].DecodeWithMatchByte(rangeDecoder, matchByte);
 		}
 	}
 
@@ -296,8 +296,8 @@ public class LzmaDecoder : ICoder, ISetDecoderProperties
 			if (m_IsMatchDecoders[(coderState.Index << 4) + num6].Decode(m_RangeDecoder) == 0)
 			{
 				byte prevByte = m_OutWindow.GetByte(0u);
-				byte aAOIAEJJINO2 = (coderState.IsCharState() ? m_LiteralDecoder.DecodeNormal(m_RangeDecoder, (uint)num5, prevByte) : m_LiteralDecoder.DecodeWithMatchByte(m_RangeDecoder, (uint)num5, prevByte, m_OutWindow.GetByte(num)));
-				m_OutWindow.PutByte(aAOIAEJJINO2);
+				byte decodedByte = (coderState.IsCharState() ? m_LiteralDecoder.DecodeNormal(m_RangeDecoder, (uint)num5, prevByte) : m_LiteralDecoder.DecodeWithMatchByte(m_RangeDecoder, (uint)num5, prevByte, m_OutWindow.GetByte(num)));
+				m_OutWindow.PutByte(decodedByte);
 				coderState.UpdateChar();
 				num5++;
 				continue;

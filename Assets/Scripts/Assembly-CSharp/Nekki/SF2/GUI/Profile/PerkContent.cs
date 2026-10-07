@@ -58,10 +58,10 @@ namespace Nekki.SF2.GUI.Profile
 			_btnImprove.onClick.AddListener(OnImproveClicked);
 		}
 
-		public void Init(string text, ProfilePerk.ProfilePerkState state, Action<object> ODDEOFKLIAG = null, InfoAnimation animation = null, float labelWidth = -1f)
+		public void Init(string text, ProfilePerk.ProfilePerkState state, Action<object> improveAction = null, InfoAnimation animation = null, float labelWidth = -1f)
 		{
 			_text = text;
-			improveCallback = ODDEOFKLIAG;
+			improveCallback = improveAction;
 			perkState = state;
 			textWidth = labelWidth;
 			infoAnimation = animation;
@@ -74,9 +74,9 @@ namespace Nekki.SF2.GUI.Profile
 			LayoutLabels();
 		}
 
-		public override void SetUpBorder(float BGEEALIPKCC)
+		public override void SetUpBorder(float upBorderValue)
 		{
-			upBorder = BGEEALIPKCC;
+			upBorder = upBorderValue;
 			hasUpBorder = true;
 		}
 

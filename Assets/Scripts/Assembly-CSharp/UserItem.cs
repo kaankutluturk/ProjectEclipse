@@ -695,18 +695,18 @@ public class UserItem
 					}
 					if (item2.GetPairs().Count > 0)
 					{
-						XmlNode mEEAKLDGLDF2 = xmlNode.AppendNewNode("Set");
+						XmlNode enchantmentNode = xmlNode.AppendNewNode("Set");
 					PerkStruct perkStruct = new PerkStruct(item2);
 					perkStruct.EvaluatePairValues();
 					foreach (KeyValuePair<string, string> item3 in perkStruct.GetPairs())
 					{
-						mEEAKLDGLDF2.AppendAttribute(item3.Key).Value = item3.Value;
+						enchantmentNode.AppendAttribute(item3.Key).Value = item3.Value;
 					}
 				}
-				PerkInfoItem aCONCDFDNJH2 = ItemInfo.ParsePerk(xmlNode);
-				if (aCONCDFDNJH2 != null)
+				PerkInfoItem enchantmentPerk = ItemInfo.ParsePerk(xmlNode);
+				if (enchantmentPerk != null)
 				{
-					enchantments.Add(aCONCDFDNJH2);
+					enchantments.Add(enchantmentPerk);
 				}
 			}
 		}

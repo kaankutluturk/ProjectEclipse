@@ -97,9 +97,9 @@ namespace Nekki.SF2.GUI.Shop
 				string attributeName = item.get_AttributeName();
 				int attributeValue = 0;
 				modelParameters.FinalAttributes.Get(attributeName, ref attributeValue);
-				int OEMALIFPGPO2 = 0;
-				_previewParameters.FinalAttributes.Get(attributeName, ref OEMALIFPGPO2);
-				item.SetValue(attributeValue, OEMALIFPGPO2, _Duration);
+				int previewValue = 0;
+				_previewParameters.FinalAttributes.Get(attributeName, ref previewValue);
+				item.SetValue(attributeValue, previewValue, _Duration);
 			}
 		}
 	}

@@ -161,11 +161,11 @@ public sealed class AliasValueDeserializer : IValueDeserializer
 		object obj = innerDeserializer.DeserializeValue(reader, expectedType, state, nestedObjectDeserializer);
 		if (text != null)
 		{
-			AliasState dMGFMLMIFGL2 = state.Get<AliasState>();
+			AliasState aliasMap = state.Get<AliasState>();
 			ValuePromise value2;
-			if (!dMGFMLMIFGL2.TryGetValue(text, out value2))
+			if (!aliasMap.TryGetValue(text, out value2))
 			{
-				dMGFMLMIFGL2.Add(text, new ValuePromise(obj));
+				aliasMap.Add(text, new ValuePromise(obj));
 			}
 			else
 			{

@@ -59,9 +59,9 @@ internal class BloodEffect
 		_Interpolation.Push(localPosition, localRotation);
 	}
 
-	public void SetPosition(Vector3f NAAPALOFBCI)
+	public void SetPosition(Vector3f bloodPosition)
 	{
-		_Interpolation.Snap(new Vector3(NAAPALOFBCI.GetX(), NAAPALOFBCI.GetY(), 0f), _Interpolation.CurrentRotation);
+		_Interpolation.Snap(new Vector3(bloodPosition.GetX(), bloodPosition.GetY(), 0f), _Interpolation.CurrentRotation);
 	}
 
 	public void SetScale(float scale)

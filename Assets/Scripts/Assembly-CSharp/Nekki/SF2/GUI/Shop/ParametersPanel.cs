@@ -39,10 +39,10 @@ namespace Nekki.SF2.GUI.Shop
 				{
 					continue;
 				}
-				int OEMALIFPGPO2 = baseValue;
+				int upgradeValue = baseValue;
 				if (upgradeItem != null && showUpgrades)
 				{
-					upgradeItem.ItemAttributes.Get(warriorItem.get_Name(), ref OEMALIFPGPO2);
+					upgradeItem.ItemAttributes.Get(warriorItem.get_Name(), ref upgradeValue);
 				}
 				if (_itemPrefab != null)
 				{
@@ -52,7 +52,7 @@ namespace Nekki.SF2.GUI.Shop
 					if (component != null)
 					{
 						bool isItemLimit = true;
-						component.Init(warriorItem.get_Name(), warriorItem.IconName, baseValue, OEMALIFPGPO2, isItemLimit);
+						component.Init(warriorItem.get_Name(), warriorItem.IconName, baseValue, upgradeValue, isItemLimit);
 						num += component.get_MinHeight();
 						_items.Add(component);
 					}

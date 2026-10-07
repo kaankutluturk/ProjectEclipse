@@ -45,9 +45,9 @@ public static class GameLoader
 		{
 			xmlDocument["Root"]["Versions"]["Version"].SetAttribute("Value", version);
 			string savePath = string.Format("{0}/{1}", SF2Paths.GetUserDataDirectory(), Constants.UsersFileName);
-			string kPFELJFPGHJ2 = string.Format("{0}/{1}", SF2Paths.GetUserDataDirectory(), Constants.UsersBackupFileName);
+			string hashedFilePath = string.Format("{0}/{1}", SF2Paths.GetUserDataDirectory(), Constants.UsersBackupFileName);
 			XmlUtils.SaveDocumentWithHash(xmlDocument, savePath);
-			XmlUtils.SaveDocumentWithHash(xmlDocument, kPFELJFPGHJ2);
+			XmlUtils.SaveDocumentWithHash(xmlDocument, hashedFilePath);
 		}
 	}
 }

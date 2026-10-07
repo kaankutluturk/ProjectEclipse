@@ -246,8 +246,8 @@ namespace Nekki.SF2.GUI.Dialogs
 			float localY = y + 120f;
 			if (_btnOK != null && _btnOK.gameObject.activeSelf)
 			{
-				float bAINMLLIKOL2 = 740f - _btnOK.GetComponent<RectTransform>().rect.width / 2f;
-				_btnOK.transform.SetLocalX(bAINMLLIKOL2);
+				float okButtonX = 740f - _btnOK.GetComponent<RectTransform>().rect.width / 2f;
+				_btnOK.transform.SetLocalX(okButtonX);
 				_btnOK.transform.SetLocalY(localY);
 			}
 			if (_btnCancel != null && _btnCancel.gameObject.activeSelf)

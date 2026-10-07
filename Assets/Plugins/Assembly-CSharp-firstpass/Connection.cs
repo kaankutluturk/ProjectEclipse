@@ -223,13 +223,13 @@ public sealed class Connection : IHeartbeat, IConnection
 		}
 	}
 
-	// C# has no syntax for parameterized property 'DLKPBAJDHBO'.
+	// C# has no syntax for parameterized property 'Item'.
 	public Hub get_DLKPBAJDHBO(int index)
 	{
 		return get_Item(index);
 	}
 
-	// C# has no syntax for parameterized property 'DLKPBAJDHBO'.
+	// C# has no syntax for parameterized property 'Item'.
 	public Hub get_DLKPBAJDHBO(string name)
 	{
 		return get_Item(name);
@@ -376,7 +376,7 @@ public sealed class Connection : IHeartbeat, IConnection
 		{
 			for (int i = 0; i < hubs.Length; i++)
 			{
-				((IHub)hubs[i]).GNLCPJFBAJE(this);
+				((IHub)hubs[i]).AttachConnection(this);
 			}
 		}
 	}
@@ -487,169 +487,169 @@ public sealed class Connection : IHeartbeat, IConnection
 	public void AddConnectedHandler(OnConnectedDelegate value)
 	{
 		OnConnectedDelegate currentHandler = OnConnected;
-		OnConnectedDelegate pILIPIHGBEG2;
+		OnConnectedDelegate previousHandler;
 		do
 		{
-			pILIPIHGBEG2 = currentHandler;
-			currentHandler = Interlocked.CompareExchange(ref OnConnected, (OnConnectedDelegate)Delegate.Combine(pILIPIHGBEG2, value), currentHandler);
+			previousHandler = currentHandler;
+			currentHandler = Interlocked.CompareExchange(ref OnConnected, (OnConnectedDelegate)Delegate.Combine(previousHandler, value), currentHandler);
 		}
-		while ((object)currentHandler != pILIPIHGBEG2);
+		while ((object)currentHandler != previousHandler);
 	}
 
 	public void RemoveConnectedHandler(OnConnectedDelegate value)
 	{
 		OnConnectedDelegate currentHandler = OnConnected;
-		OnConnectedDelegate pILIPIHGBEG2;
+		OnConnectedDelegate previousHandler;
 		do
 		{
-			pILIPIHGBEG2 = currentHandler;
-			currentHandler = Interlocked.CompareExchange(ref OnConnected, (OnConnectedDelegate)Delegate.Remove(pILIPIHGBEG2, value), currentHandler);
+			previousHandler = currentHandler;
+			currentHandler = Interlocked.CompareExchange(ref OnConnected, (OnConnectedDelegate)Delegate.Remove(previousHandler, value), currentHandler);
 		}
-		while ((object)currentHandler != pILIPIHGBEG2);
+		while ((object)currentHandler != previousHandler);
 	}
 
 	public void AddClosedHandler(OnClosedDelegate value)
 	{
 		OnClosedDelegate currentHandler = onClosedField;
-		OnClosedDelegate kMBJIOLJJCE2;
+		OnClosedDelegate previousHandler;
 		do
 		{
-			kMBJIOLJJCE2 = currentHandler;
-			currentHandler = Interlocked.CompareExchange(ref onClosedField, (OnClosedDelegate)Delegate.Combine(kMBJIOLJJCE2, value), currentHandler);
+			previousHandler = currentHandler;
+			currentHandler = Interlocked.CompareExchange(ref onClosedField, (OnClosedDelegate)Delegate.Combine(previousHandler, value), currentHandler);
 		}
-		while ((object)currentHandler != kMBJIOLJJCE2);
+		while ((object)currentHandler != previousHandler);
 	}
 
 	public void RemoveClosedHandler(OnClosedDelegate value)
 	{
 		OnClosedDelegate currentHandler = onClosedField;
-		OnClosedDelegate kMBJIOLJJCE2;
+		OnClosedDelegate previousHandler;
 		do
 		{
-			kMBJIOLJJCE2 = currentHandler;
-			currentHandler = Interlocked.CompareExchange(ref onClosedField, (OnClosedDelegate)Delegate.Remove(kMBJIOLJJCE2, value), currentHandler);
+			previousHandler = currentHandler;
+			currentHandler = Interlocked.CompareExchange(ref onClosedField, (OnClosedDelegate)Delegate.Remove(previousHandler, value), currentHandler);
 		}
-		while ((object)currentHandler != kMBJIOLJJCE2);
+		while ((object)currentHandler != previousHandler);
 	}
 
 	public void AddErrorHandler(OnConnectionErrorDelegate value)
 	{
 		OnConnectionErrorDelegate currentHandler = onErrorField;
-		OnConnectionErrorDelegate dHGLHLDFDAC2;
+		OnConnectionErrorDelegate previousHandler;
 		do
 		{
-			dHGLHLDFDAC2 = currentHandler;
-			currentHandler = Interlocked.CompareExchange(ref onErrorField, (OnConnectionErrorDelegate)Delegate.Combine(dHGLHLDFDAC2, value), currentHandler);
+			previousHandler = currentHandler;
+			currentHandler = Interlocked.CompareExchange(ref onErrorField, (OnConnectionErrorDelegate)Delegate.Combine(previousHandler, value), currentHandler);
 		}
-		while ((object)currentHandler != dHGLHLDFDAC2);
+		while ((object)currentHandler != previousHandler);
 	}
 
 	public void RemoveErrorHandler(OnConnectionErrorDelegate value)
 	{
 		OnConnectionErrorDelegate currentHandler = onErrorField;
-		OnConnectionErrorDelegate dHGLHLDFDAC2;
+		OnConnectionErrorDelegate previousHandler;
 		do
 		{
-			dHGLHLDFDAC2 = currentHandler;
-			currentHandler = Interlocked.CompareExchange(ref onErrorField, (OnConnectionErrorDelegate)Delegate.Remove(dHGLHLDFDAC2, value), currentHandler);
+			previousHandler = currentHandler;
+			currentHandler = Interlocked.CompareExchange(ref onErrorField, (OnConnectionErrorDelegate)Delegate.Remove(previousHandler, value), currentHandler);
 		}
-		while ((object)currentHandler != dHGLHLDFDAC2);
+		while ((object)currentHandler != previousHandler);
 	}
 
 	public void AddReconnectingHandler(OnConnectedDelegate value)
 	{
 		OnConnectedDelegate currentHandler = OnReconnecting;
-		OnConnectedDelegate pILIPIHGBEG2;
+		OnConnectedDelegate previousHandler;
 		do
 		{
-			pILIPIHGBEG2 = currentHandler;
-			currentHandler = Interlocked.CompareExchange(ref OnReconnecting, (OnConnectedDelegate)Delegate.Combine(pILIPIHGBEG2, value), currentHandler);
+			previousHandler = currentHandler;
+			currentHandler = Interlocked.CompareExchange(ref OnReconnecting, (OnConnectedDelegate)Delegate.Combine(previousHandler, value), currentHandler);
 		}
-		while ((object)currentHandler != pILIPIHGBEG2);
+		while ((object)currentHandler != previousHandler);
 	}
 
 	public void RemoveReconnectingHandler(OnConnectedDelegate value)
 	{
 		OnConnectedDelegate currentHandler = OnReconnecting;
-		OnConnectedDelegate pILIPIHGBEG2;
+		OnConnectedDelegate previousHandler;
 		do
 		{
-			pILIPIHGBEG2 = currentHandler;
-			currentHandler = Interlocked.CompareExchange(ref OnReconnecting, (OnConnectedDelegate)Delegate.Remove(pILIPIHGBEG2, value), currentHandler);
+			previousHandler = currentHandler;
+			currentHandler = Interlocked.CompareExchange(ref OnReconnecting, (OnConnectedDelegate)Delegate.Remove(previousHandler, value), currentHandler);
 		}
-		while ((object)currentHandler != pILIPIHGBEG2);
+		while ((object)currentHandler != previousHandler);
 	}
 
 	public void AddReconnectedHandler(OnConnectedDelegate value)
 	{
 		OnConnectedDelegate currentHandler = OnReconnected;
-		OnConnectedDelegate pILIPIHGBEG2;
+		OnConnectedDelegate previousHandler;
 		do
 		{
-			pILIPIHGBEG2 = currentHandler;
-			currentHandler = Interlocked.CompareExchange(ref OnReconnected, (OnConnectedDelegate)Delegate.Combine(pILIPIHGBEG2, value), currentHandler);
+			previousHandler = currentHandler;
+			currentHandler = Interlocked.CompareExchange(ref OnReconnected, (OnConnectedDelegate)Delegate.Combine(previousHandler, value), currentHandler);
 		}
-		while ((object)currentHandler != pILIPIHGBEG2);
+		while ((object)currentHandler != previousHandler);
 	}
 
 	public void RemoveReconnectedHandler(OnConnectedDelegate value)
 	{
 		OnConnectedDelegate currentHandler = OnReconnected;
-		OnConnectedDelegate pILIPIHGBEG2;
+		OnConnectedDelegate previousHandler;
 		do
 		{
-			pILIPIHGBEG2 = currentHandler;
-			currentHandler = Interlocked.CompareExchange(ref OnReconnected, (OnConnectedDelegate)Delegate.Remove(pILIPIHGBEG2, value), currentHandler);
+			previousHandler = currentHandler;
+			currentHandler = Interlocked.CompareExchange(ref OnReconnected, (OnConnectedDelegate)Delegate.Remove(previousHandler, value), currentHandler);
 		}
-		while ((object)currentHandler != pILIPIHGBEG2);
+		while ((object)currentHandler != previousHandler);
 	}
 
 	public void AddStateChangedHandler(OnConnectionStateChangedDelegate value)
 	{
 		OnConnectionStateChangedDelegate currentHandler = OnStateChanged;
-		OnConnectionStateChangedDelegate aIBCPDGLFPB2;
+		OnConnectionStateChangedDelegate previousHandler;
 		do
 		{
-			aIBCPDGLFPB2 = currentHandler;
-			currentHandler = Interlocked.CompareExchange(ref OnStateChanged, (OnConnectionStateChangedDelegate)Delegate.Combine(aIBCPDGLFPB2, value), currentHandler);
+			previousHandler = currentHandler;
+			currentHandler = Interlocked.CompareExchange(ref OnStateChanged, (OnConnectionStateChangedDelegate)Delegate.Combine(previousHandler, value), currentHandler);
 		}
-		while ((object)currentHandler != aIBCPDGLFPB2);
+		while ((object)currentHandler != previousHandler);
 	}
 
 	public void RemoveStateChangedHandler(OnConnectionStateChangedDelegate value)
 	{
 		OnConnectionStateChangedDelegate currentHandler = OnStateChanged;
-		OnConnectionStateChangedDelegate aIBCPDGLFPB2;
+		OnConnectionStateChangedDelegate previousHandler;
 		do
 		{
-			aIBCPDGLFPB2 = currentHandler;
-			currentHandler = Interlocked.CompareExchange(ref OnStateChanged, (OnConnectionStateChangedDelegate)Delegate.Remove(aIBCPDGLFPB2, value), currentHandler);
+			previousHandler = currentHandler;
+			currentHandler = Interlocked.CompareExchange(ref OnStateChanged, (OnConnectionStateChangedDelegate)Delegate.Remove(previousHandler, value), currentHandler);
 		}
-		while ((object)currentHandler != aIBCPDGLFPB2);
+		while ((object)currentHandler != previousHandler);
 	}
 
 	public void AddNonHubMessageHandler(OnNonHubMessageDelegate value)
 	{
 		OnNonHubMessageDelegate currentHandler = OnNonHubMessage;
-		OnNonHubMessageDelegate gAGJEANDJEK2;
+		OnNonHubMessageDelegate previousHandler;
 		do
 		{
-			gAGJEANDJEK2 = currentHandler;
-			currentHandler = Interlocked.CompareExchange(ref OnNonHubMessage, (OnNonHubMessageDelegate)Delegate.Combine(gAGJEANDJEK2, value), currentHandler);
+			previousHandler = currentHandler;
+			currentHandler = Interlocked.CompareExchange(ref OnNonHubMessage, (OnNonHubMessageDelegate)Delegate.Combine(previousHandler, value), currentHandler);
 		}
-		while ((object)currentHandler != gAGJEANDJEK2);
+		while ((object)currentHandler != previousHandler);
 	}
 
 	public void RemoveNonHubMessageHandler(OnNonHubMessageDelegate value)
 	{
 		OnNonHubMessageDelegate currentHandler = OnNonHubMessage;
-		OnNonHubMessageDelegate gAGJEANDJEK2;
+		OnNonHubMessageDelegate previousHandler;
 		do
 		{
-			gAGJEANDJEK2 = currentHandler;
-			currentHandler = Interlocked.CompareExchange(ref OnNonHubMessage, (OnNonHubMessageDelegate)Delegate.Remove(gAGJEANDJEK2, value), currentHandler);
+			previousHandler = currentHandler;
+			currentHandler = Interlocked.CompareExchange(ref OnNonHubMessage, (OnNonHubMessageDelegate)Delegate.Remove(previousHandler, value), currentHandler);
 		}
-		while ((object)currentHandler != gAGJEANDJEK2);
+		while ((object)currentHandler != previousHandler);
 	}
 
 	public OnPrepareRequestDelegate GetRequestPreparator()
@@ -1231,8 +1231,8 @@ public sealed class Connection : IHeartbeat, IConnection
 		DateTime? transportStart = transportConnectionStartedAt;
 		if (transportStart.HasValue)
 		{
-			DateTime? jEAPOHAGCLL2 = transportConnectionStartedAt;
-			TimeSpan? timeSpan2 = ((!jEAPOHAGCLL2.HasValue) ? ((TimeSpan?)null) : new TimeSpan?(DateTime.UtcNow - jEAPOHAGCLL2.GetValueOrDefault()));
+			DateTime? transportStartedAt = transportConnectionStartedAt;
+			TimeSpan? timeSpan2 = ((!transportStartedAt.HasValue) ? ((TimeSpan?)null) : new TimeSpan?(DateTime.UtcNow - transportStartedAt.GetValueOrDefault()));
 			if (timeSpan2.HasValue && timeSpan2.GetValueOrDefault() >= GetNegotiationResult().GetTransportConnectTimeout())
 			{
 				HTTPManager.GetLogger().Warning("SignalR Connection", "OnHeartbeatUpdate - Transport failed to connect in the given time!");
@@ -1242,8 +1242,8 @@ public sealed class Connection : IHeartbeat, IConnection
 		DateTime? reconnectStart = reconnectStartedAt;
 		if (reconnectStart.HasValue)
 		{
-			DateTime? jNPJOFDOAAG2 = reconnectStartedAt;
-			TimeSpan? timeSpan3 = ((!jNPJOFDOAAG2.HasValue) ? ((TimeSpan?)null) : new TimeSpan?(DateTime.UtcNow - jNPJOFDOAAG2.GetValueOrDefault()));
+			DateTime? reconnectStartTime = reconnectStartedAt;
+			TimeSpan? timeSpan3 = ((!reconnectStartTime.HasValue) ? ((TimeSpan?)null) : new TimeSpan?(DateTime.UtcNow - reconnectStartTime.GetValueOrDefault()));
 			if (timeSpan3.HasValue && timeSpan3.GetValueOrDefault() >= GetNegotiationResult().GetDisconnectTimeout())
 			{
 				HTTPManager.GetLogger().Warning("SignalR Connection", "OnHeartbeatUpdate - Failed to reconnect in the given time!");

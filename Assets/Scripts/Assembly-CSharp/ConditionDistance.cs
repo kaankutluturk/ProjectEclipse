@@ -47,9 +47,9 @@ public class ConditionDistance : ConditionAnimation
 			break;
 		case DistanceAxis.LENGTH_FULL:
 		{
-			Vector3f eMAFACPEPDK = Vector3f.op_Implicit(_to.GetPosition(conditions));
-			Vector3f eMAFACPEPDK2 = Vector3f.op_Implicit(_from.GetPosition(conditions));
-			num = Mathf.Sqrt((eMAFACPEPDK.GetX() - eMAFACPEPDK2.GetX()) * (eMAFACPEPDK.GetX() - eMAFACPEPDK2.GetX()) + (eMAFACPEPDK.GetY() - eMAFACPEPDK2.GetY()) * (eMAFACPEPDK.GetY() - eMAFACPEPDK2.GetY()));
+			Vector3f toPosition = Vector3f.op_Implicit(_to.GetPosition(conditions));
+			Vector3f fromPosition = Vector3f.op_Implicit(_from.GetPosition(conditions));
+			num = Mathf.Sqrt((toPosition.GetX() - fromPosition.GetX()) * (toPosition.GetX() - fromPosition.GetX()) + (toPosition.GetY() - fromPosition.GetY()) * (toPosition.GetY() - fromPosition.GetY()));
 			break;
 		}
 		}

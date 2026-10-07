@@ -348,15 +348,15 @@ public sealed class MD5CryptoServiceProvider : MD5
 		}
 	}
 
-	internal void AddLength(ulong bitLength, byte[] buffer, int MGMMDGFPBLP)
+	internal void AddLength(ulong bitLength, byte[] buffer, int bufferOffset)
 	{
-		buffer[MGMMDGFPBLP++] = (byte)bitLength;
-		buffer[MGMMDGFPBLP++] = (byte)(bitLength >> 8);
-		buffer[MGMMDGFPBLP++] = (byte)(bitLength >> 16);
-		buffer[MGMMDGFPBLP++] = (byte)(bitLength >> 24);
-		buffer[MGMMDGFPBLP++] = (byte)(bitLength >> 32);
-		buffer[MGMMDGFPBLP++] = (byte)(bitLength >> 40);
-		buffer[MGMMDGFPBLP++] = (byte)(bitLength >> 48);
-		buffer[MGMMDGFPBLP] = (byte)(bitLength >> 56);
+		buffer[bufferOffset++] = (byte)bitLength;
+		buffer[bufferOffset++] = (byte)(bitLength >> 8);
+		buffer[bufferOffset++] = (byte)(bitLength >> 16);
+		buffer[bufferOffset++] = (byte)(bitLength >> 24);
+		buffer[bufferOffset++] = (byte)(bitLength >> 32);
+		buffer[bufferOffset++] = (byte)(bitLength >> 40);
+		buffer[bufferOffset++] = (byte)(bitLength >> 48);
+		buffer[bufferOffset] = (byte)(bitLength >> 56);
 	}
 }

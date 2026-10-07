@@ -503,7 +503,7 @@ namespace Eclipse.UI
                 }
             }
 
-            // ParseModule.JLPMOKPFECK, step by step, minus what fighters never use: warriors,
+            // ParseModule.ProcessStep, step by step, minus what fighters never use: warriors,
             // zones, quests and the mod locale. Mod content stays: mods often change how
             // fighters look.
             private static void Parse(Action<string, long> record)
@@ -539,7 +539,7 @@ namespace Eclipse.UI
             }
 
             // A new campaign's first boot gets its profile from the game's usersDefault.xml
-            // (GameSettings.AMOMFPOENBF, run by AttachFileModule). Do the same copy into the
+            // (GameSettings.InitVersion, run by AttachFileModule). Do the same copy into the
             // sandbox directly, leaving that module's version bookkeeping untouched.
             private static void SeedSandboxProfile()
             {

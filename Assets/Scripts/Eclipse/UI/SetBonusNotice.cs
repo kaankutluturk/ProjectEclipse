@@ -7,7 +7,7 @@ using UnityEngine.UI;
 namespace Eclipse.UI
 {
     // A combo enchantment (a set ability such as Monk's Tempest Rage) is active once every
-    // equipped gear piece carries it (GameUtils.ILFJCODGINO, used by ModelParameters when
+    // equipped gear piece carries it (GameUtils.IsPerkCompatibleWithEquipment, used by ModelParameters when
     // building fight perks). The recovered game has no feedback when that happens, so
     // equipment and forge actions snapshot the active combos beforehand and announce any
     // that became active with a short banner.

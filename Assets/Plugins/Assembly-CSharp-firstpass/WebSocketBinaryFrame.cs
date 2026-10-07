@@ -64,10 +64,10 @@ public class WebSocketBinaryFrame : IWebSocketFrameWriter
 	{
 	}
 
-	public WebSocketBinaryFrame(byte[] data, ulong LCCLEFMKLPB, ulong length, bool isFinal)
+	public WebSocketBinaryFrame(byte[] data, ulong dataPosition, ulong length, bool isFinal)
 	{
 		set_Data(data);
-		SetPos(LCCLEFMKLPB);
+		SetPos(dataPosition);
 		set_Length(length);
 		set_IsFinal(isFinal);
 	}

@@ -546,7 +546,7 @@ public class AiData
 	private static void RefreshParameters()
 	{
 		string tacticSettingsPath = DirectoryController.ResolvePath("tacticSettings.xml");
-		string lOBFDOKFJIP2 = DirectoryController.ResolvePath("ComputerSettings.xml");
+		string xmlFileName = DirectoryController.ResolvePath("ComputerSettings.xml");
 		XmlDocument xmlDocument = XmlUtils.OpenXMLDocument(SF2Paths.GetGameDataPath(), tacticSettingsPath);
 		if (xmlDocument != null)
 		{
@@ -556,7 +556,7 @@ public class AiData
 		{
 			RefreshTacticSetParameters(xmlDocument);
 		}
-		xmlDocument = XmlUtils.OpenXMLDocument(SF2Paths.GetGameDataPath(), lOBFDOKFJIP2);
+		xmlDocument = XmlUtils.OpenXMLDocument(SF2Paths.GetGameDataPath(), xmlFileName);
 		if (xmlDocument == null)
 		{
 			return;

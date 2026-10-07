@@ -41,9 +41,9 @@ public class QuestActionUnlockBattle : QuestAction
 		int replayCount = 0;
 		if (!string.IsNullOrEmpty(replayCountExpression))
 		{
-			ConditionExtension.CompareResult lNIDLHOIHIM2 = new ConditionExtension.CompareResult();
-			condition.SetValue(replayCountExpression, lNIDLHOIHIM2);
-			replayCount = (int)lNIDLHOIHIM2.resultNumber;
+			ConditionExtension.CompareResult replayCountResult = new ConditionExtension.CompareResult();
+			condition.SetValue(replayCountExpression, replayCountResult);
+			replayCount = (int)replayCountResult.resultNumber;
 		}
 		if (!string.IsNullOrEmpty(_hidden))
 		{
@@ -57,9 +57,9 @@ public class QuestActionUnlockBattle : QuestAction
 			}
 			else
 			{
-				ConditionExtension.CompareResult lNIDLHOIHIM3 = new ConditionExtension.CompareResult();
-				condition.SetValue(_hidden, lNIDLHOIHIM3);
-				isHidden = lNIDLHOIHIM3.resultNumber > 0.0;
+				ConditionExtension.CompareResult hiddenResult = new ConditionExtension.CompareResult();
+				condition.SetValue(_hidden, hiddenResult);
+				isHidden = hiddenResult.resultNumber > 0.0;
 			}
 		}
 		FightIDS fightIds = new FightIDS();

@@ -113,9 +113,9 @@ public class QuestActionForeach : QuestAction
 			}
 			else if (foreachType == ForeachType.FOREACH_DELIVERY_ENCHANTMENTS)
 			{
-				Roster nKGLHEGIKKP2 = ListSF.GetRoster();
-				nKGLHEGIKKP2.RemoveEventListener(1, OnDeliveryEnchantmentAdded);
-				nKGLHEGIKKP2.GetInventory().ClearDeliveredRecipes();
+				Roster roster = ListSF.GetRoster();
+				roster.RemoveEventListener(1, OnDeliveryEnchantmentAdded);
+				roster.GetInventory().ClearDeliveredRecipes();
 			}
 			FinishAction();
 			continueLoop = false;

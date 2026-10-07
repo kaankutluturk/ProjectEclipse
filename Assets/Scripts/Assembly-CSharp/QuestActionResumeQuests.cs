@@ -11,9 +11,9 @@ public class QuestActionResumeQuests : QuestAction
 	{
 		base.Parse(node);
 		XmlNode successNode = node["Success"];
-		XmlNode ePKLCPOEELO2 = node["Error"];
+		XmlNode sequenceNode = node["Error"];
 		ParseSequenceWithUnlock(successNode, successSequence, OnSuccessComplete);
-		ParseSequenceWithUnlock(ePKLCPOEELO2, errorSequence, OnActionComplete);
+		ParseSequenceWithUnlock(sequenceNode, errorSequence, OnActionComplete);
 	}
 
 	public override void Execute(QuestParameters parameters)

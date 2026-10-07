@@ -268,8 +268,8 @@ internal sealed class EventSourceResponse : HTTPResponse, IProtocol
 					Message message = currentMessage;
 					message.set_Data(message.GetData() + Environment.NewLine);
 				}
-				Message bCHHNNNFDGI2 = currentMessage;
-				bCHHNNNFDGI2.set_Data(bCHHNNNFDGI2.GetData() + text2);
+				Message pendingMessage = currentMessage;
+				pendingMessage.set_Data(pendingMessage.GetData() + text2);
 				break;
 			}
 			case "retry":
@@ -321,9 +321,9 @@ internal sealed class EventSourceResponse : HTTPResponse, IProtocol
 		{
 			OnClosed(this);
 		}
-		catch (Exception mPFFFAOGBJE2)
+		catch (Exception closeException)
 		{
-			HTTPManager.GetLogger().Exception("EventSourceMessage", "HandleEvents - OnClosed", mPFFFAOGBJE2);
+			HTTPManager.GetLogger().Exception("EventSourceMessage", "HandleEvents - OnClosed", closeException);
 		}
 		finally
 		{

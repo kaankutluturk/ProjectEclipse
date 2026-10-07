@@ -36,10 +36,10 @@ namespace Nekki.SF2.GUI.Arrows
 			HideArrow();
 		}
 
-		public void ShowArrow(Vector3 MGMMDGFPBLP)
+		public void ShowArrow(Vector3 arrowPosition)
 		{
 			_arrow.gameObject.SetActive(true);
-			_arrow.transform.position = MGMMDGFPBLP;
+			_arrow.transform.position = arrowPosition;
 		}
 
 		public void HideArrow()

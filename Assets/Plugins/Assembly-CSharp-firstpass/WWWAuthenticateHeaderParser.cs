@@ -12,15 +12,15 @@ public sealed class WWWAuthenticateHeaderParser : KeyValuePairList
 		List<KeyValuePair> list = new List<KeyValuePair>();
 		if (header != null)
 		{
-			int LCCLEFMKLPB = 0;
-			string scheme = header.Read(ref LCCLEFMKLPB, (char ch) => !char.IsWhiteSpace(ch) && !char.IsControl(ch)).TrimAndLower();
+			int cursor = 0;
+			string scheme = header.Read(ref cursor, (char ch) => !char.IsWhiteSpace(ch) && !char.IsControl(ch)).TrimAndLower();
 			list.Add(new KeyValuePair(scheme));
-			while (LCCLEFMKLPB < header.Length)
+			while (cursor < header.Length)
 			{
-				string kGBGENDIMBC2 = header.Read(ref LCCLEFMKLPB, '=').TrimAndLower();
-				KeyValuePair keyValuePair = new KeyValuePair(kGBGENDIMBC2);
-				header.SkipWhiteSpace(ref LCCLEFMKLPB);
-				keyValuePair.set_Value(header.ReadQuotedText(ref LCCLEFMKLPB));
+				string headerKey = header.Read(ref cursor, '=').TrimAndLower();
+				KeyValuePair keyValuePair = new KeyValuePair(headerKey);
+				header.SkipWhiteSpace(ref cursor);
+				keyValuePair.set_Value(header.ReadQuotedText(ref cursor));
 				list.Add(keyValuePair);
 			}
 		}

@@ -83,7 +83,10 @@ These are descriptive guesses, not recovered original names.
   name, new name, kind, owning type, confidence (`high`, `medium` or `low`) and a
   one-sentence evidence note. `id_at_extraction` is the renamer's stable symbol
   key (file plus syntax-node ordinal) at the time of extraction. Phase 1 covers
-  types and members. Phase 2 (parameters and locals) is recorded as it lands.
+  types and members (about 13.9k). Phase 2 covers parameters, locals and lambda
+  parameters (about 11.8k). Phase 3 covers leftovers, including the
+  decompiler's digit-suffixed duplicates such as `eMAFACPEPDK2`, and earlier
+  rejections (about 0.6k).
 - `inferred_file_renames.tsv` lists every script renamed with its type. The
   `.meta` file moved with each script, so the GUID is preserved.
 - `Tools/Recovery/SymbolRenamer` performs the renames. It builds Roslyn
@@ -110,10 +113,12 @@ These are descriptive guesses, not recovered original names.
   replaced as text. Ambiguous tokens were resolved per occurrence from the
   receiver type. Literal source anchors used by the scripts were checked against
   the renamed source.
-- Kept deliberately: the two public fields of `ServerProviderBase.FFCINPEAEBE`,
-  because their names are its JSON wire format. Also kept: a few symbols whose
-  candidate names all failed verification, still listed as obfuscated in the
-  apply logs. The server-side `ExcData PartStackTrace` filters in
+- Kept deliberately: the two public fields of the JSON response type nested in
+  `ServerProviderBase` (`GIHDDAKBMHE`, `JDONBAPIJCG`), because their names are its
+  wire format. Apart from those, no obfuscated identifier remains in `Assets/`,
+  including code in inactive `#if` branches. A few stale stub names in
+  `Tools/Tests` predate this work. They mirror identifiers that no longer exist
+  and were left unchanged. The server-side `ExcData PartStackTrace` filters in
   `Assets/vanillaXml/config_cdn.xml` match obfuscated stack-trace names, so they
   no longer match renamed types. They only affect crash reporting to the original
   servers.

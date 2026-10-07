@@ -30,8 +30,8 @@ public static class MD5Utils
 			{
 				return text;
 			}
-			byte[] nCHAHPLJBMD2 = mD.ComputeHash(StringToByteArray(text + salt));
-			return ByteArrayToString(nCHAHPLJBMD2);
+			byte[] saltedHash = mD.ComputeHash(StringToByteArray(text + salt));
+			return ByteArrayToString(saltedHash);
 		}
 	}
 
@@ -45,8 +45,8 @@ public static class MD5Utils
 			{
 				return text;
 			}
-			byte[] nCHAHPLJBMD2 = mD.ComputeHash(StringToByteArray(text + salt));
-			return ByteArrayToString(nCHAHPLJBMD2);
+			byte[] saltedHash = mD.ComputeHash(StringToByteArray(text + salt));
+			return ByteArrayToString(saltedHash);
 		}
 	}
 

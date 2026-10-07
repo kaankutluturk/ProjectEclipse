@@ -51,8 +51,8 @@ public class CurrentEffect
 		}
 		int num = Owner.GetFacingSign();
 		ModelConditions conditions = Owner.GetConditions();
-		Vector3f eMAFACPEPDK = Vector3f.op_Implicit(Effect.GetPosition().GetPosition(conditions));
-		Vector3 anchor = new Vector3(eMAFACPEPDK.GetX(), eMAFACPEPDK.GetY(), eMAFACPEPDK.GetZ());
+		Vector3f followPosition = Vector3f.op_Implicit(Effect.GetPosition().GetPosition(conditions));
+		Vector3 anchor = new Vector3(followPosition.GetX(), followPosition.GetY(), followPosition.GetZ());
 		if (Effect.GetIsOnBackground()) anchor.z += 0.1f;
 		_Diagnostics.Observe(Owner, Effect, anchor, num);
 		Quaternion rotation = _Interpolation.CurrentRotation;

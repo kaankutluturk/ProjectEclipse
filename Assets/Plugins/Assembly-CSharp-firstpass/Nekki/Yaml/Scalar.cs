@@ -56,25 +56,25 @@ namespace Nekki.Yaml
 		public static void AddTextUpdateHandler(TextUpdateHandler value)
 		{
 			TextUpdateHandler currentHandler = TextUpdate;
-			TextUpdateHandler gALGMABOBDE2;
+			TextUpdateHandler previousHandler;
 			do
 			{
-				gALGMABOBDE2 = currentHandler;
-				currentHandler = Interlocked.CompareExchange(ref TextUpdate, (TextUpdateHandler)Delegate.Combine(gALGMABOBDE2, value), currentHandler);
+				previousHandler = currentHandler;
+				currentHandler = Interlocked.CompareExchange(ref TextUpdate, (TextUpdateHandler)Delegate.Combine(previousHandler, value), currentHandler);
 			}
-			while ((object)currentHandler != gALGMABOBDE2);
+			while ((object)currentHandler != previousHandler);
 		}
 
 		public static void RemoveTextUpdateHandler(TextUpdateHandler value)
 		{
 			TextUpdateHandler currentHandler = TextUpdate;
-			TextUpdateHandler gALGMABOBDE2;
+			TextUpdateHandler previousHandler;
 			do
 			{
-				gALGMABOBDE2 = currentHandler;
-				currentHandler = Interlocked.CompareExchange(ref TextUpdate, (TextUpdateHandler)Delegate.Remove(gALGMABOBDE2, value), currentHandler);
+				previousHandler = currentHandler;
+				currentHandler = Interlocked.CompareExchange(ref TextUpdate, (TextUpdateHandler)Delegate.Remove(previousHandler, value), currentHandler);
 			}
-			while ((object)currentHandler != gALGMABOBDE2);
+			while ((object)currentHandler != previousHandler);
 		}
 
 		private static void RaiseTextUpdate()

@@ -14,14 +14,14 @@ public class BarScales
 			scale.Name = childNode.Attributes["Name"].GetStringOrDefault();
 			XmlNode limitsNode = childNode["AttributeLimits"];
 			scale.ParseLimits(limitsNode, scale.AttributeLimits);
-			XmlNode oEOOHNMCBOC2 = childNode["ItemLimits"];
-			scale.ParseLimits(oEOOHNMCBOC2, scale.ItemLimits);
+			XmlNode scaleNode = childNode["ItemLimits"];
+			scale.ParseLimits(scaleNode, scale.ItemLimits);
 			XmlAttribute powerAttribute = childNode.Attributes["Power"];
 			scale.Power = powerAttribute.ParseFloat(-1f);
-			XmlAttribute cJBEMNNNHDM2 = childNode.Attributes["Min"];
-			scale.MinPower = cJBEMNNNHDM2.ParseFloat(-1f);
-			XmlAttribute cJBEMNNNHDM3 = childNode.Attributes["Type"];
-			scale.Type = cJBEMNNNHDM3.GetStringOrDefault();
+			XmlAttribute minPowerAttribute = childNode.Attributes["Min"];
+			scale.MinPower = minPowerAttribute.ParseFloat(-1f);
+			XmlAttribute typeAttribute = childNode.Attributes["Type"];
+			scale.Type = typeAttribute.GetStringOrDefault();
 			Scales.Add(scale);
 		}
 	}

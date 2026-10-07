@@ -850,16 +850,16 @@ public partial class ModelParameters
 			bool hasValue = false;
 			num += SumItemAttribute(text, equippedItems, ref hasValue);
 			num += SumPerkAttribute(text, ref hasValue);
-			int OEMALIFPGPO2 = 0;
-			if (GameUtils.StartingAttributes.Gains.Get(text, ref OEMALIFPGPO2))
+			int startingGain = 0;
+			if (GameUtils.StartingAttributes.Gains.Get(text, ref startingGain))
 			{
-				num += OEMALIFPGPO2;
+				num += startingGain;
 				hasValue = true;
 			}
-			int OEMALIFPGPO3 = 0;
-			if (GameUtils.LevelAttributeGains.Gains.Get(text, ref OEMALIFPGPO3))
+			int levelGain = 0;
+			if (GameUtils.LevelAttributeGains.Gains.Get(text, ref levelGain))
 			{
-				num += (ObscuredInt)(level) * OEMALIFPGPO3;
+				num += (ObscuredInt)(level) * levelGain;
 				hasValue = true;
 			}
 			if (hasValue || !warriorAttributes[i].UnusedFlag)
@@ -1068,12 +1068,12 @@ public partial class ModelParameters
 				List<PerkInfoItem> list3 = opponentParameters.GetAllPerks();
 				foreach (PerkInfoItem item5 in list3)
 				{
-					List<Rating> mLMLENHGNDJ2 = item5.Ratings;
-					if (mLMLENHGNDJ2.Count == 0)
+					List<Rating> ratings = item5.Ratings;
+					if (ratings.Count == 0)
 					{
 						continue;
 					}
-					foreach (Rating item6 in mLMLENHGNDJ2)
+					foreach (Rating item6 in ratings)
 					{
 						if (!(item6.player != "Enemy") && (string.IsNullOrEmpty(item6.damageType) || item6.damageType == ratingEvaluation.evaluationName) && (string.IsNullOrEmpty(item6.defenseType) || item6.defenseType == item2.DefenseName))
 						{
@@ -1444,9 +1444,9 @@ public partial class ModelParameters
 			{
 				continue;
 			}
-			UserItem dKCHDHMLKHN2 = roster.GetInventory().FindItem(text);
+			UserItem ownedItem = roster.GetInventory().FindItem(text);
 			itemInfo = null;
-			if (dKCHDHMLKHN2 == null)
+			if (ownedItem == null)
 			{
 				itemInfo = ListSF.GetItems().GetItemByName(text);
 				if (itemInfo == null)
@@ -1457,7 +1457,7 @@ public partial class ModelParameters
 			}
 			else
 			{
-				itemInfo = dKCHDHMLKHN2.GetInfo();
+				itemInfo = ownedItem.GetInfo();
 			}
 			if ((itemInfo == null || !roster.GetInventory().HasItem(itemInfo)) && !item.GetIsEquipRule())
 			{
@@ -1465,10 +1465,10 @@ public partial class ModelParameters
 			}
 			if (itemInfo != null && (!respectNoAttributeChange || !item.GetNoAttributeChange()))
 			{
-				ItemInfo dJKEECEOCJB2 = GetItemByType(itemInfo.Type);
-				ItemInfo dJKEECEOCJB3 = itemInfo.Clone();
-				dJKEECEOCJB3.IgnoreInventoryEnchantments = true;
-				SetItemByType(itemInfo.Type, dJKEECEOCJB3);
+				ItemInfo currentItemInfo = GetItemByType(itemInfo.Type);
+				ItemInfo clonedItemInfo = itemInfo.Clone();
+				clonedItemInfo.IgnoreInventoryEnchantments = true;
+				SetItemByType(itemInfo.Type, clonedItemInfo);
 			}
 		}
 	}

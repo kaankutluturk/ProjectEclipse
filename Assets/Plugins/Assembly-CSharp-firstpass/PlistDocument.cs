@@ -63,11 +63,11 @@ public class PlistDocument
 					throw new Exception("Malformed plist file");
 				}
 				string key = GetText(list2[i]).Trim();
-				PlistElement lBMGKAJIDAJ2 = ParseValue(list2[i + 1]);
-				if (lBMGKAJIDAJ2 != null)
+				PlistElement parsedElement = ParseValue(list2[i + 1]);
+				if (parsedElement != null)
 				{
 					i++;
-					dict.SetItem(key, lBMGKAJIDAJ2);
+					dict.SetItem(key, parsedElement);
 				}
 			}
 			return dict;

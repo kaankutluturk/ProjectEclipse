@@ -226,7 +226,7 @@ public class JsonData : IEquatable<JsonData>, IDictionary, IList, IEnumerable, I
 		}
 	}
 
-	// C# has no syntax for parameterized property 'DLKPBAJDHBO'.
+	// C# has no syntax for parameterized property 'Item'.
 	public JsonData get_DLKPBAJDHBO(string key)
 	{
 		return get_Item(key);
@@ -237,7 +237,7 @@ public class JsonData : IEquatable<JsonData>, IDictionary, IList, IEnumerable, I
 		set_Item(key, value);
 	}
 
-	// C# has no syntax for parameterized property 'DLKPBAJDHBO'.
+	// C# has no syntax for parameterized property 'Item'.
 	public JsonData get_DLKPBAJDHBO(int index)
 	{
 		return get_Item(index);

@@ -16,7 +16,7 @@ public static class MovesParser
 
 	private static Dictionary<string, XmlNode> _baseMoveLockSources;
 
-	public static void Parse(string path, List<InfoAnimation> animations, Dictionary<string, TemplateAnimation> CBNKICJENCB, List<Trick> tricks, List<Trigger> triggers, bool flag)
+	public static void Parse(string path, List<InfoAnimation> animations, Dictionary<string, TemplateAnimation> templateMap, List<Trick> tricks, List<Trigger> triggers, bool flag)
 	{
 		_baseMoveLockSources = null;
 		MovesMaps.Init();
@@ -28,7 +28,7 @@ public static class MovesParser
 		XmlNode templatesNode = xmlDocument["Movesxml"]["Templates"];
 		XmlNode movesNode = xmlDocument["Movesxml"]["Moves"];
 		XmlNode triggersNode = xmlDocument["Movesxml"]["Triggers"];
-		ParseTemplates(templatesNode, CBNKICJENCB);
+		ParseTemplates(templatesNode, templateMap);
 		_BaseTemplateNodes.Clear();
 		foreach (KeyValuePair<string, XmlNode> pair in _TemplateTemp)
 			_BaseTemplateNodes.Add(pair.Key, pair.Value.CloneNode(true));
@@ -39,7 +39,7 @@ public static class MovesParser
 			_LegacyTemplateTemp.Add(template.Attributes["Name"].Value, template);
 			_BaseLegacyTemplateNodes[template.Attributes["Name"].Value] = template.CloneNode(true);
 		}
-		ParseMoves(movesNode, CBNKICJENCB, animations, tricks);
+		ParseMoves(movesNode, templateMap, animations, tricks);
 		ParseTriggers(triggersNode, triggers);
 		_TemplateTemp.Clear();
 		_TemplateTemp = null;
@@ -218,7 +218,7 @@ public static class MovesParser
 		}
 	}
 
-	private static List<InfoAnimation> ParseMoves(XmlNode nodes, Dictionary<string, TemplateAnimation> JIGEFEPNCIN, List<InfoAnimation> animations, List<Trick> tricks)
+	private static List<InfoAnimation> ParseMoves(XmlNode nodes, Dictionary<string, TemplateAnimation> templateMap, List<InfoAnimation> animations, List<Trick> tricks)
 	{
 		List<global::Pair<InfoAnimation, string>> list = new List<global::Pair<InfoAnimation, string>>();
 		list.Capacity = 100;
@@ -287,7 +287,7 @@ public static class MovesParser
 			{
 				animation.AddDelay(xmlAttribute.ParseInt());
 			}
-			ApplyTemplates(list2, animation, JIGEFEPNCIN);
+			ApplyTemplates(list2, animation, templateMap);
 			ParseMoveInside(childNode, list2, animation);
 			ParseVelocity(animation, childNode, list2);
 			ParseRotation(animation, childNode["Rotation"]);
@@ -305,18 +305,18 @@ public static class MovesParser
 		{
 			InfoAnimation sourceAnimation = item2.First;
 			string equivalentName = item2.Second;
-			InfoAnimation pJAHIOELGGD2 = null;
+			InfoAnimation tacticEquivalent = null;
 			foreach (InfoAnimation item3 in animations)
 			{
 				if (item3.Name == equivalentName)
 				{
-					pJAHIOELGGD2 = item3;
+					tacticEquivalent = item3;
 					break;
 				}
 			}
-			if (pJAHIOELGGD2 != null)
+			if (tacticEquivalent != null)
 			{
-				sourceAnimation.set_TacticEquivalent(pJAHIOELGGD2);
+				sourceAnimation.set_TacticEquivalent(tacticEquivalent);
 				continue;
 			}
 			GameLog.Error("{0} tactic equivalent {1} not found", sourceAnimation.Name, equivalentName);
@@ -336,9 +336,9 @@ public static class MovesParser
 		}
 	}
 
-	private static void ParseTemplates(XmlNode templatesNode, Dictionary<string, TemplateAnimation> JIGEFEPNCIN)
+	private static void ParseTemplates(XmlNode templatesNode, Dictionary<string, TemplateAnimation> templateMap)
 	{
-		JIGEFEPNCIN.Clear();
+		templateMap.Clear();
 		_TemplateTemp = new Dictionary<string, XmlNode>();
 		if (templatesNode == null)
 		{
@@ -349,33 +349,33 @@ public static class MovesParser
 			if (childNode.Name == "Template")
 			{
 				TemplateAnimation template = new TemplateAnimation(childNode);
-				JIGEFEPNCIN.Add(template.get_Name(), template);
+				templateMap.Add(template.get_Name(), template);
 				_TemplateTemp.Add(template.get_Name(), childNode);
 			}
 		}
 	}
 
-	private static void ApplyTemplates(List<XmlNode> templateNodes, InfoAnimation animation, Dictionary<string, TemplateAnimation> JIGEFEPNCIN)
+	private static void ApplyTemplates(List<XmlNode> templateNodes, InfoAnimation animation, Dictionary<string, TemplateAnimation> templateMap)
 	{
 		string text = null;
 		for (int i = 0; i < templateNodes.Count; i++)
 		{
 			text = templateNodes[i].Attributes["Name"].Value;
-			if (JIGEFEPNCIN.ContainsKey(text))
+			if (templateMap.ContainsKey(text))
 			{
-				JIGEFEPNCIN[text].AddAnimation(animation);
+				templateMap[text].AddAnimation(animation);
 			}
 		}
-		if (!JIGEFEPNCIN.ContainsKey(animation.Name))
+		if (!templateMap.ContainsKey(animation.Name))
 		{
 			TemplateAnimation template = new TemplateAnimation(animation);
-			JIGEFEPNCIN.Add(template.get_Name(), template);
+			templateMap.Add(template.get_Name(), template);
 		}
 	}
 
-	private static bool ContainsTemplate(string name, List<TemplateAnimation> OEMALIFPGPO)
+	private static bool ContainsTemplate(string name, List<TemplateAnimation> templateList)
 	{
-		foreach (TemplateAnimation item in OEMALIFPGPO)
+		foreach (TemplateAnimation item in templateList)
 		{
 			if (item.get_Name() == name)
 			{
@@ -385,14 +385,14 @@ public static class MovesParser
 		return false;
 	}
 
-	private static TemplateAnimation FindTemplate(string name, List<TemplateAnimation> JIGEFEPNCIN)
+	private static TemplateAnimation FindTemplate(string name, List<TemplateAnimation> templateList)
 	{
 		int i = 0;
-		for (int count = JIGEFEPNCIN.Count; i < count; i++)
+		for (int count = templateList.Count; i < count; i++)
 		{
-			if (JIGEFEPNCIN[i].get_Name() == name)
+			if (templateList[i].get_Name() == name)
 			{
-				return JIGEFEPNCIN[i];
+				return templateList[i];
 			}
 		}
 		return null;
@@ -640,8 +640,8 @@ public static class MovesParser
 		string text2 = xmlNode2.Attributes["Object"].GetStringOrDefault(string.Empty);
 		XmlAttribute targetAttribute = xmlNode.Attributes["Player"];
 		string targetTypeName = targetAttribute.GetStringOrDefault("Me");
-		XmlAttribute cJBEMNNNHDM2 = xmlNode2.Attributes["Player"];
-		string lFLGCDNKNJI2 = cJBEMNNNHDM2.GetStringOrDefault("Me");
+		XmlAttribute pivotAttribute = xmlNode2.Attributes["Player"];
+		string pivotModelName = pivotAttribute.GetStringOrDefault("Me");
 		XmlAttribute xmlAttribute = node.Attributes["Axis"];
 		alignPivot.AlignX = (alignPivot.AlignY = (alignPivot.AlignZ = false));
 		if (xmlAttribute == null)
@@ -678,7 +678,7 @@ public static class MovesParser
 			alignPivot.ShiftModelNode = xmlAttribute2.GetStringOrDefault(string.Empty);
 		}
 		alignPivot.PivotModelType = ModelType.ParseTargetType(targetTypeName);
-		alignPivot.PositionModelType = ModelType.ParseTargetType(lFLGCDNKNJI2);
+		alignPivot.PositionModelType = ModelType.ParseTargetType(pivotModelName);
 		alignPivot.PivotPart = xmlNode.Attributes["Part"].GetStringOrDefault(string.Empty);
 		alignPivot.PositionPart = xmlNode2.Attributes["Part"].GetStringOrDefault(string.Empty);
 		alignPivot.PositionShift.SetX(xmlNode2.Attributes["ShiftX"].ParseFloat());
@@ -773,19 +773,19 @@ public static class MovesParser
 			}
 		}
 		Vector3 velocity = new Vector3(0f, 0f, 0f);
-		Vector3 bEHOPOPCJGB2 = new Vector3(0f, 0f, 0f);
+		Vector3 acceleration = new Vector3(0f, 0f, 0f);
 		if (xmlNode != null)
 		{
 			velocity.x = xmlNode.Attributes["X"].ParseFloat();
 			velocity.y = xmlNode.Attributes["Y"].ParseFloat();
 			velocity.z = xmlNode.Attributes["Z"].ParseFloat();
-			bEHOPOPCJGB2.x = xmlNode.Attributes["Ax"].ParseFloat();
-			bEHOPOPCJGB2.y = xmlNode.Attributes["Ay"].ParseFloat();
-			bEHOPOPCJGB2.z = xmlNode.Attributes["Az"].ParseFloat();
+			acceleration.x = xmlNode.Attributes["Ax"].ParseFloat();
+			acceleration.y = xmlNode.Attributes["Ay"].ParseFloat();
+			acceleration.z = xmlNode.Attributes["Az"].ParseFloat();
 			animation.SetSaveVelocity(xmlNode.Attributes["SaveVelocity"].ParseBool());
 		}
 		animation.SetVelocity(Vector3f.op_Implicit(velocity));
-		animation.SetAcceleration(Vector3f.op_Implicit(bEHOPOPCJGB2));
+		animation.SetAcceleration(Vector3f.op_Implicit(acceleration));
 	}
 
 	private static void ParseRotation(InfoAnimation animation, XmlNode node)
@@ -797,8 +797,8 @@ public static class MovesParser
 			XmlNode xmlNode = node["Position"];
 			if (xmlNode != null)
 			{
-				DistancePoint bAINMLLIKOL2 = new DistancePoint(xmlNode);
-				animation.SetRotationPosition(bAINMLLIKOL2);
+				DistancePoint rotationPivot = new DistancePoint(xmlNode);
+				animation.SetRotationPosition(rotationPivot);
 			}
 		}
 		animation.set_RotationAngle(angle);

@@ -222,21 +222,21 @@ public class FightResult
 			}
 			int requestedLevel = reward.EvaluateLevel();
 			int num = requestedLevel <= 0 ? ListSF.GetRoster().GetLevel() : requestedLevel;
-			ItemInfo dJKEECEOCJB2 = null;
+			ItemInfo rewardItemInfo = null;
 			if (itemInfo.ItemLevel == num)
 			{
-				dJKEECEOCJB2 = itemInfo;
+				rewardItemInfo = itemInfo;
 			}
 			else
 			{
-				ItemInfo dJKEECEOCJB3 = itemInfo.GetUpdateItemByLevel(num, false);
-				if (dJKEECEOCJB3 == null && configuredRewardGrant)
+				ItemInfo upgradedItemInfo = itemInfo.GetUpdateItemByLevel(num, false);
+				if (upgradedItemInfo == null && configuredRewardGrant)
 				{
 					UnityEngine.Debug.LogWarning("[ModReward] Skipping configured item reward '" + reward.Name +
 						"': exact level " + num + " is unavailable.");
 					return;
 				}
-				dJKEECEOCJB2 = ((dJKEECEOCJB3 == null) ? itemInfo : dJKEECEOCJB3);
+				rewardItemInfo = ((upgradedItemInfo == null) ? itemInfo : upgradedItemInfo);
 			}
 			if (!string.IsNullOrEmpty(reward.UpgradeLevelExpression))
 			{
@@ -244,13 +244,13 @@ public class FightResult
 				if (upgradeLevel < 0)
 					throw new System.InvalidOperationException("Negative reward upgrade level: " + reward.Name);
 				// The native quest grant uses this encoded-level lookup, not an ordinal.
-				dJKEECEOCJB2 = itemInfo.GetUpgradeItemAtOrAboveUpgradeLevel(upgradeLevel);
-				if (dJKEECEOCJB2 == null)
+				rewardItemInfo = itemInfo.GetUpgradeItemAtOrAboveUpgradeLevel(upgradeLevel);
+				if (rewardItemInfo == null)
 					throw new System.InvalidOperationException("Reward upgrade level is unavailable: " + reward.Name + " / " + upgradeLevel);
 			}
 			else if (reward.UpgradeNumber != 0)
 			{
-				List<UpgradeData> list = dJKEECEOCJB2.GetUpgrades(true, dJKEECEOCJB2.ItemLevel);
+				List<UpgradeData> list = rewardItemInfo.GetUpgrades(true, rewardItemInfo.ItemLevel);
 				uint count = (uint)list.Count;
 				if (count != 0)
 				{
@@ -259,11 +259,11 @@ public class FightResult
 					{
 						num2 = count - 1;
 					}
-					dJKEECEOCJB2 = itemInfo.CreateUpgradedItem(list[(int)num2]);
+					rewardItemInfo = itemInfo.CreateUpgradedItem(list[(int)num2]);
 				}
 			}
 			ItemGrant grant = new ItemGrant();
-			grant.Item = dJKEECEOCJB2;
+			grant.Item = rewardItemInfo;
 			grant.RewardSource = reward;
 			grant.IsDrop = reward.IsDrop;
 			Items.Add(grant);

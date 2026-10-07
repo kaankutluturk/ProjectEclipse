@@ -69,10 +69,10 @@ public static class ModelReloader
 		float x = xmlNode.Attributes["X"].ParseFloat();
 		float y = 0f - xmlNode.Attributes["Y"].ParseFloat();
 		float z = xmlNode.Attributes["Z"].ParseFloat();
-		Vector3f bAINMLLIKOL = new Vector3f(x, y, z);
+		Vector3f nodePosition = new Vector3f(x, y, z);
 		string text = xmlNode.Attributes["Type"].GetStringOrDefault();
-		modelNode.SetStart(bAINMLLIKOL);
-		modelNode.SetEnd(bAINMLLIKOL);
+		modelNode.SetStart(nodePosition);
+		modelNode.SetEnd(nodePosition);
 		if (text == "Node")
 		{
 			modelNode.SetCloth(xmlNode.Attributes["Cloth"].ParseBool());

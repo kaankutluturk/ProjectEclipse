@@ -40,12 +40,12 @@ public class WebSocketSample : MonoBehaviour
 				}
 				WebSocket socket = webSocket;
 				socket.OnOpen = (OnWebSocketOpenDelegate)Delegate.Combine(socket.OnOpen, new OnWebSocketOpenDelegate(OnOpen));
-				WebSocket iLNFPNFEOCL2 = webSocket;
-				iLNFPNFEOCL2.OnMessage = (OnWebSocketMessageDelegate)Delegate.Combine(iLNFPNFEOCL2.OnMessage, new OnWebSocketMessageDelegate(OnMessageReceived));
-				WebSocket iLNFPNFEOCL3 = webSocket;
-				iLNFPNFEOCL3.OnClosed = (OnWebSocketClosedDelegate)Delegate.Combine(iLNFPNFEOCL3.OnClosed, new OnWebSocketClosedDelegate(OnClosed));
-				WebSocket iLNFPNFEOCL4 = webSocket;
-				iLNFPNFEOCL4.OnError = (OnWebSocketErrorDelegate)Delegate.Combine(iLNFPNFEOCL4.OnError, new OnWebSocketErrorDelegate(OnError));
+				WebSocket messageSocket = webSocket;
+				messageSocket.OnMessage = (OnWebSocketMessageDelegate)Delegate.Combine(messageSocket.OnMessage, new OnWebSocketMessageDelegate(OnMessageReceived));
+				WebSocket closedSocket = webSocket;
+				closedSocket.OnClosed = (OnWebSocketClosedDelegate)Delegate.Combine(closedSocket.OnClosed, new OnWebSocketClosedDelegate(OnClosed));
+				WebSocket errorSocket = webSocket;
+				errorSocket.OnError = (OnWebSocketErrorDelegate)Delegate.Combine(errorSocket.OnError, new OnWebSocketErrorDelegate(OnError));
 				webSocket.OpenWebSocket();
 				logText += "Opening Web Socket...\n";
 			}

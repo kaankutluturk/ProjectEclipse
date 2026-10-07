@@ -30,7 +30,7 @@ public class QuestActionGiveItem : QuestAction
 		string itemName = string.Empty;
 		int num = 0;
 		ItemInfo itemInfo = null;
-		ItemInfo dJKEECEOCJB2 = null;
+		ItemInfo upgradedItemInfo = null;
 		List<string> list = new List<string>(result.resultSTR.Split('|'));
 		int count = list.Count;
 		if (count > 0)
@@ -44,7 +44,7 @@ public class QuestActionGiveItem : QuestAction
 		itemInfo = ListSF.GetItems().GetItemByName(itemName);
 		if (itemInfo != null && num > 0)
 		{
-			dJKEECEOCJB2 = itemInfo.GetUpgradeItemAtOrAboveUpgradeLevel(num);
+			upgradedItemInfo = itemInfo.GetUpgradeItemAtOrAboveUpgradeLevel(num);
 		}
 		if (itemInfo == null)
 		{
@@ -67,10 +67,10 @@ public class QuestActionGiveItem : QuestAction
 			Roster roster = ListSF.GetRoster();
 			UserItem userItem = ListSF.AddItem(itemInfo, num2, 0L, flag2);
             grantedItem = userItem != null;
-			if (dJKEECEOCJB2 != null)
+			if (upgradedItemInfo != null)
 			{
 				userItem.SetAcquireType("Upgrade");
-				userItem.SetUpgradeLevel(dJKEECEOCJB2.UpgradeLevel);
+				userItem.SetUpgradeLevel(upgradedItemInfo.UpgradeLevel);
 				userItem.RefreshUpgradeState(roster.GetLevel());
 			}
 			if (itemInfo.ItemLevel <= roster.GetLevel())
@@ -88,8 +88,8 @@ public class QuestActionGiveItem : QuestAction
 		}
 		else
 		{
-			UserItem nDMCFNGEPOA2 = ListSF.GetUserItem(itemInfo.Name);
-			ListSF.RemoveItem(nDMCFNGEPOA2, Math.Abs(num2));
+			UserItem removedUserItem = ListSF.GetUserItem(itemInfo.Name);
+			ListSF.RemoveItem(removedUserItem, Math.Abs(num2));
 		}
 		if (flag)
 		{
@@ -101,14 +101,14 @@ public class QuestActionGiveItem : QuestAction
 		}
 		if (num2 <= 0 && !flag2 && !grantedItem)
 		{
-			UserItem dKCHDHMLKHN2 = ListSF.GetUserItem(itemInfo.Name);
-			if (dKCHDHMLKHN2 != null)
+			UserItem ownedItem = ListSF.GetUserItem(itemInfo.Name);
+			if (ownedItem != null)
 			{
-				dKCHDHMLKHN2.GetInfo().SetIsNew(false);
+				ownedItem.GetInfo().SetIsNew(false);
 				ListSF.GetRoster().SaveCounterItems();
 			}
 		}
-		ListSF.GetInstance().OnItemGiven(dJKEECEOCJB2);
+		ListSF.GetInstance().OnItemGiven(upgradedItemInfo);
         if (grantedItem)
         {
             var menu = Nekki.SF2.GUI.Menu.MainMenu.get_Instance();

@@ -190,10 +190,10 @@ public class Camera : global::EventDispatcher<object>
 	{
 		_targetNode.SetEnd();
 		ModelObject firstFighter = _render.GetViewerModel().GetFirstFighter();
-		ModelObject oIEODIEHJMH2 = _render.GetViewerModel().GetSecondFighter();
-		if (firstFighter != null && oIEODIEHJMH2 != null)
+		ModelObject secondFighter = _render.GetViewerModel().GetSecondFighter();
+		if (firstFighter != null && secondFighter != null)
 		{
-			_targetNode.SetStart(Model.GetCameraMidpoint(firstFighter, oIEODIEHJMH2));
+			_targetNode.SetStart(Model.GetCameraMidpoint(firstFighter, secondFighter));
 		}
 	}
 
@@ -203,36 +203,36 @@ public class Camera : global::EventDispatcher<object>
 		{
 			_positionNode.TimeStep(0f);
 			Vector3f point = new Vector3f(_targetNode.GetEnd());
-			Vector3f eMAFACPEPDK2 = new Vector3f(_targetNode.GetStart());
-			Vector3f eMAFACPEPDK3 = new Vector3f(_positionNode.GetEnd());
-			Vector3f eMAFACPEPDK4 = new Vector3f(_positionNode.GetStart());
+			Vector3f targetStart = new Vector3f(_targetNode.GetStart());
+			Vector3f positionEnd = new Vector3f(_positionNode.GetEnd());
+			Vector3f positionStart = new Vector3f(_positionNode.GetStart());
 			float num = 0f;
-			eMAFACPEPDK4.SetZ(num);
+			positionStart.SetZ(num);
 			num = num;
-			eMAFACPEPDK3.SetZ(num);
+			positionEnd.SetZ(num);
 			num = num;
-			eMAFACPEPDK2.SetZ(num);
+			targetStart.SetZ(num);
 			point.SetZ(num);
-			Vector3f targetDelta = Vector3f.op_Subtraction(eMAFACPEPDK2, point);
-			Vector3f offset = Vector3f.op_Addition(eMAFACPEPDK3, targetDelta);
-			Vector3f nBMEGFBPGFE2 = Vector3f.op_Subtraction(offset, eMAFACPEPDK4);
-			Vector3f eMAFACPEPDK5 = Vector3f.op_Subtraction(eMAFACPEPDK2, eMAFACPEPDK4);
-			eMAFACPEPDK5.Multiply(0.15f);
-			Vector3f eMAFACPEPDK6 = Vector3f.op_Addition(nBMEGFBPGFE2, eMAFACPEPDK5);
-			if (eMAFACPEPDK6.GetLength2D() > 200f)
+			Vector3f targetDelta = Vector3f.op_Subtraction(targetStart, point);
+			Vector3f offset = Vector3f.op_Addition(positionEnd, targetDelta);
+			Vector3f offsetDelta = Vector3f.op_Subtraction(offset, positionStart);
+			Vector3f pullDelta = Vector3f.op_Subtraction(targetStart, positionStart);
+			pullDelta.Multiply(0.15f);
+			Vector3f stepDelta = Vector3f.op_Addition(offsetDelta, pullDelta);
+			if (stepDelta.GetLength2D() > 200f)
 			{
-				eMAFACPEPDK6.Normalize();
-				eMAFACPEPDK6.Multiply(200f);
+				stepDelta.Normalize();
+				stepDelta.Multiply(200f);
 			}
-			eMAFACPEPDK4.Add(eMAFACPEPDK6);
-			Vector3f eMAFACPEPDK7 = Vector3f.op_Subtraction(eMAFACPEPDK4, eMAFACPEPDK3);
-			float num2 = eMAFACPEPDK7.GetLength2D();
+			positionStart.Add(stepDelta);
+			Vector3f stepDrift = Vector3f.op_Subtraction(positionStart, positionEnd);
+			float num2 = stepDrift.GetLength2D();
 			if (num2 > 50f)
 			{
-				eMAFACPEPDK7.Multiply(50f / num2);
-				eMAFACPEPDK4 = Vector3f.op_Addition(eMAFACPEPDK3, eMAFACPEPDK7);
+				stepDrift.Multiply(50f / num2);
+				positionStart = Vector3f.op_Addition(positionEnd, stepDrift);
 			}
-			_positionNode.SetStart(eMAFACPEPDK4);
+			_positionNode.SetStart(positionStart);
 		}
 	}
 
@@ -475,14 +475,14 @@ public class Camera : global::EventDispatcher<object>
 		_render.SyncAdditionalDrawsLayerTransform();
 	}
 
-	public void PlayEffectAnimation(Vector3f NAAPALOFBCI, Vector3f direction, float time, bool flag, string effectName, float scale)
+	public void PlayEffectAnimation(Vector3f effectPosition, Vector3f direction, float time, bool flag, string effectName, float scale)
 	{
-		_render.PlayHitEffect(NAAPALOFBCI, direction, time, flag, effectName, scale);
+		_render.PlayHitEffect(effectPosition, direction, time, flag, effectName, scale);
 	}
 
-	public void QueueBloodEffect(Vector3f NAAPALOFBCI, Vector3f impulse, int count = 4)
+	public void QueueBloodEffect(Vector3f bloodPosition, Vector3f impulse, int count = 4)
 	{
-		_pendingBlood.Position.Set(NAAPALOFBCI);
+		_pendingBlood.Position.Set(bloodPosition);
 		_pendingBlood.Impulse.Set(impulse);
 		_pendingBlood.count = count;
 		_pendingBlood.isActive = true;

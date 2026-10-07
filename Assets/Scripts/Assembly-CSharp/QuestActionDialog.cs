@@ -130,17 +130,17 @@ public class QuestActionDialog : QuestAction
 		float difficulty = GetFightDifficulty();
 		Action<object> action = OnButtonPressed;
 		string buttonText = ((leftButton == null) ? "dlgStoryNegative" : leftButton.Text);
-		string pMDPPGNJAFE2 = ((rightButton == null) ? "dlgStoryPositive" : rightButton.Text);
-		string pMDPPGNJAFE3 = ((middleButton == null) ? "dlgButtonFight" : middleButton.Text);
+		string rightButtonText = ((rightButton == null) ? "dlgStoryPositive" : rightButton.Text);
+		string middleLabelText = ((middleButton == null) ? "dlgButtonFight" : middleButton.Text);
 		buttonText = QuestTextResolver.ResolveText(buttonText, parameters);
-		pMDPPGNJAFE2 = QuestTextResolver.ResolveText(pMDPPGNJAFE2, parameters);
-		pMDPPGNJAFE3 = QuestTextResolver.ResolveText(pMDPPGNJAFE3, parameters);
+		rightButtonText = QuestTextResolver.ResolveText(rightButtonText, parameters);
+		middleLabelText = QuestTextResolver.ResolveText(middleLabelText, parameters);
 		LabelButton.ButtonColor buttonColor = ((leftButton == null || !(leftButton.Color != string.Empty)) ? LabelButton.GetBtnColor("Red") : LabelButton.GetBtnColor(leftButton.Color));
-		LabelButton.ButtonColor fBMGEHJPPIK2 = ((rightButton == null || !(rightButton.Color != string.Empty)) ? LabelButton.GetBtnColor("Beige") : LabelButton.GetBtnColor(rightButton.Color));
+		LabelButton.ButtonColor rightButtonColor = ((rightButton == null || !(rightButton.Color != string.Empty)) ? LabelButton.GetBtnColor("Beige") : LabelButton.GetBtnColor(rightButton.Color));
 		LabelButton.ButtonColor middleButtonColor = ((middleButton == null || !(middleButton.Color != string.Empty)) ? LabelButton.GetBtnColor("Beige") : LabelButton.GetBtnColor(middleButton.Color));
-		string text = ((rightButton == null) ? string.Empty : pMDPPGNJAFE2);
+		string text = ((rightButton == null) ? string.Empty : rightButtonText);
 		string text2 = ((leftButton == null) ? string.Empty : buttonText);
-		string middleButtonText = ((middleButton == null) ? string.Empty : pMDPPGNJAFE3);
+		string middleButtonText = ((middleButton == null) ? string.Empty : middleLabelText);
 		ConditionExtension.CompareResult result = new ConditionExtension.CompareResult();
 		QuestCondition condition = new QuestCondition();
 		condition.SetParameters(parameters);
@@ -183,11 +183,11 @@ public class QuestActionDialog : QuestAction
 		}
 		if (dialogType == "Regular")
 		{
-			baseDialog = DialogsOpener.OpenStoryDialog(empty, text3, list, action, buttonText, leftButton != null && rightButton != null, pMDPPGNJAFE2, fBMGEHJPPIK2, buttonColor);
+			baseDialog = DialogsOpener.OpenStoryDialog(empty, text3, list, action, buttonText, leftButton != null && rightButton != null, rightButtonText, rightButtonColor, buttonColor);
 		}
 		else if (dialogType == "Stranger")
 		{
-			baseDialog = DialogsOpener.OpenStrangerDialog(empty, text3, list, difficulty, action, text, text2, middleButtonText, fBMGEHJPPIK2, buttonColor, middleButtonColor, true, false, false, false, string.Empty);
+			baseDialog = DialogsOpener.OpenStrangerDialog(empty, text3, list, difficulty, action, text, text2, middleButtonText, rightButtonColor, buttonColor, middleButtonColor, true, false, false, false, string.Empty);
 		}
 		else if (dialogType == "NoAvatar")
 		{
@@ -195,20 +195,20 @@ public class QuestActionDialog : QuestAction
 			bool isCheckBoxChecked = false;
 			if (checkBox != null)
 			{
-				ConditionExtension.CompareResult lNIDLHOIHIM2 = new ConditionExtension.CompareResult();
-				QuestCondition kKDGLNECFHA2 = new QuestCondition();
-				kKDGLNECFHA2.SetParameters(parameters);
-				kKDGLNECFHA2.SetValue(checkBox.InitialValue, lNIDLHOIHIM2);
-				isCheckBoxChecked = lNIDLHOIHIM2.resultNumber == 1.0;
+				ConditionExtension.CompareResult checkBoxResult = new ConditionExtension.CompareResult();
+				QuestCondition checkBoxCondition = new QuestCondition();
+				checkBoxCondition.SetParameters(parameters);
+				checkBoxCondition.SetValue(checkBox.InitialValue, checkBoxResult);
+				isCheckBoxChecked = checkBoxResult.resultNumber == 1.0;
 			}
 			bool hasCheckBox = checkBox != null;
-			StoryDialogContent nJEPNCJLPPF2 = list[0];
-			string firstLineText = ((list.Count <= 0) ? string.Empty : QuestTextResolver.ResolveText(nJEPNCJLPPF2.Text, parameters));
-			baseDialog = DialogsOpener.OpenSimpleDialog(text3, firstLineText, text, text2, action, fBMGEHJPPIK2, buttonColor, hasCheckBox, isCheckBoxChecked, checkBoxText);
+			StoryDialogContent firstContent = list[0];
+			string firstLineText = ((list.Count <= 0) ? string.Empty : QuestTextResolver.ResolveText(firstContent.Text, parameters));
+			baseDialog = DialogsOpener.OpenSimpleDialog(text3, firstLineText, text, text2, action, rightButtonColor, buttonColor, hasCheckBox, isCheckBoxChecked, checkBoxText);
 		}
 		else if (dialogType == "ThreeButtons")
 		{
-			baseDialog = DialogsOpener.OpenStrangerDialog(empty, text3, list, 0f, action, text, text2, middleButtonText, fBMGEHJPPIK2, buttonColor, middleButtonColor, false, false, false, false, string.Empty);
+			baseDialog = DialogsOpener.OpenStrangerDialog(empty, text3, list, 0f, action, text, text2, middleButtonText, rightButtonColor, buttonColor, middleButtonColor, false, false, false, false, string.Empty);
 		}
 		else if (dialogType == "Multiline")
 		{
@@ -216,18 +216,18 @@ public class QuestActionDialog : QuestAction
 			bool isMultilineChecked = false;
 			if (checkBox != null)
 			{
-				ConditionExtension.CompareResult lNIDLHOIHIM3 = new ConditionExtension.CompareResult();
-				QuestCondition kKDGLNECFHA3 = new QuestCondition();
-				kKDGLNECFHA3.SetParameters(parameters);
-				kKDGLNECFHA3.SetValue(checkBox.InitialValue, lNIDLHOIHIM3);
-				isMultilineChecked = lNIDLHOIHIM3.resultNumber == 1.0;
+				ConditionExtension.CompareResult multilineResult = new ConditionExtension.CompareResult();
+				QuestCondition multilineCondition = new QuestCondition();
+				multilineCondition.SetParameters(parameters);
+				multilineCondition.SetValue(checkBox.InitialValue, multilineResult);
+				isMultilineChecked = multilineResult.resultNumber == 1.0;
 			}
 			bool hasMultilineCheckBox = checkBox != null;
-			baseDialog = DialogsOpener.OpenStrangerDialog(empty, text3, list, 0f, action, text, text2, middleButtonText, fBMGEHJPPIK2, buttonColor, middleButtonColor, false, true, hasMultilineCheckBox, isMultilineChecked, multilineCheckBoxText);
+			baseDialog = DialogsOpener.OpenStrangerDialog(empty, text3, list, 0f, action, text, text2, middleButtonText, rightButtonColor, buttonColor, middleButtonColor, false, true, hasMultilineCheckBox, isMultilineChecked, multilineCheckBoxText);
 		}
 		else if (dialogType == "Notification")
 		{
-			NotificationsGame.get_Instance().OpenNotification(empty, list, action, text, fBMGEHJPPIK2, readTime);
+			NotificationsGame.get_Instance().OpenNotification(empty, list, action, text, rightButtonColor, readTime);
 		}
 		if (baseDialog != null)
 		{

@@ -26,9 +26,9 @@ public class QuestActionDownload : QuestAction
 		packInfo = null;
 		isRewriteHashes = node.Attributes["RewriteHashes"].ParseInt() > 0;
 		XmlNode successNode = node["Success"];
-		XmlNode ePKLCPOEELO2 = node["Error"];
+		XmlNode sequenceNode = node["Error"];
 		ParseSequenceWithUnlock(successNode, successSequence, OnActionComplete);
-		ParseSequenceWithUnlock(ePKLCPOEELO2, errorSequence, OnActionComplete);
+		ParseSequenceWithUnlock(sequenceNode, errorSequence, OnActionComplete);
 	}
 
 	private void OnActionComplete(object data)

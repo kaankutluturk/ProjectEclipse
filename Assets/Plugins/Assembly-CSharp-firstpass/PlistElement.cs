@@ -3,7 +3,7 @@ using System.Reflection;
 [DefaultMember("Item")]
 public class PlistElement
 {
-	// C# has no syntax for parameterized property 'DLKPBAJDHBO'.
+	// C# has no syntax for parameterized property 'Item'.
 	public PlistElement get_DLKPBAJDHBO(string key)
 	{
 		return get_Item(key);

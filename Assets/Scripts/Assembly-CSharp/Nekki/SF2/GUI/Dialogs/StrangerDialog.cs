@@ -195,14 +195,14 @@ namespace Nekki.SF2.GUI.Dialogs
 				}
 				if (_btnCancel != null && _btnCancel.gameObject.activeSelf)
 				{
-					float bAINMLLIKOL2 = _btnCancel.transform.localPosition.y + 100f + 30f;
-					_btnCancel.transform.SetLocalY(bAINMLLIKOL2);
+					float cancelButtonY = _btnCancel.transform.localPosition.y + 100f + 30f;
+					_btnCancel.transform.SetLocalY(cancelButtonY);
 				}
 				if (_checkBox.gameObject.activeSelf)
 				{
-					float bAINMLLIKOL3 = _bottomStripe.transform.localPosition.y + 90f;
-					_checkBox.transform.SetLocalY(bAINMLLIKOL3);
-					_checkBoxLabel.transform.SetLocalY(bAINMLLIKOL3);
+					float checkBoxY = _bottomStripe.transform.localPosition.y + 90f;
+					_checkBox.transform.SetLocalY(checkBoxY);
+					_checkBoxLabel.transform.SetLocalY(checkBoxY);
 					float num2 = _checkBox.GetComponent<RectTransform>().rect.width / 2f + _checkBoxLabel.preferredWidth;
 					_checkBox.transform.SetLocalX((0f - num2) / 2f);
 					float num3 = _checkBox.transform.localPosition.x + _checkBox.GetComponent<RectTransform>().rect.width / 2f;
@@ -305,16 +305,16 @@ namespace Nekki.SF2.GUI.Dialogs
 			_rejectButton.gameObject.SetActive(false);
 			_storeButton.gameObject.SetActive(false);
 			float localX = 20f + _btnOK.GetComponent<RectTransform>().rect.width / 2f;
-			float bAINMLLIKOL2 = _bottomStripe.transform.localPosition.y + 130f;
+			float buttonY = _bottomStripe.transform.localPosition.y + 130f;
 			_btnOK.transform.SetLocalX(localX);
-			_btnOK.transform.SetLocalY(bAINMLLIKOL2);
+			_btnOK.transform.SetLocalY(buttonY);
 			_btnOK.Label.set_LabelFontSize(87);
 			_btnOK.ButtonId = 13;
 			_btnOK.RemoveEventListener(2, OnClose);
 			_btnOK.AddEventListener(2, ButtonCallback);
 			localX = -20f - _btnCancel.GetComponent<RectTransform>().rect.width / 2f;
 			_btnCancel.transform.SetLocalX(localX);
-			_btnCancel.transform.SetLocalY(bAINMLLIKOL2);
+			_btnCancel.transform.SetLocalY(buttonY);
 			_btnCancel.Label.set_LabelFontSize(87);
 			_btnCancel.ButtonId = 1;
 			_btnCancel.RemoveEventListener(2, OnClose);

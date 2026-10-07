@@ -77,7 +77,7 @@ public class Hub : IHub
 	public Hub(string name, Connection hubConnection)
 	{
 		set_Name(name);
-		((IHub)this).GNLCPJFBAJE(hubConnection);
+		((IHub)this).AttachConnection(hubConnection);
 	}
 
 	public string get_Name()
@@ -102,28 +102,28 @@ public class Hub : IHub
 	public void AddOnMethodCall(OnMethodCallDelegate value)
 	{
 		OnMethodCallDelegate current = OnMethodCall;
-		OnMethodCallDelegate kOBOMHLOBON2;
+		OnMethodCallDelegate previousHandler;
 		do
 		{
-			kOBOMHLOBON2 = current;
-			current = Interlocked.CompareExchange(ref OnMethodCall, (OnMethodCallDelegate)Delegate.Combine(kOBOMHLOBON2, value), current);
+			previousHandler = current;
+			current = Interlocked.CompareExchange(ref OnMethodCall, (OnMethodCallDelegate)Delegate.Combine(previousHandler, value), current);
 		}
-		while ((object)current != kOBOMHLOBON2);
+		while ((object)current != previousHandler);
 	}
 
 	public void RemoveOnMethodCall(OnMethodCallDelegate value)
 	{
 		OnMethodCallDelegate current = OnMethodCall;
-		OnMethodCallDelegate kOBOMHLOBON2;
+		OnMethodCallDelegate previousHandler;
 		do
 		{
-			kOBOMHLOBON2 = current;
-			current = Interlocked.CompareExchange(ref OnMethodCall, (OnMethodCallDelegate)Delegate.Remove(kOBOMHLOBON2, value), current);
+			previousHandler = current;
+			current = Interlocked.CompareExchange(ref OnMethodCall, (OnMethodCallDelegate)Delegate.Remove(previousHandler, value), current);
 		}
-		while ((object)current != kOBOMHLOBON2);
+		while ((object)current != previousHandler);
 	}
 
-	Connection IHub.PEBFDIFIMBO
+	Connection IHub.AttachedConnection
 	{
 		get
 		{
@@ -135,7 +135,7 @@ public class Hub : IHub
 		}
 	}
 
-	void IHub.GNLCPJFBAJE(Connection value)
+	void IHub.AttachConnection(Connection value)
 	{
 		connection = value;
 	}
@@ -176,9 +176,9 @@ public class Hub : IHub
 		{
 			Connection hubConnection = ((IHub)this).HubConnection;
 			hubConnection.set_ClientMessageCounter(hubConnection.GetClientMessageCounter() % ulong.MaxValue);
-			Connection hDMLLEEKKLF2 = ((IHub)this).HubConnection;
+			Connection messageConnection = ((IHub)this).HubConnection;
 			ulong callIndex;
-			hDMLLEEKKLF2.set_ClientMessageCounter((callIndex = hDMLLEEKKLF2.GetClientMessageCounter()) + 1);
+			messageConnection.set_ClientMessageCounter((callIndex = messageConnection.GetClientMessageCounter()) + 1);
 			((IHub)this).Call(new ClientMessage(this, method, args, callIndex, onResult, onFailed, onProgress));
 		}
 	}
@@ -224,9 +224,9 @@ public class Hub : IHub
 				value(this, message);
 				return;
 			}
-			catch (Exception mPFFFAOGBJE2)
+			catch (Exception methodException)
 			{
-				HTTPManager.GetLogger().Exception("Hub - " + get_Name(), "IHub.OnMethod - callback", mPFFFAOGBJE2);
+				HTTPManager.GetLogger().Exception("Hub - " + get_Name(), "IHub.OnMethod - callback", methodException);
 				return;
 			}
 		}

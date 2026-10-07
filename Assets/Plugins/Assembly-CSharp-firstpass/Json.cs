@@ -268,8 +268,8 @@ public class Json
 
 	protected static int LookAhead(char[] json, int index)
 	{
-		int IHPMGHJPLBP2 = index;
-		return NextToken(json, ref IHPMGHJPLBP2);
+		int lookAheadIndex = index;
+		return NextToken(json, ref lookAheadIndex);
 	}
 
 	protected static int NextToken(char[] json, ref int index)

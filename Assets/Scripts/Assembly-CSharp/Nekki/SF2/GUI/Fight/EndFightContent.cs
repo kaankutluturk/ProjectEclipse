@@ -181,10 +181,10 @@ namespace Nekki.SF2.GUI.Fight
 				line.StartAnimation();
 				return;
 			}
-			Line fCMOHBLGJFP2 = ((lines.Count <= 0) ? null : lines[lines.Count - 1]);
-			if (fCMOHBLGJFP2 != null)
+			Line lastLine = ((lines.Count <= 0) ? null : lines[lines.Count - 1]);
+			if (lastLine != null)
 			{
-				fCMOHBLGJFP2.AddListener(OnAllLinesFinished);
+				lastLine.AddListener(OnAllLinesFinished);
 			}
 			foreach (Line item in lines)
 			{

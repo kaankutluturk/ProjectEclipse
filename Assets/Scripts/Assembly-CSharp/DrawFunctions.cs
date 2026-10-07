@@ -18,7 +18,7 @@ public static class DrawFunctions
 			float num3 = Mathf.Sin(f);
 			float x = num2 * radius.x + center.x;
 			float y = num3 * radius.y + center.y;
-			list.Add(CreateVertex(uv: new Vector2(num2 * 0.5f + 0.5f, num3 * 0.5f + 0.5f), GIAEPIIIMDH: new Vector2(x, y), color: color));
+			list.Add(CreateVertex(uv: new Vector2(num2 * 0.5f + 0.5f, num3 * 0.5f + 0.5f), vertexPosition: new Vector2(x, y), color: color));
 		}
 		vertexHelper.AddUIVertexStream(list, FigureTopology.CreateFanIndices(segments));
 	}
@@ -35,13 +35,13 @@ public static class DrawFunctions
 			float num2 = Mathf.Cos(f);
 			float num3 = Mathf.Sin(f);
 			Color vertexColor = Color.Lerp(startColor, endColor, (float)i / (float)segments);
-			Vector2 gIAEPIIIMDH = new Vector2(num2 * radius.x + center.x, num3 * radius.y + center.y);
+			Vector2 innerVertexPoint = new Vector2(num2 * radius.x + center.x, num3 * radius.y + center.y);
 			Vector2 uv = new Vector2(num2 * 0.5f + 0.5f, num3 * 0.5f + 0.5f);
-			list.Add(CreateVertex(gIAEPIIIMDH, uv, vertexColor));
-			Vector2 gIAEPIIIMDH2 = new Vector2(num2 * vector.x + center.x, num3 * vector.y + center.y);
+			list.Add(CreateVertex(innerVertexPoint, uv, vertexColor));
+			Vector2 outerVertexPoint = new Vector2(num2 * vector.x + center.x, num3 * vector.y + center.y);
 			Vector2 vector2 = new Vector2(1f - thickness / radius.x, 1f - thickness / radius.y);
-			Vector2 fGFOGDLPAIC2 = new Vector2(num2 * vector2.x * 0.5f + 0.5f, num3 * vector2.y * 0.5f + 0.5f);
-			list.Add(CreateVertex(gIAEPIIIMDH2, fGFOGDLPAIC2, vertexColor));
+			Vector2 outerUv = new Vector2(num2 * vector2.x * 0.5f + 0.5f, num3 * vector2.y * 0.5f + 0.5f);
+			list.Add(CreateVertex(outerVertexPoint, outerUv, vertexColor));
 		}
 		vertexHelper.AddUIVertexStream(list, FigureTopology.CreateStripIndices(segments * 2));
 	}
@@ -89,17 +89,17 @@ public static class DrawFunctions
 				vector5 = num3 * vector2 * thickness;
 				num3 *= -1;
 			}
-			Vector2 fGFOGDLPAIC2 = new Vector2(x, 1f);
+			Vector2 lineUv = new Vector2(x, 1f);
 			list.Add(CreateVertex(vector4 - vector5 / 2f, uv, color));
-			list.Add(CreateVertex(vector4 + vector5 / 2f, fGFOGDLPAIC2, color));
+			list.Add(CreateVertex(vector4 + vector5 / 2f, lineUv, color));
 		}
 		vertexHelper.AddUIVertexStream(list, FigureTopology.CreateStripIndices((points.Count - 1) * 2));
 	}
 
-	private static UIVertex CreateVertex(Vector2 GIAEPIIIMDH, Vector2 uv, Color color)
+	private static UIVertex CreateVertex(Vector2 vertexPosition, Vector2 uv, Color color)
 	{
 		UIVertex simpleVert = UIVertex.simpleVert;
-		simpleVert.position = GIAEPIIIMDH;
+		simpleVert.position = vertexPosition;
 		simpleVert.uv0 = uv;
 		simpleVert.color = color;
 		return simpleVert;

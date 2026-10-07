@@ -50,9 +50,9 @@ namespace Nekki.SF2.GUI.Common
 			}
 			for (int j = 0; j < models.Count; j++)
 			{
-				Model fGCODGKLHED2 = models[j];
-				StringBuilder stringBuilder2 = ((!fGCODGKLHED2.IsPlayerModel()) ? enemyTextBuilder : playerTextBuilder);
-				stringBuilder2.Append(FormatModelAnimationInfo(fGCODGKLHED2));
+				Model debugModel = models[j];
+				StringBuilder stringBuilder2 = ((!debugModel.IsPlayerModel()) ? enemyTextBuilder : playerTextBuilder);
+				stringBuilder2.Append(FormatModelAnimationInfo(debugModel));
 			}
 			string text = playerTextBuilder.ToString();
 			string text2 = enemyTextBuilder.ToString();

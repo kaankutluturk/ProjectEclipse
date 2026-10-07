@@ -36,11 +36,11 @@ namespace UIFigures
 			vertexHelper.AddUIVertexQuad(_Vertexes.ToArray());
 		}
 
-		protected void AddVertex(Vector3 GIAEPIIIMDH)
+		protected void AddVertex(Vector3 vertexPosition)
 		{
 			UIVertex simpleVert = UIVertex.simpleVert;
-			simpleVert.position = GIAEPIIIMDH;
-			simpleVert.uv0 = new Vector2(0.5f + GIAEPIIIMDH.x / base.rectTransform.rect.width, 0.5f + GIAEPIIIMDH.y / base.rectTransform.rect.height);
+			simpleVert.position = vertexPosition;
+			simpleVert.uv0 = new Vector2(0.5f + vertexPosition.x / base.rectTransform.rect.width, 0.5f + vertexPosition.y / base.rectTransform.rect.height);
 			simpleVert.color = color;
 			_Vertexes.Add(simpleVert);
 		}

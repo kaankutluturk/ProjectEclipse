@@ -435,7 +435,7 @@ namespace CodeStage.AntiCheat.Detectors
 			}
 		}
 
-		private void StartDetectionInternal(UnityAction callback, Vector3 MDCJBPDNAOG, byte allowedFalsePositives)
+		private void StartDetectionInternal(UnityAction callback, Vector3 detectionPosition, byte allowedFalsePositives)
 		{
 			if (isRunning)
 			{
@@ -458,7 +458,7 @@ namespace CodeStage.AntiCheat.Detectors
 				return;
 			}
 			detectionAction = callback;
-			spawnPosition = MDCJBPDNAOG;
+			spawnPosition = detectionPosition;
 			maxFalsePositives = allowedFalsePositives;
 			rigidbodyDetections = 0;
 			controllerDetections = 0;
@@ -749,7 +749,7 @@ namespace CodeStage.AntiCheat.Detectors
 #if UNITY_6000_0_OR_NEWER
 			rigidPlayer.linearVelocity = rigidPlayerVelocity;
 #else
-			rigidPlayer.velocity = PKIHJKCDMHD;
+			rigidPlayer.velocity = rigidPlayerVelocity;
 #endif
 			Invoke("StartRigidModule", 4f);
 		}

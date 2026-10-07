@@ -234,7 +234,7 @@ public abstract class ServerProviderBase : MonoBehaviour
 	{
 		private readonly Dictionary<string, QueryValue> values;
 
-		// C# has no syntax for parameterized property 'DLKPBAJDHBO'.
+		// C# has no syntax for parameterized property 'Item'.
 		public QueryValue get_DLKPBAJDHBO(string index)
 		{
 			return get_Item(index);
@@ -260,7 +260,7 @@ public abstract class ServerProviderBase : MonoBehaviour
 	{
 		private readonly List<QueryRow> _data = new List<QueryRow>();
 
-		// C# has no syntax for parameterized property 'DLKPBAJDHBO'.
+		// C# has no syntax for parameterized property 'Item'.
 		public QueryRow get_DLKPBAJDHBO(int index)
 		{
 			return get_Item(index);

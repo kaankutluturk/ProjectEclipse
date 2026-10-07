@@ -107,49 +107,49 @@ public class AudioSettings
 	public void AddSoundsVolumeChanged(VolumeChangedHandler value)
 	{
 		VolumeChangedHandler currentHandler = SoundsVolumeChanged;
-		VolumeChangedHandler nKLBOBJEEDA2;
+		VolumeChangedHandler previousHandler;
 		do
 		{
-			nKLBOBJEEDA2 = currentHandler;
-			currentHandler = Interlocked.CompareExchange(ref SoundsVolumeChanged, (VolumeChangedHandler)Delegate.Combine(nKLBOBJEEDA2, value), currentHandler);
+			previousHandler = currentHandler;
+			currentHandler = Interlocked.CompareExchange(ref SoundsVolumeChanged, (VolumeChangedHandler)Delegate.Combine(previousHandler, value), currentHandler);
 		}
-		while ((object)currentHandler != nKLBOBJEEDA2);
+		while ((object)currentHandler != previousHandler);
 	}
 
 	public void RemoveSoundsVolumeChanged(VolumeChangedHandler value)
 	{
 		VolumeChangedHandler currentHandler = SoundsVolumeChanged;
-		VolumeChangedHandler nKLBOBJEEDA2;
+		VolumeChangedHandler previousHandler;
 		do
 		{
-			nKLBOBJEEDA2 = currentHandler;
-			currentHandler = Interlocked.CompareExchange(ref SoundsVolumeChanged, (VolumeChangedHandler)Delegate.Remove(nKLBOBJEEDA2, value), currentHandler);
+			previousHandler = currentHandler;
+			currentHandler = Interlocked.CompareExchange(ref SoundsVolumeChanged, (VolumeChangedHandler)Delegate.Remove(previousHandler, value), currentHandler);
 		}
-		while ((object)currentHandler != nKLBOBJEEDA2);
+		while ((object)currentHandler != previousHandler);
 	}
 
 	public void AddMusicVolumeChanged(VolumeChangedHandler value)
 	{
 		VolumeChangedHandler currentHandler = MusicVolumeChanged;
-		VolumeChangedHandler nKLBOBJEEDA2;
+		VolumeChangedHandler previousHandler;
 		do
 		{
-			nKLBOBJEEDA2 = currentHandler;
-			currentHandler = Interlocked.CompareExchange(ref MusicVolumeChanged, (VolumeChangedHandler)Delegate.Combine(nKLBOBJEEDA2, value), currentHandler);
+			previousHandler = currentHandler;
+			currentHandler = Interlocked.CompareExchange(ref MusicVolumeChanged, (VolumeChangedHandler)Delegate.Combine(previousHandler, value), currentHandler);
 		}
-		while ((object)currentHandler != nKLBOBJEEDA2);
+		while ((object)currentHandler != previousHandler);
 	}
 
 	public void RemoveMusicVolumeChanged(VolumeChangedHandler value)
 	{
 		VolumeChangedHandler currentHandler = MusicVolumeChanged;
-		VolumeChangedHandler nKLBOBJEEDA2;
+		VolumeChangedHandler previousHandler;
 		do
 		{
-			nKLBOBJEEDA2 = currentHandler;
-			currentHandler = Interlocked.CompareExchange(ref MusicVolumeChanged, (VolumeChangedHandler)Delegate.Remove(nKLBOBJEEDA2, value), currentHandler);
+			previousHandler = currentHandler;
+			currentHandler = Interlocked.CompareExchange(ref MusicVolumeChanged, (VolumeChangedHandler)Delegate.Remove(previousHandler, value), currentHandler);
 		}
-		while ((object)currentHandler != nKLBOBJEEDA2);
+		while ((object)currentHandler != previousHandler);
 	}
 
 	public bool GetMuted()

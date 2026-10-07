@@ -201,12 +201,12 @@ internal class FastEncoderWindow
 			bufPos++;
 			if (num <= 6)
 			{
-				int MIAOKJENHOF2 = 0;
+				int matchPosition = 0;
 				int num3 = (int)InsertString(ref hash);
 				int num4;
 				if (num3 != 0)
 				{
-					num4 = FindMatch(num3, out MIAOKJENHOF2, (num >= 4) ? 8 : 32, 32);
+					num4 = FindMatch(num3, out matchPosition, (num >= 4) ? 8 : 32, 32);
 					if (bufPos + num4 > bufEnd)
 					{
 						num4 = bufEnd - bufPos;
@@ -220,7 +220,7 @@ internal class FastEncoderWindow
 				{
 					match.set_State(MatchState.HasSymbolAndMatch);
 					match.set_Symbol(window[bufPos - 1]);
-					match.set_Position(MIAOKJENHOF2);
+					match.set_Position(matchPosition);
 					match.set_Length(num4);
 					bufPos++;
 					num = num4;
@@ -308,8 +308,8 @@ internal class FastEncoderWindow
 		}
 	}
 
-	private uint RecalculateHash(int MGMMDGFPBLP)
+	private uint RecalculateHash(int windowIndex)
 	{
-		return (uint)(((window[MGMMDGFPBLP] << 8) ^ (window[MGMMDGFPBLP + 1] << 4) ^ window[MGMMDGFPBLP + 2]) & 0x7FF);
+		return (uint)(((window[windowIndex] << 8) ^ (window[windowIndex + 1] << 4) ^ window[windowIndex + 2]) & 0x7FF);
 	}
 }

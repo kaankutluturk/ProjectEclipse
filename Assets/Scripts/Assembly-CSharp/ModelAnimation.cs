@@ -759,8 +759,8 @@ public class ModelAnimation : global::EventDispatcher<object>
 			ModelNode node = _Model.GetNodeByName(name);
 			if (node != null)
 			{
-				ModelNode lCDGOCIAIDK2 = node.GetPairNode();
-				if (lCDGOCIAIDK2 == null)
+				ModelNode otherNode = node.GetPairNode();
+				if (otherNode == null)
 				{
 					return node;
 				}
@@ -771,32 +771,32 @@ public class ModelAnimation : global::EventDispatcher<object>
 					switch (c)
 					{
 					case '1':
-						if (node.GetStart().GetX() < lCDGOCIAIDK2.GetStart().GetX())
+						if (node.GetStart().GetX() < otherNode.GetStart().GetX())
 						{
-							return lCDGOCIAIDK2;
+							return otherNode;
 						}
 						return node;
 					case '2':
-						if (node.GetStart().GetX() < lCDGOCIAIDK2.GetStart().GetX())
+						if (node.GetStart().GetX() < otherNode.GetStart().GetX())
 						{
 							return node;
 						}
-						return lCDGOCIAIDK2;
+						return otherNode;
 					}
 					break;
 				case -1:
 					switch (c)
 					{
 					case '1':
-						if (node.GetStart().GetX() < lCDGOCIAIDK2.GetStart().GetX())
+						if (node.GetStart().GetX() < otherNode.GetStart().GetX())
 						{
 							return node;
 						}
-						return lCDGOCIAIDK2;
+						return otherNode;
 					case '2':
-						if (node.GetStart().GetX() < lCDGOCIAIDK2.GetStart().GetX())
+						if (node.GetStart().GetX() < otherNode.GetStart().GetX())
 						{
-							return lCDGOCIAIDK2;
+							return otherNode;
 						}
 						return node;
 					}
@@ -1144,10 +1144,10 @@ public class ModelAnimation : global::EventDispatcher<object>
 	public static bool CalcIsMirror(ModelObject modelObject, string nodeName, int sign, Vector3[] framePositions, bool useIdOrder = true)
 	{
 		ModelNode node = modelObject.GetNodeByName(nodeName);
-		ModelNode lCDGOCIAIDK2 = ((node == null) ? null : node.GetPairNode());
-		if (node != null && lCDGOCIAIDK2 != null)
+		ModelNode pairNode = ((node == null) ? null : node.GetPairNode());
+		if (node != null && pairNode != null)
 		{
-			return CalcIsMirror(node, lCDGOCIAIDK2, sign, framePositions, useIdOrder);
+			return CalcIsMirror(node, pairNode, sign, framePositions, useIdOrder);
 		}
 		GameLog.Error("ModelAnimation::mirrorNodes - nodes not found: \"{0}\"", nodeName);
 		return false;
@@ -1171,10 +1171,10 @@ public class ModelAnimation : global::EventDispatcher<object>
 	public static bool CalcIsMirror(ModelObject modelObject, string nodeName, int sign, List<Vector3f> framePositions, bool useIdOrder = true)
 	{
 		ModelNode node = modelObject.GetNodeByName(nodeName);
-		ModelNode lCDGOCIAIDK2 = ((node == null) ? null : node.GetPairNode());
-		if (node != null && lCDGOCIAIDK2 != null)
+		ModelNode pairNode = ((node == null) ? null : node.GetPairNode());
+		if (node != null && pairNode != null)
 		{
-			return CalcIsMirror(node, lCDGOCIAIDK2, sign, framePositions, useIdOrder);
+			return CalcIsMirror(node, pairNode, sign, framePositions, useIdOrder);
 		}
 		GameLog.Error("ModelAnimation::mirrorNodes - nodes not found: \"{0}\"", nodeName);
 		return false;
@@ -1208,8 +1208,8 @@ public class ModelAnimation : global::EventDispatcher<object>
 			int num3;
 			if (GetIsMirrored())
 			{
-				ModelNode lCDGOCIAIDK2 = playingNode.GetPairNode();
-				num3 = ((lCDGOCIAIDK2 == null) ? GetCurrentNodeId() : lCDGOCIAIDK2.GetID());
+				ModelNode pairNode = playingNode.GetPairNode();
+				num3 = ((pairNode == null) ? GetCurrentNodeId() : pairNode.GetID());
 			}
 			else
 			{
@@ -1283,19 +1283,19 @@ public class ModelAnimation : global::EventDispatcher<object>
 		_Frames.InterruptFramesSeted(interruptFrameCount);
 		int num = (currentInfo.MidFrames + 1) / 2;
 		KeyFrames.Frame firstFrame = _Frames.GetFrame(0);
-		KeyFrames.Frame cJMFONMNFBI2 = _Frames.GetFrame(1);
+		KeyFrames.Frame secondFrame = _Frames.GetFrame(1);
 		List<ModelNode> list = _Model.GetAllNodes();
 		for (int i = 0; i < firstFrame.Size; i++)
 		{
 			Vector3f start = list[i].GetStart();
-			Vector3f eMAFACPEPDK2 = list[i].GetEnd();
-			float deltaX = (start.GetX() - eMAFACPEPDK2.GetX()) * (float)num;
-			float deltaY = (start.GetY() - eMAFACPEPDK2.GetY()) * (float)num;
-			float deltaZ = (start.GetZ() - eMAFACPEPDK2.GetZ()) * (float)num;
+			Vector3f nodeEnd = list[i].GetEnd();
+			float deltaX = (start.GetX() - nodeEnd.GetX()) * (float)num;
+			float deltaY = (start.GetY() - nodeEnd.GetY()) * (float)num;
+			float deltaZ = (start.GetZ() - nodeEnd.GetZ()) * (float)num;
 			firstFrame.Data[i].Set(start);
 			firstFrame.Data[i].Subtract(deltaX, deltaY, deltaZ);
-			cJMFONMNFBI2.Data[i].Set(start);
-			cJMFONMNFBI2.Data[i].Add(deltaX, deltaY, deltaZ);
+			secondFrame.Data[i].Set(start);
+			secondFrame.Data[i].Add(deltaX, deltaY, deltaZ);
 		}
 	}
 
@@ -1303,12 +1303,12 @@ public class ModelAnimation : global::EventDispatcher<object>
 	{
 		InfoAnimation.MovePivot alignData = currentInfo.MoveData.AlignData;
 		ModelAnimation pivotAnimation = GetAnimationByModelType(alignData.PivotModelType);
-		ModelAnimation oJIEPADIEDE2 = GetAnimationByModelType(alignData.PositionModelType);
+		ModelAnimation alignAnimation = GetAnimationByModelType(alignData.PositionModelType);
 		Vector3f pivotPoint = new Vector3f();
-		Vector3f eMAFACPEPDK2 = new Vector3f();
-		if (oJIEPADIEDE2 == null)
+		Vector3f shiftPoint = new Vector3f();
+		if (alignAnimation == null)
 		{
-			oJIEPADIEDE2 = this;
+			alignAnimation = this;
 		}
 		switch (alignData.PivotObjectType)
 		{
@@ -1333,29 +1333,29 @@ public class ModelAnimation : global::EventDispatcher<object>
 		switch (alignData.PositionObjectType)
 		{
 		case InfoAnimation.AlignObjectType.ObjectPivot:
-			if (oJIEPADIEDE2.GetCurrentNode() != null)
+			if (alignAnimation.GetCurrentNode() != null)
 			{
-				eMAFACPEPDK2.Set(oJIEPADIEDE2.GetCurrentNode().GetStart());
+				shiftPoint.Set(alignAnimation.GetCurrentNode().GetStart());
 			}
 			break;
 		case InfoAnimation.AlignObjectType.ObjectNodes:
 		{
-			int positionNodeId = ((!oJIEPADIEDE2.GetIsMirrored() || alignData.PositionPairNodeId <= -1) ? alignData.PositionNodeId : alignData.PositionPairNodeId);
-			eMAFACPEPDK2.Set(oJIEPADIEDE2.GetNodeById(positionNodeId).GetStart());
+			int positionNodeId = ((!alignAnimation.GetIsMirrored() || alignData.PositionPairNodeId <= -1) ? alignData.PositionNodeId : alignData.PositionPairNodeId);
+			shiftPoint.Set(alignAnimation.GetNodeById(positionNodeId).GetStart());
 			break;
 		}
 		case InfoAnimation.AlignObjectType.ObjectAnimation:
-			eMAFACPEPDK2.Set(oJIEPADIEDE2.GetShift());
+			shiftPoint.Set(alignAnimation.GetShift());
 			break;
 		case InfoAnimation.AlignObjectType.ObjectWall:
-			eMAFACPEPDK2.Reset();
-			eMAFACPEPDK2.SetX((GetSign() == 1 != (alignData.PositionPart == "Back")) ? rightWallX : leftWallX);
+			shiftPoint.Reset();
+			shiftPoint.SetX((GetSign() == 1 != (alignData.PositionPart == "Back")) ? rightWallX : leftWallX);
 			break;
 		}
-		eMAFACPEPDK2.SetX(eMAFACPEPDK2.GetX() + (float)GetSign() * alignData.PositionShift.GetX());
-		eMAFACPEPDK2.SetY(eMAFACPEPDK2.GetY() + alignData.PositionShift.GetY());
-		pivotTargetX = eMAFACPEPDK2.GetX();
-		shift.Set(Vector3f.op_Subtraction(eMAFACPEPDK2, pivotPoint));
+		shiftPoint.SetX(shiftPoint.GetX() + (float)GetSign() * alignData.PositionShift.GetX());
+		shiftPoint.SetY(shiftPoint.GetY() + alignData.PositionShift.GetY());
+		pivotTargetX = shiftPoint.GetX();
+		shift.Set(Vector3f.op_Subtraction(shiftPoint, pivotPoint));
 		ShiftSequence((!alignData.AlignX) ? 0f : shift.GetX(), (!alignData.AlignY) ? 0f : shift.GetY(), (!alignData.AlignZ) ? 0f : shift.GetZ());
 		if (string.IsNullOrEmpty(alignData.ShiftModelNode))
 		{
@@ -1365,13 +1365,13 @@ public class ModelAnimation : global::EventDispatcher<object>
 		int index = shiftNode.GetID();
 		pivotPoint = _Frames.GetFrame(2).Data[index];
 		Vector3f startOffset = new Vector3f(Vector3f.op_Subtraction(pivotPoint, shiftNode.GetStart()));
-		Vector3f bEHOPOPCJGB2 = new Vector3f(Vector3f.op_Subtraction(pivotPoint, shiftNode.GetEnd()));
+		Vector3f endOffset = new Vector3f(Vector3f.op_Subtraction(pivotPoint, shiftNode.GetEnd()));
 		List<ModelNode> list = _Model.GetAllNodes();
 		int count = list.Count;
 		foreach (ModelNode item in list)
 		{
 			item.GetStart().Add(startOffset);
-			item.GetEnd().Add(bEHOPOPCJGB2);
+			item.GetEnd().Add(endOffset);
 		}
 	}
 
@@ -1433,12 +1433,12 @@ public class ModelAnimation : global::EventDispatcher<object>
 		subFrameScale = 1f / (float)interpolationSteps;
 		int steps = (GetFrameStep() + 1) * interpolationSteps;
 		List<Vector3f> startPoints = _Frames.GetFrame(firstFrameIndex).Data;
-		List<Vector3f> aLAKNMCKLFI2 = _Frames.GetFrame(secondFrameIndex).Data;
-		List<Vector3f> aLAKNMCKLFI3 = _Frames.GetFrame(secondFrameIndex + 1).Data;
+		List<Vector3f> secondFramePoints = _Frames.GetFrame(secondFrameIndex).Data;
+		List<Vector3f> thirdFramePoints = _Frames.GetFrame(secondFrameIndex + 1).Data;
 		Bezier bezier = new Bezier(steps);
 		for (int i = 0; i < bufferedFrames.Count; i++)
 		{
-			bezier.BuildCurve(startPoints[i], aLAKNMCKLFI2[i], aLAKNMCKLFI3[i], bufferedFrames[i]);
+			bezier.BuildCurve(startPoints[i], secondFramePoints[i], thirdFramePoints[i], bufferedFrames[i]);
 		}
 		bufferIndex = 0;
 	}

@@ -295,11 +295,11 @@ internal sealed class DeflateManager
 		heap[k] = num;
 	}
 
-	internal static bool _IsSmaller(short[] tree, int HDKKKCDKFEE, int m, sbyte[] depth)
+	internal static bool _IsSmaller(short[] tree, int leftNode, int m, sbyte[] depth)
 	{
-		short num = tree[HDKKKCDKFEE * 2];
+		short num = tree[leftNode * 2];
 		short num2 = tree[m * 2];
-		return num < num2 || (num == num2 && depth[HDKKKCDKFEE] <= depth[m]);
+		return num < num2 || (num == num2 && depth[leftNode] <= depth[m]);
 	}
 
 	internal void scan_tree(short[] tree, int max_code)
@@ -464,9 +464,9 @@ internal sealed class DeflateManager
 		pendingCount += length;
 	}
 
-	internal void send_code(int ILHDJDNPFKH, short[] tree)
+	internal void send_code(int symbol, short[] tree)
 	{
-		int num = ILHDJDNPFKH * 2;
+		int num = symbol * 2;
 		send_bits(tree[num] & 0xFFFF, tree[num + 1] & 0xFFFF);
 	}
 

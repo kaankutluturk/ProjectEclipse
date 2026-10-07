@@ -307,14 +307,14 @@ internal sealed class Digest
 					{
 						set_ProtectedUris(new List<string>());
 					}
-					int LCCLEFMKLPB = 0;
-					string item = item2.GetValue().Read(ref LCCLEFMKLPB, ' ');
+					int cursor = 0;
+					string item = item2.GetValue().Read(ref cursor, ' ');
 					do
 					{
 						GetProtectedUris().Add(item);
-						item = item2.GetValue().Read(ref LCCLEFMKLPB, ' ');
+						item = item2.GetValue().Read(ref cursor, ' ');
 					}
-					while (LCCLEFMKLPB < item2.GetValue().Length);
+					while (cursor < item2.GetValue().Length);
 				}
 				break;
 			case "nonce":

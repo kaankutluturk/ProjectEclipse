@@ -10,7 +10,7 @@ public class TexturesUtils
 #if UNITY_6000_0_OR_NEWER
 	private static readonly Dictionary<EntityId, int> textureRefCounts = new Dictionary<EntityId, int>();
 #else
-	private static readonly Dictionary<int, int> NJHEFKILICK = new Dictionary<int, int>();
+	private static readonly Dictionary<int, int> textureRefCounts = new Dictionary<int, int>();
 #endif
 
 	private static readonly List<Texture> texturesToDestroy = new List<Texture>();

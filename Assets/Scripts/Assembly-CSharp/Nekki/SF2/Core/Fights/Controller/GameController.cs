@@ -619,12 +619,12 @@ namespace Nekki.SF2.Core.Fights.Controller
 			}
 			else if (list.Count > 1)
 			{
-				FightCID eCHINOPKGGI2 = list[0];
-				FightCID eCHINOPKGGI3 = list[1];
-				switch (eCHINOPKGGI2)
+				FightCID firstDirection = list[0];
+				FightCID secondDirection = list[1];
+				switch (firstDirection)
 				{
 				case FightCID.QuadrantUp:
-					switch (eCHINOPKGGI3)
+					switch (secondDirection)
 					{
 					case FightCID.QuadrantForward:
 						direction = FightCID.QuadrantUpForward;
@@ -635,7 +635,7 @@ namespace Nekki.SF2.Core.Fights.Controller
 					}
 					break;
 				case FightCID.QuadrantForward:
-					switch (eCHINOPKGGI3)
+					switch (secondDirection)
 					{
 					case FightCID.QuadrantUp:
 						direction = FightCID.QuadrantUpForward;
@@ -646,7 +646,7 @@ namespace Nekki.SF2.Core.Fights.Controller
 					}
 					break;
 				case FightCID.QuadrantDown:
-					switch (eCHINOPKGGI3)
+					switch (secondDirection)
 					{
 					case FightCID.QuadrantForward:
 						direction = FightCID.QuadrantDownForward;
@@ -657,7 +657,7 @@ namespace Nekki.SF2.Core.Fights.Controller
 					}
 					break;
 				case FightCID.QuadrantBack:
-					switch (eCHINOPKGGI3)
+					switch (secondDirection)
 					{
 					case FightCID.QuadrantUp:
 						direction = FightCID.QuadrantUpBack;

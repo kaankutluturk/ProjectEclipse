@@ -9,7 +9,7 @@ public class FakeList<T>
 
 	private int currentIndex = -1;
 
-	// C# has no syntax for parameterized property 'DLKPBAJDHBO'.
+	// C# has no syntax for parameterized property 'Item'.
 	public T get_DLKPBAJDHBO(int index)
 	{
 		return get_Item(index);

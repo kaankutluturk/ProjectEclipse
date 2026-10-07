@@ -16,8 +16,8 @@ public partial class ModelMacroNode : ModelNode
 		}
 	}
 
-	public ModelMacroNode(string name, Vector3f OBLEMIHLFII)
-		: base(name, OBLEMIHLFII)
+	public ModelMacroNode(string name, Vector3f startPosition)
+		: base(name, startPosition)
 	{
 		SetType(NodeType.MacroNode);
 	}

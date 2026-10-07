@@ -34,14 +34,14 @@ namespace Nekki.SF2.GUI.Profile
 
 		protected Action<object> _dlg;
 
-		public void Init(string KHPKDMGDMAB, string title, string description, float AKIOCHEKNPE, float NPILBMKDDGN, int buttonId, Achievement achievementData = null)
+		public void Init(string iconName, string title, string description, float targetAmount, float currentAmount, int buttonId, Achievement achievementData = null)
 		{
 			Init(buttonId);
-			targetValue = AKIOCHEKNPE;
-			currentValue = NPILBMKDDGN;
+			targetValue = targetAmount;
+			currentValue = currentAmount;
 			achievement = achievementData;
 			_texturePath = "UI/Achievements/";
-			spriteName = KHPKDMGDMAB;
+			spriteName = iconName;
 			iconMaxOpacity = ProfileGUI.PerkOpacity.Max;
 			iconMinOpacity = ProfileGUI.PerkOpacity.Min;
 			int moneyPrize = ((achievementData != null) ? achievementData.MoneyPrize : 0);

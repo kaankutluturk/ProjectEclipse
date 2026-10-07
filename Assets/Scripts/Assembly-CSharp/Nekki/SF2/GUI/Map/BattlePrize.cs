@@ -38,7 +38,7 @@ namespace Nekki.SF2.GUI.Map
 		public void Init(long money, long rubies, RewardPrize prize, float width, float iconHeight, int fontSize)
 		{
 			float moneyScale = 1f;
-			float jPDGMJHNKPK2 = 1f;
+			float rubyScale = 1f;
 			foreach (BattlePrizeElement item in prizeElements)
 			{
 				Object.Destroy(item.gameObject);
@@ -48,18 +48,18 @@ namespace Nekki.SF2.GUI.Map
 			maxWidth = width;
 			itemIconHeight = iconHeight;
 			string rubyIcon = "MiscSprites.ruby";
-			string aDONPNOBBDE2 = ListSF.GetRoster().GetCoinIcon();
+			string coinIcon = ListSF.GetRoster().GetCoinIcon();
 			totalContentWidth = 0f;
 			if (money > 0)
 			{
 				BattlePrizeElement component = Object.Instantiate(_prizeElemPrefab).GetComponent<BattlePrizeElement>();
-				component.Init(aDONPNOBBDE2, money, fontSize, moneyScale);
+				component.Init(coinIcon, money, fontSize, moneyScale);
 				AddPrizeElement(component);
 			}
 			if (rubies > 0)
 			{
 				BattlePrizeElement component2 = Object.Instantiate(_prizeElemPrefab).GetComponent<BattlePrizeElement>();
-				component2.Init(rubyIcon, rubies, fontSize, jPDGMJHNKPK2);
+				component2.Init(rubyIcon, rubies, fontSize, rubyScale);
 				AddPrizeElement(component2);
 			}
 			foreach (RewardCurrency item2 in prize.currencyRewards)
@@ -84,10 +84,10 @@ namespace Nekki.SF2.GUI.Map
 					GameResistance resistance = GameUtils.GameResistances.GetResistanceByName(item3.Name);
 					if (resistance != null)
 					{
-						string aDONPNOBBDE3 = resistance.GetIcon();
-						long bAINMLLIKOL2 = item3.Value;
+						string resistanceIcon = resistance.GetIcon();
+						long resistanceValue = item3.Value;
 						BattlePrizeElement component4 = Object.Instantiate(_prizeElemPrefab).GetComponent<BattlePrizeElement>();
-						component4.Init(aDONPNOBBDE3, bAINMLLIKOL2, fontSize);
+						component4.Init(resistanceIcon, resistanceValue, fontSize);
 						AddPrizeElement(component4);
 					}
 				}

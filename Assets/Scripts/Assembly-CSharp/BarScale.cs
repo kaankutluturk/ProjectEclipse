@@ -45,12 +45,12 @@ public class BarScale
 		{
 			Limit limit = new Limit();
 			XmlAttribute leftLimitAttribute = childNode.Attributes["LeftLimit"];
-			XmlAttribute cJBEMNNNHDM2 = childNode.Attributes["RightLimit"];
+			XmlAttribute rightLimitAttribute = childNode.Attributes["RightLimit"];
 			XmlAttribute xmlAttribute = childNode.Attributes["Level"];
-			XmlAttribute cJBEMNNNHDM3 = childNode.Attributes["LevelMultiplier"];
-			XmlAttribute cJBEMNNNHDM4 = childNode.Attributes["Shift"];
+			XmlAttribute levelMultiplierAttribute = childNode.Attributes["LevelMultiplier"];
+			XmlAttribute shiftAttribute = childNode.Attributes["Shift"];
 			limit.LeftLimit = leftLimitAttribute.ParseInt(-1);
-			limit.RightLimit = cJBEMNNNHDM2.ParseInt(-1);
+			limit.RightLimit = rightLimitAttribute.ParseInt(-1);
 			if (xmlAttribute != null)
 			{
 				string text = xmlAttribute.GetStringOrDefault();
@@ -68,8 +68,8 @@ public class BarScale
 					}
 				}
 			}
-			limit.LevelMultiplier = cJBEMNNNHDM3.ParseFloat(-1f);
-			limit.Shift = cJBEMNNNHDM4.ParseInt(-1);
+			limit.LevelMultiplier = levelMultiplierAttribute.ParseFloat(-1f);
+			limit.Shift = shiftAttribute.ParseInt(-1);
 			limits.Add(limit);
 		}
 	}

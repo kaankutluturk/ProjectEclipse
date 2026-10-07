@@ -1595,8 +1595,8 @@ public class Roster : SavedXmlProfile
 		XmlNode xmlNode = battlesContainer.FindChildWithAttribute("Battle", "Name", text2);
 		if (xmlNode == null)
 		{
-			XmlNode mEEAKLDGLDF2 = battlesContainer.AppendElement(battleNodeName);
-			mEEAKLDGLDF2.AppendAttribute("Name").Value = text2;
+			XmlNode battleNode = battlesContainer.AppendElement(battleNodeName);
+			battleNode.AppendAttribute("Name").Value = text2;
 		}
 	}
 
@@ -1950,12 +1950,12 @@ public class Roster : SavedXmlProfile
 			if (currentQuest != null)
 			{
 				ScreenType checkpointScreenType = (ScreenType)currentQuest.GetCheckpointScreenType();
-				ScreenType iPKNDMINFMJ2 = Module.GetInstance().GetCurrentScreenType();
-				if (checkpointScreenType == ScreenType.ModuleFight && checkpointScreenType != iPKNDMINFMJ2)
+				ScreenType currentScreenType = Module.GetInstance().GetCurrentScreenType();
+				if (checkpointScreenType == ScreenType.ModuleFight && checkpointScreenType != currentScreenType)
 				{
 					Module.OpenScreen(ScreenType.ModuleDojo);
 				}
-				else if (checkpointScreenType != (ScreenType)(-1) && checkpointScreenType != iPKNDMINFMJ2)
+				else if (checkpointScreenType != (ScreenType)(-1) && checkpointScreenType != currentScreenType)
 				{
 					Module.OpenScreen(checkpointScreenType, 0);
 				}
@@ -2095,8 +2095,8 @@ public class Roster : SavedXmlProfile
 			string text = "OpenTricks";
 			string trickNodeName = "Trick";
 			XmlNode openTricksContainer = ((_node[text] == null) ? _node.AppendElement(text) : _node[text]);
-			XmlNode mEEAKLDGLDF2 = openTricksContainer.AppendElement(trickNodeName);
-			mEEAKLDGLDF2.AppendAttribute("Name").Value = name;
+			XmlNode trickNode = openTricksContainer.AppendElement(trickNodeName);
+			trickNode.AppendAttribute("Name").Value = name;
 			RequestSave();
 		}
 	}
@@ -2422,8 +2422,8 @@ public class Roster : SavedXmlProfile
 		}
 		if (!LocalizationManager.HasAllFonts(languageInfo))
 		{
-			string pOIPGLLCCKC2 = LocalizationManager.DefaultLanguageName;
-			languageInfo = LocalizationManager.FindLanguageByName(pOIPGLLCCKC2);
+			string languageName = LocalizationManager.DefaultLanguageName;
+			languageInfo = LocalizationManager.FindLanguageByName(languageName);
 		}
 		SetLanguage(languageInfo.name);
 		LocalizationManager.ChangeLanguage(languageInfo);

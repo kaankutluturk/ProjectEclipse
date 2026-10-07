@@ -126,9 +126,9 @@ public static class TypeConverterHelper
 					return methodInfo.Invoke(null, new object[1] { value });
 				}
 			}
-			catch (TargetInvocationException mPFFFAOGBJE2)
+			catch (TargetInvocationException invocationException)
 			{
-				throw mPFFFAOGBJE2.Unwrap();
+				throw invocationException.Unwrap();
 			}
 		}
 		if (targetType == typeof(TimeSpan))

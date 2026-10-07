@@ -4,7 +4,7 @@ using System.Reflection;
 [DefaultMember("Item")]
 public interface IOrderedDictionary : IDictionary, IEnumerable, ICollection
 {
-	// C# has no syntax for parameterized property 'DLKPBAJDHBO'.
+	// C# has no syntax for parameterized property 'Item'.
 	object get_DLKPBAJDHBO(int index);
 
 	void set_DLKPBAJDHBO(int index, object value);

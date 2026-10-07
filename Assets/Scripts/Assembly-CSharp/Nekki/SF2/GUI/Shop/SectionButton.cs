@@ -91,12 +91,12 @@ namespace Nekki.SF2.GUI.Shop
 			base.spriteState = spriteState;
 		}
 
-		private Sprite GetResolutionSprite(Sprite GBIOHMNNEJI)
+		private Sprite GetResolutionSprite(Sprite baseSprite)
 		{
-			if (GBIOHMNNEJI != null)
+			if (baseSprite != null)
 			{
-				Sprite sprite = ResolutionImage.GetSprite(string.Empty, GBIOHMNNEJI.name);
-				if (sprite != null && GBIOHMNNEJI != sprite)
+				Sprite sprite = ResolutionImage.GetSprite(string.Empty, baseSprite.name);
+				if (sprite != null && baseSprite != sprite)
 				{
 					return sprite;
 				}

@@ -154,8 +154,8 @@ public class KeyData
 		int j = 0;
 		for (int count2 = AdditionalKeys.Count; j < count2; j++)
 		{
-			int mJGKGLGJHHK2 = AdditionalKeys[j];
-			text += KeyToString(mJGKGLGJHHK2);
+			int keyCode = AdditionalKeys[j];
+			text += KeyToString(keyCode);
 			if (j < count2 - 1)
 			{
 				text += " + ";

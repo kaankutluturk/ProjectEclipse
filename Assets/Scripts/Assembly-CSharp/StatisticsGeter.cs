@@ -214,8 +214,8 @@ public static class StatisticsGeter
 			int num = ((!eventArgs.ContainsKey("isSurrender") || !(bool)eventArgs["isSurrender"]) ? Convert.ToInt32(fightResult.IsWinner()) : (-1));
 			json["fight_result"] = num;
 			DetailedDamages enemyDamages = fightResult.PlayerStatistics.Damages;
-			DetailedDamages mNDEOFOHLHI2 = fightResult.OpponentStatistics.Damages;
-			AddDetailedDamages(json, "player_damage", mNDEOFOHLHI2);
+			DetailedDamages playerDamages = fightResult.OpponentStatistics.Damages;
+			AddDetailedDamages(json, "player_damage", playerDamages);
 			AddDetailedDamages(json, "enemy_damage", enemyDamages);
 			ComboStatistic playerCombo = fightResult.PlayerStatistics;
 			ComboStatistic enemyCombo = fightResult.OpponentStatistics;
@@ -291,13 +291,13 @@ public static class StatisticsGeter
 			}
 			else
 			{
-				FightCounts iECDAEPLNEP2 = new FightCounts();
-				iECDAEPLNEP2.Name = text;
-				iECDAEPLNEP2.WinCount = item.GetWinCount();
-				iECDAEPLNEP2.LossCount = item.GetLossCount();
-				iECDAEPLNEP2.EclipseWinCount = item.GetEclipseWinCount();
-				iECDAEPLNEP2.EclipseLossCount = item.GetEclipseLossCount();
-				FightCounts value = iECDAEPLNEP2;
+				FightCounts fightCounts = new FightCounts();
+				fightCounts.Name = text;
+				fightCounts.WinCount = item.GetWinCount();
+				fightCounts.LossCount = item.GetLossCount();
+				fightCounts.EclipseWinCount = item.GetEclipseWinCount();
+				fightCounts.EclipseLossCount = item.GetEclipseLossCount();
+				FightCounts value = fightCounts;
 				dictionary[text] = value;
 			}
 		}
@@ -337,9 +337,9 @@ public static class StatisticsGeter
 		}
 		if (eventArgs.ContainsKey("rejectedPerk"))
 		{
-			PerkInfoItem aCONCDFDNJH2 = (PerkInfoItem)eventArgs["rejectedPerk"];
-			json["rejected"] = aCONCDFDNJH2.Name;
-			json["rejected_upgrade_level"] = aCONCDFDNJH2.UpgradeLevel;
+			PerkInfoItem rejectedPerk = (PerkInfoItem)eventArgs["rejectedPerk"];
+			json["rejected"] = rejectedPerk.Name;
+			json["rejected_upgrade_level"] = rejectedPerk.UpgradeLevel;
 		}
 	}
 

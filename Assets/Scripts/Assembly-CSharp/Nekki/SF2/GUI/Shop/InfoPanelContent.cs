@@ -425,12 +425,12 @@ namespace Nekki.SF2.GUI.Shop
 					priceColor = Constants.NegativeValueColor;
 				}
 				SetButton(buyGoldButton, (ObscuredLong)(currentItem.CoinPrice), priceColor);
-				Color oHJKNABLCMF2 = Color.black;
+				Color buyRubyColor = Color.black;
 				if (ListSF.GetRoster().GetBonus() < (ObscuredLong)(currentItem.GemPrice))
 				{
-					oHJKNABLCMF2 = Constants.NegativeValueColor;
+					buyRubyColor = Constants.NegativeValueColor;
 				}
-				SetButton(buyRubyButton, (ObscuredLong)(currentItem.GemPrice), oHJKNABLCMF2);
+				SetButton(buyRubyButton, (ObscuredLong)(currentItem.GemPrice), buyRubyColor);
 			}
 			else if (isBeingMade)
 			{
@@ -439,28 +439,28 @@ namespace Nekki.SF2.GUI.Shop
 				{
 					itemInfo = userItem.GetCurrentUpgradeItem();
 				}
-				Color oHJKNABLCMF3 = Color.black;
+				Color deliveryRubyColor = Color.black;
 				if (ListSF.GetRoster().GetBonus() < (ObscuredLong)(itemInfo.DeliveryGemPrice))
 				{
-					oHJKNABLCMF3 = Constants.NegativeValueColor;
+					deliveryRubyColor = Constants.NegativeValueColor;
 				}
-				SetButton(deliveryRubyButton, (ObscuredLong)(itemInfo.DeliveryGemPrice), oHJKNABLCMF3);
+				SetButton(deliveryRubyButton, (ObscuredLong)(itemInfo.DeliveryGemPrice), deliveryRubyColor);
 			}
 			else if (isUpgradable && ListSF.GetRoster().GetShowUpgrades())
 			{
-				ItemInfo dJKEECEOCJB2 = userItem.GetNextUpgradeItem();
-				Color oHJKNABLCMF4 = Color.black;
-				if (ListSF.GetRoster().GetMoney() < (ObscuredLong)(dJKEECEOCJB2.CoinPrice))
+				ItemInfo upgradeItemInfo = userItem.GetNextUpgradeItem();
+				Color upgradeGoldColor = Color.black;
+				if (ListSF.GetRoster().GetMoney() < (ObscuredLong)(upgradeItemInfo.CoinPrice))
 				{
-					oHJKNABLCMF4 = Constants.NegativeValueColor;
+					upgradeGoldColor = Constants.NegativeValueColor;
 				}
-				SetButton(upgradeGoldButton, (ObscuredLong)(dJKEECEOCJB2.CoinPrice), oHJKNABLCMF4);
-				Color oHJKNABLCMF5 = Color.black;
-				if (ListSF.GetRoster().GetBonus() < (ObscuredLong)(dJKEECEOCJB2.GemPrice))
+				SetButton(upgradeGoldButton, (ObscuredLong)(upgradeItemInfo.CoinPrice), upgradeGoldColor);
+				Color upgradeRubyColor = Color.black;
+				if (ListSF.GetRoster().GetBonus() < (ObscuredLong)(upgradeItemInfo.GemPrice))
 				{
-					oHJKNABLCMF5 = Constants.NegativeValueColor;
+					upgradeRubyColor = Constants.NegativeValueColor;
 				}
-				SetButton(upgradeRubyButton, (ObscuredLong)(dJKEECEOCJB2.GemPrice), oHJKNABLCMF5);
+				SetButton(upgradeRubyButton, (ObscuredLong)(upgradeItemInfo.GemPrice), upgradeRubyColor);
 			}
 		}
 

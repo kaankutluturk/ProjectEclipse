@@ -840,7 +840,7 @@ namespace Eclipse.Modding
                     try
                     {
                         ListSF.GetInstance().ApplyFightRewards(_prize);
-                        // IMDGMNFHFCN's return value indicates level-up, not grant success.
+                        // ApplyFightRewards' return value indicates level-up, not grant success.
                         if(!ReferenceEquals(_owner,_profileRoster) || _generation!=StoryEvents.ProfileGeneration)
                             throw new InvalidOperationException("Profile changed during lottery grant; the consumed claim cannot be retried.");
                         _owner.RequestSave(true);

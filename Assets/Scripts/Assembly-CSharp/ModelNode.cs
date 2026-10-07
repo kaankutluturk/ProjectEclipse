@@ -256,10 +256,10 @@ public partial class ModelNode
 	{
 	}
 
-	public ModelNode(string name, Vector3f PBOCEHNJDMI)
+	public ModelNode(string name, Vector3f initialPosition)
 	{
-		_Start.Set(PBOCEHNJDMI);
-		_End.Set(PBOCEHNJDMI);
+		_Start.Set(initialPosition);
+		_End.Set(initialPosition);
 		_Name = name;
 		_Id = 0;
 		_Weight = 0f;

@@ -24,20 +24,20 @@ namespace Nekki.SF2.GUI
 			base.spriteState = spriteState;
 		}
 
-		private void RemapSprite(Sprite GBIOHMNNEJI)
+		private void RemapSprite(Sprite sourceSprite)
 		{
-			if (!(GBIOHMNNEJI == null))
+			if (!(sourceSprite == null))
 			{
-				string texturePath = ResolutionImage.GetTexturePath(GBIOHMNNEJI);
-				string spriteName = GBIOHMNNEJI.name;
-				GBIOHMNNEJI = ResolutionImage.GetSprite(texturePath, spriteName);
+				string texturePath = ResolutionImage.GetTexturePath(sourceSprite);
+				string spriteName = sourceSprite.name;
+				sourceSprite = ResolutionImage.GetSprite(texturePath, spriteName);
 			}
 		}
 
-		public void SetDisabledSprite(Sprite GBIOHMNNEJI)
+		public void SetDisabledSprite(Sprite sourceSprite)
 		{
 			SpriteState spriteState = base.spriteState;
-			spriteState.disabledSprite = GBIOHMNNEJI;
+			spriteState.disabledSprite = sourceSprite;
 			RemapSprite(spriteState.disabledSprite);
 			base.spriteState = spriteState;
 		}
@@ -49,10 +49,10 @@ namespace Nekki.SF2.GUI
 			base.spriteState = spriteState;
 		}
 
-		public void SetHighlightedSprite(Sprite GBIOHMNNEJI)
+		public void SetHighlightedSprite(Sprite sourceSprite)
 		{
 			SpriteState spriteState = base.spriteState;
-			spriteState.highlightedSprite = GBIOHMNNEJI;
+			spriteState.highlightedSprite = sourceSprite;
 			RemapSprite(spriteState.highlightedSprite);
 			base.spriteState = spriteState;
 		}
@@ -64,10 +64,10 @@ namespace Nekki.SF2.GUI
 			base.spriteState = spriteState;
 		}
 
-		public void SetPressedSprite(Sprite GBIOHMNNEJI)
+		public void SetPressedSprite(Sprite sourceSprite)
 		{
 			SpriteState spriteState = base.spriteState;
-			spriteState.pressedSprite = GBIOHMNNEJI;
+			spriteState.pressedSprite = sourceSprite;
 			RemapSprite(spriteState.pressedSprite);
 			base.spriteState = spriteState;
 		}

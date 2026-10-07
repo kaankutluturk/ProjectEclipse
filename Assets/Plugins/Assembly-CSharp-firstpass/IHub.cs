@@ -1,10 +1,10 @@
 public interface IHub
 {
-	Connection PEBFDIFIMBO { get; set; }
+	Connection AttachedConnection { get; set; }
 
 	Connection HubConnection { get; }
 
-	void GNLCPJFBAJE(Connection value);
+	void AttachConnection(Connection value);
 
 	void Call(ClientMessage message);
 

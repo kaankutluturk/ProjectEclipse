@@ -825,7 +825,7 @@ namespace Nekki.SF2.Core.Quests
 
 		public bool AddActionQuest(List<QuestStage> quests)
 		{
-			// Filter before restoring parameters or calling MHNEBBGMOLA: both touch
+			// Filter before restoring parameters or calling QueueForRun: both touch
 			// native quest state. Never remove suppressed entries from the roster.
 			if (EclipseSuppressedQuests.Count != 0)
 				quests = quests.FindAll(quest => !IsEclipseSuppressed(quest));

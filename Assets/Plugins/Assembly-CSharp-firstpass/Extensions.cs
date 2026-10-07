@@ -143,55 +143,55 @@ public static class Extensions
 		return stringBuilder.ToString();
 	}
 
-	internal static string Read(this string text, ref int LCCLEFMKLPB, char delimiter, bool returnText = true)
+	internal static string Read(this string text, ref int cursor, char delimiter, bool returnText = true)
 	{
-		return text.Read(ref LCCLEFMKLPB, (char KDFCGMMKAME) => KDFCGMMKAME != delimiter, returnText);
+		return text.Read(ref cursor, (char ch) => ch != delimiter, returnText);
 	}
 
-	internal static string Read(this string text, ref int LCCLEFMKLPB, Func<char, bool> predicate, bool returnText = true)
+	internal static string Read(this string text, ref int cursor, Func<char, bool> predicate, bool returnText = true)
 	{
-		if (LCCLEFMKLPB >= text.Length)
+		if (cursor >= text.Length)
 		{
 			return string.Empty;
 		}
-		text.SkipWhiteSpace(ref LCCLEFMKLPB);
-		int num = LCCLEFMKLPB;
-		while (LCCLEFMKLPB < text.Length && predicate(text[LCCLEFMKLPB]))
+		text.SkipWhiteSpace(ref cursor);
+		int num = cursor;
+		while (cursor < text.Length && predicate(text[cursor]))
 		{
-			LCCLEFMKLPB++;
+			cursor++;
 		}
-		string result = ((!returnText) ? null : text.Substring(num, LCCLEFMKLPB - num));
-		LCCLEFMKLPB++;
+		string result = ((!returnText) ? null : text.Substring(num, cursor - num));
+		cursor++;
 		return result;
 	}
 
-	internal static string ReadQuotedText(this string text, ref int LCCLEFMKLPB)
+	internal static string ReadQuotedText(this string text, ref int cursor)
 	{
 		string empty = string.Empty;
 		if (text == null)
 		{
 			return empty;
 		}
-		if (text[LCCLEFMKLPB] == '"')
+		if (text[cursor] == '"')
 		{
-			text.Read(ref LCCLEFMKLPB, '"', false);
-			empty = text.Read(ref LCCLEFMKLPB, '"');
-			text.Read(ref LCCLEFMKLPB, ',', false);
+			text.Read(ref cursor, '"', false);
+			empty = text.Read(ref cursor, '"');
+			text.Read(ref cursor, ',', false);
 		}
 		else
 		{
-			empty = text.Read(ref LCCLEFMKLPB, ',');
+			empty = text.Read(ref cursor, ',');
 		}
 		return empty;
 	}
 
-	internal static void SkipWhiteSpace(this string text, ref int LCCLEFMKLPB)
+	internal static void SkipWhiteSpace(this string text, ref int cursor)
 	{
-		if (LCCLEFMKLPB < text.Length)
+		if (cursor < text.Length)
 		{
-			while (LCCLEFMKLPB < text.Length && char.IsWhiteSpace(text[LCCLEFMKLPB]))
+			while (cursor < text.Length && char.IsWhiteSpace(text[cursor]))
 			{
-				LCCLEFMKLPB++;
+				cursor++;
 			}
 		}
 	}
@@ -221,14 +221,14 @@ public static class Extensions
 		{
 			return list;
 		}
-		int LCCLEFMKLPB = 0;
-		while (LCCLEFMKLPB < text.Length)
+		int cursor = 0;
+		while (cursor < text.Length)
 		{
-			string key = text.Read(ref LCCLEFMKLPB, (char KDFCGMMKAME) => KDFCGMMKAME != '=' && KDFCGMMKAME != ',').TrimAndLower();
+			string key = text.Read(ref cursor, (char ch) => ch != '=' && ch != ',').TrimAndLower();
 			KeyValuePair pair = new KeyValuePair(key);
-			if (text[LCCLEFMKLPB - 1] == '=')
+			if (text[cursor - 1] == '=')
 			{
-				pair.set_Value(text.ReadQuotedText(ref LCCLEFMKLPB));
+				pair.set_Value(text.ReadQuotedText(ref cursor));
 			}
 			list.Add(pair);
 		}
@@ -242,15 +242,15 @@ public static class Extensions
 		{
 			return list;
 		}
-		int LCCLEFMKLPB = 0;
-		while (LCCLEFMKLPB < text.Length)
+		int cursor = 0;
+		while (cursor < text.Length)
 		{
-			string key = text.Read(ref LCCLEFMKLPB, (char KDFCGMMKAME) => KDFCGMMKAME != ',' && KDFCGMMKAME != ';').TrimAndLower();
+			string key = text.Read(ref cursor, (char ch) => ch != ',' && ch != ';').TrimAndLower();
 			KeyValuePair pair = new KeyValuePair(key);
-			if (text[LCCLEFMKLPB - 1] == ';')
+			if (text[cursor - 1] == ';')
 			{
-				text.Read(ref LCCLEFMKLPB, '=', false);
-				pair.set_Value(text.Read(ref LCCLEFMKLPB, ','));
+				text.Read(ref cursor, '=', false);
+				pair.set_Value(text.Read(ref cursor, ','));
 			}
 			list.Add(pair);
 		}

@@ -4,13 +4,13 @@ public sealed class LambdaObjectFactory : IObjectFactory
 {
 	private readonly Func<Type, object> factory;
 
-	public LambdaObjectFactory(Func<Type, object> DJFCIPIMOBC)
+	public LambdaObjectFactory(Func<Type, object> createObject)
 	{
-		if (DJFCIPIMOBC == null)
+		if (createObject == null)
 		{
 			throw new ArgumentNullException("factory");
 		}
-		factory = DJFCIPIMOBC;
+		factory = createObject;
 	}
 
 	public object Create(Type type)

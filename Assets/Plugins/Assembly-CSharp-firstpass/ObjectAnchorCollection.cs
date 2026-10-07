@@ -10,7 +10,7 @@ internal sealed class ObjectAnchorCollection
 
 	private readonly IDictionary<object, string> anchorsByObject = new Dictionary<object, string>();
 
-	// C# has no syntax for parameterized property 'DLKPBAJDHBO'.
+	// C# has no syntax for parameterized property 'Item'.
 	public object get_DLKPBAJDHBO(string anchor)
 	{
 		return get_Item(anchor);

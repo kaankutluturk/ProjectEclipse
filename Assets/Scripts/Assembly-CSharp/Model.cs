@@ -2365,9 +2365,9 @@ public class Model : global::EventDispatcher<object>
 		return _ModelObject.GetCenterOfMassPosition();
 	}
 
-	public void SetModelPosition(Vector3f MGMMDGFPBLP)
+	public void SetModelPosition(Vector3f modelPosition)
 	{
-		_ModelObject.SetModelPosition(MGMMDGFPBLP);
+		_ModelObject.SetModelPosition(modelPosition);
 		_Physics.IterativeProcess();
 		_ModelObject.UpdateCenterOfMass();
 		_ModelObject.UpdateMacroNodes();
@@ -2810,8 +2810,8 @@ public class Model : global::EventDispatcher<object>
 				else
 				{
 					float fullFraction = 1f;
-					EventActBtnSettings eHCLMBADLKH2 = new EventActBtnSettings(FightCID.MagicButton, fullFraction);
-					CallEvent(12, eHCLMBADLKH2);
+					EventActBtnSettings magicButtonEvent = new EventActBtnSettings(FightCID.MagicButton, fullFraction);
+					CallEvent(12, magicButtonEvent);
 				}
 			}
 		}
@@ -2976,11 +2976,11 @@ public class Model : global::EventDispatcher<object>
 		Model opponent = GetCombatTarget();
 		if (opponent != null)
 		{
-			Model fGCODGKLHED2 = opponent.GetRootModel();
-			fGCODGKLHED2.modelStats.CommitPendingStatistics(true, animation);
+			Model opponentRootModel = opponent.GetRootModel();
+			opponentRootModel.modelStats.CommitPendingStatistics(true, animation);
 		}
-		Model fGCODGKLHED3 = GetRootModel();
-		fGCODGKLHED3.modelStats.CommitPendingStatistics(false, animation);
+		Model selfRootModel = GetRootModel();
+		selfRootModel.modelStats.CommitPendingStatistics(false, animation);
 	}
 
 	public void OnControllerKeyPressed(object data)
@@ -3053,11 +3053,11 @@ public class Model : global::EventDispatcher<object>
 			Model opponent = GetCombatTarget();
 			if (opponent != null)
 			{
-				Model fGCODGKLHED2 = opponent.GetRootModel();
-				fGCODGKLHED2.modelStats.RecordUse(true, currentInfo);
+				Model opponentRootModel = opponent.GetRootModel();
+				opponentRootModel.modelStats.RecordUse(true, currentInfo);
 			}
-			Model fGCODGKLHED3 = GetRootModel();
-			fGCODGKLHED3.modelStats.RecordUse(false, currentInfo);
+			Model selfRootModel = GetRootModel();
+			selfRootModel.modelStats.RecordUse(false, currentInfo);
 		}
 	}
 
@@ -3231,11 +3231,11 @@ public class Model : global::EventDispatcher<object>
 			InfoAnimation.AlignObjectType positionObjectType = item.MoveData.AlignData.PositionObjectType;
 			if (positionObjectType == InfoAnimation.AlignObjectType.ObjectNodes)
 			{
-				ModelObject oIEODIEHJMH2 = GetModelObjectByType(item.MoveData.AlignData.PositionModelType);
-				if (oIEODIEHJMH2 != null)
+				ModelObject targetObject = GetModelObjectByType(item.MoveData.AlignData.PositionModelType);
+				if (targetObject != null)
 				{
-					item.MoveData.AlignData.PositionNodeId = oIEODIEHJMH2.GetNodeIDByName(item.MoveData.AlignData.PositionPart);
-					item.MoveData.AlignData.PositionPairNodeId = oIEODIEHJMH2.GetNodeIDByPairName(item.MoveData.AlignData.PositionNodeId);
+					item.MoveData.AlignData.PositionNodeId = targetObject.GetNodeIDByName(item.MoveData.AlignData.PositionPart);
+					item.MoveData.AlignData.PositionPairNodeId = targetObject.GetNodeIDByPairName(item.MoveData.AlignData.PositionNodeId);
 				}
 				else
 				{
@@ -3325,10 +3325,10 @@ public class Model : global::EventDispatcher<object>
 		string defenseAttribute = GetDefenseAttribute(attackInterval, blocked, victimEdge);
 		float num = GameUtils.GetDamageFactorBase();
 		string attributeName = GameUtils.GetDamageFactorAttribute();
-		int OEMALIFPGPO2 = 0;
-		attacker.Parameters.FinalAttributes.Get(attributeName, ref OEMALIFPGPO2);
-		OEMALIFPGPO2 = Mathf.Min(OEMALIFPGPO2, (int)GameUtils.GetDamageFactorMaxValue());
-		float num2 = Mathf.Pow(2f, num * (float)OEMALIFPGPO2);
+		int attributeLevel = 0;
+		attacker.Parameters.FinalAttributes.Get(attributeName, ref attributeLevel);
+		attributeLevel = Mathf.Min(attributeLevel, (int)GameUtils.GetDamageFactorMaxValue());
+		float num2 = Mathf.Pow(2f, num * (float)attributeLevel);
 		float num3 = GetBlock(blocked);
 		float num4 = attacker.GetCritical(isCritical);
 		float num5 = 0f;
@@ -3479,10 +3479,10 @@ public class Model : global::EventDispatcher<object>
 		Model opponent = GetCombatTarget();
 		if (opponent != null)
 		{
-			Model fGCODGKLHED2 = opponent.GetRootModel();
-			if (fGCODGKLHED2.IsAiControlled())
+			Model opponentRoot = opponent.GetRootModel();
+			if (opponentRoot.IsAiControlled())
 			{
-				fGCODGKLHED2.ai.StartRangedEnemy();
+				opponentRoot.ai.StartRangedEnemy();
 			}
 		}
 	}
@@ -3626,17 +3626,17 @@ public class Model : global::EventDispatcher<object>
 		{
 		case BulletType.MAGIC_BULLET:
 		{
-			int fOIPKLDNGDL2 = action.GetValue();
+			int chargeDelta = action.GetValue();
 			int bulletsBefore = magicCharges;
 			InfoAnimation currentMagicAnimation = GetCurrentAnimation();
-			AddMagicCharges(fOIPKLDNGDL2);
+			AddMagicCharges(chargeDelta);
 			Debug.Log("[MagicTrace] cast actor=" + get_Name() +
 				" player=" + Parameters.IsPlayer +
 				" animation=" + ((currentMagicAnimation != null) ? currentMagicAnimation.Name : "<none>") +
 				" animationFile=" + ((currentMagicAnimation != null) ? currentMagicAnimation.FileName : "<none>") +
 				" items=" + GetMagicTraceItems() +
 				" charge=" + bulletsBefore + "->" + magicCharges +
-				" delta=" + fOIPKLDNGDL2);
+				" delta=" + chargeDelta);
 			UpdateMagicButton();
 			break;
 		}
@@ -4199,24 +4199,24 @@ public class Model : global::EventDispatcher<object>
 		{
 			buttonCooldowns.PunchActive = false;
 			buttonCooldowns.PunchProgress = 0f;
-			EventActBtnSettings eHCLMBADLKH4 = new EventActBtnSettings(FightCID.Punch, 0f, frames);
-			CallEvent(12, eHCLMBADLKH4);
+			EventActBtnSettings punchButtonEvent = new EventActBtnSettings(FightCID.Punch, 0f, frames);
+			CallEvent(12, punchButtonEvent);
 			break;
 		}
 		case FightCID.Kick:
 		{
 			buttonCooldowns.KickActive = false;
 			buttonCooldowns.KickProgress = 0f;
-			EventActBtnSettings eHCLMBADLKH3 = new EventActBtnSettings(FightCID.Kick, 0f, frames);
-			CallEvent(12, eHCLMBADLKH3);
+			EventActBtnSettings kickButtonEvent = new EventActBtnSettings(FightCID.Kick, 0f, frames);
+			CallEvent(12, kickButtonEvent);
 			break;
 		}
 		case FightCID.MissileButton:
 		{
 			buttonCooldowns.MissileActive = false;
 			buttonCooldowns.MissileProgress = 0f;
-			EventActBtnSettings eHCLMBADLKH2 = new EventActBtnSettings(FightCID.MissileButton, 0f, frames);
-			CallEvent(12, eHCLMBADLKH2);
+			EventActBtnSettings missileButtonEvent = new EventActBtnSettings(FightCID.MissileButton, 0f, frames);
+			CallEvent(12, missileButtonEvent);
 			break;
 		}
 		case FightCID.RaidChargeButton:
@@ -4314,8 +4314,8 @@ public class Model : global::EventDispatcher<object>
 					EventActBtnSettings buttonSettings = new EventActBtnSettings(FightCID.RaidChargeButton, 0f, 0);
 					CallEvent(12, buttonSettings);
 				}
-				EventActBtnSettings eHCLMBADLKH2 = new EventActBtnSettings(FightCID.RaidChargeButton, -1f, -1, GetRaidBullets());
-				CallEvent(18, eHCLMBADLKH2);
+				EventActBtnSettings raidChargeButtonEvent = new EventActBtnSettings(FightCID.RaidChargeButton, -1f, -1, GetRaidBullets());
+				CallEvent(18, raidChargeButtonEvent);
 			}
 		}
 		else
@@ -4350,7 +4350,7 @@ public class Model : global::EventDispatcher<object>
 		List<PerkInfoItem> ownPerks = Parameters.GetAllPerks();
 		// Equipped items and action-created items live in separate collections.
 		// Newer move actions test the equipped Magic/Weapon subtype directly, so
-		// using only OJIAKDDCGLB left shop previews with an empty condition context
+		// using only Parameters.ConditionItems left shop previews with an empty condition context
 		// and made shared templates choose unrelated fallback effects.
 		List<ItemInfo> items = GetModelConditionItems();
 		_ModelConditions.Items = items;
@@ -4492,8 +4492,8 @@ public class Model : global::EventDispatcher<object>
 		Model opponent = GetCombatTarget();
 		if (opponent != null)
 		{
-			Model fGCODGKLHED2 = opponent.GetRootModel();
-			fGCODGKLHED2.ai.SetWeaponEnemy(shockWeapon.EffectiveTacticSubtype);
+			Model opponentRoot = opponent.GetRootModel();
+			opponentRoot.ai.SetWeaponEnemy(shockWeapon.EffectiveTacticSubtype);
 		}
 		ai.SetWeaponBot(shockWeapon.EffectiveTacticSubtype);
 		DisarmData disarmData = new DisarmData(this, originalWeapon.InnatePerks);
@@ -4722,10 +4722,10 @@ public class Model : global::EventDispatcher<object>
 	private void RecordStrikeStatistics(Model opponent, InfoAnimation animation, float damage, StrikeResult strikeResult)
 	{
 		Model rootModel = GetRootModel();
-		Model fGCODGKLHED2 = opponent.GetRootModel();
+		Model opponentRoot = opponent.GetRootModel();
 		rootModel.modelStats.RecordDamage(true, animation, damage);
-		fGCODGKLHED2.modelStats.RecordDamage(false, animation, damage);
-		fGCODGKLHED2.modelStats.AddRaidHitInfo(LastStrike.IsBlocked, LastStrike.IsCritical);
+		opponentRoot.modelStats.RecordDamage(false, animation, damage);
+		opponentRoot.modelStats.AddRaidHitInfo(LastStrike.IsBlocked, LastStrike.IsCritical);
 	}
 
 	private bool ShouldCauseShock(StrikeResult strikeResult, Model attacker)
@@ -4744,9 +4744,9 @@ public class Model : global::EventDispatcher<object>
 		float num2 = criticalChanceBase * (float)attributeValue;
 		float headHitChanceBase = GameUtils.ShockSettings.HeadHitChanceBase;
 		string headHitChanceAttribute = GameUtils.ShockSettings.HeadHitChanceAttribute;
-		int OEMALIFPGPO2 = 0;
-		attackerParameters.FinalAttributes.Get(headHitChanceAttribute, ref OEMALIFPGPO2);
-		float num3 = headHitChanceBase * (float)OEMALIFPGPO2;
+		int headHitAttributeValue = 0;
+		attackerParameters.FinalAttributes.Get(headHitChanceAttribute, ref headHitAttributeValue);
+		float num3 = headHitChanceBase * (float)headHitAttributeValue;
 		bool flag2 = false;
 		bool flag3 = false;
 		if (LastStrike.IsCritical)
@@ -4783,8 +4783,8 @@ public class Model : global::EventDispatcher<object>
 			{
 				buttonCooldowns.KickProgress = buttonCooldowns.KickMax;
 			}
-			EventActBtnSettings eHCLMBADLKH2 = new EventActBtnSettings(FightCID.Kick, buttonCooldowns.KickProgress, 1);
-			CallEvent(12, eHCLMBADLKH2);
+			EventActBtnSettings kickButtonEvent = new EventActBtnSettings(FightCID.Kick, buttonCooldowns.KickProgress, 1);
+			CallEvent(12, kickButtonEvent);
 		}
 		if (buttonCooldowns.MissileActive && buttonCooldowns.MissileProgress != buttonCooldowns.MissileMax)
 		{
@@ -4793,8 +4793,8 @@ public class Model : global::EventDispatcher<object>
 			{
 				buttonCooldowns.MissileProgress = buttonCooldowns.MissileMax;
 			}
-			EventActBtnSettings eHCLMBADLKH3 = new EventActBtnSettings(FightCID.MissileButton, buttonCooldowns.MissileProgress, 1);
-			CallEvent(12, eHCLMBADLKH3);
+			EventActBtnSettings missileButtonEvent = new EventActBtnSettings(FightCID.MissileButton, buttonCooldowns.MissileProgress, 1);
+			CallEvent(12, missileButtonEvent);
 		}
 		if (buttonCooldowns.RaidChargeActive && buttonCooldowns.RaidChargeProgress != buttonCooldowns.RaidChargeMax)
 		{
@@ -4803,8 +4803,8 @@ public class Model : global::EventDispatcher<object>
 			{
 				buttonCooldowns.RaidChargeProgress = buttonCooldowns.RaidChargeMax;
 			}
-			EventActBtnSettings eHCLMBADLKH4 = new EventActBtnSettings(FightCID.RaidChargeButton, buttonCooldowns.RaidChargeProgress, 1);
-			CallEvent(12, eHCLMBADLKH4);
+			EventActBtnSettings raidChargeButtonEvent = new EventActBtnSettings(FightCID.RaidChargeButton, buttonCooldowns.RaidChargeProgress, 1);
+			CallEvent(12, raidChargeButtonEvent);
 		}
 	}
 }

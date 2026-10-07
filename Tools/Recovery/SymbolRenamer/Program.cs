@@ -30,7 +30,7 @@ using Microsoft.CodeAnalysis.Text;
 
 static class Program
 {
-    public static readonly Regex Obfuscated = new("^_?[A-Pa-p][A-P]{10}$", RegexOptions.Compiled);
+    public static readonly Regex Obfuscated = new("^_?[A-Pa-p][A-P]{10}[0-9]*$", RegexOptions.Compiled);
 
     static int Main(string[] args)
     {
@@ -466,7 +466,14 @@ sealed class Groups
                             continue;
                         }
                         var impl = type.FindImplementationForInterfaceMember(member);
-                        if (impl == null || impl.Name != member.Name)
+                        var explicitImpl = impl switch
+                        {
+                            IMethodSymbol m => m.ExplicitInterfaceImplementations.Any(e => SymbolEqualityComparer.Default.Equals(e.OriginalDefinition, member.OriginalDefinition)),
+                            IPropertySymbol p => p.ExplicitInterfaceImplementations.Any(e => SymbolEqualityComparer.Default.Equals(e.OriginalDefinition, member.OriginalDefinition)),
+                            IEventSymbol e2 => e2.ExplicitInterfaceImplementations.Any(e => SymbolEqualityComparer.Default.Equals(e.OriginalDefinition, member.OriginalDefinition)),
+                            _ => false,
+                        };
+                        if (impl == null || (impl.Name != member.Name && !explicitImpl))
                         {
                             continue;
                         }

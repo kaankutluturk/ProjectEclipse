@@ -58,9 +58,9 @@ public class RewardStruct
 		Reward modeReward = ((!ListSF.GetRoster().IsEclipseMode()) ? NormalModeReward : EclipseModeReward);
 		if (modeReward != null)
 		{
-			RewardPrize cMHHEHILIIH2 = modeReward.GetPrizeForLevel(level);
-			cMHHEHILIIH2.IsCloned = true;
-			prize.Merge(cMHHEHILIIH2);
+			RewardPrize levelPrize = modeReward.GetPrizeForLevel(level);
+			levelPrize.IsCloned = true;
+			prize.Merge(levelPrize);
 		}
 		return prize;
 	}

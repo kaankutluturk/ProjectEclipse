@@ -375,21 +375,21 @@ public class FunctionExtension : global::EventDispatcher<object>
 		string text = stringBuilder.ToString();
 		if (!text.Equals(string.Empty))
 		{
-			FunctionObject pENDFCHBHIB2 = new FunctionObject();
-			Dictionary<string, RpnParser.VariableDelegate> pPEABEJMCPI2 = new Dictionary<string, RpnParser.VariableDelegate>();
-			Dictionary<string, RpnParser.ParameterDelegate> gIOGAJGIGMO2 = new Dictionary<string, RpnParser.ParameterDelegate>();
-			RpnParser.init(pPEABEJMCPI2, gIOGAJGIGMO2);
-			RpnParser.Formula lANLKOHCGEJ2 = new RpnParser.Formula(text);
-			if (lANLKOHCGEJ2.GetVariableCount() == 0)
+			FunctionObject functionObject = new FunctionObject();
+			Dictionary<string, RpnParser.VariableDelegate> variableDelegates = new Dictionary<string, RpnParser.VariableDelegate>();
+			Dictionary<string, RpnParser.ParameterDelegate> parameterDelegates = new Dictionary<string, RpnParser.ParameterDelegate>();
+			RpnParser.init(variableDelegates, parameterDelegates);
+			RpnParser.Formula formula = new RpnParser.Formula(text);
+			if (formula.GetVariableCount() == 0)
 			{
-				pENDFCHBHIB2.body = lANLKOHCGEJ2.Calculate().ToString();
+				functionObject.body = formula.Calculate().ToString();
 			}
 			else
 			{
-				pENDFCHBHIB2.body = stringBuilder.ToString();
+				functionObject.body = stringBuilder.ToString();
 			}
-			pENDFCHBHIB2.type = ObjectType.TYPE_VALUE;
-			functionCall.argumentValues.Add(pENDFCHBHIB2);
+			functionObject.type = ObjectType.TYPE_VALUE;
+			functionCall.argumentValues.Add(functionObject);
 		}
 	}
 
@@ -646,9 +646,9 @@ public class FunctionExtension : global::EventDispatcher<object>
 		if (list.Count > 2)
 		{
 			VariableType leftType = GetVariableType(list[0]);
-			VariableType aFILEBFICDF2 = GetVariableType(list[1]);
+			VariableType rightType = GetVariableType(list[1]);
 			CompareType compareType = ParseCompareType(list[2]);
-			if (leftType == aFILEBFICDF2)
+			if (leftType == rightType)
 			{
 				switch (leftType)
 				{
@@ -658,14 +658,14 @@ public class FunctionExtension : global::EventDispatcher<object>
 					Dictionary<string, RpnParser.ParameterDelegate> parameterDelegates = new Dictionary<string, RpnParser.ParameterDelegate>();
 					RpnParser.init(variableDelegates, parameterDelegates);
 					RpnParser.Formula formula = new RpnParser.Formula(list[0]);
-					RpnParser.Formula lANLKOHCGEJ2 = new RpnParser.Formula(list[1]);
+					RpnParser.Formula rightFormula = new RpnParser.Formula(list[1]);
 					float result;
 					if (!float.TryParse(formula.Calculate().ToString(), out result))
 					{
 						result = 0f;
 					}
 					float result2;
-					if (!float.TryParse(lANLKOHCGEJ2.Calculate().ToString(), out result2))
+					if (!float.TryParse(rightFormula.Calculate().ToString(), out result2))
 					{
 						result2 = 0f;
 					}

@@ -287,12 +287,12 @@ public class VersionContainer
 	private static CompareResult Compare(VersionContainer leftVersion, VersionContainer rightVersion, int componentCount = 4)
 	{
 		int[] leftParts = leftVersion._versionSource;
-		int[] mOCMENBOJJF2 = rightVersion._versionSource;
+		int[] rightParts = rightVersion._versionSource;
 		for (int i = 0; i < componentCount; i++)
 		{
-			if (leftParts[i] != mOCMENBOJJF2[i])
+			if (leftParts[i] != rightParts[i])
 			{
-				return (leftParts[i] > mOCMENBOJJF2[i]) ? CompareResult.More : CompareResult.Less;
+				return (leftParts[i] > rightParts[i]) ? CompareResult.More : CompareResult.Less;
 			}
 		}
 		return CompareResult.Equally;

@@ -264,27 +264,27 @@ public class ModelLoader
 		ModelNode startNode = modelObject.GetNodeByNameOrParent(node.Attributes["End1"].Value);
 		ModelNode endNode = modelObject.GetNodeByNameOrParent(node.Attributes["End2"].Value);
 		float edgeLength = node.Attributes["Length"].ParseFloat();
-		float bAINMLLIKOL2 = node.Attributes["Radius"].ParseFloat();
-		float bAINMLLIKOL3 = node.Attributes["Margin1"].ParseFloat();
-		float bAINMLLIKOL4 = node.Attributes["Margin2"].ParseFloat();
+		float collisionRadius = node.Attributes["Radius"].ParseFloat();
+		float startMargin = node.Attributes["Margin1"].ParseFloat();
+		float endMargin = node.Attributes["Margin2"].ParseFloat();
 		string text = node.Attributes["Type"].GetStringOrDefault(string.Empty);
 		string text2 = node.Attributes["SubType"].GetStringOrDefault(string.Empty);
-		string bAINMLLIKOL5 = node.Attributes["BodyPart"].GetStringOrDefault(string.Empty);
-		string bAINMLLIKOL6 = node.Attributes["Defense"].GetStringOrDefault(string.Empty);
+		string bodyPart = node.Attributes["BodyPart"].GetStringOrDefault(string.Empty);
+		string defense = node.Attributes["Defense"].GetStringOrDefault(string.Empty);
 		int num = node.Attributes["Collisible"].ParseInt();
-		bool bAINMLLIKOL7 = node.Attributes["Blood"].ParseBool();
-		bool bAINMLLIKOL8 = node.Attributes["Shock"].ParseBool();
+		bool hasBlood = node.Attributes["Blood"].ParseBool();
+		bool isShock = node.Attributes["Shock"].ParseBool();
 		edge = new ModelEdge(startNode, endNode);
 		edge.set_Length(edgeLength);
 		edge.set_Name(edgeName);
 		edge.set_Collisible(num);
-		edge.SetBodyPart(bAINMLLIKOL5);
-		edge.SetDefense(bAINMLLIKOL6);
-		edge.SetHasBlood(bAINMLLIKOL7);
-		edge.set_IsShock(bAINMLLIKOL8);
-		edge.SetCollisionRadius(bAINMLLIKOL2);
-		edge.SetStartMargin(bAINMLLIKOL3);
-		edge.SetEndMargin(bAINMLLIKOL4);
+		edge.SetBodyPart(bodyPart);
+		edge.SetDefense(defense);
+		edge.SetHasBlood(hasBlood);
+		edge.set_IsShock(isShock);
+		edge.SetCollisionRadius(collisionRadius);
+		edge.SetStartMargin(startMargin);
+		edge.SetEndMargin(endMargin);
 		if (text == "Edge")
 		{
 			edge.SetType(EdgeType.Edge);
@@ -342,16 +342,16 @@ public class ModelLoader
 			return;
 		}
 		value = node.Attributes["Node2"].Value;
-		ModelNode lCDGOCIAIDK2 = modelObject.GetNodeByName(value);
-		if (lCDGOCIAIDK2 != null)
+		ModelNode secondNode = modelObject.GetNodeByName(value);
+		if (secondNode != null)
 		{
 			value = node.Attributes["Node3"].Value;
-			ModelNode lCDGOCIAIDK3 = modelObject.GetNodeByName(value);
-			if (lCDGOCIAIDK3 != null)
+			ModelNode thirdNode = modelObject.GetNodeByName(value);
+			if (thirdNode != null)
 			{
-				Triangle item = new Triangle(firstNode, lCDGOCIAIDK2, lCDGOCIAIDK3, node.Name);
+				Triangle item = new Triangle(firstNode, secondNode, thirdNode, node.Name);
 				modelObject.GetTriangles().Add(item);
-				modelObject.GetModel()._MeshRender.get_Base().AddTriangle(firstNode, lCDGOCIAIDK2, lCDGOCIAIDK3, node.Name);
+				modelObject.GetModel()._MeshRender.get_Base().AddTriangle(firstNode, secondNode, thirdNode, node.Name);
 			}
 		}
 	}
@@ -398,9 +398,9 @@ public class ModelLoader
 		foreach (global::Pair<int, int> item in list2)
 		{
 			ModelNode firstNode = list[item.First];
-			ModelNode lCDGOCIAIDK2 = list[item.Second];
-			firstNode.SetPairNode(lCDGOCIAIDK2);
-			lCDGOCIAIDK2.SetPairNode(firstNode);
+			ModelNode pairNode = list[item.Second];
+			firstNode.SetPairNode(pairNode);
+			pairNode.SetPairNode(firstNode);
 		}
 	}
 }

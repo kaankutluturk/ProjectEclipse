@@ -1230,8 +1230,8 @@ public class InfoAnimation
 				{
 					if (item2.Type == ConditionAnimation.ConditionType.ITEM && !item2.IsNot)
 					{
-						ConditionItemInfo kOOGCJOEANH2 = item2 as ConditionItemInfo;
-						if (itemType == kOOGCJOEANH2.get_Type() && itemSubType == kOOGCJOEANH2.GetSubType())
+						ConditionItemInfo requiredItem = item2 as ConditionItemInfo;
+						if (itemType == requiredItem.get_Type() && itemSubType == requiredItem.GetSubType())
 						{
 							return true;
 						}
@@ -1299,10 +1299,10 @@ public class InfoAnimation
 			}
 			else
 			{
-				ConditionKeys bHDEBDIHDFM2 = AsKeysCondition(item);
-				if (bHDEBDIHDFM2 != null)
+				ConditionKeys keysCondition = AsKeysCondition(item);
+				if (keysCondition != null)
 				{
-					return bHDEBDIHDFM2;
+					return keysCondition;
 				}
 			}
 		}

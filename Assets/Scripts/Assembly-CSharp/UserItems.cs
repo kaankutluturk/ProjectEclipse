@@ -205,11 +205,11 @@ public class UserItems
 		ListSF.GetRoster().get_Parameters().SetItemByType(defaultUserItem.GetInfo().Type, defaultUserItem.GetInfo());
 		if (applyEquip)
 		{
-			UserItem dKCHDHMLKHN2 = FindItem(item);
-			if (dKCHDHMLKHN2 != null)
+			UserItem existingItem = FindItem(item);
+			if (existingItem != null)
 			{
 				var activeSets = IsPlayerItems() ? Eclipse.UI.SetBonusNotice.ActiveCombos() : null;
-				dKCHDHMLKHN2.SetIsEquipped(false);
+				existingItem.SetIsEquipped(false);
 				defaultUserItem.SetIsEquipped(true);
 				ListSF.GetRoster().EquipItem(defaultUserItem);
 				ListSF.GetRoster().RequestSave();

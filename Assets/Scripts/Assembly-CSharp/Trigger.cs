@@ -313,10 +313,10 @@ public class Trigger
 			}
 			else
 			{
-				ConditionKeys bHDEBDIHDFM2 = InfoAnimation.AsKeysCondition(item);
-				if (bHDEBDIHDFM2 != null)
+				ConditionKeys keysCondition = InfoAnimation.AsKeysCondition(item);
+				if (keysCondition != null)
 				{
-					return bHDEBDIHDFM2;
+					return keysCondition;
 				}
 			}
 		}

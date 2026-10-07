@@ -150,7 +150,7 @@ public static class ResourceManager
 
 		private static void NormalizeFunctionSyntax(XmlDocument document)
 		{
-			// FunctionExtension.JCJHEBOMKIC parses the legacy expression form
+			// FunctionExtension.ParseFunction parses the legacy expression form
 			// ?Function[arguments].Property and directly searches for '[' and ']'.
 			// The recovered 2.41.x XML already uses that exact syntax.  Do not
 			// rewrite the brackets: doing so makes every perk function reach

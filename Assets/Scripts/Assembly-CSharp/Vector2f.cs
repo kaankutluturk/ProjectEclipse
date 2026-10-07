@@ -410,9 +410,9 @@ public class Vector2f
 		{
 			return false;
 		}
-		EquationLine kEDCEHBPOIM2 = ((cachedLineA == null) ? BuildEquationLine(segmentAStart, segmentAEnd) : cachedLineA);
-		float num4 = kEDCEHBPOIM2.A * segmentBStart.GetX() + kEDCEHBPOIM2.CoefficientB * segmentBStart.GetY() + kEDCEHBPOIM2.ConstantC;
-		float num5 = kEDCEHBPOIM2.A * segmentBEnd.GetX() + kEDCEHBPOIM2.CoefficientB * segmentBEnd.GetY() + kEDCEHBPOIM2.ConstantC;
+		EquationLine segmentBLine = ((cachedLineA == null) ? BuildEquationLine(segmentAStart, segmentAEnd) : cachedLineA);
+		float num4 = segmentBLine.A * segmentBStart.GetX() + segmentBLine.CoefficientB * segmentBStart.GetY() + segmentBLine.ConstantC;
+		float num5 = segmentBLine.A * segmentBEnd.GetX() + segmentBLine.CoefficientB * segmentBEnd.GetY() + segmentBLine.ConstantC;
 		if (0f <= num4 * num5 && num < Mathf.Abs(num4) && num < Mathf.Abs(num5))
 		{
 			return false;
@@ -436,13 +436,13 @@ public class Vector2f
 			intersection.Set(segmentAEnd);
 			return true;
 		}
-		if (IsDistanceStrike(num4, num, kEDCEHBPOIM2, segmentBStart, basePoint, segmentAStart, segmentAEnd))
+		if (IsDistanceStrike(num4, num, segmentBLine, segmentBStart, basePoint, segmentAStart, segmentAEnd))
 		{
 			intersection.Set(segmentBStart);
 			basePoint.Set(segmentBStart);
 			return true;
 		}
-		if (IsDistanceStrike(num5, num, kEDCEHBPOIM2, segmentBEnd, basePoint, segmentAStart, segmentAEnd))
+		if (IsDistanceStrike(num5, num, segmentBLine, segmentBEnd, basePoint, segmentAStart, segmentAEnd))
 		{
 			intersection.Set(segmentBEnd);
 			basePoint.Set(segmentBEnd);

@@ -58,14 +58,14 @@ public class QuestActionShowMapButton : QuestAction
 		string showType = string.Empty;
 		float speed = 0f;
 		float pause = 0f;
-		Vector3 AJMBPDGKMAF = default(Vector3);
-		GetValues(ref name, ref imageName, ref timer, ref buttonType, ref atlasName, ref speed, ref pause, ref AJMBPDGKMAF, ref showType);
-		MapButtonInfo buttonInfo = new MapButtonInfo(name, imageName, timer, AJMBPDGKMAF, _AutoPosition, atlasName, buttonType, speed, pause, showType, _anchorMinX, _anchorMaxX);
+		Vector3 buttonPosition = default(Vector3);
+		GetValues(ref name, ref imageName, ref timer, ref buttonType, ref atlasName, ref speed, ref pause, ref buttonPosition, ref showType);
+		MapButtonInfo buttonInfo = new MapButtonInfo(name, imageName, timer, buttonPosition, _AutoPosition, atlasName, buttonType, speed, pause, showType, _anchorMinX, _anchorMaxX);
 		MapButtonController.GetInstance().AddButton(buttonInfo);
 		FinishAction();
 	}
 
-	private void GetValues(ref string name, ref string imageName, ref string timer, ref string buttonType, ref string atlasName, ref float speed, ref float pause, ref Vector3 AJMBPDGKMAF, ref string showType)
+	private void GetValues(ref string name, ref string imageName, ref string timer, ref string buttonType, ref string atlasName, ref float speed, ref float pause, ref Vector3 buttonPosition, ref string showType)
 	{
 		ConditionExtension.CompareResult result = new ConditionExtension.CompareResult();
 		QuestCondition condition = new QuestCondition();
@@ -109,13 +109,13 @@ public class QuestActionShowMapButton : QuestAction
 		if (!string.IsNullOrEmpty(xExpression))
 		{
 			condition.SetValue(xExpression, result);
-			AJMBPDGKMAF.x = ((!result.IsNumber()) ? 0f : ((float)result.resultNumber));
+			buttonPosition.x = ((!result.IsNumber()) ? 0f : ((float)result.resultNumber));
 		}
 		result.Clear();
 		if (!string.IsNullOrEmpty(yExpression))
 		{
 			condition.SetValue(yExpression, result);
-			AJMBPDGKMAF.y = ((!result.IsNumber()) ? 0f : ((float)result.resultNumber));
+			buttonPosition.y = ((!result.IsNumber()) ? 0f : ((float)result.resultNumber));
 		}
 		result.Clear();
 		condition.SetValue(showTypeExpression, result);

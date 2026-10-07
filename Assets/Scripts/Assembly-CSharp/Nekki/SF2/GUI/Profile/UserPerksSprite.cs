@@ -50,9 +50,9 @@ namespace Nekki.SF2.GUI.Profile
 				profilePerk.set_Description(perkInfo.DescriptionKey);
 				return;
 			}
-			ProfilePerk pLKCIINIFMJ2 = new ProfilePerk(perkInfo, 0, ProfilePerk.ProfilePerkState.PERK_SELECTED, ProfilePerk.ProfilePerkType.TYPE_PERK_SELETED);
-			perks.Add(pLKCIINIFMJ2);
-			if (!(pLKCIINIFMJ2.GetMoveName() != string.Empty))
+			ProfilePerk selectedPerk = new ProfilePerk(perkInfo, 0, ProfilePerk.ProfilePerkState.PERK_SELECTED, ProfilePerk.ProfilePerkType.TYPE_PERK_SELETED);
+			perks.Add(selectedPerk);
+			if (!(selectedPerk.GetMoveName() != string.Empty))
 			{
 				if (NeedsNewSliderItem())
 				{
@@ -63,7 +63,7 @@ namespace Nekki.SF2.GUI.Profile
 				}
 				GameObject gameObject2 = Object.Instantiate(_perkItemPrefab, currentSliderItem.transform, false);
 				PerkSubItem component = gameObject2.GetComponent<PerkSubItem>();
-				component.Init(pLKCIINIFMJ2, 0);
+				component.Init(selectedPerk, 0);
 				ProfileScene current = Scene<ProfileScene>.get_Current();
 				if (current != null)
 				{

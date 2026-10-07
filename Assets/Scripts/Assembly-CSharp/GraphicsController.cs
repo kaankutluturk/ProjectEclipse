@@ -35,8 +35,8 @@ public static class GraphicsController
 			return SystemProperties.GetQualityConditionName();
 		}
 		QualityOption.QualityLevel savedLevel = QualityOption.ParseQualityLevel(text);
-		QualityOption.QualityLevel hPNJCDGIHLI2 = QualityOption.ParseQualityLevel(SystemProperties.GetQualityConditionName());
-		if (savedLevel <= hPNJCDGIHLI2)
+		QualityOption.QualityLevel maxQualityLevel = QualityOption.ParseQualityLevel(SystemProperties.GetQualityConditionName());
+		if (savedLevel <= maxQualityLevel)
 		{
 			return text;
 		}

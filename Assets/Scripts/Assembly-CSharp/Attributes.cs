@@ -54,16 +54,16 @@ public class Attributes
 			int num = values[name];
 			if (applyAspectBonus)
 			{
-				Aspect hOHAPDGFMHL2 = GameUtils.GetAspectByName(name);
-				if (hOHAPDGFMHL2 != null)
+				Aspect aspect = GameUtils.GetAspectByName(name);
+				if (aspect != null)
 				{
 					int level = ListSF.GetRoster().GetLevel();
 					int levelStep = GameUtils.GetAspectDoublingRange().GetLevelStep();
 					float num2 = GameUtils.GetAspectDoublingRange().GetValue();
-					result = hOHAPDGFMHL2.GetValue(num, level, levelStep, num2);
-					if (values.ContainsKey(hOHAPDGFMHL2.GetAttribute()))
+					result = aspect.GetValue(num, level, levelStep, num2);
+					if (values.ContainsKey(aspect.GetAttribute()))
 					{
-						num = values[hOHAPDGFMHL2.GetAttribute()];
+						num = values[aspect.GetAttribute()];
 						result += num;
 					}
 					return true;

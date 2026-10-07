@@ -379,9 +379,9 @@ public sealed class WebSocketResponse : HTTPResponse, IHeartbeat, IProtocol
 			}
 			OnClosed(this, arg, arg2);
 		}
-		catch (Exception mPFFFAOGBJE2)
+		catch (Exception closeException)
 		{
-			HTTPManager.GetLogger().Exception("WebSocketResponse", "HandleEvents - OnClosed", mPFFFAOGBJE2);
+			HTTPManager.GetLogger().Exception("WebSocketResponse", "HandleEvents - OnClosed", closeException);
 		}
 	}
 

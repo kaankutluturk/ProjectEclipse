@@ -68,9 +68,9 @@ public class LoseFallRule : AnimationListRule
 		{
 			return false;
 		}
-		Vector3f eMAFACPEPDK = _node.GetStart();
-		eMAFACPEPDK = new Vector3f(eMAFACPEPDK.GetX() + offsetX, 0f - eMAFACPEPDK.GetY() + offsetY, eMAFACPEPDK.GetZ());
-		bool flag = eMAFACPEPDK.GetX() > maxX || eMAFACPEPDK.GetX() < minX || eMAFACPEPDK.GetY() > maxY || eMAFACPEPDK.GetY() < minY;
+		Vector3f fallPosition = _node.GetStart();
+		fallPosition = new Vector3f(fallPosition.GetX() + offsetX, 0f - fallPosition.GetY() + offsetY, fallPosition.GetZ());
+		bool flag = fallPosition.GetX() > maxX || fallPosition.GetX() < minX || fallPosition.GetY() > maxY || fallPosition.GetY() < minY;
 		if (flag)
 		{
 			SetActive(false);

@@ -48,22 +48,22 @@ namespace Nekki.SF2.GUI.Shop
 			}
 		}
 
-		public void ShowPerkHint(PerkInfoItem perkItem, Vector2 MGMMDGFPBLP, Vector2 hintOffset, GameObject AOMLCBHAJJH)
+		public void ShowPerkHint(PerkInfoItem perkItem, Vector2 hintPosition, Vector2 hintOffset, GameObject sourceObject)
 		{
 			if (perkItem == null || false || hintBox == null)
 			{
 				return;
 			}
-			if (hintSource == AOMLCBHAJJH)
+			if (hintSource == sourceObject)
 			{
 				HideHintAndStopCorutine();
 				return;
 			}
-			if (hintSource != null && hintSource != AOMLCBHAJJH && showingHint)
+			if (hintSource != null && hintSource != sourceObject && showingHint)
 			{
 				HideHintAndStopCorutine();
 			}
-				hintSource = AOMLCBHAJJH;
+				hintSource = sourceObject;
 				hintBox.gameObject.SetActive(true);
 				string title = perkItem.Alias;
 				string description = perkItem.ResolveDescriptionText(perkItem.DescriptionKey);
@@ -79,7 +79,7 @@ namespace Nekki.SF2.GUI.Shop
 					description = modDescription;
 				}
 				hintBox.SetText(title, description);
-			if (AnchorToIcon(AOMLCBHAJJH))
+			if (AnchorToIcon(sourceObject))
 			{
 				showingHint = true;
 				hideCoroutine = WaitAndHideHint();
@@ -91,18 +91,18 @@ namespace Nekki.SF2.GUI.Shop
 			if (component != null)
 			{
 				Vector2 vector = new Vector2(0f, (0f - component.sizeDelta.y) * 0.5f);
-				Vector2 vector2 = MGMMDGFPBLP + hintOffset;
+				Vector2 vector2 = hintPosition + hintOffset;
 				vector2 = base.transform.InverseTransformPoint(vector2);
 				flag = Mathf.Abs((vector - vector2).y) < hintBox.get_RectTransform().sizeDelta.y;
 			}
 			if (flag)
 			{
-				hintBox.transform.position = MGMMDGFPBLP - hintOffset;
+				hintBox.transform.position = hintPosition - hintOffset;
 				hintBox.Flip();
 			}
 			else
 			{
-				hintBox.transform.position = MGMMDGFPBLP + hintOffset;
+				hintBox.transform.position = hintPosition + hintOffset;
 				hintBox.ResetFlip();
 			}
 			showingHint = true;

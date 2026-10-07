@@ -260,145 +260,145 @@ public class EventSource : IHeartbeat
 	public void AddOnOpen(OnGeneralEventDelegate value)
 	{
 		OnGeneralEventDelegate current = OnOpen;
-		OnGeneralEventDelegate bHJHIPILHJB2;
+		OnGeneralEventDelegate previousHandler;
 		do
 		{
-			bHJHIPILHJB2 = current;
-			current = Interlocked.CompareExchange(ref OnOpen, (OnGeneralEventDelegate)Delegate.Combine(bHJHIPILHJB2, value), current);
+			previousHandler = current;
+			current = Interlocked.CompareExchange(ref OnOpen, (OnGeneralEventDelegate)Delegate.Combine(previousHandler, value), current);
 		}
-		while ((object)current != bHJHIPILHJB2);
+		while ((object)current != previousHandler);
 	}
 
 	public void RemoveOnOpen(OnGeneralEventDelegate value)
 	{
 		OnGeneralEventDelegate current = OnOpen;
-		OnGeneralEventDelegate bHJHIPILHJB2;
+		OnGeneralEventDelegate previousHandler;
 		do
 		{
-			bHJHIPILHJB2 = current;
-			current = Interlocked.CompareExchange(ref OnOpen, (OnGeneralEventDelegate)Delegate.Remove(bHJHIPILHJB2, value), current);
+			previousHandler = current;
+			current = Interlocked.CompareExchange(ref OnOpen, (OnGeneralEventDelegate)Delegate.Remove(previousHandler, value), current);
 		}
-		while ((object)current != bHJHIPILHJB2);
+		while ((object)current != previousHandler);
 	}
 
 	public void AddOnMessage(OnEventSourceMessageDelegate value)
 	{
 		OnEventSourceMessageDelegate current = onMessageField;
-		OnEventSourceMessageDelegate iPIGAJKKJLN2;
+		OnEventSourceMessageDelegate previousHandler;
 		do
 		{
-			iPIGAJKKJLN2 = current;
-			current = Interlocked.CompareExchange(ref onMessageField, (OnEventSourceMessageDelegate)Delegate.Combine(iPIGAJKKJLN2, value), current);
+			previousHandler = current;
+			current = Interlocked.CompareExchange(ref onMessageField, (OnEventSourceMessageDelegate)Delegate.Combine(previousHandler, value), current);
 		}
-		while ((object)current != iPIGAJKKJLN2);
+		while ((object)current != previousHandler);
 	}
 
 	public void RemoveOnMessage(OnEventSourceMessageDelegate value)
 	{
 		OnEventSourceMessageDelegate current = onMessageField;
-		OnEventSourceMessageDelegate iPIGAJKKJLN2;
+		OnEventSourceMessageDelegate previousHandler;
 		do
 		{
-			iPIGAJKKJLN2 = current;
-			current = Interlocked.CompareExchange(ref onMessageField, (OnEventSourceMessageDelegate)Delegate.Remove(iPIGAJKKJLN2, value), current);
+			previousHandler = current;
+			current = Interlocked.CompareExchange(ref onMessageField, (OnEventSourceMessageDelegate)Delegate.Remove(previousHandler, value), current);
 		}
-		while ((object)current != iPIGAJKKJLN2);
+		while ((object)current != previousHandler);
 	}
 
 	public void AddOnError(OnErrorDelegate value)
 	{
 		OnErrorDelegate current = onErrorField;
-		OnErrorDelegate eGECAPOLBHF2;
+		OnErrorDelegate previousHandler;
 		do
 		{
-			eGECAPOLBHF2 = current;
-			current = Interlocked.CompareExchange(ref onErrorField, (OnErrorDelegate)Delegate.Combine(eGECAPOLBHF2, value), current);
+			previousHandler = current;
+			current = Interlocked.CompareExchange(ref onErrorField, (OnErrorDelegate)Delegate.Combine(previousHandler, value), current);
 		}
-		while ((object)current != eGECAPOLBHF2);
+		while ((object)current != previousHandler);
 	}
 
 	public void RemoveOnError(OnErrorDelegate value)
 	{
 		OnErrorDelegate current = onErrorField;
-		OnErrorDelegate eGECAPOLBHF2;
+		OnErrorDelegate previousHandler;
 		do
 		{
-			eGECAPOLBHF2 = current;
-			current = Interlocked.CompareExchange(ref onErrorField, (OnErrorDelegate)Delegate.Remove(eGECAPOLBHF2, value), current);
+			previousHandler = current;
+			current = Interlocked.CompareExchange(ref onErrorField, (OnErrorDelegate)Delegate.Remove(previousHandler, value), current);
 		}
-		while ((object)current != eGECAPOLBHF2);
+		while ((object)current != previousHandler);
 	}
 
 	public void AddOnRetry(OnRetryDelegate value)
 	{
 		OnRetryDelegate current = OnRetry;
-		OnRetryDelegate cPMLAEEAKNP2;
+		OnRetryDelegate previousHandler;
 		do
 		{
-			cPMLAEEAKNP2 = current;
-			current = Interlocked.CompareExchange(ref OnRetry, (OnRetryDelegate)Delegate.Combine(cPMLAEEAKNP2, value), current);
+			previousHandler = current;
+			current = Interlocked.CompareExchange(ref OnRetry, (OnRetryDelegate)Delegate.Combine(previousHandler, value), current);
 		}
-		while ((object)current != cPMLAEEAKNP2);
+		while ((object)current != previousHandler);
 	}
 
 	public void RemoveOnRetry(OnRetryDelegate value)
 	{
 		OnRetryDelegate current = OnRetry;
-		OnRetryDelegate cPMLAEEAKNP2;
+		OnRetryDelegate previousHandler;
 		do
 		{
-			cPMLAEEAKNP2 = current;
-			current = Interlocked.CompareExchange(ref OnRetry, (OnRetryDelegate)Delegate.Remove(cPMLAEEAKNP2, value), current);
+			previousHandler = current;
+			current = Interlocked.CompareExchange(ref OnRetry, (OnRetryDelegate)Delegate.Remove(previousHandler, value), current);
 		}
-		while ((object)current != cPMLAEEAKNP2);
+		while ((object)current != previousHandler);
 	}
 
 	public void AddOnClosed(OnGeneralEventDelegate value)
 	{
 		OnGeneralEventDelegate current = onClosedField;
-		OnGeneralEventDelegate bHJHIPILHJB2;
+		OnGeneralEventDelegate previousHandler;
 		do
 		{
-			bHJHIPILHJB2 = current;
-			current = Interlocked.CompareExchange(ref onClosedField, (OnGeneralEventDelegate)Delegate.Combine(bHJHIPILHJB2, value), current);
+			previousHandler = current;
+			current = Interlocked.CompareExchange(ref onClosedField, (OnGeneralEventDelegate)Delegate.Combine(previousHandler, value), current);
 		}
-		while ((object)current != bHJHIPILHJB2);
+		while ((object)current != previousHandler);
 	}
 
 	public void RemoveOnClosed(OnGeneralEventDelegate value)
 	{
 		OnGeneralEventDelegate current = onClosedField;
-		OnGeneralEventDelegate bHJHIPILHJB2;
+		OnGeneralEventDelegate previousHandler;
 		do
 		{
-			bHJHIPILHJB2 = current;
-			current = Interlocked.CompareExchange(ref onClosedField, (OnGeneralEventDelegate)Delegate.Remove(bHJHIPILHJB2, value), current);
+			previousHandler = current;
+			current = Interlocked.CompareExchange(ref onClosedField, (OnGeneralEventDelegate)Delegate.Remove(previousHandler, value), current);
 		}
-		while ((object)current != bHJHIPILHJB2);
+		while ((object)current != previousHandler);
 	}
 
 	public void AddOnStateChanged(OnStateChangedDelegate value)
 	{
 		OnStateChangedDelegate current = OnStateChanged;
-		OnStateChangedDelegate gAHJEMHNLNB2;
+		OnStateChangedDelegate previousHandler;
 		do
 		{
-			gAHJEMHNLNB2 = current;
-			current = Interlocked.CompareExchange(ref OnStateChanged, (OnStateChangedDelegate)Delegate.Combine(gAHJEMHNLNB2, value), current);
+			previousHandler = current;
+			current = Interlocked.CompareExchange(ref OnStateChanged, (OnStateChangedDelegate)Delegate.Combine(previousHandler, value), current);
 		}
-		while ((object)current != gAHJEMHNLNB2);
+		while ((object)current != previousHandler);
 	}
 
 	public void RemoveOnStateChanged(OnStateChangedDelegate value)
 	{
 		OnStateChangedDelegate current = OnStateChanged;
-		OnStateChangedDelegate gAHJEMHNLNB2;
+		OnStateChangedDelegate previousHandler;
 		do
 		{
-			gAHJEMHNLNB2 = current;
-			current = Interlocked.CompareExchange(ref OnStateChanged, (OnStateChangedDelegate)Delegate.Remove(gAHJEMHNLNB2, value), current);
+			previousHandler = current;
+			current = Interlocked.CompareExchange(ref OnStateChanged, (OnStateChangedDelegate)Delegate.Remove(previousHandler, value), current);
 		}
-		while ((object)current != gAHJEMHNLNB2);
+		while ((object)current != previousHandler);
 	}
 
 	public void OpenEventSource()
@@ -634,9 +634,9 @@ public class EventSource : IHeartbeat
 		{
 			value(this, message);
 		}
-		catch (Exception mPFFFAOGBJE2)
+		catch (Exception callbackException)
 		{
-			HTTPManager.GetLogger().Exception("EventSource", "OnMessageReceived - action", mPFFFAOGBJE2);
+			HTTPManager.GetLogger().Exception("EventSource", "OnMessageReceived - action", callbackException);
 		}
 	}
 

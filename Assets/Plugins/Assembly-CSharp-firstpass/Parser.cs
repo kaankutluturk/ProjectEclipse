@@ -17,7 +17,7 @@ public class Parser
 
 	private const string kStopSwitchParsing = "--";
 
-	// C# has no syntax for parameterized property 'DLKPBAJDHBO'.
+	// C# has no syntax for parameterized property 'Item'.
 	public SwitchResult get_DLKPBAJDHBO(int index)
 	{
 		return get_Item(index);

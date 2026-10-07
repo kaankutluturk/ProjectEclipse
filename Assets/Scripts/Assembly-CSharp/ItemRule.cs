@@ -72,20 +72,20 @@ public class ItemRule : Rule
 			return true;
 		}
 		ItemInfo ruleItemInfo = item.GetInfo();
-		ItemInfo dJKEECEOCJB2 = userItem.GetInfo();
-		if (ruleItemInfo.Name != string.Empty && ruleItemInfo.Name == dJKEECEOCJB2.Name)
+		ItemInfo compareItemInfo = userItem.GetInfo();
+		if (ruleItemInfo.Name != string.Empty && ruleItemInfo.Name == compareItemInfo.Name)
 		{
 			return false;
 		}
-		if (ruleItemInfo.Type != string.Empty && ruleItemInfo.Type == dJKEECEOCJB2.Type)
+		if (ruleItemInfo.Type != string.Empty && ruleItemInfo.Type == compareItemInfo.Type)
 		{
 			return false;
 		}
-		if (ruleItemInfo.SubType != string.Empty && ruleItemInfo.SubType == dJKEECEOCJB2.SubType)
+		if (ruleItemInfo.SubType != string.Empty && ruleItemInfo.SubType == compareItemInfo.SubType)
 		{
 			return false;
 		}
-		int num = ((userItem.GetCurrentUpgradeItem() == null) ? dJKEECEOCJB2.ItemLevel : userItem.GetCurrentUpgradeItem().ItemLevel);
+		int num = ((userItem.GetCurrentUpgradeItem() == null) ? compareItemInfo.ItemLevel : userItem.GetCurrentUpgradeItem().ItemLevel);
 		if (item.GetUpgradeLevel() > num)
 		{
 			return false;

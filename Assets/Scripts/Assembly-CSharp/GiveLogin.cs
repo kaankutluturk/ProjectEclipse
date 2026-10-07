@@ -32,25 +32,25 @@ public class GiveLogin
 			return;
 		}
 		JSONNode bonusNode = jSONNode["Bonus"];
-		JSONNode mEEAKLDGLDF2 = jSONNode["Money"];
+		JSONNode moneyNode = jSONNode["Money"];
 		JSONNode jSONNode4 = jSONNode["Items"];
 		long bonusAmount = bonusNode.ParseLong(0L);
-		long moneyAmount = mEEAKLDGLDF2.ParseLong(0L);
+		long moneyAmount = moneyNode.ParseLong(0L);
 		int num = ((jSONNode4 != null) ? jSONNode4.Count : 0);
 		int i = 0;
 		for (int num2 = num; i < num2; i++)
 		{
 			JSONNode jSONNode5 = jSONNode4[i];
 			JSONNode jSONNode6 = jSONNode5["Item"];
-			JSONNode mEEAKLDGLDF3 = jSONNode5["UpgradeLevel"];
-			JSONNode mEEAKLDGLDF4 = jSONNode5["Count"];
-			JSONNode mEEAKLDGLDF5 = jSONNode5["Equip"];
+			JSONNode upgradeLevelNode = jSONNode5["UpgradeLevel"];
+			JSONNode countNode = jSONNode5["Count"];
+			JSONNode equipNode = jSONNode5["Equip"];
 			if (jSONNode6 != null && jSONNode6.Value != null)
 			{
 				string valueText = jSONNode6.Value;
-				int upgradeLevel = mEEAKLDGLDF3.ParseInt();
-				int num3 = mEEAKLDGLDF4.ParseInt(1);
-				int num4 = mEEAKLDGLDF5.ParseInt();
+				int upgradeLevel = upgradeLevelNode.ParseInt();
+				int num3 = countNode.ParseInt(1);
+				int num4 = equipNode.ParseInt();
 				if (num3 > 0)
 				{
 					GiveItemLogin item = new GiveItemLogin

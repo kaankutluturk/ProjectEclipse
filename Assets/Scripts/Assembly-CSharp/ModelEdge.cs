@@ -388,14 +388,14 @@ public class ModelEdge : Segment3D
 		float num = StartNode.GetWeight();
 		float num2 = EndNode.GetWeight();
 		Vector3f startPoint = StartNode.GetStart();
-		Vector3f eMAFACPEPDK2 = EndNode.GetStart();
-		float num3 = length / Vector3f.Distance(startPoint, eMAFACPEPDK2);
+		Vector3f endPoint = EndNode.GetStart();
+		float num3 = length / Vector3f.Distance(startPoint, endPoint);
 		float num4 = (1f - num3) / (num + num2);
 		float num5 = num * num4;
 		float num6 = num2 * num4;
-		offset.SetX(offset.GetX() * num3 + startPoint.GetX() * num5 + eMAFACPEPDK2.GetX() * num6);
-		offset.SetY(offset.GetY() * num3 + startPoint.GetY() * num5 + eMAFACPEPDK2.GetY() * num6);
-		offset.SetZ(offset.GetZ() * num3 + startPoint.GetZ() * num5 + eMAFACPEPDK2.GetZ() * num6);
+		offset.SetX(offset.GetX() * num3 + startPoint.GetX() * num5 + endPoint.GetX() * num6);
+		offset.SetY(offset.GetY() * num3 + startPoint.GetY() * num5 + endPoint.GetY() * num6);
+		offset.SetZ(offset.GetZ() * num3 + startPoint.GetZ() * num5 + endPoint.GetZ() * num6);
 	}
 
 	public void Iterative()
@@ -405,14 +405,14 @@ public class ModelEdge : Segment3D
 			float num = StartNode.GetWeight();
 			float num2 = EndNode.GetWeight();
 			Vector3f startPoint = StartNode.GetStart();
-			Vector3f eMAFACPEPDK2 = EndNode.GetStart();
-			float num3 = length / Vector3f.Distance(startPoint, eMAFACPEPDK2);
+			Vector3f endPoint = EndNode.GetStart();
+			float num3 = length / Vector3f.Distance(startPoint, endPoint);
 			float num4 = (1f - num3) / (num + num2);
 			float num5 = num * num4;
 			float num6 = num2 * num4;
-			float offsetX = startPoint.GetX() * num5 + eMAFACPEPDK2.GetX() * num6;
-			float offsetY = startPoint.GetY() * num5 + eMAFACPEPDK2.GetY() * num6;
-			float offsetZ = startPoint.GetZ() * num5 + eMAFACPEPDK2.GetZ() * num6;
+			float offsetX = startPoint.GetX() * num5 + endPoint.GetX() * num6;
+			float offsetY = startPoint.GetY() * num5 + endPoint.GetY() * num6;
+			float offsetZ = startPoint.GetZ() * num5 + endPoint.GetZ() * num6;
 			if (StartNode.IsPhysicsActive())
 			{
 				startPoint.Multiply(num3);
@@ -420,8 +420,8 @@ public class ModelEdge : Segment3D
 			}
 			if (EndNode.IsPhysicsActive())
 			{
-				eMAFACPEPDK2.Multiply(num3);
-				eMAFACPEPDK2.Add(offsetX, offsetY, offsetZ);
+				endPoint.Multiply(num3);
+				endPoint.Add(offsetX, offsetY, offsetZ);
 			}
 		}
 	}

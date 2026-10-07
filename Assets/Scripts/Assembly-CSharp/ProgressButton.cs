@@ -19,7 +19,7 @@ public class ProgressButton : SFButton
 	private Tween _tween;
 
 	// Eclipse: presentation-only easing of the circular fill. The gameplay percentage
-	// (ILDDBLFPPPG) still changes immediately; only the drawn fill chases it.
+	// (percentage) still changes immediately; only the drawn fill chases it.
 	[System.NonSerialized]
 	public float FillSmoothingRate;
 

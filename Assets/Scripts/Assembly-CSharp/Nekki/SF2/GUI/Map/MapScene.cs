@@ -482,14 +482,14 @@ namespace Nekki.SF2.GUI.Map
 			FightList lastFight = GameUtils.GetLastFight(battle);
 			if (lastFight != null)
 			{
-				string jFIIJBAOOIK2 = lastFight.FightId.ToString();
+				string fightIdText = lastFight.FightId.ToString();
 				if (mapMode != MapMode.RaidMode)
 				{
-					ListSF.GetRoster().SetMapFocus(jFIIJBAOOIK2);
+					ListSF.GetRoster().SetMapFocus(fightIdText);
 				}
 				else
 				{
-					ListSF.GetRoster().SetRaidMapFocus(jFIIJBAOOIK2);
+					ListSF.GetRoster().SetRaidMapFocus(fightIdText);
 				}
 			}
 		}

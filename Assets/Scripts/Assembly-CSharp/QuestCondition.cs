@@ -236,10 +236,10 @@ public class QuestCondition : ConditionExtension
 		this.questParameters = parameters;
 		this.rosterQuest = quest;
 		CompareResult result = new CompareResult();
-		CompareResult lNIDLHOIHIM2 = new CompareResult();
+		CompareResult rightResult = new CompareResult();
 		SetValue(value1, result);
-		SetValue(value2, lNIDLHOIHIM2);
-		return CompareResults(result, lNIDLHOIHIM2);
+		SetValue(value2, rightResult);
+		return CompareResults(result, rightResult);
 	}
 
 	private bool CompareResults(CompareResult leftResult, CompareResult rightResult)
@@ -566,55 +566,55 @@ public class QuestCondition : ConditionExtension
 		{
 		case "Skeleton":
 		{
-			ItemInfo dJKEECEOCJB6 = roster.get_Parameters().GetItemByType("Skeleton");
-			if (dJKEECEOCJB6 != null)
+			ItemInfo skeletonItem = roster.get_Parameters().GetItemByType("Skeleton");
+			if (skeletonItem != null)
 			{
-				result.resultSTR = dJKEECEOCJB6.Name;
+				result.resultSTR = skeletonItem.Name;
 			}
 			break;
 		}
 		case "Helm":
 		{
-			ItemInfo dJKEECEOCJB2 = roster.get_Parameters().GetItemByType("Helm");
-			if (dJKEECEOCJB2 != null)
+			ItemInfo helmItem = roster.get_Parameters().GetItemByType("Helm");
+			if (helmItem != null)
 			{
-				result.resultSTR = dJKEECEOCJB2.Name;
+				result.resultSTR = helmItem.Name;
 			}
 			break;
 		}
 		case "Armor":
 		{
-			ItemInfo dJKEECEOCJB4 = roster.get_Parameters().GetItemByType("Armor");
-			if (dJKEECEOCJB4 != null)
+			ItemInfo armorItem = roster.get_Parameters().GetItemByType("Armor");
+			if (armorItem != null)
 			{
-				result.resultSTR = dJKEECEOCJB4.Name;
+				result.resultSTR = armorItem.Name;
 			}
 			break;
 		}
 		case "Weapon":
 		{
-			ItemInfo dJKEECEOCJB7 = roster.get_Parameters().GetItemByType("Weapon");
-			if (dJKEECEOCJB7 != null)
+			ItemInfo weaponItem = roster.get_Parameters().GetItemByType("Weapon");
+			if (weaponItem != null)
 			{
-				result.resultSTR = dJKEECEOCJB7.Name;
+				result.resultSTR = weaponItem.Name;
 			}
 			break;
 		}
 		case "Magic":
 		{
-			ItemInfo dJKEECEOCJB5 = roster.get_Parameters().GetItemByType("Magic");
-			if (dJKEECEOCJB5 != null)
+			ItemInfo magicItem = roster.get_Parameters().GetItemByType("Magic");
+			if (magicItem != null)
 			{
-				result.resultSTR = dJKEECEOCJB5.Name;
+				result.resultSTR = magicItem.Name;
 			}
 			break;
 		}
 		case "RaidCharge":
 		{
-			ItemInfo dJKEECEOCJB3 = roster.get_Parameters().GetItemByType("RaidConsumable");
-			if (dJKEECEOCJB3 != null)
+			ItemInfo raidChargeItem = roster.get_Parameters().GetItemByType("RaidConsumable");
+			if (raidChargeItem != null)
 			{
-				result.resultSTR = dJKEECEOCJB3.Name;
+				result.resultSTR = raidChargeItem.Name;
 			}
 			break;
 		}
@@ -647,8 +647,8 @@ public class QuestCondition : ConditionExtension
 			break;
 		case "MapFocus":
 		{
-			FightIDS mOCEDDJOAEB2 = ListSF.GetRoster().GetMapFocus();
-			result.resultSTR = mOCEDDJOAEB2.GetZoneBattle();
+			FightIDS fightIdSet = ListSF.GetRoster().GetMapFocus();
+			result.resultSTR = fightIdSet.GetZoneBattle();
 			break;
 		}
 		case "RaidMapFocus":
@@ -694,10 +694,10 @@ public class QuestCondition : ConditionExtension
 			break;
 		case "Equipped":
 		{
-			UserItem dKCHDHMLKHN2 = roster.GetInventory().FindItem(itemInfo);
-			if (dKCHDHMLKHN2 != null)
+			UserItem equippedItem = roster.GetInventory().FindItem(itemInfo);
+			if (equippedItem != null)
 			{
-				result.resultNumber = Convert.ToDouble(dKCHDHMLKHN2.GetIsEquipped());
+				result.resultNumber = Convert.ToDouble(equippedItem.GetIsEquipped());
 			}
 			break;
 		}
@@ -715,20 +715,20 @@ public class QuestCondition : ConditionExtension
 		}
 		case "NextBonusUpgradePrice":
 		{
-			ItemInfo mBIJKDIEFIF2 = GetNextUpgradeInfo(itemInfo);
-			result.resultNumber = GetItemPrice(mBIJKDIEFIF2, false);
+			ItemInfo nextBonusUpgrade = GetNextUpgradeInfo(itemInfo);
+			result.resultNumber = GetItemPrice(nextBonusUpgrade, false);
 			break;
 		}
 		case "NextUpgradeDeliveryPrice":
 		{
-			ItemInfo mBIJKDIEFIF4 = GetNextUpgradeInfo(itemInfo);
-			result.resultNumber = GetUpgradePrice(mBIJKDIEFIF4, false);
+			ItemInfo nextDeliveryUpgrade = GetNextUpgradeInfo(itemInfo);
+			result.resultNumber = GetUpgradePrice(nextDeliveryUpgrade, false);
 			break;
 		}
 		case "NextUpgradeDeliveryTime":
 		{
-			ItemInfo mBIJKDIEFIF3 = GetNextUpgradeInfo(itemInfo);
-			result.resultNumber = GetDeliveryUpgradeTime(mBIJKDIEFIF3);
+			ItemInfo nextTimeUpgrade = GetNextUpgradeInfo(itemInfo);
+			result.resultNumber = GetDeliveryUpgradeTime(nextTimeUpgrade);
 			break;
 		}
 		case "Type":
@@ -769,8 +769,8 @@ public class QuestCondition : ConditionExtension
 		UserItem userItem = ListSF.GetRoster().GetInventory().FindItem(item);
 		if (userItem != null && userItem.GetDeliveryTimestamp() > 0 && userItem.GetDeliveryUpgradeLevel() > 0)
 		{
-			ItemInfo dJKEECEOCJB2 = userItem.GetEffectiveInfo();
-			upgradeInfo = ((dJKEECEOCJB2 == null) ? null : dJKEECEOCJB2.Clone());
+			ItemInfo nextUpgrade = userItem.GetEffectiveInfo();
+			upgradeInfo = ((nextUpgrade == null) ? null : nextUpgrade.Clone());
 		}
 		if (upgradeInfo != null)
 		{
@@ -841,8 +841,8 @@ public class QuestCondition : ConditionExtension
 		}
 		case "Existence":
 		{
-			DownloadPack jBKAOMLJCEL2 = PacksController.GetInstance().FindPack(packName);
-			result.resultNumber = ((jBKAOMLJCEL2 != null) ? 1 : 0);
+			DownloadPack downloadPack = PacksController.GetInstance().FindPack(packName);
+			result.resultNumber = ((downloadPack != null) ? 1 : 0);
 			break;
 		}
 		case "Size":
@@ -923,8 +923,8 @@ public class QuestCondition : ConditionExtension
 		{
 		case "Available":
 		{
-			Battle cGJCGEBPCAF3 = ListSF.GetBattleById(fightIds);
-			if (cGJCGEBPCAF3 != null)
+			Battle availableBattle = ListSF.GetBattleById(fightIds);
+			if (availableBattle != null)
 			{
 				Roster roster = ListSF.GetRoster();
 				bool flag = roster.HasBattle(fightIds);
@@ -939,21 +939,21 @@ public class QuestCondition : ConditionExtension
 		}
 		case "Locked":
 		{
-			Battle cGJCGEBPCAF5 = ListSF.GetBattleById(fightIds);
+			Battle lockedBattle = ListSF.GetBattleById(fightIds);
 			bool flag2 = true;
-			if (cGJCGEBPCAF5 != null)
+			if (lockedBattle != null)
 			{
-				flag2 = cGJCGEBPCAF5.GetRosterBattle() == null || cGJCGEBPCAF5.GetRosterBattle().IsLocked();
+				flag2 = lockedBattle.GetRosterBattle() == null || lockedBattle.GetRosterBattle().IsLocked();
 			}
 			result.resultNumber = (flag2 ? 1 : 0);
 			break;
 		}
 		case "Name":
 		{
-			Battle cGJCGEBPCAF4 = ListSF.GetBattleById(fightIds);
-			if (cGJCGEBPCAF4 != null)
+			Battle namedBattle = ListSF.GetBattleById(fightIds);
+			if (namedBattle != null)
 			{
-				result.resultSTR = cGJCGEBPCAF4.get_Name();
+				result.resultSTR = namedBattle.get_Name();
 				break;
 			}
 			GameLog.Error(string.Format("{0},{1}", "Quest Error: no such battle in stages: ", fightIds.ToString()));
@@ -962,11 +962,11 @@ public class QuestCondition : ConditionExtension
 		}
 		case "Type":
 		{
-			Battle cGJCGEBPCAF2 = ListSF.GetBattleById(fightIds);
+			Battle typedBattle = ListSF.GetBattleById(fightIds);
 			BattleType battleType = BattleType.FightDummy;
-			if (cGJCGEBPCAF2 != null)
+			if (typedBattle != null)
 			{
-				battleType = cGJCGEBPCAF2.get_Type();
+				battleType = typedBattle.get_Type();
 			}
 			else
 			{
@@ -1268,14 +1268,14 @@ public class QuestCondition : ConditionExtension
 		condition.SetParameters(questParameters);
 		condition.SetValue(expression, valueResult);
 		expression = valueResult.resultSTR;
-		string bAINMLLIKOL2 = array[1];
-		condition.SetValue(bAINMLLIKOL2, valueResult);
-		bAINMLLIKOL2 = valueResult.resultSTR;
+		string recipeName = array[1];
+		condition.SetValue(recipeName, valueResult);
+		recipeName = valueResult.resultSTR;
 		long num = 0L;
 		if (array.Length == 3)
 		{
-			string bAINMLLIKOL3 = array[2];
-			condition.SetValue(bAINMLLIKOL3, valueResult);
+			string countText = array[2];
+			condition.SetValue(countText, valueResult);
 			num = (long)valueResult.resultNumber;
 		}
 		switch (function.property)
@@ -1284,12 +1284,12 @@ public class QuestCondition : ConditionExtension
 			result.resultSTR = expression;
 			break;
 		case "Recipe":
-			result.resultSTR = bAINMLLIKOL2;
+			result.resultSTR = recipeName;
 			break;
 		case "Timeout":
 		{
-			RecipePrice pANAKJICBKI2 = ForgeManager.GetInstance().GetPriceByItemName(expression, bAINMLLIKOL2);
-			result.resultNumber = ((pANAKJICBKI2 != null) ? pANAKJICBKI2.DeliveryTimeSeconds : 0);
+			RecipePrice recipePrice = ForgeManager.GetInstance().GetPriceByItemName(expression, recipeName);
+			result.resultNumber = ((recipePrice != null) ? recipePrice.DeliveryTimeSeconds : 0);
 			break;
 		}
 		case "DeliveryTime":
@@ -1297,13 +1297,13 @@ public class QuestCondition : ConditionExtension
 			break;
 		case "BonusDeliveryPrice":
 		{
-			RecipePrice recipePrice = ForgeManager.GetInstance().GetPriceByItemName(expression, bAINMLLIKOL2);
+			RecipePrice recipePrice = ForgeManager.GetInstance().GetPriceByItemName(expression, recipeName);
 			result.resultNumber = (int)((recipePrice != null) ? (ObscuredLong)(recipePrice.BonusDeliveryPriceValue) : 0);
 			break;
 		}
 		case "Available":
 		{
-			Recipe recipe = ForgeManager.GetInstance().GetRecipeByName(bAINMLLIKOL2);
+			Recipe recipe = ForgeManager.GetInstance().GetRecipeByName(recipeName);
 			UserItem userItem = ListSF.GetUserItem(expression);
 			bool flag = false;
 			if (recipe != null && userItem != null)

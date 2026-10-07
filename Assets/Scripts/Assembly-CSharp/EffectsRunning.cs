@@ -69,14 +69,14 @@ public class EffectsRunning
 	{
 		ModelConditions conditions = owner.GetConditions();
 		conditions.AnimationSign = owner.GetAnimationModule().GetSign();
-		Vector3f eMAFACPEPDK = Vector3f.op_Implicit(action.GetPosition().GetPosition(conditions));
+		Vector3f effectPosition = Vector3f.op_Implicit(action.GetPosition().GetPosition(conditions));
 		// Effects are presentation; a rollback re-simulation does not spawn them twice.
 		if (Eclipse.Multiplayer.VersusTickDriver.IsResimulating)
 		{
 			return;
 		}
 		GameObject gameObject = new GameObject(action.get_Name());
-		gameObject.transform.localPosition = new Vector3(eMAFACPEPDK.GetX(), eMAFACPEPDK.GetY(), eMAFACPEPDK.GetZ());
+		gameObject.transform.localPosition = new Vector3(effectPosition.GetX(), effectPosition.GetY(), effectPosition.GetZ());
 		Quaternion attachmentRotation = Quaternion.identity;
 		if (action.Attachment != null)
 		{

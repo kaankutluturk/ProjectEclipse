@@ -25,9 +25,9 @@ public class AttributesRule : InFightRule
 			{
 			case RuleAppliance.AppliancePlayer:
 			{
-				int OEMALIFPGPO2 = 0;
-				initData.PlayerParameters.FinalAttributes.Get(item.Key, ref OEMALIFPGPO2);
-				initData.PlayerParameters.FinalAttributes.Set(item.Key, OEMALIFPGPO2 + (int)value);
+				int attributeValue = 0;
+				initData.PlayerParameters.FinalAttributes.Get(item.Key, ref attributeValue);
+				initData.PlayerParameters.FinalAttributes.Set(item.Key, attributeValue + (int)value);
 				break;
 			}
 			case RuleAppliance.ApplianceOpponent:

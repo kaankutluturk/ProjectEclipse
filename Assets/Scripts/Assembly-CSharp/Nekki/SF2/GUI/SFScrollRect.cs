@@ -933,19 +933,19 @@ namespace Nekki.SF2.GUI
 			SetContentAnchoredPosition(vector2);
 		}
 
-		protected virtual void SetContentAnchoredPosition(Vector2 MGMMDGFPBLP)
+		protected virtual void SetContentAnchoredPosition(Vector2 contentPosition)
 		{
 			if (!m_Horizontal)
 			{
-				MGMMDGFPBLP.x = m_Content.anchoredPosition.x;
+				contentPosition.x = m_Content.anchoredPosition.x;
 			}
 			if (!m_Vertical)
 			{
-				MGMMDGFPBLP.y = m_Content.anchoredPosition.y;
+				contentPosition.y = m_Content.anchoredPosition.y;
 			}
-			if (MGMMDGFPBLP != m_Content.anchoredPosition)
+			if (contentPosition != m_Content.anchoredPosition)
 			{
-				m_Content.anchoredPosition = MGMMDGFPBLP;
+				m_Content.anchoredPosition = contentPosition;
 				UpdateBounds();
 			}
 		}

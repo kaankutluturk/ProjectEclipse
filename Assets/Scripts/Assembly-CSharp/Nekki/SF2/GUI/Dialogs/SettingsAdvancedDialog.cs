@@ -371,15 +371,15 @@ namespace Nekki.SF2.GUI.Dialogs
 			}
 		}
 
-		protected void SetupSlider(Slider slider, float value, Vector2 MGMMDGFPBLP, UnityAction<float> onValueChanged)
+		protected void SetupSlider(Slider slider, float value, Vector2 sliderPosition, UnityAction<float> onValueChanged)
 		{
 			slider.gameObject.SetActive(true);
 			slider.onValueChanged.AddListener(onValueChanged);
 			slider.minValue = 0f;
 			slider.maxValue = 1f;
 			slider.value = value;
-			slider.transform.SetLocalX(MGMMDGFPBLP.x);
-			slider.transform.SetLocalY(MGMMDGFPBLP.y);
+			slider.transform.SetLocalX(sliderPosition.x);
+			slider.transform.SetLocalY(sliderPosition.y);
 		}
 
 		protected void ChangeButtonTouchZone(Button button, LabelAlias label)

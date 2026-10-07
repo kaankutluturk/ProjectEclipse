@@ -25,7 +25,7 @@ public class QuestActionShop : QuestAction
 	{
 		base.Execute(parameters);
 		ConditionExtension.CompareResult result = new ConditionExtension.CompareResult();
-		ConditionExtension.CompareResult lNIDLHOIHIM2 = new ConditionExtension.CompareResult();
+		ConditionExtension.CompareResult itemResult = new ConditionExtension.CompareResult();
 		QuestCondition condition = new QuestCondition();
 		condition.SetParameters(parameters);
 		if (!string.IsNullOrEmpty(tabExpression))
@@ -34,10 +34,10 @@ public class QuestActionShop : QuestAction
 		}
 		if (!string.IsNullOrEmpty(item))
 		{
-			condition.SetValue(item, lNIDLHOIHIM2);
+			condition.SetValue(item, itemResult);
 		}
 		_sliderType = ParseSliderType(result.ToString());
-		itemName = lNIDLHOIHIM2.ToString();
+		itemName = itemResult.ToString();
 		itemInfo = ListSF.GetItems().GetItemByName(itemName);
 		ShowShopItem();
 	}

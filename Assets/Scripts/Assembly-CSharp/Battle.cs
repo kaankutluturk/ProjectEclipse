@@ -210,9 +210,9 @@ public class Battle
 		}
 	}
 
-	public Battle(string typeName, Vector2 MGMMDGFPBLP, string name, string iconName, string previewIcon, string description, ushort rewardDigits, ushort prizeBaseDigits, string alias, string title, string location, string music, string rewardImage, string showResistance)
+	public Battle(string typeName, Vector2 mapPosition, string name, string iconName, string previewIcon, string description, ushort rewardDigits, ushort prizeBaseDigits, string alias, string title, string location, string music, string rewardImage, string showResistance)
 	{
-		_pos = MGMMDGFPBLP;
+		_pos = mapPosition;
 		_name = name;
 		_alias = alias;
 		_title = title;

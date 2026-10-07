@@ -24,12 +24,12 @@ public static class ItemBuyHelper
 		if (userItem == null)
 		{
 			XmlNode itemsNode = ListSF.GetRoster().GetItemsNode();
-			UserItem dKCHDHMLKHN2 = new UserItem(itemsNode, item.Name, false, 1, -1, -1L);
-			dKCHDHMLKHN2.SetInfo(item);
-			dKCHDHMLKHN2.SetIsUpgrade(false);
-			dKCHDHMLKHN2.ApplyDefaultEnchantments();
-			ListSF.GetRoster().GetInventory().AddItem(dKCHDHMLKHN2);
-			dKCHDHMLKHN2.RefreshUpgradeState(ListSF.GetRoster().GetLevel());
+			UserItem newUserItem = new UserItem(itemsNode, item.Name, false, 1, -1, -1L);
+			newUserItem.SetInfo(item);
+			newUserItem.SetIsUpgrade(false);
+			newUserItem.ApplyDefaultEnchantments();
+			ListSF.GetRoster().GetInventory().AddItem(newUserItem);
+			newUserItem.RefreshUpgradeState(ListSF.GetRoster().GetLevel());
 			Sound.PlaySound("snd_buy");
 			return true;
 		}
@@ -44,12 +44,12 @@ public static class ItemBuyHelper
 		{
 			long deliveryTimestamp = GlobalTimer.get_LocalTimeUTC() + item.DeliveryTime;
 			XmlNode itemsNode = ListSF.GetRoster().GetItemsNode();
-			UserItem dKCHDHMLKHN2 = new UserItem(itemsNode, item.Name, false, 0, -1, deliveryTimestamp);
-			dKCHDHMLKHN2.SetInfo(item);
-			dKCHDHMLKHN2.SetIsUpgrade(false);
-			dKCHDHMLKHN2.ApplyDefaultEnchantments();
-			ListSF.GetRoster().GetInventory().AddItem(dKCHDHMLKHN2);
-			dKCHDHMLKHN2.RefreshUpgradeState(ListSF.GetRoster().GetLevel());
+			UserItem newUserItem = new UserItem(itemsNode, item.Name, false, 0, -1, deliveryTimestamp);
+			newUserItem.SetInfo(item);
+			newUserItem.SetIsUpgrade(false);
+			newUserItem.ApplyDefaultEnchantments();
+			ListSF.GetRoster().GetInventory().AddItem(newUserItem);
+			newUserItem.RefreshUpgradeState(ListSF.GetRoster().GetLevel());
 			Sound.PlaySound("snd_upgrade");
 			return true;
 		}

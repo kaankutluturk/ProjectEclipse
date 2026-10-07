@@ -266,29 +266,29 @@ public class GeneralConfig
 	private void ParseSettings(XmlNode node)
 	{
 		XmlNode urlNode = node["time"];
-		XmlNode aIDFCDDECJB2 = node["dumps"];
-		XmlNode aIDFCDDECJB3 = node["server"];
+		XmlNode dumpUrlNode = node["dumps"];
+		XmlNode serverUrlNode = node["server"];
 		KeyValuePair<string, string> urlPair = ParseUrlPair(urlNode);
-		KeyValuePair<string, string> hFCAPMDHLJN2 = ParseUrlPair(aIDFCDDECJB2);
-		KeyValuePair<string, string> hFCAPMDHLJN3 = ParseUrlPair(aIDFCDDECJB3);
+		KeyValuePair<string, string> dumpUrlPair = ParseUrlPair(dumpUrlNode);
+		KeyValuePair<string, string> serverUrlPair = ParseUrlPair(serverUrlNode);
 		if (!IsEmptyPair(urlPair))
 		{
 			ServerProvider.set_TimeServerURL(urlPair.Value);
 		}
-		if (!IsEmptyPair(hFCAPMDHLJN2))
+		if (!IsEmptyPair(dumpUrlPair))
 		{
-			ServerProvider.set_DumpPutURL(hFCAPMDHLJN2.Key);
-			ServerProvider.set_DumpGetURL(hFCAPMDHLJN2.Value);
+			ServerProvider.set_DumpPutURL(dumpUrlPair.Key);
+			ServerProvider.set_DumpGetURL(dumpUrlPair.Value);
 		}
-		if (!IsEmptyPair(hFCAPMDHLJN3))
+		if (!IsEmptyPair(serverUrlPair))
 		{
-			ServerProvider.set_PutURL(hFCAPMDHLJN3.Key);
-			ServerProvider.set_GetURL(hFCAPMDHLJN3.Value);
+			ServerProvider.set_PutURL(serverUrlPair.Key);
+			ServerProvider.set_GetURL(serverUrlPair.Value);
 		}
 		XmlNode verificationNode = node["verification"];
 		ParseVerification(verificationNode);
-		XmlNode hKPPBKPJOEO2 = node["ledger"];
-		ParseLedger(hKPPBKPJOEO2);
+		XmlNode ledgerNode = node["ledger"];
+		ParseLedger(ledgerNode);
 	}
 
 	private void ParseVerification(XmlNode node)
@@ -375,17 +375,17 @@ public class GeneralConfig
 					continue;
 				}
 			}
-			VersionContainer pAMHFPMEPCH2 = new VersionContainer();
-			pAMHFPMEPCH2.SetVersion(childNode.Attributes["MinVersion"].GetStringOrDefault());
+			VersionContainer candidateVersion = new VersionContainer();
+			candidateVersion.SetVersion(childNode.Attributes["MinVersion"].GetStringOrDefault());
 			if (!exactMatch)
 			{
-				if (VersionContainer.IsGreaterOrEqual(pAMHFPMEPCH2, bestVersion) && VersionContainer.IsLessOrEqual(pAMHFPMEPCH2, currentVersion))
+				if (VersionContainer.IsGreaterOrEqual(candidateVersion, bestVersion) && VersionContainer.IsLessOrEqual(candidateVersion, currentVersion))
 				{
-					bestVersion = pAMHFPMEPCH2;
+					bestVersion = candidateVersion;
 					result = childNode;
 				}
 			}
-			else if (VersionContainer.IsEqual(currentVersion, pAMHFPMEPCH2))
+			else if (VersionContainer.IsEqual(currentVersion, candidateVersion))
 			{
 				result = childNode;
 				break;
@@ -509,19 +509,19 @@ public class GeneralConfig
 			{
 				continue;
 			}
-			PricesData bEOLBLGJCKA2 = Prices.FindByProductId(priceData.ProductId);
-			if (bEOLBLGJCKA2 == null)
+			PricesData basePrices = Prices.FindByProductId(priceData.ProductId);
+			if (basePrices == null)
 			{
 				Prices.GetPrices().Add(priceData);
 				continue;
 			}
-			bool flag = priceData.GroupId == bEOLBLGJCKA2.GroupId;
-			bool flag2 = priceData.SpenderTypeId == bEOLBLGJCKA2.SpenderTypeId || string.IsNullOrEmpty(bEOLBLGJCKA2.SpenderTypeId);
+			bool flag = priceData.GroupId == basePrices.GroupId;
+			bool flag2 = priceData.SpenderTypeId == basePrices.SpenderTypeId || string.IsNullOrEmpty(basePrices.SpenderTypeId);
 			if (flag && flag2)
 			{
-				if (string.IsNullOrEmpty(bEOLBLGJCKA2.Locale))
+				if (string.IsNullOrEmpty(basePrices.Locale))
 				{
-					Prices.GetPrices().Remove(bEOLBLGJCKA2);
+					Prices.GetPrices().Remove(basePrices);
 					Prices.GetPrices().Add(priceData);
 				}
 			}
@@ -557,9 +557,9 @@ public class GeneralConfig
 		priceData.Focus = node.Attributes["Focus"].ParseBool();
 		priceData.MobileOperator = node.Attributes["MobileOperator"].GetStringOrDefault(string.Empty);
 		priceData.SpenderTypeId = node.Attributes["SpenderTypeID"].GetStringOrDefault(string.Empty);
-		PricesData bEOLBLGJCKA2 = priceData;
-		bEOLBLGJCKA2.IsConsumable = node.Attributes["ProductType"].ParseInt(1) != 2;
-		return bEOLBLGJCKA2;
+		PricesData pricesData = priceData;
+		pricesData.IsConsumable = node.Attributes["ProductType"].ParseInt(1) != 2;
+		return pricesData;
 	}
 
 	private bool IsOkLocale(string localeList, string locale)

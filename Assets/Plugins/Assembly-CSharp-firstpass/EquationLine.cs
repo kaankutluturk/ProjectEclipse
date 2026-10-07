@@ -13,10 +13,10 @@ public class EquationLine
 		ConstantC = 0f;
 	}
 
-	public EquationLine(float a, float AAOIAEJJINO = 0f, float ILHDJDNPFKH = 0f)
+	public EquationLine(float a, float coefficientB = 0f, float constantC = 0f)
 	{
 		this.A = a;
-		this.CoefficientB = AAOIAEJJINO;
-		this.ConstantC = ILHDJDNPFKH;
+		this.CoefficientB = coefficientB;
+		this.ConstantC = constantC;
 	}
 }

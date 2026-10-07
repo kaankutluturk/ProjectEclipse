@@ -175,8 +175,8 @@ public class YamlEventParser : IParser
 		if (!(GetCurrentToken() is StreamEnd))
 		{
 			Mark start = GetCurrentToken().Start;
-			TagDirectiveCollection cPAIGLNDIOK2 = new TagDirectiveCollection();
-			VersionDirective versionDirective = ProcessDirectives(cPAIGLNDIOK2);
+			TagDirectiveCollection tagDirectives = new TagDirectiveCollection();
+			VersionDirective versionDirective = ProcessDirectives(tagDirectives);
 			Token token = GetCurrentToken();
 			if (!(token is DocumentStart))
 			{
@@ -184,7 +184,7 @@ public class YamlEventParser : IParser
 			}
 			states.Push(ParserState.DocumentEnd);
 			state = ParserState.DocumentContent;
-			ParsingEvent result = new DocumentStart(versionDirective, cPAIGLNDIOK2, false, start, token.End);
+			ParsingEvent result = new DocumentStart(versionDirective, tagDirectives, false, start, token.End);
 			Skip();
 			return result;
 		}

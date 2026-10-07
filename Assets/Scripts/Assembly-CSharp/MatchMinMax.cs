@@ -172,11 +172,11 @@ public class MatchMinMax
 			GetMinFunction().Parse(minExpression);
 			SetMinUnbounded(false);
 		}
-		XmlAttribute cJBEMNNNHDM2 = node.Attributes["Max"];
-		if (!cJBEMNNNHDM2.Empty())
+		XmlAttribute maxAttribute = node.Attributes["Max"];
+		if (!maxAttribute.Empty())
 		{
-			string bLLCOEAOJGF2 = cJBEMNNNHDM2.GetStringOrDefault(string.Empty);
-			GetMaxFunction().Parse(bLLCOEAOJGF2);
+			string maxFunctionText = maxAttribute.GetStringOrDefault(string.Empty);
+			GetMaxFunction().Parse(maxFunctionText);
 			SetMaxUnbounded(false);
 		}
 		GetMinFunction().SetFunctionCallback(perk.EvaluateFunctionCallback);
@@ -190,8 +190,8 @@ public class MatchMinMax
 	public void EvaluateFunctions()
 	{
 		FunctionResult result = GetMinFunction().Calculate();
-		FunctionResult dEIHAOLOPLC2 = GetMaxFunction().Calculate();
+		FunctionResult maxResult = GetMaxFunction().Calculate();
 		SetMinValue(result.Value.ToFloat());
-		SetMaxValue(dEIHAOLOPLC2.Value.ToFloat());
+		SetMaxValue(maxResult.Value.ToFloat());
 	}
 }

@@ -178,39 +178,39 @@ public class ModelPhysics
 	private void IterativeLine(ModelEdge Edge)
 	{
 		ModelNode startNode = Edge.GetStartNode();
-		ModelNode lCDGOCIAIDK2 = Edge.GetEndNode();
+		ModelNode endNode = Edge.GetEndNode();
 		if (startNode.IsPhysicsActive())
 		{
 			IterativeNode(startNode);
-			if (lCDGOCIAIDK2.IsPhysicsActive())
+			if (endNode.IsPhysicsActive())
 			{
-				IterativeNode(lCDGOCIAIDK2);
+				IterativeNode(endNode);
 			}
 			Edge.Iterative();
 		}
-		else if (lCDGOCIAIDK2.IsPhysicsActive())
+		else if (endNode.IsPhysicsActive())
 		{
-			IterativeNode(lCDGOCIAIDK2);
+			IterativeNode(endNode);
 			Edge.Iterative();
 		}
 	}
 
 	private void IterativeNode(ModelNode node)
 	{
-		Vector3f eMAFACPEPDK = node.GetStart();
-		if (eMAFACPEPDK.GetY() >= 0f)
+		Vector3f nodePosition = node.GetStart();
+		if (nodePosition.GetY() >= 0f)
 		{
 			GetFrictionForce(node);
 		}
 		if (wallLeftX != wallRightX)
 		{
-			if (eMAFACPEPDK.GetX() < wallLeftX)
+			if (nodePosition.GetX() < wallLeftX)
 			{
-				eMAFACPEPDK.SetX(wallLeftX);
+				nodePosition.SetX(wallLeftX);
 			}
-			else if (wallRightX < eMAFACPEPDK.GetX())
+			else if (wallRightX < nodePosition.GetX())
 			{
-				eMAFACPEPDK.SetX(wallRightX);
+				nodePosition.SetX(wallRightX);
 			}
 		}
 	}
@@ -220,18 +220,18 @@ public class ModelPhysics
 		if (node.IsCollisible() && wallLeftX != wallRightX)
 		{
 			Vector3f endPosition = node.GetEnd();
-			Vector3f eMAFACPEPDK2 = node.GetStart();
-			float num = eMAFACPEPDK2.GetX() - endPosition.GetX();
-			float num2 = eMAFACPEPDK2.GetZ() - endPosition.GetZ();
+			Vector3f startPosition = node.GetStart();
+			float num = startPosition.GetX() - endPosition.GetX();
+			float num2 = startPosition.GetZ() - endPosition.GetZ();
 			float num3 = num * num + num2 * num2;
-			float num4 = eMAFACPEPDK2.GetY() * _FrictionForce;
-			eMAFACPEPDK2.SetX(endPosition.GetX());
-			eMAFACPEPDK2.SetY(0f);
-			eMAFACPEPDK2.SetZ(endPosition.GetZ());
+			float num4 = startPosition.GetY() * _FrictionForce;
+			startPosition.SetX(endPosition.GetX());
+			startPosition.SetY(0f);
+			startPosition.SetZ(endPosition.GetZ());
 			if (num4 * num4 < num3)
 			{
 				num4 = 1f - num4 / Mathf.Sqrt(num3);
-				eMAFACPEPDK2.Add(num * num4, 0f, num2 * num4);
+				startPosition.Add(num * num4, 0f, num2 * num4);
 			}
 		}
 	}

@@ -644,7 +644,7 @@ public partial class Fight
                 error = string.Empty;
                 // Only the single-player HUD draws buttons, and only for the player.
                 if (_model != _fight._playerModel || _fight.IsLocalVersus || _fight.Controller == null) return true;
-                // Fight setup (FELJFJOEJNC) recomputes raid visibility for the next fight.
+                // Fight setup (UpdateRaidChargeButtonVisibility) recomputes raid visibility for the next fight.
                 _fight.Controller.GetActionButtons().ShowRaidChargeAbility(visible);
                 error = string.Empty;
                 return true;
@@ -2397,15 +2397,15 @@ public partial class Fight
 		if (strikeResult.AttackerEdge != null)
 		{
 			ModelNode attackerNode = strikeResult.AttackerEdge.GetStartNode();
-			ModelNode lCDGOCIAIDK2 = strikeResult.AttackerEdge.GetEndNode();
+			ModelNode hitNode = strikeResult.AttackerEdge.GetEndNode();
 			Vector3f currentPosition = attackerNode.GetStart();
 			Vector3f previousPosition = attackerNode.GetEnd();
-			Vector3f nBMEGFBPGFE2 = lCDGOCIAIDK2.GetStart();
-			Vector3f aKKEJFKBIHF2 = lCDGOCIAIDK2.GetEnd();
+			Vector3f nodeStart = hitNode.GetStart();
+			Vector3f nodeEnd = hitNode.GetEnd();
 			float num = 1f / 120f;
-			Vector3f hitDirection = Vector3f.op_Addition(Vector3f.op_Subtraction(currentPosition, previousPosition), Vector3f.op_Subtraction(nBMEGFBPGFE2, aKKEJFKBIHF2));
-			IntervalAttack hFIIPNLCIEE2 = eventModel.Opponent.GetAnimationModule().FindInterval(IntervalAnimation.IntervalType.INTERVAL_ATTACK) as IntervalAttack;
-			if (hFIIPNLCIEE2.GetHasEffect())
+			Vector3f hitDirection = Vector3f.op_Addition(Vector3f.op_Subtraction(currentPosition, previousPosition), Vector3f.op_Subtraction(nodeStart, nodeEnd));
+			IntervalAttack intervalAttack = eventModel.Opponent.GetAnimationModule().FindInterval(IntervalAnimation.IntervalType.INTERVAL_ATTACK) as IntervalAttack;
+			if (intervalAttack.GetHasEffect())
 			{
 				eventModel.sourceModel.SetHitData(strikeResult.Point, hitDirection, (!strikeResult.IsCritical) ? num : (2f * num));
 			}
@@ -2536,9 +2536,9 @@ public partial class Fight
 		}
 	}
 
-	public void CreateHitEffect(Vector3f NAAPALOFBCI, Vector3f direction, float time, string effectName, float scale)
+	public void CreateHitEffect(Vector3f hitPosition, Vector3f direction, float time, string effectName, float scale)
 	{
-		_Camera.PlayEffectAnimation(NAAPALOFBCI, direction, time, false, effectName, scale);
+		_Camera.PlayEffectAnimation(hitPosition, direction, time, false, effectName, scale);
 	}
 
 	public void UpdateModelAnimationParameters(Model model)
@@ -3059,12 +3059,12 @@ public partial class Fight
 		_enemyModel.GetStatistics().SetStyle(GetMaxStyle(1));
 		int num = 0;
 		ComboStatistic statistic = null;
-		ComboStatistic aBPJBNADBLA2 = null;
+		ComboStatistic comboStatistic = null;
 		if (preFight != null)
 		{
 			num = preFight.get_TimeLeft();
 			statistic = preFight.GetStatistic(0);
-			aBPJBNADBLA2 = preFight.GetStatistic(1);
+			comboStatistic = preFight.GetStatistic(1);
 		}
 		ModelParameters winnerParameters;
 		ModelParameters loserParameters;
@@ -3614,7 +3614,7 @@ public partial class Fight
 			if (userItems == null) return;
 			foreach (ItemInfo item in playerParameters.GetEquippedItems())
 			{
-				// Mirror ModelParameters.JBIOECDAAKP(): rule-created/replaced item clones do not
+				// Mirror ModelParameters.GetAllPerks(): rule-created/replaced item clones do not
 				// consume the player's saved UserItem enchantments.
 				if (item == null || item.IgnoreInventoryEnchantments) continue;
 				UserItem userItem = userItems.FindItem(item);
@@ -4242,13 +4242,13 @@ public partial class Fight
 	private void RefreshPlayerEquipment()
 	{
 		EquippedItemsStruct itemsBefore = new EquippedItemsStruct();
-		EquippedItemsStruct pFMMOILIHMP2 = new EquippedItemsStruct();
+		EquippedItemsStruct equippedItems = new EquippedItemsStruct();
 		playerParameters.CopyEquippedItemsTo(itemsBefore);
 		playerParameters.SetEquippedItemsFrom(playerEquippedItems);
 		playerParameters.CalculateAttributes();
 		ApplyItemRules(playerParameters);
-		playerParameters.CopyEquippedItemsTo(pFMMOILIHMP2);
-		if (!pFMMOILIHMP2.Compare(itemsBefore))
+		playerParameters.CopyEquippedItemsTo(equippedItems);
+		if (!equippedItems.Compare(itemsBefore))
 		{
 			RecreatePlayerModel();
 			playerParameters.FinalAttributes = itemRuleParameters.FinalAttributes;
@@ -4279,13 +4279,13 @@ public partial class Fight
 	private void RefreshEnemyEquipment()
 	{
 		EquippedItemsStruct itemsBefore = new EquippedItemsStruct();
-		EquippedItemsStruct pFMMOILIHMP2 = new EquippedItemsStruct();
+		EquippedItemsStruct equippedItems = new EquippedItemsStruct();
 		enemyParameters.CopyEquippedItemsTo(itemsBefore);
 		enemyParameters.SetEquippedItemsFrom(enemyEquippedItems);
 		enemyParameters.CalculateAttributes();
 		ApplyItemRules(enemyParameters);
-		enemyParameters.CopyEquippedItemsTo(pFMMOILIHMP2);
-		if (!pFMMOILIHMP2.Compare(itemsBefore))
+		enemyParameters.CopyEquippedItemsTo(equippedItems);
+		if (!equippedItems.Compare(itemsBefore))
 		{
 			RecreateEnemyModel();
 			enemyParameters.FinalAttributes = itemRuleParameters.FinalAttributes;
@@ -4561,16 +4561,16 @@ public partial class Fight
 	private void UpdateFightDataDamage(Model.StrikeResult strikeResult, RuleAppliance appliance)
 	{
 		FightData attackerData = null;
-		FightData hCPJJKMNMCE2 = null;
+		FightData sideData = null;
 		switch (appliance)
 		{
 		case RuleAppliance.AppliancePlayer:
 			attackerData = fightData.PlayerData;
-			hCPJJKMNMCE2 = fightData.EnemyData;
+			sideData = fightData.EnemyData;
 			break;
 		case RuleAppliance.ApplianceOpponent:
 			attackerData = fightData.EnemyData;
-			hCPJJKMNMCE2 = fightData.PlayerData;
+			sideData = fightData.PlayerData;
 			break;
 		default:
 			GameLog.Error("Fight::updateFightDataDamage ERROR - wrong RuleAppliance %i", appliance);
@@ -4582,10 +4582,10 @@ public partial class Fight
 		attackerData.IsBlocked = strikeResult.IsBlocked;
 		attackerData.IsCritical = strikeResult.IsCritical;
 		attackerData.IsHeadHit = strikeResult.IsHeadHit;
-		hCPJJKMNMCE2.DamageReceived = strikeResult.FinalDamage;
-		hCPJJKMNMCE2.DamageDealt = 0f;
-		hCPJJKMNMCE2.IsAttacker = false;
-		hCPJJKMNMCE2.IsBlocked = strikeResult.IsBlocked;
+		sideData.DamageReceived = strikeResult.FinalDamage;
+		sideData.DamageDealt = 0f;
+		sideData.IsAttacker = false;
+		sideData.IsBlocked = strikeResult.IsBlocked;
 	}
 
 	private void CheckCountersStopFight(ModelParameters winnerParameters, ModelParameters loserParameters)
@@ -4651,8 +4651,8 @@ public partial class Fight
 			int elapsedTime = FightDefinition.EffectiveRoundTime - preFight.get_TimeLeft();
 			ComboStatistic statistic = preFight.GetStatistic(0);
 			counters.SetTime(elapsedTime);
-			float bAINMLLIKOL2 = (ObscuredFloat)(winnerParameters.GetCurrentLife());
-			counters.SetLife(bAINMLLIKOL2);
+			float lifeValue = (ObscuredFloat)(winnerParameters.GetCurrentLife());
+			counters.SetLife(lifeValue);
 			if (winnerParameters.RewardsEnabled)
 			{
 				counters.OnPerfectRound();
@@ -5175,19 +5175,19 @@ public partial class Fight
 		{
 			ModelObject bodyObject = item.GetBodyObject();
 			float num2 = bodyObject.GetTotalWeight();
-			Vector3f eMAFACPEPDK2 = new Vector3f(bodyObject.GetCenterOfMassPosition());
-			eMAFACPEPDK2.Multiply(num2);
-			centerPoint.Add(eMAFACPEPDK2);
+			Vector3f weightedCenter = new Vector3f(bodyObject.GetCenterOfMassPosition());
+			weightedCenter.Multiply(num2);
+			centerPoint.Add(weightedCenter);
 			num += num2;
 		}
 		centerPoint.Multiply(1f / num);
-		Vector3f eMAFACPEPDK3 = new Vector3f(_Camera.GetCameraTarget());
-		eMAFACPEPDK3.Subtract(centerPoint);
-		eMAFACPEPDK3.SetY(0f);
-		eMAFACPEPDK3.SetZ(0f);
+		Vector3f cameraShift = new Vector3f(_Camera.GetCameraTarget());
+		cameraShift.Subtract(centerPoint);
+		cameraShift.SetY(0f);
+		cameraShift.SetZ(0f);
 		foreach (Model item2 in models)
 		{
-			item2.ShiftModelPosition(eMAFACPEPDK3, true);
+			item2.ShiftModelPosition(cameraShift, true);
 		}
 	}
 
@@ -5371,18 +5371,18 @@ public partial class Fight
 			list.AddIfNotExist(weaponSubType);
 			list2.AddIfNotExist(weaponSubType);
 		}
-		ItemInfo jGMLKIPCFII2 = _enemyModel.Parameters.Weapon;
-		if (jGMLKIPCFII2 != null)
+		ItemInfo tacticItem = _enemyModel.Parameters.Weapon;
+		if (tacticItem != null)
 		{
-			string mDPPNGIEJGD2 = jGMLKIPCFII2.SubType;
-			list.AddIfNotExist(mDPPNGIEJGD2);
-			if (list2.Contains(mDPPNGIEJGD2))
+			string tacticSubType = tacticItem.SubType;
+			list.AddIfNotExist(tacticSubType);
+			if (list2.Contains(tacticSubType))
 			{
-				list2.Remove(mDPPNGIEJGD2);
+				list2.Remove(tacticSubType);
 			}
 			else
 			{
-				list2.AddIfNotExist(mDPPNGIEJGD2);
+				list2.AddIfNotExist(tacticSubType);
 			}
 		}
 		GameLog.Write("Loading tactics for next subtypes:");

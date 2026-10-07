@@ -639,7 +639,7 @@ public class RulesInspector : global::EventDispatcher<object>
 	protected void CheckResistanceRules()
 	{
 		Model playerModel = _fight.GetModelByAppliance(RuleAppliance.AppliancePlayer);
-		Model fGCODGKLHED2 = _fight.GetModelByAppliance(RuleAppliance.ApplianceOpponent);
+		Model targetModel = _fight.GetModelByAppliance(RuleAppliance.ApplianceOpponent);
 		float num = 1f;
 		float num2 = 1f;
 		foreach (InFightRule item in _resistanceRules)
@@ -660,7 +660,7 @@ public class RulesInspector : global::EventDispatcher<object>
 			}
 		}
 		playerModel.SetDamageMultiplier(num);
-		fGCODGKLHED2.SetDamageMultiplier(num2);
+		targetModel.SetDamageMultiplier(num2);
 	}
 
 	protected void SetItemRules(List<ItemRule> itemRules)
@@ -1068,13 +1068,13 @@ public class RulesInspector : global::EventDispatcher<object>
 		if (!isCopy && rule.GetAppliance() == RuleAppliance.ApplianceAll)
 		{
 			InFightRule playerRule = rule.Copy();
-			InFightRule aAJIFBJLJOA2 = rule.Copy();
+			InFightRule inFightRule = rule.Copy();
 			playerRule.SetAppliance(RuleAppliance.AppliancePlayer);
-			aAJIFBJLJOA2.SetAppliance(RuleAppliance.ApplianceOpponent);
+			inFightRule.SetAppliance(RuleAppliance.ApplianceOpponent);
 			playerRule.ParentRule = rule;
-			aAJIFBJLJOA2.ParentRule = rule;
+			inFightRule.ParentRule = rule;
 			SetInFightRule(playerRule);
-			SetInFightRule(aAJIFBJLJOA2);
+			SetInFightRule(inFightRule);
 		}
 		else
 		{
@@ -1104,11 +1104,11 @@ public class RulesInspector : global::EventDispatcher<object>
 		}
 		for (int i = 0; i < _inFightRules.Count; i++)
 		{
-			InFightRule aAJIFBJLJOA2 = _inFightRules[i];
-			if (rule == aAJIFBJLJOA2)
+			InFightRule inFightRule = _inFightRules[i];
+			if (rule == inFightRule)
 			{
-				_inFightRules.Remove(aAJIFBJLJOA2);
-				DeactivateInFightRule(aAJIFBJLJOA2);
+				_inFightRules.Remove(inFightRule);
+				DeactivateInFightRule(inFightRule);
 				break;
 			}
 		}

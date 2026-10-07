@@ -42,25 +42,25 @@ public class VideoPlayerController : MonoBehaviour
 	public void add_ShowCompleted(ShowCompletedHandler value)
 	{
 		ShowCompletedHandler currentHandler = ShowCompleted;
-		ShowCompletedHandler pPCCKEGFAHH2;
+		ShowCompletedHandler previousHandler;
 		do
 		{
-			pPCCKEGFAHH2 = currentHandler;
-			currentHandler = Interlocked.CompareExchange(ref ShowCompleted, (ShowCompletedHandler)Delegate.Combine(pPCCKEGFAHH2, value), currentHandler);
+			previousHandler = currentHandler;
+			currentHandler = Interlocked.CompareExchange(ref ShowCompleted, (ShowCompletedHandler)Delegate.Combine(previousHandler, value), currentHandler);
 		}
-		while ((object)currentHandler != pPCCKEGFAHH2);
+		while ((object)currentHandler != previousHandler);
 	}
 
 	public void remove_ShowCompleted(ShowCompletedHandler value)
 	{
 		ShowCompletedHandler currentHandler = ShowCompleted;
-		ShowCompletedHandler pPCCKEGFAHH2;
+		ShowCompletedHandler previousHandler;
 		do
 		{
-			pPCCKEGFAHH2 = currentHandler;
-			currentHandler = Interlocked.CompareExchange(ref ShowCompleted, (ShowCompletedHandler)Delegate.Remove(pPCCKEGFAHH2, value), currentHandler);
+			previousHandler = currentHandler;
+			currentHandler = Interlocked.CompareExchange(ref ShowCompleted, (ShowCompletedHandler)Delegate.Remove(previousHandler, value), currentHandler);
 		}
-		while ((object)currentHandler != pPCCKEGFAHH2);
+		while ((object)currentHandler != previousHandler);
 	}
 
 	public void Init()

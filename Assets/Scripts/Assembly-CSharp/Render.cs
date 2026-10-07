@@ -230,7 +230,7 @@ public class Render
 		minZoom = visibleWidth / _location.width;
 	}
 
-	public void SpawnBloodEffects(Vector3f NAAPALOFBCI, Vector3f direction, int count)
+	public void SpawnBloodEffects(Vector3f bloodPosition, Vector3f direction, int count)
 	{
 		if (Eclipse.Multiplayer.VersusTickDriver.IsResimulating)
 		{
@@ -244,7 +244,7 @@ public class Render
 			bloodEffect.index = i;
 			bloodEffect.LifetimeFrames = 90;
 			bloodEffect.CreateSprite(spritePath, _location.modelsColor);
-			bloodEffect.SetPosition(NAAPALOFBCI);
+			bloodEffect.SetPosition(bloodPosition);
 			bloodEffect.SetScale(0.4f);
 			bloodEffect.SetParent(Container.GetViewerModel().GetRootObject());
 			bloodEffects.Add(bloodEffect);
@@ -319,7 +319,7 @@ public class Render
 		}
 	}
 
-	public void PlayHitEffect(Vector3f NAAPALOFBCI, Vector3f direction, float time, bool flag, string effectName, float scale)
+	public void PlayHitEffect(Vector3f hitPosition, Vector3f direction, float time, bool flag, string effectName, float scale)
 	{
 		if (Eclipse.Multiplayer.VersusTickDriver.IsResimulating)
 		{
@@ -331,7 +331,7 @@ public class Render
 		hitAnimation.set_Iterations(1);
 		hitAnimation.set_ChangeSpriteTime(time);
 		hitAnimation.set_Autoplay(true);
-		hitEffectObject.transform.localPosition = new Vector3(NAAPALOFBCI.GetX(), NAAPALOFBCI.GetY(), 0f);
+		hitEffectObject.transform.localPosition = new Vector3(hitPosition.GetX(), hitPosition.GetY(), 0f);
 		hitEffectObject.transform.localScale = new Vector3(scale, scale, scale);
 		// The fight render root is mirrored vertically (localScale.y = -1).
 		// A reflection reverses rotation handedness, so compensate here or an
@@ -445,11 +445,11 @@ public class Render
 		}
 		if (rightRingOutSprite == null)
 		{
-			ChangingSprite fEMGGEAGICG2 = new ChangingSprite(ChangingSprite.SpriteEffectType.AtlasBased);
-			fEMGGEAGICG2.InitAtlasAnimation(atlasName, "Textures/fight/rules/ringout/", frameTime, 0f, _location.width / 2f - rightMargin, 7f + 2f * _location.floorHeight);
-			fEMGGEAGICG2.SetPosition(_location.width / 4f + rightMargin / 2f, 7f + _location.floorHeight - _location.height / 2f);
-			additionalDrawsLayer.AddChangingSprite(fEMGGEAGICG2, 1);
-			rightRingOutSprite = fEMGGEAGICG2;
+			ChangingSprite ringOutSprite = new ChangingSprite(ChangingSprite.SpriteEffectType.AtlasBased);
+			ringOutSprite.InitAtlasAnimation(atlasName, "Textures/fight/rules/ringout/", frameTime, 0f, _location.width / 2f - rightMargin, 7f + 2f * _location.floorHeight);
+			ringOutSprite.SetPosition(_location.width / 4f + rightMargin / 2f, 7f + _location.floorHeight - _location.height / 2f);
+			additionalDrawsLayer.AddChangingSprite(ringOutSprite, 1);
+			rightRingOutSprite = ringOutSprite;
 		}
 	}
 

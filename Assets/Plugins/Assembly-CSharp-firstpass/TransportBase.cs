@@ -119,25 +119,25 @@ public abstract class TransportBase
 	public void AddStateChangedHandler(OnTransportStateChangedDelegate value)
 	{
 		OnTransportStateChangedDelegate currentHandler = OnStateChanged;
-		OnTransportStateChangedDelegate lCGIFKDMOMP2;
+		OnTransportStateChangedDelegate previousHandler;
 		do
 		{
-			lCGIFKDMOMP2 = currentHandler;
-			currentHandler = Interlocked.CompareExchange(ref OnStateChanged, (OnTransportStateChangedDelegate)Delegate.Combine(lCGIFKDMOMP2, value), currentHandler);
+			previousHandler = currentHandler;
+			currentHandler = Interlocked.CompareExchange(ref OnStateChanged, (OnTransportStateChangedDelegate)Delegate.Combine(previousHandler, value), currentHandler);
 		}
-		while ((object)currentHandler != lCGIFKDMOMP2);
+		while ((object)currentHandler != previousHandler);
 	}
 
 	public void RemoveStateChangedHandler(OnTransportStateChangedDelegate value)
 	{
 		OnTransportStateChangedDelegate currentHandler = OnStateChanged;
-		OnTransportStateChangedDelegate lCGIFKDMOMP2;
+		OnTransportStateChangedDelegate previousHandler;
 		do
 		{
-			lCGIFKDMOMP2 = currentHandler;
-			currentHandler = Interlocked.CompareExchange(ref OnStateChanged, (OnTransportStateChangedDelegate)Delegate.Remove(lCGIFKDMOMP2, value), currentHandler);
+			previousHandler = currentHandler;
+			currentHandler = Interlocked.CompareExchange(ref OnStateChanged, (OnTransportStateChangedDelegate)Delegate.Remove(previousHandler, value), currentHandler);
 		}
-		while ((object)currentHandler != lCGIFKDMOMP2);
+		while ((object)currentHandler != previousHandler);
 	}
 
 	public abstract void Connect();

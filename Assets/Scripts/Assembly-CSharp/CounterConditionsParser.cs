@@ -42,8 +42,8 @@ public static class CounterConditionsParser
 			{
 			case "Battle":
 			{
-				ConditionBattle ePJGLECOIBG2 = new ConditionBattle(childNode);
-				parentOperator.AddCondition(ePJGLECOIBG2);
+				ConditionBattle battleCondition = new ConditionBattle(childNode);
+				parentOperator.AddCondition(battleCondition);
 				break;
 			}
 			case "Operator":

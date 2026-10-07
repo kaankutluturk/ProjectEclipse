@@ -364,9 +364,9 @@ internal sealed class HTTPConnection : IDisposable
 					string text3 = DigestStore.FindBest(GetCurrentRequest().GetResponse().GetHeaderValues("www-authenticate"));
 					if (!string.IsNullOrEmpty(text3))
 					{
-						Digest kHNAPCOOAEF2 = DigestStore.GetOrCreate(GetCurrentRequest().GetCurrentUri());
-						kHNAPCOOAEF2.ParseChallange(text3);
-						if (GetCurrentRequest().GetCredentials() != null && kHNAPCOOAEF2.IsUriProtected(GetCurrentRequest().GetCurrentUri()) && (!GetCurrentRequest().HasHeader("Authorization") || kHNAPCOOAEF2.GetStale()))
+						Digest digest = DigestStore.GetOrCreate(GetCurrentRequest().GetCurrentUri());
+						digest.ParseChallange(text3);
+						if (GetCurrentRequest().GetCredentials() != null && digest.IsUriProtected(GetCurrentRequest().GetCurrentUri()) && (!GetCurrentRequest().HasHeader("Authorization") || digest.GetStale()))
 						{
 							retryCause = RetryCauses.Authenticate;
 						}
@@ -439,7 +439,7 @@ internal sealed class HTTPConnection : IDisposable
 			GetCurrentRequest().set_State(HTTPRequestStates.ConnectionTimedOut);
 			Close();
 		}
-		catch (Exception bAINMLLIKOL2)
+		catch (Exception threadException)
 		{
 			if (GetCurrentRequest() != null)
 			{
@@ -457,7 +457,7 @@ internal sealed class HTTPConnection : IDisposable
 					GetCurrentRequest().set_State(HTTPRequestStates.TimedOut);
 					break;
 				default:
-					GetCurrentRequest().set_Exception(bAINMLLIKOL2);
+					GetCurrentRequest().set_Exception(threadException);
 					GetCurrentRequest().set_State(HTTPRequestStates.Error);
 					break;
 				}
@@ -588,9 +588,9 @@ internal sealed class HTTPConnection : IDisposable
 					string text2 = DigestStore.FindBest(GetCurrentRequest().GetProxyResponse().GetHeaderValues("proxy-authenticate"));
 					if (!string.IsNullOrEmpty(text2))
 					{
-						Digest kHNAPCOOAEF2 = DigestStore.GetOrCreate(GetProxy().GetAddress());
-						kHNAPCOOAEF2.ParseChallange(text2);
-						if (GetProxy().GetCredentials() != null && kHNAPCOOAEF2.IsUriProtected(GetProxy().GetAddress()) && (!GetCurrentRequest().HasHeader("Proxy-Authorization") || kHNAPCOOAEF2.GetStale()))
+						Digest digest = DigestStore.GetOrCreate(GetProxy().GetAddress());
+						digest.ParseChallange(text2);
+						if (GetProxy().GetCredentials() != null && digest.IsUriProtected(GetProxy().GetAddress()) && (!GetCurrentRequest().HasHeader("Proxy-Authorization") || digest.GetStale()))
 						{
 							flag2 = true;
 						}
@@ -719,9 +719,9 @@ internal sealed class HTTPConnection : IDisposable
 			{
 				GetCurrentRequest().OnUploadProgress(GetCurrentRequest(), GetCurrentRequest().GetUploaded(), GetCurrentRequest().GetUploadLength());
 			}
-			catch (Exception mPFFFAOGBJE2)
+			catch (Exception progressException)
 			{
-				HTTPManager.GetLogger().Exception("HTTPManager", "HandleProgressCallback - OnUploadProgress", mPFFFAOGBJE2);
+				HTTPManager.GetLogger().Exception("HTTPManager", "HandleProgressCallback - OnUploadProgress", progressException);
 			}
 			GetCurrentRequest().SetUploadProgressChanged(false);
 		}

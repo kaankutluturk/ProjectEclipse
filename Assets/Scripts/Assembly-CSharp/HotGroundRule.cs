@@ -232,9 +232,9 @@ public class HotGroundRule : AnimationListRule
 	{
 		foreach (LimitedNode item in limitedNodes)
 		{
-			Vector3f eMAFACPEPDK = item.node.GetStart();
-			eMAFACPEPDK = new Vector3f(eMAFACPEPDK.GetX() + offsetX, 0f - eMAFACPEPDK.GetY(), eMAFACPEPDK.GetZ());
-			if (!(eMAFACPEPDK.GetX() >= item.MaxX) && !(eMAFACPEPDK.GetX() <= item.MinX) && !(eMAFACPEPDK.GetY() >= item.MaxY) && !(eMAFACPEPDK.GetY() <= item.MinY))
+			Vector3f mirroredPosition = item.node.GetStart();
+			mirroredPosition = new Vector3f(mirroredPosition.GetX() + offsetX, 0f - mirroredPosition.GetY(), mirroredPosition.GetZ());
+			if (!(mirroredPosition.GetX() >= item.MaxX) && !(mirroredPosition.GetX() <= item.MinX) && !(mirroredPosition.GetY() >= item.MaxY) && !(mirroredPosition.GetY() <= item.MinY))
 			{
 				return false;
 			}

@@ -273,17 +273,17 @@ public class DistancePoint
 		ModelNode pivotNode = GetPointNode(conditions).PivotNode;
 		if (pivotNode != null)
 		{
-			ModelNode lCDGOCIAIDK2 = pivotNode.GetPairNode();
-			if (lCDGOCIAIDK2 != null)
+			ModelNode pivotCandidate = pivotNode.GetPairNode();
+			if (pivotCandidate != null)
 			{
 				int animationSign = conditions.AnimationSign;
 				int pairSelector = conditions.PivotPairSelector;
 				float num = pivotNode.GetStart().GetX() * (float)animationSign;
-				float num2 = lCDGOCIAIDK2.GetStart().GetX() * (float)animationSign;
+				float num2 = pivotCandidate.GetStart().GetX() * (float)animationSign;
 				bool flag = num > num2;
 				if ((pairSelector == 1 && !flag) || (pairSelector == 2 && flag))
 				{
-					pivotNode = lCDGOCIAIDK2;
+					pivotNode = pivotCandidate;
 				}
 			}
 		}

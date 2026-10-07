@@ -260,8 +260,8 @@ public class JsonMapper
 			}
 			if (base_importers_table.ContainsKey(type) && base_importers_table[type].ContainsKey(valueType))
 			{
-				ImporterFunc iPPLMFLBMNF2 = base_importers_table[type][valueType];
-				return iPPLMFLBMNF2(reader.GetValue());
+				ImporterFunc importer = base_importers_table[type][valueType];
+				return importer(reader.GetValue());
 			}
 			if (valueType.IsEnum)
 			{
@@ -412,12 +412,12 @@ public class JsonMapper
 			wrapper.SetJsonType(JsonType.Array);
 			while (true)
 			{
-				IJsonWrapper pIIMPPKAOCI2 = ReadValue(factory, reader);
-				if (pIIMPPKAOCI2 == null && reader.GetToken() == JsonToken.ArrayEnd)
+				IJsonWrapper item = ReadValue(factory, reader);
+				if (item == null && reader.GetToken() == JsonToken.ArrayEnd)
 				{
 					break;
 				}
-				wrapper.Add(pIIMPPKAOCI2);
+				wrapper.Add(item);
 			}
 		}
 		else if (reader.GetToken() == JsonToken.ObjectStart)
@@ -607,8 +607,8 @@ public class JsonMapper
 		}
 		if (base_exporters_table.ContainsKey(type))
 		{
-			ExporterFunc nHMEKPMHION2 = base_exporters_table[type];
-			nHMEKPMHION2(obj, writer);
+			ExporterFunc exporter = base_exporters_table[type];
+			exporter(obj, writer);
 			return;
 		}
 		if (obj is Enum)

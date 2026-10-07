@@ -313,16 +313,16 @@ public class PerkInfoItem
 				xmlNode2 = xmlDocument["Perk"].AppendImportedClone(ratingEvaluationNode);
 			}
 		}
-		PerkInfoItem aCONCDFDNJH2 = new PerkInfoItem();
+		PerkInfoItem clonedPerk = new PerkInfoItem();
 		XmlNode xmlNode3 = xmlDocument["Perk"];
 		if (xmlNode3 != null)
 		{
-			aCONCDFDNJH2.Parse(xmlNode3);
+			clonedPerk.Parse(xmlNode3);
 		}
-		aCONCDFDNJH2.UpgradeLevel = UpgradeLevel;
-		aCONCDFDNJH2.IsClone = true;
-		aCONCDFDNJH2.ReleaseDefinitionXml();
-		return aCONCDFDNJH2;
+		clonedPerk.UpgradeLevel = UpgradeLevel;
+		clonedPerk.IsClone = true;
+		clonedPerk.ReleaseDefinitionXml();
+		return clonedPerk;
 	}
 
 	public void ReleaseDefinitionXml()
@@ -849,14 +849,14 @@ public class PerkInfoItem
 			return;
 		}
 		string firstArgument = functionCall.argumentValues[0].body;
-		string mJOCMMIBOGJ2 = functionCall.argumentValues[1].body;
+		string secondArgument = functionCall.argumentValues[1].body;
 		string text = string.Empty;
 		if (functionCall.argumentValues.Count >= 3)
 		{
 			text = functionCall.argumentValues[2].body;
 		}
 		DistancePoint distancePoint = new DistancePoint();
-		distancePoint.Create(firstArgument, mJOCMMIBOGJ2, text);
+		distancePoint.Create(firstArgument, secondArgument, text);
 		float num = 0f;
 		if (distancePoint.ObjectType != DistancePoint.Object.OBJECT_NODES)
 		{
@@ -871,8 +871,8 @@ public class PerkInfoItem
 			}
 			if (distancePoint.TargetModel == ModelType.ModelTargetType.MODEL_OTHER)
 			{
-				ModelNode lCDGOCIAIDK2 = model.GetCombatTarget().GetBodyObject().GetNodeByName(text);
-				num = lCDGOCIAIDK2.GetStart().GetX();
+				ModelNode otherNode = model.GetCombatTarget().GetBodyObject().GetNodeByName(text);
+				num = otherNode.GetStart().GetX();
 			}
 		}
 		functionResult.Value = num.ToString();
@@ -886,14 +886,14 @@ public class PerkInfoItem
 			return;
 		}
 		string firstArgument = functionCall.argumentValues[0].body;
-		string mJOCMMIBOGJ2 = functionCall.argumentValues[1].body;
+		string secondArgument = functionCall.argumentValues[1].body;
 		string text = string.Empty;
 		if (functionCall.argumentValues.Count >= 3)
 		{
 			text = functionCall.argumentValues[2].body;
 		}
 		DistancePoint distancePoint = new DistancePoint();
-		distancePoint.Create(firstArgument, mJOCMMIBOGJ2, text);
+		distancePoint.Create(firstArgument, secondArgument, text);
 		float num = 0f;
 		if (distancePoint.ObjectType != DistancePoint.Object.OBJECT_NODES)
 		{
@@ -908,8 +908,8 @@ public class PerkInfoItem
 			}
 			if (distancePoint.TargetModel == ModelType.ModelTargetType.MODEL_OTHER)
 			{
-				ModelNode lCDGOCIAIDK2 = model.GetCombatTarget().GetBodyObject().GetNodeByName(text);
-				num = lCDGOCIAIDK2.GetStart().GetY();
+				ModelNode otherNode = model.GetCombatTarget().GetBodyObject().GetNodeByName(text);
+				num = otherNode.GetStart().GetY();
 			}
 		}
 		functionResult.Value = num.ToString();
@@ -923,14 +923,14 @@ public class PerkInfoItem
 			return;
 		}
 		string firstArgument = functionCall.argumentValues[0].body;
-		string mJOCMMIBOGJ2 = functionCall.argumentValues[1].body;
+		string secondArgument = functionCall.argumentValues[1].body;
 		string text = string.Empty;
 		if (functionCall.argumentValues.Count >= 3)
 		{
 			text = functionCall.argumentValues[2].body;
 		}
 		DistancePoint distancePoint = new DistancePoint();
-		distancePoint.Create(firstArgument, mJOCMMIBOGJ2, text);
+		distancePoint.Create(firstArgument, secondArgument, text);
 		float num = 0f;
 		if (distancePoint.ObjectType != DistancePoint.Object.OBJECT_NODES)
 		{
@@ -945,8 +945,8 @@ public class PerkInfoItem
 			}
 			if (distancePoint.TargetModel == ModelType.ModelTargetType.MODEL_OTHER)
 			{
-				ModelNode lCDGOCIAIDK2 = model.GetCombatTarget().GetBodyObject().GetNodeByName(text);
-				num = lCDGOCIAIDK2.GetStart().GetZ();
+				ModelNode otherNode = model.GetCombatTarget().GetBodyObject().GetNodeByName(text);
+				num = otherNode.GetStart().GetZ();
 			}
 		}
 		functionResult.Value = num.ToString();
@@ -983,9 +983,9 @@ public class PerkInfoItem
 			return;
 		}
 		string minText = functionCall.argumentValues[0].body;
-		string mJOCMMIBOGJ2 = functionCall.argumentValues[1].body;
+		string maxText = functionCall.argumentValues[1].body;
 		int minValue = minText.ToInt();
-		int maxValue = mJOCMMIBOGJ2.ToInt() + 1;
+		int maxValue = maxText.ToInt() + 1;
 		NekkiMath.SetSeed();
 		int num = NekkiMath.randomInt(minValue, maxValue);
 		int aspectLevel = ListSF.GetRoster().GetLevel();
@@ -1031,13 +1031,13 @@ public class PerkInfoItem
 		}
 		if (functionCall.argumentValues.Count >= 2)
 		{
-			string mJOCMMIBOGJ2 = functionCall.argumentValues[1].body;
-			num2 = mJOCMMIBOGJ2.ToInt();
+			string precisionText = functionCall.argumentValues[1].body;
+			num2 = precisionText.ToInt();
 		}
 		if (functionCall.argumentValues.Count == 3)
 		{
-			string mJOCMMIBOGJ3 = functionCall.argumentValues[2].body;
-			key = mJOCMMIBOGJ3;
+			string modeText = functionCall.argumentValues[2].body;
+			key = modeText;
 		}
 		if (!roundingModesByName.ContainsKey(key))
 		{
@@ -1149,11 +1149,11 @@ public class PerkInfoItem
 			float num2 = 1f;
 			if (strikeResult.IsCritical && strikeResult.AttackerModel != null)
 			{
-				int OEMALIFPGPO2 = 0;
-				string nJFGLOECJEK2 = GameUtils.GetCriticalHitDamage().Attribute;
-				strikeResult.AttackerModel.Parameters.FinalAttributes.Get(nJFGLOECJEK2, ref OEMALIFPGPO2);
-				float aMKPAGCFMIN2 = GameUtils.GetCriticalHitDamage().Base;
-				num2 = Mathf.Pow(2f, (float)OEMALIFPGPO2 * aMKPAGCFMIN2);
+				int critAttributeValue = 0;
+				string critAttributeName = GameUtils.GetCriticalHitDamage().Attribute;
+				strikeResult.AttackerModel.Parameters.FinalAttributes.Get(critAttributeName, ref critAttributeValue);
+				float critBase = GameUtils.GetCriticalHitDamage().Base;
+				num2 = Mathf.Pow(2f, (float)critAttributeValue * critBase);
 			}
 			functionResult.Value = (baseDamage * num * num2).ToString();
 			break;

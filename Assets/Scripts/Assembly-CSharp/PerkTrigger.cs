@@ -121,11 +121,11 @@ public class PerkTrigger
 	{
 		set_Name(node.Attributes["Name"].GetStringOrDefault(string.Empty));
 		XmlNode eventsNode = node["Events"];
-		XmlNode hKPPBKPJOEO2 = node["Conditions"];
-		XmlNode hKPPBKPJOEO3 = node["Actions"];
+		XmlNode conditionsNode = node["Conditions"];
+		XmlNode actionsNode = node["Actions"];
 		SetEvents(PerkEvent.Create(eventsNode, GetPerk()));
-		SetConditions(PerkCondition.Create(hKPPBKPJOEO2, GetPerk()));
-		SetActions(PerkAction.Create(hKPPBKPJOEO3, GetPerk(), this));
+		SetConditions(PerkCondition.Create(conditionsNode, GetPerk()));
+		SetActions(PerkAction.Create(actionsNode, GetPerk(), this));
 	}
 
 	public bool MatchesEvent(PerkEvent.EventStruct eventData)

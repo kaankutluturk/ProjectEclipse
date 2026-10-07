@@ -178,49 +178,49 @@ public sealed class SampleCookieAuthentication : IAuthenticationProvider
 	public void AddAuthenticationSucceeded(OnAuthenticationSuccededDelegate value)
 	{
 		OnAuthenticationSuccededDelegate currentHandler = OnAuthenticationSucceded;
-		OnAuthenticationSuccededDelegate lACLODBGJEI2;
+		OnAuthenticationSuccededDelegate previousHandler;
 		do
 		{
-			lACLODBGJEI2 = currentHandler;
-			currentHandler = Interlocked.CompareExchange(ref OnAuthenticationSucceded, (OnAuthenticationSuccededDelegate)Delegate.Combine(lACLODBGJEI2, value), currentHandler);
+			previousHandler = currentHandler;
+			currentHandler = Interlocked.CompareExchange(ref OnAuthenticationSucceded, (OnAuthenticationSuccededDelegate)Delegate.Combine(previousHandler, value), currentHandler);
 		}
-		while ((object)currentHandler != lACLODBGJEI2);
+		while ((object)currentHandler != previousHandler);
 	}
 
 	public void RemoveAuthenticationSucceeded(OnAuthenticationSuccededDelegate value)
 	{
 		OnAuthenticationSuccededDelegate currentHandler = OnAuthenticationSucceded;
-		OnAuthenticationSuccededDelegate lACLODBGJEI2;
+		OnAuthenticationSuccededDelegate previousHandler;
 		do
 		{
-			lACLODBGJEI2 = currentHandler;
-			currentHandler = Interlocked.CompareExchange(ref OnAuthenticationSucceded, (OnAuthenticationSuccededDelegate)Delegate.Remove(lACLODBGJEI2, value), currentHandler);
+			previousHandler = currentHandler;
+			currentHandler = Interlocked.CompareExchange(ref OnAuthenticationSucceded, (OnAuthenticationSuccededDelegate)Delegate.Remove(previousHandler, value), currentHandler);
 		}
-		while ((object)currentHandler != lACLODBGJEI2);
+		while ((object)currentHandler != previousHandler);
 	}
 
 	public void AddAuthenticationFailed(OnAuthenticationFailedDelegate value)
 	{
 		OnAuthenticationFailedDelegate currentHandler = OnAuthenticationFailed;
-		OnAuthenticationFailedDelegate bCHANFGJONF2;
+		OnAuthenticationFailedDelegate previousHandler;
 		do
 		{
-			bCHANFGJONF2 = currentHandler;
-			currentHandler = Interlocked.CompareExchange(ref OnAuthenticationFailed, (OnAuthenticationFailedDelegate)Delegate.Combine(bCHANFGJONF2, value), currentHandler);
+			previousHandler = currentHandler;
+			currentHandler = Interlocked.CompareExchange(ref OnAuthenticationFailed, (OnAuthenticationFailedDelegate)Delegate.Combine(previousHandler, value), currentHandler);
 		}
-		while ((object)currentHandler != bCHANFGJONF2);
+		while ((object)currentHandler != previousHandler);
 	}
 
 	public void RemoveAuthenticationFailed(OnAuthenticationFailedDelegate value)
 	{
 		OnAuthenticationFailedDelegate currentHandler = OnAuthenticationFailed;
-		OnAuthenticationFailedDelegate bCHANFGJONF2;
+		OnAuthenticationFailedDelegate previousHandler;
 		do
 		{
-			bCHANFGJONF2 = currentHandler;
-			currentHandler = Interlocked.CompareExchange(ref OnAuthenticationFailed, (OnAuthenticationFailedDelegate)Delegate.Remove(bCHANFGJONF2, value), currentHandler);
+			previousHandler = currentHandler;
+			currentHandler = Interlocked.CompareExchange(ref OnAuthenticationFailed, (OnAuthenticationFailedDelegate)Delegate.Remove(previousHandler, value), currentHandler);
 		}
-		while ((object)currentHandler != bCHANFGJONF2);
+		while ((object)currentHandler != previousHandler);
 	}
 
 	public void StartAuthentication()

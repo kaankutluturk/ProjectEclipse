@@ -1318,10 +1318,10 @@ public static class GameUtils
 		int num2 = num + value;
 		for (int i = 0; i < achievements.Count; i++)
 		{
-			Achievement jNPIOKEKMII2 = achievements[i];
-			if (jNPIOKEKMII2.CounterValue >= num && jNPIOKEKMII2.CounterValue <= num2 && !jNPIOKEKMII2.IsUnlocked)
+			Achievement achievement = achievements[i];
+			if (achievement.CounterValue >= num && achievement.CounterValue <= num2 && !achievement.IsUnlocked)
 			{
-				reachedAchievement = jNPIOKEKMII2;
+				reachedAchievement = achievement;
 				if (!counter.IsFightEnd)
 				{
 					reachedAchievement.IsUnlocked = true;
@@ -1331,7 +1331,7 @@ public static class GameUtils
 					pendingAchievements.Add(reachedAchievement);
 				}
 			}
-			else if (jNPIOKEKMII2.CounterValue >= num && jNPIOKEKMII2.CounterValue >= num2)
+			else if (achievement.CounterValue >= num && achievement.CounterValue >= num2)
 			{
 				break;
 			}
@@ -1647,14 +1647,14 @@ public static class GameUtils
 					bool flag4 = QuestUtils.GetDifficultyOptions().GetOverrideAllDifficulties();
 					if ((flag3 && item2.DifficultyFilter == ModelParameters.DifficultyFilter.DFHard) || (!flag3 && item2.DifficultyFilter == ModelParameters.DifficultyFilter.DFNormal) || item2.DifficultyFilter == ModelParameters.DifficultyFilter.DFBoth || flag4)
 					{
-						float oNMMKLDMHJD2 = item2.Factor;
-						float fJAHKFNFNCK2 = item2.Shift;
-						float num13 = (num9 - num5) * (1f - oNMMKLDMHJD2) + (num10 - num) * oNMMKLDMHJD2 + fJAHKFNFNCK2;
+						float blendFactor = item2.Factor;
+						float alignmentOffset = item2.Shift;
+						float num13 = (num9 - num5) * (1f - blendFactor) + (num10 - num) * blendFactor + alignmentOffset;
 						if (num11 < num13)
 						{
 							num11 = num13;
-							num3 = oNMMKLDMHJD2;
-							num4 = fJAHKFNFNCK2;
+							num3 = blendFactor;
+							num4 = alignmentOffset;
 						}
 					}
 				}
@@ -1991,8 +1991,8 @@ public static class GameUtils
 		case ItemAction.Item_Recipe:
 		{
 			flag = true;
-			RecipeItemInfo mBIJKDIEFIF2 = (RecipeItemInfo)item;
-			ScheduleEnchantmentNotification("enchantment_notification", mBIJKDIEFIF2);
+			RecipeItemInfo recipeItem = (RecipeItemInfo)item;
+			ScheduleEnchantmentNotification("enchantment_notification", recipeItem);
 			break;
 		}
 		case ItemAction.Item_Recipe_Delivery_End:
@@ -2392,12 +2392,12 @@ public static class GameUtils
 		else
 		{
 			AutoWinPending = false;
-			RosterFight pIGKOIFBOME2 = roster.FindSavedFightRecord(fightList.FightId);
-			if (pIGKOIFBOME2 == null)
+			RosterFight savedRosterFight = roster.FindSavedFightRecord(fightList.FightId);
+			if (savedRosterFight == null)
 			{
-				pIGKOIFBOME2 = roster.CreateFight(fightList.FightId);
+				savedRosterFight = roster.CreateFight(fightList.FightId);
 			}
-			fightList.SetRosterFight(pIGKOIFBOME2);
+			fightList.SetRosterFight(savedRosterFight);
 			int num = fightList.GetRewards().Count - 2;
 			if (num < 0)
 			{

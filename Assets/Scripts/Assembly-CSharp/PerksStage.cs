@@ -208,7 +208,7 @@ public partial class PerksStage : global::EventDispatcher<PerksStage.PerkEventSt
             var history = new HashSet<ActionPerk>(expiredActions);
             foreach (var action in history)
             {
-                // CLBPEANCNOA records expired actions here. Live aliases still
+                // AddExpiredAction records expired actions here. Live aliases still
                 // take the effect-specific path. Namespace-only records are not
                 // proof of expiry and remain subject to the retirement gate.
                 if (action == null || seen.Contains(action)) continue;

@@ -155,15 +155,15 @@ public class Segment3D
 	public Vector2f GetClosestPointOnLine2D(Vector2f point)
 	{
 		Vector2f offset = new Vector2f(point);
-		Vector2f hEJKLMNOLLG2 = new Vector2f(start);
-		Vector2f hEJKLMNOLLG3 = GetDirection2D();
-		offset.SubtractXY(hEJKLMNOLLG2);
-		float num = offset.DotProduct(hEJKLMNOLLG3);
-		float num2 = hEJKLMNOLLG3.DotProduct(hEJKLMNOLLG3);
+		Vector2f closestPoint = new Vector2f(start);
+		Vector2f lineDirection = GetDirection2D();
+		offset.SubtractXY(closestPoint);
+		float num = offset.DotProduct(lineDirection);
+		float num2 = lineDirection.DotProduct(lineDirection);
 		float projectionRatio = ((num2 == 0f) ? 0f : (num / num2));
-		hEJKLMNOLLG3.Multiply(projectionRatio);
-		hEJKLMNOLLG2.Add(hEJKLMNOLLG3);
-		return hEJKLMNOLLG2;
+		lineDirection.Multiply(projectionRatio);
+		closestPoint.Add(lineDirection);
+		return closestPoint;
 	}
 
 	public float GetRatioFromEnd(Vector2f point)

@@ -24,21 +24,21 @@ public sealed class NonGenericDictionaryNodeDeserializer : INodeDeserializer
 			object key = nestedObjectDeserializer(reader, typeof(object));
 			IValuePromise keyPromise = key as IValuePromise;
 			object entryValue = nestedObjectDeserializer(reader, typeof(object));
-			IValuePromise aGAMFLELGLG2 = entryValue as IValuePromise;
+			IValuePromise promise = entryValue as IValuePromise;
 			if (keyPromise == null)
 			{
-				if (aGAMFLELGLG2 == null)
+				if (promise == null)
 				{
 					dictionary.Add(key, entryValue);
 					continue;
 				}
-				aGAMFLELGLG2.add_ValueAvailable((object resolvedValue) =>
+				promise.add_ValueAvailable((object resolvedValue) =>
 				{
 					dictionary.Add(key, resolvedValue);
 				});
 				continue;
 			}
-			if (aGAMFLELGLG2 == null)
+			if (promise == null)
 			{
 				keyPromise.add_ValueAvailable((object resolvedValue) =>
 				{
@@ -59,7 +59,7 @@ public sealed class NonGenericDictionaryNodeDeserializer : INodeDeserializer
 					hasFirstPart = true;
 				}
 			});
-			aGAMFLELGLG2.add_ValueAvailable((object resolvedValue) =>
+			promise.add_ValueAvailable((object resolvedValue) =>
 			{
 				if (hasFirstPart)
 				{

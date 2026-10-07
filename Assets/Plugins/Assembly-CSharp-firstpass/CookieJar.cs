@@ -144,17 +144,17 @@ public static class CookieJar
 							continue;
 						}
 						int index;
-						Cookie eKAOIOLAGFH2 = Find(cookie, out index);
+						Cookie existingCookie = Find(cookie, out index);
 						if (!string.IsNullOrEmpty(cookie.GetValue()) && cookie.WillExpireInTheFuture())
 						{
-							if (eKAOIOLAGFH2 == null)
+							if (existingCookie == null)
 							{
 								cookies.Add(cookie);
 								list.Add(cookie);
 							}
 							else
 							{
-								cookie.SetDate(eKAOIOLAGFH2.GetDate());
+								cookie.SetDate(existingCookie.GetDate());
 								cookies[index] = cookie;
 								list.Add(cookie);
 							}
@@ -204,9 +204,9 @@ public static class CookieJar
 					cookies.Sort();
 					while (num > HTTPManager.GetCookieJarSize() && cookies.Count > 0)
 					{
-						Cookie eKAOIOLAGFH2 = cookies[0];
+						Cookie cookie = cookies[0];
 						cookies.RemoveAt(0);
-						num -= eKAOIOLAGFH2.GuessSize();
+						num -= cookie.GuessSize();
 					}
 				}
 			}

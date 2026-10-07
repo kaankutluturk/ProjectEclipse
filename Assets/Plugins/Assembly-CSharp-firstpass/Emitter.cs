@@ -544,10 +544,10 @@ public class Emitter : IEmitter
 			if (nonDefaultTags.Count > 0)
 			{
 				flag = false;
-				TagDirective[] gNPKLFKPLCM2 = YamlConstants.DefaultTagDirectives;
-				foreach (TagDirective bAINMLLIKOL2 in gNPKLFKPLCM2)
+				TagDirective[] tagDirectives = YamlConstants.DefaultTagDirectives;
+				foreach (TagDirective tagDirective in tagDirectives)
 				{
-					AppendTagDirectiveTo(bAINMLLIKOL2, true, nonDefaultTags);
+					AppendTagDirectiveTo(tagDirective, true, nonDefaultTags);
 				}
 				foreach (TagDirective item2 in nonDefaultTags)
 				{
@@ -1032,24 +1032,24 @@ public class Emitter : IEmitter
 		}
 	}
 
-	private static bool IsSpace(char KGDPNIINCJH)
+	private static bool IsSpace(char ch)
 	{
-		return KGDPNIINCJH == ' ';
+		return ch == ' ';
 	}
 
-	private static bool IsBreak(char KGDPNIINCJH)
+	private static bool IsBreak(char ch)
 	{
-		return KGDPNIINCJH == '\r' || KGDPNIINCJH == '\n' || KGDPNIINCJH == '\u0085' || KGDPNIINCJH == '\u2028' || KGDPNIINCJH == '\u2029';
+		return ch == '\r' || ch == '\n' || ch == '\u0085' || ch == '\u2028' || ch == '\u2029';
 	}
 
-	private static bool IsBlank(char KGDPNIINCJH)
+	private static bool IsBlank(char ch)
 	{
-		return KGDPNIINCJH == ' ' || KGDPNIINCJH == '\t';
+		return ch == ' ' || ch == '\t';
 	}
 
-	private static bool IsPrintable(char KGDPNIINCJH)
+	private static bool IsPrintable(char ch)
 	{
-		return KGDPNIINCJH == '\t' || KGDPNIINCJH == '\n' || KGDPNIINCJH == '\r' || (KGDPNIINCJH >= ' ' && KGDPNIINCJH <= '~') || KGDPNIINCJH == '\u0085' || (KGDPNIINCJH >= '\u00a0' && KGDPNIINCJH <= '\ud7ff') || (KGDPNIINCJH >= '\ue000' && KGDPNIINCJH <= '\ufffd');
+		return ch == '\t' || ch == '\n' || ch == '\r' || (ch >= ' ' && ch <= '~') || ch == '\u0085' || (ch >= '\u00a0' && ch <= '\ud7ff') || (ch >= '\ue000' && ch <= '\ufffd');
 	}
 
 	private void EmitSequenceStart(ParsingEvent evt)

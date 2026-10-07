@@ -186,8 +186,8 @@ namespace Nekki.SF2.GUI.Fight
 		{
 			Vector2 startPosition = firstNodePosition;
 			float x = startPosition.x;
-			Vector2 aLLNKANPNBL2 = firstNodePosition;
-			Vector2 vector = new Vector2(x, aLLNKANPNBL2.y);
+			Vector2 nodePosition = firstNodePosition;
+			Vector2 vector = new Vector2(x, nodePosition.y);
 			target.get_rectTransform().pivot = ((modelSide != ScreenModel.ScreenSide.TYPE_LEFT) ? new Vector2(1f, 0.5f) : new Vector2(0f, 0.5f));
 			vector.x = spawnX;
 			target.get_rectTransform().anchorMin = anchorMin;
@@ -359,8 +359,8 @@ namespace Nekki.SF2.GUI.Fight
 		{
 			Vector2 startPosition = firstNodePosition;
 			float x = startPosition.x;
-			Vector2 aLLNKANPNBL2 = firstNodePosition;
-			Vector2 targetPosition = new Vector2(x, aLLNKANPNBL2.y);
+			Vector2 currentNodePosition = firstNodePosition;
+			Vector2 targetPosition = new Vector2(x, currentNodePosition.y);
 			foreach (ComboNode item in nodes)
 			{
 				RectTransform rectTransform = item.Target.get_rectTransform();
@@ -407,9 +407,9 @@ namespace Nekki.SF2.GUI.Fight
 				else
 				{
 					item.IsSettled = false;
-					Vector2 iPMPAMAHLJG2 = item.Target.transform.localPosition;
-					iPMPAMAHLJG2.x = 0f - item.Target.get_rectTransform().rect.width;
-					if (MoveTo(item.Target, iPMPAMAHLJG2, 30f))
+					Vector2 moveTarget = item.Target.transform.localPosition;
+					moveTarget.x = 0f - item.Target.get_rectTransform().rect.width;
+					if (MoveTo(item.Target, moveTarget, 30f))
 					{
 						list.Add(item);
 					}

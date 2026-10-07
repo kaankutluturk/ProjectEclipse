@@ -347,8 +347,8 @@ namespace Nekki.SF2.GUI.Dialogs
 			}
 			else if (AssemblyController.GetMarket().GetIsChinaMarket())
 			{
-				float bAINMLLIKOL2 = ((!AssemblyController.GetMarket().GetIsChinaMarket()) ? 200 : 200);
-				btnLanguage.transform.SetLocalY(bAINMLLIKOL2);
+				float languageButtonY = ((!AssemblyController.GetMarket().GetIsChinaMarket()) ? 200 : 200);
+				btnLanguage.transform.SetLocalY(languageButtonY);
 				SetupSupportButtonCompact();
 			}
 			else if (AssemblyController.GetMarket().GetIsSteamMarket())
@@ -362,8 +362,8 @@ namespace Nekki.SF2.GUI.Dialogs
 			}
 			else
 			{
-				float bAINMLLIKOL3 = ((!AssemblyController.GetMarket().GetIsChinaMarket()) ? 200 : 200);
-				btnLanguage.transform.SetLocalY(bAINMLLIKOL3);
+				float languageButtonOffsetY = ((!AssemblyController.GetMarket().GetIsChinaMarket()) ? 200 : 200);
+				btnLanguage.transform.SetLocalY(languageButtonOffsetY);
 				SetupDefaultPlatformButtons();
 			}
 			UpdateLabels();

@@ -305,9 +305,9 @@ public partial class InfoPerk
 		{
 			string key = item.Key;
 			int attributeDelta = item.Value;
-			int OEMALIFPGPO2 = 0;
-			actionPerk.TargetModel.Parameters.FinalAttributes.Get(key, ref OEMALIFPGPO2, false, true);
-			actionPerk.TargetModel.Parameters.FinalAttributes.Set(key, OEMALIFPGPO2 + attributeDelta * num, true);
+			int currentValue = 0;
+			actionPerk.TargetModel.Parameters.FinalAttributes.Get(key, ref currentValue, false, true);
+			actionPerk.TargetModel.Parameters.FinalAttributes.Set(key, currentValue + attributeDelta * num, true);
 			if (key == "DamageFactor" && !isRemoval && GetIsOwnerPlayer())
 			{
 				Model.StrikeResult strikeResult = actionPerk.SourceModel.LastStrike;
@@ -863,8 +863,8 @@ public partial class InfoPerk
 		float num = valueResult.ToFloat();
 		if (setVariableAction.GetHasMinValue())
 		{
-			FunctionResult dEIHAOLOPLC2 = setVariableAction.GetMinValue().Calculate();
-			float num2 = dEIHAOLOPLC2.ToFloat();
+			FunctionResult minResult = setVariableAction.GetMinValue().Calculate();
+			float num2 = minResult.ToFloat();
 			if (num < num2)
 			{
 				num = num2;
@@ -872,8 +872,8 @@ public partial class InfoPerk
 		}
 		if (setVariableAction.GetHasMaxValue())
 		{
-			FunctionResult dEIHAOLOPLC3 = setVariableAction.GetMaxValue().Calculate();
-			float num3 = dEIHAOLOPLC3.ToFloat();
+			FunctionResult maxResult = setVariableAction.GetMaxValue().Calculate();
+			float num3 = maxResult.ToFloat();
 			if (num > num3)
 			{
 				num = num3;

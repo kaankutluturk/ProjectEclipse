@@ -44,8 +44,8 @@ public sealed class ObjectNodeDeserializer : INodeDeserializer
 			object valueRef = value;
 			valuePromise.add_ValueAvailable((object resolvedValue) =>
 			{
-				object bAINMLLIKOL2 = TypeConverterHelper.ChangeType(resolvedValue, property.get_Type());
-				property.Write(valueRef, bAINMLLIKOL2);
+				object convertedValue = TypeConverterHelper.ChangeType(resolvedValue, property.get_Type());
+				property.Write(valueRef, convertedValue);
 			});
 		}
 		reader.Expect<MappingEnd>();

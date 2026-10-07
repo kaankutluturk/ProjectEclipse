@@ -122,10 +122,10 @@ public class UserPerks
 		RosterPerk newPerk = new RosterPerk(newChild);
 		newPerk.SetLevel(rosterPerkInfo.Level);
 		newPerk.set_Name(rosterPerkInfo.Name);
-		int aKKLOMFOLNO2 = rosterPerkInfo.UpgradeLevel;
-		if (aKKLOMFOLNO2 > 0)
+		int existingLevel = rosterPerkInfo.UpgradeLevel;
+		if (existingLevel > 0)
 		{
-			newPerk.SetUpgradeLevel(aKKLOMFOLNO2);
+			newPerk.SetUpgradeLevel(existingLevel);
 		}
 			newPerk.AppendNodeChild(rosterPerkInfo.Pairs);
 			InitializeEclipsePerkParameters(newPerk);
@@ -191,9 +191,9 @@ public class UserPerks
 		{
 			GameLog.Write("Save " + _node.Name);
 			XmlNode historyNode = _node["PerkHistory"] ?? _node.AppendElement("PerkHistory");
-			XmlNode mEEAKLDGLDF2 = historyNode.AppendElement("Level");
-			mEEAKLDGLDF2.AppendAttribute("Value").Value = historyEntry.Level.ToString();
-			mEEAKLDGLDF2.AppendAttribute("Perk").Value = historyEntry.Name;
+			XmlNode perkNode = historyNode.AppendElement("Level");
+			perkNode.AppendAttribute("Value").Value = historyEntry.Level.ToString();
+			perkNode.AppendAttribute("Perk").Value = historyEntry.Name;
 			ListSF.GetRoster().RequestSave();
 		}
 	}

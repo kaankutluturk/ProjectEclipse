@@ -352,8 +352,8 @@ public static class AnimationData
 				KeyData requiredKeys = item2.RequiredKeys;
 				foreach (ConditionKeys item3 in list2)
 				{
-					KeyData fONEJOKEIEN2 = item3.RequiredKeys;
-					if (fONEJOKEIEN2.IsVariable(requiredKeys))
+					KeyData capabilityKey = item3.RequiredKeys;
+					if (capabilityKey.IsVariable(requiredKeys))
 					{
 						flag = true;
 						break;

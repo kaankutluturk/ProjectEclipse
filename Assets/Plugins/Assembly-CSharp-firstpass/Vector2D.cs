@@ -45,9 +45,9 @@ public class Vector2D
 		{
 			return false;
 		}
-		EquationLine kEDCEHBPOIM2 = ((segmentALine == null) ? BuildLineEquation(segmentAStart, segmentAEnd) : segmentALine);
-		float num4 = kEDCEHBPOIM2.A * vector3.x + kEDCEHBPOIM2.CoefficientB * vector3.y + kEDCEHBPOIM2.ConstantC;
-		float num5 = kEDCEHBPOIM2.A * vector4.x + kEDCEHBPOIM2.CoefficientB * vector4.y + kEDCEHBPOIM2.ConstantC;
+		EquationLine segmentLine = ((segmentALine == null) ? BuildLineEquation(segmentAStart, segmentAEnd) : segmentALine);
+		float num4 = segmentLine.A * vector3.x + segmentLine.CoefficientB * vector3.y + segmentLine.ConstantC;
+		float num5 = segmentLine.A * vector4.x + segmentLine.CoefficientB * vector4.y + segmentLine.ConstantC;
 		if (0f <= num4 * num5 && num < Abs(num4) && num < Abs(num5))
 		{
 			return false;
@@ -71,13 +71,13 @@ public class Vector2D
 			intersectionStart = vector2;
 			return true;
 		}
-		if (IsPointNearSegment(num4, num, kEDCEHBPOIM2, vector3, ref intersectionEnd, vector, vector2))
+		if (IsPointNearSegment(num4, num, segmentLine, vector3, ref intersectionEnd, vector, vector2))
 		{
 			intersectionStart = vector3;
 			intersectionEnd = vector3;
 			return true;
 		}
-		if (IsPointNearSegment(num5, num, kEDCEHBPOIM2, vector4, ref intersectionEnd, vector, vector2))
+		if (IsPointNearSegment(num5, num, segmentLine, vector4, ref intersectionEnd, vector, vector2))
 		{
 			intersectionStart = vector4;
 			intersectionEnd = vector4;

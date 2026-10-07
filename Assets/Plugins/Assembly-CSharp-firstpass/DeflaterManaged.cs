@@ -79,14 +79,14 @@ internal class DeflaterManaged : IDisposable, IDeflater
 		{
 		case DeflaterState.NotStarted:
 		{
-			DeflateInput.InputState pIFKPLHIOFJ3 = input.DumpState();
-			OutputBuffer.BufferState pIFKPLHIOFJ4 = output.DumpState();
+			DeflateInput.InputState initialInputState = input.DumpState();
+			OutputBuffer.BufferState initialOutputState = output.DumpState();
 			deflateEncoder.GetBlockHeader(output);
 			deflateEncoder.GetCompressedData(input, output);
 			if (!UseCompressed(deflateEncoder.GetLastCompressionRatio()))
 			{
-				input.RestoreState(pIFKPLHIOFJ3);
-				output.RestoreState(pIFKPLHIOFJ4);
+				input.RestoreState(initialInputState);
+				output.RestoreState(initialOutputState);
 				copyEncoder.GetBlock(input, output, false);
 				FlushInputWindows();
 				processingState = DeflaterState.CheckingForIncompressible;
@@ -123,12 +123,12 @@ internal class DeflaterManaged : IDisposable, IDeflater
 		case DeflaterState.CheckingForIncompressible:
 		{
 			DeflateInput.InputState inputState = input.DumpState();
-			OutputBuffer.BufferState pIFKPLHIOFJ2 = output.DumpState();
+			OutputBuffer.BufferState outputState = output.DumpState();
 			deflateEncoder.GetBlock(input, output, 8072);
 			if (!UseCompressed(deflateEncoder.GetLastCompressionRatio()))
 			{
 				input.RestoreState(inputState);
-				output.RestoreState(pIFKPLHIOFJ2);
+				output.RestoreState(outputState);
 				copyEncoder.GetBlock(input, output, false);
 				FlushInputWindows();
 			}

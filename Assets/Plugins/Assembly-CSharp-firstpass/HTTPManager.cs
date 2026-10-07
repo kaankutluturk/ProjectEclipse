@@ -513,7 +513,7 @@ public static class HTTPManager
 		HTTPConnection connection = FindOrCreateFreeConnection(request);
 		if (connection != null)
 		{
-			if (activeConnections.Find((HTTPConnection ILHDJDNPFKH) => ILHDJDNPFKH == connection) == null)
+			if (activeConnections.Find((HTTPConnection candidate) => candidate == connection) == null)
 			{
 				activeConnections.Add(connection);
 			}
@@ -557,10 +557,10 @@ public static class HTTPManager
 					{
 						break;
 					}
-					HTTPConnection hPNEPPBEKGG2 = value[j];
-					if (hPNEPPBEKGG2 != null && hPNEPPBEKGG2.GetIsFree() && (!hPNEPPBEKGG2.GetHasProxy() || hPNEPPBEKGG2.GetLastProcessedUri() == null || hPNEPPBEKGG2.GetLastProcessedUri().Host.Equals(request.GetCurrentUri().Host, StringComparison.OrdinalIgnoreCase)))
+					HTTPConnection candidate = value[j];
+					if (candidate != null && candidate.GetIsFree() && (!candidate.GetHasProxy() || candidate.GetLastProcessedUri() == null || candidate.GetLastProcessedUri().Host.Equals(request.GetCurrentUri().Host, StringComparison.OrdinalIgnoreCase)))
 					{
-						connection = hPNEPPBEKGG2;
+						connection = candidate;
 					}
 				}
 			}
@@ -726,11 +726,11 @@ public static class HTTPManager
 			{
 				for (int j = 0; j < recycledConnections.Count; j++)
 				{
-					HTTPConnection hPNEPPBEKGG2 = recycledConnections[j];
-					if (hPNEPPBEKGG2.GetIsFree())
+					HTTPConnection connection = recycledConnections[j];
+					if (connection.GetIsFree())
 					{
-						activeConnections.Remove(hPNEPPBEKGG2);
-						freeConnections.Add(hPNEPPBEKGG2);
+						activeConnections.Remove(connection);
+						freeConnections.Add(connection);
 					}
 				}
 				recycledConnections.Clear();
@@ -739,15 +739,15 @@ public static class HTTPManager
 			{
 				for (int k = 0; k < freeConnections.Count; k++)
 				{
-					HTTPConnection hPNEPPBEKGG3 = freeConnections[k];
-					if (hPNEPPBEKGG3.GetIsRemovable())
+					HTTPConnection staleConnection = freeConnections[k];
+					if (staleConnection.GetIsRemovable())
 					{
 						List<HTTPConnection> value = null;
-						if (connections.TryGetValue(hPNEPPBEKGG3.GetServerAddress(), out value))
+						if (connections.TryGetValue(staleConnection.GetServerAddress(), out value))
 						{
-							value.Remove(hPNEPPBEKGG3);
+							value.Remove(staleConnection);
 						}
-						hPNEPPBEKGG3.Dispose();
+						staleConnection.Dispose();
 						freeConnections.RemoveAt(k);
 						k--;
 					}

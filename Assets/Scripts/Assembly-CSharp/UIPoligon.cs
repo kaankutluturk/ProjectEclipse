@@ -36,10 +36,10 @@ public class UIPoligon : UIFigure
 		vertexHelper.AddUIVertexStream(list, (!_UseTriangleFan) ? FigureTopology.CreateStripIndices(list.Count - 2) : FigureTopology.CreateFanIndices(list.Count - 2));
 	}
 
-	private UIVertex AddVertex(Vector3 GIAEPIIIMDH)
+	private UIVertex AddVertex(Vector3 vertexPosition)
 	{
 		UIVertex simpleVert = UIVertex.simpleVert;
-		simpleVert.position = new Vector2(GIAEPIIIMDH.x, GIAEPIIIMDH.y);
+		simpleVert.position = new Vector2(vertexPosition.x, vertexPosition.y);
 		simpleVert.uv0 = new Vector2(0f, 0f);
 		simpleVert.color = color;
 		return simpleVert;

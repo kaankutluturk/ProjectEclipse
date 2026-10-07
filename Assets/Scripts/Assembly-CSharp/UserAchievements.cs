@@ -205,10 +205,10 @@ public class UserAchievements
 		}
 		string achievementNodeName = "Achievement";
 		XmlNode achievementNode = achievementsNode.AppendElement(achievementNodeName);
-		RosterAchievement pMGCOHHMIIC2 = new RosterAchievement(achievementNode);
-		pMGCOHHMIIC2.set_Name(achievementName);
-		pMGCOHHMIIC2.set_Reward(isClaimed);
-		AddRosterAchievement(pMGCOHHMIIC2, achievement);
+		RosterAchievement rosterAchievement = new RosterAchievement(achievementNode);
+		rosterAchievement.set_Name(achievementName);
+		rosterAchievement.set_Reward(isClaimed);
+		AddRosterAchievement(rosterAchievement, achievement);
 		ArgsDict eventArgs = new ArgsDict();
 		eventArgs["name"] = achievementName;
 		StatisticsCollector.LogEvent(StatisticsEvent.EventType.Achievement, eventArgs);

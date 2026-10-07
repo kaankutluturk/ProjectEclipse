@@ -43,12 +43,12 @@ public sealed class SignalRWebSocketTransport : TransportBase
 		wSocket = new WebSocket(uri);
 		WebSocket webSocket = wSocket;
 		webSocket.OnOpen = (OnWebSocketOpenDelegate)Delegate.Combine(webSocket.OnOpen, new OnWebSocketOpenDelegate(WSocket_OnOpen));
-		WebSocket gPDLJHEAEDF2 = wSocket;
-		gPDLJHEAEDF2.OnMessage = (OnWebSocketMessageDelegate)Delegate.Combine(gPDLJHEAEDF2.OnMessage, new OnWebSocketMessageDelegate(WSocket_OnMessage));
-		WebSocket gPDLJHEAEDF3 = wSocket;
-		gPDLJHEAEDF3.OnClosed = (OnWebSocketClosedDelegate)Delegate.Combine(gPDLJHEAEDF3.OnClosed, new OnWebSocketClosedDelegate(WSocket_OnClosed));
-		WebSocket gPDLJHEAEDF4 = wSocket;
-		gPDLJHEAEDF4.OnErrorDesc = (OnWebSocketErrorDescriptionDelegate)Delegate.Combine(gPDLJHEAEDF4.OnErrorDesc, new OnWebSocketErrorDescriptionDelegate(WSocket_OnError));
+		WebSocket messageSocket = wSocket;
+		messageSocket.OnMessage = (OnWebSocketMessageDelegate)Delegate.Combine(messageSocket.OnMessage, new OnWebSocketMessageDelegate(WSocket_OnMessage));
+		WebSocket closedSocket = wSocket;
+		closedSocket.OnClosed = (OnWebSocketClosedDelegate)Delegate.Combine(closedSocket.OnClosed, new OnWebSocketClosedDelegate(WSocket_OnClosed));
+		WebSocket errorSocket = wSocket;
+		errorSocket.OnErrorDesc = (OnWebSocketErrorDescriptionDelegate)Delegate.Combine(errorSocket.OnErrorDesc, new OnWebSocketErrorDescriptionDelegate(WSocket_OnError));
 		GetConnection().PrepareRequest(wSocket.GetInternalRequest(), requestType);
 		wSocket.OpenWebSocket();
 	}

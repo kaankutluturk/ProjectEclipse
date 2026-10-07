@@ -1499,10 +1499,10 @@ public sealed class HTTPRequest : IEnumerator<HTTPRequest>, IDisposable, IEnumer
 			case AuthenticationTypes.Unknown:
 			case AuthenticationTypes.Digest:
 			{
-				Digest kHNAPCOOAEF2 = DigestStore.Get(GetCurrentUri());
-				if (kHNAPCOOAEF2 != null)
+				Digest digest = DigestStore.Get(GetCurrentUri());
+				if (digest != null)
 				{
-					string text2 = kHNAPCOOAEF2.GenerateResponseHeader(this, GetCredentials());
+					string text2 = digest.GenerateResponseHeader(this, GetCredentials());
 					if (!string.IsNullOrEmpty(text2))
 					{
 						SetHeader("Authorization", text2);

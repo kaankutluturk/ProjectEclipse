@@ -336,7 +336,7 @@ public class ListSF
 		StepTimer(name, watch.ElapsedMilliseconds);
 	}
 
-	// Eclipse: the part of IIKDNMBIHCM the title's sparring fighters need (items with the
+	// Eclipse: the part of LoadGameContent the title's sparring fighters need (items with the
 	// enabled mods' content, which often changes how fighters look, and a profile), without
 	// warriors, zones, quests or the roster timer. Campaign entry retains this content
 	// and replaces the sandbox profile before completing the remaining steps.
@@ -466,12 +466,12 @@ public class ListSF
 		{
 			Roster roster = _roster;
 			roster.SetTotalPaymentSum(roster.GetTotalPaymentSum() + item.PriceAmountText.ToFloat());
-			Roster aNEHEDFAPCH2 = _roster;
-			aNEHEDFAPCH2.SetPaymentCount(aNEHEDFAPCH2.GetPaymentCount() + 1);
+			Roster paymentRoster = _roster;
+			paymentRoster.SetPaymentCount(paymentRoster.GetPaymentCount() + 1);
 			if (item.IsPaid)
 			{
-				Roster aNEHEDFAPCH3 = _roster;
-				aNEHEDFAPCH3.SetPaidMoney((ObscuredLong)((ObscuredLong)(aNEHEDFAPCH3.GetPaidMoney()) + (ObscuredLong)(item.ReceiveGold)));
+				Roster paidMoneyRoster = _roster;
+				paidMoneyRoster.SetPaidMoney((ObscuredLong)((ObscuredLong)(paidMoneyRoster.GetPaidMoney()) + (ObscuredLong)(item.ReceiveGold)));
 			}
 			_roster.SetMoney(_roster.GetMoney() + (ObscuredLong)(item.ReceiveGold));
 			_roster.SetBonus(_roster.GetBonus() + (ObscuredLong)(item.ReceiveBonus), Roster.BalanceChangeType.CHANGE_PAYMENT, true);
@@ -537,19 +537,19 @@ public class ListSF
 					GroupsUser groupUser = GetGroupByName(item.Name);
 					if (groupUser != null)
 					{
-						ModelParameters kIKOGDEPGHB2 = null;
+						ModelParameters groupModel = null;
 						if (!item.IsRandom)
 						{
 							int index = j % groupUser.GetCount();
-							kIKOGDEPGHB2 = groupUser.Models[index];
+							groupModel = groupUser.Models[index];
 						}
 						else if (!item.NoDoubles)
 						{
-							kIKOGDEPGHB2 = groupUser.GetRandomModel();
+							groupModel = groupUser.GetRandomModel();
 						}
 						else
 						{
-							kIKOGDEPGHB2 = groupUser.GetRandomModel(list2[num2]);
+							groupModel = groupUser.GetRandomModel(list2[num2]);
 							int count2 = groupUser.Models.Count;
 							if (num >= count2 - 1)
 							{
@@ -561,15 +561,15 @@ public class ListSF
 								num++;
 							}
 						}
-						if (kIKOGDEPGHB2 != null)
+						if (groupModel != null)
 						{
 							if (mergedParameters == null)
 							{
-								mergedParameters = kIKOGDEPGHB2;
+								mergedParameters = groupModel;
 							}
 							else
 							{
-								mergedParameters = ParseWarriorParameters(kIKOGDEPGHB2.Node, mergedParameters);
+								mergedParameters = ParseWarriorParameters(groupModel.Node, mergedParameters);
 								AddMergedGroupModel(mergedParameters);
 							}
 						}
@@ -578,17 +578,17 @@ public class ListSF
 				}
 				if (mergedParameters != null)
 				{
-					ModelParameters kIKOGDEPGHB3 = null;
+					ModelParameters builtParameters = null;
 					if (groupParameters.Node.Attributes["Template"] == null)
 					{
-						kIKOGDEPGHB3 = ParseWarriorParameters(groupParameters.Node, mergedParameters);
+						builtParameters = ParseWarriorParameters(groupParameters.Node, mergedParameters);
 					}
 					else
 					{
-						kIKOGDEPGHB3 = ((mergedParameters == null) ? new ModelParameters() : mergedParameters.Clone());
-						ApplyParameterOverrides(kIKOGDEPGHB3, groupParameters);
+						builtParameters = ((mergedParameters == null) ? new ModelParameters() : mergedParameters.Clone());
+						ApplyParameterOverrides(builtParameters, groupParameters);
 					}
-					list.Add(kIKOGDEPGHB3);
+					list.Add(builtParameters);
 				}
 			}
 		}
@@ -789,19 +789,19 @@ public class ListSF
 		UserItem existingItem = roster.GetInventory().FindItem(item.Name);
 		long existingDeliveryTimestamp = ((existingItem == null) ? (-1) : existingItem.GetDeliveryTimestamp());
 		bool flag = deliveryTime <= 0 || item.DeliveryTime == 0;
-		UserItem dKCHDHMLKHN2 = AddItem(item, count, deliveryTime, flag);
-		bool equipAfterPurchase = dKCHDHMLKHN2.GetIsOwned() || flag;
+		UserItem purchasedUserItem = AddItem(item, count, deliveryTime, flag);
+		bool equipAfterPurchase = purchasedUserItem.GetIsOwned() || flag;
 		if (item.Type == "RealMoneyItem" || item.Type == "Consumable")
 		{
 			equipAfterPurchase = false;
 		}
-		UseItem(dKCHDHMLKHN2, equipAfterPurchase);
+		UseItem(purchasedUserItem, equipAfterPurchase);
 		GameUtils.TrackItemAction(item, action, count, existingDeliveryTimestamp);
 		QuestParameters questParameters = GetInstance().GetQuestParameters();
 		FightIDS savedFightIds = questParameters.fightIds;
 		questParameters.fightIds = FightIDS.Empty();
 		questParameters.fightResult = string.Empty;
-		questParameters.purchasedItem = dKCHDHMLKHN2.GetInfo();
+		questParameters.purchasedItem = purchasedUserItem.GetInfo();
 		if (GetInstance().RaiseQuestEvent(QuestEvent.QuestEventType.QUEST_EVENT_PURCHASE))
 		{
 			GetInstance().RunQuestActions();
@@ -863,32 +863,32 @@ public class ListSF
 		{
 		case "Weapon":
 		{
-			UserItem nDMCFNGEPOA2 = GetUserItem("Fists");
-			UseItem(nDMCFNGEPOA2, true);
+			UserItem fistsItem = GetUserItem("Fists");
+			UseItem(fistsItem, true);
 			break;
 		}
 		case "Armor":
 		{
-			UserItem nDMCFNGEPOA6 = GetUserItem("Body");
-			UseItem(nDMCFNGEPOA6, true);
+			UserItem bodyItem = GetUserItem("Body");
+			UseItem(bodyItem, true);
 			break;
 		}
 		case "Helm":
 		{
-			UserItem nDMCFNGEPOA5 = GetUserItem("Head");
-			UseItem(nDMCFNGEPOA5, true);
+			UserItem headItem = GetUserItem("Head");
+			UseItem(headItem, true);
 			break;
 		}
 		case "Ranged":
 		{
-			UserItem nDMCFNGEPOA4 = GetUserItem("NoRanged");
-			UseItem(nDMCFNGEPOA4, true);
+			UserItem noRangedItem = GetUserItem("NoRanged");
+			UseItem(noRangedItem, true);
 			break;
 		}
 		case "Magic":
 		{
-			UserItem nDMCFNGEPOA3 = GetUserItem("NoMagic");
-			UseItem(nDMCFNGEPOA3, true);
+			UserItem noMagicItem = GetUserItem("NoMagic");
+			UseItem(noMagicItem, true);
 			break;
 		}
 		case "RaidConsumable":
@@ -979,9 +979,9 @@ public class ListSF
 		{
 			XmlNode itemsNode = roster.GetItemsNode();
 			int initialCount = ((deliveryTime <= 0) ? count : 0);
-			UserItem dKCHDHMLKHN2 = new UserItem(itemsNode, item.Name, equip, initialCount, -1, deliveryTime);
-			dKCHDHMLKHN2.SetInfo(item);
-			existingItem = roster.GetInventory().AddItem(dKCHDHMLKHN2);
+			UserItem newUserItem = new UserItem(itemsNode, item.Name, equip, initialCount, -1, deliveryTime);
+			newUserItem.SetInfo(item);
+			existingItem = roster.GetInventory().AddItem(newUserItem);
 			acquiredCount = existingItem.GetCount();
 			existingItem.RefreshUpgradeState(rosterLevel);
 			existingItem.SetIsUpgrade(false);
@@ -2237,14 +2237,14 @@ public class ListSF
 							parameters.DecorateItems.Add(itemInfo);
 							continue;
 						}
-						ItemInfo dJKEECEOCJB2 = itemInfo.Clone();
+						ItemInfo warriorItemInfo = itemInfo.Clone();
 						XmlNode enchantmentsNode = item3["Enchantments"];
-						dJKEECEOCJB2.DefaultEnchantments.Clear();
-						dJKEECEOCJB2.SetParsedPerks(enchantmentsNode);
-						parameters.SetItemByType(dJKEECEOCJB2.Type, dJKEECEOCJB2);
+						warriorItemInfo.DefaultEnchantments.Clear();
+						warriorItemInfo.SetParsedPerks(enchantmentsNode);
+						parameters.SetItemByType(warriorItemInfo.Type, warriorItemInfo);
 						if (!IsContentLoaded)
 						{
-							parameters.AddConditionItem(dJKEECEOCJB2);
+							parameters.AddConditionItem(warriorItemInfo);
 						}
 					}
 					else if (!string.IsNullOrEmpty(parameters.GroupName))
@@ -2366,14 +2366,14 @@ public class ListSF
 			}
 		}
 		XmlNode rulesNode = node["Rules"];
-		XmlNode hKPPBKPJOEO2 = node["Rewards"];
+		XmlNode rewardsNode = node["Rewards"];
 		ParseFightRules(fight, rulesNode);
 		// FightIDS is assigned after this parser returns; use the already registered
 		// battle metadata to identify offline raids while building their rewards.
 		if (battleType != BattleType.FightRaid ||
 			(battle != null && Eclipse.Modding.ModPolicies.TryRaidBattle(battle.get_Name(), out _)))
 		{
-			ParseFightRewards(fight, hKPPBKPJOEO2);
+			ParseFightRewards(fight, rewardsNode);
 		}
 	}
 
@@ -2464,10 +2464,10 @@ public class ListSF
 			targetParameters.Seal = sourceParameters.Seal;
 		}
 		RaidModelParameters raidParameters = targetParameters as RaidModelParameters;
-		RaidModelParameters kAOPLEPILDH2 = sourceParameters as RaidModelParameters;
-		if (raidParameters != null && kAOPLEPILDH2 != null && kAOPLEPILDH2.RaidChargeItem != null)
+		RaidModelParameters overrideRaidParameters = sourceParameters as RaidModelParameters;
+		if (raidParameters != null && overrideRaidParameters != null && overrideRaidParameters.RaidChargeItem != null)
 		{
-			raidParameters.RaidChargeItem = kAOPLEPILDH2.RaidChargeItem;
+			raidParameters.RaidChargeItem = overrideRaidParameters.RaidChargeItem;
 		}
 		if (sourceParameters.EndRoundType != EndRoundType.EndRoundTypeNone)
 		{
@@ -2566,10 +2566,10 @@ public class ListSF
 		foreach (WarriorAttribute item5 in attributeList)
 		{
 			string attributeName = item5.get_Name();
-			int OEMALIFPGPO2 = 0;
-			if (sourceParameters.FinalAttributes.Get(attributeName, ref OEMALIFPGPO2))
+			int copiedAttributeValue = 0;
+			if (sourceParameters.FinalAttributes.Get(attributeName, ref copiedAttributeValue))
 			{
-				targetParameters.FinalAttributes.Set(attributeName, OEMALIFPGPO2);
+				targetParameters.FinalAttributes.Set(attributeName, copiedAttributeValue);
 			}
 		}
 	}
@@ -2685,7 +2685,7 @@ public class ListSF
 
 	// Eclipse modding seam: register a mod-owned warrior template after the base
 	// templates were resolved. The parent must already be registered; inheritance
-	// is merged exactly like the base resolver (EANLGFEDADB) does for one entry.
+	// is merged exactly like the base resolver (ResolveTemplateInheritance) does for one entry.
 	public void AddExternalTemplate(XmlNode node)
 	{
 		if (node == null || node.Name != "Template")
@@ -3015,7 +3015,7 @@ public class ListSF
 
 	private Battle ParseBattle(XmlNode node, Zone parentZone = null, bool parseFights = false)
 	{
-		Vector2 mGMMDGFPBLP = new Vector2(node.Attributes["X"].ParseInt(), node.Attributes["Y"].ParseInt());
+		Vector2 battlePosition = new Vector2(node.Attributes["X"].ParseInt(), node.Attributes["Y"].ParseInt());
 		string battleName = node.Attributes["Name"].GetStringOrDefault(string.Empty);
 		string alias = node.Attributes["Alias"].GetStringOrDefault(string.Empty);
 		string title = node.Attributes["Title"].GetStringOrDefault(string.Empty);
@@ -3049,33 +3049,33 @@ public class ListSF
 		switch (GetBattleTypeByName(text))
 		{
 		case BattleType.FightPeriodic:
-			battle = new BattlePeriodic(text, mGMMDGFPBLP, battleName, icon, preview, description, rewardDigits, prizeBaseDigits, alias, title, location, music, rewardImage, showResistance);
+			battle = new BattlePeriodic(text, battlePosition, battleName, icon, preview, description, rewardDigits, prizeBaseDigits, alias, title, location, music, rewardImage, showResistance);
 			break;
 		case BattleType.FightReplayable:
 		case BattleType.FightBossesReplayable:
 		case BattleType.FightFinalReplayable:
 		{
-			BattleReplayable replayableBattle = new BattleReplayable(text, mGMMDGFPBLP, battleName, icon, preview, description, rewardDigits, prizeBaseDigits, alias, title, location, music, rewardImage, showResistance);
+			BattleReplayable replayableBattle = new BattleReplayable(text, battlePosition, battleName, icon, preview, description, rewardDigits, prizeBaseDigits, alias, title, location, music, rewardImage, showResistance);
 			replayableBattle.Parse(node);
 			battle = replayableBattle;
 			break;
 		}
 		case BattleType.FightAscension:
 		{
-			BattleAscension ascensionBattle = new BattleAscension(text, mGMMDGFPBLP, battleName, icon, preview, description, rewardDigits, prizeBaseDigits, alias, title, location, music, rewardImage, showResistance);
+			BattleAscension ascensionBattle = new BattleAscension(text, battlePosition, battleName, icon, preview, description, rewardDigits, prizeBaseDigits, alias, title, location, music, rewardImage, showResistance);
 			ascensionBattle.Parse(node);
 			battle = ascensionBattle;
 			break;
 		}
 		case BattleType.FightRaid:
 		{
-			BattleRaid raidBattle = new BattleRaid(text, mGMMDGFPBLP, battleName, icon, preview, description, rewardDigits, prizeBaseDigits, alias, title, location, music, rewardImage, showResistance);
+			BattleRaid raidBattle = new BattleRaid(text, battlePosition, battleName, icon, preview, description, rewardDigits, prizeBaseDigits, alias, title, location, music, rewardImage, showResistance);
 			raidBattle.Parse(node);
 			battle = raidBattle;
 			break;
 		}
 		default:
-			battle = new Battle(text, mGMMDGFPBLP, battleName, icon, preview, description, rewardDigits, prizeBaseDigits, alias, title, location, music, rewardImage, showResistance);
+			battle = new Battle(text, battlePosition, battleName, icon, preview, description, rewardDigits, prizeBaseDigits, alias, title, location, music, rewardImage, showResistance);
 			break;
 		}
 		battle.SetZone(parentZone);

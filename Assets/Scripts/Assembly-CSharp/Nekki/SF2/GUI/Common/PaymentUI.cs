@@ -35,20 +35,20 @@ namespace Nekki.SF2.GUI.Common
 			base.Init();
 			PaymentStore store = PaymentManager.GetStore();
 			store.OnPurchaseCancelled = (Action<string>)Delegate.Combine(store.OnPurchaseCancelled, new Action<string>(OnPurchaseDismissed));
-			PaymentStore aDEKACKLIJG2 = PaymentManager.GetStore();
-			aDEKACKLIJG2.OnPurchaseSucceeded = (Action<string>)Delegate.Combine(aDEKACKLIJG2.OnPurchaseSucceeded, new Action<string>(OnPurchaseSucceeded));
-			PaymentStore aDEKACKLIJG3 = PaymentManager.GetStore();
-			aDEKACKLIJG3.OnPurchaseFailed = (Action<string, PurchaseFailureReason>)Delegate.Combine(aDEKACKLIJG3.OnPurchaseFailed, new Action<string, PurchaseFailureReason>(OnPurchaseFailed));
-			PaymentStore aDEKACKLIJG4 = PaymentManager.GetStore();
-			aDEKACKLIJG4.OnPurchaseRejected = (Action<string>)Delegate.Combine(aDEKACKLIJG4.OnPurchaseRejected, new Action<string>(OnPurchaseUnsuccessful));
-			PaymentStore aDEKACKLIJG5 = PaymentManager.GetStore();
-			aDEKACKLIJG5.OnVerificationNoResponse = (Action<string>)Delegate.Combine(aDEKACKLIJG5.OnVerificationNoResponse, new Action<string>(OnServerNoResponse));
-			PaymentStore aDEKACKLIJG6 = PaymentManager.GetStore();
-			aDEKACKLIJG6.OnRestoreCompleted = (Action)Delegate.Combine(aDEKACKLIJG6.OnRestoreCompleted, new Action(OnPurchaseFlowFinished));
-			PaymentStore aDEKACKLIJG7 = PaymentManager.GetStore();
-			aDEKACKLIJG7.OnRestoreFailed = (Action)Delegate.Combine(aDEKACKLIJG7.OnRestoreFailed, new Action(OnConnectionFailed));
-			PaymentStore aDEKACKLIJG8 = PaymentManager.GetStore();
-			aDEKACKLIJG8.OnInitialized = (Action)Delegate.Combine(aDEKACKLIJG8.OnInitialized, new Action(OnProductsUpdated));
+			PaymentStore purchaseSucceededStore = PaymentManager.GetStore();
+			purchaseSucceededStore.OnPurchaseSucceeded = (Action<string>)Delegate.Combine(purchaseSucceededStore.OnPurchaseSucceeded, new Action<string>(OnPurchaseSucceeded));
+			PaymentStore purchaseFailedStore = PaymentManager.GetStore();
+			purchaseFailedStore.OnPurchaseFailed = (Action<string, PurchaseFailureReason>)Delegate.Combine(purchaseFailedStore.OnPurchaseFailed, new Action<string, PurchaseFailureReason>(OnPurchaseFailed));
+			PaymentStore purchaseRejectedStore = PaymentManager.GetStore();
+			purchaseRejectedStore.OnPurchaseRejected = (Action<string>)Delegate.Combine(purchaseRejectedStore.OnPurchaseRejected, new Action<string>(OnPurchaseUnsuccessful));
+			PaymentStore noResponseStore = PaymentManager.GetStore();
+			noResponseStore.OnVerificationNoResponse = (Action<string>)Delegate.Combine(noResponseStore.OnVerificationNoResponse, new Action<string>(OnServerNoResponse));
+			PaymentStore restoreCompletedStore = PaymentManager.GetStore();
+			restoreCompletedStore.OnRestoreCompleted = (Action)Delegate.Combine(restoreCompletedStore.OnRestoreCompleted, new Action(OnPurchaseFlowFinished));
+			PaymentStore restoreFailedStore = PaymentManager.GetStore();
+			restoreFailedStore.OnRestoreFailed = (Action)Delegate.Combine(restoreFailedStore.OnRestoreFailed, new Action(OnConnectionFailed));
+			PaymentStore initializedStore = PaymentManager.GetStore();
+			initializedStore.OnInitialized = (Action)Delegate.Combine(initializedStore.OnInitialized, new Action(OnProductsUpdated));
 			PaymentManager.GetStore().LoadProducts();
 			PaymentManager.ProcessPendingPayments();
 		}
@@ -60,20 +60,20 @@ namespace Nekki.SF2.GUI.Common
 			{
 				PaymentStore store = PaymentManager.GetStore();
 				store.OnPurchaseCancelled = (Action<string>)Delegate.Remove(store.OnPurchaseCancelled, new Action<string>(OnPurchaseDismissed));
-				PaymentStore aDEKACKLIJG2 = PaymentManager.GetStore();
-				aDEKACKLIJG2.OnPurchaseSucceeded = (Action<string>)Delegate.Remove(aDEKACKLIJG2.OnPurchaseSucceeded, new Action<string>(OnPurchaseSucceeded));
-				PaymentStore aDEKACKLIJG3 = PaymentManager.GetStore();
-				aDEKACKLIJG3.OnPurchaseFailed = (Action<string, PurchaseFailureReason>)Delegate.Remove(aDEKACKLIJG3.OnPurchaseFailed, new Action<string, PurchaseFailureReason>(OnPurchaseFailed));
-				PaymentStore aDEKACKLIJG4 = PaymentManager.GetStore();
-				aDEKACKLIJG4.OnPurchaseRejected = (Action<string>)Delegate.Remove(aDEKACKLIJG4.OnPurchaseRejected, new Action<string>(OnPurchaseUnsuccessful));
-				PaymentStore aDEKACKLIJG5 = PaymentManager.GetStore();
-				aDEKACKLIJG5.OnVerificationNoResponse = (Action<string>)Delegate.Remove(aDEKACKLIJG5.OnVerificationNoResponse, new Action<string>(OnServerNoResponse));
-				PaymentStore aDEKACKLIJG6 = PaymentManager.GetStore();
-				aDEKACKLIJG6.OnRestoreCompleted = (Action)Delegate.Remove(aDEKACKLIJG6.OnRestoreCompleted, new Action(OnPurchaseFlowFinished));
-				PaymentStore aDEKACKLIJG7 = PaymentManager.GetStore();
-				aDEKACKLIJG7.OnRestoreFailed = (Action)Delegate.Remove(aDEKACKLIJG7.OnRestoreFailed, new Action(OnConnectionFailed));
-				PaymentStore aDEKACKLIJG8 = PaymentManager.GetStore();
-				aDEKACKLIJG8.OnInitialized = (Action)Delegate.Remove(aDEKACKLIJG8.OnInitialized, new Action(OnProductsUpdated));
+				PaymentStore purchaseSucceededStore = PaymentManager.GetStore();
+				purchaseSucceededStore.OnPurchaseSucceeded = (Action<string>)Delegate.Remove(purchaseSucceededStore.OnPurchaseSucceeded, new Action<string>(OnPurchaseSucceeded));
+				PaymentStore purchaseFailedStore = PaymentManager.GetStore();
+				purchaseFailedStore.OnPurchaseFailed = (Action<string, PurchaseFailureReason>)Delegate.Remove(purchaseFailedStore.OnPurchaseFailed, new Action<string, PurchaseFailureReason>(OnPurchaseFailed));
+				PaymentStore purchaseRejectedStore = PaymentManager.GetStore();
+				purchaseRejectedStore.OnPurchaseRejected = (Action<string>)Delegate.Remove(purchaseRejectedStore.OnPurchaseRejected, new Action<string>(OnPurchaseUnsuccessful));
+				PaymentStore noResponseStore = PaymentManager.GetStore();
+				noResponseStore.OnVerificationNoResponse = (Action<string>)Delegate.Remove(noResponseStore.OnVerificationNoResponse, new Action<string>(OnServerNoResponse));
+				PaymentStore restoreCompletedStore = PaymentManager.GetStore();
+				restoreCompletedStore.OnRestoreCompleted = (Action)Delegate.Remove(restoreCompletedStore.OnRestoreCompleted, new Action(OnPurchaseFlowFinished));
+				PaymentStore restoreFailedStore = PaymentManager.GetStore();
+				restoreFailedStore.OnRestoreFailed = (Action)Delegate.Remove(restoreFailedStore.OnRestoreFailed, new Action(OnConnectionFailed));
+				PaymentStore initializedStore = PaymentManager.GetStore();
+				initializedStore.OnInitialized = (Action)Delegate.Remove(initializedStore.OnInitialized, new Action(OnProductsUpdated));
 			}
 		}
 

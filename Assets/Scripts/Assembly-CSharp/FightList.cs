@@ -371,9 +371,9 @@ public class FightList
 			{
 				GameLog.Error("name for item is empty");
 			}
-			UserItem dKCHDHMLKHN2 = ListSF.GetRoster().GetInventory().FindItem(text);
+			UserItem ownedItem = ListSF.GetRoster().GetInventory().FindItem(text);
 			itemInfo = null;
-			if (dKCHDHMLKHN2 == null)
+			if (ownedItem == null)
 			{
 				itemInfo = ListSF.GetItems().GetItemByName(text);
 				if (itemInfo == null)
@@ -384,7 +384,7 @@ public class FightList
 			}
 			else
 			{
-				itemInfo = dKCHDHMLKHN2.GetInfo();
+				itemInfo = ownedItem.GetInfo();
 			}
 			if ((itemInfo == null || !roster.GetInventory().HasItem(itemInfo)) && !item.GetIsEquipRule())
 			{
@@ -392,9 +392,9 @@ public class FightList
 			}
 			if (itemInfo != null && (!respectNoAttributeChange || !item.GetNoAttributeChange()))
 			{
-				ItemInfo dJKEECEOCJB2 = itemInfo.Clone();
-				dJKEECEOCJB2.IgnoreInventoryEnchantments = true;
-				parameters.SetItemByType(itemInfo.Type, dJKEECEOCJB2);
+				ItemInfo equipItemInfo = itemInfo.Clone();
+				equipItemInfo.IgnoreInventoryEnchantments = true;
+				parameters.SetItemByType(itemInfo.Type, equipItemInfo);
 			}
 		}
 	}
@@ -489,9 +489,9 @@ public class FightList
 			num3 = ratingRule.GetRatingCorrection();
 		}
 		EquippedItemsStruct savedItems = new EquippedItemsStruct();
-		EquippedItemsStruct hELFDCAIJNE2 = new EquippedItemsStruct();
+		EquippedItemsStruct savedEquipment = new EquippedItemsStruct();
 		playerParameters.CopyEquippedItemsTo(savedItems);
-		opponentParameters.CopyEquippedItemsTo(hELFDCAIJNE2);
+		opponentParameters.CopyEquippedItemsTo(savedEquipment);
 		ApplyRuleItems(playerParameters);
 		ApplyRuleItems(opponentParameters);
 		List<global::Pair<string, float>> list = GetPlayerAttributeModifiers();
@@ -515,13 +515,13 @@ public class FightList
 		float num4 = GameUtils.GetDamageFactorBase();
 		string damageFactorAttribute = GameUtils.GetDamageFactorAttribute();
 		int attributeValue = 0;
-		int OEMALIFPGPO2 = 0;
+		int opponentAttributeValue = 0;
 		ModelParameters clonedParameters = opponentParameters.Clone();
-		ModelParameters kIKOGDEPGHB2 = playerParameters.Clone();
+		ModelParameters shiftedParameters = playerParameters.Clone();
 		clonedParameters.AddAttributeShifts(list2);
-		kIKOGDEPGHB2.AddAttributeShifts(list);
+		shiftedParameters.AddAttributeShifts(list);
 		clonedParameters.FinalAttributes.Get(damageFactorAttribute, ref attributeValue);
-		kIKOGDEPGHB2.FinalAttributes.Get(damageFactorAttribute, ref OEMALIFPGPO2);
+		shiftedParameters.FinalAttributes.Get(damageFactorAttribute, ref opponentAttributeValue);
 		float num5 = 1f;
 		float num6 = 1f;
 		List<Rule> list3 = GetRules();
@@ -554,11 +554,11 @@ public class FightList
 				}
 			}
 		}
-		float num11 = num2 / num * Mathf.Pow(2f, (float)(attributeValue - OEMALIFPGPO2) * num4) * num6 / num5;
+		float num11 = num2 / num * Mathf.Pow(2f, (float)(attributeValue - opponentAttributeValue) * num4) * num6 / num5;
 		float num12 = (float)opponentParameters.RatingCorrection + num3;
 		num11 *= Mathf.Pow(2f, 2f * num12 / GameUtils.DamageDoublingRange);
 		playerParameters.SetEquippedItemsFrom(savedItems);
-		opponentParameters.SetEquippedItemsFrom(hELFDCAIJNE2);
+		opponentParameters.SetEquippedItemsFrom(savedEquipment);
 		return num11;
 	}
 

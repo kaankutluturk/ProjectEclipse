@@ -1155,8 +1155,8 @@ public class ItemInfo
 	public ItemInfo GetUpdateItemByLevel(int level, bool usePreviousUpgrade = true)
 	{
 		UpgradeData exactMatch = null;
-		UpgradeData fKFLGOCPFEB2 = null;
-		UpgradeData fKFLGOCPFEB3 = null;
+		UpgradeData previousUpgrade = null;
+		UpgradeData currentUpgrade = null;
 		bool flag = false;
 		List<UpgradeData> list = GetUpgrades();
 		foreach (UpgradeData item in list)
@@ -1169,16 +1169,16 @@ public class ItemInfo
 			}
 			if (itemLevel > level)
 			{
-				fKFLGOCPFEB2 = fKFLGOCPFEB3;
+				previousUpgrade = currentUpgrade;
 				break;
 			}
-			fKFLGOCPFEB3 = item;
+			currentUpgrade = item;
 		}
-		if (exactMatch == null && fKFLGOCPFEB2 == null)
+		if (exactMatch == null && previousUpgrade == null)
 		{
 			return null;
 		}
-		UpgradeData selectedUpgrade = ((!usePreviousUpgrade) ? exactMatch : fKFLGOCPFEB2);
+		UpgradeData selectedUpgrade = ((!usePreviousUpgrade) ? exactMatch : previousUpgrade);
 		return CreateUpgradedItem(selectedUpgrade);
 	}
 
@@ -1230,8 +1230,8 @@ public class ItemInfo
 		List<UpgradeData> list = GetUpgrades();
 		List<UpgradeData> list2 = new List<UpgradeData>();
 		UpgradeData currentUpgrade = null;
-		UpgradeData fKFLGOCPFEB2 = null;
-		UpgradeData fKFLGOCPFEB3 = null;
+		UpgradeData nextMilestoneUpgrade = null;
+		UpgradeData nextRegularUpgrade = null;
 		float num = GameUtils.OutdateLevelTable.GetValue(Type);
 		int num2 = upgradeLevel / 100;
 		foreach (UpgradeData item in list)
@@ -1243,13 +1243,13 @@ public class ItemInfo
 			}
 			if (item.Values.Level <= maxItemLevel && candidateLevel > upgradeLevel)
 			{
-				if (item.Values.Milestone > 0 && (float)item.Values.Level >= (float)num2 + num && (fKFLGOCPFEB2 == null || fKFLGOCPFEB2.Values.UpgradeLevel < candidateLevel))
+				if (item.Values.Milestone > 0 && (float)item.Values.Level >= (float)num2 + num && (nextMilestoneUpgrade == null || nextMilestoneUpgrade.Values.UpgradeLevel < candidateLevel))
 				{
-					fKFLGOCPFEB2 = item;
+					nextMilestoneUpgrade = item;
 				}
-				if (item.Values.Milestone <= 0 && (fKFLGOCPFEB3 == null || fKFLGOCPFEB3.Values.UpgradeLevel > candidateLevel))
+				if (item.Values.Milestone <= 0 && (nextRegularUpgrade == null || nextRegularUpgrade.Values.UpgradeLevel > candidateLevel))
 				{
-					fKFLGOCPFEB3 = item;
+					nextRegularUpgrade = item;
 				}
 			}
 		}
@@ -1261,13 +1261,13 @@ public class ItemInfo
 		{
 			currentItem = null;
 		}
-		if (fKFLGOCPFEB2 != null)
+		if (nextMilestoneUpgrade != null)
 		{
-			nextItem = CreateUpgradedItem(fKFLGOCPFEB2);
+			nextItem = CreateUpgradedItem(nextMilestoneUpgrade);
 		}
-		else if (fKFLGOCPFEB3 != null)
+		else if (nextRegularUpgrade != null)
 		{
-			nextItem = CreateUpgradedItem(fKFLGOCPFEB3);
+			nextItem = CreateUpgradedItem(nextRegularUpgrade);
 		}
 		else
 		{

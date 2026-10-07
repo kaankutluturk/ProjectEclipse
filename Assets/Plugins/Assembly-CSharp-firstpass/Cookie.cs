@@ -449,14 +449,14 @@ public sealed class Cookie : IComparable<Cookie>, IEquatable<Cookie>
 		return ToString().GetHashCode();
 	}
 
-	private static string ReadValue(string text, ref int LCCLEFMKLPB)
+	private static string ReadValue(string text, ref int cursor)
 	{
 		string empty = string.Empty;
 		if (text == null)
 		{
 			return empty;
 		}
-		return text.Read(ref LCCLEFMKLPB, ';');
+		return text.Read(ref cursor, ';');
 	}
 
 	private static List<KeyValuePair> ParseCookieValue(string text)
@@ -466,14 +466,14 @@ public sealed class Cookie : IComparable<Cookie>, IEquatable<Cookie>
 		{
 			return list;
 		}
-		int LCCLEFMKLPB = 0;
-		while (LCCLEFMKLPB < text.Length)
+		int cursor = 0;
+		while (cursor < text.Length)
 		{
-			string name = text.Read(ref LCCLEFMKLPB, (char KDFCGMMKAME) => KDFCGMMKAME != '=' && KDFCGMMKAME != ';').Trim();
+			string name = text.Read(ref cursor, (char ch) => ch != '=' && ch != ';').Trim();
 			KeyValuePair pair = new KeyValuePair(name);
-			if (LCCLEFMKLPB < text.Length && text[LCCLEFMKLPB - 1] == '=')
+			if (cursor < text.Length && text[cursor - 1] == '=')
 			{
-				pair.set_Value(ReadValue(text, ref LCCLEFMKLPB));
+				pair.set_Value(ReadValue(text, ref cursor));
 			}
 			list.Add(pair);
 		}

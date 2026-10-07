@@ -332,7 +332,7 @@ namespace Nekki.SF2.GUI.Fight
 			button.onClick.AddListener(OnBenchmarkClicked);
 		}
 
-		private void InitModel(ScreenModel screenModel, ModelParameters parameters, bool showRounds, Vector2 LCCLEFMKLPB, string name)
+		private void InitModel(ScreenModel screenModel, ModelParameters parameters, bool showRounds, Vector2 modelScreenPosition, string name)
 		{
 			parameters.RoundTotal = GetRound().roundTotal;
 			screenModel.Init(parameters, showRounds);

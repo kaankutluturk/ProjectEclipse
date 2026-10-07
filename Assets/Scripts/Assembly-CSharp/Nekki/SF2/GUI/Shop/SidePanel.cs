@@ -155,9 +155,9 @@ namespace Nekki.SF2.GUI.Shop
 			SetOpen(_shouldOpenOnRelease);
 		}
 
-		private void SetPosition(Vector2 LCCLEFMKLPB)
+		private void SetPosition(Vector2 normalizedPosition)
 		{
-			_normalizedPosition = LCCLEFMKLPB;
+			_normalizedPosition = normalizedPosition;
 			if (_scrollRect != null)
 			{
 				_scrollRect.normalizedPosition = _normalizedPosition;
@@ -176,9 +176,9 @@ namespace Nekki.SF2.GUI.Shop
 		private void TweenPosition(Vector2 targetPosition, float _Duration)
 		{
 			KillTween();
-			_tween = DOTween.To(() => _normalizedPosition, (Vector2Wrapper HBLGAEMOHAL) =>
+			_tween = DOTween.To(() => _normalizedPosition, (Vector2Wrapper positionWrapper) =>
 			{
-				SetPosition(HBLGAEMOHAL);
+				SetPosition(positionWrapper);
 			}, targetPosition, _Duration);
 			_tween.OnComplete(OnTweenComplete);
 		}

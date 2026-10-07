@@ -513,7 +513,7 @@ namespace Nekki.SF2.GUI
 			base.OnDestroy();
 		}
 
-		public static string GetTexturePath(Sprite GBIOHMNNEJI)
+		public static string GetTexturePath(Sprite sourceSprite)
 		{
 			return string.Empty;
 		}

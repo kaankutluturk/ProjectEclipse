@@ -93,14 +93,14 @@ public class GlobalLoad : GlobalPath
 
 	public static Sprite GetLoadSpriteInternal(string key, string name = "")
 	{
-		Sprite aOMLCBHAJJH = GetLoadObjectInternal<Sprite>(key, name);
-		return ObjecOrDefault(aOMLCBHAJJH, GetNoImageSprite());
+		Sprite loadedSprite = GetLoadObjectInternal<Sprite>(key, name);
+		return ObjecOrDefault(loadedSprite, GetNoImageSprite());
 	}
 
 	public static Sprite GetLoadSprite(string path)
 	{
-		Sprite aOMLCBHAJJH = GetLoadObject<Sprite>(path);
-		return ObjecOrDefault(aOMLCBHAJJH, GetNoImageSprite());
+		Sprite loadedSprite = GetLoadObject<Sprite>(path);
+		return ObjecOrDefault(loadedSprite, GetNoImageSprite());
 	}
 
 	public static Sprite GetLoadSpriteFromTextureInternal(string key, string name = "")
@@ -263,7 +263,7 @@ public class GlobalLoad : GlobalPath
 			// Same value Object.GetInstanceID() returns in Unity 6: the low 32 bits of the EntityId. The legacy sign test still holds.
 			if (unchecked((int)EntityId.ToULong(asset.GetEntityId())) <= 0)
 #else
-			if (AOMLCBHAJJH.GetInstanceID() <= 0)
+			if (asset.GetInstanceID() <= 0)
 #endif
 			{
 				DestroyObject(asset, immediate);

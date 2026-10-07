@@ -406,15 +406,15 @@ public class SelectAnimation
 		int num = int.MinValue;
 		SelectInfo chosenInfo = null;
 		List<SelectInfo> list2 = new List<SelectInfo>();
-		SelectInfo nKDNDLNDFJH2 = null;
+		SelectInfo selectInfo = null;
 		for (int i = 0; i < selectInfos.Count; i++)
 		{
-			nKDNDLNDFJH2 = selectInfos[i];
-			if (!ignoreRandom && nKDNDLNDFJH2.IsRandom)
+			selectInfo = selectInfos[i];
+			if (!ignoreRandom && selectInfo.IsRandom)
 			{
-				list.Add(nKDNDLNDFJH2);
+				list.Add(selectInfo);
 			}
-			int priority = nKDNDLNDFJH2.Animation.Priority;
+			int priority = selectInfo.Animation.Priority;
 			if (priority >= num)
 			{
 				if (priority > num)
@@ -422,7 +422,7 @@ public class SelectAnimation
 					num = priority;
 					list2.Clear();
 				}
-				list2.Add(nKDNDLNDFJH2);
+				list2.Add(selectInfo);
 			}
 		}
 		int index = Eclipse.Multiplayer.VersusDeterminism.Range(0, list2.Count);
@@ -527,10 +527,10 @@ public class SelectAnimation
 		for (int m = 0; m < selectInfos.Count; m++)
 		{
 			SelectInfo item4 = selectInfos[m];
-			ConditionKeys bHDEBDIHDFM2 = item4.Animation.GetFirstKeysCondition();
-			if (firstKeysCondition != null && bHDEBDIHDFM2 != null)
+			ConditionKeys keysCondition = item4.Animation.GetFirstKeysCondition();
+			if (firstKeysCondition != null && keysCondition != null)
 			{
-				if (bHDEBDIHDFM2.IsEqual(firstKeysCondition.RequiredKeys, true))
+				if (keysCondition.IsEqual(firstKeysCondition.RequiredKeys, true))
 				{
 					list.Add(item4);
 				}
@@ -771,13 +771,13 @@ public class SelectAnimation
 	{
 		Fight fight = Fight.GetCurrentFight();
 		Model targetModel = model.GetCombatTarget();
-		Model fGCODGKLHED2 = model.GetModelByType(ModelType.ModelTargetType.MODEL_PARENT);
-		Model fGCODGKLHED3 = model.GetModelByType(ModelType.ModelTargetType.MODEL_CHILD);
+		Model parentModel = model.GetModelByType(ModelType.ModelTargetType.MODEL_PARENT);
+		Model childModel = model.GetModelByType(ModelType.ModelTargetType.MODEL_CHILD);
 		// A strike can delete a projectile and create its child in the same frame.
 		// The child may retain a parent reference after the parent's runtime rig is cleared.
 		if (targetModel != null && targetModel.GetPhysicsModule() == null) targetModel = null;
-		if (fGCODGKLHED2 != null && fGCODGKLHED2.GetPhysicsModule() == null) fGCODGKLHED2 = null;
-		if (fGCODGKLHED3 != null && fGCODGKLHED3.GetPhysicsModule() == null) fGCODGKLHED3 = null;
+		if (parentModel != null && parentModel.GetPhysicsModule() == null) parentModel = null;
+		if (childModel != null && childModel.GetPhysicsModule() == null) childModel = null;
 		if (fight != null)
 		{
 			fight.GetPerksStage().CollectActiveActions(model, conditions.SelfActionPerks);
@@ -799,18 +799,18 @@ public class SelectAnimation
 		conditions.HasOther = ((targetModel != null) ? true : false);
 		conditions.SelfSign = model.GetFacingSign();
 		conditions.OtherSign = ((targetModel == null) ? 1 : targetModel.GetFacingSign());
-		conditions.ParentSign = ((fGCODGKLHED2 == null) ? 1 : fGCODGKLHED2.GetFacingSign());
-		conditions.ChildSign = ((fGCODGKLHED3 == null) ? 1 : fGCODGKLHED3.GetFacingSign());
+		conditions.ParentSign = ((parentModel == null) ? 1 : parentModel.GetFacingSign());
+		conditions.ChildSign = ((childModel == null) ? 1 : childModel.GetFacingSign());
 		conditions.PressedKeys = model.GetKeyDataBySign(conditions.SelfSign);
 		conditions.Intervals = model.GetIntervals();
 		conditions.OtherIntervals = ((targetModel == null) ? null : targetModel.GetIntervals());
-		conditions.ParentIntervals = ((fGCODGKLHED2 == null) ? null : fGCODGKLHED2.GetIntervals());
+		conditions.ParentIntervals = ((parentModel == null) ? null : parentModel.GetIntervals());
 		conditions.IsPlayer = model.IsPlayerModel();
 		conditions.IsWeapon = model.IsWeapon();
 		conditions.RoundStage = model.RoundStage;
 		conditions.SelfIsPhysics = model.GetPhysicsModule().IsPhysics();
 		conditions.OtherIsPhysics = targetModel != null && targetModel.GetPhysicsModule().IsPhysics();
-		conditions.ParentIsPhysics = fGCODGKLHED2 != null && fGCODGKLHED2.GetPhysicsModule().IsPhysics();
+		conditions.ParentIsPhysics = parentModel != null && parentModel.GetPhysicsModule().IsPhysics();
 		conditions.CurrentFrame = model.GetPhysicsModule().GetFrame();
 		conditions.RoundEnded = model.Parameters.RoundEnded;
 		conditions.IsWinner = model.Parameters.IsWinner;
@@ -824,12 +824,12 @@ public class SelectAnimation
 		conditions.RaidCharges = model.GetRaidBullets();
 		conditions.SelfNode = model.GetAnimationModule().GetPlayingNode();
 		conditions.OtherNode = ((targetModel == null) ? null : targetModel.GetAnimationModule().GetPlayingNode());
-		conditions.ParentNode = ((fGCODGKLHED2 == null) ? null : fGCODGKLHED2.GetAnimationModule().GetPlayingNode());
-		conditions.ChildNode = ((fGCODGKLHED3 == null) ? null : fGCODGKLHED3.GetAnimationModule().GetPlayingNode());
+		conditions.ParentNode = ((parentModel == null) ? null : parentModel.GetAnimationModule().GetPlayingNode());
+		conditions.ChildNode = ((childModel == null) ? null : childModel.GetAnimationModule().GetPlayingNode());
 		UpdateModelPositionInfo(ref conditions.SelfAnimationNames, conditions.SelfPositions, model);
-		UpdateModelPositionInfo(ref conditions.ParentAnimationNames, conditions.ParentPositions, fGCODGKLHED2);
+		UpdateModelPositionInfo(ref conditions.ParentAnimationNames, conditions.ParentPositions, parentModel);
 		UpdateModelPositionInfo(ref conditions.OtherAnimationNames, conditions.OtherPositions, targetModel);
-		UpdateModelPositionInfo(ref conditions.ChildAnimationNames, conditions.ChildPositions, fGCODGKLHED3);
+		UpdateModelPositionInfo(ref conditions.ChildAnimationNames, conditions.ChildPositions, childModel);
 	}
 
 	private static void SetTransitions(Model model, ModelConditions conditions, InfoAnimation animation, int facingSign)

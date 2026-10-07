@@ -123,9 +123,9 @@ public class LzmaEncoder : ICoder, ISetCoderProperties, IWriteCoderProperties
 			}
 		}
 
-		public LiteralSubEncoder GetSubCoder(uint LCCLEFMKLPB, byte prevByte)
+		public LiteralSubEncoder GetSubCoder(uint literalPosition, byte prevByte)
 		{
-			return coders[(int)((LCCLEFMKLPB & m_PosMask) << numPrevBits) + (prevByte >> 8 - numPrevBits)];
+			return coders[(int)((literalPosition & m_PosMask) << numPrevBits) + (prevByte >> 8 - numPrevBits)];
 		}
 	}
 
@@ -624,10 +624,10 @@ public class LzmaEncoder : ICoder, ISetCoderProperties, IWriteCoderProperties
 				}
 			}
 			uint num = posMem;
-			uint eKNEPEFHCIL2 = backMem;
+			uint previousBack = backMem;
 			backMem = optimum[num].BackPrev;
 			posMem = optimum[num].PosPrev;
-			optimum[num].BackPrev = eKNEPEFHCIL2;
+			optimum[num].BackPrev = previousBack;
 			optimum[num].PosPrev = cur;
 			cur = num;
 		}
@@ -637,7 +637,7 @@ public class LzmaEncoder : ICoder, ISetCoderProperties, IWriteCoderProperties
 		return optimumCurrentIndex;
 	}
 
-	private uint GetOptimum(uint MGMMDGFPBLP, out uint backRes)
+	private uint GetOptimum(uint nowPosition, out uint backRes)
 	{
 		if (optimumEndIndex != optimumCurrentIndex)
 		{
@@ -700,8 +700,8 @@ public class LzmaEncoder : ICoder, ISetCoderProperties, IWriteCoderProperties
 			return 1u;
 		}
 		optimum[0].CoderState = state;
-		uint num5 = MGMMDGFPBLP & posStateMask;
-		optimum[1].Price = isMatch[(state.Index << 4) + num5].GetPrice0() + literalEncoder.GetSubCoder(MGMMDGFPBLP, _previousByte).GetPrice(!state.IsCharState(), b2, b);
+		uint num5 = nowPosition & posStateMask;
+		optimum[1].Price = isMatch[(state.Index << 4) + num5].GetPrice0() + literalEncoder.GetSubCoder(nowPosition, _previousByte).GetPrice(!state.IsCharState(), b2, b);
 		optimum[1].MakeAsChar();
 		uint num6 = isMatch[(state.Index << 4) + num5].GetPrice1();
 		uint num7 = num6 + isRep[state.Index].GetPrice1();
@@ -765,13 +765,13 @@ public class LzmaEncoder : ICoder, ISetCoderProperties, IWriteCoderProperties
 			{
 				uint num16 = matchDistances[num15 + 1];
 				uint num17 = num14 + GetPosLenPrice(num16, num10, num5);
-				Optimal jDOABBOPFIP2 = optimum[num10];
-				if (num17 < jDOABBOPFIP2.Price)
+				Optimal matchOptimal = optimum[num10];
+				if (num17 < matchOptimal.Price)
 				{
-					jDOABBOPFIP2.Price = num17;
-					jDOABBOPFIP2.PosPrev = 0u;
-					jDOABBOPFIP2.BackPrev = num16 + 4;
-					jDOABBOPFIP2.Prev1IsChar = false;
+					matchOptimal.Price = num17;
+					matchOptimal.PosPrev = 0u;
+					matchOptimal.BackPrev = num16 + 4;
+					matchOptimal.Prev1IsChar = false;
 				}
 				if (num10 == matchDistances[num15])
 				{
@@ -785,7 +785,7 @@ public class LzmaEncoder : ICoder, ISetCoderProperties, IWriteCoderProperties
 			}
 		}
 		uint num18 = 0u;
-		uint CEAHDKFDIOK2;
+		uint mainLength;
 		while (true)
 		{
 			num18++;
@@ -793,12 +793,12 @@ public class LzmaEncoder : ICoder, ISetCoderProperties, IWriteCoderProperties
 			{
 				return Backward(out backRes, num18);
 			}
-			ReadMatchDistances(out CEAHDKFDIOK2, out distancePairCount);
-			if (CEAHDKFDIOK2 >= numFastBytes)
+			ReadMatchDistances(out mainLength, out distancePairCount);
+			if (mainLength >= numFastBytes)
 			{
 				break;
 			}
-			MGMMDGFPBLP++;
+			nowPosition++;
 			uint num19 = optimum[num18].PosPrev;
 			Base.CoderState currentState;
 			if (optimum[num18].Prev1IsChar)
@@ -858,38 +858,38 @@ public class LzmaEncoder : ICoder, ISetCoderProperties, IWriteCoderProperties
 						currentState.UpdateMatch();
 					}
 				}
-				Optimal jDOABBOPFIP3 = optimum[num19];
+				Optimal currentOptimal = optimum[num19];
 				switch (num20)
 				{
 				case 0u:
-					reps[0] = jDOABBOPFIP3.Backs0;
-					reps[1] = jDOABBOPFIP3.Backs1;
-					reps[2] = jDOABBOPFIP3.Backs2;
-					reps[3] = jDOABBOPFIP3.Backs3;
+					reps[0] = currentOptimal.Backs0;
+					reps[1] = currentOptimal.Backs1;
+					reps[2] = currentOptimal.Backs2;
+					reps[3] = currentOptimal.Backs3;
 					break;
 				case 1u:
-					reps[0] = jDOABBOPFIP3.Backs1;
-					reps[1] = jDOABBOPFIP3.Backs0;
-					reps[2] = jDOABBOPFIP3.Backs2;
-					reps[3] = jDOABBOPFIP3.Backs3;
+					reps[0] = currentOptimal.Backs1;
+					reps[1] = currentOptimal.Backs0;
+					reps[2] = currentOptimal.Backs2;
+					reps[3] = currentOptimal.Backs3;
 					break;
 				case 2u:
-					reps[0] = jDOABBOPFIP3.Backs2;
-					reps[1] = jDOABBOPFIP3.Backs0;
-					reps[2] = jDOABBOPFIP3.Backs1;
-					reps[3] = jDOABBOPFIP3.Backs3;
+					reps[0] = currentOptimal.Backs2;
+					reps[1] = currentOptimal.Backs0;
+					reps[2] = currentOptimal.Backs1;
+					reps[3] = currentOptimal.Backs3;
 					break;
 				case 3u:
-					reps[0] = jDOABBOPFIP3.Backs3;
-					reps[1] = jDOABBOPFIP3.Backs0;
-					reps[2] = jDOABBOPFIP3.Backs1;
-					reps[3] = jDOABBOPFIP3.Backs2;
+					reps[0] = currentOptimal.Backs3;
+					reps[1] = currentOptimal.Backs0;
+					reps[2] = currentOptimal.Backs1;
+					reps[3] = currentOptimal.Backs2;
 					break;
 				default:
 					reps[0] = num20 - 4;
-					reps[1] = jDOABBOPFIP3.Backs0;
-					reps[2] = jDOABBOPFIP3.Backs1;
-					reps[3] = jDOABBOPFIP3.Backs2;
+					reps[1] = currentOptimal.Backs0;
+					reps[2] = currentOptimal.Backs1;
+					reps[3] = currentOptimal.Backs2;
 					break;
 				}
 			}
@@ -901,27 +901,27 @@ public class LzmaEncoder : ICoder, ISetCoderProperties, IWriteCoderProperties
 			uint curPrice = optimum[num18].Price;
 			b = matchFinder.GetIndexByte(-1);
 			b2 = matchFinder.GetIndexByte((int)(0 - reps[0] - 1 - 1));
-			num5 = MGMMDGFPBLP & posStateMask;
-			uint num21 = curPrice + isMatch[(currentState.Index << 4) + num5].GetPrice0() + literalEncoder.GetSubCoder(MGMMDGFPBLP, matchFinder.GetIndexByte(-2)).GetPrice(!currentState.IsCharState(), b2, b);
-			Optimal jDOABBOPFIP4 = optimum[num18 + 1];
+			num5 = nowPosition & posStateMask;
+			uint num21 = curPrice + isMatch[(currentState.Index << 4) + num5].GetPrice0() + literalEncoder.GetSubCoder(nowPosition, matchFinder.GetIndexByte(-2)).GetPrice(!currentState.IsCharState(), b2, b);
+			Optimal charOptimal = optimum[num18 + 1];
 			bool flag = false;
-			if (num21 < jDOABBOPFIP4.Price)
+			if (num21 < charOptimal.Price)
 			{
-				jDOABBOPFIP4.Price = num21;
-				jDOABBOPFIP4.PosPrev = num18;
-				jDOABBOPFIP4.MakeAsChar();
+				charOptimal.Price = num21;
+				charOptimal.PosPrev = num18;
+				charOptimal.MakeAsChar();
 				flag = true;
 			}
 			num6 = curPrice + isMatch[(currentState.Index << 4) + num5].GetPrice1();
 			num7 = num6 + isRep[currentState.Index].GetPrice1();
-			if (b2 == b && (jDOABBOPFIP4.PosPrev >= num18 || jDOABBOPFIP4.BackPrev != 0))
+			if (b2 == b && (charOptimal.PosPrev >= num18 || charOptimal.BackPrev != 0))
 			{
 				uint num22 = num7 + GetRepLen1Price(currentState, num5);
-				if (num22 <= jDOABBOPFIP4.Price)
+				if (num22 <= charOptimal.Price)
 				{
-					jDOABBOPFIP4.Price = num22;
-					jDOABBOPFIP4.PosPrev = num18;
-					jDOABBOPFIP4.MakeAsShortRep();
+					charOptimal.Price = num22;
+					charOptimal.PosPrev = num18;
+					charOptimal.MakeAsShortRep();
 					flag = true;
 				}
 			}
@@ -944,7 +944,7 @@ public class LzmaEncoder : ICoder, ISetCoderProperties, IWriteCoderProperties
 				{
 					Base.CoderState nextState = currentState;
 					nextState.UpdateChar();
-					uint num24 = (MGMMDGFPBLP + 1) & posStateMask;
+					uint num24 = (nowPosition + 1) & posStateMask;
 					uint num25 = num21 + isMatch[(nextState.Index << 4) + num24].GetPrice1() + isRep[nextState.Index].GetPrice1();
 					uint num26 = num18 + 1 + num23;
 					while (num9 < num26)
@@ -952,14 +952,14 @@ public class LzmaEncoder : ICoder, ISetCoderProperties, IWriteCoderProperties
 						optimum[++num9].Price = 268435455u;
 					}
 					uint num27 = num25 + GetRepPrice(0u, num23, nextState, num24);
-					Optimal jDOABBOPFIP5 = optimum[num26];
-					if (num27 < jDOABBOPFIP5.Price)
+					Optimal charRepOptimal = optimum[num26];
+					if (num27 < charRepOptimal.Price)
 					{
-						jDOABBOPFIP5.Price = num27;
-						jDOABBOPFIP5.PosPrev = num18 + 1;
-						jDOABBOPFIP5.BackPrev = 0u;
-						jDOABBOPFIP5.Prev1IsChar = true;
-						jDOABBOPFIP5.Prev2 = false;
+						charRepOptimal.Price = num27;
+						charRepOptimal.PosPrev = num18 + 1;
+						charRepOptimal.BackPrev = 0u;
+						charRepOptimal.Prev1IsChar = true;
+						charRepOptimal.Prev2 = false;
 					}
 				}
 			}
@@ -980,13 +980,13 @@ public class LzmaEncoder : ICoder, ISetCoderProperties, IWriteCoderProperties
 						continue;
 					}
 					uint num32 = num7 + GetRepPrice(num29, num30, currentState, num5);
-					Optimal jDOABBOPFIP6 = optimum[num18 + num30];
-					if (num32 < jDOABBOPFIP6.Price)
+					Optimal repOptimal = optimum[num18 + num30];
+					if (num32 < repOptimal.Price)
 					{
-						jDOABBOPFIP6.Price = num32;
-						jDOABBOPFIP6.PosPrev = num18;
-						jDOABBOPFIP6.BackPrev = num29;
-						jDOABBOPFIP6.Prev1IsChar = false;
+						repOptimal.Price = num32;
+						repOptimal.PosPrev = num18;
+						repOptimal.BackPrev = num29;
+						repOptimal.Prev1IsChar = false;
 					}
 					if (--num30 < 2)
 					{
@@ -1002,52 +1002,52 @@ public class LzmaEncoder : ICoder, ISetCoderProperties, IWriteCoderProperties
 				{
 					continue;
 				}
-				uint lOHCIKNKDEI2 = Math.Min(val - 1 - num30, numFastBytes);
-				uint num33 = matchFinder.GetMatchLen((int)num30, reps[num29], lOHCIKNKDEI2);
+				uint repLengthLimit = Math.Min(val - 1 - num30, numFastBytes);
+				uint num33 = matchFinder.GetMatchLen((int)num30, reps[num29], repLengthLimit);
 				if (num33 >= 2)
 				{
-					Base.CoderState pIFKPLHIOFJ2 = currentState;
-					pIFKPLHIOFJ2.UpdateRep();
-					uint num34 = (MGMMDGFPBLP + num30) & posStateMask;
-					uint num35 = num7 + GetRepPrice(num29, num30, currentState, num5) + isMatch[(pIFKPLHIOFJ2.Index << 4) + num34].GetPrice0() + literalEncoder.GetSubCoder(MGMMDGFPBLP + num30, matchFinder.GetIndexByte((int)(num30 - 1 - 1))).GetPrice(true, matchFinder.GetIndexByte((int)(num30 - 1 - (reps[num29] + 1))), matchFinder.GetIndexByte((int)(num30 - 1)));
-					pIFKPLHIOFJ2.UpdateChar();
-					num34 = (MGMMDGFPBLP + num30 + 1) & posStateMask;
-					uint num36 = num35 + isMatch[(pIFKPLHIOFJ2.Index << 4) + num34].GetPrice1();
-					uint num37 = num36 + isRep[pIFKPLHIOFJ2.Index].GetPrice1();
+					Base.CoderState repState = currentState;
+					repState.UpdateRep();
+					uint num34 = (nowPosition + num30) & posStateMask;
+					uint num35 = num7 + GetRepPrice(num29, num30, currentState, num5) + isMatch[(repState.Index << 4) + num34].GetPrice0() + literalEncoder.GetSubCoder(nowPosition + num30, matchFinder.GetIndexByte((int)(num30 - 1 - 1))).GetPrice(true, matchFinder.GetIndexByte((int)(num30 - 1 - (reps[num29] + 1))), matchFinder.GetIndexByte((int)(num30 - 1)));
+					repState.UpdateChar();
+					num34 = (nowPosition + num30 + 1) & posStateMask;
+					uint num36 = num35 + isMatch[(repState.Index << 4) + num34].GetPrice1();
+					uint num37 = num36 + isRep[repState.Index].GetPrice1();
 					uint num38 = num30 + 1 + num33;
 					while (num9 < num18 + num38)
 					{
 						optimum[++num9].Price = 268435455u;
 					}
-					uint num39 = num37 + GetRepPrice(0u, num33, pIFKPLHIOFJ2, num34);
-					Optimal jDOABBOPFIP7 = optimum[num18 + num38];
-					if (num39 < jDOABBOPFIP7.Price)
+					uint num39 = num37 + GetRepPrice(0u, num33, repState, num34);
+					Optimal repMatchOptimal = optimum[num18 + num38];
+					if (num39 < repMatchOptimal.Price)
 					{
-						jDOABBOPFIP7.Price = num39;
-						jDOABBOPFIP7.PosPrev = num18 + num30 + 1;
-						jDOABBOPFIP7.BackPrev = 0u;
-						jDOABBOPFIP7.Prev1IsChar = true;
-						jDOABBOPFIP7.Prev2 = true;
-						jDOABBOPFIP7.PosPrev2 = num18;
-						jDOABBOPFIP7.BackPrev2 = num29;
+						repMatchOptimal.Price = num39;
+						repMatchOptimal.PosPrev = num18 + num30 + 1;
+						repMatchOptimal.BackPrev = 0u;
+						repMatchOptimal.Prev1IsChar = true;
+						repMatchOptimal.Prev2 = true;
+						repMatchOptimal.PosPrev2 = num18;
+						repMatchOptimal.BackPrev2 = num29;
 					}
 				}
 			}
-			if (CEAHDKFDIOK2 > num)
+			if (mainLength > num)
 			{
-				CEAHDKFDIOK2 = num;
-				for (distancePairCount = 0u; CEAHDKFDIOK2 > matchDistances[distancePairCount]; distancePairCount += 2)
+				mainLength = num;
+				for (distancePairCount = 0u; mainLength > matchDistances[distancePairCount]; distancePairCount += 2)
 				{
 				}
-				matchDistances[distancePairCount] = CEAHDKFDIOK2;
+				matchDistances[distancePairCount] = mainLength;
 				distancePairCount += 2;
 			}
-			if (CEAHDKFDIOK2 < num28)
+			if (mainLength < num28)
 			{
 				continue;
 			}
 			num14 = num6 + isRep[currentState.Index].GetPrice0();
-			while (num9 < num18 + CEAHDKFDIOK2)
+			while (num9 < num18 + mainLength)
 			{
 				optimum[++num9].Price = 268435455u;
 			}
@@ -1060,46 +1060,46 @@ public class LzmaEncoder : ICoder, ISetCoderProperties, IWriteCoderProperties
 			{
 				uint num42 = matchDistances[num40 + 1];
 				uint num43 = num14 + GetPosLenPrice(num42, num41, num5);
-				Optimal jDOABBOPFIP8 = optimum[num18 + num41];
-				if (num43 < jDOABBOPFIP8.Price)
+				Optimal matchLenOptimal = optimum[num18 + num41];
+				if (num43 < matchLenOptimal.Price)
 				{
-					jDOABBOPFIP8.Price = num43;
-					jDOABBOPFIP8.PosPrev = num18;
-					jDOABBOPFIP8.BackPrev = num42 + 4;
-					jDOABBOPFIP8.Prev1IsChar = false;
+					matchLenOptimal.Price = num43;
+					matchLenOptimal.PosPrev = num18;
+					matchLenOptimal.BackPrev = num42 + 4;
+					matchLenOptimal.Prev1IsChar = false;
 				}
 				if (num41 == matchDistances[num40])
 				{
 					if (num41 < val)
 					{
-						uint lOHCIKNKDEI3 = Math.Min(val - 1 - num41, numFastBytes);
-						uint num44 = matchFinder.GetMatchLen((int)num41, num42, lOHCIKNKDEI3);
+						uint matchLengthLimit = Math.Min(val - 1 - num41, numFastBytes);
+						uint num44 = matchFinder.GetMatchLen((int)num41, num42, matchLengthLimit);
 						if (num44 >= 2)
 						{
-							Base.CoderState pIFKPLHIOFJ3 = currentState;
-							pIFKPLHIOFJ3.UpdateMatch();
-							uint num45 = (MGMMDGFPBLP + num41) & posStateMask;
-							uint num46 = num43 + isMatch[(pIFKPLHIOFJ3.Index << 4) + num45].GetPrice0() + literalEncoder.GetSubCoder(MGMMDGFPBLP + num41, matchFinder.GetIndexByte((int)(num41 - 1 - 1))).GetPrice(true, matchFinder.GetIndexByte((int)(num41 - (num42 + 1) - 1)), matchFinder.GetIndexByte((int)(num41 - 1)));
-							pIFKPLHIOFJ3.UpdateChar();
-							num45 = (MGMMDGFPBLP + num41 + 1) & posStateMask;
-							uint num47 = num46 + isMatch[(pIFKPLHIOFJ3.Index << 4) + num45].GetPrice1();
-							uint num48 = num47 + isRep[pIFKPLHIOFJ3.Index].GetPrice1();
+							Base.CoderState matchState = currentState;
+							matchState.UpdateMatch();
+							uint num45 = (nowPosition + num41) & posStateMask;
+							uint num46 = num43 + isMatch[(matchState.Index << 4) + num45].GetPrice0() + literalEncoder.GetSubCoder(nowPosition + num41, matchFinder.GetIndexByte((int)(num41 - 1 - 1))).GetPrice(true, matchFinder.GetIndexByte((int)(num41 - (num42 + 1) - 1)), matchFinder.GetIndexByte((int)(num41 - 1)));
+							matchState.UpdateChar();
+							num45 = (nowPosition + num41 + 1) & posStateMask;
+							uint num47 = num46 + isMatch[(matchState.Index << 4) + num45].GetPrice1();
+							uint num48 = num47 + isRep[matchState.Index].GetPrice1();
 							uint num49 = num41 + 1 + num44;
 							while (num9 < num18 + num49)
 							{
 								optimum[++num9].Price = 268435455u;
 							}
-							num43 = num48 + GetRepPrice(0u, num44, pIFKPLHIOFJ3, num45);
-							jDOABBOPFIP8 = optimum[num18 + num49];
-							if (num43 < jDOABBOPFIP8.Price)
+							num43 = num48 + GetRepPrice(0u, num44, matchState, num45);
+							matchLenOptimal = optimum[num18 + num49];
+							if (num43 < matchLenOptimal.Price)
 							{
-								jDOABBOPFIP8.Price = num43;
-								jDOABBOPFIP8.PosPrev = num18 + num41 + 1;
-								jDOABBOPFIP8.BackPrev = 0u;
-								jDOABBOPFIP8.Prev1IsChar = true;
-								jDOABBOPFIP8.Prev2 = true;
-								jDOABBOPFIP8.PosPrev2 = num18;
-								jDOABBOPFIP8.BackPrev2 = num42 + 4;
+								matchLenOptimal.Price = num43;
+								matchLenOptimal.PosPrev = num18 + num41 + 1;
+								matchLenOptimal.BackPrev = 0u;
+								matchLenOptimal.Prev1IsChar = true;
+								matchLenOptimal.Prev2 = true;
+								matchLenOptimal.PosPrev2 = num18;
+								matchLenOptimal.BackPrev2 = num42 + 4;
 							}
 						}
 					}
@@ -1113,7 +1113,7 @@ public class LzmaEncoder : ICoder, ISetCoderProperties, IWriteCoderProperties
 			}
 		}
 		numDistancePairs = distancePairCount;
-		longestMatchLength = CEAHDKFDIOK2;
+		longestMatchLength = mainLength;
 		longestMatchWasFound = true;
 		return Backward(out backRes, num18);
 	}
@@ -1382,17 +1382,17 @@ public class LzmaEncoder : ICoder, ISetCoderProperties, IWriteCoderProperties
 			SetStreams(inStream, outStream, inSize, outSize);
 			while (true)
 			{
-				long NCKELGLBGJN2;
-				long JNILCBKONPG2;
+				long inputProgress;
+				long outputProgress;
 				bool isFinished;
-				CodeOneBlock(out NCKELGLBGJN2, out JNILCBKONPG2, out isFinished);
+				CodeOneBlock(out inputProgress, out outputProgress, out isFinished);
 				if (isFinished)
 				{
 					break;
 				}
 				if (progress != null)
 				{
-					progress.SetProgress(NCKELGLBGJN2, JNILCBKONPG2);
+					progress.SetProgress(inputProgress, outputProgress);
 				}
 			}
 		}

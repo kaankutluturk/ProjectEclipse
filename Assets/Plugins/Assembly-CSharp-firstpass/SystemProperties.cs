@@ -438,12 +438,12 @@ public class SystemProperties
 			guiPathType = (IsHighResolution() ? PathType.PATH_BIG : PathType.PATH_SMALL);
 		}
 		SetPicturePaths(guiPathType);
-		PathType lOHALAKNGFB2 = GetLocationPathType();
-		if (lOHALAKNGFB2 == PathType.PATH_DEFAULT)
+		PathType locationPathType = GetLocationPathType();
+		if (locationPathType == PathType.PATH_DEFAULT)
 		{
-			lOHALAKNGFB2 = (IsHighResolution() ? PathType.PATH_BIG : PathType.PATH_SMALL);
+			locationPathType = (IsHighResolution() ? PathType.PATH_BIG : PathType.PATH_SMALL);
 		}
-		SetInverseLocationScale((lOHALAKNGFB2 != PathType.PATH_SMALL) ? 1 : 2);
+		SetInverseLocationScale((locationPathType != PathType.PATH_SMALL) ? 1 : 2);
 		Vector2 baseResolution = smallResolution;
 		ScaleX = (float)GetScreenWidth() / baseResolution.x;
 		ScaleY = (float)GetScreenHeight() / wideResolution.y;
@@ -757,8 +757,8 @@ public class SystemProperties
 					deviceInfo.IsTablet = xmlElement2.ChildNodes[i].Attributes["Tablet"] != null && int.Parse(xmlElement2.ChildNodes[i].Attributes["Tablet"].Value) > 0;
 					string guiResolutionName = ((xmlElement2.Attributes["Resolution"] == null) ? "DEFAULT" : xmlNode.Attributes["Resolution"].Value);
 					deviceInfo.GuiResolution = ParsePathType(guiResolutionName);
-					string gOHIIMFFFJI2 = ((xmlElement2.Attributes["LocationResolution"] == null) ? "DEFAULT" : xmlNode.Attributes["LocationResolution"].Value);
-					deviceInfo.LocationResolution = ParsePathType(gOHIIMFFFJI2);
+					string locationResolutionName = ((xmlElement2.Attributes["LocationResolution"] == null) ? "DEFAULT" : xmlNode.Attributes["LocationResolution"].Value);
+					deviceInfo.LocationResolution = ParsePathType(locationResolutionName);
 					deviceInfo.QualityCondition = ((xmlElement2.Attributes["QualityCondition"] == null) ? string.Empty : xmlNode.Attributes["QualityCondition"].Value);
 				}
 			}

@@ -470,15 +470,15 @@ public class ModelObject
 	public void UpdateCenterOfMass()
 	{
 		Vector3f centerStart = new Vector3f();
-		Vector3f eMAFACPEPDK2 = new Vector3f();
+		Vector3f weightedPosition = new Vector3f();
 		Vector3f centerEnd = new Vector3f(centerOfMassNode.GetStart());
 		List<ModelNode> list = GetMassNodes();
 		centerOfMassNode.GetStart().Reset();
 		foreach (ModelNode item in list)
 		{
-			eMAFACPEPDK2.Set(item.GetStart());
-			eMAFACPEPDK2.Multiply(item.GetWeight());
-			centerStart.Add(eMAFACPEPDK2);
+			weightedPosition.Set(item.GetStart());
+			weightedPosition.Multiply(item.GetWeight());
+			centerStart.Add(weightedPosition);
 		}
 		centerStart.Multiply(1f / _ModelWeight);
 		centerOfMassNode.SetStart(centerStart);
@@ -501,11 +501,11 @@ public class ModelObject
 			return;
 		}
 		Vector3f offset = new Vector3f(Vector3f.op_Subtraction(targetPosition, pivotNode.GetStart()));
-		Vector3f bEHOPOPCJGB2 = new Vector3f(Vector3f.op_Subtraction(targetPosition, pivotNode.GetEnd()));
+		Vector3f endOffset = new Vector3f(Vector3f.op_Subtraction(targetPosition, pivotNode.GetEnd()));
 		foreach (ModelNode item in nodeData.AllNodes)
 		{
 			item.GetStart().Add(offset);
-			item.GetEnd().Add(bEHOPOPCJGB2);
+			item.GetEnd().Add(endOffset);
 		}
 	}
 

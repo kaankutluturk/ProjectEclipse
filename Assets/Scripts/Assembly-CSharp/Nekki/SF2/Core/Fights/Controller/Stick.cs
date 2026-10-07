@@ -370,10 +370,10 @@ namespace Nekki.SF2.Core.Fights.Controller
 			currentDirection = FightCID.QuadrantZero;
 		}
 
-		private void SetKnobPosition(Vector2 DGEJJGMMODA)
+		private void SetKnobPosition(Vector2 knobPosition)
 		{
-			DGEJJGMMODA = Vector2.ClampMagnitude(DGEJJGMMODA, stopRadius);
-			_selectedController.transform.localPosition = DGEJJGMMODA;
+			knobPosition = Vector2.ClampMagnitude(knobPosition, stopRadius);
+			_selectedController.transform.localPosition = knobPosition;
 		}
 
 		private FightCID GetDirectionForPoint(Vector2 point)

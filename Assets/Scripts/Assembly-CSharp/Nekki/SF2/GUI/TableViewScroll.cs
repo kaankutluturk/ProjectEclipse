@@ -80,15 +80,15 @@ namespace Nekki.SF2.GUI
 			set_vertical(!get_horizontal());
 		}
 
-		public void SetNormalizedPosition(float HOLFOPDJLFL)
+		public void SetNormalizedPosition(float normalizedValue)
 		{
 			if (_orientation == TableViewOrientation.Horizontal)
 			{
-				set_horizontalNormalizedPosition(HOLFOPDJLFL);
+				set_horizontalNormalizedPosition(normalizedValue);
 			}
 			else
 			{
-				set_verticalNormalizedPosition(HOLFOPDJLFL);
+				set_verticalNormalizedPosition(normalizedValue);
 			}
 		}
 

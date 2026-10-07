@@ -41,5 +41,5 @@ public interface ITableView
 
 	void ReloadData();
 
-	void SetPosition(float FFMJGKPCBNK, float time);
+	void SetPosition(float targetPosition, float time);
 }

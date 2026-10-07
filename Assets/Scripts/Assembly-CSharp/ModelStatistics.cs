@@ -305,15 +305,15 @@ public class ModelStatistics
 		damage = 0f;
 		animationBuffer.Clear();
 		AnimationData.AddTemplateAnimations(templateName, animationBuffer);
-		float BLJGEOEHIGP2 = 0f;
-		float CKKFKEIELCP2 = 0f;
-		float JOOJIMPEPOJ2 = 0f;
+		float subCount = 0f;
+		float subDamage = 0f;
+		float subHitCount = 0f;
 		for (int i = 0; i < animationBuffer.Count; i++)
 		{
-			GetCountAndDamage(isDealt, animationBuffer[i], ref BLJGEOEHIGP2, ref CKKFKEIELCP2, ref JOOJIMPEPOJ2);
-			count += BLJGEOEHIGP2;
-			damage += CKKFKEIELCP2;
-			hitCount += JOOJIMPEPOJ2;
+			GetCountAndDamage(isDealt, animationBuffer[i], ref subCount, ref subDamage, ref subHitCount);
+			count += subCount;
+			damage += subDamage;
+			hitCount += subHitCount;
 		}
 	}
 

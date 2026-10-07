@@ -142,7 +142,7 @@ public sealed class SocketManager : IHeartbeat, IManager
 		}
 	}
 
-	// C# has no syntax for parameterized property 'DLKPBAJDHBO'.
+	// C# has no syntax for parameterized property 'Item'.
 	public Socket get_DLKPBAJDHBO(string namespaceName)
 	{
 		return get_Item(namespaceName);

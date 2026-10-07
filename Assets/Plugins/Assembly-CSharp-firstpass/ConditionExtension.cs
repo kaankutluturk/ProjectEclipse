@@ -254,9 +254,9 @@ public abstract class ConditionExtension
 		}
 		if (stringBuilder2.Length > 0)
 		{
-			FunctionArgument hLCPKKIIBFB2 = new FunctionArgument();
-			hLCPKKIIBFB2.result = stringBuilder2.ToString();
-			questFunction.arguments.Add(hLCPKKIIBFB2);
+			FunctionArgument argument = new FunctionArgument();
+			argument.result = stringBuilder2.ToString();
+			questFunction.arguments.Add(argument);
 			stringBuilder2.Clear();
 		}
 	}
@@ -340,9 +340,9 @@ public abstract class ConditionExtension
 			}
 			else
 			{
-				CompareResult lNIDLHOIHIM2 = new CompareResult();
-				SetValue(item.result, lNIDLHOIHIM2);
-				item.result = lNIDLHOIHIM2.ToString();
+				CompareResult newResult = new CompareResult();
+				SetValue(item.result, newResult);
+				item.result = newResult.ToString();
 			}
 		}
 		FullFunction(questFunction, compareResult);

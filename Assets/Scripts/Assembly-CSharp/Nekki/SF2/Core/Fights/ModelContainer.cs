@@ -550,8 +550,8 @@ namespace Nekki.SF2.Core.Fights
 		{
 			if (_playerModel != null)
 			{
-				Vector3f mGMMDGFPBLP = new Vector3f(_modelPosition);
-				_playerModel.SetModelPosition(mGMMDGFPBLP);
+				Vector3f resetPosition = new Vector3f(_modelPosition);
+				_playerModel.SetModelPosition(resetPosition);
 			}
 		}
 

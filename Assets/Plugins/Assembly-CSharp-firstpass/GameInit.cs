@@ -27,25 +27,25 @@ public abstract class GameInit
 	public static void AddInitializeDone(InitializeDoneHandler value)
 	{
 		InitializeDoneHandler current = InitializeDone;
-		InitializeDoneHandler kNHFNPECPED2;
+		InitializeDoneHandler previousHandler;
 		do
 		{
-			kNHFNPECPED2 = current;
-			current = Interlocked.CompareExchange(ref InitializeDone, (InitializeDoneHandler)Delegate.Combine(kNHFNPECPED2, value), current);
+			previousHandler = current;
+			current = Interlocked.CompareExchange(ref InitializeDone, (InitializeDoneHandler)Delegate.Combine(previousHandler, value), current);
 		}
-		while ((object)current != kNHFNPECPED2);
+		while ((object)current != previousHandler);
 	}
 
 	public static void RemoveInitializeDone(InitializeDoneHandler value)
 	{
 		InitializeDoneHandler current = InitializeDone;
-		InitializeDoneHandler kNHFNPECPED2;
+		InitializeDoneHandler previousHandler;
 		do
 		{
-			kNHFNPECPED2 = current;
-			current = Interlocked.CompareExchange(ref InitializeDone, (InitializeDoneHandler)Delegate.Remove(kNHFNPECPED2, value), current);
+			previousHandler = current;
+			current = Interlocked.CompareExchange(ref InitializeDone, (InitializeDoneHandler)Delegate.Remove(previousHandler, value), current);
 		}
-		while ((object)current != kNHFNPECPED2);
+		while ((object)current != previousHandler);
 	}
 
 	private static void RaiseInitializeDone()

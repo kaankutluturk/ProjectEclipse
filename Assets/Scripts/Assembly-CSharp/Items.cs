@@ -457,8 +457,8 @@ public class Items
 				break;
 			}
 		}
-		XmlNode hKPPBKPJOEO3 = xmlDocument["List"]["ItemSets"];
-		GetItemSets().Parse(hKPPBKPJOEO3);
+		XmlNode itemSetsNode = xmlDocument["List"]["ItemSets"];
+		GetItemSets().Parse(itemSetsNode);
 	}
 
 	public void ClearNewItemFlags()

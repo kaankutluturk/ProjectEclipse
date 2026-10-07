@@ -165,9 +165,9 @@ namespace Nekki.SF2.Core.Fights.Renders.Model
 			if (_Base != null && !Vector2f.op_Equality(_Base.GetStart(), null) && !Vector2f.op_Equality(_Base.GetEnd(), null) && !(_LineRender == null))
 			{
 				Vector3f startPosition = _Base.GetStart();
-				Vector3f eMAFACPEPDK2 = _Base.GetEnd();
+				Vector3f edgeEnd = _Base.GetEnd();
 				Vector3 rawStart = new Vector3(startPosition.GetX(), startPosition.GetY(), startPosition.GetZ());
-				Vector3 rawEnd = new Vector3(eMAFACPEPDK2.GetX(), eMAFACPEPDK2.GetY(), eMAFACPEPDK2.GetZ());
+				Vector3 rawEnd = new Vector3(edgeEnd.GetX(), edgeEnd.GetY(), edgeEnd.GetZ());
 				Vector3 start;
 				Vector3 end;
 				_Interpolation.Sample(rawStart, rawEnd, Eclipse.Rendering.ModelPresentation.AlphaFor(_Presentation), out start, out end);

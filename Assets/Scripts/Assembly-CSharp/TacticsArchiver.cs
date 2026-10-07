@@ -199,7 +199,7 @@ public class TacticsArchiver
 	private static void AddTable(string weaponName, ref byte[] archiveBytes)
 	{
 		string dodgeTablePath = SF2Paths.GetGameDataPath() + "/tactics/dodge/" + weaponName + ".tbs";
-		string dCOPLCIFCFL2 = SF2Paths.GetGameDataPath() + "/tactics/shiftTables/" + weaponName + ".sts";
+		string resourcePath = SF2Paths.GetGameDataPath() + "/tactics/shiftTables/" + weaponName + ".sts";
 		byte[] array = ResourceManager.GetBinary(dodgeTablePath);
 		if (array != null && array.Length > 0)
 		{
@@ -207,7 +207,7 @@ public class TacticsArchiver
 			archiveBytes = Concat(archiveBytes, Encoding.ASCII.GetBytes(weaponName));
 			archiveBytes = Concat(archiveBytes, array);
 		}
-		byte[] array2 = ResourceManager.GetBinary(dCOPLCIFCFL2);
+		byte[] array2 = ResourceManager.GetBinary(resourcePath);
 		if (array2 != null && array2.Length > 0)
 		{
 			archiveBytes = Concat(archiveBytes, BitConverter.GetBytes(7u));
@@ -220,7 +220,7 @@ public class TacticsArchiver
 	{
 		string text = firstWeapon + "_" + secondWeapon + ".tbs";
 		string tablePath = SF2Paths.GetGameDataPath() + "/tactics/movements/" + text;
-		string dCOPLCIFCFL2 = SF2Paths.GetGameDataPath() + "/tactics/outcometablesforattack/" + text;
+		string resourcePath = SF2Paths.GetGameDataPath() + "/tactics/outcometablesforattack/" + text;
 		byte[] array = ResourceManager.GetBinary(tablePath);
 		if (array != null && array.Length > 0)
 		{
@@ -229,7 +229,7 @@ public class TacticsArchiver
 			archiveBytes = Concat(archiveBytes, Encoding.ASCII.GetBytes(secondWeapon));
 			archiveBytes = Concat(archiveBytes, array);
 		}
-		byte[] array2 = ResourceManager.GetBinary(dCOPLCIFCFL2);
+		byte[] array2 = ResourceManager.GetBinary(resourcePath);
 		if (array2 != null && array2.Length > 0)
 		{
 			archiveBytes = Concat(archiveBytes, BitConverter.GetBytes(0u));

@@ -374,14 +374,14 @@ public class ModelAi
 			if (_ModelAnimation.GetIsPlaying() && enemyModelAnimation.GetIsPlaying())
 			{
 				InfoAnimation animation = _ModelAnimation.GetCurrentInfo();
-				InfoAnimation pJAHIOELGGD2 = enemyModelAnimation.GetCurrentInfo();
-				if (animation != null && pJAHIOELGGD2 != null)
+				InfoAnimation enemyCurrentInfo = enemyModelAnimation.GetCurrentInfo();
+				if (animation != null && enemyCurrentInfo != null)
 				{
 					int num6 = animation.GetMoveLengthStrict();
 					switch (waitMode)
 					{
 					case WaitMode.SetWaitRandAttack:
-						decisionWait = pJAHIOELGGD2.GetLastAttackFrame(true) - enemyFrame + 1;
+						decisionWait = enemyCurrentInfo.GetLastAttackFrame(true) - enemyFrame + 1;
 						decisionWait = Mathf.Min(decisionWait, animation.GetMoveLengthExtended());
 						if (num6 > decisionWait)
 						{
@@ -390,7 +390,7 @@ public class ModelAi
 						decisionWait--;
 						break;
 					case WaitMode.SetWaitRandUnint:
-						decisionWait = pJAHIOELGGD2.GetLastUninterruptFrame(true) - enemyFrame + 1;
+						decisionWait = enemyCurrentInfo.GetLastUninterruptFrame(true) - enemyFrame + 1;
 						decisionWait = Mathf.Min(decisionWait, animation.GetMoveLengthExtended());
 						if (num6 > decisionWait)
 						{
@@ -420,15 +420,15 @@ public class ModelAi
 			decisionWait--;
 			return null;
 		}
-		InfoAnimation pJAHIOELGGD3 = enemyModelAnimation.GetCurrentInfo();
-		if (pJAHIOELGGD3 != null)
+		InfoAnimation enemyActiveInfo = enemyModelAnimation.GetCurrentInfo();
+		if (enemyActiveInfo != null)
 		{
 			bool flag = false;
 			List<TemplateAnimation> list = AiData.get_RandomizingEnemyAnimation();
 			foreach (TemplateAnimation item in list)
 			{
 				List<InfoAnimation> list2 = item.GetAnimations();
-				if (list2.Contains(pJAHIOELGGD3))
+				if (list2.Contains(enemyActiveInfo))
 				{
 					flag = true;
 					break;
@@ -586,14 +586,14 @@ public class ModelAi
 		InfoAnimation animation = enemyModelAnimation.GetCurrentInfo();
 		if (enemyModelAnimation.GetIsPlaying() && animation != null)
 		{
-			InfoAnimation pJAHIOELGGD2 = animation.GetTacticEquivalent();
-			if (pJAHIOELGGD2 == null)
+			InfoAnimation tacticEquivalent = animation.GetTacticEquivalent();
+			if (tacticEquivalent == null)
 			{
 				enemyAnimation = animation;
 			}
 			else
 			{
-				enemyAnimation = pJAHIOELGGD2;
+				enemyAnimation = tacticEquivalent;
 			}
 			InfoAnimation enemyMove = enemyAnimation;
 			RandomizeBehavior(enemy);
@@ -1094,12 +1094,12 @@ public class ModelAi
 	private float GetCurrentDirectionToEnemy(ModelAnimation modelAnimation)
 	{
 		ModelNode node = modelAnimation.GetPlayingNode();
-		ModelNode lCDGOCIAIDK2 = _ModelAnimation.GetPlayingNode();
-		if (node == null || lCDGOCIAIDK2 == null)
+		ModelNode enemyNode = _ModelAnimation.GetPlayingNode();
+		if (node == null || enemyNode == null)
 		{
 			return 0f;
 		}
-		float num = node.GetStart().GetX() - lCDGOCIAIDK2.GetStart().GetX();
+		float num = node.GetStart().GetX() - enemyNode.GetStart().GetX();
 		if (num >= 0f)
 		{
 			return 1f;
@@ -1290,14 +1290,14 @@ public class ModelAi
 			{
 				break;
 			}
-			ChanceRoll bHDKGLJIOJD2 = evadeRolls[j];
-			if (!bHDKGLJIOJD2.Flag)
+			ChanceRoll chanceRoll = evadeRolls[j];
+			if (!chanceRoll.Flag)
 			{
 				continue;
 			}
-			global::Pair<string, TacticValue> cCKLNOPEKHO2 = list5[j];
+			global::Pair<string, TacticValue> tacticPair = list5[j];
 			List<InfoAnimation> list6 = new List<InfoAnimation>();
-			AnimationData.AddTemplateAnimations(cCKLNOPEKHO2.First, list6);
+			AnimationData.AddTemplateAnimations(tacticPair.First, list6);
 			ModelAi enemyAi = enemy.GetAi();
 			if (enemyAi == null)
 			{
@@ -1352,8 +1352,8 @@ public class ModelAi
 					List<InfoAnimation> list8 = item5.GetAnimations();
 					foreach (InfoAnimation item6 in list8)
 					{
-						int jOHDCPNACOC2 = item6.GetMoveLengthStrict();
-						decisions.Add(new Decision(item6, jOHDCPNACOC2));
+						int moveLength = item6.GetMoveLengthStrict();
+						decisions.Add(new Decision(item6, moveLength));
 					}
 				}
 				num13 = decisions.Count;
@@ -1371,8 +1371,8 @@ public class ModelAi
 					List<InfoAnimation> list10 = item7.GetAnimations();
 					foreach (InfoAnimation item8 in list10)
 					{
-						int jOHDCPNACOC3 = item8.GetMoveLengthStrict();
-						decisions.Add(new Decision(item8, jOHDCPNACOC3));
+						int secondMoveLength = item8.GetMoveLengthStrict();
+						decisions.Add(new Decision(item8, secondMoveLength));
 					}
 				}
 				num13 = decisions.Count;
@@ -1630,8 +1630,8 @@ public class ModelAi
 				float num11 = botMove.ShiftTable.GetDistance(enemyFrameIndex, tableLabel);
 				float num12 = botMove.ShiftTable.GetDistance(num7, tableLabel);
 				float num13 = num12 - num11;
-				float oIOMNNFMDOO2 = (float)num * (num10 + num13 * (float)num8 - enemyStartPosition) + errorOffset;
-				num9 += GetRow(groupTables, tableLabel, num7, oIOMNNFMDOO2, decisions);
+				float shiftedDistance = (float)num * (num10 + num13 * (float)num8 - enemyStartPosition) + errorOffset;
+				num9 += GetRow(groupTables, tableLabel, num7, shiftedDistance, decisions);
 			}
 			if (num7 == enemyFrameIndex || num9 == 0)
 			{
@@ -1809,18 +1809,18 @@ public class ModelAi
 						break;
 					}
 					ModelAnimation enemyModelAnimation = enemy.GetAnimationModule();
-					InfoAnimation pJAHIOELGGD2 = botAnimation;
-					if (_ModelAnimation.GetIsPlaying() && pJAHIOELGGD2 != null)
+					InfoAnimation botAnimationInfo = botAnimation;
+					if (_ModelAnimation.GetIsPlaying() && botAnimationInfo != null)
 					{
-						InfoAnimation pJAHIOELGGD3 = pJAHIOELGGD2.GetTacticEquivalent();
-						if (pJAHIOELGGD3 != null)
+						InfoAnimation botTacticEquivalent = botAnimationInfo.GetTacticEquivalent();
+						if (botTacticEquivalent != null)
 						{
-							pJAHIOELGGD2 = pJAHIOELGGD3;
+							botAnimationInfo = botTacticEquivalent;
 						}
 						bool flag = false;
 						foreach (string item in list2)
 						{
-							if (pJAHIOELGGD2.HasName(item))
+							if (botAnimationInfo.HasName(item))
 							{
 								flag = true;
 								break;
@@ -1828,7 +1828,7 @@ public class ModelAi
 						}
 						if (flag)
 						{
-							string tableLabel = pJAHIOELGGD2.GetPivotPartName();
+							string tableLabel = botAnimationInfo.GetPivotPartName();
 							TacticalTable table = groupTables.GetTacticalTableByLabel(tableLabel);
 							if (table != null)
 							{
@@ -1850,7 +1850,7 @@ public class ModelAi
 									bool flag2 = false;
 									foreach (IntervalNew item2 in frameIntervals.Items)
 									{
-										if (item2.Animation == pJAHIOELGGD2)
+										if (item2.Animation == botAnimationInfo)
 										{
 											int num11 = item2.GetInterframeByDistance(distance);
 											if (0 < num11)
@@ -1898,12 +1898,12 @@ public class ModelAi
 					int num14 = 0;
 					for (int i = 0; i < count; i++)
 					{
-						InfoAnimation pJAHIOELGGD4 = candidateAnimations[i];
-						if (TestWall(pJAHIOELGGD4, _Model, enemy))
+						InfoAnimation candidateAnimation = candidateAnimations[i];
+						if (TestWall(candidateAnimation, _Model, enemy))
 						{
 							if (num14 < i)
 							{
-								candidateAnimations[num14] = pJAHIOELGGD4;
+								candidateAnimations[num14] = candidateAnimation;
 							}
 							num14++;
 						}
@@ -1933,12 +1933,12 @@ public class ModelAi
 						if (-1 < num17)
 						{
 							float num20 = GetNodeX(nodeName, _Model, enemy.GetRootModel());
-							float oIOMNNFMDOO2 = (float)num16 * (num20 - num15) + distanceError;
-							Intervals gOOGNIPMCEM2 = null;
-							gOOGNIPMCEM2 = ((num17 >= item3.IntervalList.Count) ? item3.IntervalList[0] : item3.IntervalList[num17]);
-							foreach (IntervalNew item4 in gOOGNIPMCEM2.Items)
+							float distanceToTarget = (float)num16 * (num20 - num15) + distanceError;
+							Intervals intervalGroup = null;
+							intervalGroup = ((num17 >= item3.IntervalList.Count) ? item3.IntervalList[0] : item3.IntervalList[num17]);
+							foreach (IntervalNew item4 in intervalGroup.Items)
 							{
-								int num21 = item4.GetInterframeByDistance(oIOMNNFMDOO2);
+								int num21 = item4.GetInterframeByDistance(distanceToTarget);
 								if (0 >= num21)
 								{
 									continue;
@@ -1961,17 +1961,17 @@ public class ModelAi
 					}
 					candidateAnimations.Resize(count);
 					IntervalAnimation interval = enemyModelAnimation.FindInterval(IntervalAnimation.IntervalType.INTERVAL_UNINTERRUPT);
-					InfoAnimation pJAHIOELGGD5 = animation;
+					InfoAnimation ownAnimation = animation;
 					bool flag3 = enemyModelAnimation.GetIsPlaying();
-					if (interval != null && pJAHIOELGGD5 != null && flag3)
+					if (interval != null && ownAnimation != null && flag3)
 					{
-						int num22 = pJAHIOELGGD5.GetLastUninterruptFrame(true);
+						int num22 = ownAnimation.GetLastUninterruptFrame(true);
 						int num23 = num22 - enemyFrame;
 						for (int k = 0; k < count; k++)
 						{
-							InfoAnimation pJAHIOELGGD6 = candidateAnimations[k];
-							int num24 = pJAHIOELGGD6.GetLastUninterruptFrame(true);
-							if (num23 <= num24 && !IsSafeDodges(pJAHIOELGGD6))
+							InfoAnimation remainingCandidate = candidateAnimations[k];
+							int num24 = remainingCandidate.GetLastUninterruptFrame(true);
+							if (num23 <= num24 && !IsSafeDodges(remainingCandidate))
 							{
 								count--;
 								candidateAnimations[k] = candidateAnimations[count];
@@ -2006,8 +2006,8 @@ public class ModelAi
 					for (int l = 0; l < num25; l++)
 					{
 						int num26 = animation.GetLastAttackFrame(true);
-						int jOHDCPNACOC2 = num26 - enemyFrame + 1;
-						decisions.Add(new Decision(candidateAnimations[l], jOHDCPNACOC2));
+						int moveLength = num26 - enemyFrame + 1;
+						decisions.Add(new Decision(candidateAnimations[l], moveLength));
 					}
 				}
 				return decisions.Count;
@@ -2285,13 +2285,13 @@ public class ModelAi
 	private float GetDistanceToEnemy(Model model)
 	{
 		int direction = GetModelDirection(model, model.GetCombatTarget().GetRootModel());
-		int aOJJBKLCHJO2 = GetModelDirection(model.GetCombatTarget().GetRootModel(), model);
+		int enemyDirection = GetModelDirection(model.GetCombatTarget().GetRootModel(), model);
 		ModelNode node = model.GetAnimationModule().GetNodeByNameForSign(AiData.get_DistanceNode(), direction);
-		ModelNode lCDGOCIAIDK2 = model.GetCombatTarget().GetRootModel().GetAnimationModule()
-			.GetNodeByNameForSign(AiData.get_DistanceNode(), aOJJBKLCHJO2);
-		if (node != null && lCDGOCIAIDK2 != null)
+		ModelNode enemyNode = model.GetCombatTarget().GetRootModel().GetAnimationModule()
+			.GetNodeByNameForSign(AiData.get_DistanceNode(), enemyDirection);
+		if (node != null && enemyNode != null)
 		{
-			float f = node.GetStart().GetX() - lCDGOCIAIDK2.GetStart().GetX();
+			float f = node.GetStart().GetX() - enemyNode.GetStart().GetX();
 			return Mathf.Abs(f);
 		}
 		return 0f;

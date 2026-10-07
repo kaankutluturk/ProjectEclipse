@@ -258,17 +258,17 @@ namespace Nekki.SF2.GUI.Shop
 			}
 			if (_itemParam != null)
 			{
-				bool jOJGKNGGAHB2 = true;
+				bool isParametersEnabled = true;
 				bool isPanelOpen = false;
 				float buttonOffsetY = -40f;
-				_itemParam.Init(_parametersPanelContent, jOJGKNGGAHB2, buttonOffsetY, isPanelOpen, _rightFlagImage, _leftFlagImage);
+				_itemParam.Init(_parametersPanelContent, isParametersEnabled, buttonOffsetY, isPanelOpen, _rightFlagImage, _leftFlagImage);
 			}
 			if (_itemProperties != null)
 			{
-				bool jOJGKNGGAHB3 = true;
-				bool nKGDKKNNJOF2 = false;
-				float mDPGKEDBHNO2 = 40f;
-				_itemProperties.Init(_propertiesPanelContent, jOJGKNGGAHB3, mDPGKEDBHNO2, nKGDKKNNJOF2, _rightFlagPropertiesNoneImage, _leftFlagPropertiesNoneImage);
+				bool isPropertiesEnabled = true;
+				bool isPropertiesPanelOpen = false;
+				float propertiesButtonOffsetY = 40f;
+				_itemProperties.Init(_propertiesPanelContent, isPropertiesEnabled, propertiesButtonOffsetY, isPropertiesPanelOpen, _rightFlagPropertiesNoneImage, _leftFlagPropertiesNoneImage);
 			}
 			if (_buttonPanel != null)
 			{
@@ -720,9 +720,9 @@ namespace Nekki.SF2.GUI.Shop
 			items.Sort((ItemInfo itemA, ItemInfo itemB) =>
 			{
 				UserItem userItemA = ListSF.GetRoster().GetInventory().FindItem(itemA);
-				UserItem dKCHDHMLKHN2 = ListSF.GetRoster().GetInventory().FindItem(itemB);
+				UserItem ownedItem = ListSF.GetRoster().GetInventory().FindItem(itemB);
 				int num = ((userItemA == null) ? itemA.UpgradeLevel : userItemA.GetUpgradeLevel());
-				int num2 = ((dKCHDHMLKHN2 == null) ? itemB.UpgradeLevel : dKCHDHMLKHN2.GetUpgradeLevel());
+				int num2 = ((ownedItem == null) ? itemB.UpgradeLevel : ownedItem.GetUpgradeLevel());
 				int num3 = items.IndexOf(itemA);
 				int value = items.IndexOf(itemB);
 				return (num == num2) ? num3.CompareTo(value) : num.CompareTo(num2);

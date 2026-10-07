@@ -32,11 +32,11 @@ public class QuestActionOpenUrl : QuestAction
 		}
 		if (flag && altUrlExpression != string.Empty)
 		{
-			ConditionExtension.CompareResult lNIDLHOIHIM2 = new ConditionExtension.CompareResult();
-			QuestCondition kKDGLNECFHA2 = new QuestCondition();
-			kKDGLNECFHA2.SetParameters(parameters);
-			kKDGLNECFHA2.SetValue(altUrlExpression, lNIDLHOIHIM2);
-			string text2 = lNIDLHOIHIM2.ToString();
+			ConditionExtension.CompareResult altUrlResult = new ConditionExtension.CompareResult();
+			QuestCondition altUrlCondition = new QuestCondition();
+			altUrlCondition.SetParameters(parameters);
+			altUrlCondition.SetValue(altUrlExpression, altUrlResult);
+			string text2 = altUrlResult.ToString();
 			if (text2 != string.Empty)
 			{
 				OfflineServices.OpenExternalUrl(text2);

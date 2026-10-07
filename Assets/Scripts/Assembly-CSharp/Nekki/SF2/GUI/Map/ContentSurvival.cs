@@ -51,11 +51,11 @@ namespace Nekki.SF2.GUI.Map
 			}
 			int level = ListSF.GetRoster().GetLevel();
 			RewardPrize minPrize = list2[1].GetPrizeForLevel(level);
-			RewardPrize cMHHEHILIIH2 = list2[list2.Count - 1].GetPrizeForLevel(level);
+			RewardPrize prize = list2[list2.Count - 1].GetPrizeForLevel(level);
 			num = (ObscuredLong)(minPrize.bonus);
-			num2 = (ObscuredLong)(cMHHEHILIIH2.bonus);
+			num2 = (ObscuredLong)(prize.bonus);
 			num3 = (ObscuredLong)(minPrize.money);
-			num4 = (ObscuredLong)(cMHHEHILIIH2.money);
+			num4 = (ObscuredLong)(prize.money);
 			num3 = GameUtils.GetDenominatedValue(num3);
 			num4 = GameUtils.GetDenominatedValue(num4);
 			int fontSize = 68;
@@ -64,7 +64,7 @@ namespace Nekki.SF2.GUI.Map
 				fontSize = 50;
 			}
 			_survivalPrizeMin.Init(num3, num, minPrize, 0f, 100f, fontSize);
-			_survivalPrizeMax.Init(num4, num2, cMHHEHILIIH2, 0f, 100f, fontSize);
+			_survivalPrizeMax.Init(num4, num2, prize, 0f, 100f, fontSize);
 			if (battle.get_Type() == BattleType.FightBossesIntermission)
 			{
 				_lblDescription.SetAlias(battle.GetDescription());

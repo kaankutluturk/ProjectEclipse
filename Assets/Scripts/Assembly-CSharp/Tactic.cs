@@ -135,9 +135,9 @@ public class Tactic
 		{
 			if (childNode2.Name == "Animation")
 			{
-				string gBCLEDJAOBM2 = childNode2.Attributes["Name"].GetStringOrDefault(string.Empty);
-				TacticValue pOFHDGJAFMP2 = new TacticValue(childNode2);
-				_expectedWaits.Add(new global::Pair<string, TacticValue>(gBCLEDJAOBM2, pOFHDGJAFMP2));
+				string animationName = childNode2.Attributes["Name"].GetStringOrDefault(string.Empty);
+				TacticValue tacticValue = new TacticValue(childNode2);
+				_expectedWaits.Add(new global::Pair<string, TacticValue>(animationName, tacticValue));
 			}
 		}
 	}
@@ -276,14 +276,14 @@ public class Tactic
 				int num4 = 0;
 				for (int j = 0; j < candidateAnimations.Count; j++)
 				{
-					InfoAnimation pJAHIOELGGD2 = candidateAnimations[j];
-					if (pJAHIOELGGD2 == null && fallbackAnimation != null)
+					InfoAnimation selectedAnimation = candidateAnimations[j];
+					if (selectedAnimation == null && fallbackAnimation != null)
 					{
-						pJAHIOELGGD2 = fallbackAnimation;
+						selectedAnimation = fallbackAnimation;
 					}
-					if (pJAHIOELGGD2 != null)
+					if (selectedAnimation != null)
 					{
-						float num5 = GetWeight(pJAHIOELGGD2, factors);
+						float num5 = GetWeight(selectedAnimation, factors);
 						float num6 = num3 - num5;
 						if (num6 < 0f)
 						{
