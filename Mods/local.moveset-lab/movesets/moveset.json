@@ -6,7 +6,35 @@
     {
       "id": "KatanaDoubleSlash_Katana",
       "subtype": "Katana",
-      "move": "KatanaDoubleSlash"
+      "move": "KatanaDoubleSlash",
+      "animation": {
+        "expected": "katana_double_slash.bytes",
+        "value": "axe_double_slash.bytes"
+      },
+      "attacks": [
+        {
+          "id": 64,
+          "start": {
+            "expected": 16,
+            "value": 20
+          },
+          "end": {
+            "expected": 18,
+            "value": 23
+          }
+        },
+        {
+          "id": 63,
+          "start": {
+            "expected": 10,
+            "value": 8
+          },
+          "end": {
+            "expected": 10,
+            "value": 9
+          }
+        }
+      ]
     }
   ]
 }
